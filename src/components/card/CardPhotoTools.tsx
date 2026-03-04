@@ -28,6 +28,9 @@ export default function CardPhotoTools({
   const [generatingBackdrop, setGeneratingBackdrop] = useState(false);
   const [customPrompt, setCustomPrompt] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const coverFileInputRef = useRef<HTMLInputElement>(null);
+  const coverCameraInputRef = useRef<HTMLInputElement>(null);
 
   const uploadFile = async (file: File, path: string): Promise<string> => {
     const { error } = await supabase.storage
@@ -56,7 +59,6 @@ export default function CardPhotoTools({
       const path = `${user.id}/avatar.${ext}`;
       const url = await uploadFile(file, path);
 
-      // Update profile avatar_url
       await supabase
         .from("profiles")
         .update({ avatar_url: url })
@@ -69,6 +71,30 @@ export default function CardPhotoTools({
       toast.error(err.message || "Failed to upload photo");
     } finally {
       setUploading(false);
+      // Reset inputs so the same file can be re-selected
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      if (cameraInputRef.current) cameraInputRef.current.value = "";
+    }
+  };
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${user.id}/cover.${ext}`;
+      const url = await uploadFile(file, path);
+      onCoverChange(url);
+      toast.success("Cover photo uploaded!");
+    } catch (err: any) {
+      console.error("Cover upload error:", err);
+      toast.error(err.message || "Failed to upload cover");
+    } finally {
+      setUploading(false);
+      if (coverFileInputRef.current) coverFileInputRef.current.value = "";
+      if (coverCameraInputRef.current) coverCameraInputRef.current.value = "";
     }
   };
 
@@ -151,7 +177,7 @@ export default function CardPhotoTools({
         <h2 className="font-semibold">Photo & Backdrop</h2>
       </div>
 
-      {/* Upload Photo */}
+      {/* Upload / Take Profile Photo */}
       <div className="space-y-2">
         <Label className="text-xs text-muted-foreground">Profile Photo</Label>
         <input
@@ -161,20 +187,38 @@ export default function CardPhotoTools({
           className="hidden"
           onChange={handlePhotoUpload}
         />
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={uploading}
-        >
-          {uploading ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Camera className="h-4 w-4 mr-2" />
-          )}
-          {uploading ? "Uploading…" : avatarUrl ? "Change Photo" : "Upload Photo"}
-        </Button>
+        <input
+          ref={cameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="user"
+          className="hidden"
+          onChange={handlePhotoUpload}
+        />
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            {uploading ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <ImagePlus className="h-4 w-4 mr-2" />
+            )}
+            {avatarUrl ? "Change" : "Upload"}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => cameraInputRef.current?.click()}
+            disabled={uploading}
+          >
+            <Camera className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Remove Background */}
@@ -197,6 +241,46 @@ export default function CardPhotoTools({
           </Button>
         </div>
       )}
+
+      {/* Cover Photo Upload */}
+      <div className="space-y-2 pt-2 border-t border-border/50">
+        <Label className="text-xs text-muted-foreground">Cover Photo</Label>
+        <input
+          ref={coverFileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleCoverUpload}
+        />
+        <input
+          ref={coverCameraInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handleCoverUpload}
+        />
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex-1"
+            onClick={() => coverFileInputRef.current?.click()}
+            disabled={uploading}
+          >
+            <ImagePlus className="h-4 w-4 mr-2" />
+            {coverUrl ? "Change Cover" : "Upload Cover"}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => coverCameraInputRef.current?.click()}
+            disabled={uploading}
+          >
+            <Camera className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
 
       {/* AI Backdrop Generator */}
       <div className="space-y-2 pt-2 border-t border-border/50">
