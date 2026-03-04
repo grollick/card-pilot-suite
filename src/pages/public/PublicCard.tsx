@@ -60,20 +60,28 @@ export default function PublicCard() {
 
   const profile = data?.profile;
 
-  // Track card view once with visitor metadata (must be before early returns)
+  // Track card view once — fire-and-forget, non-blocking
   useEffect(() => {
     if (!handle || !profile?.id || viewTracked.current) return;
     viewTracked.current = true;
-    const meta = getVisitorMeta();
-    supabase
-      .from("analytics_events")
-      .insert({
-        user_id: profile.id,
-        handle,
-        event_type: "card_view" as const,
-        meta_json: meta,
-      })
-      .then();
+    // Use requestIdleCallback to defer analytics after paint
+    const track = () => {
+      const meta = getVisitorMeta();
+      supabase
+        .from("analytics_events")
+        .insert({
+          user_id: profile.id,
+          handle,
+          event_type: "card_view" as const,
+          meta_json: meta,
+        })
+        .then();
+    };
+    if ("requestIdleCallback" in window) {
+      (window as any).requestIdleCallback(track);
+    } else {
+      setTimeout(track, 100);
+    }
   }, [handle, profile?.id]);
 
   if (isLoading) {
