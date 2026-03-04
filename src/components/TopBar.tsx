@@ -48,7 +48,7 @@ export default function TopBar() {
           <DropdownMenuItem onClick={() => navigate("/app/contacts?new=1")}>
             <UserPlus className="h-4 w-4 mr-2" /> New Contact
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate("/app/booking?new=1")}>
+          <DropdownMenuItem onClick={() => navigate("/app/bookings?new=1")}>
             <Calendar className="h-4 w-4 mr-2" /> New Booking
           </DropdownMenuItem>
           <DropdownMenuSeparator />

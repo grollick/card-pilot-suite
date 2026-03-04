@@ -112,7 +112,7 @@ export default function ContactDetail() {
               <DropdownMenuItem onClick={() => navigate("/app/email?new=1")}>
                 <Mail className="h-4 w-4 mr-2" /> Email
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate("/app/booking?new=1")}>
+              <DropdownMenuItem onClick={() => navigate("/app/bookings?new=1")}>
                 <Calendar className="h-4 w-4 mr-2" /> Booking
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -142,7 +142,7 @@ export default function ContactDetail() {
               { icon: Phone, label: "Call", action: () => handleLogQuickAction("call", "Call logged") },
               { icon: MessageSquare, label: "Text", action: () => handleLogQuickAction("cta_click", "Text sent") },
               { icon: Mail, label: "Email", action: () => navigate("/app/email?new=1") },
-              { icon: Calendar, label: "Book", action: () => navigate("/app/booking?new=1") },
+              { icon: Calendar, label: "Book", action: () => navigate("/app/bookings?new=1") },
             ].map(a => (
               <Button key={a.label} variant="outline" className="flex-col h-16 gap-1 text-xs" onClick={a.action}>
                 <a.icon className="h-5 w-5" />

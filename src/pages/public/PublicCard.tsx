@@ -285,7 +285,7 @@ export default function PublicCard() {
 
             {/* Booking */}
             {enabledSections.has("booking") && (
-              <Link to={`/${handle}/book`}>
+              <Link to={`/book/${handle}`}>
                 <Button className="w-full shadow-glow" size="lg">
                   <Calendar className="h-4 w-4 mr-1.5" /> Book an Appointment
                 </Button>

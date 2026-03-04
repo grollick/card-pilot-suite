@@ -59,8 +59,7 @@ export default function QRCampaignsPage() {
   };
 
   const getQRUrl = (code: string) => {
-    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
-    return `https://${projectId}.supabase.co/functions/v1/qr-redirect?code=${code}`;
+    return `${window.location.origin}/q/${code}`;
   };
 
   const handleCopy = async (code: string) => {

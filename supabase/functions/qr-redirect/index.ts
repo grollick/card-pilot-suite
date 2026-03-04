@@ -2,7 +2,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 Deno.serve(async (req) => {
@@ -49,7 +50,7 @@ Deno.serve(async (req) => {
     return new Response("User has no public card", { status: 404, headers: corsHeaders });
   }
 
-  // Parse device info from user agent
+  // Parse device info
   const userAgent = req.headers.get("user-agent") || "";
   let device = "Desktop";
   if (/mobile|android|iphone/i.test(userAgent)) device = "Mobile";
@@ -72,7 +73,7 @@ Deno.serve(async (req) => {
     },
   });
 
-  // Also log an analytics_event for the existing analytics system
+  // Log analytics event
   await supabase.from("analytics_events").insert({
     user_id: campaign.user_id,
     handle,
@@ -82,18 +83,10 @@ Deno.serve(async (req) => {
       campaign_code: code,
       device,
       referrer: referrer || null,
-      user_agent: userAgent.slice(0, 300),
     },
   });
 
-  // Determine card URL - use the app's public URL
-  const appUrl = Deno.env.get("SUPABASE_URL")!.replace(".supabase.co", "");
-  // Redirect to the user's public card with utm params
-  const cardUrl = `https://${handle}.cardpilot.app/?utm_source=qr&utm_campaign=${encodeURIComponent(code)}`;
-  
-  // For now, redirect to the handle route on the same domain
-  // The frontend will handle /:handle routing
-  const origin = req.headers.get("origin") || url.origin;
+  // Redirect to public card with UTM params
   const redirectUrl = `/${handle}?utm_source=qr&utm_campaign=${encodeURIComponent(code)}`;
 
   return new Response(null, {

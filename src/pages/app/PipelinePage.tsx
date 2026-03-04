@@ -189,7 +189,7 @@ export default function PipelinePage() {
                                 <DropdownMenuItem onClick={() => navigate(`/app/contacts/${contact.id}`)}>
                                   <Mail className="h-3.5 w-3.5 mr-2" /> Email
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => navigate(`/app/booking?new=1`)}>
+                                <DropdownMenuItem onClick={() => navigate(`/app/bookings?new=1`)}>
                                   <Calendar className="h-3.5 w-3.5 mr-2" /> Book
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
