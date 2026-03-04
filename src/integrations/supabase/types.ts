@@ -889,6 +889,110 @@ export type Database = {
           },
         ]
       }
+      qr_campaigns: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          org_id: string | null
+          placement: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          org_id?: string | null
+          placement?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          org_id?: string | null
+          placement?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qr_campaigns_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      qr_scans: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          device: string | null
+          handle: string
+          id: string
+          ip_hash: string | null
+          lead_id: string | null
+          meta_json: Json | null
+          referrer: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          device?: string | null
+          handle: string
+          id?: string
+          ip_hash?: string | null
+          lead_id?: string | null
+          meta_json?: Json | null
+          referrer?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          device?: string | null
+          handle?: string
+          id?: string
+          ip_hash?: string | null
+          lead_id?: string | null
+          meta_json?: Json | null
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "qr_scans_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "qr_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "qr_scans_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       social_accounts: {
         Row: {
           account_name: string | null

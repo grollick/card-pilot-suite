@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, Users, Kanban, Calendar, Mail, Share2,
   BarChart3, Settings, Shield, ChevronLeft, LogOut,
-  FileText, Zap, Megaphone, CreditCard, Building2
+  FileText, Zap, Megaphone, CreditCard, Building2, QrCode
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,6 +29,7 @@ const marketingItems = [
 
 const insightItems = [
   { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
+  { title: "QR Campaigns", url: "/app/qr-campaigns", icon: QrCode },
   { title: "Automation", url: "/app/automation", icon: Zap },
 ];
 

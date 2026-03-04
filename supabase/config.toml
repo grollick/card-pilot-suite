@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.check-idle-leads]
 verify_jwt = false
+
+[functions.qr-redirect]
+verify_jwt = false

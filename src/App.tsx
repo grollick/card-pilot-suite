@@ -27,6 +27,7 @@ import SocialScheduler from "./pages/app/SocialScheduler";
 import ContentPage from "./pages/app/ContentPage";
 import Analytics from "./pages/app/Analytics";
 import AutomationPage from "./pages/app/AutomationPage";
+import QRCampaignsPage from "./pages/app/QRCampaignsPage";
 import SettingsPage from "./pages/app/SettingsPage";
 import AdminPage from "./pages/app/AdminPage";
 import TeamPage from "./pages/app/TeamPage";
@@ -66,6 +67,7 @@ const App = () => (
               <Route path="content" element={<ContentPage />} />
               <Route path="analytics" element={<Analytics />} />
               <Route path="automation" element={<AutomationPage />} />
+              <Route path="qr-campaigns" element={<QRCampaignsPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="team" element={<TeamPage />} />
               <Route path="admin" element={<AdminPage />} />
