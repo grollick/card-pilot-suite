@@ -24,14 +24,14 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image",
+        model: "google/gemini-3-pro-image-preview",
         messages: [
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "Remove the background from this image completely. Make the background fully transparent/white. Keep only the person/subject in the foreground with clean edges. Output the result as a clean cutout.",
+                text: "Remove the background from this image completely. Make the background fully transparent or white. Keep only the person/subject in the foreground with clean, precise edges. Return the result as an image.",
               },
               {
                 type: "image_url",
@@ -40,19 +40,19 @@ serve(async (req) => {
             ],
           },
         ],
-        modalities: ["image", "text"],
+        modalities: ["text", "image"],
       }),
     });
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again." }), {
+        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
           status: 429,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add credits." }), {
+        return new Response(JSON.stringify({ error: "AI credits exhausted." }), {
           status: 402,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -63,8 +63,36 @@ serve(async (req) => {
     }
 
     const result = await response.json();
-    const imageData = result.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    if (!imageData) throw new Error("No image returned from AI");
+    console.log("AI response keys:", JSON.stringify(Object.keys(result)));
+
+    // Try multiple response formats
+    const choice = result.choices?.[0]?.message;
+    let imageData: string | undefined;
+
+    // Format 1: inline_data in parts
+    if (choice?.content && Array.isArray(choice.content)) {
+      for (const part of choice.content) {
+        if (part.type === "image_url" && part.image_url?.url) {
+          imageData = part.image_url.url;
+          break;
+        }
+        if (part.inline_data?.data) {
+          imageData = `data:${part.inline_data.mime_type || "image/png"};base64,${part.inline_data.data}`;
+          break;
+        }
+      }
+    }
+
+    // Format 2: images array
+    if (!imageData && choice?.images?.[0]) {
+      const img = choice.images[0];
+      imageData = img.image_url?.url || img.url || (img.data ? `data:image/png;base64,${img.data}` : undefined);
+    }
+
+    if (!imageData) {
+      console.error("Could not find image in response:", JSON.stringify(result).slice(0, 500));
+      throw new Error("No image returned from AI");
+    }
 
     return new Response(JSON.stringify({ success: true, image_url: imageData }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
