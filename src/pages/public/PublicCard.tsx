@@ -10,6 +10,7 @@ import {
   FileText,
   Globe,
   Loader2,
+  Share2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,10 @@ import { Link, useParams } from "react-router-dom";
 import { usePublicCard, CTA_TYPES, type CardSection } from "@/hooks/useCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { downloadVCard } from "@/lib/vcard";
+import QRShareDialog from "@/components/card/QRShareDialog";
+import NFCShareDialog from "@/components/card/NFCShareDialog";
+import WalletPassDialog from "@/components/card/WalletPassDialog";
 
 const CTA_ICONS: Record<string, React.ReactNode> = {
   call: <Phone className="h-4 w-4 mr-1.5" />,
@@ -60,6 +65,31 @@ export default function PublicCard() {
   const enabledSections = new Set(sections.filter((s) => s.enabled).map((s) => s.id));
   const primaryCta = profile.primary_cta ?? "call";
   const professionName = (profile as any)?.professions?.name ?? "Professional";
+  const cardUrl = `${window.location.origin}/${handle}`;
+
+  const handleCtaClick = (cta: string) => {
+    // Track analytics
+    supabase.from("analytics_events").insert({
+      user_id: profile.id,
+      handle: handle!,
+      event_type: "button_click" as const,
+      meta_json: { cta },
+    }).then();
+
+    if (cta === "call" && profile.phone) window.location.href = `tel:${profile.phone}`;
+    else if (cta === "text" && profile.phone) window.location.href = `sms:${profile.phone}`;
+    else if (cta === "email" && profile.email) window.location.href = `mailto:${profile.email}`;
+    else if (cta === "vcard") {
+      downloadVCard({
+        name: profile.name,
+        email: profile.email,
+        phone: profile.phone,
+        company: profile.company,
+        handle: profile.handle,
+        profession: professionName,
+      });
+    }
+  };
 
   const handleFormSubmit = async () => {
     if (!formData.name) return;
@@ -134,16 +164,23 @@ export default function PublicCard() {
 
             {/* CTA Buttons */}
             <div className="grid grid-cols-2 gap-2">
-              <Button className="shadow-glow">
+              <Button className="shadow-glow" onClick={() => handleCtaClick(primaryCta)}>
                 {CTA_ICONS[primaryCta]}
                 {CTA_TYPES.find((c) => c.value === primaryCta)?.label ?? "Call"}
               </Button>
               {secondaryCtas.slice(0, 3).map((cta) => (
-                <Button key={cta} variant="outline">
+                <Button key={cta} variant="outline" onClick={() => handleCtaClick(cta)}>
                   {CTA_ICONS[cta]}
                   {CTA_TYPES.find((c) => c.value === cta)?.label ?? cta}
                 </Button>
               ))}
+            </div>
+
+            {/* Sharing Tools */}
+            <div className="flex items-center gap-2 justify-center flex-wrap">
+              <QRShareDialog url={cardUrl} name={profile.name || "Contact"} />
+              <NFCShareDialog url={cardUrl} name={profile.name || "Contact"} />
+              <WalletPassDialog handle={handle!} name={profile.name || "Contact"} />
             </div>
 
             {/* About */}
