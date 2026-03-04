@@ -20,6 +20,7 @@ export type Database = {
           event_type: Database["public"]["Enums"]["analytics_event_type"]
           handle: string
           id: string
+          lead_id: string | null
           meta_json: Json | null
           user_id: string
         }
@@ -28,6 +29,7 @@ export type Database = {
           event_type: Database["public"]["Enums"]["analytics_event_type"]
           handle: string
           id?: string
+          lead_id?: string | null
           meta_json?: Json | null
           user_id: string
         }
@@ -36,10 +38,19 @@ export type Database = {
           event_type?: Database["public"]["Enums"]["analytics_event_type"]
           handle?: string
           id?: string
+          lead_id?: string | null
           meta_json?: Json | null
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "analytics_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       availability_rules: {
         Row: {
@@ -115,6 +126,7 @@ export type Database = {
           customer_phone: string | null
           end_datetime: string
           id: string
+          lead_id: string | null
           notes: string | null
           service_id: string | null
           start_datetime: string
@@ -129,6 +141,7 @@ export type Database = {
           customer_phone?: string | null
           end_datetime: string
           id?: string
+          lead_id?: string | null
           notes?: string | null
           service_id?: string | null
           start_datetime: string
@@ -143,6 +156,7 @@ export type Database = {
           customer_phone?: string | null
           end_datetime?: string
           id?: string
+          lead_id?: string | null
           notes?: string | null
           service_id?: string | null
           start_datetime?: string
@@ -151,6 +165,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "bookings_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "bookings_service_id_fkey"
             columns: ["service_id"]
@@ -308,6 +329,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      contact_activities: {
+        Row: {
+          activity_type: string
+          created_at: string
+          description: string | null
+          id: string
+          lead_id: string
+          related_id: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          lead_id: string
+          related_id?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          lead_id?: string
+          related_id?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       email_templates: {
         Row: {
@@ -537,6 +599,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          lead_id: string | null
           media_urls: string[] | null
           platforms_json: Json
           scheduled_at: string | null
@@ -548,6 +611,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          lead_id?: string | null
           media_urls?: string[] | null
           platforms_json?: Json
           scheduled_at?: string | null
@@ -559,6 +623,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          lead_id?: string | null
           media_urls?: string[] | null
           platforms_json?: Json
           scheduled_at?: string | null
@@ -566,7 +631,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "social_posts_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       style_packs: {
         Row: {
@@ -600,6 +673,53 @@ export type Database = {
           theme_tokens?: Json
         }
         Relationships: []
+      }
+      tasks: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          due_date: string | null
+          id: string
+          lead_id: string | null
+          priority: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          lead_id?: string | null
+          priority?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          lead_id?: string | null
+          priority?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
