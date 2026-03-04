@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ArrowRight, ArrowLeft, Check, Upload, Sparkles } from "lucide-react";
+import { Search, ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
-import { professions, getProfessionsByCategory } from "@/data/professions";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { useQuery } from "@tanstack/react-query";
 
 const stylePacks = [
   { id: "modern", name: "Modern", desc: "Clean lines, bold colors", preview: "bg-gradient-to-br from-primary/20 to-primary/5" },
@@ -19,29 +22,143 @@ const ctaOptions = [
   { id: "quote", label: "Get a Quote", icon: "💰" },
 ];
 
+interface Profession {
+  id: string;
+  name: string;
+  category: string;
+  default_card_sections: any;
+  default_pipeline_stages: any;
+  default_booking_services: any;
+  default_email_templates: any;
+}
+
 export default function Onboarding() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [search, setSearch] = useState("");
-  const [selectedProfession, setSelectedProfession] = useState("");
+  const [selectedProfessionId, setSelectedProfessionId] = useState("");
   const [selectedStyle, setSelectedStyle] = useState("modern");
   const [selectedCTA, setSelectedCTA] = useState("call");
+  const [name, setName] = useState("");
+  const [company, setCompany] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState(user?.email || "");
+  const [saving, setSaving] = useState(false);
 
-  const byCategory = getProfessionsByCategory();
-  const filteredProfessions = search
+  const { data: professions = [] } = useQuery({
+    queryKey: ["professions"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("professions").select("*").order("category").order("name");
+      if (error) throw error;
+      return data as Profession[];
+    },
+  });
+
+  const filtered = search
     ? professions.filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
     : professions;
 
-  const filteredByCategory = search
-    ? { "Search Results": filteredProfessions }
-    : byCategory;
+  const byCategory = filtered.reduce<Record<string, Profession[]>>((acc, p) => {
+    const cat = search ? "Search Results" : p.category;
+    (acc[cat] = acc[cat] || []).push(p);
+    return acc;
+  }, {});
+
+  const selectedProfession = professions.find(p => p.id === selectedProfessionId);
+
+  const generateHandle = (fullName: string) => {
+    return fullName.toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 20) + Math.floor(Math.random() * 1000);
+  };
+
+  const handleLaunch = async () => {
+    if (!user || !selectedProfession) return;
+    setSaving(true);
+
+    try {
+      const handle = generateHandle(name || user.email || "user");
+
+      // 1. Update profile
+      const { error: profileErr } = await supabase.from("profiles").update({
+        name,
+        company: company || null,
+        phone: phone || null,
+        email,
+        handle,
+        profession_id: selectedProfession.id,
+        style_pack: selectedStyle,
+        primary_cta: selectedCTA,
+        onboarding_completed: true,
+      }).eq("id", user.id);
+      if (profileErr) throw profileErr;
+
+      // 2. Create card with profession defaults
+      const themeJson = { style_pack: selectedStyle, primary_cta: selectedCTA };
+      const sectionsJson = selectedProfession.default_card_sections || [];
+      const { error: cardErr } = await supabase.from("cards").insert({
+        user_id: user.id,
+        theme_json: themeJson,
+        sections_json: sectionsJson,
+        status: "draft",
+      });
+      if (cardErr) throw cardErr;
+
+      // 3. Create pipeline stages
+      const stages = (selectedProfession.default_pipeline_stages as string[]) || [];
+      if (stages.length > 0) {
+        const stageRows = stages.map((stageName: string, i: number) => ({
+          user_id: user.id,
+          name: stageName,
+          sort_order: i,
+        }));
+        const { error: stagesErr } = await supabase.from("pipeline_stages").insert(stageRows);
+        if (stagesErr) throw stagesErr;
+      }
+
+      // 4. Create booking services
+      const services = (selectedProfession.default_booking_services as any[]) || [];
+      if (services.length > 0) {
+        const serviceRows = services.map((s: any) => ({
+          user_id: user.id,
+          name: s.name,
+          duration_min: s.durationMin || s.duration_min || 30,
+          price: s.price ?? null,
+          description: s.description || null,
+          active: true,
+        }));
+        const { error: servicesErr } = await supabase.from("booking_services").insert(serviceRows);
+        if (servicesErr) throw servicesErr;
+      }
+
+      // 5. Create email templates
+      const templates = (selectedProfession.default_email_templates as any[]) || [];
+      if (templates.length > 0) {
+        const templateRows = templates.map((t: any) => ({
+          user_id: user.id,
+          name: t.name,
+          subject: t.subject,
+          body: t.body,
+        }));
+        const { error: templatesErr } = await supabase.from("email_templates").insert(templateRows);
+        if (templatesErr) throw templatesErr;
+      }
+
+      toast({ title: "You're all set! 🎉", description: "Your card and workspace are ready." });
+      navigate("/app");
+    } catch (err: any) {
+      console.error("Onboarding error:", err);
+      toast({ title: "Something went wrong", description: err.message, variant: "destructive" });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const totalSteps = 4;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-lg">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-lg">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold gradient-text">CardPilot</h1>
           <p className="text-sm text-muted-foreground mt-1">Let's set up your digital business card</p>
@@ -67,14 +184,14 @@ export default function Onboarding() {
                   <Input placeholder="Search professions..." className="pl-9" value={search} onChange={e => setSearch(e.target.value)} />
                 </div>
                 <div className="max-h-64 overflow-y-auto space-y-3 pr-1">
-                  {Object.entries(filteredByCategory).map(([cat, profs]) => (
+                  {Object.entries(byCategory).map(([cat, profs]) => (
                     <div key={cat}>
                       <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">{cat}</p>
                       <div className="space-y-1">
                         {profs.map(p => (
-                          <button key={p.name} onClick={() => setSelectedProfession(p.name)}
+                          <button key={p.id} onClick={() => setSelectedProfessionId(p.id)}
                             className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
-                              selectedProfession === p.name ? "bg-primary/10 text-primary font-medium border border-primary/20" : "hover:bg-muted"
+                              selectedProfessionId === p.id ? "bg-primary/10 text-primary font-medium border border-primary/20" : "hover:bg-muted"
                             }`}>
                             {p.name}
                           </button>
@@ -83,7 +200,7 @@ export default function Onboarding() {
                     </div>
                   ))}
                 </div>
-                <Button onClick={() => setStep(2)} disabled={!selectedProfession} className="w-full">
+                <Button onClick={() => setStep(2)} disabled={!selectedProfessionId} className="w-full">
                   Continue <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               </motion.div>
@@ -120,19 +237,13 @@ export default function Onboarding() {
                   <h2 className="text-lg font-semibold">The essentials</h2>
                   <p className="text-sm text-muted-foreground">Add your basic info</p>
                 </div>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="h-16 w-16 rounded-2xl bg-muted flex items-center justify-center cursor-pointer hover:bg-muted/70 transition-colors">
-                    <Upload className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div className="text-sm text-muted-foreground">Upload headshot</div>
-                </div>
-                <Input placeholder="Full name" />
-                <Input placeholder="Company (optional)" />
-                <Input placeholder="Phone number" />
-                <Input type="email" placeholder="Email" />
+                <Input placeholder="Full name" value={name} onChange={e => setName(e.target.value)} />
+                <Input placeholder="Company (optional)" value={company} onChange={e => setCompany(e.target.value)} />
+                <Input placeholder="Phone number" value={phone} onChange={e => setPhone(e.target.value)} />
+                <Input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setStep(2)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
-                  <Button onClick={() => setStep(4)} className="flex-1">Continue <ArrowRight className="h-4 w-4 ml-1" /></Button>
+                  <Button onClick={() => setStep(4)} className="flex-1" disabled={!name}>Continue <ArrowRight className="h-4 w-4 ml-1" /></Button>
                 </div>
               </motion.div>
             )}
@@ -156,8 +267,12 @@ export default function Onboarding() {
                 </div>
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setStep(3)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
-                  <Button onClick={() => navigate("/app")} className="flex-1 shadow-glow">
-                    <Sparkles className="h-4 w-4 mr-1" /> Launch My Card
+                  <Button onClick={handleLaunch} disabled={saving} className="flex-1 shadow-glow">
+                    {saving ? (
+                      <div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full" />
+                    ) : (
+                      <><Sparkles className="h-4 w-4 mr-1" /> Launch My Card</>
+                    )}
                   </Button>
                 </div>
               </motion.div>
