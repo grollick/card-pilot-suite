@@ -1,10 +1,23 @@
 import { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Loader2, Sparkles } from "lucide-react";
+import { X, Send, Loader2, Sparkles, Copy, ClipboardPaste } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type Msg = { role: "user" | "assistant"; content: string };
+
+interface SectionTarget {
+  id: string;
+  label: string;
+  enabled: boolean;
+}
 
 interface CardAssistantProps {
   context: {
@@ -16,6 +29,8 @@ interface CardAssistantProps {
     hasBackdrop: boolean;
     cardStatus: string;
   };
+  sectionTargets: SectionTarget[];
+  onCopyToSection: (sectionId: string, content: string) => void;
 }
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/card-assistant`;
@@ -27,7 +42,15 @@ const QUICK_PROMPTS = [
   "What sections should I enable?",
 ];
 
-export default function CardAssistant({ context }: CardAssistantProps) {
+// Map section IDs to the content field the pasted text should fill
+const SECTION_CONTENT_FIELD: Record<string, string> = {
+  hero: "tagline",
+  about: "text",
+  contact: "heading",
+  booking: "bookingHeading",
+};
+
+export default function CardAssistant({ context, sectionTargets, onCopyToSection }: CardAssistantProps) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -162,6 +185,16 @@ export default function CardAssistant({ context }: CardAssistantProps) {
     }
   };
 
+  const handleCopyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  };
+
+  const handlePasteToSection = (sectionId: string, content: string) => {
+    onCopyToSection(sectionId, content);
+    toast.success(`Content pasted to ${sectionTargets.find((s) => s.id === sectionId)?.label || sectionId}`);
+  };
+
   return (
     <>
       {/* Floating trigger button */}
@@ -227,25 +260,68 @@ export default function CardAssistant({ context }: CardAssistantProps) {
               )}
 
               {messages.map((msg, i) => (
-                <div
-                  key={i}
-                  className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                >
-                  <div
-                    className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${
-                      msg.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
-                    }`}
-                  >
-                    {msg.role === "assistant" ? (
-                      <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
-                        <ReactMarkdown>{msg.content}</ReactMarkdown>
-                      </div>
-                    ) : (
-                      msg.content
-                    )}
+                <div key={i} className="space-y-1">
+                  <div className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                    <div
+                      className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${
+                        msg.role === "user"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted"
+                      }`}
+                    >
+                      {msg.role === "assistant" ? (
+                        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        </div>
+                      ) : (
+                        msg.content
+                      )}
+                    </div>
                   </div>
+
+                  {/* Action buttons for assistant messages */}
+                  {msg.role === "assistant" && !isLoading && (
+                    <div className="flex items-center gap-1 ml-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 text-[10px] text-muted-foreground hover:text-foreground"
+                        onClick={() => handleCopyToClipboard(msg.content)}
+                      >
+                        <Copy className="h-3 w-3 mr-1" />
+                        Copy
+                      </Button>
+
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-6 px-2 text-[10px] text-muted-foreground hover:text-foreground"
+                          >
+                            <ClipboardPaste className="h-3 w-3 mr-1" />
+                            Paste to section
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start" className="w-44">
+                          {sectionTargets.map((section) => (
+                            <DropdownMenuItem
+                              key={section.id}
+                              onClick={() => handlePasteToSection(section.id, msg.content)}
+                              className="text-xs"
+                            >
+                              <span className="flex items-center gap-2">
+                                {section.label}
+                                {!section.enabled && (
+                                  <span className="text-[9px] text-muted-foreground">(off)</span>
+                                )}
+                              </span>
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  )}
                 </div>
               ))}
 
