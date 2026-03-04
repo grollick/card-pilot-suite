@@ -37,6 +37,7 @@ import CardSectionWrapper from "@/components/card/CardSectionWrapper";
 import QRShareDialog from "@/components/card/QRShareDialog";
 import NFCShareDialog from "@/components/card/NFCShareDialog";
 import WalletPassDialog from "@/components/card/WalletPassDialog";
+import { showsBranding } from "@/lib/plans";
 
 // ── Visitor meta for analytics ──
 function getVisitorMeta() {
@@ -574,13 +575,18 @@ export default function PublicCard() {
             )}
           </div>
 
-          {/* ── Footer ── */}
-          <div style={{ textAlign: "center", paddingTop: 8 }}>
-            <p style={{ fontSize: 10, color: `${palette.secondary}80`, margin: 0 }}>
-              Powered by{" "}
-              <span style={{ fontWeight: 700, color: palette.primary }}>CardPilot</span>
-            </p>
-          </div>
+          {/* ── Footer / Branding ── */}
+          {showsBranding((profile as any)?.plan ?? "free") && (
+            <div style={{ textAlign: "center", paddingTop: 8 }}>
+              <a
+                href="/"
+                style={{ fontSize: 10, color: `${palette.secondary}80`, textDecoration: "none" }}
+              >
+                Powered by{" "}
+                <span style={{ fontWeight: 700, color: palette.primary }}>CardPilot</span>
+              </a>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>

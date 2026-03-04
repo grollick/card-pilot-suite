@@ -3,6 +3,30 @@
 
 export const PLAN_TIERS = [
   {
+    key: "free",
+    name: "Free",
+    price: 0,
+    interval: "month" as const,
+    tagline: "Try it out — forever free",
+    popular: false,
+    features: [
+      "1 digital card",
+      "20 contacts",
+      "Basic lead capture",
+      "QR code sharing",
+      "CardPilot branding on card",
+    ],
+    limits: {
+      contacts: 20,
+      cards: 1,
+      booking_services: 0,
+      team_members: 1,
+      automations: 0,
+      email_templates: 0,
+      qr_campaigns: 0,
+    },
+  },
+  {
     key: "starter",
     name: "Starter",
     price: 19,
@@ -11,11 +35,13 @@ export const PLAN_TIERS = [
     popular: false,
     features: [
       "1 digital card",
+      "100 contacts",
       "Basic lead capture",
       "Contact CRM",
       "Task tracking",
       "QR code sharing",
       "Basic analytics",
+      "Remove CardPilot branding",
     ],
     limits: {
       contacts: 100,
@@ -125,14 +151,19 @@ export function getPlanByKey(key: string): (typeof PLAN_TIERS)[number] | undefin
 export function getPlanLimits(key: string): PlanLimits {
   const plan = getPlanByKey(key);
   if (!plan) {
-    // Default to starter limits for free/unknown plans
+    // Default to free limits for unknown plans
     return PLAN_TIERS[0].limits;
   }
-  return plan.limits;
+  return { ...plan.limits };
 }
 
 /** Returns true if the limit is reached. -1 means unlimited. */
 export function isLimitReached(limit: number, current: number): boolean {
   if (limit === -1) return false;
   return current >= limit;
+}
+
+/** Whether this plan shows "Powered by CardPilot" branding */
+export function showsBranding(planKey: string): boolean {
+  return planKey === "free" || !planKey;
 }
