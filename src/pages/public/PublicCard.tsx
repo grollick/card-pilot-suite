@@ -201,34 +201,87 @@ export default function PublicCard() {
         .limit(1);
       const firstStageId = stages?.[0]?.id ?? null;
 
-      const { data: lead } = await supabase
-        .from("leads")
-        .insert({
-          user_id: profile.id,
-          name: formData.name,
-          phone: formData.phone || null,
-          email: formData.email || null,
-          notes: formData.message || null,
-          source: "card_form" as const,
-          stage_id: firstStageId,
-          custom_fields_json: {
-            referrer: visitorMeta.referrer,
-            utm_source: visitorMeta.utm_source,
-            utm_medium: visitorMeta.utm_medium,
-            utm_campaign: visitorMeta.utm_campaign,
-            device: visitorMeta.user_agent,
-            capture_url: window.location.href,
-          },
-        })
-        .select("id")
-        .single();
+      // ── Duplicate detection: match by email or phone ──
+      let existingLead: { id: string } | null = null;
 
-      if (lead?.id) {
+      if (formData.email) {
+        const { data } = await supabase
+          .from("leads")
+          .select("id")
+          .eq("user_id", profile.id)
+          .eq("email", formData.email)
+          .limit(1)
+          .maybeSingle();
+        if (data) existingLead = data;
+      }
+
+      if (!existingLead && formData.phone) {
+        const { data } = await supabase
+          .from("leads")
+          .select("id")
+          .eq("user_id", profile.id)
+          .eq("phone", formData.phone)
+          .limit(1)
+          .maybeSingle();
+        if (data) existingLead = data;
+      }
+
+      let leadId: string | undefined;
+
+      if (existingLead) {
+        // Update existing lead with latest info
+        await supabase
+          .from("leads")
+          .update({
+            name: formData.name,
+            ...(formData.phone ? { phone: formData.phone } : {}),
+            ...(formData.email ? { email: formData.email } : {}),
+            notes: formData.message || undefined,
+            custom_fields_json: {
+              referrer: visitorMeta.referrer,
+              utm_source: visitorMeta.utm_source,
+              utm_medium: visitorMeta.utm_medium,
+              utm_campaign: visitorMeta.utm_campaign,
+              device: visitorMeta.user_agent,
+              capture_url: window.location.href,
+            },
+          })
+          .eq("id", existingLead.id);
+        leadId = existingLead.id;
+      } else {
+        // Create new lead
+        const { data: lead } = await supabase
+          .from("leads")
+          .insert({
+            user_id: profile.id,
+            name: formData.name,
+            phone: formData.phone || null,
+            email: formData.email || null,
+            notes: formData.message || null,
+            source: "card_form" as const,
+            stage_id: firstStageId,
+            custom_fields_json: {
+              referrer: visitorMeta.referrer,
+              utm_source: visitorMeta.utm_source,
+              utm_medium: visitorMeta.utm_medium,
+              utm_campaign: visitorMeta.utm_campaign,
+              device: visitorMeta.user_agent,
+              capture_url: window.location.href,
+            },
+          })
+          .select("id")
+          .maybeSingle();
+        leadId = lead?.id;
+      }
+
+      if (leadId) {
         await supabase.from("contact_activities").insert({
           user_id: profile.id,
-          lead_id: lead.id,
+          lead_id: leadId,
           activity_type: "form_submitted",
-          title: "Contact form submitted via digital card",
+          title: existingLead
+            ? "Returning contact submitted card form"
+            : "Contact form submitted via digital card",
           description: formData.message || null,
           occurred_at: new Date().toISOString(),
         });
@@ -238,7 +291,7 @@ export default function PublicCard() {
         user_id: profile.id,
         handle: handle!,
         event_type: "form_submit" as const,
-        meta_json: { lead_id: lead?.id, ...visitorMeta },
+        meta_json: { lead_id: leadId, duplicate: !!existingLead, ...visitorMeta },
       });
 
       // Notify card owner via email (fire-and-forget)
@@ -246,11 +299,13 @@ export default function PublicCard() {
         supabase.functions.invoke("send-email", {
           body: {
             to: profile.email,
-            subject: `New lead captured: ${formData.name}`,
+            subject: existingLead
+              ? `Returning lead: ${formData.name}`
+              : `New lead captured: ${formData.name}`,
             html: `
               <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;">
-                <h2 style="color:#4361ee;margin:0 0 16px;">New Lead from Your Card</h2>
-                <p style="color:#374151;margin:0 0 12px;">Someone just submitted the contact form on your digital card.</p>
+                <h2 style="color:#4361ee;margin:0 0 16px;">${existingLead ? "Returning Contact" : "New Lead"} from Your Card</h2>
+                <p style="color:#374151;margin:0 0 12px;">${existingLead ? "A returning contact" : "Someone new"} just submitted the contact form on your digital card.</p>
                 <table style="width:100%;border-collapse:collapse;margin:16px 0;">
                   <tr><td style="padding:8px 0;color:#6b7280;width:90px;">Name</td><td style="padding:8px 0;color:#111827;font-weight:600;">${formData.name}</td></tr>
                   ${formData.email ? `<tr><td style="padding:8px 0;color:#6b7280;">Email</td><td style="padding:8px 0;color:#111827;">${formData.email}</td></tr>` : ""}
@@ -262,7 +317,7 @@ export default function PublicCard() {
               </div>
             `,
             email_type: "custom",
-            lead_id: lead?.id,
+            lead_id: leadId,
           },
         }).catch(() => {}); // fire-and-forget
       }
