@@ -48,9 +48,10 @@ export function useCard() {
         .from("cards")
         .select("*")
         .eq("user_id", user!.id)
-        .maybeSingle();
+        .order("updated_at", { ascending: false })
+        .limit(1);
       if (error) throw error;
-      return data;
+      return data?.[0] ?? null;
     },
   });
 }
@@ -67,11 +68,13 @@ export function useUpsertCard() {
       status?: "draft" | "published" | "unpublished";
     }) => {
       // Check if card exists
-      const { data: existing } = await supabase
+      const { data: rows } = await supabase
         .from("cards")
         .select("id")
         .eq("user_id", user!.id)
-        .maybeSingle();
+        .order("updated_at", { ascending: false })
+        .limit(1);
+      const existing = rows?.[0] ?? null;
 
       if (existing) {
         const { data, error } = await supabase

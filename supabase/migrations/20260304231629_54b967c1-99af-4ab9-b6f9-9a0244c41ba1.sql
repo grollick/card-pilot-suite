@@ -1,0 +1,6 @@
+DELETE FROM cards WHERE id IN (
+  'fe0423ed-a3ce-470f-a065-95759fe4e269',
+  '1ead5049-8f95-42e6-9616-609ef52ed393',
+  '57ecb411-fb72-455a-9aaf-77e2876f2417',
+  '77d8384f-0973-44dc-b5e0-68caed3993c1'
+);
