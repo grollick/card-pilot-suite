@@ -28,12 +28,13 @@ const typeIcons: Record<string, typeof Phone> = {
   text: MessageSquare,
   follow_up: Clock,
   meeting: Calendar,
+  reminder: Clock,
   other: MoreHorizontal,
 };
 
 const typeLabels: Record<string, string> = {
   call: "Call", email: "Email", text: "Text",
-  follow_up: "Follow-up", meeting: "Meeting", other: "Other",
+  follow_up: "Follow-up", meeting: "Meeting", reminder: "Reminder", other: "Other",
 };
 
 type ViewFilter = "all" | "open" | "done" | "overdue";
