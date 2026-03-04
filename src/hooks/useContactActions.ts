@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { runAutomation } from "@/hooks/useAutomation";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -54,6 +55,13 @@ export function useCreateContact() {
         .select()
         .single();
       if (error) throw error;
+
+      // Run new_lead automation
+      await runAutomation(user!.id, "new_lead", {
+        contactId: data.id,
+        contactName: data.name,
+      });
+
       return data;
     },
     onSuccess: () => {
