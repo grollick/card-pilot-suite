@@ -16,11 +16,16 @@ import PublicBooking from "./pages/public/PublicBooking";
 import DashboardLayout from "./components/DashboardLayout";
 import DashboardHome from "./pages/app/DashboardHome";
 import CardBuilder from "./pages/app/CardBuilder";
-import LeadsCRM from "./pages/app/LeadsCRM";
+import ContactsPage from "./pages/app/ContactsPage";
+import ContactDetail from "./pages/app/ContactDetail";
+import PipelinePage from "./pages/app/PipelinePage";
+import TasksPage from "./pages/app/TasksPage";
 import BookingManager from "./pages/app/BookingManager";
 import EmailMarketing from "./pages/app/EmailMarketing";
 import SocialScheduler from "./pages/app/SocialScheduler";
+import ContentPage from "./pages/app/ContentPage";
 import Analytics from "./pages/app/Analytics";
+import AutomationPage from "./pages/app/AutomationPage";
 import SettingsPage from "./pages/app/SettingsPage";
 import AdminPage from "./pages/app/AdminPage";
 
@@ -48,11 +53,16 @@ const App = () => (
             }>
               <Route index element={<DashboardHome />} />
               <Route path="card" element={<CardBuilder />} />
-              <Route path="leads" element={<LeadsCRM />} />
+              <Route path="contacts" element={<ContactsPage />} />
+              <Route path="contacts/:id" element={<ContactDetail />} />
+              <Route path="pipeline" element={<PipelinePage />} />
+              <Route path="tasks" element={<TasksPage />} />
               <Route path="booking" element={<BookingManager />} />
               <Route path="email" element={<EmailMarketing />} />
               <Route path="social" element={<SocialScheduler />} />
+              <Route path="content" element={<ContentPage />} />
               <Route path="analytics" element={<Analytics />} />
+              <Route path="automation" element={<AutomationPage />} />
               <Route path="settings" element={<SettingsPage />} />
               <Route path="admin" element={<AdminPage />} />
             </Route>
