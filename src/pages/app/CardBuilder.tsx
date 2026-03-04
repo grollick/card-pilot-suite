@@ -1,4 +1,5 @@
-import { CreditCard, Eye, Paintbrush, Smartphone, Save, Globe } from "lucide-react";
+import { CreditCard, Eye, Paintbrush, Smartphone, Save, Globe, QrCode } from "lucide-react";
+import QRShareDialog from "@/components/card/QRShareDialog";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from "react";
@@ -118,6 +119,12 @@ export default function CardBuilder() {
               <Save className="h-4 w-4 mr-2" />
               Save
             </Button>
+          )}
+          {profile?.handle && (
+            <QRShareDialog
+              url={`${window.location.origin}/${profile.handle}`}
+              name={profile.name || "Card"}
+            />
           )}
           {profile?.handle && (
             <Button variant="outline" asChild>
