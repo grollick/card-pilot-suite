@@ -4,6 +4,7 @@ import {
   Calendar, Clock, Plus, Settings, Loader2, CheckCircle2,
   XCircle, AlertCircle, MoreHorizontal, User
 } from "lucide-react";
+import { useSendEmail } from "@/hooks/useSendEmail";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -47,6 +48,7 @@ export default function BookingManager() {
   const updateService = useUpdateService();
   const updateBooking = useUpdateBooking();
   const upsertAvailability = useUpsertAvailability();
+  const sendEmail = useSendEmail();
 
   // New service dialog
   const [newOpen, setNewOpen] = useState(false);
@@ -107,6 +109,41 @@ export default function BookingManager() {
 
   const handleStatusChange = async (bookingId: string, status: "pending" | "confirmed" | "completed" | "cancelled" | "no_show" | "requested") => {
     await updateBooking.mutateAsync({ id: bookingId, status });
+
+    // Auto-send confirmation email
+    if (status === "confirmed") {
+      const booking = bookings.find((b: any) => b.id === bookingId);
+      if (booking?.customer_email) {
+        const startDate = format(new Date(booking.start_datetime), "EEEE, MMMM d, yyyy");
+        const startTime = format(new Date(booking.start_datetime), "h:mm a");
+        const serviceName = booking.booking_services?.name ?? "your appointment";
+
+        sendEmail.mutate({
+          to: booking.customer_email,
+          subject: `Booking Confirmed – ${serviceName} on ${startDate}`,
+          html: `
+            <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 24px;">
+              <h2 style="color: #111; margin-bottom: 8px;">You're confirmed! ✅</h2>
+              <p style="color: #555; font-size: 15px;">
+                Hi ${booking.customer_name.split(" ")[0]}, your booking has been confirmed.
+              </p>
+              <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin: 20px 0;">
+                <p style="margin: 0 0 8px; font-weight: 600; color: #111;">${serviceName}</p>
+                <p style="margin: 0 0 4px; color: #555;">📅 ${startDate}</p>
+                <p style="margin: 0; color: #555;">🕐 ${startTime}</p>
+              </div>
+              <p style="color: #888; font-size: 13px;">
+                Need to reschedule? Reply to this email and we'll help you find a new time.
+              </p>
+            </div>
+          `,
+          email_type: "booking_confirmation",
+          lead_id: booking.lead_id ?? undefined,
+        });
+        toast.success("Confirmation email sent");
+      }
+    }
+
     toast.success(`Booking ${status}`);
   };
 
