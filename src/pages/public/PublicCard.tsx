@@ -157,9 +157,12 @@ export default function PublicCard() {
   const sections: CardSection[] =
     card && Array.isArray(card.sections_json) ? (card.sections_json as unknown as CardSection[]) : [];
   const enabledSections = new Set(sections.filter((s) => s.enabled).map((s) => s.id));
+  const sectionContent = (id: string) => sections.find((s) => s.id === id)?.content as Record<string, any> | undefined;
   const primaryCta = profile.primary_cta ?? "call";
   const professionName = (profile as any)?.professions?.name ?? "Professional";
   const cardUrl = `${window.location.origin}/${handle}`;
+  const themeJson = (card?.theme_json ?? {}) as Record<string, any>;
+  const coverUrl = themeJson.cover_url as string | undefined;
 
   const handleCtaClick = (cta: string) => {
     supabase.from("analytics_events").insert({
@@ -375,6 +378,7 @@ export default function PublicCard() {
             profession={professionName}
             company={profile.company ?? undefined}
             avatarUrl={profile.avatar_url}
+            coverUrl={coverUrl}
           />
         )}
 
@@ -427,33 +431,54 @@ export default function PublicCard() {
             <CardSectionWrapper theme={theme}>
               <p style={sectionTitleStyle}>About</p>
               <p style={{ fontSize: 14, lineHeight: 1.7, color: palette.secondary, margin: 0 }}>
-                Passionate professional dedicated to delivering exceptional results.
+                {sectionContent("about")?.text || "Passionate professional dedicated to delivering exceptional results."}
               </p>
             </CardSectionWrapper>
           )}
 
           {/* ── Services ── */}
-          {enabledSections.has("services") && services.length > 0 && (
-            <div>
-              <p style={sectionTitleStyle}>Services</p>
-              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                {services.map((s) => (
-                  <CardSectionWrapper key={s.id} theme={theme}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <span style={{ fontSize: 14, fontWeight: 500, color: palette.primary }}>
-                        {s.name}
-                      </span>
-                      {s.price != null && (
-                        <span style={{ fontSize: 13, color: palette.secondary }}>
-                          ${Number(s.price).toFixed(0)}
-                        </span>
-                      )}
-                    </div>
-                  </CardSectionWrapper>
-                ))}
+          {enabledSections.has("services") && (() => {
+            const cardServices = sectionContent("services")?.items as { name: string; description?: string; price?: string }[] | undefined;
+            const hasCardServices = cardServices && cardServices.length > 0;
+            const hasDbServices = services.length > 0;
+
+            if (!hasCardServices && !hasDbServices) return null;
+
+            return (
+              <div>
+                <p style={sectionTitleStyle}>Services</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {hasCardServices
+                    ? cardServices!.filter((s) => s.name).map((s, i) => (
+                        <CardSectionWrapper key={i} theme={theme}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <div>
+                              <span style={{ fontSize: 14, fontWeight: 500, color: palette.primary }}>{s.name}</span>
+                              {s.description && (
+                                <p style={{ fontSize: 12, color: palette.secondary, margin: "4px 0 0", opacity: 0.8 }}>{s.description}</p>
+                              )}
+                            </div>
+                            {s.price && (
+                              <span style={{ fontSize: 13, color: palette.secondary, fontWeight: 500 }}>{s.price}</span>
+                            )}
+                          </div>
+                        </CardSectionWrapper>
+                      ))
+                    : services.map((s) => (
+                        <CardSectionWrapper key={s.id} theme={theme}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <span style={{ fontSize: 14, fontWeight: 500, color: palette.primary }}>{s.name}</span>
+                            {s.price != null && (
+                              <span style={{ fontSize: 13, color: palette.secondary }}>${Number(s.price).toFixed(0)}</span>
+                            )}
+                          </div>
+                        </CardSectionWrapper>
+                      ))
+                  }
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* ── Booking ── */}
           {enabledSections.has("booking") && (
@@ -461,70 +486,162 @@ export default function PublicCard() {
               <Link to={`/book/${handle}`} style={{ textDecoration: "none" }}>
                 <CardButton theme={theme} fullWidth>
                   <Calendar className="h-4 w-4" />
-                  <span>Book an Appointment</span>
+                  <span>{sectionContent("booking")?.bookingHeading || "Book an Appointment"}</span>
                 </CardButton>
               </Link>
             </div>
           )}
 
           {/* ── Testimonials ── */}
-          {enabledSections.has("testimonials") && (
-            <div>
-              <p style={sectionTitleStyle}>Testimonials</p>
-              <CardSectionWrapper theme={theme}>
-                <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="h-3.5 w-3.5"
-                      style={{ fill: "#f59e0b", color: "#f59e0b" }}
-                    />
+          {enabledSections.has("testimonials") && (() => {
+            const testimonials = sectionContent("testimonials")?.testimonials as { name: string; text: string; role?: string }[] | undefined;
+            const hasContent = testimonials && testimonials.length > 0;
+
+            return (
+              <div>
+                <p style={sectionTitleStyle}>Testimonials</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {hasContent
+                    ? testimonials!.map((t, i) => (
+                        <CardSectionWrapper key={i} theme={theme}>
+                          <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
+                            {[...Array(5)].map((_, j) => (
+                              <Star key={j} className="h-3.5 w-3.5" style={{ fill: "#f59e0b", color: "#f59e0b" }} />
+                            ))}
+                          </div>
+                          <p style={{ fontSize: 14, fontStyle: "italic", color: palette.secondary, margin: 0, lineHeight: 1.6 }}>
+                            "{t.text}"
+                          </p>
+                          <p style={{ fontSize: 12, color: `${palette.secondary}99`, margin: 0, marginTop: 8 }}>
+                            — {t.name}{t.role ? `, ${t.role}` : ""}
+                          </p>
+                        </CardSectionWrapper>
+                      ))
+                    : (
+                        <CardSectionWrapper theme={theme}>
+                          <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} className="h-3.5 w-3.5" style={{ fill: "#f59e0b", color: "#f59e0b" }} />
+                            ))}
+                          </div>
+                          <p style={{ fontSize: 14, fontStyle: "italic", color: palette.secondary, margin: 0, lineHeight: 1.6 }}>
+                            "Absolutely amazing experience. Highly recommend!"
+                          </p>
+                          <p style={{ fontSize: 12, color: `${palette.secondary}99`, margin: 0, marginTop: 8 }}>
+                            — Happy Client
+                          </p>
+                        </CardSectionWrapper>
+                      )
+                  }
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ── Gallery ── */}
+          {enabledSections.has("gallery") && (() => {
+            const images = sectionContent("gallery")?.images as { url: string; caption?: string }[] | undefined;
+            if (!images || images.length === 0) return null;
+
+            return (
+              <div>
+                <p style={sectionTitleStyle}>Gallery</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  {images.map((img, i) => (
+                    <div key={i} style={{ borderRadius: radii.button, overflow: "hidden" }}>
+                      <img
+                        src={img.url}
+                        alt={img.caption || ""}
+                        style={{ width: "100%", height: 120, objectFit: "cover", display: "block" }}
+                      />
+                      {img.caption && (
+                        <p style={{ fontSize: 11, color: palette.secondary, padding: "4px 0", margin: 0, textAlign: "center" }}>
+                          {img.caption}
+                        </p>
+                      )}
+                    </div>
                   ))}
                 </div>
-                <p style={{ fontSize: 14, fontStyle: "italic", color: palette.secondary, margin: 0, lineHeight: 1.6 }}>
-                  "Absolutely amazing experience. Highly recommend!"
-                </p>
-                <p style={{ fontSize: 12, color: `${palette.secondary}99`, marginTop: 8, margin: 0, marginBlockStart: 8 }}>
-                  — Happy Client
-                </p>
-              </CardSectionWrapper>
-            </div>
-          )}
+              </div>
+            );
+          })()}
 
           {/* ── Social Links ── */}
-          {enabledSections.has("social") && (
-            <div>
-              <p style={sectionTitleStyle}>Connect</p>
-              <div style={{ display: "flex", justifyContent: "center", gap: 12 }}>
-                {["instagram", "facebook", "linkedin", "twitter"].map((platform) => (
-                  <button
-                    key={platform}
-                    style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: theme.button.shape === "pill" ? "9999px" : radii.button,
-                      border: `1px solid ${palette.primary}20`,
-                      background: `${palette.primary}08`,
-                      color: palette.primary,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                    }}
-                    onClick={() => toast.info(`${platform} link not configured yet`)}
-                  >
-                    {SOCIAL_ICONS[platform]}
-                  </button>
-                ))}
+          {enabledSections.has("social") && (() => {
+            const links = sectionContent("social")?.links as { platform: string; url: string }[] | undefined;
+            const hasLinks = links && links.length > 0;
+
+            const platformIcon = (platform: string) => {
+              const key = platform.toLowerCase().replace("/x", "");
+              return SOCIAL_ICONS[key] || <Globe className="h-5 w-5" />;
+            };
+
+            return (
+              <div>
+                <p style={sectionTitleStyle}>Connect</p>
+                <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
+                  {hasLinks
+                    ? links!.filter((l) => l.url).map((link, i) => (
+                        <a
+                          key={i}
+                          href={link.url.startsWith("http") ? link.url : `https://${link.url}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            width: 44,
+                            height: 44,
+                            borderRadius: theme.button.shape === "pill" ? "9999px" : radii.button,
+                            border: `1px solid ${palette.primary}20`,
+                            background: `${palette.primary}08`,
+                            color: palette.primary,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            transition: "all 0.2s",
+                            textDecoration: "none",
+                          }}
+                          title={link.platform}
+                        >
+                          {platformIcon(link.platform)}
+                        </a>
+                      ))
+                    : ["instagram", "facebook", "linkedin", "twitter"].map((platform) => (
+                        <button
+                          key={platform}
+                          style={{
+                            width: 44,
+                            height: 44,
+                            borderRadius: theme.button.shape === "pill" ? "9999px" : radii.button,
+                            border: `1px solid ${palette.primary}20`,
+                            background: `${palette.primary}08`,
+                            color: palette.primary,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            cursor: "pointer",
+                            transition: "all 0.2s",
+                          }}
+                          onClick={() => toast.info(`${platform} link not configured yet`)}
+                        >
+                          {SOCIAL_ICONS[platform]}
+                        </button>
+                      ))
+                  }
+                </div>
               </div>
-            </div>
-          )}
+            );
+          })()}
 
           {/* ── Contact / Lead Capture ── */}
           {enabledSections.has("contact") && (
             <div>
-              <p style={sectionTitleStyle}>Get in Touch</p>
+              <p style={sectionTitleStyle}>{sectionContent("contact")?.heading || "Get in Touch"}</p>
+              {sectionContent("contact")?.description && (
+                <p style={{ fontSize: 13, color: palette.secondary, margin: "0 0 12px", lineHeight: 1.5 }}>
+                  {sectionContent("contact")?.description}
+                </p>
+              )}
               {formSent ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.95 }}
