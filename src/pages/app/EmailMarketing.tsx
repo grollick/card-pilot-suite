@@ -23,7 +23,7 @@ import { formatDistanceToNow } from "date-fns";
 import {
   useEmailTemplates, useCreateTemplate, useUpdateTemplate, useDeleteTemplate,
   useCampaigns, useCreateCampaign, useUpdateCampaign,
-  useAddCampaignRecipients, TEMPLATE_VARIABLES,
+  useAddCampaignRecipients, useSendCampaign, TEMPLATE_VARIABLES,
 } from "@/hooks/useEmail";
 import { useContacts, usePipelineStages, useTags } from "@/hooks/useContacts";
 
@@ -47,6 +47,7 @@ export default function EmailMarketing() {
   const createCampaign = useCreateCampaign();
   const updateCampaign = useUpdateCampaign();
   const addRecipients = useAddCampaignRecipients();
+  const sendCampaign = useSendCampaign();
 
   // Template dialog state
   const [tOpen, setTOpen] = useState(false);
@@ -244,8 +245,14 @@ export default function EmailMarketing() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-36">
                       {c.status === "draft" && (
-                        <DropdownMenuItem onClick={() => updateCampaign.mutate({ id: c.id, status: "sending" })}>
-                          <Send className="h-4 w-4 mr-2" /> Send
+                        <DropdownMenuItem
+                          disabled={sendCampaign.isPending}
+                          onClick={() => {
+                            if (!confirm(`Send this campaign to all pending recipients?`)) return;
+                            sendCampaign.mutate(c.id);
+                          }}
+                        >
+                          <Send className="h-4 w-4 mr-2" /> {sendCampaign.isPending ? "Sending…" : "Send Now"}
                         </DropdownMenuItem>
                       )}
                       {c.status === "sending" && (
