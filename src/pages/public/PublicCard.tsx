@@ -392,6 +392,8 @@ export default function PublicCard() {
             company={profile.company ?? undefined}
             avatarUrl={profile.avatar_url}
             coverUrl={coverUrl}
+            avatarBgColor={themeJson.avatar_bg_color as string | undefined}
+            avatarRotation={themeJson.avatar_rotation as number | undefined}
           />
         )}
 

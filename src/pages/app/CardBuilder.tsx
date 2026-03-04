@@ -49,6 +49,8 @@ export default function CardBuilder() {
   const [published, setPublished] = useState(false);
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarBgColor, setAvatarBgColor] = useState("transparent");
+  const [avatarRotation, setAvatarRotation] = useState(0);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
   const hydrated = useRef(false);
@@ -89,6 +91,8 @@ export default function CardBuilder() {
         setCoverUrl(themeJson.cover_url);
         coverUrlRef.current = themeJson.cover_url;
       }
+      if (themeJson?.avatar_bg_color) setAvatarBgColor(themeJson.avatar_bg_color);
+      if (typeof themeJson?.avatar_rotation === "number") setAvatarRotation(themeJson.avatar_rotation);
     }
   }, [card]);
 
@@ -221,6 +225,29 @@ export default function CardBuilder() {
   const handleAvatarChange = (url: string) => {
     setAvatarUrl(url);
     qc.invalidateQueries({ queryKey: ["profile"] });
+  };
+
+  const saveThemeField = async (fields: Record<string, any>) => {
+    try {
+      const existing = (card?.theme_json as any) ?? {};
+      await upsertCard.mutateAsync({
+        sections_json: sections as any,
+        status: published ? "published" : "draft",
+        theme_json: { ...existing, cover_url: coverUrlRef.current, ...fields } as any,
+      });
+    } catch {
+      // silent — debounced visual updates don't need error toasts
+    }
+  };
+
+  const handleAvatarBgColorChange = (color: string) => {
+    setAvatarBgColor(color);
+    saveThemeField({ avatar_bg_color: color });
+  };
+
+  const handleAvatarRotationChange = (deg: number) => {
+    setAvatarRotation(deg);
+    saveThemeField({ avatar_rotation: deg });
   };
 
   const handleCoverChange = async (url: string) => {
@@ -401,6 +428,10 @@ export default function CardBuilder() {
               profession={professionName}
               onAvatarChange={handleAvatarChange}
               onCoverChange={handleCoverChange}
+              avatarBgColor={avatarBgColor}
+              avatarRotation={avatarRotation}
+              onAvatarBgColorChange={handleAvatarBgColorChange}
+              onAvatarRotationChange={handleAvatarRotationChange}
             />
           </div>
 
@@ -482,11 +513,19 @@ export default function CardBuilder() {
               <div className="px-5 pb-5 -mt-10">
                 {/* Avatar */}
                 <div
-                  className="h-20 w-20 rounded-2xl bg-muted border-4 border-card flex items-center justify-center mb-3 cursor-pointer relative group overflow-hidden"
+                  className="h-20 w-20 rounded-2xl border-4 border-card flex items-center justify-center mb-3 cursor-pointer relative group overflow-hidden"
                   onClick={() => fileInputRef.current?.click()}
+                  style={{
+                    backgroundColor: avatarBgColor === "transparent" ? "hsl(var(--muted))" : avatarBgColor,
+                  }}
                 >
                   {avatarUrl ? (
-                    <img src={avatarUrl} alt="avatar" className="h-full w-full object-cover rounded-2xl" />
+                    <img
+                      src={avatarUrl}
+                      alt="avatar"
+                      className="h-full w-full object-cover rounded-2xl"
+                      style={{ transform: `rotate(${avatarRotation}deg)` }}
+                    />
                   ) : (
                     <CreditCard className="h-8 w-8 text-muted-foreground" />
                   )}
