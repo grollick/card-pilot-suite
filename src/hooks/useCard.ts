@@ -40,6 +40,8 @@ export function useCard() {
   return useQuery({
     queryKey: ["cards"],
     enabled: !!user,
+    staleTime: 5 * 60 * 1000, // 5 min cache
+    gcTime: 10 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("cards")
@@ -121,6 +123,8 @@ export function useStylePack(key: string | null | undefined) {
   return useQuery({
     queryKey: ["style-pack", key],
     enabled: !!key,
+    staleTime: 30 * 60 * 1000, // 30 min — style packs rarely change
+    gcTime: 60 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("style_packs")
@@ -138,6 +142,8 @@ export function usePublicCard(handle: string | undefined) {
   return useQuery({
     queryKey: ["public-card", handle],
     enabled: !!handle,
+    staleTime: 10 * 60 * 1000, // 10 min cache for public cards
+    gcTime: 30 * 60 * 1000,
     queryFn: async () => {
       // Get profile by handle
       const { data: profile, error: pErr } = await supabase
