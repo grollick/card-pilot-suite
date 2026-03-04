@@ -3,8 +3,13 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Onboarding from "./pages/Onboarding";
 import PublicCard from "./pages/public/PublicCard";
 import PublicBooking from "./pages/public/PublicBooking";
@@ -27,29 +32,38 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/onboarding" element={<Onboarding />} />
+        <AuthProvider>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/onboarding" element={
+              <ProtectedRoute><Onboarding /></ProtectedRoute>
+            } />
 
-          {/* Dashboard */}
-          <Route path="/app" element={<DashboardLayout />}>
-            <Route index element={<DashboardHome />} />
-            <Route path="card" element={<CardBuilder />} />
-            <Route path="leads" element={<LeadsCRM />} />
-            <Route path="booking" element={<BookingManager />} />
-            <Route path="email" element={<EmailMarketing />} />
-            <Route path="social" element={<SocialScheduler />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="settings" element={<SettingsPage />} />
-            <Route path="admin" element={<AdminPage />} />
-          </Route>
+            {/* Dashboard (protected) */}
+            <Route path="/app" element={
+              <ProtectedRoute><DashboardLayout /></ProtectedRoute>
+            }>
+              <Route index element={<DashboardHome />} />
+              <Route path="card" element={<CardBuilder />} />
+              <Route path="leads" element={<LeadsCRM />} />
+              <Route path="booking" element={<BookingManager />} />
+              <Route path="email" element={<EmailMarketing />} />
+              <Route path="social" element={<SocialScheduler />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="settings" element={<SettingsPage />} />
+              <Route path="admin" element={<AdminPage />} />
+            </Route>
 
-          {/* Public */}
-          <Route path="/:handle" element={<PublicCard />} />
-          <Route path="/:handle/book" element={<PublicBooking />} />
+            {/* Public */}
+            <Route path="/:handle" element={<PublicCard />} />
+            <Route path="/:handle/book" element={<PublicBooking />} />
 
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
