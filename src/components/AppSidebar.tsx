@@ -18,6 +18,7 @@ const crmItems = [
   { title: "Pipeline", url: "/app/pipeline", icon: Kanban },
   { title: "Tasks", url: "/app/tasks", icon: FileText },
   { title: "Bookings", url: "/app/booking", icon: Calendar },
+  { title: "Card Editor", url: "/app/card", icon: CreditCard },
 ];
 
 const marketingItems = [
