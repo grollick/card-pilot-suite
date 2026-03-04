@@ -24,6 +24,7 @@ const taskTypes = [
   { key: "text", label: "Text" },
   { key: "follow_up", label: "Follow-up" },
   { key: "meeting", label: "Meeting" },
+  { key: "reminder", label: "Reminder" },
   { key: "other", label: "Other" },
 ];
 
