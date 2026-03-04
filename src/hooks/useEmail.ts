@@ -166,7 +166,7 @@ export function resolveTemplateVars(
     .replace(/\{\{full_name\}\}/g, contact.name)
     .replace(/\{\{company\}\}/g, contact.company ?? "")
     .replace(/\{\{email\}\}/g, contact.email ?? "")
-    .replace(/\{\{booking_link\}\}/g, handle ? `${window.location.origin}/${handle}/book` : "");
+    .replace(/\{\{booking_link\}\}/g, handle ? `${window.location.origin}/book/${handle}` : "");
 }
 
 // ── Send Campaign (batch emails via Resend) ──

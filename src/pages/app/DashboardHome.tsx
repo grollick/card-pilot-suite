@@ -17,7 +17,7 @@ const quickActions = [
   { label: "Publish Card", icon: CreditCard, href: "/app/card" },
   { label: "Create Email", icon: Mail, href: "/app/email" },
   { label: "Social Post", icon: Share2, href: "/app/social" },
-  { label: "Add Service", icon: Bookmark, href: "/app/booking" },
+  { label: "Add Service", icon: Bookmark, href: "/app/bookings" },
 ];
 
 const priorityColors: Record<string, string> = {

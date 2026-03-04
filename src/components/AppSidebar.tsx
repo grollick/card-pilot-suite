@@ -17,7 +17,7 @@ const crmItems = [
   { title: "Contacts", url: "/app/contacts", icon: Users },
   { title: "Pipeline", url: "/app/pipeline", icon: Kanban },
   { title: "Tasks", url: "/app/tasks", icon: FileText },
-  { title: "Bookings", url: "/app/booking", icon: Calendar },
+  { title: "Bookings", url: "/app/bookings", icon: Calendar },
   { title: "Card Editor", url: "/app/card", icon: CreditCard },
 ];
 
