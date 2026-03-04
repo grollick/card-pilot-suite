@@ -12,11 +12,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function TopBar() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [searchOpen, setSearchOpen] = useState(false);
+  const { data: profile } = useQuery({
+    queryKey: ["profile-handle"],
+    enabled: !!user,
+    staleTime: 10 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("handle")
+        .eq("id", user!.id)
+        .single();
+      return data;
+    },
+  });
 
   return (
     <header className="h-14 flex items-center border-b border-border px-4 gap-3 bg-card/80 backdrop-blur-sm sticky top-0 z-30">
@@ -62,7 +77,7 @@ export default function TopBar() {
       </DropdownMenu>
 
       {/* View card */}
-      <Button variant="outline" size="sm" className="gap-1.5 hidden sm:flex" onClick={() => window.open("/demo", "_blank")}>
+      <Button variant="outline" size="sm" className="gap-1.5 hidden sm:flex" disabled={!profile?.handle} onClick={() => window.open(`/${profile?.handle}`, "_blank")}>
         <ExternalLink className="h-3.5 w-3.5" /> View Card
       </Button>
 
