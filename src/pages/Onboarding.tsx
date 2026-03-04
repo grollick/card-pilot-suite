@@ -1,14 +1,16 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ArrowRight, ArrowLeft, Sparkles, Check } from "lucide-react";
+import { Search, ArrowRight, ArrowLeft, Sparkles, Check, Loader2, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { pickStylePackKey, getRecommendedPacks, type StylePack } from "@/lib/stylePackSelection";
+import { useGenerateCardContent, type GeneratedCardContent } from "@/hooks/useGenerateContent";
 
 interface Profession {
   id: string;
@@ -61,7 +63,10 @@ export default function Onboarding() {
   const [company, setCompany] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState(user?.email || "");
+  const [city, setCity] = useState("");
   const [saving, setSaving] = useState(false);
+  const { generate, isGenerating, content: aiContent, setContent: setAiContent } = useGenerateCardContent();
+  const [editingField, setEditingField] = useState<string | null>(null);
 
   const { data: professions = [] } = useQuery({
     queryKey: ["professions"],
@@ -217,7 +222,18 @@ export default function Onboarding() {
     }
   };
 
-  const totalSteps = 4;
+  const totalSteps = 5;
+
+  const handleGenerateContent = async () => {
+    if (!selectedProfession) return;
+    setStep(4);
+    await generate({
+      profession: selectedProfession.name,
+      name,
+      company: company || undefined,
+      city: city || undefined,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -346,18 +362,100 @@ export default function Onboarding() {
                 </div>
                 <Input placeholder="Full name" value={name} onChange={e => setName(e.target.value)} />
                 <Input placeholder="Company (optional)" value={company} onChange={e => setCompany(e.target.value)} />
+                <Input placeholder="City / Location (optional)" value={city} onChange={e => setCity(e.target.value)} />
                 <Input placeholder="Phone number" value={phone} onChange={e => setPhone(e.target.value)} />
                 <Input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setStep(2)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
-                  <Button onClick={() => setStep(4)} className="flex-1" disabled={!name}>Continue <ArrowRight className="h-4 w-4 ml-1" /></Button>
+                  <Button onClick={handleGenerateContent} className="flex-1" disabled={!name}>
+                    <Sparkles className="h-4 w-4 mr-1" /> Generate Card <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
                 </div>
               </motion.div>
             )}
 
-            {/* Step 4: CTA */}
+            {/* Step 4: AI-Generated Content Review */}
             {step === 4 && (
               <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                <div>
+                  <h2 className="text-lg font-semibold flex items-center gap-2">
+                    <Sparkles className="h-5 w-5 text-primary" /> AI-Generated Content
+                  </h2>
+                  <p className="text-sm text-muted-foreground">Review and edit your card copy</p>
+                </div>
+
+                {isGenerating ? (
+                  <div className="flex flex-col items-center justify-center py-12 gap-3">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    <p className="text-sm text-muted-foreground">Writing your card content...</p>
+                  </div>
+                ) : aiContent ? (
+                  <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+                    {([
+                      { key: "tagline", label: "Tagline" },
+                      { key: "bio", label: "Bio" },
+                      { key: "about", label: "About" },
+                      { key: "cta_text", label: "Call to Action" },
+                      { key: "instagram_bio", label: "Social Bio" },
+                    ] as const).map(({ key, label }) => (
+                      <div key={key} className="rounded-lg border border-border/50 p-3">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+                          <button onClick={() => setEditingField(editingField === key ? null : key)}
+                            className="text-muted-foreground hover:text-foreground">
+                            <Pencil className="h-3 w-3" />
+                          </button>
+                        </div>
+                        {editingField === key ? (
+                          <Textarea
+                            value={aiContent[key]}
+                            onChange={e => setAiContent({ ...aiContent, [key]: e.target.value })}
+                            className="min-h-[40px] text-sm"
+                            autoFocus
+                          />
+                        ) : (
+                          <p className="text-sm">{aiContent[key]}</p>
+                        )}
+                      </div>
+                    ))}
+
+                    {/* Services */}
+                    <div className="rounded-lg border border-border/50 p-3">
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Services</span>
+                      <div className="flex flex-wrap gap-1.5 mt-1.5">
+                        {aiContent.services.map((s, i) => (
+                          <span key={i} className="px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium">{s}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-muted-foreground mb-3">Content generation failed</p>
+                    <Button variant="outline" size="sm" onClick={handleGenerateContent}>
+                      <Sparkles className="h-4 w-4 mr-1" /> Try Again
+                    </Button>
+                  </div>
+                )}
+
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setStep(3)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
+                  <Button onClick={() => setStep(5)} className="flex-1" disabled={isGenerating || !aiContent}>
+                    Looks Great <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+
+                {aiContent && (
+                  <Button variant="ghost" size="sm" className="w-full text-xs" onClick={handleGenerateContent} disabled={isGenerating}>
+                    <Sparkles className="h-3 w-3 mr-1" /> Regenerate
+                  </Button>
+                )}
+              </motion.div>
+            )}
+
+            {/* Step 5: CTA */}
+            {step === 5 && (
+              <motion.div key="s5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold">Primary action</h2>
                   <p className="text-sm text-muted-foreground">What should visitors do first?</p>
@@ -374,7 +472,7 @@ export default function Onboarding() {
                   ))}
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(3)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
+                  <Button variant="outline" onClick={() => setStep(4)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
                   <Button onClick={handleLaunch} disabled={saving} className="flex-1 shadow-glow">
                     {saving ? (
                       <div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full" />
