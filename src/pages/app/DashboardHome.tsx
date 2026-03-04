@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { useTasks, useUpdateTask } from "@/hooks/useTasks";
 import { useNeedsFollowUp } from "@/hooks/useNeedsFollowUp";
+import { useAnalyticsStats } from "@/hooks/useAnalytics";
 import { formatDistanceToNow, format } from "date-fns";
 
 const quickActions = [
@@ -37,10 +38,17 @@ export default function DashboardHome() {
   const { data: allTasks = [], isLoading: tasksLoading } = useTasks({ status: "open" });
   const updateTask = useUpdateTask();
   const { data: followUpContacts = [], isLoading: followUpLoading } = useNeedsFollowUp();
+  const { data: stats } = useAnalyticsStats(7);
 
   const today = new Date().toISOString().split("T")[0];
   const todayTasks = allTasks.filter((t: any) => t.due_date && t.due_date <= today);
   const upcomingTasks = allTasks.filter((t: any) => t.due_date && t.due_date > today).slice(0, 3);
+
+  const fmtChange = (c?: { value: number; type: string }) => {
+    if (!c || c.type === "neutral") return { text: "7d", type: "neutral" as const };
+    const prefix = c.type === "positive" ? "+" : "-";
+    return { text: `${prefix}${c.value}% vs prev 7d`, type: c.type as "positive" | "negative" };
+  };
 
   return (
     <div className="space-y-8 max-w-6xl">
@@ -49,12 +57,16 @@ export default function DashboardHome() {
         <p className="text-muted-foreground text-sm mt-1">Here's what needs your attention today.</p>
       </div>
 
-      {/* KPI Row */}
+      {/* KPI Row — real data */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPICard icon={Eye} title="Card Views" value={0} change="7d" changeType="neutral" />
-        <KPICard icon={MousePointer} title="Button Clicks" value={0} change="7d" changeType="neutral" />
-        <KPICard icon={Users} title="New Contacts" value={0} change="7d" changeType="neutral" />
-        <KPICard icon={Calendar} title="Bookings" value={0} change="7d" changeType="neutral" />
+        <KPICard icon={Eye} title="Card Views" value={stats?.views ?? 0}
+          change={fmtChange(stats?.viewsChange).text} changeType={fmtChange(stats?.viewsChange).type} />
+        <KPICard icon={MousePointer} title="Button Clicks" value={stats?.clicks ?? 0}
+          change={fmtChange(stats?.clicksChange).text} changeType={fmtChange(stats?.clicksChange).type} />
+        <KPICard icon={Users} title="New Contacts" value={stats?.contacts ?? 0}
+          change={fmtChange(stats?.contactsChange).text} changeType={fmtChange(stats?.contactsChange).type} />
+        <KPICard icon={Calendar} title="Bookings" value={stats?.bookings ?? 0}
+          change={fmtChange(stats?.bookingsChange).text} changeType={fmtChange(stats?.bookingsChange).type} />
       </div>
 
       {/* Quick Actions */}
@@ -159,18 +171,16 @@ export default function DashboardHome() {
             </div>
           )}
           {upcomingTasks.length > 0 && (
-            <>
-              <div className="border-t border-border mt-3 pt-3">
-                <p className="text-xs text-muted-foreground mb-2">Coming up</p>
-                {upcomingTasks.map((task: any) => (
-                  <div key={task.id} className="flex items-center gap-3 py-1.5 opacity-70">
-                    <Circle className={`h-4 w-4 shrink-0 ${priorityColors[task.priority]}`} />
-                    <span className="text-xs flex-1 truncate">{task.title}</span>
-                    <span className="text-[10px] text-muted-foreground">{task.due_date && format(new Date(task.due_date), "MMM d")}</span>
-                  </div>
-                ))}
-              </div>
-            </>
+            <div className="border-t border-border mt-3 pt-3">
+              <p className="text-xs text-muted-foreground mb-2">Coming up</p>
+              {upcomingTasks.map((task: any) => (
+                <div key={task.id} className="flex items-center gap-3 py-1.5 opacity-70">
+                  <Circle className={`h-4 w-4 shrink-0 ${priorityColors[task.priority]}`} />
+                  <span className="text-xs flex-1 truncate">{task.title}</span>
+                  <span className="text-[10px] text-muted-foreground">{task.due_date && format(new Date(task.due_date), "MMM d")}</span>
+                </div>
+              ))}
+            </div>
           )}
           <Button variant="ghost" size="sm" className="mt-3 text-xs gap-1 w-full justify-center" onClick={() => navigate("/app/tasks")}>
             <Plus className="h-3 w-3" /> Add Task
