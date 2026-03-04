@@ -1,0 +1,1 @@
+ALTER TABLE public.cards ADD CONSTRAINT cards_user_id_unique UNIQUE (user_id);
