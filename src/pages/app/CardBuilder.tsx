@@ -1,8 +1,8 @@
-import { CreditCard, Eye, Paintbrush, Smartphone, Save, Globe, QrCode, Sparkles, Loader2 } from "lucide-react";
+import { CreditCard, Eye, Paintbrush, Save, Globe, Sparkles, Loader2 } from "lucide-react";
 import QRShareDialog from "@/components/card/QRShareDialog";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -26,7 +26,8 @@ export default function CardBuilder() {
 
   const [sections, setSections] = useState<CardSection[]>(DEFAULT_SECTIONS);
   const [published, setPublished] = useState(false);
-  const [dirty, setDirty] = useState(false);
+  const hydrated = useRef(false);
+  const saveTimer = useRef<ReturnType<typeof setTimeout>>();
 
   const handleAIGenerate = async () => {
     if (!profile) return;
@@ -41,9 +42,10 @@ export default function CardBuilder() {
     }
   };
 
-  // Hydrate from DB
+  // Hydrate from DB only once
   useEffect(() => {
-    if (card) {
+    if (card && !hydrated.current) {
+      hydrated.current = true;
       const dbSections = card.sections_json as unknown as CardSection[] | null;
       if (dbSections && Array.isArray(dbSections) && dbSections.length > 0) {
         setSections(dbSections);
@@ -52,49 +54,48 @@ export default function CardBuilder() {
     }
   }, [card]);
 
-  const toggleSection = (id: string) => {
-    setSections((s) =>
-      s.map((sec) => (sec.id === id ? { ...sec, enabled: !sec.enabled } : sec))
-    );
-    setDirty(true);
-  };
+  // Auto-save sections after toggle (debounced 800ms)
+  const autoSave = useCallback(
+    (newSections: CardSection[]) => {
+      clearTimeout(saveTimer.current);
+      saveTimer.current = setTimeout(async () => {
+        try {
+          await upsertCard.mutateAsync({
+            sections_json: newSections as any,
+            status: published ? "published" : "draft",
+            theme_json: (card?.theme_json ?? {}) as any,
+          });
+          toast.success("Sections saved");
+        } catch {
+          toast.error("Failed to save sections");
+        }
+      }, 800);
+    },
+    [published, card, upsertCard],
+  );
 
-  const handleSave = async () => {
-    try {
-      await upsertCard.mutateAsync({
-        sections_json: sections as any,
-        status: published ? "published" : "draft",
-        theme_json: (card?.theme_json ?? {}) as any,
-      });
-      setDirty(false);
-      toast.success("Card saved");
-    } catch {
-      toast.error("Failed to save card");
-    }
+  const toggleSection = (id: string) => {
+    setSections((prev) => {
+      const next = prev.map((sec) =>
+        sec.id === id ? { ...sec, enabled: !sec.enabled } : sec
+      );
+      autoSave(next);
+      return next;
+    });
   };
 
   const handlePublishToggle = async (val: boolean) => {
     setPublished(val);
+    clearTimeout(saveTimer.current);
     try {
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: val ? "published" : "draft",
       });
       toast.success(val ? "Card published!" : "Card unpublished");
-      setDirty(false);
     } catch {
       toast.error("Failed to update status");
     }
-  };
-
-  // Resolve theme for preview
-  const themeTokens = (stylePack?.theme_tokens as Record<string, any>) ?? {};
-  const palettes = (stylePack?.default_palettes as any[]) ?? [];
-  const palette = palettes[0] ?? {
-    primary: "hsl(230, 80%, 56%)",
-    secondary: "#818cf8",
-    accent: "#a78bfa",
-    background: "#ffffff",
   };
 
   const primaryCta = profile?.primary_cta ?? "call";
@@ -129,12 +130,6 @@ export default function CardBuilder() {
             </span>
             <Switch checked={published} onCheckedChange={handlePublishToggle} />
           </div>
-          {dirty && (
-            <Button onClick={handleSave} disabled={upsertCard.isPending}>
-              <Save className="h-4 w-4 mr-2" />
-              Save
-            </Button>
-          )}
           {profile?.handle && (
             <QRShareDialog
               url={`${window.location.origin}/${profile.handle}`}
