@@ -94,15 +94,28 @@ export default function PublicCard() {
   const theme: ResolvedCardTheme = useMemo(() => {
     const tokens = (data?.stylePack?.theme_tokens as Record<string, any>) ?? {};
     const palettes = (data?.stylePack?.default_palettes as any[]) ?? [];
-    const palette = palettes[0] ?? DEFAULT_PALETTE;
-    return resolveCardTheme(tokens, palette);
-  }, [data?.stylePack]);
+    const basePalette = palettes[0] ?? DEFAULT_PALETTE;
+    const themeJson = (data?.card?.theme_json ?? {}) as Record<string, any>;
+    // User overrides from card builder theme editor take priority
+    const palette = themeJson.palette
+      ? { ...basePalette, ...themeJson.palette }
+      : basePalette;
+    // Merge custom fonts into tokens
+    const mergedTokens = themeJson.fonts
+      ? { ...tokens, fontPrimary: themeJson.fonts.primary, fontSecondary: themeJson.fonts.secondary }
+      : tokens;
+    return resolveCardTheme(mergedTokens, palette);
+  }, [data?.stylePack, data?.card?.theme_json]);
 
   // ── Load Google Fonts ──
   const fontsUrl = useMemo(() => {
     const tokens = (data?.stylePack?.theme_tokens as Record<string, any>) ?? {};
-    return getGoogleFontsUrl(tokens);
-  }, [data?.stylePack]);
+    const themeJson = (data?.card?.theme_json ?? {}) as Record<string, any>;
+    const mergedTokens = themeJson.fonts
+      ? { ...tokens, fontPrimary: themeJson.fonts.primary, fontSecondary: themeJson.fonts.secondary }
+      : tokens;
+    return getGoogleFontsUrl(mergedTokens);
+  }, [data?.stylePack, data?.card?.theme_json]);
 
   useEffect(() => {
     if (!fontsUrl) return;

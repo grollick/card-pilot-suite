@@ -1,9 +1,10 @@
-import { CreditCard, Eye, Paintbrush, Globe, Sparkles, Loader2, Pencil } from "lucide-react";
+import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil } from "lucide-react";
 import QRShareDialog from "@/components/card/QRShareDialog";
 import CardPhotoTools from "@/components/card/CardPhotoTools";
 import SectionEditor, { type SectionContent } from "@/components/card/SectionEditor";
 import CardAssistant from "@/components/card/CardAssistant";
 import SortableSectionItem from "@/components/card/SortableSectionItem";
+import CardThemeEditor, { type CardThemeOverrides } from "@/components/card/CardThemeEditor";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -49,6 +50,7 @@ export default function CardBuilder() {
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [themeEditorOpen, setThemeEditorOpen] = useState(false);
   const hydrated = useRef(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -231,6 +233,26 @@ export default function CardBuilder() {
   };
 
   const primaryCta = profile?.primary_cta ?? "call";
+
+  const currentThemeOverrides: CardThemeOverrides = {
+    palette: (card?.theme_json as any)?.palette ?? undefined,
+    fonts: (card?.theme_json as any)?.fonts ?? undefined,
+  };
+
+  const handleThemeSave = async (overrides: CardThemeOverrides) => {
+    try {
+      const existing = (card?.theme_json as any) ?? {};
+      await upsertCard.mutateAsync({
+        sections_json: sections as any,
+        status: published ? "published" : "draft",
+        theme_json: { ...existing, cover_url: coverUrl, palette: overrides.palette, fonts: overrides.fonts } as any,
+      });
+      toast.success("Theme updated!");
+    } catch {
+      toast.error("Failed to save theme");
+    }
+  };
+
   const editingSec = sections.find((s) => s.id === editingSection);
 
   // Preview content helpers
@@ -375,6 +397,14 @@ export default function CardBuilder() {
               onAvatarChange={handleAvatarChange}
               onCoverChange={handleCoverChange}
             />
+          </div>
+
+          {/* Theme */}
+          <div className="rounded-xl border border-border bg-card p-5">
+            <Button variant="outline" className="w-full" onClick={() => setThemeEditorOpen(true)}>
+              <Palette className="h-4 w-4 mr-2" />
+              Customize Theme
+            </Button>
           </div>
 
           {/* Sections */}
@@ -531,6 +561,19 @@ export default function CardBuilder() {
         />
       )}
 
+      {/* Theme Editor Sheet */}
+      <CardThemeEditor
+        open={themeEditorOpen}
+        onOpenChange={setThemeEditorOpen}
+        currentOverrides={currentThemeOverrides}
+        stylePackPalettes={(stylePack?.default_palettes as any[]) ?? undefined}
+        stylePackFonts={
+          stylePack?.theme_tokens
+            ? { primary: (stylePack.theme_tokens as any).fontPrimary ?? "Inter", secondary: (stylePack.theme_tokens as any).fontSecondary ?? "Inter" }
+            : undefined
+        }
+        onSave={handleThemeSave}
+      />
       {/* AI Assistant */}
       <CardAssistant
         context={{
