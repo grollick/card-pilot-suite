@@ -1,10 +1,16 @@
-import { Eye, MousePointer, Users, TrendingUp, Mail, BarChart3 } from "lucide-react";
+import { Eye, MousePointer, Users, TrendingUp, Mail, BarChart3, Calendar, Globe, Smartphone, Monitor, Tablet } from "lucide-react";
 import KPICard from "@/components/KPICard";
 import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
-import { useAnalyticsStats, useCtaBreakdown, useEmailStats } from "@/hooks/useAnalytics";
+import { useAnalyticsStats, useCtaBreakdown, useEmailStats, useReferrerBreakdown, useDeviceBreakdown } from "@/hooks/useAnalytics";
 import { Skeleton } from "@/components/ui/skeleton";
+
+const DEVICE_ICONS: Record<string, React.ReactNode> = {
+  Mobile: <Smartphone className="h-3.5 w-3.5" />,
+  Desktop: <Monitor className="h-3.5 w-3.5" />,
+  Tablet: <Tablet className="h-3.5 w-3.5" />,
+};
 
 export default function Analytics() {
   const [period, setPeriod] = useState("7");
@@ -12,6 +18,8 @@ export default function Analytics() {
   const { data: stats, isLoading } = useAnalyticsStats(days);
   const { data: ctaData = [] } = useCtaBreakdown(days);
   const { data: emailStats } = useEmailStats(days);
+  const { data: referrerData = [] } = useReferrerBreakdown(days);
+  const { data: deviceData = [] } = useDeviceBreakdown(days);
 
   const fmtChange = (c?: { value: number; type: string }) => {
     if (!c || c.type === "neutral") return { text: `${days}d`, type: "neutral" as const };
@@ -43,17 +51,19 @@ export default function Analytics() {
 
       {/* KPIs */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-28 rounded-xl" />)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-28 rounded-xl" />)}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <KPICard icon={Eye} title="Card Views" value={stats?.views ?? 0}
             change={fmtChange(stats?.viewsChange).text} changeType={fmtChange(stats?.viewsChange).type} />
           <KPICard icon={MousePointer} title="CTA Clicks" value={stats?.clicks ?? 0}
             change={fmtChange(stats?.clicksChange).text} changeType={fmtChange(stats?.clicksChange).type} />
           <KPICard icon={Users} title="Leads Captured" value={stats?.contacts ?? 0}
             change={fmtChange(stats?.contactsChange).text} changeType={fmtChange(stats?.contactsChange).type} />
+          <KPICard icon={Calendar} title="Bookings" value={stats?.bookings ?? 0}
+            change={fmtChange(stats?.bookingsChange).text} changeType={fmtChange(stats?.bookingsChange).type} />
           <KPICard icon={TrendingUp} title="Conversion Rate" value={`${stats?.conversionRate ?? 0}%`}
             change={`${(stats?.conversionChange ?? 0) >= 0 ? "+" : ""}${stats?.conversionChange ?? 0}% vs prev`}
             changeType={(stats?.conversionChange ?? 0) > 0 ? "positive" : (stats?.conversionChange ?? 0) < 0 ? "negative" : "neutral"} />
@@ -115,7 +125,65 @@ export default function Analytics() {
         </motion.div>
       </div>
 
-      {/* Email & Bookings Row */}
+      {/* Referrer & Device Breakdown */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}
+          className="rounded-xl border border-border bg-card p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Globe className="h-4 w-4 text-primary" />
+            <h2 className="font-semibold">Traffic Sources</h2>
+          </div>
+          {referrerData.length === 0 ? (
+            <div className="h-32 flex items-center justify-center text-sm text-muted-foreground">No traffic data yet</div>
+          ) : (
+            <div className="space-y-3">
+              {referrerData.slice(0, 6).map(r => (
+                <div key={r.source}>
+                  <div className="flex items-center justify-between text-sm mb-1">
+                    <span className="font-medium truncate max-w-[180px]">{r.source}</span>
+                    <span className="text-muted-foreground text-xs">{r.count} ({r.pct}%)</span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                    <div className="h-full rounded-full bg-primary/70 transition-all" style={{ width: `${r.pct}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}
+          className="rounded-xl border border-border bg-card p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Smartphone className="h-4 w-4 text-primary" />
+            <h2 className="font-semibold">Devices</h2>
+          </div>
+          {deviceData.length === 0 ? (
+            <div className="h-32 flex items-center justify-center text-sm text-muted-foreground">No device data yet</div>
+          ) : (
+            <div className="space-y-4">
+              {deviceData.map(d => (
+                <div key={d.device} className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-muted/50 flex items-center justify-center text-muted-foreground">
+                    {DEVICE_ICONS[d.device] ?? <Monitor className="h-3.5 w-3.5" />}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between text-sm mb-1">
+                      <span className="font-medium">{d.device}</span>
+                      <span className="text-muted-foreground text-xs">{d.count} ({d.pct}%)</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                      <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${d.pct}%` }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      </div>
+
+      {/* Email & Period Summary */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
           className="rounded-xl border border-border bg-card p-5">
