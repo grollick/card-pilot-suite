@@ -37,6 +37,14 @@ export default function AutomationPage() {
     },
   });
 
+  const { data: stages = [] } = useQuery({
+    queryKey: ["pipeline-stages-list"],
+    queryFn: async () => {
+      const { data } = await supabase.from("pipeline_stages").select("id, name").order("sort_order");
+      return data ?? [];
+    },
+  });
+
   // Seed defaults on first visit
   useEffect(() => {
     if (!isLoading && rules.length === 0) {
@@ -195,7 +203,17 @@ export default function AutomationPage() {
             {/* Action */}
             <div>
               <Label className="text-xs uppercase tracking-wide text-muted-foreground">Do this…</Label>
-              <Select value={actionType} onValueChange={v => { setActionType(v); setActionConfig(v === "create_task" ? { title: "Follow up with {name}", type: "follow_up", priority: "medium", due_offset_hours: 24 } : v === "send_email" ? { title: "Send email to {name}", template_id: "" } : { title: "Log activity for {name}", activity_type: "note", description: "" }); }}>
+              <Select value={actionType} onValueChange={v => {
+                setActionType(v);
+                const defaults: Record<string, Record<string, any>> = {
+                  create_task: { title: "Follow up with {name}", type: "follow_up", priority: "medium", due_offset_hours: 24 },
+                  send_email: { title: "Send email to {name}", template_id: "" },
+                  log_activity: { title: "Log activity for {name}", activity_type: "note", description: "" },
+                  move_stage: { title: "Move {name} to next stage", target_stage_id: "" },
+                  send_notification: { title: "Reminder about {name}", message: "" },
+                };
+                setActionConfig(defaults[v] ?? { title: "" });
+              }}>
                 <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {ACTION_TYPES.map(a => <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>)}
@@ -262,6 +280,27 @@ export default function AutomationPage() {
                       <Label className="text-xs">Description</Label>
                       <Input value={actionConfig.description ?? ""} onChange={e => setActionConfig({ ...actionConfig, description: e.target.value })} className="mt-1" />
                     </div>
+                  </div>
+                )}
+
+                {actionType === "move_stage" && (
+                  <div>
+                    <Label className="text-xs">Target stage</Label>
+                    <Select value={actionConfig.target_stage_id ?? ""} onValueChange={v => setActionConfig({ ...actionConfig, target_stage_id: v })}>
+                      <SelectTrigger className="mt-1"><SelectValue placeholder="Select stage" /></SelectTrigger>
+                      <SelectContent>
+                        {stages.map(s => <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>)}
+                        {stages.length === 0 && <SelectItem value="" disabled>No stages created yet</SelectItem>}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {actionType === "send_notification" && (
+                  <div>
+                    <Label className="text-xs">Notification message</Label>
+                    <Input value={actionConfig.message ?? ""} onChange={e => setActionConfig({ ...actionConfig, message: e.target.value })}
+                      placeholder="Custom message (optional)" className="mt-1" />
                   </div>
                 )}
               </div>
