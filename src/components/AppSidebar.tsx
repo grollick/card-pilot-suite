@@ -85,7 +85,10 @@ export function AppSidebar() {
       <SidebarHeader className="p-4">
         <div className="flex items-center justify-between">
           {!collapsed && (
-            <span className="text-lg font-bold tracking-tight gradient-text">CardPilot</span>
+            <div>
+              <span className="text-lg font-bold tracking-tight gradient-text">CardPilot</span>
+              <p className="text-[10px] text-muted-foreground/60 leading-tight mt-0.5">Auto follow-up. Auto close.</p>
+            </div>
           )}
           <Button
             variant="ghost"

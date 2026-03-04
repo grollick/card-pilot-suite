@@ -240,7 +240,7 @@ export default function Onboarding() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-lg">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold gradient-text">CardPilot</h1>
-          <p className="text-sm text-muted-foreground mt-1">Let's set up your digital business card</p>
+          <p className="text-sm text-muted-foreground mt-1">The card that automatically follows up with every lead</p>
         </div>
 
         {/* Progress */}

@@ -61,7 +61,10 @@ export default function Auth() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm">
         <div className="text-center mb-8">
           <Link to="/"><h1 className="text-2xl font-bold gradient-text">CardPilot</h1></Link>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground mt-1.5 max-w-[260px] mx-auto">
+            The digital business card that automatically follows up with every lead.
+          </p>
+          <p className="text-sm text-muted-foreground mt-3">
             {mode === "login" ? "Welcome back" : mode === "signup" ? "Create your account" : "Sign in with magic link"}
           </p>
         </div>
