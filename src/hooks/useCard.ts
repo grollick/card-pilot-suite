@@ -32,6 +32,7 @@ export interface CardSection {
   id: string;
   label: string;
   enabled: boolean;
+  content?: Record<string, any>;
 }
 
 // ── Fetch current user's card ──

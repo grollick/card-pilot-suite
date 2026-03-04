@@ -1,6 +1,7 @@
-import { CreditCard, Eye, Paintbrush, Save, Globe, Sparkles, Loader2 } from "lucide-react";
+import { CreditCard, Eye, Paintbrush, Globe, Sparkles, Loader2, Pencil } from "lucide-react";
 import QRShareDialog from "@/components/card/QRShareDialog";
 import CardPhotoTools from "@/components/card/CardPhotoTools";
+import SectionEditor, { type SectionContent } from "@/components/card/SectionEditor";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -15,7 +16,6 @@ import {
   CTA_TYPES,
   type CardSection,
 } from "@/hooks/useCard";
-import { resolveCardTheme } from "@/lib/cardTokens";
 import { useGenerateCardContent } from "@/hooks/useGenerateContent";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -31,6 +31,7 @@ export default function CardBuilder() {
   const [published, setPublished] = useState(false);
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [editingSection, setEditingSection] = useState<string | null>(null);
   const hydrated = useRef(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,35 +59,35 @@ export default function CardBuilder() {
         setSections(dbSections);
       }
       setPublished(card.status === "published");
-      // Hydrate cover from theme_json
       const themeJson = card.theme_json as any;
       if (themeJson?.cover_url) setCoverUrl(themeJson.cover_url);
     }
   }, [card]);
 
-  // Hydrate avatar from profile
   useEffect(() => {
-    if (profile?.avatar_url) {
-      setAvatarUrl(profile.avatar_url);
-    }
+    if (profile?.avatar_url) setAvatarUrl(profile.avatar_url);
   }, [profile]);
 
-  // Auto-save sections after toggle (debounced 800ms)
-  const autoSave = useCallback(
-    (newSections: CardSection[]) => {
+  const saveSections = useCallback(
+    async (newSections: CardSection[], immediate = false) => {
       clearTimeout(saveTimer.current);
-      saveTimer.current = setTimeout(async () => {
+      const doSave = async () => {
         try {
           await upsertCard.mutateAsync({
             sections_json: newSections as any,
             status: published ? "published" : "draft",
             theme_json: { ...(card?.theme_json as any ?? {}), cover_url: coverUrl } as any,
           });
-          toast.success("Sections saved");
+          toast.success("Card saved");
         } catch {
-          toast.error("Failed to save sections");
+          toast.error("Failed to save");
         }
-      }, 800);
+      };
+      if (immediate) {
+        await doSave();
+      } else {
+        saveTimer.current = setTimeout(doSave, 800);
+      }
     },
     [published, card, upsertCard, coverUrl],
   );
@@ -96,7 +97,17 @@ export default function CardBuilder() {
       const next = prev.map((sec) =>
         sec.id === id ? { ...sec, enabled: !sec.enabled } : sec
       );
-      autoSave(next);
+      saveSections(next);
+      return next;
+    });
+  };
+
+  const handleSectionContentSave = (sectionId: string, content: SectionContent) => {
+    setSections((prev) => {
+      const next = prev.map((sec) =>
+        sec.id === sectionId ? { ...sec, content } : sec
+      );
+      saveSections(next, true);
       return next;
     });
   };
@@ -123,20 +134,101 @@ export default function CardBuilder() {
 
   const handleCoverChange = async (url: string) => {
     setCoverUrl(url);
-    // Save cover_url to card theme_json
     try {
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: published ? "published" : "draft",
         theme_json: { ...(card?.theme_json as any ?? {}), cover_url: url } as any,
       });
-      toast.success("Backdrop saved!");
     } catch {
       toast.error("Failed to save backdrop");
     }
   };
 
   const primaryCta = profile?.primary_cta ?? "call";
+  const editingSec = sections.find((s) => s.id === editingSection);
+
+  // Preview content helpers
+  const getSectionPreview = (section: CardSection) => {
+    const c = section.content;
+    if (!c) return <p className="text-xs text-muted-foreground text-center">{section.label} Section</p>;
+
+    switch (section.id) {
+      case "hero":
+        return c.tagline ? (
+          <div className="text-center">
+            <p className="text-sm font-semibold">{c.tagline}</p>
+            {c.subtitle && <p className="text-xs text-muted-foreground mt-0.5">{c.subtitle}</p>}
+          </div>
+        ) : <p className="text-xs text-muted-foreground text-center">Hero Section</p>;
+
+      case "about":
+        return c.text ? (
+          <p className="text-xs leading-relaxed">{c.text}</p>
+        ) : <p className="text-xs text-muted-foreground text-center">About Section</p>;
+
+      case "services":
+        return c.items?.length ? (
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Services</p>
+            {c.items.map((item: any, i: number) => (
+              <div key={i} className="flex items-center justify-between text-xs">
+                <span>{item.name || "Untitled"}</span>
+                {item.price && <span className="text-muted-foreground">{item.price}</span>}
+              </div>
+            ))}
+          </div>
+        ) : <p className="text-xs text-muted-foreground text-center">Services Section</p>;
+
+      case "testimonials":
+        return c.testimonials?.length ? (
+          <div className="space-y-2">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Testimonials</p>
+            {c.testimonials.map((t: any, i: number) => (
+              <div key={i} className="text-xs italic">
+                "{t.text}" — <span className="font-medium not-italic">{t.name}</span>
+              </div>
+            ))}
+          </div>
+        ) : <p className="text-xs text-muted-foreground text-center">Testimonials Section</p>;
+
+      case "gallery":
+        return c.images?.length ? (
+          <div className="grid grid-cols-3 gap-1">
+            {c.images.slice(0, 6).map((img: any, i: number) => (
+              <img key={i} src={img.url} alt={img.caption || ""} className="w-full h-16 object-cover rounded" />
+            ))}
+          </div>
+        ) : <p className="text-xs text-muted-foreground text-center">Gallery Section</p>;
+
+      case "social":
+        return c.links?.length ? (
+          <div className="flex flex-wrap gap-2">
+            {c.links.map((l: any, i: number) => (
+              <span key={i} className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">
+                {l.platform}
+              </span>
+            ))}
+          </div>
+        ) : <p className="text-xs text-muted-foreground text-center">Social Links</p>;
+
+      case "contact":
+        return (
+          <div className="text-center">
+            <p className="text-xs font-medium">{c.heading || "Get in Touch"}</p>
+            {c.description && <p className="text-[10px] text-muted-foreground mt-0.5">{c.description}</p>}
+          </div>
+        );
+
+      case "booking":
+        return (
+          <p className="text-xs text-center font-medium">{c.bookingHeading || "Book an Appointment"}</p>
+        );
+
+      default:
+        return <p className="text-xs text-muted-foreground text-center">{section.label} Section</p>;
+    }
+  };
 
   if (cardLoading) {
     return (
@@ -148,12 +240,11 @@ export default function CardBuilder() {
 
   return (
     <div className="space-y-6 max-w-6xl">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Card Builder</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Design and publish your digital business card
-          </p>
+          <p className="text-muted-foreground text-sm mt-1">Design and publish your digital business card</p>
           {profile?.handle && (
             <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
               <Globe className="h-3 w-3" />
@@ -163,9 +254,7 @@ export default function CardBuilder() {
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              {published ? "Published" : "Unpublished"}
-            </span>
+            <span className="text-sm text-muted-foreground">{published ? "Published" : "Unpublished"}</span>
             <Switch checked={published} onCheckedChange={handlePublishToggle} />
           </div>
           {profile?.handle && (
@@ -192,7 +281,7 @@ export default function CardBuilder() {
           animate={{ opacity: 1, x: 0 }}
           className="lg:col-span-1 space-y-4"
         >
-          {/* Photo & Backdrop Tools */}
+          {/* Photo & Backdrop */}
           <div className="rounded-xl border border-border bg-card p-5">
             <CardPhotoTools
               avatarUrl={avatarUrl}
@@ -203,7 +292,7 @@ export default function CardBuilder() {
             />
           </div>
 
-          {/* Sections panel */}
+          {/* Sections */}
           <div className="rounded-xl border border-border bg-card p-5 space-y-4">
             <div className="flex items-center gap-2">
               <Paintbrush className="h-4 w-4 text-primary" />
@@ -215,7 +304,16 @@ export default function CardBuilder() {
                   key={section.id}
                   className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:bg-muted/30 transition-colors"
                 >
-                  <span className="text-sm font-medium">{section.label}</span>
+                  <button
+                    className="flex items-center gap-2 text-sm font-medium text-left flex-1 min-w-0"
+                    onClick={() => setEditingSection(section.id)}
+                  >
+                    <Pencil className="h-3 w-3 text-muted-foreground shrink-0" />
+                    <span className="truncate">{section.label}</span>
+                    {section.content && Object.keys(section.content).length > 0 && (
+                      <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
+                    )}
+                  </button>
                   <Switch
                     checked={section.enabled}
                     onCheckedChange={() => toggleSection(section.id)}
@@ -226,17 +324,8 @@ export default function CardBuilder() {
 
             {/* AI Generate */}
             <div className="pt-3 border-t border-border/50">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={handleAIGenerate}
-                disabled={isGenerating}
-              >
-                {isGenerating ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                ) : (
-                  <Sparkles className="h-4 w-4 mr-2" />
-                )}
+              <Button variant="outline" className="w-full" onClick={handleAIGenerate} disabled={isGenerating}>
+                {isGenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
                 {isGenerating ? "Generating..." : "AI Write My Card"}
               </Button>
               {aiContent && (
@@ -255,9 +344,7 @@ export default function CardBuilder() {
               <p className="text-sm font-semibold capitalize">
                 {CTA_TYPES.find((c) => c.value === primaryCta)?.label ?? primaryCta}
               </p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">
-                Change in Settings → Profile
-              </p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Change in Settings → Profile</p>
             </div>
           </div>
         </motion.div>
@@ -271,34 +358,24 @@ export default function CardBuilder() {
         >
           <div className="w-full max-w-sm mx-auto">
             <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-card">
-              {/* Cover/Backdrop */}
+              {/* Cover */}
               <div
-                className="h-28 relative cursor-pointer group"
+                className="h-28 relative"
                 style={{
                   background: coverUrl
                     ? `url(${coverUrl}) center/cover`
                     : "linear-gradient(135deg, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))",
                 }}
-              >
-                {!coverUrl && (
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/20 rounded-t-2xl">
-                    <p className="text-xs text-white font-medium">Generate a backdrop →</p>
-                  </div>
-                )}
-              </div>
+              />
 
               <div className="px-5 pb-5 -mt-10">
-                {/* Avatar - clickable to upload */}
+                {/* Avatar */}
                 <div
                   className="h-20 w-20 rounded-2xl bg-muted border-4 border-card flex items-center justify-center mb-3 cursor-pointer relative group overflow-hidden"
                   onClick={() => fileInputRef.current?.click()}
                 >
                   {avatarUrl ? (
-                    <img
-                      src={avatarUrl}
-                      alt="avatar"
-                      className="h-full w-full object-cover rounded-2xl"
-                    />
+                    <img src={avatarUrl} alt="avatar" className="h-full w-full object-cover rounded-2xl" />
                   ) : (
                     <CreditCard className="h-8 w-8 text-muted-foreground" />
                   )}
@@ -318,9 +395,7 @@ export default function CardBuilder() {
                       const { supabase } = await import("@/integrations/supabase/client");
                       const ext = file.name.split(".").pop() || "jpg";
                       const path = `${profile.id}/avatar.${ext}`;
-                      const { error } = await supabase.storage
-                        .from("card-assets")
-                        .upload(path, file, { upsert: true });
+                      const { error } = await supabase.storage.from("card-assets").upload(path, file, { upsert: true });
                       if (error) throw error;
                       const { data } = supabase.storage.from("card-assets").getPublicUrl(path);
                       const url = `${data.publicUrl}?t=${Date.now()}`;
@@ -334,32 +409,32 @@ export default function CardBuilder() {
                 />
 
                 <h3 className="text-lg font-bold">{profile?.name || "Your Name"}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {professionName}
-                </p>
+                <p className="text-sm text-muted-foreground">{professionName}</p>
 
                 <div className="flex gap-2 mt-4">
                   <Button size="sm" className="flex-1 text-xs">
                     {CTA_TYPES.find((c) => c.value === primaryCta)?.label ?? "Call"}
                   </Button>
-                  <Button size="sm" variant="outline" className="flex-1 text-xs">
-                    Text
-                  </Button>
-                  <Button size="sm" variant="outline" className="flex-1 text-xs">
-                    Email
-                  </Button>
+                  <Button size="sm" variant="outline" className="flex-1 text-xs">Text</Button>
+                  <Button size="sm" variant="outline" className="flex-1 text-xs">Email</Button>
                 </div>
 
+                {/* Section previews - clickable to edit */}
                 {sections
                   .filter((s) => s.enabled)
                   .map((section) => (
                     <div
                       key={section.id}
-                      className="mt-4 p-3 rounded-lg border border-dashed border-border/60 bg-muted/20"
+                      className="mt-4 p-3 rounded-lg border border-dashed border-border/60 bg-muted/20 cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-colors group"
+                      onClick={() => setEditingSection(section.id)}
                     >
-                      <p className="text-xs text-muted-foreground text-center">
-                        {section.label} Section
-                      </p>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                          {section.label}
+                        </span>
+                        <Pencil className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                      {getSectionPreview(section)}
                     </div>
                   ))}
               </div>
@@ -367,6 +442,18 @@ export default function CardBuilder() {
           </div>
         </motion.div>
       </div>
+
+      {/* Section Editor Sheet */}
+      {editingSec && (
+        <SectionEditor
+          sectionId={editingSec.id}
+          sectionLabel={editingSec.label}
+          content={(editingSec.content || {}) as SectionContent}
+          open={!!editingSection}
+          onOpenChange={(open) => { if (!open) setEditingSection(null); }}
+          onSave={(content) => handleSectionContentSave(editingSec.id, content)}
+        />
+      )}
     </div>
   );
 }
