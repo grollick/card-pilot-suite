@@ -3,11 +3,27 @@ import QRShareDialog from "@/components/card/QRShareDialog";
 import CardPhotoTools from "@/components/card/CardPhotoTools";
 import SectionEditor, { type SectionContent } from "@/components/card/SectionEditor";
 import CardAssistant from "@/components/card/CardAssistant";
+import SortableSectionItem from "@/components/card/SortableSectionItem";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
 import {
   useCard,
   useUpsertCard,
@@ -36,6 +52,11 @@ export default function CardBuilder() {
   const hydrated = useRef(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   const professionName = (profile as any)?.professions?.name ?? "Professional";
 
@@ -98,6 +119,18 @@ export default function CardBuilder() {
       const next = prev.map((sec) =>
         sec.id === id ? { ...sec, enabled: !sec.enabled } : sec
       );
+      saveSections(next);
+      return next;
+    });
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    setSections((prev) => {
+      const oldIndex = prev.findIndex((s) => s.id === active.id);
+      const newIndex = prev.findIndex((s) => s.id === over.id);
+      const next = arrayMove(prev, oldIndex, newIndex);
       saveSections(next);
       return next;
     });
@@ -350,29 +383,20 @@ export default function CardBuilder() {
               <Paintbrush className="h-4 w-4 text-primary" />
               <h2 className="font-semibold">Sections</h2>
             </div>
-            <div className="space-y-2">
-              {sections.map((section) => (
-                <div
-                  key={section.id}
-                  className="flex items-center justify-between p-3 rounded-lg border border-border/50 hover:bg-muted/30 transition-colors"
-                >
-                  <button
-                    className="flex items-center gap-2 text-sm font-medium text-left flex-1 min-w-0"
-                    onClick={() => setEditingSection(section.id)}
-                  >
-                    <Pencil className="h-3 w-3 text-muted-foreground shrink-0" />
-                    <span className="truncate">{section.label}</span>
-                    {section.content && Object.keys(section.content).length > 0 && (
-                      <span className="h-1.5 w-1.5 rounded-full bg-primary shrink-0" />
-                    )}
-                  </button>
-                  <Switch
-                    checked={section.enabled}
-                    onCheckedChange={() => toggleSection(section.id)}
-                  />
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+                <div className="space-y-2">
+                  {sections.map((section) => (
+                    <SortableSectionItem
+                      key={section.id}
+                      section={section}
+                      onEdit={setEditingSection}
+                      onToggle={toggleSection}
+                    />
+                  ))}
                 </div>
-              ))}
-            </div>
+              </SortableContext>
+            </DndContext>
 
             {/* AI Generate */}
             <div className="pt-3 border-t border-border/50">
