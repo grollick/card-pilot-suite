@@ -126,6 +126,7 @@ export type Database = {
           customer_phone: string | null
           end_datetime: string
           id: string
+          internal_notes: string | null
           lead_id: string | null
           notes: string | null
           service_id: string | null
@@ -141,6 +142,7 @@ export type Database = {
           customer_phone?: string | null
           end_datetime: string
           id?: string
+          internal_notes?: string | null
           lead_id?: string | null
           notes?: string | null
           service_id?: string | null
@@ -156,6 +158,7 @@ export type Database = {
           customer_phone?: string | null
           end_datetime?: string
           id?: string
+          internal_notes?: string | null
           lead_id?: string | null
           notes?: string | null
           service_id?: string | null
@@ -334,9 +337,11 @@ export type Database = {
         Row: {
           activity_type: string
           created_at: string
+          created_by_user_id: string | null
           description: string | null
           id: string
           lead_id: string
+          occurred_at: string
           related_id: string | null
           title: string
           user_id: string
@@ -344,9 +349,11 @@ export type Database = {
         Insert: {
           activity_type: string
           created_at?: string
+          created_by_user_id?: string | null
           description?: string | null
           id?: string
           lead_id: string
+          occurred_at?: string
           related_id?: string | null
           title: string
           user_id: string
@@ -354,9 +361,11 @@ export type Database = {
         Update: {
           activity_type?: string
           created_at?: string
+          created_by_user_id?: string | null
           description?: string | null
           id?: string
           lead_id?: string
+          occurred_at?: string
           related_id?: string | null
           title?: string
           user_id?: string
@@ -367,6 +376,39 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contact_tags: {
+        Row: {
+          created_at: string
+          lead_id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string
+          lead_id: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string
+          lead_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_tags_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
             referencedColumns: ["id"]
           },
         ]
@@ -403,40 +445,55 @@ export type Database = {
       }
       leads: {
         Row: {
+          assigned_to_user_id: string | null
+          company: string | null
           created_at: string
           email: string | null
           id: string
+          last_activity_at: string | null
           name: string
+          next_activity_at: string | null
           notes: string | null
           phone: string | null
           source: Database["public"]["Enums"]["lead_source"]
           stage_id: string | null
+          status: string
           tags: string[] | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          assigned_to_user_id?: string | null
+          company?: string | null
           created_at?: string
           email?: string | null
           id?: string
+          last_activity_at?: string | null
           name: string
+          next_activity_at?: string | null
           notes?: string | null
           phone?: string | null
           source?: Database["public"]["Enums"]["lead_source"]
           stage_id?: string | null
+          status?: string
           tags?: string[] | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          assigned_to_user_id?: string | null
+          company?: string | null
           created_at?: string
           email?: string | null
           id?: string
+          last_activity_at?: string | null
           name?: string
+          next_activity_at?: string | null
           notes?: string | null
           phone?: string | null
           source?: Database["public"]["Enums"]["lead_source"]
           stage_id?: string | null
+          status?: string
           tags?: string[] | null
           updated_at?: string
           user_id?: string
@@ -455,6 +512,8 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_lost: boolean
+          is_won: boolean
           name: string
           sort_order: number
           user_id: string
@@ -462,6 +521,8 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_lost?: boolean
+          is_won?: boolean
           name: string
           sort_order?: number
           user_id: string
@@ -469,6 +530,8 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_lost?: boolean
+          is_won?: boolean
           name?: string
           sort_order?: number
           user_id?: string
@@ -674,44 +737,93 @@ export type Database = {
         }
         Relationships: []
       }
+      tags: {
+        Row: {
+          color: string | null
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
+          assigned_to_user_id: string | null
+          booking_id: string | null
           completed: boolean
           completed_at: string | null
           created_at: string
+          created_by_user_id: string | null
           due_date: string | null
           id: string
           lead_id: string | null
           priority: string
+          remind_at: string | null
+          status: string
           title: string
+          type: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          assigned_to_user_id?: string | null
+          booking_id?: string | null
           completed?: boolean
           completed_at?: string | null
           created_at?: string
+          created_by_user_id?: string | null
           due_date?: string | null
           id?: string
           lead_id?: string | null
           priority?: string
+          remind_at?: string | null
+          status?: string
           title: string
+          type?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          assigned_to_user_id?: string | null
+          booking_id?: string | null
           completed?: boolean
           completed_at?: string | null
           created_at?: string
+          created_by_user_id?: string | null
           due_date?: string | null
           id?: string
           lead_id?: string | null
           priority?: string
+          remind_at?: string | null
+          status?: string
           title?: string
+          type?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "tasks_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tasks_lead_id_fkey"
             columns: ["lead_id"]
@@ -751,6 +863,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      owns_lead: {
+        Args: { _lead_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       analytics_event_type:
@@ -759,11 +875,23 @@ export type Database = {
         | "form_submit"
         | "booking_created"
       app_role: "admin" | "user"
-      booking_status: "pending" | "confirmed" | "cancelled" | "completed"
+      booking_status:
+        | "pending"
+        | "confirmed"
+        | "cancelled"
+        | "completed"
+        | "requested"
+        | "no_show"
       campaign_email_status: "pending" | "sent" | "failed" | "bounced"
       campaign_status: "draft" | "sending" | "sent" | "paused"
       card_status: "draft" | "published" | "unpublished"
-      lead_source: "card_form" | "booking" | "manual" | "import"
+      lead_source:
+        | "card_form"
+        | "booking"
+        | "manual"
+        | "import"
+        | "referral"
+        | "other"
       social_post_status: "draft" | "scheduled" | "published" | "failed"
     }
     CompositeTypes: {
@@ -899,11 +1027,25 @@ export const Constants = {
         "booking_created",
       ],
       app_role: ["admin", "user"],
-      booking_status: ["pending", "confirmed", "cancelled", "completed"],
+      booking_status: [
+        "pending",
+        "confirmed",
+        "cancelled",
+        "completed",
+        "requested",
+        "no_show",
+      ],
       campaign_email_status: ["pending", "sent", "failed", "bounced"],
       campaign_status: ["draft", "sending", "sent", "paused"],
       card_status: ["draft", "published", "unpublished"],
-      lead_source: ["card_form", "booking", "manual", "import"],
+      lead_source: [
+        "card_form",
+        "booking",
+        "manual",
+        "import",
+        "referral",
+        "other",
+      ],
       social_post_status: ["draft", "scheduled", "published", "failed"],
     },
   },

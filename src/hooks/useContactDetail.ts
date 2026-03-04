@@ -1,33 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
-export interface ContactActivity {
-  id: string;
-  activity_type: string;
-  title: string;
-  description: string | null;
-  related_id: string | null;
-  created_at: string;
-}
-
-export interface ContactTask {
-  id: string;
-  title: string;
-  due_date: string | null;
-  priority: string;
-  completed: boolean;
-}
-
-export interface ContactBooking {
-  id: string;
-  customer_name: string;
-  start_datetime: string;
-  end_datetime: string;
-  status: string;
-  service_id: string | null;
-  notes: string | null;
-}
-
 export function useContact(id: string | undefined) {
   return useQuery({
     queryKey: ["contact", id],
@@ -35,7 +8,7 @@ export function useContact(id: string | undefined) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("leads")
-        .select("*, pipeline_stages(name)")
+        .select("*, pipeline_stages(id, name, is_won, is_lost), contact_tags(tag_id, tags(id, name, color))")
         .eq("id", id!)
         .single();
       if (error) throw error;
@@ -53,10 +26,10 @@ export function useContactActivities(leadId: string | undefined) {
         .from("contact_activities")
         .select("*")
         .eq("lead_id", leadId!)
-        .order("created_at", { ascending: false })
+        .order("occurred_at", { ascending: false })
         .limit(50);
       if (error) throw error;
-      return (data ?? []) as ContactActivity[];
+      return data ?? [];
     },
   });
 }
@@ -70,11 +43,11 @@ export function useContactTasks(leadId: string | undefined) {
         .from("tasks")
         .select("*")
         .eq("lead_id", leadId!)
-        .order("completed", { ascending: true })
+        .order("status", { ascending: true })
         .order("due_date", { ascending: true })
         .limit(20);
       if (error) throw error;
-      return (data ?? []) as ContactTask[];
+      return data ?? [];
     },
   });
 }
@@ -86,12 +59,12 @@ export function useContactBookings(leadId: string | undefined) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
-        .select("*")
+        .select("*, booking_services(name)")
         .eq("lead_id", leadId!)
         .order("start_datetime", { ascending: false })
         .limit(10);
       if (error) throw error;
-      return (data ?? []) as ContactBooking[];
+      return data ?? [];
     },
   });
 }
