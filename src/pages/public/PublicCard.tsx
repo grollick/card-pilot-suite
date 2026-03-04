@@ -3,26 +3,42 @@ import {
   MessageSquare,
   Mail,
   Download,
-  MapPin,
   Star,
   Send,
   Calendar,
   FileText,
   Globe,
   Loader2,
-  Share2,
+  MapPin,
+  Instagram,
+  Facebook,
+  Linkedin,
+  Twitter,
+  Youtube,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import { Link, useParams } from "react-router-dom";
 import { usePublicCard, CTA_TYPES, type CardSection } from "@/hooks/useCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { downloadVCard } from "@/lib/vcard";
+import {
+  resolveCardTheme,
+  getGoogleFontsUrl,
+  type ResolvedCardTheme,
+} from "@/lib/cardTokens";
+import CardHeader from "@/components/card/CardHeader";
+import CardButton from "@/components/card/CardButton";
+import CardSectionWrapper from "@/components/card/CardSectionWrapper";
+import QRShareDialog from "@/components/card/QRShareDialog";
+import NFCShareDialog from "@/components/card/NFCShareDialog";
+import WalletPassDialog from "@/components/card/WalletPassDialog";
 
+// ── Visitor meta for analytics ──
 function getVisitorMeta() {
   return {
     referrer: document.referrer || null,
@@ -35,23 +51,36 @@ function getVisitorMeta() {
     timestamp: new Date().toISOString(),
   };
 }
-import QRShareDialog from "@/components/card/QRShareDialog";
-import NFCShareDialog from "@/components/card/NFCShareDialog";
-import WalletPassDialog from "@/components/card/WalletPassDialog";
 
 const CTA_ICONS: Record<string, React.ReactNode> = {
-  call: <Phone className="h-4 w-4 mr-1.5" />,
-  text: <MessageSquare className="h-4 w-4 mr-1.5" />,
-  email: <Mail className="h-4 w-4 mr-1.5" />,
-  book: <Calendar className="h-4 w-4 mr-1.5" />,
-  quote: <FileText className="h-4 w-4 mr-1.5" />,
-  vcard: <Download className="h-4 w-4 mr-1.5" />,
-  website: <Globe className="h-4 w-4 mr-1.5" />,
+  call: <Phone className="h-4 w-4" />,
+  text: <MessageSquare className="h-4 w-4" />,
+  email: <Mail className="h-4 w-4" />,
+  book: <Calendar className="h-4 w-4" />,
+  quote: <FileText className="h-4 w-4" />,
+  vcard: <Download className="h-4 w-4" />,
+  website: <Globe className="h-4 w-4" />,
+};
+
+const SOCIAL_ICONS: Record<string, React.ReactNode> = {
+  instagram: <Instagram className="h-5 w-5" />,
+  facebook: <Facebook className="h-5 w-5" />,
+  linkedin: <Linkedin className="h-5 w-5" />,
+  twitter: <Twitter className="h-5 w-5" />,
+  youtube: <Youtube className="h-5 w-5" />,
+  website: <Globe className="h-5 w-5" />,
+};
+
+// ── Default palette when no style pack ──
+const DEFAULT_PALETTE = {
+  primary: "#4361ee",
+  secondary: "#6b7280",
+  accent: "#7c3aed",
+  background: "#ffffff",
 };
 
 export default function PublicCard() {
   const { handle } = useParams();
-  
   const { data, isLoading, isError } = usePublicCard(handle);
   const [formSent, setFormSent] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
@@ -60,20 +89,42 @@ export default function PublicCard() {
 
   const profile = data?.profile;
 
-  // Track card view once — fire-and-forget, non-blocking
+  // ── Resolve theme from style pack ──
+  const theme: ResolvedCardTheme = useMemo(() => {
+    const tokens = (data?.stylePack?.theme_tokens as Record<string, any>) ?? {};
+    const palettes = (data?.stylePack?.default_palettes as any[]) ?? [];
+    const palette = palettes[0] ?? DEFAULT_PALETTE;
+    return resolveCardTheme(tokens, palette);
+  }, [data?.stylePack]);
+
+  // ── Load Google Fonts ──
+  const fontsUrl = useMemo(() => {
+    const tokens = (data?.stylePack?.theme_tokens as Record<string, any>) ?? {};
+    return getGoogleFontsUrl(tokens);
+  }, [data?.stylePack]);
+
+  useEffect(() => {
+    if (!fontsUrl) return;
+    const existing = document.querySelector(`link[href="${fontsUrl}"]`);
+    if (existing) return;
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = fontsUrl;
+    document.head.appendChild(link);
+  }, [fontsUrl]);
+
+  // ── Track card view ──
   useEffect(() => {
     if (!handle || !profile?.id || viewTracked.current) return;
     viewTracked.current = true;
-    // Use requestIdleCallback to defer analytics after paint
     const track = () => {
-      const meta = getVisitorMeta();
       supabase
         .from("analytics_events")
         .insert({
           user_id: profile.id,
           handle,
           event_type: "card_view" as const,
-          meta_json: meta,
+          meta_json: getVisitorMeta(),
         })
         .then();
     };
@@ -84,10 +135,11 @@ export default function PublicCard() {
     }
   }, [handle, profile?.id]);
 
+  // ── Loading ──
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: theme.palette.background }}>
+        <Loader2 className="h-6 w-6 animate-spin" style={{ color: theme.palette.secondary }} />
       </div>
     );
   }
@@ -100,7 +152,7 @@ export default function PublicCard() {
     );
   }
 
-  const { card, services } = data;
+  const { card, services } = data!;
   const sections: CardSection[] =
     card && Array.isArray(card.sections_json) ? (card.sections_json as unknown as CardSection[]) : [];
   const enabledSections = new Set(sections.filter((s) => s.enabled).map((s) => s.id));
@@ -109,7 +161,6 @@ export default function PublicCard() {
   const cardUrl = `${window.location.origin}/${handle}`;
 
   const handleCtaClick = (cta: string) => {
-    // Track analytics
     supabase.from("analytics_events").insert({
       user_id: profile.id,
       handle: handle!,
@@ -120,7 +171,10 @@ export default function PublicCard() {
     if (cta === "call" && profile.phone) window.location.href = `tel:${profile.phone}`;
     else if (cta === "text" && profile.phone) window.location.href = `sms:${profile.phone}`;
     else if (cta === "email" && profile.email) window.location.href = `mailto:${profile.email}`;
-    else if (cta === "vcard") {
+    else if (cta === "book") {
+      const bookingSection = document.getElementById("booking-section");
+      if (bookingSection) bookingSection.scrollIntoView({ behavior: "smooth" });
+    } else if (cta === "vcard") {
       downloadVCard({
         name: profile.name,
         email: profile.email,
@@ -138,7 +192,6 @@ export default function PublicCard() {
     try {
       const visitorMeta = getVisitorMeta();
 
-      // 1. Find "New Lead" pipeline stage for this card owner
       const { data: stages } = await supabase
         .from("pipeline_stages")
         .select("id")
@@ -147,7 +200,6 @@ export default function PublicCard() {
         .limit(1);
       const firstStageId = stages?.[0]?.id ?? null;
 
-      // 2. Create lead with stage + source metadata
       const { data: lead } = await supabase
         .from("leads")
         .insert({
@@ -170,7 +222,6 @@ export default function PublicCard() {
         .select("id")
         .single();
 
-      // 3. Log activity on the new lead
       if (lead?.id) {
         await supabase.from("contact_activities").insert({
           user_id: profile.id,
@@ -182,7 +233,6 @@ export default function PublicCard() {
         });
       }
 
-      // 4. Track analytics
       await supabase.from("analytics_events").insert({
         user_id: profile.id,
         handle: handle!,
@@ -198,190 +248,338 @@ export default function PublicCard() {
     }
   };
 
-  // Secondary CTAs (exclude primary)
+  // Secondary CTAs
   const secondaryCtas = ["call", "text", "email", "vcard"].filter((c) => c !== primaryCta);
 
+  // Card theme-aware inline styles
+  const { palette, fonts, radii, spacing, shadows } = theme;
+
+  const cardContainerStyle: React.CSSProperties = {
+    borderRadius: radii.card,
+    boxShadow: shadows.card,
+    background: palette.background,
+    fontFamily: `'${fonts.secondary}', sans-serif`,
+    overflow: "hidden",
+    maxWidth: 440,
+    width: "100%",
+  };
+
+  const sectionTitleStyle: React.CSSProperties = {
+    fontFamily: `'${fonts.primary}', sans-serif`,
+    fontWeight: 600,
+    fontSize: 12,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase" as const,
+    color: palette.secondary,
+    marginBottom: 8,
+  };
+
   return (
-    <div className="min-h-screen bg-background flex items-start justify-center p-4 py-8">
+    <div
+      className="min-h-screen flex items-start justify-center p-4 py-8"
+      style={{ background: `linear-gradient(135deg, ${palette.primary}08, ${palette.accent}06, ${palette.background})` }}
+    >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
+        transition={{ duration: 0.4 }}
+        style={cardContainerStyle}
       >
-        <div className="rounded-3xl border border-border bg-card overflow-hidden shadow-lg">
-          {/* Header */}
-          <div className="h-36 bg-gradient-to-br from-primary/30 via-primary/10 to-transparent relative">
-            <div className="absolute -bottom-12 left-6">
-              <div className="h-24 w-24 rounded-2xl bg-card border-4 border-card shadow-card flex items-center justify-center text-2xl font-bold text-primary overflow-hidden">
-                {profile.avatar_url ? (
-                  <img src={profile.avatar_url} alt={profile.name ?? ""} className="h-full w-full object-cover" />
-                ) : (
-                  (profile.name || "U")[0].toUpperCase()
-                )}
-              </div>
+        {/* ── Header ── */}
+        {enabledSections.has("hero") && (
+          <CardHeader
+            theme={theme}
+            name={profile.name || "Your Name"}
+            profession={professionName}
+            company={profile.company ?? undefined}
+            avatarUrl={profile.avatar_url}
+          />
+        )}
+
+        <div style={{ padding: `${spacing.section}px`, display: "flex", flexDirection: "column", gap: spacing.section }}>
+          {/* ── Primary CTA ── */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <CardButton theme={theme} fullWidth onClick={() => handleCtaClick(primaryCta)}>
+              {CTA_ICONS[primaryCta]}
+              <span>{CTA_TYPES.find((c) => c.value === primaryCta)?.label ?? "Call"}</span>
+            </CardButton>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
+              {secondaryCtas.slice(0, 3).map((cta) => (
+                <button
+                  key={cta}
+                  onClick={() => handleCtaClick(cta)}
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 4,
+                    padding: "12px 8px",
+                    borderRadius: radii.button,
+                    border: `1px solid ${palette.primary}20`,
+                    background: `${palette.primary}06`,
+                    color: palette.primary,
+                    cursor: "pointer",
+                    fontSize: 11,
+                    fontWeight: 500,
+                    fontFamily: `'${fonts.secondary}', sans-serif`,
+                    transition: "all 0.2s",
+                  }}
+                >
+                  {CTA_ICONS[cta]}
+                  {CTA_TYPES.find((c) => c.value === cta)?.label ?? cta}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="px-6 pt-14 pb-6 space-y-6">
-            {/* Name */}
-            {enabledSections.has("hero") && (
-              <div>
-                <h1 className="text-xl font-bold">{profile.name || "Your Name"}</h1>
-                <p className="text-sm text-muted-foreground">{professionName}</p>
-                {profile.company && (
-                  <p className="text-xs text-muted-foreground mt-0.5">{profile.company}</p>
-                )}
-              </div>
-            )}
+          {/* ── Sharing Tools ── */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+            <QRShareDialog url={cardUrl} name={profile.name || "Contact"} />
+            <NFCShareDialog url={cardUrl} name={profile.name || "Contact"} />
+            <WalletPassDialog handle={handle!} name={profile.name || "Contact"} />
+          </div>
 
-            {/* CTA Buttons */}
-            <div className="grid grid-cols-2 gap-2">
-              <Button className="shadow-glow" onClick={() => handleCtaClick(primaryCta)}>
-                {CTA_ICONS[primaryCta]}
-                {CTA_TYPES.find((c) => c.value === primaryCta)?.label ?? "Call"}
-              </Button>
-              {secondaryCtas.slice(0, 3).map((cta) => (
-                <Button key={cta} variant="outline" onClick={() => handleCtaClick(cta)}>
-                  {CTA_ICONS[cta]}
-                  {CTA_TYPES.find((c) => c.value === cta)?.label ?? cta}
-                </Button>
-              ))}
-            </div>
+          {/* ── About ── */}
+          {enabledSections.has("about") && (
+            <CardSectionWrapper theme={theme}>
+              <p style={sectionTitleStyle}>About</p>
+              <p style={{ fontSize: 14, lineHeight: 1.7, color: palette.secondary, margin: 0 }}>
+                Passionate professional dedicated to delivering exceptional results.
+              </p>
+            </CardSectionWrapper>
+          )}
 
-            {/* Sharing Tools */}
-            <div className="flex items-center gap-2 justify-center flex-wrap">
-              <QRShareDialog url={cardUrl} name={profile.name || "Contact"} />
-              <NFCShareDialog url={cardUrl} name={profile.name || "Contact"} />
-              <WalletPassDialog handle={handle!} name={profile.name || "Contact"} />
-            </div>
-
-            {/* About */}
-            {enabledSections.has("about") && (
-              <div className="space-y-2">
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                  About
-                </h2>
-                <p className="text-sm leading-relaxed">
-                  Passionate professional dedicated to delivering exceptional results.
-                </p>
-              </div>
-            )}
-
-            {/* Services */}
-            {enabledSections.has("services") && services.length > 0 && (
-              <div className="space-y-2">
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                  Services
-                </h2>
-                <div className="space-y-2">
-                  {services.map((s) => (
-                    <div
-                      key={s.id}
-                      className="p-3 rounded-xl border border-border/50 bg-muted/20 flex items-center justify-between"
-                    >
-                      <span className="text-sm font-medium">{s.name}</span>
+          {/* ── Services ── */}
+          {enabledSections.has("services") && services.length > 0 && (
+            <div>
+              <p style={sectionTitleStyle}>Services</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {services.map((s) => (
+                  <CardSectionWrapper key={s.id} theme={theme}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <span style={{ fontSize: 14, fontWeight: 500, color: palette.primary }}>
+                        {s.name}
+                      </span>
                       {s.price != null && (
-                        <span className="text-xs text-muted-foreground">
+                        <span style={{ fontSize: 13, color: palette.secondary }}>
                           ${Number(s.price).toFixed(0)}
                         </span>
                       )}
                     </div>
+                  </CardSectionWrapper>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── Booking ── */}
+          {enabledSections.has("booking") && (
+            <div id="booking-section">
+              <Link to={`/book/${handle}`} style={{ textDecoration: "none" }}>
+                <CardButton theme={theme} fullWidth>
+                  <Calendar className="h-4 w-4" />
+                  <span>Book an Appointment</span>
+                </CardButton>
+              </Link>
+            </div>
+          )}
+
+          {/* ── Testimonials ── */}
+          {enabledSections.has("testimonials") && (
+            <div>
+              <p style={sectionTitleStyle}>Testimonials</p>
+              <CardSectionWrapper theme={theme}>
+                <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className="h-3.5 w-3.5"
+                      style={{ fill: "#f59e0b", color: "#f59e0b" }}
+                    />
                   ))}
                 </div>
-              </div>
-            )}
+                <p style={{ fontSize: 14, fontStyle: "italic", color: palette.secondary, margin: 0, lineHeight: 1.6 }}>
+                  "Absolutely amazing experience. Highly recommend!"
+                </p>
+                <p style={{ fontSize: 12, color: `${palette.secondary}99`, marginTop: 8, margin: 0, marginBlockStart: 8 }}>
+                  — Happy Client
+                </p>
+              </CardSectionWrapper>
+            </div>
+          )}
 
-            {/* Booking */}
-            {enabledSections.has("booking") && (
-              <Link to={`/book/${handle}`}>
-                <Button className="w-full shadow-glow" size="lg">
-                  <Calendar className="h-4 w-4 mr-1.5" /> Book an Appointment
-                </Button>
-              </Link>
-            )}
-
-            {/* Testimonials */}
-            {enabledSections.has("testimonials") && (
-              <div className="space-y-2">
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                  Testimonials
-                </h2>
-                <div className="p-4 rounded-xl border border-border/50 bg-muted/10">
-                  <div className="flex gap-0.5 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className="h-3.5 w-3.5 fill-[hsl(var(--warning))] text-[hsl(var(--warning))]"
-                      />
-                    ))}
-                  </div>
-                  <p className="text-sm italic">
-                    "Absolutely amazing experience. Highly recommend!"
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-2">— Happy Client</p>
-                </div>
-              </div>
-            )}
-
-            {/* Lead Capture */}
-            {enabledSections.has("contact") && (
-              <div className="space-y-3">
-                <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                  Get in Touch
-                </h2>
-                {formSent ? (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="p-4 rounded-xl bg-[hsl(var(--success))]/10 text-center"
+          {/* ── Social Links ── */}
+          {enabledSections.has("social") && (
+            <div>
+              <p style={sectionTitleStyle}>Connect</p>
+              <div style={{ display: "flex", justifyContent: "center", gap: 12 }}>
+                {["instagram", "facebook", "linkedin", "twitter"].map((platform) => (
+                  <button
+                    key={platform}
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: theme.button.shape === "pill" ? "9999px" : radii.button,
+                      border: `1px solid ${palette.primary}20`,
+                      background: `${palette.primary}08`,
+                      color: palette.primary,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      transition: "all 0.2s",
+                    }}
+                    onClick={() => toast.info(`${platform} link not configured yet`)}
                   >
-                    <p className="text-sm font-medium text-[hsl(var(--success))]">
-                      Message sent! We'll be in touch.
-                    </p>
-                  </motion.div>
-                ) : (
-                  <div className="space-y-2">
-                    <Input
-                      placeholder="Your name"
+                    {SOCIAL_ICONS[platform]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── Contact / Lead Capture ── */}
+          {enabledSections.has("contact") && (
+            <div>
+              <p style={sectionTitleStyle}>Get in Touch</p>
+              {formSent ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  style={{
+                    padding: 20,
+                    borderRadius: radii.card,
+                    background: `${palette.primary}10`,
+                    textAlign: "center",
+                  }}
+                >
+                  <p style={{ fontSize: 14, fontWeight: 600, color: palette.primary, margin: 0 }}>
+                    ✓ Message sent! We'll be in touch.
+                  </p>
+                </motion.div>
+              ) : (
+                <CardSectionWrapper theme={theme}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    <input
+                      placeholder="Your name *"
                       value={formData.name}
                       onChange={(e) => setFormData((f) => ({ ...f, name: e.target.value }))}
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: radii.button,
+                        border: `1px solid ${palette.secondary}30`,
+                        fontSize: 14,
+                        fontFamily: `'${fonts.secondary}', sans-serif`,
+                        outline: "none",
+                        background: "transparent",
+                        color: palette.primary,
+                      }}
                     />
-                    <Input
+                    <input
                       placeholder="Phone number"
                       value={formData.phone}
                       onChange={(e) => setFormData((f) => ({ ...f, phone: e.target.value }))}
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: radii.button,
+                        border: `1px solid ${palette.secondary}30`,
+                        fontSize: 14,
+                        fontFamily: `'${fonts.secondary}', sans-serif`,
+                        outline: "none",
+                        background: "transparent",
+                        color: palette.primary,
+                      }}
                     />
-                    <Input
+                    <input
                       type="email"
                       placeholder="Email"
                       value={formData.email}
                       onChange={(e) => setFormData((f) => ({ ...f, email: e.target.value }))}
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: radii.button,
+                        border: `1px solid ${palette.secondary}30`,
+                        fontSize: 14,
+                        fontFamily: `'${fonts.secondary}', sans-serif`,
+                        outline: "none",
+                        background: "transparent",
+                        color: palette.primary,
+                      }}
                     />
-                    <Textarea
+                    <textarea
                       placeholder="Message (optional)"
-                      className="min-h-[60px]"
+                      rows={3}
                       value={formData.message}
                       onChange={(e) => setFormData((f) => ({ ...f, message: e.target.value }))}
+                      style={{
+                        padding: "10px 14px",
+                        borderRadius: radii.button,
+                        border: `1px solid ${palette.secondary}30`,
+                        fontSize: 14,
+                        fontFamily: `'${fonts.secondary}', sans-serif`,
+                        outline: "none",
+                        resize: "vertical",
+                        background: "transparent",
+                        color: palette.primary,
+                      }}
                     />
-                    <Button
+                    <CardButton
+                      theme={theme}
+                      fullWidth
                       onClick={handleFormSubmit}
-                      disabled={submitting || !formData.name}
-                      className="w-full"
                     >
-                      <Send className="h-4 w-4 mr-1.5" /> Send Message
-                    </Button>
+                      <Send className="h-4 w-4" />
+                      <span>{submitting ? "Sending..." : "Send Message"}</span>
+                    </CardButton>
                   </div>
-                )}
-              </div>
-            )}
-
-            {/* Footer */}
-            <div className="text-center pt-2">
-              <p className="text-[10px] text-muted-foreground">
-                Powered by{" "}
-                <span className="font-semibold gradient-text">CardPilot</span>
-              </p>
+                </CardSectionWrapper>
+              )}
             </div>
+          )}
+
+          {/* ── Contact Info ── */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {profile.phone && (
+              <a
+                href={`tel:${profile.phone}`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  fontSize: 13,
+                  color: palette.secondary,
+                  textDecoration: "none",
+                }}
+              >
+                <Phone className="h-3.5 w-3.5" style={{ color: palette.primary }} />
+                {profile.phone}
+              </a>
+            )}
+            {profile.email && (
+              <a
+                href={`mailto:${profile.email}`}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  fontSize: 13,
+                  color: palette.secondary,
+                  textDecoration: "none",
+                }}
+              >
+                <Mail className="h-3.5 w-3.5" style={{ color: palette.primary }} />
+                {profile.email}
+              </a>
+            )}
+          </div>
+
+          {/* ── Footer ── */}
+          <div style={{ textAlign: "center", paddingTop: 8 }}>
+            <p style={{ fontSize: 10, color: `${palette.secondary}80`, margin: 0 }}>
+              Powered by{" "}
+              <span style={{ fontWeight: 700, color: palette.primary }}>CardPilot</span>
+            </p>
           </div>
         </div>
       </motion.div>
