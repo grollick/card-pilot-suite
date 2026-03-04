@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { pickStylePackKey, getRecommendedPacks, type StylePack } from "@/lib/stylePackSelection";
 import { useGenerateCardContent, type GeneratedCardContent } from "@/hooks/useGenerateContent";
 
@@ -53,6 +53,7 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [step, setStep] = useState(1);
   const [search, setSearch] = useState("");
   const [selectedProfessionId, setSelectedProfessionId] = useState("");
@@ -213,6 +214,7 @@ export default function Onboarding() {
       }
 
       toast({ title: "You're all set! 🎉", description: "Your card and workspace are ready." });
+      await queryClient.invalidateQueries({ queryKey: ["profile-onboarding"] });
       navigate("/app");
     } catch (err: any) {
       console.error("Onboarding error:", err);
