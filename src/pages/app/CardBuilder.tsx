@@ -1,4 +1,4 @@
-import { CreditCard, Eye, Paintbrush, Smartphone, Save, Globe, QrCode } from "lucide-react";
+import { CreditCard, Eye, Paintbrush, Smartphone, Save, Globe, QrCode, Sparkles, Loader2 } from "lucide-react";
 import QRShareDialog from "@/components/card/QRShareDialog";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -15,16 +15,31 @@ import {
   type CardSection,
 } from "@/hooks/useCard";
 import { resolveCardTheme } from "@/lib/cardTokens";
+import { useGenerateCardContent } from "@/hooks/useGenerateContent";
 
 export default function CardBuilder() {
   const { data: card, isLoading: cardLoading } = useCard();
   const { data: profile } = useProfile();
   const { data: stylePack } = useStylePack(profile?.style_pack);
   const upsertCard = useUpsertCard();
+  const { generate, isGenerating, content: aiContent } = useGenerateCardContent();
 
   const [sections, setSections] = useState<CardSection[]>(DEFAULT_SECTIONS);
   const [published, setPublished] = useState(false);
   const [dirty, setDirty] = useState(false);
+
+  const handleAIGenerate = async () => {
+    if (!profile) return;
+    const professionName = (profile as any)?.professions?.name ?? "Professional";
+    const result = await generate({
+      profession: professionName,
+      name: profile.name || "",
+      company: profile.company || undefined,
+    });
+    if (result) {
+      toast.success("AI content generated! It will appear on your published card.");
+    }
+  };
 
   // Hydrate from DB
   useEffect(() => {
@@ -161,6 +176,31 @@ export default function CardBuilder() {
                 />
               </div>
             ))}
+          </div>
+
+          {/* AI Generate */}
+          <div className="pt-3 border-t border-border/50">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={handleAIGenerate}
+              disabled={isGenerating}
+            >
+              {isGenerating ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4 mr-2" />
+              )}
+              {isGenerating ? "Generating..." : "AI Write My Card"}
+            </Button>
+            {aiContent && (
+              <div className="mt-2 rounded-lg bg-primary/5 border border-primary/20 p-2.5">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-primary mb-1">AI Tagline</p>
+                <p className="text-xs">{aiContent.tagline}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-primary mt-2 mb-1">AI Bio</p>
+                <p className="text-xs">{aiContent.bio}</p>
+              </div>
+            )}
           </div>
 
           {/* CTA info */}
