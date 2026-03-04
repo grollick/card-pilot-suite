@@ -1,8 +1,10 @@
 import {
   LayoutDashboard, CreditCard, Users, Calendar, Mail, Share2,
-  BarChart3, Settings, Shield, ChevronLeft
+  BarChart3, Settings, Shield, ChevronLeft, LogOut
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
@@ -30,8 +32,15 @@ export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
+  const { signOut } = useAuth();
+  const navigate = useNavigate();
   const isActive = (path: string) =>
     path === "/app" ? location.pathname === "/app" : location.pathname.startsWith(path);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/auth");
+  };
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
@@ -94,6 +103,15 @@ export function AppSidebar() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={handleSignOut}
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-destructive/10 text-muted-foreground hover:text-destructive cursor-pointer"
+            >
+              <LogOut className="h-4 w-4 shrink-0" />
+              {!collapsed && <span>Sign Out</span>}
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
