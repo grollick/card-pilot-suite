@@ -128,11 +128,13 @@ export function useUpsertAvailability() {
   });
 }
 
-// ── Public: fetch services + availability by user handle ──
+// ── Public: fetch services + availability by user handle (parallelized) ──
 export function usePublicBookingData(handle: string | undefined) {
   return useQuery({
     queryKey: ["public-booking", handle],
     enabled: !!handle,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 15 * 60 * 1000,
     queryFn: async () => {
       const { data: profile, error: pErr } = await supabase
         .from("profiles")
@@ -141,35 +143,36 @@ export function usePublicBookingData(handle: string | undefined) {
         .single();
       if (pErr) throw pErr;
 
-      const { data: services } = await supabase
-        .from("booking_services")
-        .select("*")
-        .eq("user_id", profile.id)
-        .eq("active", true)
-        .order("name");
-
-      const { data: availability } = await supabase
-        .from("availability_rules")
-        .select("*")
-        .eq("user_id", profile.id)
-        .order("day_of_week");
-
-      // Get existing bookings for next 30 days to check conflicts
       const now = new Date();
       const thirtyDays = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-      const { data: existingBookings } = await supabase
-        .from("bookings")
-        .select("start_datetime, end_datetime")
-        .eq("user_id", profile.id)
-        .in("status", ["pending", "confirmed", "requested"])
-        .gte("start_datetime", now.toISOString())
-        .lte("start_datetime", thirtyDays.toISOString());
+
+      // Fire all queries in parallel
+      const [servicesResult, availabilityResult, bookingsResult] = await Promise.all([
+        supabase
+          .from("booking_services")
+          .select("id, name, description, duration_min, price")
+          .eq("user_id", profile.id)
+          .eq("active", true)
+          .order("name"),
+        supabase
+          .from("availability_rules")
+          .select("day_of_week, start_time, end_time, buffer_min")
+          .eq("user_id", profile.id)
+          .order("day_of_week"),
+        supabase
+          .from("bookings")
+          .select("start_datetime, end_datetime")
+          .eq("user_id", profile.id)
+          .in("status", ["pending", "confirmed", "requested"])
+          .gte("start_datetime", now.toISOString())
+          .lte("start_datetime", thirtyDays.toISOString()),
+      ]);
 
       return {
         profile,
-        services: services ?? [],
-        availability: availability ?? [],
-        existingBookings: existingBookings ?? [],
+        services: servicesResult.data ?? [],
+        availability: availabilityResult.data ?? [],
+        existingBookings: bookingsResult.data ?? [],
       };
     },
   });

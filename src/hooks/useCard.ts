@@ -137,50 +137,51 @@ export function useStylePack(key: string | null | undefined) {
   });
 }
 
-// ── Public: Fetch card + profile by handle ──
+// ── Public: Fetch card + profile by handle (parallelized for <500ms) ──
 export function usePublicCard(handle: string | undefined) {
   return useQuery({
     queryKey: ["public-card", handle],
     enabled: !!handle,
-    staleTime: 10 * 60 * 1000, // 10 min cache for public cards
+    staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
     queryFn: async () => {
-      // Get profile by handle
+      // Step 1: Get profile (required for user_id)
       const { data: profile, error: pErr } = await supabase
         .from("profiles")
-        .select("*, professions(name, category)")
+        .select("id, name, handle, email, phone, company, avatar_url, primary_cta, style_pack, profession_id, professions(name, category)")
         .eq("handle", handle!)
         .single();
       if (pErr) throw pErr;
 
-      // Get card
-      const { data: card } = await supabase
-        .from("cards")
-        .select("*")
-        .eq("user_id", profile.id)
-        .eq("status", "published")
-        .maybeSingle();
+      // Step 2: Fire all dependent queries in parallel
+      const [cardResult, servicesResult, stylePackResult] = await Promise.all([
+        supabase
+          .from("cards")
+          .select("sections_json, theme_json, status")
+          .eq("user_id", profile.id)
+          .eq("status", "published")
+          .maybeSingle(),
+        supabase
+          .from("booking_services")
+          .select("id, name, price, duration_min")
+          .eq("user_id", profile.id)
+          .eq("active", true)
+          .order("name"),
+        profile.style_pack
+          ? supabase
+              .from("style_packs")
+              .select("key, name, style, theme_tokens, default_palettes")
+              .eq("key", profile.style_pack)
+              .maybeSingle()
+          : Promise.resolve({ data: null }),
+      ]);
 
-      // Get style pack
-      let stylePack = null;
-      if (profile.style_pack) {
-        const { data } = await supabase
-          .from("style_packs")
-          .select("*")
-          .eq("key", profile.style_pack)
-          .maybeSingle();
-        stylePack = data;
-      }
-
-      // Get active services
-      const { data: services } = await supabase
-        .from("booking_services")
-        .select("*")
-        .eq("user_id", profile.id)
-        .eq("active", true)
-        .order("name");
-
-      return { profile, card, stylePack, services: services ?? [] };
+      return {
+        profile,
+        card: cardResult.data,
+        stylePack: stylePackResult.data,
+        services: servicesResult.data ?? [],
+      };
     },
   });
 }

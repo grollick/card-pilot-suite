@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,33 +7,46 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { OrgProvider } from "@/contexts/OrgContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import Auth from "./pages/Auth";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Onboarding from "./pages/Onboarding";
+import { Loader2 } from "lucide-react";
+
+// Public routes — loaded eagerly for fast <500ms render
 import PublicCard from "./pages/public/PublicCard";
 import PublicBooking from "./pages/public/PublicBooking";
 import QRLanding from "./pages/public/QRLanding";
-import DashboardLayout from "./components/DashboardLayout";
-import DashboardHome from "./pages/app/DashboardHome";
-import CardBuilder from "./pages/app/CardBuilder";
-import ContactsPage from "./pages/app/ContactsPage";
-import ContactDetail from "./pages/app/ContactDetail";
-import PipelinePage from "./pages/app/PipelinePage";
-import TasksPage from "./pages/app/TasksPage";
-import BookingManager from "./pages/app/BookingManager";
-import EmailMarketing from "./pages/app/EmailMarketing";
-import SocialScheduler from "./pages/app/SocialScheduler";
-import ContentPage from "./pages/app/ContentPage";
-import Analytics from "./pages/app/Analytics";
-import AutomationPage from "./pages/app/AutomationPage";
-import QRCampaignsPage from "./pages/app/QRCampaignsPage";
-import SettingsPage from "./pages/app/SettingsPage";
-import AdminPage from "./pages/app/AdminPage";
-import TeamPage from "./pages/app/TeamPage";
-import LeadsCRM from "./pages/app/LeadsCRM";
+
+// Auth & marketing — loaded eagerly (small)
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import NotFound from "./pages/NotFound";
+
+// App dashboard — lazy loaded (heavy, auth-gated)
+const Onboarding = lazy(() => import("./pages/Onboarding"));
+const DashboardLayout = lazy(() => import("./components/DashboardLayout"));
+const DashboardHome = lazy(() => import("./pages/app/DashboardHome"));
+const CardBuilder = lazy(() => import("./pages/app/CardBuilder"));
+const ContactsPage = lazy(() => import("./pages/app/ContactsPage"));
+const ContactDetail = lazy(() => import("./pages/app/ContactDetail"));
+const PipelinePage = lazy(() => import("./pages/app/PipelinePage"));
+const TasksPage = lazy(() => import("./pages/app/TasksPage"));
+const BookingManager = lazy(() => import("./pages/app/BookingManager"));
+const EmailMarketing = lazy(() => import("./pages/app/EmailMarketing"));
+const SocialScheduler = lazy(() => import("./pages/app/SocialScheduler"));
+const ContentPage = lazy(() => import("./pages/app/ContentPage"));
+const Analytics = lazy(() => import("./pages/app/Analytics"));
+const AutomationPage = lazy(() => import("./pages/app/AutomationPage"));
+const QRCampaignsPage = lazy(() => import("./pages/app/QRCampaignsPage"));
+const SettingsPage = lazy(() => import("./pages/app/SettingsPage"));
+const AdminPage = lazy(() => import("./pages/app/AdminPage"));
+const TeamPage = lazy(() => import("./pages/app/TeamPage"));
+const LeadsCRM = lazy(() => import("./pages/app/LeadsCRM"));
+
+const LazyFallback = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -51,34 +65,34 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/onboarding" element={
-              <ProtectedRoute><Onboarding /></ProtectedRoute>
+              <ProtectedRoute><Suspense fallback={<LazyFallback />}><Onboarding /></Suspense></ProtectedRoute>
             } />
 
             {/* Public routes — no auth required, minimal data access */}
             <Route path="/q/:campaign" element={<QRLanding />} />
             <Route path="/book/:handle" element={<PublicBooking />} />
 
-            {/* App dashboard — auth required */}
+            {/* App dashboard — auth required, lazy loaded */}
             <Route path="/app" element={
-              <ProtectedRoute><DashboardLayout /></ProtectedRoute>
+              <ProtectedRoute><Suspense fallback={<LazyFallback />}><DashboardLayout /></Suspense></ProtectedRoute>
             }>
-              <Route index element={<DashboardHome />} />
-              <Route path="dashboard" element={<DashboardHome />} />
-              <Route path="card" element={<CardBuilder />} />
-              <Route path="contacts" element={<ContactsPage />} />
-              <Route path="contacts/:id" element={<ContactDetail />} />
-              <Route path="pipeline" element={<PipelinePage />} />
-              <Route path="tasks" element={<TasksPage />} />
-              <Route path="bookings" element={<BookingManager />} />
-              <Route path="email" element={<EmailMarketing />} />
-              <Route path="social" element={<SocialScheduler />} />
-              <Route path="content" element={<ContentPage />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route path="automation" element={<AutomationPage />} />
-              <Route path="qr-campaigns" element={<QRCampaignsPage />} />
-              <Route path="settings" element={<SettingsPage />} />
-              <Route path="team" element={<TeamPage />} />
-              <Route path="admin" element={<AdminPage />} />
+              <Route index element={<Suspense fallback={<LazyFallback />}><DashboardHome /></Suspense>} />
+              <Route path="dashboard" element={<Suspense fallback={<LazyFallback />}><DashboardHome /></Suspense>} />
+              <Route path="card" element={<Suspense fallback={<LazyFallback />}><CardBuilder /></Suspense>} />
+              <Route path="contacts" element={<Suspense fallback={<LazyFallback />}><ContactsPage /></Suspense>} />
+              <Route path="contacts/:id" element={<Suspense fallback={<LazyFallback />}><ContactDetail /></Suspense>} />
+              <Route path="pipeline" element={<Suspense fallback={<LazyFallback />}><PipelinePage /></Suspense>} />
+              <Route path="tasks" element={<Suspense fallback={<LazyFallback />}><TasksPage /></Suspense>} />
+              <Route path="bookings" element={<Suspense fallback={<LazyFallback />}><BookingManager /></Suspense>} />
+              <Route path="email" element={<Suspense fallback={<LazyFallback />}><EmailMarketing /></Suspense>} />
+              <Route path="social" element={<Suspense fallback={<LazyFallback />}><SocialScheduler /></Suspense>} />
+              <Route path="content" element={<Suspense fallback={<LazyFallback />}><ContentPage /></Suspense>} />
+              <Route path="analytics" element={<Suspense fallback={<LazyFallback />}><Analytics /></Suspense>} />
+              <Route path="automation" element={<Suspense fallback={<LazyFallback />}><AutomationPage /></Suspense>} />
+              <Route path="qr-campaigns" element={<Suspense fallback={<LazyFallback />}><QRCampaignsPage /></Suspense>} />
+              <Route path="settings" element={<Suspense fallback={<LazyFallback />}><SettingsPage /></Suspense>} />
+              <Route path="team" element={<Suspense fallback={<LazyFallback />}><TeamPage /></Suspense>} />
+              <Route path="admin" element={<Suspense fallback={<LazyFallback />}><AdminPage /></Suspense>} />
             </Route>
 
             {/* Public card — must be last to avoid catching other routes */}
