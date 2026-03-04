@@ -32,11 +32,12 @@ export default function Index() {
             <Sparkles className="h-3 w-3" /> Built for professionals
           </div>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight max-w-3xl mx-auto leading-[1.1]">
-            Your digital business card,{" "}
-            <span className="gradient-text">reimagined</span>
+            The digital business card that{" "}
+            <span className="gradient-text">automatically follows up</span>{" "}
+            with every lead
           </h1>
           <p className="text-lg text-muted-foreground max-w-xl mx-auto mt-6">
-            Create a stunning digital card, capture leads, book appointments, and grow your business — all from one platform.
+            Create a stunning card, capture leads, book appointments, and let smart automations close the loop — all from one platform.
           </p>
           <div className="flex items-center justify-center gap-3 mt-8">
             <Link to="/onboarding">
