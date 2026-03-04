@@ -2,6 +2,7 @@ import { CreditCard, Eye, Paintbrush, Globe, Sparkles, Loader2, Pencil } from "l
 import QRShareDialog from "@/components/card/QRShareDialog";
 import CardPhotoTools from "@/components/card/CardPhotoTools";
 import SectionEditor, { type SectionContent } from "@/components/card/SectionEditor";
+import CardAssistant from "@/components/card/CardAssistant";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect, useRef, useCallback } from "react";
@@ -454,6 +455,19 @@ export default function CardBuilder() {
           onSave={(content) => handleSectionContentSave(editingSec.id, content)}
         />
       )}
+
+      {/* AI Assistant */}
+      <CardAssistant
+        context={{
+          name: profile?.name || "",
+          profession: professionName,
+          company: profile?.company || undefined,
+          sections: sections.filter((s) => s.enabled).map((s) => s.label).join(", "),
+          hasAvatar: !!avatarUrl,
+          hasBackdrop: !!coverUrl,
+          cardStatus: published ? "published" : "draft",
+        }}
+      />
     </div>
   );
 }
