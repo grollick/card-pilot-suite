@@ -241,6 +241,32 @@ export default function PublicCard() {
         meta_json: { lead_id: lead?.id, ...visitorMeta },
       });
 
+      // Notify card owner via email (fire-and-forget)
+      if (profile.email) {
+        supabase.functions.invoke("send-email", {
+          body: {
+            to: profile.email,
+            subject: `New lead captured: ${formData.name}`,
+            html: `
+              <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;">
+                <h2 style="color:#4361ee;margin:0 0 16px;">New Lead from Your Card</h2>
+                <p style="color:#374151;margin:0 0 12px;">Someone just submitted the contact form on your digital card.</p>
+                <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+                  <tr><td style="padding:8px 0;color:#6b7280;width:90px;">Name</td><td style="padding:8px 0;color:#111827;font-weight:600;">${formData.name}</td></tr>
+                  ${formData.email ? `<tr><td style="padding:8px 0;color:#6b7280;">Email</td><td style="padding:8px 0;color:#111827;">${formData.email}</td></tr>` : ""}
+                  ${formData.phone ? `<tr><td style="padding:8px 0;color:#6b7280;">Phone</td><td style="padding:8px 0;color:#111827;">${formData.phone}</td></tr>` : ""}
+                  ${formData.message ? `<tr><td style="padding:8px 0;color:#6b7280;">Message</td><td style="padding:8px 0;color:#111827;">${formData.message}</td></tr>` : ""}
+                </table>
+                <a href="${window.location.origin}/app/contacts" style="display:inline-block;padding:10px 20px;background:#4361ee;color:#fff;border-radius:6px;text-decoration:none;font-weight:600;margin-top:8px;">View in CRM</a>
+                <p style="color:#9ca3af;font-size:12px;margin:24px 0 0;">CardPilot — Your digital business card platform</p>
+              </div>
+            `,
+            email_type: "custom",
+            lead_id: lead?.id,
+          },
+        }).catch(() => {}); // fire-and-forget
+      }
+
       setFormSent(true);
     } catch {
       toast.error("Something went wrong");
