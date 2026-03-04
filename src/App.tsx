@@ -13,6 +13,7 @@ import { Loader2 } from "lucide-react";
 import PublicCard from "./pages/public/PublicCard";
 import PublicBooking from "./pages/public/PublicBooking";
 import QRLanding from "./pages/public/QRLanding";
+import ProductsPage from "./pages/public/ProductsPage";
 
 // Auth & marketing — loaded eagerly (small)
 import Index from "./pages/Index";
@@ -71,6 +72,7 @@ const App = () => (
             {/* Public routes — no auth required, minimal data access */}
             <Route path="/q/:campaign" element={<QRLanding />} />
             <Route path="/book/:handle" element={<PublicBooking />} />
+            <Route path="/products" element={<ProductsPage />} />
 
             {/* App dashboard — auth required, lazy loaded */}
             <Route path="/app" element={
