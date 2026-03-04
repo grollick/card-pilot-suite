@@ -568,6 +568,39 @@ export type Database = {
         }
         Relationships: []
       }
+      style_packs: {
+        Row: {
+          created_at: string
+          default_palettes: Json
+          id: string
+          key: string
+          name: string
+          recommended_for_categories: Json
+          style: string
+          theme_tokens: Json
+        }
+        Insert: {
+          created_at?: string
+          default_palettes?: Json
+          id?: string
+          key: string
+          name: string
+          recommended_for_categories?: Json
+          style: string
+          theme_tokens?: Json
+        }
+        Update: {
+          created_at?: string
+          default_palettes?: Json
+          id?: string
+          key?: string
+          name?: string
+          recommended_for_categories?: Json
+          style?: string
+          theme_tokens?: Json
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string

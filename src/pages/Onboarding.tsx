@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
+import { Search, ArrowRight, ArrowLeft, Sparkles, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,19 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
-
-const stylePacks = [
-  { id: "modern", name: "Modern", desc: "Clean lines, bold colors", preview: "bg-gradient-to-br from-primary/20 to-primary/5" },
-  { id: "elegant", name: "Elegant", desc: "Refined, sophisticated", preview: "bg-gradient-to-br from-amber-100 to-amber-50" },
-  { id: "bold", name: "Bold", desc: "Strong, high-contrast", preview: "bg-gradient-to-br from-gray-900 to-gray-700" },
-];
-
-const ctaOptions = [
-  { id: "call", label: "Call Me", icon: "📞" },
-  { id: "text", label: "Text Me", icon: "💬" },
-  { id: "book", label: "Book Now", icon: "📅" },
-  { id: "quote", label: "Get a Quote", icon: "💰" },
-];
+import { pickStylePackKey, getRecommendedPacks, type StylePack } from "@/lib/stylePackSelection";
 
 interface Profession {
   id: string;
@@ -32,6 +20,33 @@ interface Profession {
   default_email_templates: any;
 }
 
+const ctaOptions = [
+  { id: "call", label: "Call Me", icon: "📞" },
+  { id: "text", label: "Text Me", icon: "💬" },
+  { id: "book", label: "Book Now", icon: "📅" },
+  { id: "quote", label: "Get a Quote", icon: "💰" },
+];
+
+const styleChoices = [
+  { id: "Modern", name: "Modern", desc: "Clean lines, bold colors", preview: "bg-gradient-to-br from-primary/20 to-primary/5" },
+  { id: "Elegant", name: "Elegant", desc: "Refined, sophisticated", preview: "bg-gradient-to-br from-amber-100 to-amber-50" },
+  { id: "Bold", name: "Bold", desc: "Strong, high-contrast", preview: "bg-gradient-to-br from-gray-900 to-gray-700" },
+];
+
+// Category key mapping from display name
+const categoryKeyMap: Record<string, string> = {
+  "Sales & Advising": "sales_advising",
+  "Home & Trade": "home_trade",
+  "Health & Wellness": "health_wellness",
+  "Beauty & Personal Care": "beauty_personal_care",
+  "Creative & Media": "creative_media",
+  "Automotive Services": "automotive_services",
+  "Legal & Finance": "legal_finance",
+  "Education & Lessons": "education_services",
+  "Food & Events": "food_events",
+  "Pet & Other Services": "pet_other",
+};
+
 export default function Onboarding() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -39,7 +54,8 @@ export default function Onboarding() {
   const [step, setStep] = useState(1);
   const [search, setSearch] = useState("");
   const [selectedProfessionId, setSelectedProfessionId] = useState("");
-  const [selectedStyle, setSelectedStyle] = useState("modern");
+  const [selectedStyle, setSelectedStyle] = useState("Modern");
+  const [selectedPackKey, setSelectedPackKey] = useState("");
   const [selectedCTA, setSelectedCTA] = useState("call");
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
@@ -56,6 +72,15 @@ export default function Onboarding() {
     },
   });
 
+  const { data: stylePacks = [] } = useQuery({
+    queryKey: ["style_packs"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("style_packs").select("*");
+      if (error) throw error;
+      return data as unknown as StylePack[];
+    },
+  });
+
   const filtered = search
     ? professions.filter(p => p.name.toLowerCase().includes(search.toLowerCase()))
     : professions;
@@ -68,6 +93,38 @@ export default function Onboarding() {
 
   const selectedProfession = professions.find(p => p.id === selectedProfessionId);
 
+  // Get category key for selected profession
+  const categoryKey = useMemo(() => {
+    if (!selectedProfession) return "";
+    return categoryKeyMap[selectedProfession.category] || selectedProfession.category.toLowerCase().replace(/[^a-z]+/g, "_");
+  }, [selectedProfession]);
+
+  // Filter and sort packs for the chosen style, prioritizing recommended ones
+  const availablePacks = useMemo(() => {
+    const packsForStyle = stylePacks.filter(p => p.style === selectedStyle);
+    if (!categoryKey) return packsForStyle;
+
+    const recommended = getRecommendedPacks(selectedStyle, categoryKey);
+    return [...packsForStyle].sort((a, b) => {
+      const aIdx = recommended.indexOf(a.key);
+      const bIdx = recommended.indexOf(b.key);
+      if (aIdx >= 0 && bIdx >= 0) return aIdx - bIdx;
+      if (aIdx >= 0) return -1;
+      if (bIdx >= 0) return 1;
+      return 0;
+    });
+  }, [stylePacks, selectedStyle, categoryKey]);
+
+  // Auto-select best pack when style or category changes
+  const autoSelectedPackKey = useMemo(() => {
+    if (!categoryKey) return availablePacks[0]?.key || "";
+    return pickStylePackKey(selectedStyle, categoryKey);
+  }, [selectedStyle, categoryKey, availablePacks]);
+
+  // Use explicit selection or auto
+  const effectivePackKey = selectedPackKey || autoSelectedPackKey;
+  const effectivePack = stylePacks.find(p => p.key === effectivePackKey);
+
   const generateHandle = (fullName: string) => {
     return fullName.toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 20) + Math.floor(Math.random() * 1000);
   };
@@ -78,6 +135,7 @@ export default function Onboarding() {
 
     try {
       const handle = generateHandle(name || user.email || "user");
+      const palette = effectivePack?.default_palettes?.[0] || {};
 
       // 1. Update profile
       const { error: profileErr } = await supabase.from("profiles").update({
@@ -87,14 +145,19 @@ export default function Onboarding() {
         email,
         handle,
         profession_id: selectedProfession.id,
-        style_pack: selectedStyle,
+        style_pack: effectivePackKey,
         primary_cta: selectedCTA,
         onboarding_completed: true,
       }).eq("id", user.id);
       if (profileErr) throw profileErr;
 
-      // 2. Create card with profession defaults
-      const themeJson = { style_pack: selectedStyle, primary_cta: selectedCTA };
+      // 2. Create card with profession defaults + style pack tokens
+      const themeJson = {
+        style_pack: effectivePackKey,
+        primary_cta: selectedCTA,
+        tokens: effectivePack?.theme_tokens || {},
+        palette,
+      };
       const sectionsJson = selectedProfession.default_card_sections || [];
       const { error: cardErr } = await supabase.from("cards").insert({
         user_id: user.id,
@@ -173,6 +236,7 @@ export default function Onboarding() {
 
         <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
           <AnimatePresence mode="wait">
+            {/* Step 1: Profession */}
             {step === 1 && (
               <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
@@ -206,24 +270,66 @@ export default function Onboarding() {
               </motion.div>
             )}
 
+            {/* Step 2: Style + Pack */}
             {step === 2 && (
               <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold">Choose your style</h2>
-                  <p className="text-sm text-muted-foreground">Pick a card template</p>
+                  <p className="text-sm text-muted-foreground">Pick a vibe, then a theme</p>
                 </div>
+
+                {/* Style selector */}
                 <div className="grid grid-cols-3 gap-3">
-                  {stylePacks.map(s => (
-                    <button key={s.id} onClick={() => setSelectedStyle(s.id)}
+                  {styleChoices.map(s => (
+                    <button key={s.id} onClick={() => { setSelectedStyle(s.id); setSelectedPackKey(""); }}
                       className={`rounded-xl border p-3 text-center transition-all ${
                         selectedStyle === s.id ? "border-primary shadow-glow" : "border-border hover:border-primary/30"
                       }`}>
-                      <div className={`h-20 rounded-lg mb-2 ${s.preview}`} />
+                      <div className={`h-12 rounded-lg mb-2 ${s.preview}`} />
                       <p className="text-xs font-semibold">{s.name}</p>
                       <p className="text-[10px] text-muted-foreground">{s.desc}</p>
                     </button>
                   ))}
                 </div>
+
+                {/* Pack sub-selection */}
+                {availablePacks.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-medium text-muted-foreground">Theme variant</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {availablePacks.map((pack, i) => {
+                        const palette = (pack.default_palettes as any[])?.[0];
+                        const isSelected = effectivePackKey === pack.key;
+                        const isRecommended = i === 0;
+                        return (
+                          <button key={pack.key} onClick={() => setSelectedPackKey(pack.key)}
+                            className={`relative rounded-xl border p-3 text-left transition-all ${
+                              isSelected ? "border-primary bg-primary/5 shadow-glow" : "border-border hover:border-primary/30"
+                            }`}>
+                            {isRecommended && (
+                              <span className="absolute -top-2 right-2 text-[9px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full font-semibold">
+                                Best fit
+                              </span>
+                            )}
+                            {/* Color preview */}
+                            <div className="flex gap-1 mb-2">
+                              {palette && (
+                                <>
+                                  <div className="h-6 w-6 rounded-full border border-border" style={{ background: palette.primary }} />
+                                  <div className="h-6 w-6 rounded-full border border-border" style={{ background: palette.accent }} />
+                                  <div className="h-6 w-6 rounded-full border border-border" style={{ background: palette.background }} />
+                                </>
+                              )}
+                            </div>
+                            <p className="text-xs font-semibold">{pack.name}</p>
+                            {isSelected && <Check className="absolute top-3 right-3 h-3.5 w-3.5 text-primary" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex gap-2">
                   <Button variant="outline" onClick={() => setStep(1)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
                   <Button onClick={() => setStep(3)} className="flex-1">Continue <ArrowRight className="h-4 w-4 ml-1" /></Button>
@@ -231,6 +337,7 @@ export default function Onboarding() {
               </motion.div>
             )}
 
+            {/* Step 3: Essentials */}
             {step === 3 && (
               <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
@@ -248,6 +355,7 @@ export default function Onboarding() {
               </motion.div>
             )}
 
+            {/* Step 4: CTA */}
             {step === 4 && (
               <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
