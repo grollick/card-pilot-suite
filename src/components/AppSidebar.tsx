@@ -1,11 +1,11 @@
 import {
-  LayoutDashboard, CreditCard, Users, Calendar, Mail, Share2,
-  BarChart3, Settings, Shield, ChevronLeft, LogOut
+  LayoutDashboard, Users, Kanban, Calendar, Mail, Share2,
+  BarChart3, Settings, Shield, ChevronLeft, LogOut,
+  FileText, Zap, Megaphone
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
@@ -13,14 +13,22 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 
-const mainItems = [
-  { title: "Home", url: "/app", icon: LayoutDashboard },
-  { title: "Card", url: "/app/card", icon: CreditCard },
-  { title: "Leads", url: "/app/leads", icon: Users },
-  { title: "Booking", url: "/app/booking", icon: Calendar },
+const crmItems = [
+  { title: "Contacts", url: "/app/contacts", icon: Users },
+  { title: "Pipeline", url: "/app/pipeline", icon: Kanban },
+  { title: "Tasks", url: "/app/tasks", icon: FileText },
+  { title: "Bookings", url: "/app/booking", icon: Calendar },
+];
+
+const marketingItems = [
   { title: "Email", url: "/app/email", icon: Mail },
   { title: "Social", url: "/app/social", icon: Share2 },
+  { title: "Content", url: "/app/content", icon: Megaphone },
+];
+
+const insightItems = [
   { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
+  { title: "Automation", url: "/app/automation", icon: Zap },
 ];
 
 const bottomItems = [
@@ -34,6 +42,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { signOut } = useAuth();
   const navigate = useNavigate();
+
   const isActive = (path: string) =>
     path === "/app" ? location.pathname === "/app" : location.pathname.startsWith(path);
 
@@ -41,6 +50,33 @@ export function AppSidebar() {
     await signOut();
     navigate("/auth");
   };
+
+  const renderGroup = (label: string, items: typeof crmItems) => (
+    <SidebarGroup>
+      <SidebarGroupLabel className="text-[10px] uppercase tracking-widest text-muted-foreground/50 px-3 mb-1">
+        {!collapsed && label}
+      </SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {items.map((item) => (
+            <SidebarMenuItem key={item.title}>
+              <SidebarMenuButton asChild>
+                <NavLink
+                  to={item.url}
+                  end={item.url === "/app"}
+                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-sidebar-accent"
+                  activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
+                >
+                  <item.icon className="h-4 w-4 shrink-0" />
+                  {!collapsed && <span>{item.title}</span>}
+                </NavLink>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  );
 
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
@@ -61,30 +97,30 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-2">
+        {/* Home */}
         <SidebarGroup>
-          <SidebarGroupLabel className="text-xs uppercase tracking-wider text-muted-foreground/60 px-3">
-            {!collapsed && "Main"}
-          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      end={item.url === "/app"}
-                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-sidebar-accent"
-                      activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
-                    >
-                      <item.icon className="h-4 w-4 shrink-0" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <NavLink
+                    to="/app"
+                    end
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-sidebar-accent"
+                    activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
+                  >
+                    <LayoutDashboard className="h-4 w-4 shrink-0" />
+                    {!collapsed && <span>Home</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {renderGroup("CRM", crmItems)}
+        {renderGroup("Marketing", marketingItems)}
+        {renderGroup("Insights", insightItems)}
       </SidebarContent>
 
       <SidebarFooter className="px-2 pb-4">
