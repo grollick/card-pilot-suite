@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, Users, Kanban, Calendar, Mail, Share2,
   BarChart3, Settings, Shield, ChevronLeft, LogOut,
-  FileText, Zap, Megaphone
+  FileText, Zap, Megaphone, CreditCard
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
