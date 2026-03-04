@@ -54,6 +54,7 @@ export default function CardBuilder() {
   const hydrated = useRef(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const coverUrlRef = useRef<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -84,7 +85,10 @@ export default function CardBuilder() {
       }
       setPublished(card.status === "published");
       const themeJson = card.theme_json as any;
-      if (themeJson?.cover_url) setCoverUrl(themeJson.cover_url);
+      if (themeJson?.cover_url) {
+        setCoverUrl(themeJson.cover_url);
+        coverUrlRef.current = themeJson.cover_url;
+      }
     }
   }, [card]);
 
@@ -100,7 +104,7 @@ export default function CardBuilder() {
           await upsertCard.mutateAsync({
             sections_json: newSections as any,
             status: published ? "published" : "draft",
-            theme_json: { ...(card?.theme_json as any ?? {}), cover_url: coverUrl } as any,
+            theme_json: { ...(card?.theme_json as any ?? {}), cover_url: coverUrlRef.current } as any,
           });
           toast.success("Card saved");
         } catch {
@@ -113,7 +117,7 @@ export default function CardBuilder() {
         saveTimer.current = setTimeout(doSave, 800);
       }
     },
-    [published, card, upsertCard, coverUrl],
+    [published, card, upsertCard],
   );
 
   const toggleSection = (id: string) => {
@@ -221,6 +225,7 @@ export default function CardBuilder() {
 
   const handleCoverChange = async (url: string) => {
     setCoverUrl(url);
+    coverUrlRef.current = url;
     try {
       await upsertCard.mutateAsync({
         sections_json: sections as any,
