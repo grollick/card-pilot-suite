@@ -1,11 +1,23 @@
 import { useState, useRef } from "react";
-import { Camera, Eraser, ImagePlus, Loader2, Wand2 } from "lucide-react";
+import { Camera, Eraser, ImagePlus, Loader2, RotateCw, Wand2, Paintbrush } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+
+const BG_PRESETS = [
+  { label: "None", value: "transparent" },
+  { label: "White", value: "#FFFFFF" },
+  { label: "Black", value: "#000000" },
+  { label: "Soft Gray", value: "#F3F4F6" },
+  { label: "Sky", value: "#DBEAFE" },
+  { label: "Mint", value: "#D1FAE5" },
+  { label: "Peach", value: "#FEF3C7" },
+  { label: "Lavender", value: "#EDE9FE" },
+];
 
 interface CardPhotoToolsProps {
   avatarUrl: string | null | undefined;
@@ -13,6 +25,10 @@ interface CardPhotoToolsProps {
   profession: string;
   onAvatarChange: (url: string) => void;
   onCoverChange: (url: string) => void;
+  avatarBgColor?: string;
+  avatarRotation?: number;
+  onAvatarBgColorChange?: (color: string) => void;
+  onAvatarRotationChange?: (deg: number) => void;
 }
 
 export default function CardPhotoTools({
@@ -21,12 +37,17 @@ export default function CardPhotoTools({
   profession,
   onAvatarChange,
   onCoverChange,
+  avatarBgColor = "transparent",
+  avatarRotation = 0,
+  onAvatarBgColorChange,
+  onAvatarRotationChange,
 }: CardPhotoToolsProps) {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
   const [removingBg, setRemovingBg] = useState(false);
   const [generatingBackdrop, setGeneratingBackdrop] = useState(false);
   const [customPrompt, setCustomPrompt] = useState("");
+  const [bgRemoved, setBgRemoved] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const coverFileInputRef = useRef<HTMLInputElement>(null);
@@ -37,9 +58,7 @@ export default function CardPhotoTools({
       .from("card-assets")
       .upload(path, file, { upsert: true });
     if (error) throw error;
-
     const { data } = supabase.storage.from("card-assets").getPublicUrl(path);
-    // Add cache-buster to force reload
     return `${data.publicUrl}?t=${Date.now()}`;
   };
 
@@ -52,26 +71,20 @@ export default function CardPhotoTools({
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
-
     setUploading(true);
     try {
       const ext = file.name.split(".").pop() || "jpg";
       const path = `${user.id}/avatar.${ext}`;
       const url = await uploadFile(file, path);
-
-      await supabase
-        .from("profiles")
-        .update({ avatar_url: url })
-        .eq("id", user.id);
-
+      await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
       onAvatarChange(url);
+      setBgRemoved(false);
+      onAvatarRotationChange?.(0);
       toast.success("Photo uploaded!");
     } catch (err: any) {
-      console.error("Upload error:", err);
       toast.error(err.message || "Failed to upload photo");
     } finally {
       setUploading(false);
-      // Reset inputs so the same file can be re-selected
       if (fileInputRef.current) fileInputRef.current.value = "";
       if (cameraInputRef.current) cameraInputRef.current.value = "";
     }
@@ -80,7 +93,6 @@ export default function CardPhotoTools({
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
-
     setUploading(true);
     try {
       const ext = file.name.split(".").pop() || "jpg";
@@ -89,7 +101,6 @@ export default function CardPhotoTools({
       onCoverChange(url);
       toast.success("Cover photo uploaded!");
     } catch (err: any) {
-      console.error("Cover upload error:", err);
       toast.error(err.message || "Failed to upload cover");
     } finally {
       setUploading(false);
@@ -100,33 +111,23 @@ export default function CardPhotoTools({
 
   const handleRemoveBackground = async () => {
     if (!avatarUrl || !user) return;
-
     setRemovingBg(true);
     try {
       const { data, error } = await supabase.functions.invoke("remove-background", {
         body: { image_url: avatarUrl },
       });
-
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-
       const imageUrl = data.image_url;
       if (!imageUrl) throw new Error("No image returned");
-
-      // Upload the result to storage
       const file = await base64ToFile(imageUrl, "avatar-nobg.png");
       const path = `${user.id}/avatar-nobg.png`;
       const url = await uploadFile(file, path);
-
-      await supabase
-        .from("profiles")
-        .update({ avatar_url: url })
-        .eq("id", user.id);
-
+      await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
       onAvatarChange(url);
+      setBgRemoved(true);
       toast.success("Background removed!");
     } catch (err: any) {
-      console.error("BG removal error:", err);
       toast.error(err.message || "Failed to remove background");
     } finally {
       setRemovingBg(false);
@@ -135,7 +136,6 @@ export default function CardPhotoTools({
 
   const handleGenerateBackdrop = async (useCustom: boolean) => {
     if (!user) return;
-
     setGeneratingBackdrop(true);
     try {
       const body: Record<string, string> = {};
@@ -144,30 +144,26 @@ export default function CardPhotoTools({
       } else {
         body.profession = profession;
       }
-
-      const { data, error } = await supabase.functions.invoke("generate-backdrop", {
-        body,
-      });
-
+      const { data, error } = await supabase.functions.invoke("generate-backdrop", { body });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-
       const imageUrl = data.image_url;
       if (!imageUrl) throw new Error("No image returned");
-
-      // Upload the result to storage
       const file = await base64ToFile(imageUrl, "backdrop.png");
       const path = `${user.id}/backdrop.png`;
       const url = await uploadFile(file, path);
-
       onCoverChange(url);
       toast.success("Backdrop generated!");
     } catch (err: any) {
-      console.error("Backdrop generation error:", err);
       toast.error(err.message || "Failed to generate backdrop");
     } finally {
       setGeneratingBackdrop(false);
     }
+  };
+
+  const handleRotate90 = () => {
+    const next = ((avatarRotation || 0) + 90) % 360;
+    onAvatarRotationChange?.(next);
   };
 
   return (
@@ -180,103 +176,97 @@ export default function CardPhotoTools({
       {/* Upload / Take Profile Photo */}
       <div className="space-y-2">
         <Label className="text-xs text-muted-foreground">Profile Photo</Label>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handlePhotoUpload}
-        />
-        <input
-          ref={cameraInputRef}
-          type="file"
-          accept="image/*"
-          capture="user"
-          className="hidden"
-          onChange={handlePhotoUpload}
-        />
+        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+        <input ref={cameraInputRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handlePhotoUpload} />
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-          >
-            {uploading ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <ImagePlus className="h-4 w-4 mr-2" />
-            )}
+          <Button variant="outline" size="sm" className="flex-1" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+            {uploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <ImagePlus className="h-4 w-4 mr-2" />}
             {avatarUrl ? "Change" : "Upload"}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => cameraInputRef.current?.click()}
-            disabled={uploading}
-          >
+          <Button variant="outline" size="sm" onClick={() => cameraInputRef.current?.click()} disabled={uploading}>
             <Camera className="h-4 w-4" />
           </Button>
         </div>
       </div>
 
-      {/* Remove Background */}
+      {/* Remove Background + Rotation */}
       {avatarUrl && (
-        <div className="space-y-2">
-          <Label className="text-xs text-muted-foreground">Background Removal</Label>
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full"
-            onClick={handleRemoveBackground}
-            disabled={removingBg}
-          >
-            {removingBg ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            ) : (
-              <Eraser className="h-4 w-4 mr-2" />
-            )}
-            {removingBg ? "Removing BG…" : "Remove Background"}
-          </Button>
+        <div className="space-y-3">
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="flex-1" onClick={handleRemoveBackground} disabled={removingBg}>
+              {removingBg ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Eraser className="h-4 w-4 mr-2" />}
+              {removingBg ? "Removing…" : "Remove BG"}
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleRotate90} title="Rotate 90°">
+              <RotateCw className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Rotation slider */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-muted-foreground">Rotation</Label>
+              <span className="text-xs text-muted-foreground">{avatarRotation}°</span>
+            </div>
+            <Slider
+              min={0}
+              max={359}
+              step={1}
+              value={[avatarRotation]}
+              onValueChange={([v]) => onAvatarRotationChange?.(v)}
+              className="w-full"
+            />
+          </div>
+
+          {/* Background Color Picker (shown after BG removal or always available) */}
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <Paintbrush className="h-3 w-3" />
+              Photo Background
+            </Label>
+            <div className="flex flex-wrap gap-1.5">
+              {BG_PRESETS.map((preset) => (
+                <button
+                  key={preset.value}
+                  className={`h-7 w-7 rounded-md border-2 transition-all ${
+                    avatarBgColor === preset.value
+                      ? "border-primary ring-2 ring-primary/30 scale-110"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                  style={{
+                    background: preset.value === "transparent"
+                      ? "repeating-conic-gradient(hsl(var(--muted)) 0% 25%, transparent 0% 50%) 50% / 12px 12px"
+                      : preset.value,
+                  }}
+                  onClick={() => onAvatarBgColorChange?.(preset.value)}
+                  title={preset.label}
+                />
+              ))}
+            </div>
+            <div className="flex gap-1.5 items-center mt-1">
+              <input
+                type="color"
+                value={avatarBgColor === "transparent" ? "#ffffff" : avatarBgColor}
+                onChange={(e) => onAvatarBgColorChange?.(e.target.value)}
+                className="h-7 w-7 rounded cursor-pointer border border-border"
+              />
+              <span className="text-[10px] text-muted-foreground">Custom color</span>
+            </div>
+          </div>
         </div>
       )}
 
       {/* Cover Photo Upload */}
       <div className="space-y-2 pt-2 border-t border-border/50">
         <Label className="text-xs text-muted-foreground">Cover Photo</Label>
-        <input
-          ref={coverFileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={handleCoverUpload}
-        />
-        <input
-          ref={coverCameraInputRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          className="hidden"
-          onChange={handleCoverUpload}
-        />
+        <input ref={coverFileInputRef} type="file" accept="image/*" className="hidden" onChange={handleCoverUpload} />
+        <input ref={coverCameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleCoverUpload} />
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1"
-            onClick={() => coverFileInputRef.current?.click()}
-            disabled={uploading}
-          >
+          <Button variant="outline" size="sm" className="flex-1" onClick={() => coverFileInputRef.current?.click()} disabled={uploading}>
             <ImagePlus className="h-4 w-4 mr-2" />
             {coverUrl ? "Change Cover" : "Upload Cover"}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => coverCameraInputRef.current?.click()}
-            disabled={uploading}
-          >
+          <Button variant="outline" size="sm" onClick={() => coverCameraInputRef.current?.click()} disabled={uploading}>
             <Camera className="h-4 w-4" />
           </Button>
         </div>
@@ -285,50 +275,20 @@ export default function CardPhotoTools({
       {/* AI Backdrop Generator */}
       <div className="space-y-2 pt-2 border-t border-border/50">
         <Label className="text-xs text-muted-foreground">AI Cover Backdrop</Label>
-
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full"
-          onClick={() => handleGenerateBackdrop(false)}
-          disabled={generatingBackdrop}
-        >
-          {generatingBackdrop ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Wand2 className="h-4 w-4 mr-2" />
-          )}
+        <Button variant="outline" size="sm" className="w-full" onClick={() => handleGenerateBackdrop(false)} disabled={generatingBackdrop}>
+          {generatingBackdrop ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Wand2 className="h-4 w-4 mr-2" />}
           {generatingBackdrop ? "Generating…" : `Generate for "${profession}"`}
         </Button>
-
         <div className="flex gap-1.5">
-          <Input
-            placeholder="Or describe your backdrop…"
-            value={customPrompt}
-            onChange={(e) => setCustomPrompt(e.target.value)}
-            className="text-xs h-8"
-          />
-          <Button
-            variant="secondary"
-            size="sm"
-            className="h-8 px-3 shrink-0"
-            onClick={() => handleGenerateBackdrop(true)}
-            disabled={generatingBackdrop || !customPrompt.trim()}
-          >
+          <Input placeholder="Or describe your backdrop…" value={customPrompt} onChange={(e) => setCustomPrompt(e.target.value)} className="text-xs h-8" />
+          <Button variant="secondary" size="sm" className="h-8 px-3 shrink-0" onClick={() => handleGenerateBackdrop(true)} disabled={generatingBackdrop || !customPrompt.trim()}>
             <ImagePlus className="h-3.5 w-3.5" />
           </Button>
         </div>
-
         {coverUrl && (
           <div className="relative rounded-lg overflow-hidden border border-border/50">
-            <img
-              src={coverUrl}
-              alt="Backdrop preview"
-              className="w-full h-20 object-cover"
-            />
-            <p className="text-[10px] text-muted-foreground text-center py-1">
-              Current backdrop
-            </p>
+            <img src={coverUrl} alt="Backdrop preview" className="w-full h-20 object-cover" />
+            <p className="text-[10px] text-muted-foreground text-center py-1">Current backdrop</p>
           </div>
         )}
       </div>

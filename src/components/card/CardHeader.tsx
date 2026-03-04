@@ -8,13 +8,15 @@ interface CardHeaderProps {
   company?: string;
   avatarUrl?: string | null;
   coverUrl?: string | null;
+  avatarBgColor?: string;
+  avatarRotation?: number;
 }
 
 /**
  * Renders one of 4 header layouts based on theme tokens:
  * cover | split | classic | hero
  */
-export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl }: CardHeaderProps) {
+export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0 }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
 
@@ -34,18 +36,28 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     marginTop: 4,
   };
 
+  const avatarContainerStyle: React.CSSProperties = {
+    width: 80,
+    height: 80,
+    borderRadius: avatarBorderRadius,
+    border: `3px solid ${palette.background}`,
+    overflow: "hidden",
+    backgroundColor: avatarBgColor === "transparent" ? undefined : avatarBgColor,
+  };
+
   const avatarEl = avatarUrl ? (
-    <img
-      src={avatarUrl}
-      alt={name}
-      style={{
-        width: 80,
-        height: 80,
-        borderRadius: avatarBorderRadius,
-        objectFit: "cover",
-        border: `3px solid ${palette.background}`,
-      }}
-    />
+    <div style={avatarContainerStyle}>
+      <img
+        src={avatarUrl}
+        alt={name}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          transform: avatarRotation ? `rotate(${avatarRotation}deg)` : undefined,
+        }}
+      />
+    </div>
   ) : (
     <div
       style={{
