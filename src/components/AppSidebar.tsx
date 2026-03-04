@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, Users, Kanban, Calendar, Mail, Share2,
   BarChart3, Settings, Shield, ChevronLeft, LogOut,
-  FileText, Zap, Megaphone, CreditCard
+  FileText, Zap, Megaphone, CreditCard, Building2
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
@@ -33,6 +33,7 @@ const insightItems = [
 ];
 
 const bottomItems = [
+  { title: "Team", url: "/app/team", icon: Building2 },
   { title: "Settings", url: "/app/settings", icon: Settings },
   { title: "Admin", url: "/app/admin", icon: Shield },
 ];
