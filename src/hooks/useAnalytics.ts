@@ -97,13 +97,80 @@ export function useCtaBreakdown(days = 30) {
       const counts: Record<string, number> = {};
       (data ?? []).forEach(e => {
         const meta = e.meta_json as any;
-        const action = meta?.action || meta?.button || "Unknown";
+        const action = meta?.cta || meta?.action || meta?.button || "Unknown";
         counts[action] = (counts[action] || 0) + 1;
       });
 
       const total = Object.values(counts).reduce((a, b) => a + b, 0);
       return Object.entries(counts)
         .map(([action, count]) => ({ action, count, pct: total > 0 ? Math.round(count / total * 100) : 0 }))
+        .sort((a, b) => b.count - a.count);
+    },
+  });
+}
+
+// ── Referrer breakdown ──
+export function useReferrerBreakdown(days = 30) {
+  return useQuery({
+    queryKey: ["referrer-breakdown", days],
+    queryFn: async () => {
+      const since = subDays(new Date(), days).toISOString();
+      const { data } = await supabase
+        .from("analytics_events")
+        .select("meta_json")
+        .eq("event_type", "card_view")
+        .gte("created_at", since);
+
+      const counts: Record<string, number> = {};
+      (data ?? []).forEach(e => {
+        const meta = e.meta_json as any;
+        let source = "Direct";
+        const referrer = meta?.referrer || "";
+        const utm = meta?.utm_source;
+        if (utm) {
+          source = utm;
+        } else if (referrer) {
+          try {
+            source = new URL(referrer).hostname.replace("www.", "");
+          } catch {
+            source = referrer.slice(0, 30);
+          }
+        }
+        counts[source] = (counts[source] || 0) + 1;
+      });
+
+      const total = Object.values(counts).reduce((a, b) => a + b, 0);
+      return Object.entries(counts)
+        .map(([source, count]) => ({ source, count, pct: total > 0 ? Math.round(count / total * 100) : 0 }))
+        .sort((a, b) => b.count - a.count);
+    },
+  });
+}
+
+// ── Device breakdown ──
+export function useDeviceBreakdown(days = 30) {
+  return useQuery({
+    queryKey: ["device-breakdown", days],
+    queryFn: async () => {
+      const since = subDays(new Date(), days).toISOString();
+      const { data } = await supabase
+        .from("analytics_events")
+        .select("meta_json")
+        .eq("event_type", "card_view")
+        .gte("created_at", since);
+
+      const counts: Record<string, number> = {};
+      (data ?? []).forEach(e => {
+        const meta = e.meta_json as any;
+        const ua = (meta?.user_agent || meta?.device || "").toLowerCase();
+        let device = "Desktop";
+        if (/mobile|android|iphone|ipad/i.test(ua)) device = /ipad|tablet/i.test(ua) ? "Tablet" : "Mobile";
+        counts[device] = (counts[device] || 0) + 1;
+      });
+
+      const total = Object.values(counts).reduce((a, b) => a + b, 0);
+      return Object.entries(counts)
+        .map(([device, count]) => ({ device, count, pct: total > 0 ? Math.round(count / total * 100) : 0 }))
         .sort((a, b) => b.count - a.count);
     },
   });
