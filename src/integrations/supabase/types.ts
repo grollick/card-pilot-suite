@@ -52,6 +52,42 @@ export type Database = {
           },
         ]
       }
+      automation_rules: {
+        Row: {
+          action_config: Json
+          action_type: string
+          created_at: string
+          enabled: boolean
+          id: string
+          trigger_config: Json
+          trigger_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_config?: Json
+          action_type: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          trigger_config?: Json
+          trigger_type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_config?: Json
+          action_type?: string
+          created_at?: string
+          enabled?: boolean
+          id?: string
+          trigger_config?: Json
+          trigger_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       availability_rules: {
         Row: {
           buffer_min: number
@@ -445,56 +481,77 @@ export type Database = {
       }
       leads: {
         Row: {
+          address: string | null
           assigned_to_user_id: string | null
           company: string | null
           created_at: string
+          custom_fields_json: Json
           email: string | null
           id: string
           last_activity_at: string | null
+          lead_score: number
+          lifecycle_stage: string
           name: string
           next_activity_at: string | null
           notes: string | null
           phone: string | null
+          preferred_contact_method: string | null
+          preferred_language: string | null
           source: Database["public"]["Enums"]["lead_source"]
           stage_id: string | null
           status: string
           tags: string[] | null
+          timezone: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          address?: string | null
           assigned_to_user_id?: string | null
           company?: string | null
           created_at?: string
+          custom_fields_json?: Json
           email?: string | null
           id?: string
           last_activity_at?: string | null
+          lead_score?: number
+          lifecycle_stage?: string
           name: string
           next_activity_at?: string | null
           notes?: string | null
           phone?: string | null
+          preferred_contact_method?: string | null
+          preferred_language?: string | null
           source?: Database["public"]["Enums"]["lead_source"]
           stage_id?: string | null
           status?: string
           tags?: string[] | null
+          timezone?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          address?: string | null
           assigned_to_user_id?: string | null
           company?: string | null
           created_at?: string
+          custom_fields_json?: Json
           email?: string | null
           id?: string
           last_activity_at?: string | null
+          lead_score?: number
+          lifecycle_stage?: string
           name?: string
           next_activity_at?: string | null
           notes?: string | null
           phone?: string | null
+          preferred_contact_method?: string | null
+          preferred_language?: string | null
           source?: Database["public"]["Enums"]["lead_source"]
           stage_id?: string | null
           status?: string
           tags?: string[] | null
+          timezone?: string | null
           updated_at?: string
           user_id?: string
         }
