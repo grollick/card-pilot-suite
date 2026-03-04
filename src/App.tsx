@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { OrgProvider } from "@/contexts/OrgContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -28,6 +29,7 @@ import Analytics from "./pages/app/Analytics";
 import AutomationPage from "./pages/app/AutomationPage";
 import SettingsPage from "./pages/app/SettingsPage";
 import AdminPage from "./pages/app/AdminPage";
+import TeamPage from "./pages/app/TeamPage";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <OrgProvider>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -64,6 +67,7 @@ const App = () => (
               <Route path="analytics" element={<Analytics />} />
               <Route path="automation" element={<AutomationPage />} />
               <Route path="settings" element={<SettingsPage />} />
+              <Route path="team" element={<TeamPage />} />
               <Route path="admin" element={<AdminPage />} />
             </Route>
 
@@ -73,6 +77,7 @@ const App = () => (
 
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </OrgProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
