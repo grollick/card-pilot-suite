@@ -26,6 +26,8 @@ export const ACTION_TYPES = [
   { value: "create_task", label: "Create a task" },
   { value: "send_email", label: "Send email template" },
   { value: "log_activity", label: "Log an activity" },
+  { value: "move_stage", label: "Move pipeline stage" },
+  { value: "send_notification", label: "Send notification" },
 ] as const;
 
 export const TASK_TYPES = ["follow_up", "call", "email", "meeting", "reminder"] as const;
@@ -241,6 +243,32 @@ export async function runAutomation(
         activity_type: config.activity_type ?? "note",
         title,
         description: config.description ?? "",
+        occurred_at: new Date().toISOString(),
+      });
+    }
+
+    if (rule.action_type === "move_stage") {
+      const targetStageId = config.target_stage_id;
+      if (targetStageId) {
+        await supabase.from("leads").update({ stage_id: targetStageId }).eq("id", context.contactId);
+        await supabase.from("contact_activities").insert({
+          user_id: userId,
+          lead_id: context.contactId,
+          activity_type: "stage_change",
+          title: `Auto: ${title}`,
+          occurred_at: new Date().toISOString(),
+        });
+      }
+    }
+
+    if (rule.action_type === "send_notification") {
+      // In-app notification logged as activity with special type
+      await supabase.from("contact_activities").insert({
+        user_id: userId,
+        lead_id: context.contactId,
+        activity_type: "notification",
+        title: `🔔 ${title}`,
+        description: config.message ?? "",
         occurred_at: new Date().toISOString(),
       });
     }

@@ -105,13 +105,39 @@ serve(async (req) => {
       }
 
       if (rule.action_type === "send_email") {
-        // Log the intent — actual sending requires email provider integration
         await supabase.from("contact_activities").insert({
           user_id: userId,
           lead_id: context.contactId,
           activity_type: "email",
           title: `Auto: ${title}`,
           description: `Queued from template (${config.template_id ?? "none"})`,
+          occurred_at: new Date().toISOString(),
+        });
+        executed++;
+      }
+
+      if (rule.action_type === "move_stage") {
+        const targetStageId = config.target_stage_id;
+        if (targetStageId) {
+          await supabase.from("leads").update({ stage_id: targetStageId }).eq("id", context.contactId);
+          await supabase.from("contact_activities").insert({
+            user_id: userId,
+            lead_id: context.contactId,
+            activity_type: "stage_change",
+            title: `Auto: ${title}`,
+            occurred_at: new Date().toISOString(),
+          });
+          executed++;
+        }
+      }
+
+      if (rule.action_type === "send_notification") {
+        await supabase.from("contact_activities").insert({
+          user_id: userId,
+          lead_id: context.contactId,
+          activity_type: "notification",
+          title: `🔔 ${title}`,
+          description: config.message ?? "",
           occurred_at: new Date().toISOString(),
         });
         executed++;
