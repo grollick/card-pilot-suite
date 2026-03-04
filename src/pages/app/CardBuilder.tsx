@@ -113,6 +113,57 @@ export default function CardBuilder() {
     });
   };
 
+  // Paste AI-generated text into a section's primary content field
+  const handleCopyToSection = (sectionId: string, text: string) => {
+    // Strip markdown formatting for clean paste
+    const clean = text.replace(/[#*_`~>\-]/g, "").replace(/\n{3,}/g, "\n\n").trim();
+
+    setSections((prev) => {
+      const next = prev.map((sec) => {
+        if (sec.id !== sectionId) return sec;
+        const existing = (sec.content || {}) as SectionContent;
+        let updated: SectionContent;
+
+        switch (sectionId) {
+          case "hero":
+            // Use first line as tagline, rest as subtitle
+            const lines = clean.split("\n").filter(Boolean);
+            updated = { ...existing, tagline: lines[0] || clean, subtitle: lines.slice(1).join(" ") };
+            break;
+          case "about":
+            updated = { ...existing, text: clean };
+            break;
+          case "contact":
+            updated = { ...existing, heading: clean.slice(0, 60), description: clean };
+            break;
+          case "booking":
+            updated = { ...existing, bookingHeading: clean.slice(0, 60) };
+            break;
+          case "services": {
+            // Try to parse lines as service items
+            const serviceLines = clean.split("\n").filter(Boolean);
+            const items = serviceLines.map((line) => ({ name: line.slice(0, 80), description: "", price: "" }));
+            updated = { ...existing, items: items.length > 0 ? items : existing.items };
+            break;
+          }
+          case "testimonials": {
+            // Add as a single testimonial
+            updated = {
+              ...existing,
+              testimonials: [...(existing.testimonials || []), { name: "Client", text: clean, role: "" }],
+            };
+            break;
+          }
+          default:
+            updated = existing;
+        }
+        return { ...sec, content: updated, enabled: true };
+      });
+      saveSections(next, true);
+      return next;
+    });
+  };
+
   const handlePublishToggle = async (val: boolean) => {
     setPublished(val);
     clearTimeout(saveTimer.current);
@@ -467,6 +518,8 @@ export default function CardBuilder() {
           hasBackdrop: !!coverUrl,
           cardStatus: published ? "published" : "draft",
         }}
+        sectionTargets={sections.map((s) => ({ id: s.id, label: s.label, enabled: s.enabled }))}
+        onCopyToSection={handleCopyToSection}
       />
     </div>
   );
