@@ -114,7 +114,25 @@ export default function PublicBooking() {
       const startDt = setMinutes(setHours(selectedDate, h), m);
       const endDt = new Date(startDt.getTime() + (selectedService.duration_min ?? 30) * 60000);
 
-      // Create or find lead
+      // Visitor metadata for referral tracking
+      const visitorMeta = {
+        referrer: document.referrer || null,
+        utm_source: new URLSearchParams(window.location.search).get("utm_source"),
+        user_agent: navigator.userAgent,
+        capture_url: window.location.href,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Find first pipeline stage for auto-assignment
+      const { data: stages } = await supabase
+        .from("pipeline_stages")
+        .select("id")
+        .eq("user_id", data.profile.id)
+        .order("sort_order", { ascending: true })
+        .limit(1);
+      const firstStageId = stages?.[0]?.id ?? null;
+
+      // Create lead with pipeline stage + referral source
       const { data: lead } = await supabase
         .from("leads")
         .insert({
@@ -123,6 +141,8 @@ export default function PublicBooking() {
           email: formData.email || null,
           phone: formData.phone || null,
           source: "booking" as const,
+          stage_id: firstStageId,
+          custom_fields_json: visitorMeta,
         })
         .select("id")
         .single();
@@ -146,6 +166,7 @@ export default function PublicBooking() {
         user_id: data.profile.id,
         handle: handle!,
         event_type: "booking_created" as const,
+        meta_json: { lead_id: lead?.id, service: selectedService.name, ...visitorMeta },
       });
 
       // Log activity on lead
@@ -155,6 +176,7 @@ export default function PublicBooking() {
           lead_id: lead.id,
           activity_type: "booking_created",
           title: `Booking requested: ${selectedService.name}`,
+          description: `${format(startDt, "EEEE, MMMM d")} at ${selectedTime}`,
           occurred_at: new Date().toISOString(),
         });
       }

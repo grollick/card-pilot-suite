@@ -15,13 +15,26 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Link, useParams } from "react-router-dom";
 import { usePublicCard, CTA_TYPES, type CardSection } from "@/hooks/useCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { downloadVCard } from "@/lib/vcard";
+
+function getVisitorMeta() {
+  return {
+    referrer: document.referrer || null,
+    utm_source: new URLSearchParams(window.location.search).get("utm_source"),
+    utm_medium: new URLSearchParams(window.location.search).get("utm_medium"),
+    utm_campaign: new URLSearchParams(window.location.search).get("utm_campaign"),
+    user_agent: navigator.userAgent,
+    language: navigator.language,
+    screen: `${screen.width}x${screen.height}`,
+    timestamp: new Date().toISOString(),
+  };
+}
 import QRShareDialog from "@/components/card/QRShareDialog";
 import NFCShareDialog from "@/components/card/NFCShareDialog";
 import WalletPassDialog from "@/components/card/WalletPassDialog";
@@ -38,10 +51,30 @@ const CTA_ICONS: Record<string, React.ReactNode> = {
 
 export default function PublicCard() {
   const { handle } = useParams();
+  
   const { data, isLoading, isError } = usePublicCard(handle);
   const [formSent, setFormSent] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
+  const viewTracked = useRef(false);
+
+  const profile = data?.profile;
+
+  // Track card view once with visitor metadata (must be before early returns)
+  useEffect(() => {
+    if (!handle || !profile?.id || viewTracked.current) return;
+    viewTracked.current = true;
+    const meta = getVisitorMeta();
+    supabase
+      .from("analytics_events")
+      .insert({
+        user_id: profile.id,
+        handle,
+        event_type: "card_view" as const,
+        meta_json: meta,
+      })
+      .then();
+  }, [handle, profile?.id]);
 
   if (isLoading) {
     return (
@@ -51,7 +84,7 @@ export default function PublicCard() {
     );
   }
 
-  if (isError || !data?.profile) {
+  if (isError || !profile) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <p className="text-muted-foreground">Card not found</p>
@@ -59,7 +92,7 @@ export default function PublicCard() {
     );
   }
 
-  const { profile, card, services } = data;
+  const { card, services } = data;
   const sections: CardSection[] =
     card && Array.isArray(card.sections_json) ? (card.sections_json as unknown as CardSection[]) : [];
   const enabledSections = new Set(sections.filter((s) => s.enabled).map((s) => s.id));
@@ -95,21 +128,60 @@ export default function PublicCard() {
     if (!formData.name) return;
     setSubmitting(true);
     try {
-      // Create lead
-      await supabase.from("leads").insert({
-        user_id: profile.id,
-        name: formData.name,
-        phone: formData.phone || null,
-        email: formData.email || null,
-        notes: formData.message || null,
-        source: "card_form" as const,
-      });
-      // Track analytics
+      const visitorMeta = getVisitorMeta();
+
+      // 1. Find "New Lead" pipeline stage for this card owner
+      const { data: stages } = await supabase
+        .from("pipeline_stages")
+        .select("id")
+        .eq("user_id", profile.id)
+        .order("sort_order", { ascending: true })
+        .limit(1);
+      const firstStageId = stages?.[0]?.id ?? null;
+
+      // 2. Create lead with stage + source metadata
+      const { data: lead } = await supabase
+        .from("leads")
+        .insert({
+          user_id: profile.id,
+          name: formData.name,
+          phone: formData.phone || null,
+          email: formData.email || null,
+          notes: formData.message || null,
+          source: "card_form" as const,
+          stage_id: firstStageId,
+          custom_fields_json: {
+            referrer: visitorMeta.referrer,
+            utm_source: visitorMeta.utm_source,
+            utm_medium: visitorMeta.utm_medium,
+            utm_campaign: visitorMeta.utm_campaign,
+            device: visitorMeta.user_agent,
+            capture_url: window.location.href,
+          },
+        })
+        .select("id")
+        .single();
+
+      // 3. Log activity on the new lead
+      if (lead?.id) {
+        await supabase.from("contact_activities").insert({
+          user_id: profile.id,
+          lead_id: lead.id,
+          activity_type: "form_submitted",
+          title: "Contact form submitted via digital card",
+          description: formData.message || null,
+          occurred_at: new Date().toISOString(),
+        });
+      }
+
+      // 4. Track analytics
       await supabase.from("analytics_events").insert({
         user_id: profile.id,
         handle: handle!,
         event_type: "form_submit" as const,
+        meta_json: { lead_id: lead?.id, ...visitorMeta },
       });
+
       setFormSent(true);
     } catch {
       toast.error("Something went wrong");
@@ -117,14 +189,6 @@ export default function PublicCard() {
       setSubmitting(false);
     }
   };
-
-  // Track card view on mount (fire-and-forget)
-  if (handle && profile.id) {
-    supabase
-      .from("analytics_events")
-      .insert({ user_id: profile.id, handle, event_type: "card_view" as const })
-      .then();
-  }
 
   // Secondary CTAs (exclude primary)
   const secondaryCtas = ["call", "text", "email", "vcard"].filter((c) => c !== primaryCta);
