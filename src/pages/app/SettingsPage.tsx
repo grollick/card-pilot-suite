@@ -1,11 +1,26 @@
-import { Settings as SettingsIcon, User, Palette, Bell, CreditCard } from "lucide-react";
+import { Settings as SettingsIcon, User, Palette, Bell, RotateCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function SettingsPage() {
+  const navigate = useNavigate();
+  const [showReOnboard, setShowReOnboard] = useState(false);
+
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
@@ -20,7 +35,7 @@ export default function SettingsPage() {
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="profile" className="mt-4">
+        <TabsContent value="profile" className="mt-4 space-y-4">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="rounded-xl border border-border bg-card p-6 space-y-5">
             <div className="flex items-center gap-4">
@@ -55,6 +70,22 @@ export default function SettingsPage() {
               </div>
             </div>
             <Button className="shadow-glow">Save Changes</Button>
+          </motion.div>
+
+          {/* Re-onboard section */}
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            className="rounded-xl border border-border bg-card p-6 space-y-3">
+            <div className="flex items-center gap-2">
+              <RotateCw className="h-4 w-4 text-primary" />
+              <h3 className="font-semibold">Change Profession</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Re-run the setup wizard to change your profession, style pack, and regenerate default templates. Your existing contacts and custom data will be preserved.
+            </p>
+            <Button variant="outline" size="sm" onClick={() => setShowReOnboard(true)}>
+              <RotateCw className="h-4 w-4 mr-2" />
+              Re-run Setup Wizard
+            </Button>
           </motion.div>
         </TabsContent>
 
@@ -104,6 +135,24 @@ export default function SettingsPage() {
           </motion.div>
         </TabsContent>
       </Tabs>
+
+      {/* Confirmation dialog */}
+      <AlertDialog open={showReOnboard} onOpenChange={setShowReOnboard}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Re-run Setup Wizard?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will take you through the onboarding flow again. You can change your profession, style pack, and CTA. Your existing pipeline stages, booking services, and email templates will be replaced with the new profession's defaults. Contacts and custom card content are preserved.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => navigate("/onboarding")}>
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
