@@ -282,12 +282,27 @@ export default function PublicBooking() {
                 <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                   <h2 className="font-semibold">Pick a Date & Time</h2>
                   {availableDays.size === 0 ? (
-                    <div className="rounded-xl border border-border bg-muted/30 p-6 text-center space-y-2">
+                    <div className="rounded-xl border border-border bg-muted/30 p-6 text-center space-y-3">
                       <Clock className="h-8 w-8 text-muted-foreground mx-auto" />
                       <p className="text-sm font-medium text-foreground">No availability set</p>
                       <p className="text-xs text-muted-foreground">
-                        This person hasn't configured their available hours yet. Please check back later.
+                        This person hasn't configured their available hours yet. You can reach out directly:
                       </p>
+                      <div className="flex flex-col items-center gap-2">
+                        {data.profile.email && (
+                          <a href={`mailto:${data.profile.email}`} className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline">
+                            ✉ {data.profile.email}
+                          </a>
+                        )}
+                        {data.profile.phone && (
+                          <a href={`tel:${data.profile.phone}`} className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline">
+                            📞 {data.profile.phone}
+                          </a>
+                        )}
+                        {!data.profile.email && !data.profile.phone && (
+                          <p className="text-xs text-muted-foreground">No contact info available. Please check back later.</p>
+                        )}
+                      </div>
                     </div>
                   ) : (
                     <CalendarPicker
