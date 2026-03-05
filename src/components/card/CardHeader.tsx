@@ -100,38 +100,43 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
   ) : null;
 
   const avatarEl = avatarUrl ? (
-    <motion.div style={{ ...avatarContainerStyle, position: "relative" as const }} animate={floatAnimation}>
-      <img
-        src={avatarUrl}
-        alt={name}
-        style={{
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          transform: avatarRotation ? `rotate(${avatarRotation}deg)` : undefined,
-        }}
-      />
+    <motion.div style={{ position: "relative" as const, width: avatarSize, height: avatarSize }} animate={floatAnimation}>
+      <div style={avatarContainerStyle}>
+        <img
+          src={avatarUrl}
+          alt={name}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            transform: avatarRotation ? `rotate(${avatarRotation}deg)` : undefined,
+          }}
+        />
+      </div>
       {bannerEl}
     </motion.div>
   ) : (
     <motion.div
       animate={floatAnimation}
-      style={{
-        width: avatarSize,
-        height: avatarSize,
-        borderRadius: avatarBorderRadius,
-        background: `${palette.primary}18`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 28,
-        fontWeight: 700,
-        color: palette.primary,
-        fontFamily: `'${fonts.primary}', sans-serif`,
-        position: "relative" as const,
-      }}
+      style={{ position: "relative" as const, width: avatarSize, height: avatarSize }}
     >
-      {name?.charAt(0)?.toUpperCase() || "?"}
+      <div
+        style={{
+          width: avatarSize,
+          height: avatarSize,
+          borderRadius: avatarBorderRadius,
+          background: `${palette.primary}18`,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 28,
+          fontWeight: 700,
+          color: palette.primary,
+          fontFamily: `'${fonts.primary}', sans-serif`,
+        }}
+      >
+        {name?.charAt(0)?.toUpperCase() || "?"}
+      </div>
       {bannerEl}
     </motion.div>
   );
