@@ -395,9 +395,9 @@ export default function Index() {
                 <h3 className="text-lg font-bold">{plan.name}</h3>
                 <p className="text-xs text-muted-foreground">{plan.tagline}</p>
               </div>
-              <div className="mb-6">
-                <span className="text-4xl font-extrabold">${plan.price}</span>
-                <span className="text-muted-foreground text-sm">/mo</span>
+              <div className="mb-8">
+                <span className="text-4xl font-extrabold tracking-tight">${plan.price}</span>
+                <span className="text-muted-foreground text-sm ml-1">/mo</span>
               </div>
               <ul className="space-y-2 mb-6 flex-1">
                 {plan.features.map((f) => (
