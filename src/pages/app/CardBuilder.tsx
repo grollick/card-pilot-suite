@@ -628,6 +628,16 @@ export default function CardBuilder() {
                 const existing = (card?.theme_json as any)?.tokens ?? {};
                 saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarSize: val } } });
               }}
+              avatarBannerText={((card?.theme_json as any)?.tokens?.header?.avatarBannerText) ?? ""}
+              onAvatarBannerTextChange={(val) => {
+                const existing = (card?.theme_json as any)?.tokens ?? {};
+                saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarBannerText: val } } });
+              }}
+              avatarBannerBg={((card?.theme_json as any)?.tokens?.header?.avatarBannerBg) ?? ""}
+              onAvatarBannerBgChange={(val) => {
+                const existing = (card?.theme_json as any)?.tokens ?? {};
+                saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarBannerBg: val } } });
+              }}
             />
           </div>
 

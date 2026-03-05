@@ -478,6 +478,8 @@ export default function PublicCard() {
             avatarRotation={themeJson.avatar_rotation as number | undefined}
             avatarBorderWidth={(themeJson.tokens as any)?.header?.avatarBorderWidth ?? 3}
             avatarSize={(themeJson.tokens as any)?.header?.avatarSize ?? 80}
+            avatarBannerText={(themeJson.tokens as any)?.header?.avatarBannerText ?? ""}
+            avatarBannerBg={(themeJson.tokens as any)?.header?.avatarBannerBg ?? ""}
             coverOffsetY={themeJson.cover_offset_y as number | undefined}
             logoUrl={themeJson.logo_url as string | undefined}
             logoFrostedBg={themeJson.logo_frosted_bg !== false}

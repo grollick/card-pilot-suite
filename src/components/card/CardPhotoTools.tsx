@@ -46,6 +46,10 @@ interface CardPhotoToolsProps {
   onAvatarBorderWidthChange?: (val: number) => void;
   avatarSize?: number;
   onAvatarSizeChange?: (val: number) => void;
+  avatarBannerText?: string;
+  onAvatarBannerTextChange?: (val: string) => void;
+  avatarBannerBg?: string;
+  onAvatarBannerBgChange?: (val: string) => void;
 }
 
 export default function CardPhotoTools({
@@ -72,6 +76,10 @@ export default function CardPhotoTools({
   onAvatarBorderWidthChange,
   avatarSize = 80,
   onAvatarSizeChange,
+  avatarBannerText = "",
+  onAvatarBannerTextChange,
+  avatarBannerBg = "",
+  onAvatarBannerBgChange,
 }: CardPhotoToolsProps) {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
@@ -321,6 +329,31 @@ export default function CardPhotoTools({
                   </button>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Avatar Title Banner */}
+          {onAvatarBannerTextChange && (
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Title Banner</Label>
+              <Input
+                value={avatarBannerText}
+                onChange={(e) => onAvatarBannerTextChange(e.target.value)}
+                placeholder="e.g. CEO, Founder, Available"
+                className="text-xs h-8"
+                maxLength={20}
+              />
+              {avatarBannerText && onAvatarBannerBgChange && (
+                <div className="flex items-center gap-2 mt-1">
+                  <input
+                    type="color"
+                    value={avatarBannerBg || "#4361ee"}
+                    onChange={(e) => onAvatarBannerBgChange(e.target.value)}
+                    className="h-7 w-7 rounded cursor-pointer border border-border"
+                  />
+                  <span className="text-[10px] text-muted-foreground">Banner color</span>
+                </div>
+              )}
             </div>
           )}
 
