@@ -28,6 +28,7 @@ interface Props {
   editName: string | null;
   editCompany: string | null;
   displayJobTitle: string;
+  boldLastName?: boolean;
   onAvatarChange: (url: string) => void;
   setEditingSection: (id: string | null) => void;
 }
@@ -99,7 +100,7 @@ export default function CardBuilderPreview({
   coverUrl, coverOffsetY, avatarUrl, avatarBgColor, avatarRotation,
   logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity,
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
-  onAvatarChange, setEditingSection,
+  boldLastName, onAvatarChange, setEditingSection,
 }: Props) {
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -222,7 +223,13 @@ export default function CardBuilderPreview({
                     />
 
                     <h3 className="text-lg font-bold" style={{ color: previewTheme.palette.secondary, fontFamily: `'${previewTheme.fonts.primary}', sans-serif` }}>
-                      {(editName ?? profile?.name) || "Your Name"}
+                      {boldLastName ? (() => {
+                        const full = (editName ?? profile?.name) || "Your Name";
+                        const parts = full.trim().split(/\s+/);
+                        if (parts.length <= 1) return full;
+                        const last = parts.pop()!;
+                        return <>{parts.join(" ")} <span style={{ fontWeight: 800 }}>{last}</span></>;
+                      })() : (editName ?? profile?.name) || "Your Name"}
                     </h3>
                     <p className="text-sm" style={{ color: `${previewTheme.palette.secondary}99` }}>{displayJobTitle}</p>
                     {(editCompany ?? profile?.company) && (

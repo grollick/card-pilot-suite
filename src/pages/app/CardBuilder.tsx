@@ -47,6 +47,8 @@ export default function CardBuilder() {
             setEditJobTitle={s.setEditJobTitle}
             jobTitle={s.jobTitle}
             setJobTitle={s.setJobTitle}
+            boldLastName={s.boldLastName}
+            setBoldLastName={s.setBoldLastName}
             professionName={s.professionName}
             identitySaveTimers={s.identitySaveTimers}
             identitySaveState={s.identitySaveState}
@@ -178,6 +180,7 @@ export default function CardBuilder() {
             editName={s.editName}
             editCompany={s.editCompany}
             displayJobTitle={s.displayJobTitle}
+            boldLastName={s.boldLastName}
             onAvatarChange={s.handleAvatarChange}
             setEditingSection={s.setEditingSection}
           />

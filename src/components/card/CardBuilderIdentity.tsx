@@ -1,4 +1,5 @@
 import { Pencil, Loader2, Check } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
@@ -12,6 +13,8 @@ interface Props {
   setEditJobTitle: (v: string | null) => void;
   jobTitle: string | null;
   setJobTitle: (v: string | null) => void;
+  boldLastName: boolean;
+  setBoldLastName: (v: boolean) => void;
   professionName: string;
   identitySaveTimers: React.MutableRefObject<Record<string, ReturnType<typeof setTimeout>>>;
   identitySaveState: Record<string, "saving" | "saved" | null>;
@@ -28,8 +31,8 @@ function SaveIndicator({ state }: { state: "saving" | "saved" | null }) {
 
 export default function CardBuilderIdentity({
   profile, editName, setEditName, editCompany, setEditCompany,
-  editJobTitle, setEditJobTitle, jobTitle, setJobTitle, professionName,
-  identitySaveTimers, identitySaveState, setIdentitySaveState,
+  editJobTitle, setEditJobTitle, jobTitle, setJobTitle, boldLastName, setBoldLastName,
+  professionName, identitySaveTimers, identitySaveState, setIdentitySaveState,
   saveThemeField, qc,
 }: Props) {
   const makeHandler = (field: string, dbField: string, setter: (v: string | null) => void) =>
@@ -74,6 +77,14 @@ export default function CardBuilderIdentity({
           <SaveIndicator state={identitySaveState.name ?? null} />
         </div>
         <Input value={editName ?? profile?.name ?? ""} onChange={makeHandler("name", "name", setEditName)} placeholder="Your Name" className="text-sm" />
+        <div className="flex items-center justify-between mt-1">
+          <label className="text-[11px] text-muted-foreground">Bold last name</label>
+          <Switch
+            checked={boldLastName}
+            onCheckedChange={(v) => { setBoldLastName(v); saveThemeField({ bold_last_name: v }); }}
+            className="scale-75 origin-right"
+          />
+        </div>
       </div>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
