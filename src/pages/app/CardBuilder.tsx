@@ -770,8 +770,11 @@ export default function CardBuilder() {
                   }}
                 />
 
-                <h3 className="text-lg font-bold" style={{ color: previewTheme.palette.secondary, fontFamily: `'${previewTheme.fonts.primary}', sans-serif` }}>{profile?.name || "Your Name"}</h3>
+                <h3 className="text-lg font-bold" style={{ color: previewTheme.palette.secondary, fontFamily: `'${previewTheme.fonts.primary}', sans-serif` }}>{(editName ?? profile?.name) || "Your Name"}</h3>
                 <p className="text-sm" style={{ color: `${previewTheme.palette.secondary}99` }}>{displayJobTitle}</p>
+                {(editCompany ?? profile?.company) && (
+                  <p className="text-xs mt-0.5" style={{ color: `${previewTheme.palette.secondary}70` }}>{editCompany ?? profile?.company}</p>
+                )}
 
                 {(() => {
                   const enabledCtas = ctaConfig.filter(c => c.enabled);
