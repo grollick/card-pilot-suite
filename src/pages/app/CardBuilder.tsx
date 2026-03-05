@@ -795,13 +795,21 @@ export default function CardBuilder() {
               </Button>
             </div>
           )}
-          <div className="rounded-xl border border-border bg-muted/30 p-6 lg:max-h-[calc(100vh-7rem)] overflow-y-auto scroll-smooth snap-y snap-proximity flex items-start justify-center">
-          <div className="w-full max-w-sm mx-auto">
-            <div className="rounded-2xl border border-border overflow-hidden shadow-card relative" style={{
-              background: currentThemeOverrides.gradientBg?.enabled
-                ? `linear-gradient(${currentThemeOverrides.gradientBg.direction}, ${previewTheme.palette.background}, ${currentThemeOverrides.gradientBg.color2})`
-                : previewTheme.palette.background,
-            }}>
+          <div className="flex items-start justify-center py-4">
+            {/* Phone frame */}
+            <div className="relative mx-auto w-[300px]">
+              {/* Notch */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 z-30 w-[120px] h-[26px] bg-foreground/90 rounded-b-2xl" />
+              {/* Outer shell */}
+              <div className="rounded-[2.5rem] border-[6px] border-foreground/90 bg-foreground/90 shadow-xl overflow-hidden">
+                {/* Screen area */}
+                <div className="rounded-[2rem] overflow-hidden bg-background">
+                  <div className="lg:max-h-[calc(100vh-10rem)] overflow-y-auto scroll-smooth snap-y snap-proximity">
+                    <div className="relative" style={{
+                      background: currentThemeOverrides.gradientBg?.enabled
+                        ? `linear-gradient(${currentThemeOverrides.gradientBg.direction}, ${previewTheme.palette.background}, ${currentThemeOverrides.gradientBg.color2})`
+                        : previewTheme.palette.background,
+                    }}>
               {currentThemeOverrides.bgPattern?.type && currentThemeOverrides.bgPattern.type !== "none" && (
                 <div
                   className={`absolute inset-0 pointer-events-none ${(currentThemeOverrides.bgPattern as any).coverage === "gaps" ? "z-[0]" : "z-[1]"}`}
@@ -941,8 +949,11 @@ export default function CardBuilder() {
                     </div>
                   ))}
               </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
           </div>
         </motion.div>
       </div>
