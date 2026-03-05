@@ -199,7 +199,7 @@ export default function CardBuilderPreview({
                       }}
                     >
                       {avatarUrl ? (
-                        <img src={avatarUrl} alt="avatar" className="h-full w-full object-cover rounded-2xl" style={{ transform: `rotate(${avatarRotation}deg)` }} />
+                        <img src={avatarUrl} alt="avatar" className={`h-full w-full rounded-2xl ${avatarBgColor !== "transparent" ? "object-contain" : "object-cover"}`} style={{ transform: `rotate(${avatarRotation}deg)` }} />
                       ) : (
                         <CreditCard className="h-8 w-8 text-muted-foreground" />
                       )}

@@ -74,15 +74,17 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, p
     marginTop: 4,
   };
 
+  const hasBgColor = avatarBgColor && avatarBgColor !== "transparent";
   const avatarContainerStyle: React.CSSProperties = {
     width: avatarSize,
     height: avatarSize,
     borderRadius: avatarBorderRadius,
     border: `${avatarBorderWidth}px solid #FFFFFF`,
     overflow: "hidden",
-    backgroundColor: avatarBgColor === "transparent" ? undefined : avatarBgColor,
+    backgroundColor: hasBgColor ? avatarBgColor : undefined,
     boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
   };
+  const avatarImgFit = hasBgColor ? "contain" as const : "cover" as const;
 
   const floatAnimation = {
     y: [0, -6, 0],
@@ -149,7 +151,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, p
           style={{
             width: "100%",
             height: "100%",
-            objectFit: "cover",
+            objectFit: avatarImgFit,
             transform: avatarRotation ? `rotate(${avatarRotation}deg)` : undefined,
           }}
         />

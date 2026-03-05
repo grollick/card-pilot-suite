@@ -31,7 +31,7 @@ serve(async (req) => {
             content: [
               {
                 type: "text",
-                text: "Remove the background from this image completely. Make the background fully transparent or white. Keep only the person/subject in the foreground with clean, precise edges. Return the result as an image.",
+                text: "Remove the background from this image completely. Make the background fully transparent (alpha channel = 0). Keep only the person/subject in the foreground with clean, precise edges. Output as a PNG image with a transparent background. Do NOT use a white or any solid color background.",
               },
               {
                 type: "image_url",
