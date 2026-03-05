@@ -48,6 +48,7 @@ export function useCardBuilderState() {
   const [showSectionIcons, setShowSectionIcons] = useState(false);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
+  const [themePreviewOverrides, setThemePreviewOverrides] = useState<CardThemeOverrides | null>(null);
   const [editName, setEditName] = useState<string | null>(null);
   const [editCompany, setEditCompany] = useState<string | null>(null);
   const [editJobTitle, setEditJobTitle] = useState<string | null>(null);
@@ -252,7 +253,7 @@ export function useCardBuilderState() {
   }, [profile, professionName, generate]);
 
   // ── Theme resolution ──
-  const currentThemeOverrides: CardThemeOverrides = {
+  const savedThemeOverrides: CardThemeOverrides = {
     palette: (card?.theme_json as any)?.palette ?? undefined,
     fonts: (card?.theme_json as any)?.fonts ?? undefined,
     tokens: (card?.theme_json as any)?.tokens ?? undefined,
@@ -260,16 +261,28 @@ export function useCardBuilderState() {
     bgPattern: (card?.theme_json as any)?.bgPattern ?? undefined,
   };
 
+  // When theme editor is open, show live preview overrides; otherwise show saved
+  const currentThemeOverrides: CardThemeOverrides = themePreviewOverrides
+    ? { ...savedThemeOverrides, ...themePreviewOverrides }
+    : savedThemeOverrides;
+
   const previewTheme: ResolvedCardTheme = useMemo(() => {
     const tokens = (stylePack?.theme_tokens as Record<string, any>) ?? {};
     const palettes = (stylePack?.default_palettes as any[]) ?? [];
     const basePalette = palettes[0] ?? FALLBACK_PALETTE;
     const themeJson = (card?.theme_json as any) ?? {};
-    const palette = themeJson.palette ? { ...basePalette, ...themeJson.palette } : basePalette;
+
+    // Use live preview overrides from theme editor when available
+    const liveOverrides = themePreviewOverrides ?? {};
+    const effectivePalette = (liveOverrides as any).palette ?? themeJson.palette;
+    const effectiveFonts = (liveOverrides as any).fonts ?? themeJson.fonts;
+    const effectiveTokens = (liveOverrides as any).tokens ?? themeJson.tokens;
+
+    const palette = effectivePalette ? { ...basePalette, ...effectivePalette } : basePalette;
     let merged = { ...tokens };
-    if (themeJson.fonts) merged = { ...merged, fontPrimary: themeJson.fonts.primary, fontSecondary: themeJson.fonts.secondary };
-    if (themeJson.tokens) {
-      const t = themeJson.tokens;
+    if (effectiveFonts) merged = { ...merged, fontPrimary: effectiveFonts.primary, fontSecondary: effectiveFonts.secondary };
+    if (effectiveTokens) {
+      const t = effectiveTokens;
       if (t.button) merged = { ...merged, button: { ...(merged.button ?? {}), ...t.button } };
       if (t.header) merged = { ...merged, header: { ...(merged.header ?? {}), ...t.header } };
       if (t.section) merged = { ...merged, section: { ...(merged.section ?? {}), ...t.section } };
@@ -278,9 +291,14 @@ export function useCardBuilderState() {
       if (t.radius) merged = { ...merged, radius: { ...(merged.radius ?? {}), ...t.radius } };
     }
     return resolveCardTheme(merged, palette);
-  }, [stylePack, card?.theme_json]);
+  }, [stylePack, card?.theme_json, themePreviewOverrides]);
+
+  const handleThemePreview = useCallback((overrides: CardThemeOverrides) => {
+    setThemePreviewOverrides(overrides);
+  }, []);
 
   const handleThemeSave = useCallback(async (overrides: CardThemeOverrides) => {
+    setThemePreviewOverrides(null);
     try {
       const existing = (card?.theme_json as any) ?? {};
       await upsertCard.mutateAsync({
@@ -291,6 +309,11 @@ export function useCardBuilderState() {
       toast.success("Theme updated!");
     } catch { toast.error("Failed to save theme"); }
   }, [card, sections, published, coverUrl, upsertCard]);
+
+  const handleThemeEditorOpenChange = useCallback((open: boolean) => {
+    setThemeEditorOpen(open);
+    if (!open) setThemePreviewOverrides(null);
+  }, []);
 
   const handleDragEnd = useCallback((active: string, over: string) => {
     setSections((prev) => {
@@ -330,8 +353,8 @@ export function useCardBuilderState() {
     // Section display
     showSectionIcons, setShowSectionIcons,
     // Theme
-    themeEditorOpen, setThemeEditorOpen,
-    currentThemeOverrides, previewTheme, handleThemeSave,
+    themeEditorOpen, setThemeEditorOpen: handleThemeEditorOpenChange,
+    currentThemeOverrides, previewTheme, handleThemeSave, handleThemePreview,
     // Save
     saveThemeField, saveSections, globalSaveState,
     // AI

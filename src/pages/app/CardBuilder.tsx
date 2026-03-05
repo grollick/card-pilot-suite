@@ -212,6 +212,7 @@ export default function CardBuilder() {
         }
         stylePackTokens={(s.stylePack?.theme_tokens as Record<string, any>) ?? undefined}
         onSave={s.handleThemeSave}
+        onPreview={s.handleThemePreview}
       />
 
       {/* AI Assistant */}
