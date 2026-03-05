@@ -1,4 +1,4 @@
-import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick, Check, Cloud, CloudOff, Smartphone, Tablet } from "lucide-react";
+import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick, Check, Cloud, CloudOff, Smartphone, Tablet, Link2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import CtaEditor, { type CtaItem, DEFAULT_CTA_CONFIG } from "@/components/card/CtaEditor";
 import { resolveCardTheme, type ResolvedCardTheme } from "@/lib/cardTokens";
@@ -494,12 +494,26 @@ export default function CardBuilder() {
             </span>
             <Switch checked={published} onCheckedChange={handlePublishToggle} />
           </div>
-          {/* QR share */}
+          {/* Share buttons */}
           {profile?.handle && (
-            <QRShareDialog
-              url={`${window.location.origin}/${profile.handle}`}
-              name={profile.name || "Card"}
-            />
+            <>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                title="Copy card link"
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/${profile.handle}`);
+                  toast.success("Link copied!");
+                }}
+              >
+                <Link2 className="h-4 w-4" />
+              </Button>
+              <QRShareDialog
+                url={`${window.location.origin}/${profile.handle}`}
+                name={profile.name || "Card"}
+              />
+            </>
           )}
         </div>
       </div>
