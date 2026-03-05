@@ -10,13 +10,15 @@ interface CardHeaderProps {
   coverUrl?: string | null;
   avatarBgColor?: string;
   avatarRotation?: number;
+  coverOffsetY?: number;
+  logoUrl?: string | null;
 }
 
 /**
  * Renders one of 4 header layouts based on theme tokens:
  * cover | split | classic | hero
  */
-export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0 }: CardHeaderProps) {
+export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, coverOffsetY = 0, logoUrl }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
 
@@ -87,11 +89,36 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
             style={{
               height: 160,
               borderRadius: `${radii.card} ${radii.card} 0 0`,
+              overflow: "hidden",
+              position: "relative",
               background: coverUrl
-                ? `url(${coverUrl}) center/cover`
+                ? undefined
                 : `linear-gradient(135deg, ${palette.primary}30, ${palette.accent}20)`,
             }}
-          />
+          >
+            {coverUrl && (
+              <img
+                src={coverUrl}
+                alt=""
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  objectPosition: `center ${coverOffsetY}%`,
+                }}
+              />
+            )}
+            {logoUrl && (
+              <div style={{
+                position: "absolute", top: 8, right: 8,
+                height: 32, width: 32, borderRadius: 6,
+                background: "rgba(255,255,255,0.85)", backdropFilter: "blur(4px)",
+                display: "flex", alignItems: "center", justifyContent: "center", padding: 4,
+              }}>
+                <img src={logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
+              </div>
+            )}
+          </div>
           <div style={{ padding: "0 24px", marginTop: -40, display: "flex", flexDirection: "column" }}>
             {avatarEl}
             <h1 style={{ ...titleStyle, fontSize: 24, marginTop: 12 }}>{name}</h1>

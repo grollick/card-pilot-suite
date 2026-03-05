@@ -7,6 +7,8 @@ import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import CoverPositioner from "./CoverPositioner";
+import LogoUploader from "./LogoUploader";
 
 const BG_PRESETS = [
   { label: "None", value: "transparent" },
@@ -29,6 +31,10 @@ interface CardPhotoToolsProps {
   avatarRotation?: number;
   onAvatarBgColorChange?: (color: string) => void;
   onAvatarRotationChange?: (deg: number) => void;
+  coverOffsetY?: number;
+  onCoverOffsetYChange?: (y: number) => void;
+  logoUrl?: string | null;
+  onLogoChange?: (url: string | null) => void;
 }
 
 export default function CardPhotoTools({
@@ -41,6 +47,10 @@ export default function CardPhotoTools({
   avatarRotation = 0,
   onAvatarBgColorChange,
   onAvatarRotationChange,
+  coverOffsetY = 0,
+  onCoverOffsetYChange,
+  logoUrl = null,
+  onLogoChange,
 }: CardPhotoToolsProps) {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
@@ -286,12 +296,18 @@ export default function CardPhotoTools({
           </Button>
         </div>
         {coverUrl && (
-          <div className="relative rounded-lg overflow-hidden border border-border/50">
-            <img src={coverUrl} alt="Backdrop preview" className="w-full h-20 object-cover" />
-            <p className="text-[10px] text-muted-foreground text-center py-1">Current backdrop</p>
-          </div>
+          <CoverPositioner
+            coverUrl={coverUrl}
+            offsetY={coverOffsetY}
+            onOffsetChange={(y) => onCoverOffsetYChange?.(y)}
+          />
         )}
       </div>
+
+      {/* Logo Upload */}
+      {onLogoChange && (
+        <LogoUploader logoUrl={logoUrl} onLogoChange={onLogoChange} />
+      )}
     </div>
   );
 }
