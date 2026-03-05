@@ -144,6 +144,9 @@ const PALETTE_CATEGORIES: PaletteCategory[] = [
       { name: "YouTube", palette: { primary: "#ff0000", secondary: "#606060", accent: "#cc0000", background: "#ffffff" } },
       { name: "Facebook", palette: { primary: "#1877f2", secondary: "#65676b", accent: "#166fe5", background: "#f0f2f5" } },
       { name: "X", palette: { primary: "#000000", secondary: "#71767b", accent: "#1d9bf0", background: "#ffffff" } },
+      { name: "TikTok", palette: { primary: "#000000", secondary: "#71767b", accent: "#fe2c55", background: "#ffffff" } },
+      { name: "Instagram", palette: { primary: "#e1306c", secondary: "#8e8e8e", accent: "#833ab4", background: "#fafafa" } },
+      { name: "Snapchat", palette: { primary: "#fffc00", secondary: "#333333", accent: "#000000", background: "#ffffff" } },
     ],
   },
 ];
