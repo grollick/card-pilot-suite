@@ -10,18 +10,29 @@ import {
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
-import { Circle, Square, RectangleHorizontal, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Circle, Square, RectangleHorizontal, Loader2, Maximize } from "lucide-react";
 
-const PROFILE_PRESETS = [
-  { label: "Circle", value: "circle", aspect: 1, shape: "round" as const, icon: Circle },
-  { label: "Square", value: "square", aspect: 1, shape: "rect" as const, icon: Square },
-  { label: "4:3", value: "4:3", aspect: 4 / 3, shape: "rect" as const, icon: RectangleHorizontal },
+type PresetItem = {
+  label: string;
+  value: string;
+  aspect: number | undefined;
+  shape: "round" | "rect";
+  icon: typeof Circle;
+};
+
+const PROFILE_PRESETS: PresetItem[] = [
+  { label: "Circle", value: "circle", aspect: 1, shape: "round", icon: Circle },
+  { label: "Square", value: "square", aspect: 1, shape: "rect", icon: Square },
+  { label: "4:3", value: "4:3", aspect: 4 / 3, shape: "rect", icon: RectangleHorizontal },
+  { label: "Free", value: "free", aspect: undefined, shape: "rect", icon: Maximize },
 ];
 
-const COVER_PRESETS = [
-  { label: "16:9", value: "16:9", aspect: 16 / 9, shape: "rect" as const, icon: RectangleHorizontal },
-  { label: "4:3", value: "4:3", aspect: 4 / 3, shape: "rect" as const, icon: RectangleHorizontal },
-  { label: "Square", value: "square", aspect: 1, shape: "rect" as const, icon: Square },
+const COVER_PRESETS: PresetItem[] = [
+  { label: "16:9", value: "16:9", aspect: 16 / 9, shape: "rect", icon: RectangleHorizontal },
+  { label: "4:3", value: "4:3", aspect: 4 / 3, shape: "rect", icon: RectangleHorizontal },
+  { label: "Square", value: "square", aspect: 1, shape: "rect", icon: Square },
+  { label: "Free", value: "free", aspect: undefined, shape: "rect", icon: Maximize },
 ];
 
 interface ImageCropDialogProps {
@@ -33,10 +44,7 @@ interface ImageCropDialogProps {
   title?: string;
 }
 
-async function getCroppedBlob(
-  imageSrc: string,
-  crop: Area
-): Promise<Blob> {
+async function getCroppedBlob(imageSrc: string, crop: Area): Promise<Blob> {
   const image = new Image();
   image.crossOrigin = "anonymous";
   await new Promise<void>((resolve, reject) => {
@@ -49,17 +57,7 @@ async function getCroppedBlob(
   canvas.width = crop.width;
   canvas.height = crop.height;
   const ctx = canvas.getContext("2d")!;
-  ctx.drawImage(
-    image,
-    crop.x,
-    crop.y,
-    crop.width,
-    crop.height,
-    0,
-    0,
-    crop.width,
-    crop.height
-  );
+  ctx.drawImage(image, crop.x, crop.y, crop.width, crop.height, 0, 0, crop.width, crop.height);
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(
@@ -85,15 +83,22 @@ export default function ImageCropDialog({
   const isWide = _initialAspect > 1.1;
   const presets = isWide ? COVER_PRESETS : PROFILE_PRESETS;
   const [activePreset, setActivePreset] = useState(presets[0].value);
+  const [customW, setCustomW] = useState("16");
+  const [customH, setCustomH] = useState("9");
 
   const currentPreset = presets.find((p) => p.value === activePreset) ?? presets[0];
 
-  const onCropDone = useCallback(
-    (_: Area, croppedAreaPixels: Area) => {
-      setCroppedArea(croppedAreaPixels);
-    },
-    []
-  );
+  const resolvedAspect = (() => {
+    if (activePreset !== "free") return currentPreset.aspect;
+    const w = parseFloat(customW);
+    const h = parseFloat(customH);
+    if (w > 0 && h > 0) return w / h;
+    return undefined;
+  })();
+
+  const onCropDone = useCallback((_: Area, croppedAreaPixels: Area) => {
+    setCroppedArea(croppedAreaPixels);
+  }, []);
 
   const handlePresetChange = (value: string) => {
     setActivePreset(value);
@@ -124,7 +129,7 @@ export default function ImageCropDialog({
         </DialogHeader>
 
         {/* Aspect ratio presets */}
-        <div className="px-4 pb-2 flex gap-1.5">
+        <div className="px-4 pb-2 flex flex-wrap gap-1.5">
           {presets.map((preset) => {
             const Icon = preset.icon;
             const isActive = activePreset === preset.value;
@@ -145,14 +150,48 @@ export default function ImageCropDialog({
           })}
         </div>
 
+        {/* Custom ratio inputs when Free is selected */}
+        {activePreset === "free" && (
+          <div className="px-4 pb-2 flex items-center gap-2">
+            <Label className="text-xs text-muted-foreground shrink-0">Ratio</Label>
+            <Input
+              type="number"
+              min={1}
+              max={99}
+              value={customW}
+              onChange={(e) => setCustomW(e.target.value)}
+              className="h-7 w-14 text-xs text-center px-1"
+              placeholder="W"
+            />
+            <span className="text-xs text-muted-foreground">:</span>
+            <Input
+              type="number"
+              min={1}
+              max={99}
+              value={customH}
+              onChange={(e) => setCustomH(e.target.value)}
+              className="h-7 w-14 text-xs text-center px-1"
+              placeholder="H"
+            />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 text-[10px] text-muted-foreground"
+              onClick={() => { setCustomW(""); setCustomH(""); }}
+            >
+              No lock
+            </Button>
+          </div>
+        )}
+
         <div className="relative w-full h-72 bg-muted">
           <Cropper
             image={imageSrc}
             crop={crop}
             zoom={zoom}
-            aspect={currentPreset.aspect}
+            aspect={resolvedAspect}
             cropShape={currentPreset.shape}
-            showGrid={currentPreset.shape === "rect"}
+            showGrid
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={onCropDone}
