@@ -40,6 +40,8 @@ interface CardPhotoToolsProps {
   onLogoFrostedBgChange?: (val: boolean) => void;
   logoGlow?: boolean;
   onLogoGlowChange?: (val: boolean) => void;
+  avatarShape?: "circle" | "rounded" | "square";
+  onAvatarShapeChange?: (shape: "circle" | "rounded" | "square") => void;
 }
 
 export default function CardPhotoTools({
@@ -60,6 +62,8 @@ export default function CardPhotoTools({
   onLogoFrostedBgChange,
   logoGlow = false,
   onLogoGlowChange,
+  avatarShape = "circle",
+  onAvatarShapeChange,
 }: CardPhotoToolsProps) {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
@@ -255,6 +259,32 @@ export default function CardPhotoTools({
               className="w-full"
             />
           </div>
+
+          {/* Avatar Shape */}
+          {onAvatarShapeChange && (
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Photo Shape</Label>
+              <div className="flex gap-1.5">
+                {([
+                  { value: "circle", label: "Circle" },
+                  { value: "rounded", label: "Rounded" },
+                  { value: "square", label: "Square" },
+                ] as const).map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => onAvatarShapeChange(opt.value)}
+                    className={`flex-1 px-2 py-1.5 rounded-md text-xs font-medium border transition-all ${
+                      avatarShape === opt.value
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border/50 text-muted-foreground hover:border-border hover:bg-muted/30"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Background Color Picker (shown after BG removal or always available) */}
           <div className="space-y-1.5">

@@ -613,6 +613,11 @@ export default function CardBuilder() {
               onLogoFrostedBgChange={handleLogoFrostedBgChange}
               logoGlow={logoGlow}
               onLogoGlowChange={handleLogoGlowChange}
+              avatarShape={previewTheme.header.avatarShape}
+              onAvatarShapeChange={(shape) => {
+                const existing = (card?.theme_json as any)?.tokens ?? {};
+                saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarShape: shape } } });
+              }}
             />
           </div>
 
