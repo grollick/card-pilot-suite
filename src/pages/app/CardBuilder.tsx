@@ -7,7 +7,7 @@ import CardPhotoTools from "@/components/card/CardPhotoTools";
 import SectionEditor, { type SectionContent } from "@/components/card/SectionEditor";
 import CardAssistant from "@/components/card/CardAssistant";
 import SortableSectionItem from "@/components/card/SortableSectionItem";
-import CardThemeEditor, { type CardThemeOverrides } from "@/components/card/CardThemeEditor";
+import CardThemeEditor, { type CardThemeOverrides, getPatternSvg } from "@/components/card/CardThemeEditor";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
@@ -336,6 +336,7 @@ export default function CardBuilder() {
     fonts: (card?.theme_json as any)?.fonts ?? undefined,
     tokens: (card?.theme_json as any)?.tokens ?? undefined,
     gradientBg: (card?.theme_json as any)?.gradientBg ?? undefined,
+    bgPattern: (card?.theme_json as any)?.bgPattern ?? undefined,
   };
 
   // Resolve the full theme for the live preview
@@ -371,7 +372,7 @@ export default function CardBuilder() {
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: published ? "published" : "draft",
-        theme_json: { ...existing, cover_url: coverUrl, palette: overrides.palette, fonts: overrides.fonts, tokens: overrides.tokens, gradientBg: overrides.gradientBg } as any,
+        theme_json: { ...existing, cover_url: coverUrl, palette: overrides.palette, fonts: overrides.fonts, tokens: overrides.tokens, gradientBg: overrides.gradientBg, bgPattern: overrides.bgPattern } as any,
       });
       toast.success("Theme updated!");
     } catch {
@@ -793,11 +794,21 @@ export default function CardBuilder() {
           className="lg:col-span-2 rounded-xl border border-border bg-muted/30 p-6 min-h-[600px] flex items-start justify-center"
         >
           <div className="w-full max-w-sm mx-auto">
-            <div className="rounded-2xl border border-border overflow-hidden shadow-card" style={{
+            <div className="rounded-2xl border border-border overflow-hidden shadow-card relative" style={{
               background: currentThemeOverrides.gradientBg?.enabled
                 ? `linear-gradient(${currentThemeOverrides.gradientBg.direction}, ${previewTheme.palette.background}, ${currentThemeOverrides.gradientBg.color2})`
                 : previewTheme.palette.background,
             }}>
+              {currentThemeOverrides.bgPattern?.type && currentThemeOverrides.bgPattern.type !== "none" && (
+                <div
+                  className="absolute inset-0 pointer-events-none z-[1]"
+                  style={{
+                    opacity: currentThemeOverrides.bgPattern.opacity,
+                    backgroundImage: getPatternSvg(currentThemeOverrides.bgPattern.type, previewTheme.palette.secondary),
+                    backgroundSize: currentThemeOverrides.bgPattern.type === "noise" ? "200px 200px" : "20px 20px",
+                  }}
+                />
+              )}
               {/* Cover */}
               <div
                 className="h-28 relative overflow-hidden"
