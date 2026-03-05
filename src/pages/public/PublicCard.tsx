@@ -223,6 +223,7 @@ export default function PublicCard() {
   const secondaryCtaItems = enabledCtas.filter(c => c !== primaryCtaItem);
   const primaryCta = primaryCtaItem?.id ?? "call";
   const ctaIconsOnly = themeJson.cta_icons_only === true;
+  const socialIconsOnly = themeJson.social_icons_only !== false; // default true
 
   const handleCtaClick = (cta: string) => {
     supabase.from("analytics_events").insert({
@@ -750,43 +751,59 @@ export default function PublicCard() {
                           target="_blank"
                           rel="noopener noreferrer"
                           style={{
-                            width: 44,
-                            height: 44,
+                            width: socialIconsOnly ? 44 : "auto",
+                            minWidth: socialIconsOnly ? undefined : 64,
+                            height: socialIconsOnly ? 44 : "auto",
+                            padding: socialIconsOnly ? 0 : "10px 14px",
                             borderRadius: theme.button.shape === "pill" ? "9999px" : radii.button,
                             border: `1px solid ${palette.primary}20`,
                             background: `${palette.primary}08`,
                             color: palette.primary,
                             display: "flex",
+                            flexDirection: socialIconsOnly ? "row" as const : "column" as const,
                             alignItems: "center",
                             justifyContent: "center",
+                            gap: socialIconsOnly ? 0 : 4,
                             cursor: "pointer",
                             transition: "all 0.2s",
                             textDecoration: "none",
+                            fontSize: 10,
+                            fontWeight: 500,
+                            fontFamily: `'${fonts.secondary}', sans-serif`,
                           }}
                           title={link.platform}
                         >
                           {platformIcon(link.platform)}
+                          {!socialIconsOnly && <span>{link.platform}</span>}
                         </a>
                       ))
                     : ["instagram", "facebook", "linkedin", "twitter"].map((platform) => (
                         <button
                           key={platform}
                           style={{
-                            width: 44,
-                            height: 44,
+                            width: socialIconsOnly ? 44 : "auto",
+                            minWidth: socialIconsOnly ? undefined : 64,
+                            height: socialIconsOnly ? 44 : "auto",
+                            padding: socialIconsOnly ? 0 : "10px 14px",
                             borderRadius: theme.button.shape === "pill" ? "9999px" : radii.button,
                             border: `1px solid ${palette.primary}20`,
                             background: `${palette.primary}08`,
                             color: palette.primary,
                             display: "flex",
+                            flexDirection: socialIconsOnly ? "row" as const : "column" as const,
                             alignItems: "center",
                             justifyContent: "center",
+                            gap: socialIconsOnly ? 0 : 4,
                             cursor: "pointer",
                             transition: "all 0.2s",
+                            fontSize: 10,
+                            fontWeight: 500,
+                            fontFamily: `'${fonts.secondary}', sans-serif`,
                           }}
                           onClick={() => toast.info(`${platform} link not configured yet`)}
                         >
                           {SOCIAL_ICONS[platform]}
+                          {!socialIconsOnly && <span style={{ textTransform: "capitalize" }}>{platform}</span>}
                         </button>
                       ))
                   }

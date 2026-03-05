@@ -65,6 +65,7 @@ export default function CardBuilder() {
   const [logoSize, setLogoSize] = useState<"small" | "medium" | "large">("medium");
   const [ctaConfig, setCtaConfig] = useState<CtaItem[]>(DEFAULT_CTA_CONFIG);
   const [ctaIconsOnly, setCtaIconsOnly] = useState(false);
+  const [socialIconsOnly, setSocialIconsOnly] = useState(true);
   const [showSectionIcons, setShowSectionIcons] = useState(false);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
@@ -126,6 +127,7 @@ export default function CardBuilder() {
       if (themeJson?.job_title) { setJobTitle(themeJson.job_title); }
       if (typeof themeJson?.section_icons === "boolean") setShowSectionIcons(themeJson.section_icons);
       if (typeof themeJson?.cta_icons_only === "boolean") setCtaIconsOnly(themeJson.cta_icons_only);
+      if (typeof themeJson?.social_icons_only === "boolean") setSocialIconsOnly(themeJson.social_icons_only);
       if (themeJson?.cta_config && Array.isArray(themeJson.cta_config)) {
         setCtaConfig(themeJson.cta_config as CtaItem[]);
       }
@@ -836,6 +838,30 @@ export default function CardBuilder() {
                 </div>
               </div>
               <CtaEditor ctas={ctaConfig} onChange={handleCtaConfigChange} />
+            </div>
+
+            {/* Social Links Display */}
+            <div className="pt-3 border-t border-border/50 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Globe className="h-4 w-4 text-primary" />
+                  <h2 className="font-semibold text-sm">Social Links</h2>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] text-muted-foreground">Icons only</span>
+                  <Switch
+                    checked={socialIconsOnly}
+                    onCheckedChange={(v) => {
+                      setSocialIconsOnly(v);
+                      saveThemeField({ social_icons_only: v });
+                    }}
+                    className="scale-75"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {socialIconsOnly ? "Showing icon circles only" : "Showing icons with platform labels"}
+              </p>
             </div>
           </div>
         </motion.div>
