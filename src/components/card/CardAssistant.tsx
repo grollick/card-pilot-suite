@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Send, Loader2, Sparkles, Copy, ClipboardPaste } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
@@ -51,6 +52,7 @@ const SECTION_CONTENT_FIELD: Record<string, string> = {
 };
 
 export default function CardAssistant({ context, sectionTargets, onCopyToSection }: CardAssistantProps) {
+  const isMobile = useIsMobile();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
@@ -221,12 +223,26 @@ export default function CardAssistant({ context, sectionTargets, onCopyToSection
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            initial={{ opacity: 0, y: "100%" }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: "100%" }}
+            transition={{ type: "spring", damping: 30, stiffness: 350 }}
+            drag={isMobile ? "y" : false}
+            dragConstraints={{ top: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(_e, info) => {
+              if (info.offset.y > 100 || info.velocity.y > 500) {
+                setOpen(false);
+              }
+            }}
+            style={{ touchAction: "none" }}
             className="fixed inset-x-0 bottom-0 sm:inset-auto sm:bottom-6 sm:right-6 z-50 w-full sm:w-[380px] h-[100dvh] sm:h-auto sm:max-h-[min(560px,calc(100dvh-3rem))] flex flex-col rounded-t-2xl sm:rounded-2xl border border-border bg-card shadow-2xl overflow-hidden"
           >
+            {/* Drag handle (mobile only) */}
+            <div className="sm:hidden flex justify-center pt-2 pb-0 cursor-grab active:cursor-grabbing">
+              <div className="w-10 h-1 rounded-full bg-border" />
+            </div>
+
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-primary/5">
               <div className="flex items-center gap-2">
