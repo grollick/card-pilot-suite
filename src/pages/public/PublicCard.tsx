@@ -171,11 +171,25 @@ export default function PublicCard() {
     card && Array.isArray(card.sections_json) ? (card.sections_json as unknown as CardSection[]) : [];
   const enabledSections = new Set(sections.filter((s) => s.enabled).map((s) => s.id));
   const sectionContent = (id: string) => sections.find((s) => s.id === id)?.content as Record<string, any> | undefined;
-  const primaryCta = profile.primary_cta ?? "call";
   const professionName = (profile as any)?.professions?.name ?? "Professional";
   const cardUrl = `${window.location.origin}/${handle}`;
   const themeJson = (card?.theme_json ?? {}) as Record<string, any>;
   const coverUrl = themeJson.cover_url as string | undefined;
+
+  // CTA config from theme_json or fallback to legacy primary_cta
+  type CtaItem = { id: string; label: string; enabled: boolean; isPrimary: boolean };
+  const ctaConfig: CtaItem[] = themeJson.cta_config && Array.isArray(themeJson.cta_config)
+    ? (themeJson.cta_config as CtaItem[])
+    : [
+        { id: profile.primary_cta ?? "call", label: CTA_TYPES.find(c => c.value === (profile.primary_cta ?? "call"))?.label ?? "Call", enabled: true, isPrimary: true },
+        ...["call", "text", "email", "vcard"]
+          .filter(c => c !== (profile.primary_cta ?? "call"))
+          .map(c => ({ id: c, label: CTA_TYPES.find(ct => ct.value === c)?.label ?? c, enabled: true, isPrimary: false })),
+      ];
+  const enabledCtas = ctaConfig.filter(c => c.enabled);
+  const primaryCtaItem = enabledCtas.find(c => c.isPrimary) || enabledCtas[0];
+  const secondaryCtaItems = enabledCtas.filter(c => c !== primaryCtaItem);
+  const primaryCta = primaryCtaItem?.id ?? "call";
 
   const handleCtaClick = (cta: string) => {
     supabase.from("analytics_events").insert({
@@ -346,8 +360,8 @@ export default function PublicCard() {
     }
   };
 
-  // Secondary CTAs
-  const secondaryCtas = ["call", "text", "email", "vcard"].filter((c) => c !== primaryCta);
+  // Secondary CTAs (from config)
+  const secondaryCtas = secondaryCtaItems.map(c => c.id);
 
   // Card theme-aware inline styles
   const { palette, fonts, radii, spacing, shadows } = theme;
@@ -401,17 +415,19 @@ export default function PublicCard() {
 
         <div style={{ padding: `${spacing.section}px`, display: "flex", flexDirection: "column", gap: spacing.section }}>
           {/* ── Primary CTA ── */}
+          {primaryCtaItem && (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <CardButton theme={theme} fullWidth onClick={() => handleCtaClick(primaryCta)}>
               {CTA_ICONS[primaryCta]}
-              <span>{CTA_TYPES.find((c) => c.value === primaryCta)?.label ?? "Call"}</span>
+              <span>{primaryCtaItem.label}</span>
             </CardButton>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 8 }}>
-              {secondaryCtas.slice(0, 3).map((cta) => (
+            {secondaryCtaItems.length > 0 && (
+            <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(secondaryCtaItems.length, 3)}, 1fr)`, gap: 8 }}>
+              {secondaryCtaItems.map((ctaItem) => (
                 <button
-                  key={cta}
-                  onClick={() => handleCtaClick(cta)}
+                  key={ctaItem.id}
+                  onClick={() => handleCtaClick(ctaItem.id)}
                   style={{
                     display: "flex",
                     flexDirection: "column",
@@ -429,12 +445,14 @@ export default function PublicCard() {
                     transition: "all 0.2s",
                   }}
                 >
-                  {CTA_ICONS[cta]}
-                  {CTA_TYPES.find((c) => c.value === cta)?.label ?? cta}
+                  {CTA_ICONS[ctaItem.id]}
+                  {ctaItem.label}
                 </button>
               ))}
             </div>
+            )}
           </div>
+          )}
 
           {/* ── Sharing Tools ── */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>

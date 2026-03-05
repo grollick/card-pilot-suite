@@ -1,4 +1,5 @@
-import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil } from "lucide-react";
+import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick } from "lucide-react";
+import CtaEditor, { type CtaItem, DEFAULT_CTA_CONFIG } from "@/components/card/CtaEditor";
 import QRShareDialog from "@/components/card/QRShareDialog";
 import CardPhotoTools from "@/components/card/CardPhotoTools";
 import SectionEditor, { type SectionContent } from "@/components/card/SectionEditor";
@@ -53,6 +54,7 @@ export default function CardBuilder() {
   const [avatarRotation, setAvatarRotation] = useState(0);
   const [coverOffsetY, setCoverOffsetY] = useState(0);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [ctaConfig, setCtaConfig] = useState<CtaItem[]>(DEFAULT_CTA_CONFIG);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
   const hydrated = useRef(false);
@@ -97,6 +99,9 @@ export default function CardBuilder() {
       if (typeof themeJson?.avatar_rotation === "number") setAvatarRotation(themeJson.avatar_rotation);
       if (typeof themeJson?.cover_offset_y === "number") setCoverOffsetY(themeJson.cover_offset_y);
       if (themeJson?.logo_url) setLogoUrl(themeJson.logo_url);
+      if (themeJson?.cta_config && Array.isArray(themeJson.cta_config)) {
+        setCtaConfig(themeJson.cta_config as CtaItem[]);
+      }
     }
   }, [card]);
 
@@ -278,7 +283,12 @@ export default function CardBuilder() {
     }
   };
 
-  const primaryCta = profile?.primary_cta ?? "call";
+  const primaryCta = ctaConfig.find(c => c.isPrimary)?.id ?? profile?.primary_cta ?? "call";
+
+  const handleCtaConfigChange = (newConfig: CtaItem[]) => {
+    setCtaConfig(newConfig);
+    saveThemeField({ cta_config: newConfig });
+  };
 
   const currentThemeOverrides: CardThemeOverrides = {
     palette: (card?.theme_json as any)?.palette ?? undefined,
@@ -498,13 +508,13 @@ export default function CardBuilder() {
               )}
             </div>
 
-            {/* CTA info */}
-            <div className="pt-3 border-t border-border/50">
-              <p className="text-xs font-medium text-muted-foreground mb-1">Primary CTA</p>
-              <p className="text-sm font-semibold capitalize">
-                {CTA_TYPES.find((c) => c.value === primaryCta)?.label ?? primaryCta}
-              </p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">Change in Settings → Profile</p>
+            {/* CTA Buttons */}
+            <div className="pt-3 border-t border-border/50 space-y-3">
+              <div className="flex items-center gap-2">
+                <MousePointerClick className="h-4 w-4 text-primary" />
+                <h2 className="font-semibold text-sm">CTA Buttons</h2>
+              </div>
+              <CtaEditor ctas={ctaConfig} onChange={handleCtaConfigChange} />
             </div>
           </div>
         </motion.div>
@@ -593,13 +603,29 @@ export default function CardBuilder() {
                 <h3 className="text-lg font-bold">{profile?.name || "Your Name"}</h3>
                 <p className="text-sm text-muted-foreground">{professionName}</p>
 
-                <div className="flex gap-2 mt-4">
-                  <Button size="sm" className="flex-1 text-xs">
-                    {CTA_TYPES.find((c) => c.value === primaryCta)?.label ?? "Call"}
-                  </Button>
-                  <Button size="sm" variant="outline" className="flex-1 text-xs">Text</Button>
-                  <Button size="sm" variant="outline" className="flex-1 text-xs">Email</Button>
-                </div>
+                {(() => {
+                  const enabledCtas = ctaConfig.filter(c => c.enabled);
+                  const primary = enabledCtas.find(c => c.isPrimary) || enabledCtas[0];
+                  const secondary = enabledCtas.filter(c => c !== primary);
+                  return (
+                    <div className="space-y-2 mt-4">
+                      {primary && (
+                        <Button size="sm" className="w-full text-xs">
+                          {primary.label}
+                        </Button>
+                      )}
+                      {secondary.length > 0 && (
+                        <div className="flex gap-2">
+                          {secondary.map(c => (
+                            <Button key={c.id} size="sm" variant="outline" className="flex-1 text-xs">
+                              {c.label}
+                            </Button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {/* Section previews - clickable to edit */}
                 {sections
