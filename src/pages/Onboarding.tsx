@@ -165,12 +165,12 @@ export default function Onboarding() {
         palette,
       };
       const sectionsJson = selectedProfession.default_card_sections || [];
-      const { error: cardErr } = await supabase.from("cards").insert({
+      const { error: cardErr } = await supabase.from("cards").upsert({
         user_id: user.id,
         theme_json: themeJson,
         sections_json: sectionsJson,
         status: "draft",
-      });
+      }, { onConflict: "user_id" });
       if (cardErr) throw cardErr;
 
       // 3. Create pipeline stages
