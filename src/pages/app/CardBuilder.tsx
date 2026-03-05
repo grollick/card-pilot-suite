@@ -62,6 +62,8 @@ export default function CardBuilder() {
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
   const [editName, setEditName] = useState<string | null>(null);
   const [editCompany, setEditCompany] = useState<string | null>(null);
+  const [editJobTitle, setEditJobTitle] = useState<string | null>(null);
+  const [jobTitle, setJobTitle] = useState<string | null>(null);
   const hydrated = useRef(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -73,6 +75,7 @@ export default function CardBuilder() {
   );
 
   const professionName = (profile as any)?.professions?.name ?? "Professional";
+  const displayJobTitle = jobTitle || professionName;
 
   const handleAIGenerate = async () => {
     if (!profile) return;
@@ -105,6 +108,7 @@ export default function CardBuilder() {
       if (typeof themeJson?.cover_offset_y === "number") setCoverOffsetY(themeJson.cover_offset_y);
       if (themeJson?.logo_url) setLogoUrl(themeJson.logo_url);
       if (typeof themeJson?.logo_frosted_bg === "boolean") setLogoFrostedBg(themeJson.logo_frosted_bg);
+      if (themeJson?.job_title) { setJobTitle(themeJson.job_title); }
       if (themeJson?.cta_config && Array.isArray(themeJson.cta_config)) {
         setCtaConfig(themeJson.cta_config as CtaItem[]);
       }
@@ -537,6 +541,36 @@ export default function CardBuilder() {
                 )}
               </div>
             </div>
+            <div className="space-y-2">
+              <label className="text-xs text-muted-foreground">Job Title</label>
+              <div className="flex gap-2">
+                <Input
+                  value={editJobTitle ?? jobTitle ?? ""}
+                  onChange={(e) => setEditJobTitle(e.target.value)}
+                  placeholder={professionName}
+                  className="text-sm"
+                />
+                {editJobTitle !== null && editJobTitle !== (jobTitle ?? "") && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="shrink-0"
+                    onClick={() => {
+                      const val = editJobTitle.trim() || null;
+                      setJobTitle(val);
+                      setEditJobTitle(null);
+                      saveThemeField({ job_title: val });
+                      toast.success("Job title updated");
+                    }}
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              {jobTitle && (
+                <p className="text-[10px] text-muted-foreground">Clear to use default: {professionName}</p>
+              )}
+            </div>
           </div>
 
           {/* Photo & Backdrop */}
@@ -699,7 +733,7 @@ export default function CardBuilder() {
                 />
 
                 <h3 className="text-lg font-bold" style={{ color: previewTheme.palette.secondary, fontFamily: `'${previewTheme.fonts.primary}', sans-serif` }}>{profile?.name || "Your Name"}</h3>
-                <p className="text-sm" style={{ color: `${previewTheme.palette.secondary}99` }}>{professionName}</p>
+                <p className="text-sm" style={{ color: `${previewTheme.palette.secondary}99` }}>{displayJobTitle}</p>
 
                 {(() => {
                   const enabledCtas = ctaConfig.filter(c => c.enabled);
