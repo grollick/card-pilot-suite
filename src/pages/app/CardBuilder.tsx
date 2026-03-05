@@ -58,6 +58,7 @@ export default function CardBuilder() {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoFrostedBg, setLogoFrostedBg] = useState(true);
   const [ctaConfig, setCtaConfig] = useState<CtaItem[]>(DEFAULT_CTA_CONFIG);
+  const [showSectionIcons, setShowSectionIcons] = useState(false);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
   const [editName, setEditName] = useState<string | null>(null);
@@ -109,6 +110,7 @@ export default function CardBuilder() {
       if (themeJson?.logo_url) setLogoUrl(themeJson.logo_url);
       if (typeof themeJson?.logo_frosted_bg === "boolean") setLogoFrostedBg(themeJson.logo_frosted_bg);
       if (themeJson?.job_title) { setJobTitle(themeJson.job_title); }
+      if (typeof themeJson?.section_icons === "boolean") setShowSectionIcons(themeJson.section_icons);
       if (themeJson?.cta_config && Array.isArray(themeJson.cta_config)) {
         setCtaConfig(themeJson.cta_config as CtaItem[]);
       }
@@ -604,9 +606,15 @@ export default function CardBuilder() {
 
           {/* Sections */}
           <div className="rounded-xl border border-border bg-card p-5 space-y-4">
-            <div className="flex items-center gap-2">
-              <Paintbrush className="h-4 w-4 text-primary" />
-              <h2 className="font-semibold">Sections</h2>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Paintbrush className="h-4 w-4 text-primary" />
+                <h2 className="font-semibold">Sections</h2>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Icons</span>
+                <Switch checked={showSectionIcons} onCheckedChange={(val) => { setShowSectionIcons(val); saveThemeField({ section_icons: val }); }} />
+              </div>
             </div>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
