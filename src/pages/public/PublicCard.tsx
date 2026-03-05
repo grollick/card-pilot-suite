@@ -410,6 +410,23 @@ export default function PublicCard() {
         transition={{ duration: 0.4 }}
         style={cardContainerStyle}
       >
+        {/* Draft preview banner */}
+        {isOwner && isUnpublished && (
+          <div
+            style={{
+              background: `linear-gradient(90deg, ${palette.primary}, ${palette.accent || palette.primary})`,
+              color: "#fff",
+              textAlign: "center",
+              padding: "8px 16px",
+              fontSize: 12,
+              fontWeight: 600,
+              fontFamily: `'${fonts.secondary}', sans-serif`,
+              letterSpacing: "0.02em",
+            }}
+          >
+            Draft Preview — only you can see this
+          </div>
+        )}
         {/* ── Header ── */}
         {enabledSections.has("hero") && (
           <CardHeader
