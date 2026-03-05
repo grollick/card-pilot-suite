@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Plus, Trash2, GripVertical } from "lucide-react";
+import { X, Plus, Trash2, GripVertical, Wand2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +10,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export interface SectionContent {
   // About
@@ -39,11 +41,87 @@ interface SectionEditorProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (content: SectionContent) => void;
+  profession?: string;
+  userName?: string;
+  company?: string;
 }
 
 const SOCIAL_PLATFORMS = [
   "Instagram", "Facebook", "Twitter/X", "LinkedIn", "TikTok", "YouTube", "Snapchat", "Pinterest", "Website",
 ];
+
+const AI_SUPPORTED_SECTIONS = ["hero", "about", "services", "testimonials", "contact", "booking"];
+
+function useAISectionWriter() {
+  const [generating, setGenerating] = useState(false);
+
+  const generate = async (
+    section: string,
+    profession: string,
+    name: string,
+    company: string
+  ): Promise<SectionContent | null> => {
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-section-writer", {
+        body: { section, profession, name, company },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data.content as SectionContent;
+    } catch (err: any) {
+      toast.error(err.message || "AI generation failed");
+      return null;
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  return { generate, generating };
+}
+
+function AIWriteButton({
+  sectionId,
+  profession,
+  userName,
+  company,
+  onResult,
+}: {
+  sectionId: string;
+  profession: string;
+  userName: string;
+  company: string;
+  onResult: (content: SectionContent) => void;
+}) {
+  const { generate, generating } = useAISectionWriter();
+
+  if (!AI_SUPPORTED_SECTIONS.includes(sectionId)) return null;
+
+  const handleClick = async () => {
+    const result = await generate(sectionId, profession, userName, company);
+    if (result) {
+      onResult(result);
+      toast.success("AI content generated!");
+    }
+  };
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      className="w-full border-primary/30 text-primary hover:bg-primary/5"
+      onClick={handleClick}
+      disabled={generating}
+    >
+      {generating ? (
+        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+      ) : (
+        <Wand2 className="h-4 w-4 mr-2" />
+      )}
+      {generating ? "Writing…" : "AI Write Assist"}
+    </Button>
+  );
+}
 
 export default function SectionEditor({
   sectionId,
@@ -52,10 +130,12 @@ export default function SectionEditor({
   open,
   onOpenChange,
   onSave,
+  profession = "",
+  userName = "",
+  company = "",
 }: SectionEditorProps) {
   const [draft, setDraft] = useState<SectionContent>(content);
 
-  // Reset draft when opening
   const handleOpenChange = (val: boolean) => {
     if (val) setDraft(content);
     onOpenChange(val);
@@ -66,6 +146,10 @@ export default function SectionEditor({
     onOpenChange(false);
   };
 
+  const handleAIResult = (generated: SectionContent) => {
+    setDraft((prev) => ({ ...prev, ...generated }));
+  };
+
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent className="overflow-y-auto">
@@ -74,6 +158,15 @@ export default function SectionEditor({
         </SheetHeader>
 
         <div className="space-y-4 mt-4">
+          {/* AI Write Assist button */}
+          <AIWriteButton
+            sectionId={sectionId}
+            profession={profession}
+            userName={userName}
+            company={company}
+            onResult={handleAIResult}
+          />
+
           {sectionId === "hero" && <HeroEditor draft={draft} setDraft={setDraft} />}
           {sectionId === "about" && <AboutEditor draft={draft} setDraft={setDraft} />}
           {sectionId === "services" && <ServicesEditor draft={draft} setDraft={setDraft} />}

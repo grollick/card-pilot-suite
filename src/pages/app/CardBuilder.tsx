@@ -685,6 +685,9 @@ export default function CardBuilder() {
           open={!!editingSection}
           onOpenChange={(open) => { if (!open) setEditingSection(null); }}
           onSave={(content) => handleSectionContentSave(editingSec.id, content)}
+          profession={(profile as any)?.professions?.name ?? ""}
+          userName={profile?.name ?? ""}
+          company={profile?.company ?? ""}
         />
       )}
 
