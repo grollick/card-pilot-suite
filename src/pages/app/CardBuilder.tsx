@@ -811,7 +811,7 @@ export default function CardBuilder() {
               )}
               {/* Cover */}
               <div
-                className="h-28 relative overflow-hidden"
+                className="h-28 relative overflow-hidden z-[2]"
                 style={{
                   background: coverUrl
                     ? undefined
@@ -833,7 +833,7 @@ export default function CardBuilder() {
                 )}
               </div>
 
-              <div className="px-5 pb-5 -mt-10">
+              <div className="px-5 pb-5 -mt-10 relative z-[2]">
                 {/* Avatar */}
                 <div
                   className="h-20 w-20 rounded-2xl border-4 flex items-center justify-center mb-3 cursor-pointer relative group overflow-hidden"
