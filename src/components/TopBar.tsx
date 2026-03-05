@@ -77,9 +77,13 @@ export default function TopBar() {
       </DropdownMenu>
 
       {/* View card */}
-      <Button variant="outline" size="sm" className="gap-1.5 hidden sm:flex" disabled={!profile?.handle} onClick={() => window.open(`/${profile?.handle}`, "_blank")}>
-        <ExternalLink className="h-3.5 w-3.5" /> View Card
-      </Button>
+      {profile?.handle && (
+        <Button variant="outline" size="sm" className="gap-1.5 hidden sm:flex" asChild>
+          <a href={`/${profile.handle}`} target="_blank" rel="noreferrer">
+            <ExternalLink className="h-3.5 w-3.5" /> View Card
+          </a>
+        </Button>
+      )}
 
       {/* Notifications */}
       <Button variant="ghost" size="icon" className="h-9 w-9 relative">
