@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import {
   type ResolvedCardTheme,
   getSectionStyles,
@@ -13,27 +14,33 @@ interface CardSectionWrapperProps {
 /**
  * Wraps each card section with the correct cardStyle
  * (solid / frosted / elevated / soft / glow) derived from tokens.
- * Renders a hairline divider at the bottom if the token calls for it.
+ * Animates in with a lifted tile + glow effect on scroll.
  */
 export default function CardSectionWrapper({ theme, children, className = "" }: CardSectionWrapperProps) {
-  const style = getSectionStyles(theme.section.cardStyle, theme.palette, {
-    radius: { card: parseInt(theme.radii.card), button: 0, input: 0 },
-    shadow: {},
-    spacingScale: undefined,
-    ...({ section: theme.section } as any),
-  });
-
-  // Re-derive from full tokens is cleaner — the component receives the resolved theme,
-  // so we compute the styles from the primitives directly.
   const sectionStyle: React.CSSProperties = {
     borderRadius: theme.radii.card,
     padding: theme.spacing.inner,
-    transition: "all 0.2s ease",
     ...cardStyleMap(theme),
   };
 
   return (
-    <div style={sectionStyle} className={className}>
+    <motion.div
+      style={sectionStyle}
+      className={className}
+      initial={{ opacity: 0, y: 24, boxShadow: "0 0 0 transparent" }}
+      whileInView={{
+        opacity: 1,
+        y: 0,
+        boxShadow: `0 8px 32px -8px ${theme.palette.primary}25, 0 0 20px ${theme.palette.primary}10`,
+      }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{
+        y: -2,
+        boxShadow: `0 12px 40px -8px ${theme.palette.primary}35, 0 0 28px ${theme.palette.primary}15`,
+        transition: { duration: 0.2 },
+      }}
+    >
       {children}
       {theme.section.divider === "hairline" && (
         <div
@@ -44,7 +51,7 @@ export default function CardSectionWrapper({ theme, children, className = "" }: 
           }}
         />
       )}
-    </div>
+    </motion.div>
   );
 }
 
