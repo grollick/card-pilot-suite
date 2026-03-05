@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { Palette, Type, Check, RotateCcw, Layers, Sun, Moon, Circle, Share2, Save, Trash2, Plus } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Palette, Type, Check, RotateCcw, Layers, Sun, Moon, Circle, Share2, Save, Trash2, Plus, Undo2, Redo2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -231,11 +231,80 @@ export default function CardThemeEditor({
   const defaultPalette = stylePackPalettes?.[0] ?? PRESET_PALETTES[0].palette;
   const defaultFonts = stylePackFonts ?? { primary: "Inter", secondary: "Inter" };
 
-  const [palette, setPalette] = useState<CardPalette>(currentOverrides.palette ?? defaultPalette);
-  const [fonts, setFonts] = useState<CardFonts>(currentOverrides.fonts ?? defaultFonts);
-  const [tokens, setTokens] = useState<CardStyleTokens>(currentOverrides.tokens ?? {});
-  const [gradientBg, setGradientBg] = useState<CardGradientBg>(currentOverrides.gradientBg ?? { enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
-  const [bgPattern, setBgPattern] = useState<CardBgPattern>(currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 });
+  const [palette, _setPalette] = useState<CardPalette>(currentOverrides.palette ?? defaultPalette);
+  const [fonts, _setFonts] = useState<CardFonts>(currentOverrides.fonts ?? defaultFonts);
+  const [tokens, _setTokens] = useState<CardStyleTokens>(currentOverrides.tokens ?? {});
+  const [gradientBg, _setGradientBg] = useState<CardGradientBg>(currentOverrides.gradientBg ?? { enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
+  const [bgPattern, _setBgPattern] = useState<CardBgPattern>(currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 });
+
+  // ── Undo / Redo history ──
+  interface ThemeSnapshot { palette: CardPalette; fonts: CardFonts; tokens: CardStyleTokens; gradientBg: CardGradientBg; bgPattern: CardBgPattern }
+  const historyRef = useRef<ThemeSnapshot[]>([]);
+  const historyIndexRef = useRef(-1);
+  const [historyLen, setHistoryLen] = useState(0);
+  const [historyIdx, setHistoryIdx] = useState(-1);
+  const skipHistoryRef = useRef(false);
+
+  const getSnapshot = useCallback((): ThemeSnapshot => ({ palette, fonts, tokens, gradientBg, bgPattern }), [palette, fonts, tokens, gradientBg, bgPattern]);
+
+  const pushHistory = useCallback((snap: ThemeSnapshot) => {
+    if (skipHistoryRef.current) return;
+    const idx = historyIndexRef.current;
+    // Trim any future states after current position
+    historyRef.current = historyRef.current.slice(0, idx + 1);
+    historyRef.current.push(snap);
+    // Cap at 50 entries
+    if (historyRef.current.length > 50) historyRef.current.shift();
+    historyIndexRef.current = historyRef.current.length - 1;
+    setHistoryLen(historyRef.current.length);
+    setHistoryIdx(historyIndexRef.current);
+  }, []);
+
+  const applySnapshot = useCallback((snap: ThemeSnapshot) => {
+    skipHistoryRef.current = true;
+    _setPalette(snap.palette);
+    _setFonts(snap.fonts);
+    _setTokens(snap.tokens);
+    _setGradientBg(snap.gradientBg);
+    _setBgPattern(snap.bgPattern);
+    // Allow next tick to re-enable history
+    requestAnimationFrame(() => { skipHistoryRef.current = false; });
+  }, []);
+
+  const handleUndo = useCallback(() => {
+    if (historyIndexRef.current <= 0) return;
+    historyIndexRef.current--;
+    setHistoryIdx(historyIndexRef.current);
+    applySnapshot(historyRef.current[historyIndexRef.current]);
+  }, [applySnapshot]);
+
+  const handleRedo = useCallback(() => {
+    if (historyIndexRef.current >= historyRef.current.length - 1) return;
+    historyIndexRef.current++;
+    setHistoryIdx(historyIndexRef.current);
+    applySnapshot(historyRef.current[historyIndexRef.current]);
+  }, [applySnapshot]);
+
+  const canUndo = historyIdx > 0;
+  const canRedo = historyIdx < historyLen - 1;
+
+  // Push history on state changes (debounced to avoid flooding on slider drags)
+  const historyTimer = useRef<ReturnType<typeof setTimeout>>();
+  useEffect(() => {
+    if (!open || skipHistoryRef.current) return;
+    clearTimeout(historyTimer.current);
+    historyTimer.current = setTimeout(() => {
+      pushHistory(getSnapshot());
+    }, 300);
+    return () => clearTimeout(historyTimer.current);
+  }, [palette, fonts, tokens, gradientBg, bgPattern, open, pushHistory, getSnapshot]);
+
+  // Wrapped setters that go through normal state (history is pushed via effect)
+  const setPalette = _setPalette;
+  const setFonts = _setFonts;
+  const setTokens = _setTokens;
+  const setGradientBg = _setGradientBg;
+  const setBgPattern = _setBgPattern;
 
   // Custom palettes
   const [customPalettes, setCustomPalettes] = useState<{ id: string; name: string; palette: CardPalette }[]>([]);
@@ -273,12 +342,20 @@ export default function CardThemeEditor({
   }, [fetchCustomPalettes]);
 
   useEffect(() => {
-    setPalette(currentOverrides.palette ?? defaultPalette);
-    setFonts(currentOverrides.fonts ?? defaultFonts);
-    setTokens(currentOverrides.tokens ?? {});
-    setGradientBg(currentOverrides.gradientBg ?? { enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
-    setBgPattern(currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 });
-    if (open) fetchCustomPalettes();
+    const p = currentOverrides.palette ?? defaultPalette;
+    const f = currentOverrides.fonts ?? defaultFonts;
+    const t = currentOverrides.tokens ?? {};
+    const g = currentOverrides.gradientBg ?? { enabled: false, color2: "#e0e7ff", direction: "to bottom right" };
+    const b = currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 };
+    _setPalette(p); _setFonts(f); _setTokens(t); _setGradientBg(g); _setBgPattern(b);
+    if (open) {
+      // Reset history when opening
+      historyRef.current = [{ palette: p, fonts: f, tokens: t, gradientBg: g, bgPattern: b }];
+      historyIndexRef.current = 0;
+      setHistoryLen(1);
+      setHistoryIdx(0);
+      fetchCustomPalettes();
+    }
   }, [open]);
 
   // ── Live preview: push overrides on every change ──
@@ -787,7 +864,15 @@ export default function CardThemeEditor({
         </Tabs>
 
         {/* Sticky Actions */}
-        <div className="sticky bottom-0 bg-background/95 backdrop-blur-sm border-t border-border px-5 py-3 flex gap-2">
+        <div className="sticky bottom-0 bg-background/95 backdrop-blur-sm border-t border-border px-5 py-3 flex items-center gap-2">
+          <div className="flex items-center gap-1 mr-auto">
+            <Button variant="ghost" size="sm" onClick={handleUndo} disabled={!canUndo} className="h-8 w-8 p-0" title="Undo">
+              <Undo2 className="h-3.5 w-3.5" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={handleRedo} disabled={!canRedo} className="h-8 w-8 p-0" title="Redo">
+              <Redo2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
           <Button variant="outline" size="sm" onClick={handleReset} className="h-9">
             <RotateCcw className="h-3 w-3 mr-1.5" /> Reset
           </Button>
