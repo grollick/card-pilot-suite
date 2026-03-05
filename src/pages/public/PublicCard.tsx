@@ -962,10 +962,7 @@ export default function PublicCard() {
           </div>
 
           {/* ── Save Contact Button ── */}
-          <CardButton
-            theme={theme}
-            fullWidth
-            metallicEffect={metallicEffect}
+          <button
             onClick={() =>
               downloadVCard({
                 name: profile.name,
@@ -976,10 +973,35 @@ export default function PublicCard() {
                 profession: professionName,
               })
             }
+            style={{
+              width: "100%",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 8,
+              padding: "10px 20px",
+              borderRadius: theme.button.shape === "pill" ? "9999px" : radii.button,
+              border: `1.5px solid ${palette.primary}30`,
+              background: `${palette.primary}08`,
+              color: palette.primary,
+              fontSize: 14,
+              fontWeight: 500,
+              fontFamily: `'${fonts.secondary}', sans-serif`,
+              cursor: "pointer",
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = `${palette.primary}15`;
+              e.currentTarget.style.borderColor = `${palette.primary}50`;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = `${palette.primary}08`;
+              e.currentTarget.style.borderColor = `${palette.primary}30`;
+            }}
           >
             <Download className="h-4 w-4" />
             <span>Save Contact</span>
-          </CardButton>
+          </button>
 
           {/* ── Footer / Branding ── */}
           {showsBranding((profile as any)?.plan ?? "free") && (
