@@ -281,16 +281,26 @@ export default function PublicBooking() {
               {step === 2 && (
                 <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                   <h2 className="font-semibold">Pick a Date & Time</h2>
-                  <CalendarPicker
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={(d) => { setSelectedDate(d); setSelectedTime(null); }}
-                    disabled={(date) => {
-                      const key = format(date, "yyyy-MM-dd");
-                      return !availableDays.has(key) || isBefore(date, addDays(new Date(), -1));
-                    }}
-                    className={cn("p-3 pointer-events-auto rounded-xl border border-border")}
-                  />
+                  {availableDays.size === 0 ? (
+                    <div className="rounded-xl border border-border bg-muted/30 p-6 text-center space-y-2">
+                      <Clock className="h-8 w-8 text-muted-foreground mx-auto" />
+                      <p className="text-sm font-medium text-foreground">No availability set</p>
+                      <p className="text-xs text-muted-foreground">
+                        This person hasn't configured their available hours yet. Please check back later.
+                      </p>
+                    </div>
+                  ) : (
+                    <CalendarPicker
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(d) => { setSelectedDate(d); setSelectedTime(null); }}
+                      disabled={(date) => {
+                        const key = format(date, "yyyy-MM-dd");
+                        return !availableDays.has(key) || isBefore(date, addDays(new Date(), -1));
+                      }}
+                      className={cn("p-3 pointer-events-auto rounded-xl border border-border")}
+                    />
+                  )
 
                   {selectedDate && (
                     <div>
