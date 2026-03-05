@@ -3,6 +3,7 @@ import { Palette, Type, Check, RotateCcw, Layout, Square, Layers, Sparkles, Sun,
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import {
   Select,
@@ -47,10 +48,17 @@ export interface CardStyleTokens {
   radius?: { card?: number; button?: number };
 }
 
+export interface CardGradientBg {
+  enabled: boolean;
+  color2: string;
+  direction: "to bottom" | "to right" | "to bottom right" | "to top right";
+}
+
 export interface CardThemeOverrides {
   palette?: CardPalette;
   fonts?: CardFonts;
   tokens?: CardStyleTokens;
+  gradientBg?: CardGradientBg;
 }
 
 const FONT_OPTIONS = [
@@ -129,11 +137,13 @@ export default function CardThemeEditor({
   const [palette, setPalette] = useState<CardPalette>(currentOverrides.palette ?? defaultPalette);
   const [fonts, setFonts] = useState<CardFonts>(currentOverrides.fonts ?? defaultFonts);
   const [tokens, setTokens] = useState<CardStyleTokens>(currentOverrides.tokens ?? {});
+  const [gradientBg, setGradientBg] = useState<CardGradientBg>(currentOverrides.gradientBg ?? { enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
 
   useEffect(() => {
     setPalette(currentOverrides.palette ?? defaultPalette);
     setFonts(currentOverrides.fonts ?? defaultFonts);
     setTokens(currentOverrides.tokens ?? {});
+    setGradientBg(currentOverrides.gradientBg ?? { enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
   }, [open]);
 
   const handleColorChange = useCallback((key: keyof CardPalette, value: string) => {
@@ -148,12 +158,13 @@ export default function CardThemeEditor({
     setPalette(defaultPalette);
     setFonts(defaultFonts);
     setTokens({});
+    setGradientBg({ enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
   }, [defaultPalette, defaultFonts]);
 
   const handleSave = useCallback(() => {
-    onSave({ palette, fonts, tokens });
+    onSave({ palette, fonts, tokens, gradientBg: gradientBg.enabled ? gradientBg : undefined });
     onOpenChange(false);
-  }, [palette, fonts, tokens, onSave, onOpenChange]);
+  }, [palette, fonts, tokens, gradientBg, onSave, onOpenChange]);
 
   const updateToken = useCallback(<K extends keyof CardStyleTokens>(key: K, value: CardStyleTokens[K]) => {
     setTokens((prev) => ({ ...prev, [key]: value }));
@@ -320,10 +331,70 @@ export default function CardThemeEditor({
                 </div>
               </div>
 
+              {/* Gradient Background */}
+              <div className="space-y-2">
+                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Gradient Background</Label>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Enable gradient</span>
+                  <Switch checked={gradientBg.enabled} onCheckedChange={(v) => setGradientBg(prev => ({ ...prev, enabled: v }))} />
+                </div>
+                {gradientBg.enabled && (
+                  <div className="space-y-3 pt-1">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">Second Color</Label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={gradientBg.color2}
+                          onChange={(e) => setGradientBg(prev => ({ ...prev, color2: e.target.value }))}
+                          className="h-9 w-9 rounded-lg border border-border cursor-pointer bg-transparent p-0.5"
+                        />
+                        <Input
+                          value={gradientBg.color2}
+                          onChange={(e) => setGradientBg(prev => ({ ...prev, color2: e.target.value }))}
+                          className="h-9 text-xs font-mono uppercase"
+                          maxLength={7}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">Direction</Label>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {([
+                          { value: "to bottom", label: "↓" },
+                          { value: "to right", label: "→" },
+                          { value: "to bottom right", label: "↘" },
+                          { value: "to top right", label: "↗" },
+                        ] as const).map((dir) => (
+                          <button
+                            key={dir.value}
+                            onClick={() => setGradientBg(prev => ({ ...prev, direction: dir.value }))}
+                            className={`px-2 py-1.5 rounded-md text-sm font-medium border transition-all ${
+                              gradientBg.direction === dir.value
+                                ? "border-primary bg-primary/10 text-primary"
+                                : "border-border/50 text-muted-foreground hover:border-border hover:bg-muted/30"
+                            }`}
+                          >
+                            {dir.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Preview */}
               <div className="space-y-2">
                 <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Preview</Label>
-                <div className="rounded-xl p-4 border border-border/50" style={{ background: palette.background }}>
+                <div
+                  className="rounded-xl p-4 border border-border/50"
+                  style={{
+                    background: gradientBg.enabled
+                      ? `linear-gradient(${gradientBg.direction}, ${palette.background}, ${gradientBg.color2})`
+                      : palette.background,
+                  }}
+                >
                   <div className="h-3 w-20 rounded-full mb-2" style={{ background: palette.primary }} />
                   <div className="h-2 w-32 rounded-full mb-3" style={{ background: palette.secondary, opacity: 0.5 }} />
                   <div className="flex gap-2 mt-3">
