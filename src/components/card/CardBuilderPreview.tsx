@@ -25,6 +25,7 @@ interface Props {
   logoOpacity: number;
   logoPadding: number;
   logoNameGap?: number;
+  logoVerticalAlign?: "top" | "center" | "bottom";
   ctaConfig: CtaItem[];
   ctaIconsOnly: boolean;
   editName: string | null;
