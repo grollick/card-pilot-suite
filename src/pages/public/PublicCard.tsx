@@ -15,6 +15,11 @@ import {
   Linkedin,
   Twitter,
   Youtube,
+  User,
+  Briefcase,
+  Image,
+  Share2,
+  type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -189,6 +194,7 @@ export default function PublicCard() {
   const themeJson = (card?.theme_json ?? {}) as Record<string, any>;
   const displayJobTitle = (themeJson.job_title as string) || professionName;
   const coverUrl = themeJson.cover_url as string | undefined;
+  const showSectionIcons = themeJson.section_icons === true;
 
   // CTA config from theme_json or fallback to legacy primary_cta
   type CtaItem = { id: string; label: string; enabled: boolean; isPrimary: boolean };
@@ -390,6 +396,16 @@ export default function PublicCard() {
     width: "100%",
   };
 
+  const SECTION_ICONS: Record<string, LucideIcon> = {
+    about: User,
+    services: Briefcase,
+    testimonials: Star,
+    gallery: Image,
+    social: Share2,
+    contact: Mail,
+    booking: Calendar,
+  };
+
   const sectionTitleStyle: React.CSSProperties = {
     fontFamily: `'${fonts.primary}', sans-serif`,
     fontWeight: 600,
@@ -398,6 +414,16 @@ export default function PublicCard() {
     textTransform: "uppercase" as const,
     color: palette.secondary,
     marginBottom: 8,
+  };
+
+  const SectionTitle = ({ id, label }: { id: string; label: string }) => {
+    const Icon = SECTION_ICONS[id];
+    return (
+      <p style={{ ...sectionTitleStyle, display: "flex", alignItems: "center", gap: 6 }}>
+        {showSectionIcons && Icon && <Icon size={14} style={{ opacity: 0.7 }} />}
+        {label}
+      </p>
+    );
   };
 
   return (
@@ -496,7 +522,7 @@ export default function PublicCard() {
           {/* ── About ── */}
           {enabledSections.has("about") && (
             <CardSectionWrapper theme={theme}>
-              <p style={sectionTitleStyle}>About</p>
+              <SectionTitle id="about" label="About" />
               <p style={{ fontSize: 14, lineHeight: 1.7, color: palette.secondary, margin: 0 }}>
                 {sectionContent("about")?.text || "Passionate professional dedicated to delivering exceptional results."}
               </p>
@@ -513,7 +539,7 @@ export default function PublicCard() {
 
             return (
               <div>
-                <p style={sectionTitleStyle}>Services</p>
+                <SectionTitle id="services" label="Services" />
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {hasCardServices
                     ? cardServices!.filter((s) => s.name).map((s, i) => (
@@ -566,7 +592,7 @@ export default function PublicCard() {
 
             return (
               <div>
-                <p style={sectionTitleStyle}>Testimonials</p>
+                <SectionTitle id="testimonials" label="Testimonials" />
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {hasContent
                     ? testimonials!.map((t, i) => (
@@ -612,7 +638,7 @@ export default function PublicCard() {
 
             return (
               <div>
-                <p style={sectionTitleStyle}>Gallery</p>
+                <SectionTitle id="gallery" label="Gallery" />
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
                   {images.map((img, i) => (
                     <div key={i} style={{ borderRadius: radii.button, overflow: "hidden" }}>
@@ -645,7 +671,7 @@ export default function PublicCard() {
 
             return (
               <div>
-                <p style={sectionTitleStyle}>Connect</p>
+                <SectionTitle id="social" label="Connect" />
                 <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
                   {hasLinks
                     ? links!.filter((l) => l.url).map((link, i) => (
@@ -703,7 +729,7 @@ export default function PublicCard() {
           {/* ── Contact / Lead Capture ── */}
           {enabledSections.has("contact") && (
             <div>
-              <p style={sectionTitleStyle}>{sectionContent("contact")?.heading || "Get in Touch"}</p>
+              <SectionTitle id="contact" label={sectionContent("contact")?.heading || "Get in Touch"} />
               {sectionContent("contact")?.description && (
                 <p style={{ fontSize: 13, color: palette.secondary, margin: "0 0 12px", lineHeight: 1.5 }}>
                   {sectionContent("contact")?.description}
