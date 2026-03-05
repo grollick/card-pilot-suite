@@ -431,6 +431,7 @@ export default function PublicCard() {
     gallery: Image,
     social: Share2,
     contact: Mail,
+    quote_request: FileText,
     booking: Calendar,
   };
 
