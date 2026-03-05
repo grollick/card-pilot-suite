@@ -335,6 +335,7 @@ export default function CardBuilder() {
     palette: (card?.theme_json as any)?.palette ?? undefined,
     fonts: (card?.theme_json as any)?.fonts ?? undefined,
     tokens: (card?.theme_json as any)?.tokens ?? undefined,
+    gradientBg: (card?.theme_json as any)?.gradientBg ?? undefined,
   };
 
   // Resolve the full theme for the live preview
@@ -370,7 +371,7 @@ export default function CardBuilder() {
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: published ? "published" : "draft",
-        theme_json: { ...existing, cover_url: coverUrl, palette: overrides.palette, fonts: overrides.fonts, tokens: overrides.tokens } as any,
+        theme_json: { ...existing, cover_url: coverUrl, palette: overrides.palette, fonts: overrides.fonts, tokens: overrides.tokens, gradientBg: overrides.gradientBg } as any,
       });
       toast.success("Theme updated!");
     } catch {
@@ -770,7 +771,11 @@ export default function CardBuilder() {
           className="lg:col-span-2 rounded-xl border border-border bg-muted/30 p-6 min-h-[600px] flex items-start justify-center"
         >
           <div className="w-full max-w-sm mx-auto">
-            <div className="rounded-2xl border border-border overflow-hidden shadow-card" style={{ background: previewTheme.palette.background }}>
+            <div className="rounded-2xl border border-border overflow-hidden shadow-card" style={{
+              background: currentThemeOverrides.gradientBg?.enabled
+                ? `linear-gradient(${currentThemeOverrides.gradientBg.direction}, ${previewTheme.palette.background}, ${currentThemeOverrides.gradientBg.color2})`
+                : previewTheme.palette.background,
+            }}>
               {/* Cover */}
               <div
                 className="h-28 relative overflow-hidden"

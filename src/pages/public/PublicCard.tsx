@@ -396,11 +396,16 @@ export default function PublicCard() {
 
   // Card theme-aware inline styles
   const { palette, fonts, radii, spacing, shadows } = theme;
+  const gradientBg = (themeJson as any)?.gradientBg as { enabled: boolean; color2: string; direction: string } | undefined;
+
+  const cardBackground = gradientBg?.enabled
+    ? `linear-gradient(${gradientBg.direction}, ${palette.background}, ${gradientBg.color2})`
+    : palette.background;
 
   const cardContainerStyle: React.CSSProperties = {
     borderRadius: radii.card,
     boxShadow: shadows.card,
-    background: palette.background,
+    background: cardBackground,
     fontFamily: `'${fonts.secondary}', sans-serif`,
     overflow: "hidden",
     maxWidth: 440,
