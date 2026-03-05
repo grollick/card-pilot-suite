@@ -576,6 +576,28 @@ export default function CardThemeEditor({
                   <>
                     <div className="space-y-1">
                       <Label className="text-xs text-muted-foreground">Pattern Color</Label>
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        {[
+                          { label: "Primary", value: palette.primary },
+                          { label: "Secondary", value: palette.secondary },
+                          { label: "Accent", value: palette.accent },
+                          { label: "Background", value: palette.background },
+                        ].map((preset) => (
+                          <button
+                            key={preset.label}
+                            onClick={() => setBgPattern(prev => ({ ...prev, color: preset.value }))}
+                            className={`flex items-center gap-1 px-1.5 py-1 rounded-md text-[10px] font-medium border transition-all ${
+                              (bgPattern.color || palette.secondary) === preset.value
+                                ? "border-primary bg-primary/10 text-primary"
+                                : "border-border/50 text-muted-foreground hover:border-border hover:bg-muted/30"
+                            }`}
+                            title={preset.value}
+                          >
+                            <span className="h-2.5 w-2.5 rounded-full shrink-0 border border-border/30" style={{ backgroundColor: preset.value }} />
+                            {preset.label}
+                          </button>
+                        ))}
+                      </div>
                       <div className="flex items-center gap-2">
                         <input
                           type="color"
