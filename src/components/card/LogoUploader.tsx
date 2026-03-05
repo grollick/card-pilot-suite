@@ -12,9 +12,11 @@ interface LogoUploaderProps {
   onLogoChange: (url: string | null) => void;
   logoFrostedBg?: boolean;
   onLogoFrostedBgChange?: (val: boolean) => void;
+  logoGlow?: boolean;
+  onLogoGlowChange?: (val: boolean) => void;
 }
 
-export default function LogoUploader({ logoUrl, onLogoChange, logoFrostedBg = true, onLogoFrostedBgChange }: LogoUploaderProps) {
+export default function LogoUploader({ logoUrl, onLogoChange, logoFrostedBg = true, onLogoFrostedBgChange, logoGlow = false, onLogoGlowChange }: LogoUploaderProps) {
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -66,6 +68,12 @@ export default function LogoUploader({ logoUrl, onLogoChange, logoFrostedBg = tr
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">Frosted background</span>
               <Switch checked={logoFrostedBg} onCheckedChange={onLogoFrostedBgChange} />
+            </div>
+          )}
+          {onLogoGlowChange && (
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">Glow effect</span>
+              <Switch checked={logoGlow} onCheckedChange={onLogoGlowChange} />
             </div>
           )}
         </div>

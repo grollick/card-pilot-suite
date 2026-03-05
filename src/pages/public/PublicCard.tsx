@@ -479,6 +479,7 @@ export default function PublicCard() {
             coverOffsetY={themeJson.cover_offset_y as number | undefined}
             logoUrl={themeJson.logo_url as string | undefined}
             logoFrostedBg={themeJson.logo_frosted_bg !== false}
+            logoGlow={themeJson.logo_glow === true}
           />
         )}
 
