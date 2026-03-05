@@ -510,7 +510,7 @@ export default function CardBuilder() {
       <motion.div
         initial={{ opacity: 0, y: -4 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+        className={`relative overflow-hidden flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
           globalSaveState === "saving"
             ? "border-primary/30 bg-primary/5 text-primary"
             : globalSaveState === "saved"
@@ -520,6 +520,23 @@ export default function CardBuilder() {
             : "border-border bg-muted/50 text-muted-foreground"
         }`}
       >
+        {/* Animated progress bar */}
+        {globalSaveState === "saving" && (
+          <motion.div
+            className="absolute bottom-0 left-0 h-[2px] bg-primary/40"
+            initial={{ width: "0%" }}
+            animate={{ width: "90%" }}
+            transition={{ duration: 3, ease: "easeOut" }}
+          />
+        )}
+        {globalSaveState === "saved" && (
+          <motion.div
+            className="absolute bottom-0 left-0 h-[2px] bg-emerald-500/40"
+            initial={{ width: "90%" }}
+            animate={{ width: "100%", opacity: [1, 0] }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          />
+        )}
         {globalSaveState === "saving" && (
           <>
             <Loader2 className="h-3 w-3 animate-spin" />
