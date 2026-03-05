@@ -243,6 +243,9 @@ export default function PublicCard() {
     else if (cta === "book") {
       const bookingSection = document.getElementById("booking-section");
       if (bookingSection) bookingSection.scrollIntoView({ behavior: "smooth" });
+    } else if (cta === "quote") {
+      const quoteSection = document.getElementById("quote-request-section");
+      if (quoteSection) quoteSection.scrollIntoView({ behavior: "smooth" });
     } else if (cta === "vcard") {
       downloadVCard({
         name: profile.name,
