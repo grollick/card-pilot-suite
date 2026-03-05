@@ -1008,8 +1008,10 @@ export default function PublicCard() {
             <Download className="h-4 w-4" />
             <span>Save Contact</span>
           </button>
+          <p style={{ fontSize: 11, color: `${palette.secondary}90`, textAlign: "center", marginTop: -2 }}>
+            Downloads .vcf to your phone
+          </p>
 
-          {/* ── Footer / Branding ── */}
           {showsBranding((profile as any)?.plan ?? "free") && (
             <div style={{ textAlign: "center", paddingTop: 8 }}>
               <a
