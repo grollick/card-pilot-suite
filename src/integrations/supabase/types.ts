@@ -544,6 +544,30 @@ export type Database = {
           },
         ]
       }
+      custom_palettes: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          palette: Json
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          palette?: Json
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          palette?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_templates: {
         Row: {
           body: string

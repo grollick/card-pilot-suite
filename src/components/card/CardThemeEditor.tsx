@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Palette, Type, Check, RotateCcw, Layout, Square, Layers, Sparkles, Sun, Moon, Circle, Share2 } from "lucide-react";
+import { Palette, Type, Check, RotateCcw, Layout, Square, Layers, Sparkles, Sun, Moon, Circle, Share2, Save, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import type { ButtonShape, ButtonStyle, ButtonSize, HeaderLayout, SectionCardStyle, SectionDivider } from "@/lib/cardTokens";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 export interface CardPalette {
   primary: string;
@@ -179,6 +182,8 @@ export default function CardThemeEditor({
   stylePackTokens,
   onSave,
 }: Props) {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const defaultPalette = stylePackPalettes?.[0] ?? PRESET_PALETTES[0].palette;
   const defaultFonts = stylePackFonts ?? { primary: "Inter", secondary: "Inter" };
 
@@ -188,12 +193,53 @@ export default function CardThemeEditor({
   const [gradientBg, setGradientBg] = useState<CardGradientBg>(currentOverrides.gradientBg ?? { enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
   const [bgPattern, setBgPattern] = useState<CardBgPattern>(currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 });
 
+  // Custom palettes
+  const [customPalettes, setCustomPalettes] = useState<{ id: string; name: string; palette: CardPalette }[]>([]);
+  const [savingPalette, setSavingPalette] = useState(false);
+  const [newPaletteName, setNewPaletteName] = useState("");
+  const [showSaveInput, setShowSaveInput] = useState(false);
+
+  const fetchCustomPalettes = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("custom_palettes")
+      .select("id, name, palette")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+    if (data) setCustomPalettes(data.map(d => ({ id: d.id, name: d.name, palette: d.palette as unknown as CardPalette })));
+  }, [user]);
+
+  const handleSavePalette = useCallback(async () => {
+    if (!user || !newPaletteName.trim()) return;
+    setSavingPalette(true);
+    const { error } = await supabase.from("custom_palettes").insert({
+      user_id: user.id,
+      name: newPaletteName.trim(),
+      palette: palette as any,
+    });
+    setSavingPalette(false);
+    if (error) {
+      toast({ title: "Error saving palette", variant: "destructive" });
+    } else {
+      toast({ title: `"${newPaletteName.trim()}" saved` });
+      setNewPaletteName("");
+      setShowSaveInput(false);
+      fetchCustomPalettes();
+    }
+  }, [user, newPaletteName, palette, toast, fetchCustomPalettes]);
+
+  const handleDeletePalette = useCallback(async (id: string) => {
+    await supabase.from("custom_palettes").delete().eq("id", id);
+    fetchCustomPalettes();
+  }, [fetchCustomPalettes]);
+
   useEffect(() => {
     setPalette(currentOverrides.palette ?? defaultPalette);
     setFonts(currentOverrides.fonts ?? defaultFonts);
     setTokens(currentOverrides.tokens ?? {});
     setGradientBg(currentOverrides.gradientBg ?? { enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
     setBgPattern(currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 });
+    if (open) fetchCustomPalettes();
   }, [open]);
 
   const handleColorChange = useCallback((key: keyof CardPalette, value: string) => {
@@ -359,6 +405,68 @@ export default function CardThemeEditor({
                   </div>
                 </div>
               )}
+
+              {/* Saved Palettes */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Saved Palettes</Label>
+                  <button
+                    onClick={() => setShowSaveInput(!showSaveInput)}
+                    className="flex items-center gap-1 text-[10px] font-medium text-primary hover:text-primary/80 transition-colors"
+                  >
+                    <Plus className="h-3 w-3" />
+                    Save Current
+                  </button>
+                </div>
+                {showSaveInput && (
+                  <div className="flex items-center gap-2">
+                    <Input
+                      value={newPaletteName}
+                      onChange={(e) => setNewPaletteName(e.target.value)}
+                      placeholder="Palette name…"
+                      className="h-8 text-xs flex-1"
+                      onKeyDown={(e) => e.key === "Enter" && handleSavePalette()}
+                      autoFocus
+                    />
+                    <Button size="sm" className="h-8 px-3 text-xs" onClick={handleSavePalette} disabled={savingPalette || !newPaletteName.trim()}>
+                      <Save className="h-3 w-3 mr-1" />
+                      Save
+                    </Button>
+                  </div>
+                )}
+                {customPalettes.length > 0 ? (
+                  <div className="grid grid-cols-4 gap-2">
+                    {customPalettes.map((cp) => {
+                      const isActive = cp.palette.primary === palette.primary && cp.palette.accent === palette.accent && cp.palette.background === palette.background;
+                      return (
+                        <div key={cp.id} className="relative group">
+                          <button
+                            onClick={() => handlePreset(cp.palette)}
+                            className={`w-full flex flex-col items-center gap-1.5 p-2 rounded-lg border transition-all ${
+                              isActive ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border/50 hover:border-border hover:bg-muted/30"
+                            }`}
+                          >
+                            <div className="flex gap-0.5">
+                              <div className="h-5 w-5 rounded-full border border-border/30" style={{ background: cp.palette.primary }} />
+                              <div className="h-5 w-5 rounded-full border border-border/30" style={{ background: cp.palette.accent }} />
+                            </div>
+                            <span className="text-[10px] font-medium text-muted-foreground truncate w-full text-center">{cp.name}</span>
+                            {isActive && <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />}
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDeletePalette(cp.id); }}
+                            className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash2 className="h-2.5 w-2.5" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-[10px] text-muted-foreground text-center py-2">No saved palettes yet</p>
+                )}
+              </div>
 
               {/* Custom Colors */}
               <div className="space-y-2">
