@@ -185,7 +185,7 @@ export default function CardBuilderPreview({
                     {coverUrl && (
                       <img src={coverUrl} alt="cover" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: `center ${coverOffsetY}%` }} />
                     )}
-                    {logoUrl && logoPosition !== "beside-name" && (
+                    {logoUrl && logoPosition !== "beside-name" && logoPosition !== "beside-name-right" && (
                       <div
                         className={`absolute ${posMap[logoPosition]} rounded-lg flex items-center justify-center ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
                         style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
@@ -259,6 +259,14 @@ export default function CardBuilderPreview({
                           return <>{firstStyle ? <span style={firstStyle}>{firstName}</span> : firstName} {lastStyle ? <span style={lastStyle}>{last}</span> : last}</>;
                         })()}
                       </h3>
+                      {logoUrl && logoPosition === "beside-name-right" && (
+                        <div
+                          className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
+                          style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
+                        >
+                          <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
+                        </div>
+                      )}
                     </div>
                     <p style={{ color: `${previewTheme.palette.secondary}99`, fontSize: subtitleFontSize ?? 14 }}>{displayJobTitle}</p>
                     {(editCompany ?? profile?.company) && (

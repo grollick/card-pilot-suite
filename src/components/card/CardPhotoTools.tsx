@@ -40,8 +40,8 @@ interface CardPhotoToolsProps {
   onLogoFrostedBgChange?: (val: boolean) => void;
   logoGlow?: boolean;
   onLogoGlowChange?: (val: boolean) => void;
-  logoPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name";
-  onLogoPositionChange?: (pos: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name") => void;
+  logoPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name" | "beside-name-right";
+  onLogoPositionChange?: (pos: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name" | "beside-name-right") => void;
   logoSize?: "small" | "medium" | "large";
   onLogoSizeChange?: (size: "small" | "medium" | "large") => void;
   logoOpacity?: number;
