@@ -1,5 +1,6 @@
 import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick } from "lucide-react";
 import CtaEditor, { type CtaItem, DEFAULT_CTA_CONFIG } from "@/components/card/CtaEditor";
+import { resolveCardTheme, type ResolvedCardTheme } from "@/lib/cardTokens";
 import QRShareDialog from "@/components/card/QRShareDialog";
 import CardPhotoTools from "@/components/card/CardPhotoTools";
 import SectionEditor, { type SectionContent } from "@/components/card/SectionEditor";
@@ -8,7 +9,7 @@ import SortableSectionItem from "@/components/card/SortableSectionItem";
 import CardThemeEditor, { type CardThemeOverrides } from "@/components/card/CardThemeEditor";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import {
@@ -295,6 +296,22 @@ export default function CardBuilder() {
     fonts: (card?.theme_json as any)?.fonts ?? undefined,
   };
 
+  // Resolve the full theme for the live preview
+  const FALLBACK_PALETTE = { primary: "#4361ee", secondary: "#6b7280", accent: "#7c3aed", background: "#ffffff" };
+  const previewTheme: ResolvedCardTheme = useMemo(() => {
+    const tokens = (stylePack?.theme_tokens as Record<string, any>) ?? {};
+    const palettes = (stylePack?.default_palettes as any[]) ?? [];
+    const basePalette = palettes[0] ?? FALLBACK_PALETTE;
+    const themeJson = (card?.theme_json as any) ?? {};
+    const palette = themeJson.palette
+      ? { ...basePalette, ...themeJson.palette }
+      : basePalette;
+    const mergedTokens = themeJson.fonts
+      ? { ...tokens, fontPrimary: themeJson.fonts.primary, fontSecondary: themeJson.fonts.secondary }
+      : tokens;
+    return resolveCardTheme(mergedTokens, palette);
+  }, [stylePack, card?.theme_json]);
+
   const handleThemeSave = async (overrides: CardThemeOverrides) => {
     try {
       const existing = (card?.theme_json as any) ?? {};
@@ -527,14 +544,14 @@ export default function CardBuilder() {
           className="lg:col-span-2 rounded-xl border border-border bg-muted/30 p-6 min-h-[600px] flex items-start justify-center"
         >
           <div className="w-full max-w-sm mx-auto">
-            <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-card">
+            <div className="rounded-2xl border border-border overflow-hidden shadow-card" style={{ background: previewTheme.palette.background }}>
               {/* Cover */}
               <div
                 className="h-28 relative overflow-hidden"
                 style={{
                   background: coverUrl
                     ? undefined
-                    : "linear-gradient(135deg, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))",
+                    : `linear-gradient(135deg, ${previewTheme.palette.primary}33, ${previewTheme.palette.primary}0D)`,
                 }}
               >
                 {coverUrl && (
@@ -555,10 +572,11 @@ export default function CardBuilder() {
               <div className="px-5 pb-5 -mt-10">
                 {/* Avatar */}
                 <div
-                  className="h-20 w-20 rounded-2xl border-4 border-card flex items-center justify-center mb-3 cursor-pointer relative group overflow-hidden"
+                  className="h-20 w-20 rounded-2xl border-4 flex items-center justify-center mb-3 cursor-pointer relative group overflow-hidden"
                   onClick={() => fileInputRef.current?.click()}
                   style={{
-                    backgroundColor: avatarBgColor === "transparent" ? "hsl(var(--muted))" : avatarBgColor,
+                    borderColor: previewTheme.palette.background,
+                    backgroundColor: avatarBgColor === "transparent" ? `${previewTheme.palette.secondary}15` : avatarBgColor,
                   }}
                 >
                   {avatarUrl ? (
@@ -600,26 +618,33 @@ export default function CardBuilder() {
                   }}
                 />
 
-                <h3 className="text-lg font-bold">{profile?.name || "Your Name"}</h3>
-                <p className="text-sm text-muted-foreground">{professionName}</p>
+                <h3 className="text-lg font-bold" style={{ color: previewTheme.palette.secondary, fontFamily: `'${previewTheme.fonts.primary}', sans-serif` }}>{profile?.name || "Your Name"}</h3>
+                <p className="text-sm" style={{ color: `${previewTheme.palette.secondary}99` }}>{professionName}</p>
 
                 {(() => {
                   const enabledCtas = ctaConfig.filter(c => c.enabled);
-                  const primary = enabledCtas.find(c => c.isPrimary) || enabledCtas[0];
-                  const secondary = enabledCtas.filter(c => c !== primary);
+                  const primaryCta = enabledCtas.find(c => c.isPrimary) || enabledCtas[0];
+                  const secondaryCtas = enabledCtas.filter(c => c !== primaryCta);
                   return (
                     <div className="space-y-2 mt-4">
-                      {primary && (
-                        <Button size="sm" className="w-full text-xs">
-                          {primary.label}
-                        </Button>
+                      {primaryCta && (
+                        <button
+                          className="w-full text-xs font-semibold py-2.5 rounded-lg transition-colors"
+                          style={{ background: previewTheme.palette.primary, color: previewTheme.palette.background }}
+                        >
+                          {primaryCta.label}
+                        </button>
                       )}
-                      {secondary.length > 0 && (
+                      {secondaryCtas.length > 0 && (
                         <div className="flex gap-2">
-                          {secondary.map(c => (
-                            <Button key={c.id} size="sm" variant="outline" className="flex-1 text-xs">
+                          {secondaryCtas.map(c => (
+                            <button
+                              key={c.id}
+                              className="flex-1 text-xs font-semibold py-2 rounded-lg border transition-colors"
+                              style={{ borderColor: `${previewTheme.palette.primary}40`, color: previewTheme.palette.primary, background: "transparent" }}
+                            >
                               {c.label}
-                            </Button>
+                            </button>
                           ))}
                         </div>
                       )}
