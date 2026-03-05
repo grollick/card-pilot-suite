@@ -930,6 +930,20 @@ export default function PublicCard() {
             </div>
           )}
 
+          {/* ── Quote Request ── */}
+          {enabledSections.has("quote_request") && (
+            <div id="quote-request-section">
+              <SectionTitle id="quote_request" label={sectionContent("quote_request")?.heading || "Request a Quote"} />
+              <QuoteRequestForm
+                theme={theme}
+                profileId={profile.id}
+                handle={handle!}
+                metallicEffect={metallicEffect}
+                sectionContent={sectionContent("quote_request")}
+              />
+            </div>
+          )}
+
           {/* ── Contact Info ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {profile.phone && (
