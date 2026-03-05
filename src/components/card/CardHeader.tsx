@@ -80,6 +80,44 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     </div>
   );
 
+  // Shared cover/backdrop banner element for non-cover layouts
+  const coverBanner = (coverUrl || logoUrl) ? (
+    <div
+      style={{
+        height: 120,
+        borderRadius: `${radii.card} ${radii.card} 0 0`,
+        overflow: "hidden",
+        position: "relative",
+        background: coverUrl
+          ? undefined
+          : `linear-gradient(135deg, ${palette.primary}30, ${palette.accent}20)`,
+      }}
+    >
+      {coverUrl && (
+        <img
+          src={coverUrl}
+          alt=""
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: `center ${coverOffsetY}%`,
+          }}
+        />
+      )}
+      {logoUrl && (
+        <div style={{
+          position: "absolute", top: 8, right: 8,
+          height: 32, width: 32, borderRadius: 6,
+          background: "rgba(255,255,255,0.85)", backdropFilter: "blur(4px)",
+          display: "flex", alignItems: "center", justifyContent: "center", padding: 4,
+        }}>
+          <img src={logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
+        </div>
+      )}
+    </div>
+  ) : null;
+
   switch (header.layout) {
     // ─── Cover: full-width cover image, avatar overlapping ─────
     case "cover":
@@ -131,12 +169,15 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     // ─── Split: avatar left, text right ───────────────────────
     case "split":
       return (
-        <div style={{ display: "flex", gap: 20, alignItems: "center", padding: 24 }}>
-          {avatarEl}
-          <div>
-            <h1 style={{ ...titleStyle, fontSize: 22 }}>{name}</h1>
-            {profession && <p style={subtitleStyle}>{profession}</p>}
-            {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
+        <div>
+          {coverBanner}
+          <div style={{ display: "flex", gap: 20, alignItems: "center", padding: 24 }}>
+            {avatarEl}
+            <div>
+              <h1 style={{ ...titleStyle, fontSize: 22 }}>{name}</h1>
+              {profession && <p style={subtitleStyle}>{profession}</p>}
+              {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
+            </div>
           </div>
         </div>
       );
@@ -144,19 +185,22 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     // ─── Hero: large centered, big title ──────────────────────
     case "hero":
       return (
-        <div style={{ textAlign: "center", padding: "40px 24px 24px" }}>
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
-            {React.cloneElement(avatarEl as React.ReactElement, {
-              style: {
-                ...(avatarEl as React.ReactElement).props.style,
-                width: 100,
-                height: 100,
-              },
-            })}
+        <div>
+          {coverBanner}
+          <div style={{ textAlign: "center", padding: "40px 24px 24px" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+              {React.cloneElement(avatarEl as React.ReactElement, {
+                style: {
+                  ...(avatarEl as React.ReactElement).props.style,
+                  width: 100,
+                  height: 100,
+                },
+              })}
+            </div>
+            <h1 style={{ ...titleStyle, fontSize: 28 }}>{name}</h1>
+            {profession && <p style={{ ...subtitleStyle, fontSize: 16 }}>{profession}</p>}
+            {company && <p style={{ ...subtitleStyle, fontSize: 14, opacity: 0.7 }}>{company}</p>}
           </div>
-          <h1 style={{ ...titleStyle, fontSize: 28 }}>{name}</h1>
-          {profession && <p style={{ ...subtitleStyle, fontSize: 16 }}>{profession}</p>}
-          {company && <p style={{ ...subtitleStyle, fontSize: 14, opacity: 0.7 }}>{company}</p>}
         </div>
       );
 
@@ -164,13 +208,16 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     case "classic":
     default:
       return (
-        <div style={{ textAlign: "center", padding: "24px 24px 16px" }}>
-          <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
-            {avatarEl}
+        <div>
+          {coverBanner}
+          <div style={{ textAlign: "center", padding: "24px 24px 16px" }}>
+            <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+              {avatarEl}
+            </div>
+            <h1 style={{ ...titleStyle, fontSize: 22 }}>{name}</h1>
+            {profession && <p style={subtitleStyle}>{profession}</p>}
+            {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
           </div>
-          <h1 style={{ ...titleStyle, fontSize: 22 }}>{name}</h1>
-          {profession && <p style={subtitleStyle}>{profession}</p>}
-          {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
         </div>
       );
   }
