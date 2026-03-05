@@ -13,6 +13,9 @@ interface CardHeaderProps {
   avatarRotation?: number;
   avatarBorderWidth?: number;
   avatarSize?: number;
+  avatarBannerText?: string;
+  avatarBannerColor?: string;
+  avatarBannerBg?: string;
   coverOffsetY?: number;
   logoUrl?: string | null;
   logoFrostedBg?: boolean;
@@ -24,7 +27,7 @@ interface CardHeaderProps {
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false }: CardHeaderProps) {
+export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -70,8 +73,34 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     transition: { duration: 3, repeat: Infinity, ease: "easeInOut" as const },
   };
 
+  const bannerEl = avatarBannerText ? (
+    <div
+      style={{
+        position: "absolute",
+        bottom: 0,
+        left: "50%",
+        transform: "translateX(-50%) translateY(40%)",
+        background: avatarBannerBg || palette.primary,
+        color: avatarBannerColor,
+        fontSize: Math.max(9, avatarSize * 0.12),
+        fontWeight: 700,
+        fontFamily: `'${fonts.primary}', sans-serif`,
+        padding: "2px 10px",
+        borderRadius: 999,
+        whiteSpace: "nowrap",
+        lineHeight: 1.4,
+        boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+        zIndex: 2,
+        letterSpacing: "0.02em",
+        textTransform: "uppercase" as const,
+      }}
+    >
+      {avatarBannerText}
+    </div>
+  ) : null;
+
   const avatarEl = avatarUrl ? (
-    <motion.div style={avatarContainerStyle} animate={floatAnimation}>
+    <motion.div style={{ ...avatarContainerStyle, position: "relative" as const }} animate={floatAnimation}>
       <img
         src={avatarUrl}
         alt={name}
@@ -82,6 +111,7 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
           transform: avatarRotation ? `rotate(${avatarRotation}deg)` : undefined,
         }}
       />
+      {bannerEl}
     </motion.div>
   ) : (
     <motion.div
@@ -98,9 +128,11 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
         fontWeight: 700,
         color: palette.primary,
         fontFamily: `'${fonts.primary}', sans-serif`,
+        position: "relative" as const,
       }}
     >
       {name?.charAt(0)?.toUpperCase() || "?"}
+      {bannerEl}
     </motion.div>
   );
 
