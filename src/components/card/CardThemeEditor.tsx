@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Palette, Type, Check, RotateCcw, Layout, Square, Layers, Sparkles } from "lucide-react";
+import { Palette, Type, Check, RotateCcw, Layout, Square, Layers, Sparkles, Sun, Moon, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -59,27 +59,50 @@ const FONT_OPTIONS = [
   "Crimson Pro", "Libre Baskerville", "Josefin Sans", "Bebas Neue",
 ];
 
-const PRESET_PALETTES: { name: string; palette: CardPalette }[] = [
-  // ── Light Modern ──
-  { name: "Ocean", palette: { primary: "#4361ee", secondary: "#6b7280", accent: "#7c3aed", background: "#ffffff" } },
-  { name: "Sage", palette: { primary: "#4a7c6f", secondary: "#64748b", accent: "#2dd4bf", background: "#f8faf9" } },
-  { name: "Clay", palette: { primary: "#c2775e", secondary: "#78716c", accent: "#e07a5f", background: "#fdf6f0" } },
-  { name: "Lavender", palette: { primary: "#7c5cbf", secondary: "#6b7280", accent: "#a78bfa", background: "#faf8ff" } },
-  { name: "Cobalt", palette: { primary: "#2563eb", secondary: "#64748b", accent: "#0ea5e9", background: "#f8fafc" } },
-  { name: "Rose", palette: { primary: "#e11d48", secondary: "#71717a", accent: "#f43f5e", background: "#fff1f2" } },
-  { name: "Olive", palette: { primary: "#65803c", secondary: "#6b7280", accent: "#84cc16", background: "#fafdf2" } },
-  { name: "Copper", palette: { primary: "#b45309", secondary: "#78716c", accent: "#d97706", background: "#fffbeb" } },
-  // ── Dark Modern ──
-  { name: "Midnight", palette: { primary: "#818cf8", secondary: "#94a3b8", accent: "#c084fc", background: "#0f172a" } },
-  { name: "Carbon", palette: { primary: "#f0f0f0", secondary: "#a1a1aa", accent: "#e4e4e7", background: "#18181b" } },
-  { name: "Neon", palette: { primary: "#06b6d4", secondary: "#94a3b8", accent: "#8b5cf6", background: "#020617" } },
-  { name: "Aurora", palette: { primary: "#34d399", secondary: "#94a3b8", accent: "#22d3ee", background: "#0c1222" } },
-  // ── Neutral & Minimal ──
-  { name: "Slate", palette: { primary: "#475569", secondary: "#94a3b8", accent: "#334155", background: "#f8fafc" } },
-  { name: "Warm Gray", palette: { primary: "#57534e", secondary: "#a8a29e", accent: "#78716c", background: "#fafaf9" } },
-  { name: "Ink", palette: { primary: "#1e293b", secondary: "#64748b", accent: "#475569", background: "#ffffff" } },
-  { name: "Sand", palette: { primary: "#92702c", secondary: "#8b8680", accent: "#b8972e", background: "#faf7f2" } },
+interface PaletteCategory {
+  label: string;
+  icon: React.ReactNode;
+  palettes: { name: string; palette: CardPalette }[];
+}
+
+const PALETTE_CATEGORIES: PaletteCategory[] = [
+  {
+    label: "Light",
+    icon: <Sun className="h-3.5 w-3.5" />,
+    palettes: [
+      { name: "Ocean", palette: { primary: "#4361ee", secondary: "#6b7280", accent: "#7c3aed", background: "#ffffff" } },
+      { name: "Sage", palette: { primary: "#4a7c6f", secondary: "#64748b", accent: "#2dd4bf", background: "#f8faf9" } },
+      { name: "Clay", palette: { primary: "#c2775e", secondary: "#78716c", accent: "#e07a5f", background: "#fdf6f0" } },
+      { name: "Lavender", palette: { primary: "#7c5cbf", secondary: "#6b7280", accent: "#a78bfa", background: "#faf8ff" } },
+      { name: "Cobalt", palette: { primary: "#2563eb", secondary: "#64748b", accent: "#0ea5e9", background: "#f8fafc" } },
+      { name: "Rose", palette: { primary: "#e11d48", secondary: "#71717a", accent: "#f43f5e", background: "#fff1f2" } },
+      { name: "Olive", palette: { primary: "#65803c", secondary: "#6b7280", accent: "#84cc16", background: "#fafdf2" } },
+      { name: "Copper", palette: { primary: "#b45309", secondary: "#78716c", accent: "#d97706", background: "#fffbeb" } },
+    ],
+  },
+  {
+    label: "Dark",
+    icon: <Moon className="h-3.5 w-3.5" />,
+    palettes: [
+      { name: "Midnight", palette: { primary: "#818cf8", secondary: "#94a3b8", accent: "#c084fc", background: "#0f172a" } },
+      { name: "Carbon", palette: { primary: "#f0f0f0", secondary: "#a1a1aa", accent: "#e4e4e7", background: "#18181b" } },
+      { name: "Neon", palette: { primary: "#06b6d4", secondary: "#94a3b8", accent: "#8b5cf6", background: "#020617" } },
+      { name: "Aurora", palette: { primary: "#34d399", secondary: "#94a3b8", accent: "#22d3ee", background: "#0c1222" } },
+    ],
+  },
+  {
+    label: "Neutral",
+    icon: <Circle className="h-3.5 w-3.5" />,
+    palettes: [
+      { name: "Slate", palette: { primary: "#475569", secondary: "#94a3b8", accent: "#334155", background: "#f8fafc" } },
+      { name: "Warm Gray", palette: { primary: "#57534e", secondary: "#a8a29e", accent: "#78716c", background: "#fafaf9" } },
+      { name: "Ink", palette: { primary: "#1e293b", secondary: "#64748b", accent: "#475569", background: "#ffffff" } },
+      { name: "Sand", palette: { primary: "#92702c", secondary: "#8b8680", accent: "#b8972e", background: "#faf7f2" } },
+    ],
+  },
 ];
+
+const PRESET_PALETTES = PALETTE_CATEGORIES.flatMap((c) => c.palettes);
 
 interface Props {
   open: boolean;
@@ -211,45 +234,65 @@ export default function CardThemeEditor({
               </span>
             </AccordionTrigger>
             <AccordionContent className="space-y-4 pt-2">
-              {/* Preset Palettes */}
-              <div className="space-y-2">
+              {/* Preset Palettes by Category */}
+              <div className="space-y-1">
                 <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Presets</Label>
-                <div className="grid grid-cols-4 gap-2">
-                  {PRESET_PALETTES.map((preset) => {
-                    const isActive = preset.palette.primary === palette.primary && preset.palette.accent === palette.accent;
+                <Accordion type="multiple" defaultValue={["Light"]} className="space-y-0">
+                  {PALETTE_CATEGORIES.map((category) => {
+                    const hasActive = category.palettes.some(
+                      (p) => p.palette.primary === palette.primary && p.palette.accent === palette.accent
+                    );
                     return (
-                      <button
-                        key={preset.name}
-                        onClick={() => handlePreset(preset.palette)}
-                        className={`relative flex flex-col items-center gap-1.5 p-2 rounded-lg border transition-all ${
-                          isActive ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border/50 hover:border-border hover:bg-muted/30"
-                        }`}
-                      >
-                        <div className="flex gap-0.5">
-                          <div className="h-5 w-5 rounded-full border border-border/30" style={{ background: preset.palette.primary }} />
-                          <div className="h-5 w-5 rounded-full border border-border/30" style={{ background: preset.palette.accent }} />
-                        </div>
-                        <span className="text-[10px] font-medium text-muted-foreground">{preset.name}</span>
-                        {isActive && <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />}
-                      </button>
+                      <AccordionItem key={category.label} value={category.label} className="border-b-0">
+                        <AccordionTrigger className="py-2 text-xs font-medium hover:no-underline">
+                          <span className={`flex items-center gap-1.5 ${hasActive ? "text-primary" : "text-muted-foreground"}`}>
+                            {category.icon}
+                            {category.label}
+                            <span className="text-[10px] text-muted-foreground/60 font-normal">({category.palettes.length})</span>
+                          </span>
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-2 pt-0">
+                          <div className="grid grid-cols-4 gap-2">
+                            {category.palettes.map((preset) => {
+                              const isActive = preset.palette.primary === palette.primary && preset.palette.accent === palette.accent;
+                              return (
+                                <button
+                                  key={preset.name}
+                                  onClick={() => handlePreset(preset.palette)}
+                                  className={`relative flex flex-col items-center gap-1.5 p-2 rounded-lg border transition-all ${
+                                    isActive ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border/50 hover:border-border hover:bg-muted/30"
+                                  }`}
+                                >
+                                  <div className="flex gap-0.5">
+                                    <div className="h-5 w-5 rounded-full border border-border/30" style={{ background: preset.palette.primary }} />
+                                    <div className="h-5 w-5 rounded-full border border-border/30" style={{ background: preset.palette.accent }} />
+                                  </div>
+                                  <span className="text-[10px] font-medium text-muted-foreground">{preset.name}</span>
+                                  {isActive && <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </AccordionContent>
+                      </AccordionItem>
                     );
                   })}
-                </div>
-                {stylePackPalettes && stylePackPalettes.length > 1 && (
-                  <>
-                    <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">From Your Style Pack</Label>
-                    <div className="flex gap-2 flex-wrap">
-                      {stylePackPalettes.map((sp, i) => (
-                        <button key={i} onClick={() => handlePreset(sp)} className="flex gap-0.5 p-1.5 rounded-lg border border-border/50 hover:border-primary/40 transition-all">
-                          <div className="h-4 w-4 rounded-full" style={{ background: sp.primary }} />
-                          <div className="h-4 w-4 rounded-full" style={{ background: sp.accent }} />
-                          <div className="h-4 w-4 rounded-full" style={{ background: sp.background }} />
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
+                </Accordion>
               </div>
+              {stylePackPalettes && stylePackPalettes.length > 1 && (
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">From Your Style Pack</Label>
+                  <div className="flex gap-2 flex-wrap">
+                    {stylePackPalettes.map((sp, i) => (
+                      <button key={i} onClick={() => handlePreset(sp)} className="flex gap-0.5 p-1.5 rounded-lg border border-border/50 hover:border-primary/40 transition-all">
+                        <div className="h-4 w-4 rounded-full" style={{ background: sp.primary }} />
+                        <div className="h-4 w-4 rounded-full" style={{ background: sp.accent }} />
+                        <div className="h-4 w-4 rounded-full" style={{ background: sp.background }} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Custom Colors */}
               <div className="space-y-2">
