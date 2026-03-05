@@ -187,6 +187,7 @@ export default function PublicCard() {
   const professionName = (profile as any)?.professions?.name ?? "Professional";
   const cardUrl = `${window.location.origin}/${handle}`;
   const themeJson = (card?.theme_json ?? {}) as Record<string, any>;
+  const displayJobTitle = (themeJson.job_title as string) || professionName;
   const coverUrl = themeJson.cover_url as string | undefined;
 
   // CTA config from theme_json or fallback to legacy primary_cta
@@ -432,7 +433,7 @@ export default function PublicCard() {
           <CardHeader
             theme={theme}
             name={profile.name || "Your Name"}
-            profession={professionName}
+            profession={displayJobTitle}
             company={profile.company ?? undefined}
             avatarUrl={profile.avatar_url}
             coverUrl={coverUrl}
