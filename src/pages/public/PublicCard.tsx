@@ -465,7 +465,7 @@ export default function PublicCard() {
               zIndex: 1,
               opacity: bgPattern.opacity,
               backgroundImage: getPatternSvg(bgPattern.type as any, (bgPattern as any).color || palette.secondary),
-              backgroundSize: bgPattern.type === "noise" ? "200px 200px" : "20px 20px",
+              backgroundSize: bgPattern.type === "noise" ? "200px 200px" : `${(bgPattern as any).scale ?? 20}px ${(bgPattern as any).scale ?? 20}px`,
             }}
           />
         )}

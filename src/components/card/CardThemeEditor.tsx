@@ -63,6 +63,7 @@ export interface CardBgPattern {
   type: BgPatternType;
   opacity: number;
   color?: string;
+  scale?: number;
 }
 
 export interface CardThemeOverrides {
@@ -608,6 +609,18 @@ export default function CardThemeEditor({
                         className="w-full"
                       />
                       <span className="text-[10px] text-muted-foreground">{Math.round(bgPattern.opacity * 100)}%</span>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Scale</Label>
+                      <Slider
+                        value={[bgPattern.scale ?? 20]}
+                        onValueChange={([v]) => setBgPattern(prev => ({ ...prev, scale: v }))}
+                        min={8}
+                        max={80}
+                        step={2}
+                        className="w-full"
+                      />
+                      <span className="text-[10px] text-muted-foreground">{bgPattern.scale ?? 20}px</span>
                     </div>
                   </>
                 )}
