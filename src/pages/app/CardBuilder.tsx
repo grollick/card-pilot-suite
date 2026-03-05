@@ -1,4 +1,4 @@
-import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick } from "lucide-react";
+import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick, Check } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import CtaEditor, { type CtaItem, DEFAULT_CTA_CONFIG } from "@/components/card/CtaEditor";
 import { resolveCardTheme, type ResolvedCardTheme } from "@/lib/cardTokens";
@@ -67,6 +67,7 @@ export default function CardBuilder() {
   const [editJobTitle, setEditJobTitle] = useState<string | null>(null);
   const [jobTitle, setJobTitle] = useState<string | null>(null);
   const identitySaveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
+  const [identitySaveState, setIdentitySaveState] = useState<Record<string, "saving" | "saved" | null>>({});
   const hydrated = useRef(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -503,21 +504,28 @@ export default function CardBuilder() {
               <h2 className="font-semibold">Identity</h2>
             </div>
             <div className="space-y-2">
-              <label className="text-xs text-muted-foreground">Display Name</label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-muted-foreground">Display Name</label>
+                {identitySaveState.name === "saving" && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
+                {identitySaveState.name === "saved" && <span className="flex items-center gap-0.5 text-[10px] text-emerald-500 font-medium"><Check className="h-3 w-3" />Saved</span>}
+              </div>
               <Input
                 value={editName ?? profile?.name ?? ""}
                 onChange={(e) => {
                   const val = e.target.value;
                   setEditName(val);
+                  setIdentitySaveState(s => ({ ...s, name: "saving" }));
                   clearTimeout(identitySaveTimers.current.name);
                   identitySaveTimers.current.name = setTimeout(async () => {
                     if (!profile) return;
                     const { supabase } = await import("@/integrations/supabase/client");
                     const { error } = await supabase.from("profiles").update({ name: val }).eq("id", profile.id);
-                    if (error) { toast.error("Failed to save name"); return; }
+                    if (error) { toast.error("Failed to save name"); setIdentitySaveState(s => ({ ...s, name: null })); return; }
                     qc.invalidateQueries({ queryKey: ["profile"] });
                     qc.invalidateQueries({ queryKey: ["public-card"] });
                     setEditName(null);
+                    setIdentitySaveState(s => ({ ...s, name: "saved" }));
+                    setTimeout(() => setIdentitySaveState(s => s.name === "saved" ? { ...s, name: null } : s), 2000);
                   }, 800);
                 }}
                 placeholder="Your Name"
@@ -525,21 +533,28 @@ export default function CardBuilder() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs text-muted-foreground">Company / Title</label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-muted-foreground">Company / Title</label>
+                {identitySaveState.company === "saving" && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
+                {identitySaveState.company === "saved" && <span className="flex items-center gap-0.5 text-[10px] text-emerald-500 font-medium"><Check className="h-3 w-3" />Saved</span>}
+              </div>
               <Input
                 value={editCompany ?? profile?.company ?? ""}
                 onChange={(e) => {
                   const val = e.target.value;
                   setEditCompany(val);
+                  setIdentitySaveState(s => ({ ...s, company: "saving" }));
                   clearTimeout(identitySaveTimers.current.company);
                   identitySaveTimers.current.company = setTimeout(async () => {
                     if (!profile) return;
                     const { supabase } = await import("@/integrations/supabase/client");
                     const { error } = await supabase.from("profiles").update({ company: val }).eq("id", profile.id);
-                    if (error) { toast.error("Failed to save company"); return; }
+                    if (error) { toast.error("Failed to save company"); setIdentitySaveState(s => ({ ...s, company: null })); return; }
                     qc.invalidateQueries({ queryKey: ["profile"] });
                     qc.invalidateQueries({ queryKey: ["public-card"] });
                     setEditCompany(null);
+                    setIdentitySaveState(s => ({ ...s, company: "saved" }));
+                    setTimeout(() => setIdentitySaveState(s => s.company === "saved" ? { ...s, company: null } : s), 2000);
                   }, 800);
                 }}
                 placeholder="Your Company"
@@ -547,18 +562,25 @@ export default function CardBuilder() {
               />
             </div>
             <div className="space-y-2">
-              <label className="text-xs text-muted-foreground">Job Title</label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-muted-foreground">Job Title</label>
+                {identitySaveState.jobTitle === "saving" && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
+                {identitySaveState.jobTitle === "saved" && <span className="flex items-center gap-0.5 text-[10px] text-emerald-500 font-medium"><Check className="h-3 w-3" />Saved</span>}
+              </div>
               <Input
                 value={editJobTitle ?? jobTitle ?? ""}
                 onChange={(e) => {
                   const val = e.target.value;
                   setEditJobTitle(val);
+                  setIdentitySaveState(s => ({ ...s, jobTitle: "saving" }));
                   clearTimeout(identitySaveTimers.current.jobTitle);
                   identitySaveTimers.current.jobTitle = setTimeout(() => {
                     const trimmed = val.trim() || null;
                     setJobTitle(trimmed);
                     setEditJobTitle(null);
                     saveThemeField({ job_title: trimmed });
+                    setIdentitySaveState(s => ({ ...s, jobTitle: "saved" }));
+                    setTimeout(() => setIdentitySaveState(s => s.jobTitle === "saved" ? { ...s, jobTitle: null } : s), 2000);
                   }, 800);
                 }}
                 placeholder={professionName}
