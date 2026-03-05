@@ -314,15 +314,27 @@ export default function CardPhotoTools({
           {/* Avatar Size */}
           {onAvatarSizeChange && (
             <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">Photo Size — {avatarSize}px</Label>
-              <Slider
-                min={48}
-                max={128}
-                step={4}
-                value={[avatarSize]}
-                onValueChange={([v]) => onAvatarSizeChange(v)}
-                className="w-full"
-              />
+              <Label className="text-xs text-muted-foreground">Photo Size</Label>
+              <div className="flex gap-0.5 rounded-md border border-border bg-muted/50 p-0.5">
+                {([
+                  { label: "S", value: 56 },
+                  { label: "M", value: 80 },
+                  { label: "L", value: 112 },
+                  { label: "XL", value: 160 },
+                ] as const).map((s) => (
+                  <button
+                    key={s.label}
+                    onClick={() => onAvatarSizeChange(s.value)}
+                    className={`flex-1 py-1 rounded text-xs font-medium transition-colors ${
+                      avatarSize === s.value
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
