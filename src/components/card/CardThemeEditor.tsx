@@ -41,7 +41,7 @@ export interface CardFonts {
 export interface CardStyleTokens {
   button?: { shape?: ButtonShape; style?: ButtonStyle; size?: ButtonSize };
   header?: { layout?: HeaderLayout; avatarShape?: "circle" | "rounded" | "square" };
-  section?: { cardStyle?: SectionCardStyle; divider?: SectionDivider };
+  section?: { cardStyle?: SectionCardStyle; divider?: SectionDivider; dividerWidth?: number };
   spacingScale?: "compact" | "comfortable" | "airy";
   shadow?: { card?: string; button?: string };
   radius?: { card?: number; button?: number };
@@ -144,6 +144,7 @@ export default function CardThemeEditor({
   const resolvedSection = {
     cardStyle: tokens.section?.cardStyle ?? (stylePackTokens?.section?.cardStyle ?? "solid"),
     divider: tokens.section?.divider ?? (stylePackTokens?.section?.divider ?? "none"),
+    dividerWidth: tokens.section?.dividerWidth ?? (stylePackTokens?.section?.dividerWidth ?? 100),
   };
   const resolvedSpacing = tokens.spacingScale ?? (stylePackTokens?.spacingScale ?? "comfortable");
   const resolvedShadowCard = tokens.shadow?.card ?? (stylePackTokens?.shadow?.card ?? "soft");
@@ -362,6 +363,24 @@ export default function CardThemeEditor({
                   onChange={(v) => updateNestedToken("section", "divider", v)}
                 />
               </div>
+
+              {/* Divider Width */}
+              {resolvedSection.divider === "hairline" && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Divider Length</Label>
+                    <span className="text-xs text-muted-foreground">{resolvedSection.dividerWidth}%</span>
+                  </div>
+                  <Slider
+                    min={20}
+                    max={100}
+                    step={5}
+                    value={[resolvedSection.dividerWidth]}
+                    onValueChange={([v]) => updateNestedToken("section", "dividerWidth", v)}
+                    className="w-full"
+                  />
+                </div>
+              )}
 
               {/* Header Layout */}
               <div className="space-y-2">
