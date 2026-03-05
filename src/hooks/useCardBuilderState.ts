@@ -42,6 +42,7 @@ export function useCardBuilderState() {
   const [logoOpacity, setLogoOpacity] = useState(100);
   const [logoPadding, setLogoPadding] = useState(4);
   const [logoNameGap, setLogoNameGap] = useState(8);
+  const [logoVerticalAlign, setLogoVerticalAlign] = useState<"top" | "center" | "bottom">("center");
   const [ctaConfig, setCtaConfig] = useState<CtaItem[]>(DEFAULT_CTA_CONFIG);
   const [ctaIconsOnly, setCtaIconsOnly] = useState(false);
   const [socialIconsOnly, setSocialIconsOnly] = useState(true);
@@ -94,6 +95,7 @@ export function useCardBuilderState() {
       if (typeof t?.logo_opacity === "number") setLogoOpacity(t.logo_opacity);
       if (typeof t?.logo_padding === "number") setLogoPadding(t.logo_padding);
       if (typeof t?.logo_name_gap === "number") setLogoNameGap(t.logo_name_gap);
+      if (t?.logo_vertical_align) setLogoVerticalAlign(t.logo_vertical_align);
       if (t?.job_title) setJobTitle(t.job_title);
       if (typeof t?.bold_last_name === "boolean") setBoldLastName(t.bold_last_name);
       if (typeof t?.uppercase_name === "boolean") setUppercaseName(t.uppercase_name);
@@ -257,6 +259,7 @@ export function useCardBuilderState() {
   const handleLogoOpacityChange = makeThemeHandler("logo_opacity", setLogoOpacity);
   const handleLogoPaddingChange = makeThemeHandler("logo_padding", setLogoPadding);
   const handleLogoNameGapChange = makeThemeHandler("logo_name_gap", setLogoNameGap);
+  const handleLogoVerticalAlignChange = makeThemeHandler("logo_vertical_align", setLogoVerticalAlign);
   const handleLogoPositionChange = makeThemeHandler("logo_position", setLogoPosition);
   const handleLogoSizeChange = makeThemeHandler("logo_size", setLogoSize);
   const handleCtaConfigChange = useCallback((newConfig: CtaItem[]) => {
