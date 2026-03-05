@@ -57,6 +57,7 @@ export default function CardBuilder() {
   const [coverOffsetY, setCoverOffsetY] = useState(0);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoFrostedBg, setLogoFrostedBg] = useState(true);
+  const [logoGlow, setLogoGlow] = useState(false);
   const [ctaConfig, setCtaConfig] = useState<CtaItem[]>(DEFAULT_CTA_CONFIG);
   const [showSectionIcons, setShowSectionIcons] = useState(false);
   const [editingSection, setEditingSection] = useState<string | null>(null);
@@ -109,6 +110,7 @@ export default function CardBuilder() {
       if (typeof themeJson?.cover_offset_y === "number") setCoverOffsetY(themeJson.cover_offset_y);
       if (themeJson?.logo_url) setLogoUrl(themeJson.logo_url);
       if (typeof themeJson?.logo_frosted_bg === "boolean") setLogoFrostedBg(themeJson.logo_frosted_bg);
+      if (typeof themeJson?.logo_glow === "boolean") setLogoGlow(themeJson.logo_glow);
       if (themeJson?.job_title) { setJobTitle(themeJson.job_title); }
       if (typeof themeJson?.section_icons === "boolean") setShowSectionIcons(themeJson.section_icons);
       if (themeJson?.cta_config && Array.isArray(themeJson.cta_config)) {
@@ -284,6 +286,11 @@ export default function CardBuilder() {
   const handleLogoFrostedBgChange = (val: boolean) => {
     setLogoFrostedBg(val);
     saveThemeField({ logo_frosted_bg: val });
+  };
+
+  const handleLogoGlowChange = (val: boolean) => {
+    setLogoGlow(val);
+    saveThemeField({ logo_glow: val });
   };
 
   const handleCoverChange = async (url: string) => {
@@ -604,6 +611,8 @@ export default function CardBuilder() {
               onLogoChange={handleLogoChange}
               logoFrostedBg={logoFrostedBg}
               onLogoFrostedBgChange={handleLogoFrostedBgChange}
+              logoGlow={logoGlow}
+              onLogoGlowChange={handleLogoGlowChange}
             />
           </div>
 

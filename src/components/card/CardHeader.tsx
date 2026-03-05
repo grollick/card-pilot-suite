@@ -14,6 +14,7 @@ interface CardHeaderProps {
   coverOffsetY?: number;
   logoUrl?: string | null;
   logoFrostedBg?: boolean;
+  logoGlow?: boolean;
 }
 
 /**
@@ -21,7 +22,7 @@ interface CardHeaderProps {
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, coverOffsetY = 0, logoUrl, logoFrostedBg = true }: CardHeaderProps) {
+export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -102,17 +103,27 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
 
   // Shared logo element
   const logoEl = logoUrl ? (
-    <div style={{
-      position: "absolute", top: 8, right: 8,
-      height: 48, width: 48, borderRadius: 8,
-      background: logoFrostedBg ? "rgba(255,255,255,0.85)" : "transparent",
-      backdropFilter: logoFrostedBg ? "blur(4px)" : undefined,
-      display: "flex", alignItems: "center", justifyContent: "center",
-      padding: logoFrostedBg ? 4 : 0,
-      zIndex: 2,
-    }}>
+    <motion.div
+      animate={logoGlow ? {
+        boxShadow: [
+          `0 0 12px ${palette.primary}40, 0 0 24px ${palette.primary}20`,
+          `0 0 20px ${palette.primary}60, 0 0 40px ${palette.primary}30`,
+          `0 0 12px ${palette.primary}40, 0 0 24px ${palette.primary}20`,
+        ],
+      } : undefined}
+      transition={logoGlow ? { duration: 2.5, repeat: Infinity, ease: "easeInOut" as const } : undefined}
+      style={{
+        position: "absolute", top: 8, right: 8,
+        height: 48, width: 48, borderRadius: 8,
+        background: logoFrostedBg ? "rgba(255,255,255,0.85)" : "transparent",
+        backdropFilter: logoFrostedBg ? "blur(4px)" : undefined,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        padding: logoFrostedBg ? 4 : 0,
+        zIndex: 2,
+      }}
+    >
       <img src={logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
-    </div>
+    </motion.div>
   ) : null;
 
   // Parallax cover image element — reused in cover layout and banner
