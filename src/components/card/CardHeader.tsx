@@ -61,8 +61,13 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     backgroundColor: avatarBgColor === "transparent" ? undefined : avatarBgColor,
   };
 
+  const floatAnimation = {
+    y: [0, -6, 0],
+    transition: { duration: 3, repeat: Infinity, ease: "easeInOut" as const },
+  };
+
   const avatarEl = avatarUrl ? (
-    <div style={avatarContainerStyle}>
+    <motion.div style={avatarContainerStyle} animate={floatAnimation}>
       <img
         src={avatarUrl}
         alt={name}
@@ -73,9 +78,10 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
           transform: avatarRotation ? `rotate(${avatarRotation}deg)` : undefined,
         }}
       />
-    </div>
+    </motion.div>
   ) : (
-    <div
+    <motion.div
+      animate={floatAnimation}
       style={{
         width: 80,
         height: 80,
@@ -91,7 +97,7 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
       }}
     >
       {name?.charAt(0)?.toUpperCase() || "?"}
-    </div>
+    </motion.div>
   );
 
   // Shared logo element
