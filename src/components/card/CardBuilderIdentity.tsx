@@ -1,5 +1,6 @@
 import { Pencil, Loader2, Check } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
@@ -17,6 +18,8 @@ interface Props {
   setBoldLastName: (v: boolean) => void;
   uppercaseName: boolean;
   setUppercaseName: (v: boolean) => void;
+  nameLetterSpacing: number;
+  setNameLetterSpacing: (v: number) => void;
   professionName: string;
   identitySaveTimers: React.MutableRefObject<Record<string, ReturnType<typeof setTimeout>>>;
   identitySaveState: Record<string, "saving" | "saved" | null>;
@@ -36,6 +39,7 @@ export default function CardBuilderIdentity({
   profile, editName, setEditName, editCompany, setEditCompany,
   editJobTitle, setEditJobTitle, jobTitle, setJobTitle, boldLastName, setBoldLastName,
   uppercaseName, setUppercaseName,
+  nameLetterSpacing, setNameLetterSpacing,
   professionName, identitySaveTimers, identitySaveState, setIdentitySaveState,
   saveThemeField, qc, hideWrapper,
 }: Props) {
@@ -97,6 +101,20 @@ export default function CardBuilderIdentity({
             checked={uppercaseName}
             onCheckedChange={(v) => { setUppercaseName(v); saveThemeField({ uppercase_name: v }); }}
             className="scale-75 origin-right"
+          />
+        </div>
+        <div className="mt-1.5">
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[11px] text-muted-foreground">Letter spacing</label>
+            <span className="text-[10px] text-muted-foreground tabular-nums">{nameLetterSpacing > 0 ? `+${nameLetterSpacing}` : nameLetterSpacing}px</span>
+          </div>
+          <Slider
+            min={-2}
+            max={12}
+            step={0.5}
+            value={[nameLetterSpacing]}
+            onValueChange={([v]) => { setNameLetterSpacing(v); saveThemeField({ name_letter_spacing: v }); }}
+            className="w-full"
           />
         </div>
       </div>
