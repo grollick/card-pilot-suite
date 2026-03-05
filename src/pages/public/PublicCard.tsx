@@ -44,6 +44,7 @@ import CardSectionWrapper from "@/components/card/CardSectionWrapper";
 import QRShareDialog from "@/components/card/QRShareDialog";
 import NFCShareDialog from "@/components/card/NFCShareDialog";
 import WalletPassDialog from "@/components/card/WalletPassDialog";
+import QuoteRequestForm from "@/components/card/QuoteRequestForm";
 import { showsBranding } from "@/lib/plans";
 
 // ── Visitor meta for analytics ──
@@ -242,6 +243,9 @@ export default function PublicCard() {
     else if (cta === "book") {
       const bookingSection = document.getElementById("booking-section");
       if (bookingSection) bookingSection.scrollIntoView({ behavior: "smooth" });
+    } else if (cta === "quote") {
+      const quoteSection = document.getElementById("quote-request-section");
+      if (quoteSection) quoteSection.scrollIntoView({ behavior: "smooth" });
     } else if (cta === "vcard") {
       downloadVCard({
         name: profile.name,
@@ -427,6 +431,7 @@ export default function PublicCard() {
     gallery: Image,
     social: Share2,
     contact: Mail,
+    quote_request: FileText,
     booking: Calendar,
   };
 
@@ -922,6 +927,20 @@ export default function PublicCard() {
                   </div>
                 </CardSectionWrapper>
               )}
+            </div>
+          )}
+
+          {/* ── Quote Request ── */}
+          {enabledSections.has("quote_request") && (
+            <div id="quote-request-section">
+              <SectionTitle id="quote_request" label={sectionContent("quote_request")?.heading || "Request a Quote"} />
+              <QuoteRequestForm
+                theme={theme}
+                profileId={profile.id}
+                handle={handle!}
+                metallicEffect={metallicEffect}
+                sectionContent={sectionContent("quote_request")}
+              />
             </div>
           )}
 
