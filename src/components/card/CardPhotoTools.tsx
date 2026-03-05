@@ -44,6 +44,8 @@ interface CardPhotoToolsProps {
   onLogoPositionChange?: (pos: "top-left" | "top-right" | "bottom-left" | "bottom-right") => void;
   logoSize?: "small" | "medium" | "large";
   onLogoSizeChange?: (size: "small" | "medium" | "large") => void;
+  logoOpacity?: number;
+  onLogoOpacityChange?: (val: number) => void;
   avatarShape?: "circle" | "rounded" | "square";
   onAvatarShapeChange?: (shape: "circle" | "rounded" | "square") => void;
   avatarBorderWidth?: number;
@@ -82,6 +84,8 @@ export default function CardPhotoTools({
   onLogoPositionChange,
   logoSize = "medium",
   onLogoSizeChange,
+  logoOpacity = 100,
+  onLogoOpacityChange,
   avatarShape = "circle",
   onAvatarShapeChange,
   avatarBorderWidth = 3,
@@ -492,7 +496,7 @@ export default function CardPhotoTools({
 
       {/* Logo Upload */}
       {onLogoChange && (
-        <LogoUploader logoUrl={logoUrl} onLogoChange={onLogoChange} logoFrostedBg={logoFrostedBg} onLogoFrostedBgChange={onLogoFrostedBgChange} logoGlow={logoGlow} onLogoGlowChange={onLogoGlowChange} logoPosition={logoPosition} onLogoPositionChange={onLogoPositionChange} logoSize={logoSize} onLogoSizeChange={onLogoSizeChange} />
+        <LogoUploader logoUrl={logoUrl} onLogoChange={onLogoChange} logoFrostedBg={logoFrostedBg} onLogoFrostedBgChange={onLogoFrostedBgChange} logoGlow={logoGlow} onLogoGlowChange={onLogoGlowChange} logoPosition={logoPosition} onLogoPositionChange={onLogoPositionChange} logoSize={logoSize} onLogoSizeChange={onLogoSizeChange} logoOpacity={logoOpacity} onLogoOpacityChange={onLogoOpacityChange} />
       )}
 
       {/* Profile Photo Crop Dialog */}

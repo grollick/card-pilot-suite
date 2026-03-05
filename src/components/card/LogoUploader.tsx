@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { ImagePlus, Loader2, X } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -21,6 +22,8 @@ interface LogoUploaderProps {
   onLogoPositionChange?: (pos: LogoPosition) => void;
   logoSize?: LogoSize;
   onLogoSizeChange?: (size: LogoSize) => void;
+  logoOpacity?: number;
+  onLogoOpacityChange?: (val: number) => void;
 }
 
 const POSITIONS: { value: LogoPosition; label: string }[] = [
@@ -47,6 +50,8 @@ export default function LogoUploader({
   onLogoPositionChange,
   logoSize = "medium",
   onLogoSizeChange,
+  logoOpacity = 100,
+  onLogoOpacityChange,
 }: LogoUploaderProps) {
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -142,6 +147,22 @@ export default function LogoUploader({
             </div>
           )}
 
+          {/* Opacity slider */}
+          {onLogoOpacityChange && (
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Opacity</span>
+                <span className="text-[10px] text-muted-foreground tabular-nums">{logoOpacity}%</span>
+              </div>
+              <Slider
+                value={[logoOpacity]}
+                onValueChange={([v]) => onLogoOpacityChange(v)}
+                min={10}
+                max={100}
+                step={5}
+              />
+            </div>
+          )}
           {onLogoFrostedBgChange && (
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">Frosted background</span>

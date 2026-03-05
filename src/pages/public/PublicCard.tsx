@@ -512,6 +512,7 @@ export default function PublicCard() {
             logoGlow={themeJson.logo_glow === true}
             logoPosition={(themeJson.logo_position as any) ?? "top-right"}
             logoSize={(themeJson.logo_size as any) ?? "medium"}
+            logoOpacity={typeof themeJson.logo_opacity === "number" ? (themeJson.logo_opacity as number) : 100}
           />
           </div>
         )}
