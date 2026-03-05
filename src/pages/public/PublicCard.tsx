@@ -509,6 +509,8 @@ export default function PublicCard() {
             logoUrl={themeJson.logo_url as string | undefined}
             logoFrostedBg={themeJson.logo_frosted_bg !== false}
             logoGlow={themeJson.logo_glow === true}
+            logoPosition={(themeJson.logo_position as any) ?? "top-right"}
+            logoSize={(themeJson.logo_size as any) ?? "medium"}
           />
           </div>
         )}

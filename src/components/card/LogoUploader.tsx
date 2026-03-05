@@ -7,6 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
+export type LogoPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right";
+export type LogoSize = "small" | "medium" | "large";
+
 interface LogoUploaderProps {
   logoUrl: string | null;
   onLogoChange: (url: string | null) => void;
@@ -14,9 +17,37 @@ interface LogoUploaderProps {
   onLogoFrostedBgChange?: (val: boolean) => void;
   logoGlow?: boolean;
   onLogoGlowChange?: (val: boolean) => void;
+  logoPosition?: LogoPosition;
+  onLogoPositionChange?: (pos: LogoPosition) => void;
+  logoSize?: LogoSize;
+  onLogoSizeChange?: (size: LogoSize) => void;
 }
 
-export default function LogoUploader({ logoUrl, onLogoChange, logoFrostedBg = true, onLogoFrostedBgChange, logoGlow = false, onLogoGlowChange }: LogoUploaderProps) {
+const POSITIONS: { value: LogoPosition; label: string }[] = [
+  { value: "top-left", label: "↖" },
+  { value: "top-right", label: "↗" },
+  { value: "bottom-left", label: "↙" },
+  { value: "bottom-right", label: "↘" },
+];
+
+const SIZES: { value: LogoSize; label: string }[] = [
+  { value: "small", label: "S" },
+  { value: "medium", label: "M" },
+  { value: "large", label: "L" },
+];
+
+export default function LogoUploader({
+  logoUrl,
+  onLogoChange,
+  logoFrostedBg = true,
+  onLogoFrostedBgChange,
+  logoGlow = false,
+  onLogoGlowChange,
+  logoPosition = "top-right",
+  onLogoPositionChange,
+  logoSize = "medium",
+  onLogoSizeChange,
+}: LogoUploaderProps) {
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -50,7 +81,7 @@ export default function LogoUploader({ logoUrl, onLogoChange, logoFrostedBg = tr
       <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleUpload} />
 
       {logoUrl ? (
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 rounded-lg border border-border bg-muted/30 overflow-hidden flex items-center justify-center">
               <img src={logoUrl} alt="Logo" className="max-h-full max-w-full object-contain" />
@@ -64,6 +95,53 @@ export default function LogoUploader({ logoUrl, onLogoChange, logoFrostedBg = tr
               </Button>
             </div>
           </div>
+
+          {/* Position selector */}
+          {onLogoPositionChange && (
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">Position</span>
+              <div className="flex gap-0.5 rounded-md border border-border bg-muted/50 p-0.5">
+                {POSITIONS.map((p) => (
+                  <button
+                    key={p.value}
+                    onClick={() => onLogoPositionChange(p.value)}
+                    className={`w-7 h-7 rounded text-xs font-medium transition-colors ${
+                      logoPosition === p.value
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    title={p.value}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Size selector */}
+          {onLogoSizeChange && (
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">Size</span>
+              <div className="flex gap-0.5 rounded-md border border-border bg-muted/50 p-0.5">
+                {SIZES.map((s) => (
+                  <button
+                    key={s.value}
+                    onClick={() => onLogoSizeChange(s.value)}
+                    className={`w-7 h-7 rounded text-xs font-medium transition-colors ${
+                      logoSize === s.value
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    title={s.value}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {onLogoFrostedBgChange && (
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">Frosted background</span>
