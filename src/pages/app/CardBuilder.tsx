@@ -804,7 +804,7 @@ export default function CardBuilder() {
                   className="absolute inset-0 pointer-events-none z-[1]"
                   style={{
                     opacity: currentThemeOverrides.bgPattern.opacity,
-                    backgroundImage: getPatternSvg(currentThemeOverrides.bgPattern.type, previewTheme.palette.secondary),
+                    backgroundImage: getPatternSvg(currentThemeOverrides.bgPattern.type, currentThemeOverrides.bgPattern.color || previewTheme.palette.secondary),
                     backgroundSize: currentThemeOverrides.bgPattern.type === "noise" ? "200px 200px" : "20px 20px",
                   }}
                 />

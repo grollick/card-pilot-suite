@@ -59,6 +59,7 @@ export type BgPatternType = "none" | "dots" | "lines" | "grid" | "noise";
 export interface CardBgPattern {
   type: BgPatternType;
   opacity: number;
+  color?: string;
 }
 
 export interface CardThemeOverrides {
@@ -463,18 +464,44 @@ export default function CardThemeEditor({
                   ))}
                 </div>
                 {bgPattern.type !== "none" && (
-                  <div className="space-y-1">
-                    <Label className="text-xs text-muted-foreground">Opacity</Label>
-                    <Slider
-                      value={[bgPattern.opacity * 100]}
-                      onValueChange={([v]) => setBgPattern(prev => ({ ...prev, opacity: v / 100 }))}
-                      min={2}
-                      max={25}
-                      step={1}
-                      className="w-full"
-                    />
-                    <span className="text-[10px] text-muted-foreground">{Math.round(bgPattern.opacity * 100)}%</span>
-                  </div>
+                  <>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Pattern Color</Label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={bgPattern.color || palette.secondary}
+                          onChange={(e) => setBgPattern(prev => ({ ...prev, color: e.target.value }))}
+                          className="w-8 h-8 rounded-md border border-border/50 cursor-pointer bg-transparent p-0.5"
+                        />
+                        <Input
+                          value={bgPattern.color || palette.secondary}
+                          onChange={(e) => setBgPattern(prev => ({ ...prev, color: e.target.value }))}
+                          className="h-8 text-xs font-mono flex-1"
+                        />
+                        {bgPattern.color && (
+                          <button
+                            onClick={() => setBgPattern(prev => ({ ...prev, color: undefined }))}
+                            className="text-[10px] text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
+                          >
+                            Reset
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Opacity</Label>
+                      <Slider
+                        value={[bgPattern.opacity * 100]}
+                        onValueChange={([v]) => setBgPattern(prev => ({ ...prev, opacity: v / 100 }))}
+                        min={2}
+                        max={25}
+                        step={1}
+                        className="w-full"
+                      />
+                      <span className="text-[10px] text-muted-foreground">{Math.round(bgPattern.opacity * 100)}%</span>
+                    </div>
+                  </>
                 )}
               </div>
 
@@ -494,7 +521,7 @@ export default function CardThemeEditor({
                       className="absolute inset-0 pointer-events-none"
                       style={{
                         opacity: bgPattern.opacity,
-                        backgroundImage: getPatternSvg(bgPattern.type, palette.secondary),
+                        backgroundImage: getPatternSvg(bgPattern.type, bgPattern.color || palette.secondary),
                         backgroundSize: bgPattern.type === "noise" ? "200px 200px" : "20px 20px",
                       }}
                     />
