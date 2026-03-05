@@ -108,9 +108,20 @@ export default function PublicCard() {
       ? { ...basePalette, ...themeJson.palette }
       : basePalette;
     // Merge custom fonts into tokens
-    const mergedTokens = themeJson.fonts
-      ? { ...tokens, fontPrimary: themeJson.fonts.primary, fontSecondary: themeJson.fonts.secondary }
-      : tokens;
+    let mergedTokens = { ...tokens };
+    if (themeJson.fonts) {
+      mergedTokens = { ...mergedTokens, fontPrimary: themeJson.fonts.primary, fontSecondary: themeJson.fonts.secondary };
+    }
+    // Merge card style token overrides
+    if (themeJson.tokens) {
+      const t = themeJson.tokens;
+      if (t.button) mergedTokens = { ...mergedTokens, button: { ...(mergedTokens.button ?? {}), ...t.button } };
+      if (t.header) mergedTokens = { ...mergedTokens, header: { ...(mergedTokens.header ?? {}), ...t.header } };
+      if (t.section) mergedTokens = { ...mergedTokens, section: { ...(mergedTokens.section ?? {}), ...t.section } };
+      if (t.spacingScale) mergedTokens = { ...mergedTokens, spacingScale: t.spacingScale };
+      if (t.shadow) mergedTokens = { ...mergedTokens, shadow: { ...(mergedTokens.shadow ?? {}), ...t.shadow } };
+      if (t.radius) mergedTokens = { ...mergedTokens, radius: { ...(mergedTokens.radius ?? {}), ...t.radius } };
+    }
     return resolveCardTheme(mergedTokens, palette);
   }, [data?.stylePack, data?.card?.theme_json]);
 

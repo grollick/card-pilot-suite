@@ -310,6 +310,7 @@ export default function CardBuilder() {
   const currentThemeOverrides: CardThemeOverrides = {
     palette: (card?.theme_json as any)?.palette ?? undefined,
     fonts: (card?.theme_json as any)?.fonts ?? undefined,
+    tokens: (card?.theme_json as any)?.tokens ?? undefined,
   };
 
   // Resolve the full theme for the live preview
@@ -322,9 +323,20 @@ export default function CardBuilder() {
     const palette = themeJson.palette
       ? { ...basePalette, ...themeJson.palette }
       : basePalette;
-    const mergedTokens = themeJson.fonts
-      ? { ...tokens, fontPrimary: themeJson.fonts.primary, fontSecondary: themeJson.fonts.secondary }
-      : tokens;
+    let mergedTokens = { ...tokens };
+    if (themeJson.fonts) {
+      mergedTokens = { ...mergedTokens, fontPrimary: themeJson.fonts.primary, fontSecondary: themeJson.fonts.secondary };
+    }
+    // Merge card style token overrides
+    if (themeJson.tokens) {
+      const t = themeJson.tokens;
+      if (t.button) mergedTokens = { ...mergedTokens, button: { ...(mergedTokens.button ?? {}), ...t.button } };
+      if (t.header) mergedTokens = { ...mergedTokens, header: { ...(mergedTokens.header ?? {}), ...t.header } };
+      if (t.section) mergedTokens = { ...mergedTokens, section: { ...(mergedTokens.section ?? {}), ...t.section } };
+      if (t.spacingScale) mergedTokens = { ...mergedTokens, spacingScale: t.spacingScale };
+      if (t.shadow) mergedTokens = { ...mergedTokens, shadow: { ...(mergedTokens.shadow ?? {}), ...t.shadow } };
+      if (t.radius) mergedTokens = { ...mergedTokens, radius: { ...(mergedTokens.radius ?? {}), ...t.radius } };
+    }
     return resolveCardTheme(mergedTokens, palette);
   }, [stylePack, card?.theme_json]);
 
@@ -334,7 +346,7 @@ export default function CardBuilder() {
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: published ? "published" : "draft",
-        theme_json: { ...existing, cover_url: coverUrl, palette: overrides.palette, fonts: overrides.fonts } as any,
+        theme_json: { ...existing, cover_url: coverUrl, palette: overrides.palette, fonts: overrides.fonts, tokens: overrides.tokens } as any,
       });
       toast.success("Theme updated!");
     } catch {
@@ -823,6 +835,7 @@ export default function CardBuilder() {
             ? { primary: (stylePack.theme_tokens as any).fontPrimary ?? "Inter", secondary: (stylePack.theme_tokens as any).fontSecondary ?? "Inter" }
             : undefined
         }
+        stylePackTokens={(stylePack?.theme_tokens as Record<string, any>) ?? undefined}
         onSave={handleThemeSave}
       />
       {/* AI Assistant */}
