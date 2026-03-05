@@ -578,6 +578,7 @@ export default function PublicCard() {
 
             if (!hasCardServices && !hasDbServices) return null;
 
+            return (
               <CardSectionWrapper theme={theme} index={1}>
                 <SectionTitle id="services" label="Services" />
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -606,6 +607,7 @@ export default function PublicCard() {
                   }
                 </div>
               </CardSectionWrapper>
+            );
           })()}
 
           {/* ── Booking ── */}
