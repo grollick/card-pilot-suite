@@ -67,6 +67,8 @@ export default function CardBuilder() {
   const [ctaConfig, setCtaConfig] = useState<CtaItem[]>(DEFAULT_CTA_CONFIG);
   const [ctaIconsOnly, setCtaIconsOnly] = useState(false);
   const [socialIconsOnly, setSocialIconsOnly] = useState(true);
+  const [socialBtnColor, setSocialBtnColor] = useState<string>("");
+  const [socialBtnStyle, setSocialBtnStyle] = useState<"auto" | "filled" | "outline">("auto");
   const [showSectionIcons, setShowSectionIcons] = useState(false);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
@@ -130,6 +132,8 @@ export default function CardBuilder() {
       if (typeof themeJson?.section_icons === "boolean") setShowSectionIcons(themeJson.section_icons);
       if (typeof themeJson?.cta_icons_only === "boolean") setCtaIconsOnly(themeJson.cta_icons_only);
       if (typeof themeJson?.social_icons_only === "boolean") setSocialIconsOnly(themeJson.social_icons_only);
+      if (themeJson?.social_btn_color) setSocialBtnColor(themeJson.social_btn_color as string);
+      if (themeJson?.social_btn_style) setSocialBtnStyle(themeJson.social_btn_style as any);
       if (themeJson?.cta_config && Array.isArray(themeJson.cta_config)) {
         setCtaConfig(themeJson.cta_config as CtaItem[]);
       }
@@ -808,20 +812,74 @@ export default function CardBuilder() {
               <CtaEditor ctas={ctaConfig} onChange={handleCtaConfigChange} />
             </div>
 
-              <div className="flex items-center justify-between mt-3">
-                <span className="text-xs font-medium flex items-center gap-1.5">
-                  <Globe className="h-3.5 w-3.5 text-primary" /> Social Links
-                </span>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] text-muted-foreground">Icons only</span>
-                  <Switch
-                    checked={socialIconsOnly}
-                    onCheckedChange={(v) => {
-                      setSocialIconsOnly(v);
-                      saveThemeField({ social_icons_only: v });
-                    }}
-                    className="scale-75"
-                  />
+              <div className="space-y-2 mt-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium flex items-center gap-1.5">
+                    <Globe className="h-3.5 w-3.5 text-primary" /> Social Links
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-muted-foreground">Icons only</span>
+                    <Switch
+                      checked={socialIconsOnly}
+                      onCheckedChange={(v) => {
+                        setSocialIconsOnly(v);
+                        saveThemeField({ social_icons_only: v });
+                      }}
+                      className="scale-75"
+                    />
+                  </div>
+                </div>
+                {/* Style */}
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted-foreground">Style</span>
+                  <div className="flex gap-0.5 rounded-md border border-border bg-muted/50 p-0.5">
+                    {([
+                      { value: "auto", label: "Auto" },
+                      { value: "filled", label: "Filled" },
+                      { value: "outline", label: "Outline" },
+                    ] as const).map((s) => (
+                      <button
+                        key={s.value}
+                        onClick={() => {
+                          setSocialBtnStyle(s.value);
+                          saveThemeField({ social_btn_style: s.value });
+                        }}
+                        className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors ${
+                          socialBtnStyle === s.value
+                            ? "bg-background text-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {/* Color */}
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted-foreground">Color</span>
+                  <div className="flex items-center gap-1.5">
+                    <input
+                      type="color"
+                      value={socialBtnColor || "#4361ee"}
+                      onChange={(e) => {
+                        setSocialBtnColor(e.target.value);
+                        saveThemeField({ social_btn_color: e.target.value });
+                      }}
+                      className="h-6 w-6 rounded border border-border cursor-pointer bg-transparent p-0"
+                    />
+                    {socialBtnColor && (
+                      <button
+                        onClick={() => {
+                          setSocialBtnColor("");
+                          saveThemeField({ social_btn_color: "" });
+                        }}
+                        className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
