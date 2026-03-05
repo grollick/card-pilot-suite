@@ -637,6 +637,11 @@ export default function CardBuilder() {
                 const existing = (card?.theme_json as any)?.tokens ?? {};
                 saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarBannerBg: val } } });
               }}
+              avatarBannerPosition={((card?.theme_json as any)?.tokens?.header?.avatarBannerPosition) ?? "bottom"}
+              onAvatarBannerPositionChange={(val) => {
+                const existing = (card?.theme_json as any)?.tokens ?? {};
+                saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarBannerPosition: val } } });
+              }}
             />
           </div>
 

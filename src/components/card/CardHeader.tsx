@@ -16,6 +16,7 @@ interface CardHeaderProps {
   avatarBannerText?: string;
   avatarBannerColor?: string;
   avatarBannerBg?: string;
+  avatarBannerPosition?: "top" | "bottom";
   coverOffsetY?: number;
   logoUrl?: string | null;
   logoFrostedBg?: boolean;
@@ -27,7 +28,7 @@ interface CardHeaderProps {
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false }: CardHeaderProps) {
+export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -77,9 +78,10 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     <div
       style={{
         position: "absolute",
-        bottom: 0,
+        ...(avatarBannerPosition === "top"
+          ? { top: 0, transform: "translateX(-50%) translateY(-40%)" }
+          : { bottom: 0, transform: "translateX(-50%) translateY(40%)" }),
         left: "50%",
-        transform: "translateX(-50%) translateY(40%)",
         background: avatarBannerBg || palette.primary,
         color: avatarBannerColor,
         fontSize: Math.max(9, avatarSize * 0.12),
