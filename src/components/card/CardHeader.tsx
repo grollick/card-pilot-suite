@@ -225,6 +225,10 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     "bottom-right": { bottom: 8, right: 8 },
   };
 
+  // Vertical alignment for inline logo
+  const vAlignMap = { top: "flex-start", center: "center", bottom: "flex-end" } as const;
+  const inlineAlignItems = vAlignMap[logoVerticalAlign] || "center";
+
   // Shared logo element (absolute positioned on cover)
   const isInlineLogo = logoPosition === "beside-name" || logoPosition === "beside-name-right";
   const logoEl = logoUrl && !isInlineLogo ? (
