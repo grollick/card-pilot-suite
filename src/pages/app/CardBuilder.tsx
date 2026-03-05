@@ -68,6 +68,8 @@ export default function CardBuilder() {
                     identitySaveTimers={s.identitySaveTimers}
                     identitySaveState={s.identitySaveState}
                     setIdentitySaveState={s.setIdentitySaveState}
+                    nameLetterSpacing={s.nameLetterSpacing}
+                    setNameLetterSpacing={s.setNameLetterSpacing}
                     saveThemeField={s.saveThemeField}
                     qc={s.qc}
                     hideWrapper
@@ -226,6 +228,8 @@ export default function CardBuilder() {
                     identitySaveTimers={s.identitySaveTimers}
                     identitySaveState={s.identitySaveState}
                     setIdentitySaveState={s.setIdentitySaveState}
+                    nameLetterSpacing={s.nameLetterSpacing}
+                    setNameLetterSpacing={s.setNameLetterSpacing}
                     saveThemeField={s.saveThemeField}
                     qc={s.qc}
                     hideWrapper
@@ -385,6 +389,7 @@ export default function CardBuilder() {
             displayJobTitle={s.displayJobTitle}
             boldLastName={s.boldLastName}
             uppercaseName={s.uppercaseName}
+            nameLetterSpacing={s.nameLetterSpacing}
             onAvatarChange={s.handleAvatarChange}
             setEditingSection={s.setEditingSection}
           />
