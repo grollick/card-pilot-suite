@@ -41,7 +41,7 @@ export interface CardFonts {
 export interface CardStyleTokens {
   button?: { shape?: ButtonShape; style?: ButtonStyle; size?: ButtonSize };
   header?: { layout?: HeaderLayout; avatarShape?: "circle" | "rounded" | "square" };
-  section?: { cardStyle?: SectionCardStyle; divider?: SectionDivider; dividerWidth?: number };
+  section?: { cardStyle?: SectionCardStyle; divider?: SectionDivider; dividerWidth?: number; dividerColor?: string };
   spacingScale?: "compact" | "comfortable" | "airy";
   shadow?: { card?: string; button?: string };
   radius?: { card?: number; button?: number };
@@ -145,6 +145,7 @@ export default function CardThemeEditor({
     cardStyle: tokens.section?.cardStyle ?? (stylePackTokens?.section?.cardStyle ?? "solid"),
     divider: tokens.section?.divider ?? (stylePackTokens?.section?.divider ?? "none"),
     dividerWidth: tokens.section?.dividerWidth ?? (stylePackTokens?.section?.dividerWidth ?? 100),
+    dividerColor: tokens.section?.dividerColor ?? (stylePackTokens?.section?.dividerColor ?? ""),
   };
   const resolvedSpacing = tokens.spacingScale ?? (stylePackTokens?.spacingScale ?? "comfortable");
   const resolvedShadowCard = tokens.shadow?.card ?? (stylePackTokens?.shadow?.card ?? "soft");
@@ -379,6 +380,38 @@ export default function CardThemeEditor({
                     onValueChange={([v]) => updateNestedToken("section", "dividerWidth", v)}
                     className="w-full"
                   />
+                </div>
+              )}
+
+              {/* Divider Color */}
+              {resolvedSection.divider === "hairline" && (
+                <div className="space-y-2">
+                  <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Divider Color</Label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={resolvedSection.dividerColor || palette.secondary}
+                      onChange={(e) => updateNestedToken("section", "dividerColor", e.target.value)}
+                      className="h-9 w-9 rounded-lg border border-border cursor-pointer bg-transparent p-0.5"
+                    />
+                    <Input
+                      value={resolvedSection.dividerColor || "auto"}
+                      onChange={(e) => updateNestedToken("section", "dividerColor", e.target.value)}
+                      placeholder="auto"
+                      className="h-9 text-xs font-mono uppercase"
+                      maxLength={7}
+                    />
+                    {resolvedSection.dividerColor && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-9 px-2 text-xs"
+                        onClick={() => updateNestedToken("section", "dividerColor", "")}
+                      >
+                        Reset
+                      </Button>
+                    )}
+                  </div>
                 </div>
               )}
 

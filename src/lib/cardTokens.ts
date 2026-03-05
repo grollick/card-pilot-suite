@@ -133,6 +133,7 @@ export function getSectionTokens(tokens: Record<string, any>) {
     cardStyle: (s.cardStyle ?? "solid") as SectionCardStyle,
     divider: (s.divider ?? "none") as SectionDivider,
     dividerWidth: (s.dividerWidth ?? 100) as number,
+    dividerColor: (s.dividerColor ?? "") as string,
   };
 }
 
