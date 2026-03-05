@@ -36,6 +36,7 @@ interface Props {
   firstNameFontWeight?: number | null;
   nameItalic?: boolean;
   nameFontSize?: number | null;
+  subtitleFontSize?: number | null;
   onAvatarChange: (url: string) => void;
   setEditingSection: (id: string | null) => void;
 }
@@ -107,7 +108,7 @@ export default function CardBuilderPreview({
   coverUrl, coverOffsetY, avatarUrl, avatarBgColor, avatarRotation,
   logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity, logoPadding,
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
-  boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, onAvatarChange, setEditingSection,
+  boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, onAvatarChange, setEditingSection,
 }: Props) {
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -259,7 +260,7 @@ export default function CardBuilderPreview({
                         })()}
                       </h3>
                     </div>
-                    <p className="text-sm" style={{ color: `${previewTheme.palette.secondary}99` }}>{displayJobTitle}</p>
+                    <p style={{ color: `${previewTheme.palette.secondary}99`, fontSize: subtitleFontSize ?? 14 }}>{displayJobTitle}</p>
                     {(editCompany ?? profile?.company) && (
                       <p className="text-xs mt-0.5" style={{ color: `${previewTheme.palette.secondary}70` }}>{editCompany ?? profile?.company}</p>
                     )}
