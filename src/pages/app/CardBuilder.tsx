@@ -783,7 +783,7 @@ export default function CardBuilder() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="lg:col-span-2 space-y-3"
+          className="lg:col-span-2 space-y-3 lg:sticky lg:top-20 lg:self-start"
         >
           {profile?.handle && (
             <div className="flex justify-end">
