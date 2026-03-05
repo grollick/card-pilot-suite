@@ -493,41 +493,58 @@ export default function CardBuilder() {
   }
 
   return (
-    <div className="space-y-6 max-w-6xl">
+    <div className="space-y-5 max-w-6xl">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Card Builder</h1>
-          <p className="text-muted-foreground text-sm mt-1">Design and publish your digital business card</p>
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+        <div className="space-y-0.5">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold tracking-tight">Card Builder</h1>
+            {/* Save status indicator */}
+            <span className={`inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full ${
+              globalSaveState === "saving"
+                ? "bg-primary/10 text-primary"
+                : globalSaveState === "saved"
+                ? "bg-emerald-500/10 text-emerald-600"
+                : globalSaveState === "error"
+                ? "bg-destructive/10 text-destructive"
+                : "bg-muted text-muted-foreground"
+            }`}>
+              {globalSaveState === "saving" && <Loader2 className="h-2.5 w-2.5 animate-spin" />}
+              {globalSaveState === "saved" && <Cloud className="h-2.5 w-2.5" />}
+              {globalSaveState === "error" && <CloudOff className="h-2.5 w-2.5" />}
+              {globalSaveState === "idle" && <Cloud className="h-2.5 w-2.5" />}
+              {globalSaveState === "saving" ? "Saving…" : globalSaveState === "saved" ? "Saved" : globalSaveState === "error" ? "Error" : "Synced"}
+            </span>
+          </div>
           {profile?.handle && (
-            <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
               <Globe className="h-3 w-3" />
               cardpilot.com/{profile.handle}
             </p>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           {/* Publish toggle */}
-          <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-1.5">
-            <span className={`text-xs font-medium ${published ? "text-emerald-600" : "text-muted-foreground"}`}>
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-2.5 py-1">
+            <span className={`text-[10px] font-semibold uppercase tracking-wider ${published ? "text-emerald-600" : "text-muted-foreground"}`}>
               {published ? "Live" : "Draft"}
             </span>
-            <Switch checked={published} onCheckedChange={handlePublishToggle} />
+            <Switch checked={published} onCheckedChange={handlePublishToggle} className="scale-90" />
           </div>
           {/* Share buttons */}
           {profile?.handle && (
-            <>
+            <div className="flex items-center gap-1 ml-1">
               <Button
-                variant="outline"
+                variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-7 w-7"
                 title="Copy card link"
                 onClick={() => {
                   navigator.clipboard.writeText(`${window.location.origin}/${profile.handle}`);
                   toast.success("Link copied!");
                 }}
               >
-                <Link2 className="h-4 w-4" />
+                <Link2 className="h-3.5 w-3.5" />
               </Button>
               <QRShareDialog
                 url={`${window.location.origin}/${profile.handle}`}
@@ -541,77 +558,20 @@ export default function CardBuilder() {
                 handle={profile.handle}
                 name={profile.name || "Card"}
               />
-            </>
+            </div>
           )}
         </div>
       </div>
-
-      {/* Global auto-save status bar */}
-      <motion.div
-        initial={{ opacity: 0, y: -4 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={`relative overflow-hidden flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
-          globalSaveState === "saving"
-            ? "border-primary/30 bg-primary/5 text-primary"
-            : globalSaveState === "saved"
-            ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-600"
-            : globalSaveState === "error"
-            ? "border-destructive/30 bg-destructive/5 text-destructive"
-            : "border-border bg-muted/50 text-muted-foreground"
-        }`}
-      >
-        {/* Animated progress bar */}
-        {globalSaveState === "saving" && (
-          <motion.div
-            className="absolute bottom-0 left-0 h-[2px] bg-primary/40"
-            initial={{ width: "0%" }}
-            animate={{ width: "90%" }}
-            transition={{ duration: 3, ease: "easeOut" }}
-          />
-        )}
-        {globalSaveState === "saved" && (
-          <motion.div
-            className="absolute bottom-0 left-0 h-[2px] bg-emerald-500/40"
-            initial={{ width: "90%" }}
-            animate={{ width: "100%", opacity: [1, 0] }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          />
-        )}
-        {globalSaveState === "saving" && (
-          <>
-            <Loader2 className="h-3 w-3 animate-spin" />
-            <span>Saving changes…</span>
-          </>
-        )}
-        {globalSaveState === "saved" && (
-          <>
-            <Cloud className="h-3 w-3" />
-            <span>All changes saved</span>
-          </>
-        )}
-        {globalSaveState === "error" && (
-          <>
-            <CloudOff className="h-3 w-3" />
-            <span>Save failed — retrying on next edit</span>
-          </>
-        )}
-        {globalSaveState === "idle" && (
-          <>
-            <Cloud className="h-3 w-3" />
-            <span>Up to date</span>
-          </>
-        )}
-      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left panel */}
         <motion.div
           initial={{ opacity: 0, x: -12 }}
           animate={{ opacity: 1, x: 0 }}
-          className="lg:col-span-1 space-y-4"
+          className="lg:col-span-1 space-y-3"
         >
-          {/* Name & Title */}
-          <div className="rounded-xl border border-border bg-card p-5 space-y-3">
+          {/* Identity */}
+          <div className="rounded-xl border border-border bg-card p-4 space-y-3">
             <div className="flex items-center gap-2">
               <Pencil className="h-4 w-4 text-primary" />
               <h2 className="font-semibold">Identity</h2>
@@ -706,7 +666,7 @@ export default function CardBuilder() {
           </div>
 
           {/* Photo & Backdrop */}
-          <div className="rounded-xl border border-border bg-card p-5">
+          <div className="rounded-xl border border-border bg-card p-4">
             <CardPhotoTools
               avatarUrl={avatarUrl}
               coverUrl={coverUrl}
@@ -768,15 +728,15 @@ export default function CardBuilder() {
           </div>
 
           {/* Theme */}
-          <div className="rounded-xl border border-border bg-card p-5">
+          <div className="rounded-xl border border-border bg-card p-4">
             <Button variant="outline" className="w-full" onClick={() => setThemeEditorOpen(true)}>
               <Palette className="h-4 w-4 mr-2" />
               Customize Theme
             </Button>
           </div>
 
-          {/* Sections */}
-          <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+          {/* Sections & Controls */}
+          <div className="rounded-xl border border-border bg-card p-4 space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Paintbrush className="h-4 w-4 text-primary" />
@@ -818,13 +778,12 @@ export default function CardBuilder() {
               )}
             </div>
 
-            {/* CTA Buttons */}
-            <div className="pt-3 border-t border-border/50 space-y-3">
+            {/* CTA & Social toggles */}
+            <div className="pt-2 border-t border-border/50 space-y-2">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <MousePointerClick className="h-4 w-4 text-primary" />
-                  <h2 className="font-semibold text-sm">CTA Buttons</h2>
-                </div>
+                <span className="text-xs font-medium flex items-center gap-1.5">
+                  <MousePointerClick className="h-3.5 w-3.5 text-primary" /> CTA Buttons
+                </span>
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] text-muted-foreground">Icons only</span>
                   <Switch
@@ -840,13 +799,10 @@ export default function CardBuilder() {
               <CtaEditor ctas={ctaConfig} onChange={handleCtaConfigChange} />
             </div>
 
-            {/* Social Links Display */}
-            <div className="pt-3 border-t border-border/50 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Globe className="h-4 w-4 text-primary" />
-                  <h2 className="font-semibold text-sm">Social Links</h2>
-                </div>
+              <div className="flex items-center justify-between mt-3">
+                <span className="text-xs font-medium flex items-center gap-1.5">
+                  <Globe className="h-3.5 w-3.5 text-primary" /> Social Links
+                </span>
                 <div className="flex items-center gap-1.5">
                   <span className="text-[10px] text-muted-foreground">Icons only</span>
                   <Switch
@@ -859,9 +815,6 @@ export default function CardBuilder() {
                   />
                 </div>
               </div>
-              <p className="text-xs text-muted-foreground">
-                {socialIconsOnly ? "Showing icon circles only" : "Showing icons with platform labels"}
-              </p>
             </div>
           </div>
         </motion.div>
