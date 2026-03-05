@@ -9,6 +9,8 @@ interface CardHeaderProps {
   uppercaseName?: boolean;
   nameLetterSpacing?: number;
   nameFontWeight?: number;
+  firstNameFontWeight?: number | null;
+  nameItalic?: boolean;
   profession?: string;
   company?: string;
   avatarUrl?: string | null;
@@ -31,13 +33,20 @@ interface CardHeaderProps {
   logoOpacity?: number;
 }
 
-function renderName(name: string, bold?: boolean, uppercase?: boolean) {
+function renderName(name: string, bold?: boolean, uppercase?: boolean, firstNameWeight?: number | null) {
   const display = uppercase ? name.toUpperCase() : name;
-  if (!bold || !display) return display;
+  if (!display) return display;
   const parts = display.trim().split(/\s+/);
-  if (parts.length <= 1) return display;
+  if (parts.length <= 1) {
+    if (firstNameWeight != null) return <span style={{ fontWeight: firstNameWeight }}>{display}</span>;
+    if (bold) return <span style={{ fontWeight: 800 }}>{display}</span>;
+    return display;
+  }
   const last = parts.pop()!;
-  return <>{parts.join(" ")} <span style={{ fontWeight: 800 }}>{last}</span></>;
+  const firstName = parts.join(" ");
+  const firstStyle: React.CSSProperties | undefined = firstNameWeight != null ? { fontWeight: firstNameWeight } : undefined;
+  const lastStyle: React.CSSProperties | undefined = bold ? { fontWeight: 800 } : undefined;
+  return <>{firstStyle ? <span style={firstStyle}>{firstName}</span> : firstName} {lastStyle ? <span style={lastStyle}>{last}</span> : last}</>;
 }
 
 /**
@@ -45,7 +54,7 @@ function renderName(name: string, bold?: boolean, uppercase?: boolean) {
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100 }: CardHeaderProps) {
+export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100 }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -67,6 +76,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     margin: 0,
     lineHeight: 1.2,
     letterSpacing: nameLetterSpacing ? `${nameLetterSpacing}px` : undefined,
+    fontStyle: nameItalic ? "italic" : undefined,
   };
 
   const subtitleStyle: React.CSSProperties = {
@@ -274,7 +284,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
           {parallaxCover(160, true)}
           <div style={{ padding: "0 24px", marginTop: -40, display: "flex", flexDirection: "column", position: "relative", zIndex: 2 }}>
             {avatarEl}
-            <h1 style={{ ...titleStyle, fontSize: 24, marginTop: 12 }}>{renderName(name, boldLastName, uppercaseName)}</h1>
+            <h1 style={{ ...titleStyle, fontSize: 24, marginTop: 12 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
             {profession && <p style={subtitleStyle}>{profession}</p>}
             {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
           </div>
@@ -292,7 +302,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
           }}>
             {avatarEl}
             <div>
-              <h1 style={{ ...titleStyle, fontSize: 22 }}>{renderName(name, boldLastName, uppercaseName)}</h1>
+              <h1 style={{ ...titleStyle, fontSize: 22 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
               {profession && <p style={subtitleStyle}>{profession}</p>}
               {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
             </div>
@@ -319,7 +329,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
                 },
               })}
             </div>
-            <h1 style={{ ...titleStyle, fontSize: 28 }}>{renderName(name, boldLastName, uppercaseName)}</h1>
+            <h1 style={{ ...titleStyle, fontSize: 28 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
             {profession && <p style={{ ...subtitleStyle, fontSize: 16 }}>{profession}</p>}
             {company && <p style={{ ...subtitleStyle, fontSize: 14, opacity: 0.7 }}>{company}</p>}
           </div>
@@ -340,7 +350,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
               {avatarEl}
             </div>
-            <h1 style={{ ...titleStyle, fontSize: 22 }}>{renderName(name, boldLastName, uppercaseName)}</h1>
+            <h1 style={{ ...titleStyle, fontSize: 22 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
             {profession && <p style={subtitleStyle}>{profession}</p>}
             {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
           </div>

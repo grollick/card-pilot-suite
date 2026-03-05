@@ -32,6 +32,8 @@ interface Props {
   uppercaseName?: boolean;
   nameLetterSpacing?: number;
   nameFontWeight?: number;
+  firstNameFontWeight?: number | null;
+  nameItalic?: boolean;
   onAvatarChange: (url: string) => void;
   setEditingSection: (id: string | null) => void;
 }
@@ -103,7 +105,7 @@ export default function CardBuilderPreview({
   coverUrl, coverOffsetY, avatarUrl, avatarBgColor, avatarRotation,
   logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity,
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
-  boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, onAvatarChange, setEditingSection,
+  boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, onAvatarChange, setEditingSection,
 }: Props) {
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -228,14 +230,22 @@ export default function CardBuilderPreview({
                       }}
                     />
 
-                    <h3 className="text-lg" style={{ color: previewTheme.palette.secondary, fontFamily: `'${previewTheme.fonts.primary}', sans-serif`, fontWeight: nameFontWeight ?? 700, ...(uppercaseName ? { textTransform: 'uppercase' as const } : {}), ...(nameLetterSpacing ? { letterSpacing: `${nameLetterSpacing}px` } : {}) }}>
-                      {boldLastName ? (() => {
+                    <h3 className="text-lg" style={{ color: previewTheme.palette.secondary, fontFamily: `'${previewTheme.fonts.primary}', sans-serif`, fontWeight: nameFontWeight ?? 700, fontStyle: nameItalic ? "italic" : undefined, ...(uppercaseName ? { textTransform: 'uppercase' as const } : {}), ...(nameLetterSpacing ? { letterSpacing: `${nameLetterSpacing}px` } : {}) }}>
+                      {(() => {
                         const full = (editName ?? profile?.name) || "Your Name";
-                        const parts = full.trim().split(/\s+/);
-                        if (parts.length <= 1) return full;
+                        const display = uppercaseName ? full.toUpperCase() : full;
+                        const parts = display.trim().split(/\s+/);
+                        if (parts.length <= 1) {
+                          if (firstNameFontWeight != null) return <span style={{ fontWeight: firstNameFontWeight }}>{display}</span>;
+                          if (boldLastName) return <span style={{ fontWeight: 800 }}>{display}</span>;
+                          return display;
+                        }
                         const last = parts.pop()!;
-                        return <>{parts.join(" ")} <span style={{ fontWeight: 800 }}>{last}</span></>;
-                      })() : (editName ?? profile?.name) || "Your Name"}
+                        const firstName = parts.join(" ");
+                        const firstStyle = firstNameFontWeight != null ? { fontWeight: firstNameFontWeight } : undefined;
+                        const lastStyle = boldLastName ? { fontWeight: 800 } : undefined;
+                        return <>{firstStyle ? <span style={firstStyle}>{firstName}</span> : firstName} {lastStyle ? <span style={lastStyle}>{last}</span> : last}</>;
+                      })()}
                     </h3>
                     <p className="text-sm" style={{ color: `${previewTheme.palette.secondary}99` }}>{displayJobTitle}</p>
                     {(editCompany ?? profile?.company) && (
