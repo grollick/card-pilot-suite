@@ -60,6 +60,7 @@ export function useCardBuilderState() {
   const [nameFontWeight, setNameFontWeight] = useState(700);
   const [firstNameFontWeight, setFirstNameFontWeight] = useState<number | null>(null);
   const [nameItalic, setNameItalic] = useState(false);
+  const [nameFontSize, setNameFontSize] = useState<number | null>(null);
   const identitySaveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const [identitySaveState, setIdentitySaveState] = useState<Record<string, "saving" | "saved" | null>>({});
   const [globalSaveState, setGlobalSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -97,6 +98,7 @@ export function useCardBuilderState() {
       if (typeof t?.name_font_weight === "number") setNameFontWeight(t.name_font_weight);
       if (typeof t?.first_name_font_weight === "number") setFirstNameFontWeight(t.first_name_font_weight);
       if (typeof t?.name_italic === "boolean") setNameItalic(t.name_italic);
+      if (typeof t?.name_font_size === "number") setNameFontSize(t.name_font_size);
       if (typeof t?.section_icons === "boolean") setShowSectionIcons(t.section_icons);
       if (typeof t?.cta_icons_only === "boolean") setCtaIconsOnly(t.cta_icons_only);
       if (typeof t?.social_icons_only === "boolean") setSocialIconsOnly(t.social_icons_only);
@@ -358,6 +360,7 @@ export function useCardBuilderState() {
     nameFontWeight, setNameFontWeight,
     firstNameFontWeight, setFirstNameFontWeight,
     nameItalic, setNameItalic,
+    nameFontSize, setNameFontSize,
     identitySaveTimers, identitySaveState, setIdentitySaveState,
     // Photos / Logo
     avatarUrl, coverUrl, avatarBgColor, avatarRotation, coverOffsetY,
