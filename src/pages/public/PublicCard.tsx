@@ -476,6 +476,7 @@ export default function PublicCard() {
             coverUrl={coverUrl}
             avatarBgColor={themeJson.avatar_bg_color as string | undefined}
             avatarRotation={themeJson.avatar_rotation as number | undefined}
+            avatarBorderWidth={(themeJson.tokens as any)?.header?.avatarBorderWidth ?? 3}
             coverOffsetY={themeJson.cover_offset_y as number | undefined}
             logoUrl={themeJson.logo_url as string | undefined}
             logoFrostedBg={themeJson.logo_frosted_bg !== false}

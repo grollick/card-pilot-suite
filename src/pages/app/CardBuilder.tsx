@@ -618,6 +618,11 @@ export default function CardBuilder() {
                 const existing = (card?.theme_json as any)?.tokens ?? {};
                 saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarShape: shape } } });
               }}
+              avatarBorderWidth={((card?.theme_json as any)?.tokens?.header?.avatarBorderWidth) ?? 3}
+              onAvatarBorderWidthChange={(val) => {
+                const existing = (card?.theme_json as any)?.tokens ?? {};
+                saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarBorderWidth: val } } });
+              }}
             />
           </div>
 

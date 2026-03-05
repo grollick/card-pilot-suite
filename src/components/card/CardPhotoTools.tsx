@@ -42,6 +42,8 @@ interface CardPhotoToolsProps {
   onLogoGlowChange?: (val: boolean) => void;
   avatarShape?: "circle" | "rounded" | "square";
   onAvatarShapeChange?: (shape: "circle" | "rounded" | "square") => void;
+  avatarBorderWidth?: number;
+  onAvatarBorderWidthChange?: (val: number) => void;
 }
 
 export default function CardPhotoTools({
@@ -64,6 +66,8 @@ export default function CardPhotoTools({
   onLogoGlowChange,
   avatarShape = "circle",
   onAvatarShapeChange,
+  avatarBorderWidth = 3,
+  onAvatarBorderWidthChange,
 }: CardPhotoToolsProps) {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
@@ -259,6 +263,21 @@ export default function CardPhotoTools({
               className="w-full"
             />
           </div>
+
+          {/* Avatar Border Width */}
+          {onAvatarBorderWidthChange && (
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Border Thickness — {avatarBorderWidth}px</Label>
+              <Slider
+                min={0}
+                max={8}
+                step={1}
+                value={[avatarBorderWidth]}
+                onValueChange={([v]) => onAvatarBorderWidthChange(v)}
+                className="w-full"
+              />
+            </div>
+          )}
 
           {/* Avatar Shape */}
           {onAvatarShapeChange && (
