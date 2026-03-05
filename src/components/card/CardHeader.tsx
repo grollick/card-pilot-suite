@@ -57,9 +57,10 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     width: 80,
     height: 80,
     borderRadius: avatarBorderRadius,
-    border: `3px solid ${palette.background}`,
+    border: `3px solid #FFFFFF`,
     overflow: "hidden",
     backgroundColor: avatarBgColor === "transparent" ? undefined : avatarBgColor,
+    boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
   };
 
   const floatAnimation = {
@@ -182,9 +183,12 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     // ─── Split: avatar left, text right ───────────────────────
     case "split":
       return (
-        <div>
+        <div style={{ position: "relative" }}>
           {coverBanner}
-          <div style={{ display: "flex", gap: 20, alignItems: "center", padding: 24 }}>
+          <div style={{
+            display: "flex", gap: 20, alignItems: "center", padding: 24,
+            ...(coverBanner ? { marginTop: -40, position: "relative", zIndex: 2 } : {}),
+          }}>
             {avatarEl}
             <div>
               <h1 style={{ ...titleStyle, fontSize: 22 }}>{name}</h1>
@@ -198,9 +202,13 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     // ─── Hero: large centered, big title ──────────────────────
     case "hero":
       return (
-        <div>
+        <div style={{ position: "relative" }}>
           {coverBanner}
-          <div style={{ textAlign: "center", padding: "40px 24px 24px" }}>
+          <div style={{
+            textAlign: "center",
+            padding: "40px 24px 24px",
+            ...(coverBanner ? { marginTop: -50, position: "relative", zIndex: 2 } : {}),
+          }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
               {React.cloneElement(avatarEl as React.ReactElement, {
                 style: {
@@ -221,9 +229,13 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     case "classic":
     default:
       return (
-        <div>
+        <div style={{ position: "relative" }}>
           {coverBanner}
-          <div style={{ textAlign: "center", padding: "24px 24px 16px" }}>
+          <div style={{
+            textAlign: "center",
+            padding: "24px 24px 16px",
+            ...(coverBanner ? { marginTop: -40, position: "relative", zIndex: 2 } : {}),
+          }}>
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
               {avatarEl}
             </div>
