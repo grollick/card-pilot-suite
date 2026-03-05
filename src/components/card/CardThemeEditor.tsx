@@ -54,11 +54,19 @@ export interface CardGradientBg {
   direction: "to bottom" | "to right" | "to bottom right" | "to top right";
 }
 
+export type BgPatternType = "none" | "dots" | "lines" | "grid" | "noise";
+
+export interface CardBgPattern {
+  type: BgPatternType;
+  opacity: number;
+}
+
 export interface CardThemeOverrides {
   palette?: CardPalette;
   fonts?: CardFonts;
   tokens?: CardStyleTokens;
   gradientBg?: CardGradientBg;
+  bgPattern?: CardBgPattern;
 }
 
 const FONT_OPTIONS = [
@@ -66,6 +74,26 @@ const FONT_OPTIONS = [
   "Montserrat", "Lora", "Space Grotesk", "Sora", "Outfit", "Raleway",
   "Crimson Pro", "Libre Baskerville", "Josefin Sans", "Bebas Neue",
 ];
+
+/** Returns an inline SVG data URL for a given pattern type */
+function getPatternSvg(type: BgPatternType, color: string): string {
+  const hex = encodeURIComponent(color);
+  switch (type) {
+    case "dots":
+      return `url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='10' cy='10' r='1.5' fill='${hex}'/%3E%3C/svg%3E")`;
+    case "lines":
+      return `url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cline x1='0' y1='20' x2='20' y2='0' stroke='${hex}' stroke-width='0.5'/%3E%3C/svg%3E")`;
+    case "grid":
+      return `url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 20 0 L 0 0 0 20' fill='none' stroke='${hex}' stroke-width='0.5'/%3E%3C/svg%3E")`;
+    case "noise":
+      return `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`;
+    default:
+      return "";
+  }
+}
+
+/** Exported for use in PublicCard / CardBuilder */
+export { getPatternSvg };
 
 interface PaletteCategory {
   label: string;
@@ -148,12 +176,14 @@ export default function CardThemeEditor({
   const [fonts, setFonts] = useState<CardFonts>(currentOverrides.fonts ?? defaultFonts);
   const [tokens, setTokens] = useState<CardStyleTokens>(currentOverrides.tokens ?? {});
   const [gradientBg, setGradientBg] = useState<CardGradientBg>(currentOverrides.gradientBg ?? { enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
+  const [bgPattern, setBgPattern] = useState<CardBgPattern>(currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 });
 
   useEffect(() => {
     setPalette(currentOverrides.palette ?? defaultPalette);
     setFonts(currentOverrides.fonts ?? defaultFonts);
     setTokens(currentOverrides.tokens ?? {});
     setGradientBg(currentOverrides.gradientBg ?? { enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
+    setBgPattern(currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 });
   }, [open]);
 
   const handleColorChange = useCallback((key: keyof CardPalette, value: string) => {
@@ -169,12 +199,17 @@ export default function CardThemeEditor({
     setFonts(defaultFonts);
     setTokens({});
     setGradientBg({ enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
+    setBgPattern({ type: "none", opacity: 0.08 });
   }, [defaultPalette, defaultFonts]);
 
   const handleSave = useCallback(() => {
-    onSave({ palette, fonts, tokens, gradientBg: gradientBg.enabled ? gradientBg : undefined });
+    onSave({
+      palette, fonts, tokens,
+      gradientBg: gradientBg.enabled ? gradientBg : undefined,
+      bgPattern: bgPattern.type !== "none" ? bgPattern : undefined,
+    });
     onOpenChange(false);
-  }, [palette, fonts, tokens, gradientBg, onSave, onOpenChange]);
+  }, [palette, fonts, tokens, gradientBg, bgPattern, onSave, onOpenChange]);
 
   const updateToken = useCallback(<K extends keyof CardStyleTokens>(key: K, value: CardStyleTokens[K]) => {
     setTokens((prev) => ({ ...prev, [key]: value }));
@@ -394,22 +429,74 @@ export default function CardThemeEditor({
                 )}
               </div>
 
+              {/* Background Pattern */}
+              <div className="space-y-2">
+                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Pattern Overlay</Label>
+                <div className="grid grid-cols-5 gap-1.5">
+                  {([
+                    { value: "none", label: "None" },
+                    { value: "dots", label: "Dots" },
+                    { value: "lines", label: "Lines" },
+                    { value: "grid", label: "Grid" },
+                    { value: "noise", label: "Noise" },
+                  ] as const).map((p) => (
+                    <button
+                      key={p.value}
+                      onClick={() => setBgPattern(prev => ({ ...prev, type: p.value }))}
+                      className={`px-1.5 py-1.5 rounded-md text-[10px] font-medium border transition-all ${
+                        bgPattern.type === p.value
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border/50 text-muted-foreground hover:border-border hover:bg-muted/30"
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+                {bgPattern.type !== "none" && (
+                  <div className="space-y-1">
+                    <Label className="text-xs text-muted-foreground">Opacity</Label>
+                    <Slider
+                      value={[bgPattern.opacity * 100]}
+                      onValueChange={([v]) => setBgPattern(prev => ({ ...prev, opacity: v / 100 }))}
+                      min={2}
+                      max={25}
+                      step={1}
+                      className="w-full"
+                    />
+                    <span className="text-[10px] text-muted-foreground">{Math.round(bgPattern.opacity * 100)}%</span>
+                  </div>
+                )}
+              </div>
+
               {/* Preview */}
               <div className="space-y-2">
                 <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Preview</Label>
                 <div
-                  className="rounded-xl p-4 border border-border/50"
+                  className="rounded-xl p-4 border border-border/50 relative overflow-hidden"
                   style={{
                     background: gradientBg.enabled
                       ? `linear-gradient(${gradientBg.direction}, ${palette.background}, ${gradientBg.color2})`
                       : palette.background,
                   }}
                 >
-                  <div className="h-3 w-20 rounded-full mb-2" style={{ background: palette.primary }} />
-                  <div className="h-2 w-32 rounded-full mb-3" style={{ background: palette.secondary, opacity: 0.5 }} />
-                  <div className="flex gap-2 mt-3">
-                    <div className="h-8 flex-1 rounded-lg flex items-center justify-center text-xs font-semibold" style={{ background: palette.primary, color: palette.background }}>Button</div>
-                    <div className="h-8 flex-1 rounded-lg flex items-center justify-center text-xs font-semibold" style={{ background: `linear-gradient(135deg, ${palette.primary}, ${palette.accent})`, color: "#fff" }}>Accent</div>
+                  {bgPattern.type !== "none" && (
+                    <div
+                      className="absolute inset-0 pointer-events-none"
+                      style={{
+                        opacity: bgPattern.opacity,
+                        backgroundImage: getPatternSvg(bgPattern.type, palette.secondary),
+                        backgroundSize: bgPattern.type === "noise" ? "200px 200px" : "20px 20px",
+                      }}
+                    />
+                  )}
+                  <div className="relative z-[1]">
+                    <div className="h-3 w-20 rounded-full mb-2" style={{ background: palette.primary }} />
+                    <div className="h-2 w-32 rounded-full mb-3" style={{ background: palette.secondary, opacity: 0.5 }} />
+                    <div className="flex gap-2 mt-3">
+                      <div className="h-8 flex-1 rounded-lg flex items-center justify-center text-xs font-semibold" style={{ background: palette.primary, color: palette.background }}>Button</div>
+                      <div className="h-8 flex-1 rounded-lg flex items-center justify-center text-xs font-semibold" style={{ background: `linear-gradient(135deg, ${palette.primary}, ${palette.accent})`, color: "#fff" }}>Accent</div>
+                    </div>
                   </div>
                 </div>
               </div>

@@ -38,6 +38,7 @@ import {
   type ResolvedCardTheme,
 } from "@/lib/cardTokens";
 import CardHeader from "@/components/card/CardHeader";
+import { getPatternSvg } from "@/components/card/CardThemeEditor";
 import CardButton from "@/components/card/CardButton";
 import CardSectionWrapper from "@/components/card/CardSectionWrapper";
 import QRShareDialog from "@/components/card/QRShareDialog";
@@ -397,6 +398,7 @@ export default function PublicCard() {
   // Card theme-aware inline styles
   const { palette, fonts, radii, spacing, shadows } = theme;
   const gradientBg = (themeJson as any)?.gradientBg as { enabled: boolean; color2: string; direction: string } | undefined;
+  const bgPattern = (themeJson as any)?.bgPattern as { type: string; opacity: number } | undefined;
 
   const cardBackground = gradientBg?.enabled
     ? `linear-gradient(${gradientBg.direction}, ${palette.background}, ${gradientBg.color2})`
@@ -410,6 +412,7 @@ export default function PublicCard() {
     overflow: "hidden",
     maxWidth: 440,
     width: "100%",
+    position: "relative",
   };
 
   const SECTION_ICONS: Record<string, LucideIcon> = {
@@ -453,6 +456,19 @@ export default function PublicCard() {
         transition={{ duration: 0.4 }}
         style={cardContainerStyle}
       >
+        {bgPattern?.type && bgPattern.type !== "none" && (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              pointerEvents: "none",
+              zIndex: 1,
+              opacity: bgPattern.opacity,
+              backgroundImage: getPatternSvg(bgPattern.type as any, palette.secondary),
+              backgroundSize: bgPattern.type === "noise" ? "200px 200px" : "20px 20px",
+            }}
+          />
+        )}
         {/* Draft preview banner */}
         {isOwner && isUnpublished && (
           <div
