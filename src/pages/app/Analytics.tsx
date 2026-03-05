@@ -63,6 +63,7 @@ export default function Analytics() {
           <KPICard icon={Users} title="Leads Captured" value={stats?.contacts ?? 0}
             change={fmtChange(stats?.contactsChange).text} changeType={fmtChange(stats?.contactsChange).type} />
           <KPICard icon={Download} title="Contact Saves" value={stats?.contactSaves ?? 0}
+            sparklineData={stats?.dailyData?.map(d => d.contactSaves)}
             change={fmtChange(stats?.contactSavesChange).text} changeType={fmtChange(stats?.contactSavesChange).type} />
           <KPICard icon={Calendar} title="Bookings" value={stats?.bookings ?? 0}
             change={fmtChange(stats?.bookingsChange).text} changeType={fmtChange(stats?.bookingsChange).type} />
