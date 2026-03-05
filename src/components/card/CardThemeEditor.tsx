@@ -60,14 +60,25 @@ const FONT_OPTIONS = [
 ];
 
 const PRESET_PALETTES: { name: string; palette: CardPalette }[] = [
+  // ── Light Modern ──
   { name: "Ocean", palette: { primary: "#4361ee", secondary: "#6b7280", accent: "#7c3aed", background: "#ffffff" } },
-  { name: "Forest", palette: { primary: "#059669", secondary: "#6b7280", accent: "#0d9488", background: "#ffffff" } },
-  { name: "Sunset", palette: { primary: "#ea580c", secondary: "#78716c", accent: "#dc2626", background: "#fffbeb" } },
+  { name: "Sage", palette: { primary: "#4a7c6f", secondary: "#64748b", accent: "#2dd4bf", background: "#f8faf9" } },
+  { name: "Clay", palette: { primary: "#c2775e", secondary: "#78716c", accent: "#e07a5f", background: "#fdf6f0" } },
+  { name: "Lavender", palette: { primary: "#7c5cbf", secondary: "#6b7280", accent: "#a78bfa", background: "#faf8ff" } },
+  { name: "Cobalt", palette: { primary: "#2563eb", secondary: "#64748b", accent: "#0ea5e9", background: "#f8fafc" } },
+  { name: "Rose", palette: { primary: "#e11d48", secondary: "#71717a", accent: "#f43f5e", background: "#fff1f2" } },
+  { name: "Olive", palette: { primary: "#65803c", secondary: "#6b7280", accent: "#84cc16", background: "#fafdf2" } },
+  { name: "Copper", palette: { primary: "#b45309", secondary: "#78716c", accent: "#d97706", background: "#fffbeb" } },
+  // ── Dark Modern ──
   { name: "Midnight", palette: { primary: "#818cf8", secondary: "#94a3b8", accent: "#c084fc", background: "#0f172a" } },
-  { name: "Rose", palette: { primary: "#e11d48", secondary: "#71717a", accent: "#db2777", background: "#fff1f2" } },
-  { name: "Slate", palette: { primary: "#475569", secondary: "#94a3b8", accent: "#334155", background: "#f8fafc" } },
-  { name: "Gold", palette: { primary: "#b45309", secondary: "#78716c", accent: "#a16207", background: "#fffbeb" } },
+  { name: "Carbon", palette: { primary: "#f0f0f0", secondary: "#a1a1aa", accent: "#e4e4e7", background: "#18181b" } },
   { name: "Neon", palette: { primary: "#06b6d4", secondary: "#94a3b8", accent: "#8b5cf6", background: "#020617" } },
+  { name: "Aurora", palette: { primary: "#34d399", secondary: "#94a3b8", accent: "#22d3ee", background: "#0c1222" } },
+  // ── Neutral & Minimal ──
+  { name: "Slate", palette: { primary: "#475569", secondary: "#94a3b8", accent: "#334155", background: "#f8fafc" } },
+  { name: "Warm Gray", palette: { primary: "#57534e", secondary: "#a8a29e", accent: "#78716c", background: "#fafaf9" } },
+  { name: "Ink", palette: { primary: "#1e293b", secondary: "#64748b", accent: "#475569", background: "#ffffff" } },
+  { name: "Sand", palette: { primary: "#92702c", secondary: "#8b8680", accent: "#b8972e", background: "#faf7f2" } },
 ];
 
 interface Props {
