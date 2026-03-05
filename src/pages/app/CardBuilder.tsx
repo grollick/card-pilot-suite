@@ -474,7 +474,7 @@ export default function CardBuilder() {
   return (
     <div className="space-y-6 max-w-6xl">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Card Builder</h1>
           <p className="text-muted-foreground text-sm mt-1">Design and publish your digital business card</p>
@@ -485,11 +485,15 @@ export default function CardBuilder() {
             </p>
           )}
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">{published ? "Published" : "Unpublished"}</span>
+        <div className="flex items-center gap-2">
+          {/* Publish toggle */}
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-1.5">
+            <span className={`text-xs font-medium ${published ? "text-emerald-600" : "text-muted-foreground"}`}>
+              {published ? "Live" : "Draft"}
+            </span>
             <Switch checked={published} onCheckedChange={handlePublishToggle} />
           </div>
+          {/* QR share */}
           {profile?.handle && (
             <QRShareDialog
               url={`${window.location.origin}/${profile.handle}`}
