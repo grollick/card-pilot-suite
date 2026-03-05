@@ -51,6 +51,8 @@ export default function CardBuilder() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarBgColor, setAvatarBgColor] = useState("transparent");
   const [avatarRotation, setAvatarRotation] = useState(0);
+  const [coverOffsetY, setCoverOffsetY] = useState(0);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
   const hydrated = useRef(false);
@@ -93,6 +95,8 @@ export default function CardBuilder() {
       }
       if (themeJson?.avatar_bg_color) setAvatarBgColor(themeJson.avatar_bg_color);
       if (typeof themeJson?.avatar_rotation === "number") setAvatarRotation(themeJson.avatar_rotation);
+      if (typeof themeJson?.cover_offset_y === "number") setCoverOffsetY(themeJson.cover_offset_y);
+      if (themeJson?.logo_url) setLogoUrl(themeJson.logo_url);
     }
   }, [card]);
 
@@ -248,6 +252,16 @@ export default function CardBuilder() {
   const handleAvatarRotationChange = (deg: number) => {
     setAvatarRotation(deg);
     saveThemeField({ avatar_rotation: deg });
+  };
+
+  const handleCoverOffsetYChange = (y: number) => {
+    setCoverOffsetY(y);
+    saveThemeField({ cover_offset_y: y });
+  };
+
+  const handleLogoChange = (url: string | null) => {
+    setLogoUrl(url);
+    saveThemeField({ logo_url: url });
   };
 
   const handleCoverChange = async (url: string) => {
@@ -432,6 +446,10 @@ export default function CardBuilder() {
               avatarRotation={avatarRotation}
               onAvatarBgColorChange={handleAvatarBgColorChange}
               onAvatarRotationChange={handleAvatarRotationChange}
+              coverOffsetY={coverOffsetY}
+              onCoverOffsetYChange={handleCoverOffsetYChange}
+              logoUrl={logoUrl}
+              onLogoChange={handleLogoChange}
             />
           </div>
 
@@ -502,13 +520,27 @@ export default function CardBuilder() {
             <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-card">
               {/* Cover */}
               <div
-                className="h-28 relative"
+                className="h-28 relative overflow-hidden"
                 style={{
                   background: coverUrl
-                    ? `url(${coverUrl}) center/cover`
+                    ? undefined
                     : "linear-gradient(135deg, hsl(var(--primary) / 0.2), hsl(var(--primary) / 0.05))",
                 }}
-              />
+              >
+                {coverUrl && (
+                  <img
+                    src={coverUrl}
+                    alt="cover"
+                    className="absolute inset-0 w-full h-full object-cover"
+                    style={{ objectPosition: `center ${coverOffsetY}%` }}
+                  />
+                )}
+                {logoUrl && (
+                  <div className="absolute top-2 right-2 h-8 w-8 rounded bg-white/80 backdrop-blur-sm flex items-center justify-center p-1 shadow-sm">
+                    <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
+                  </div>
+                )}
+              </div>
 
               <div className="px-5 pb-5 -mt-10">
                 {/* Avatar */}
