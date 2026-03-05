@@ -40,12 +40,14 @@ interface CardPhotoToolsProps {
   onLogoFrostedBgChange?: (val: boolean) => void;
   logoGlow?: boolean;
   onLogoGlowChange?: (val: boolean) => void;
-  logoPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
-  onLogoPositionChange?: (pos: "top-left" | "top-right" | "bottom-left" | "bottom-right") => void;
+  logoPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name";
+  onLogoPositionChange?: (pos: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name") => void;
   logoSize?: "small" | "medium" | "large";
   onLogoSizeChange?: (size: "small" | "medium" | "large") => void;
   logoOpacity?: number;
   onLogoOpacityChange?: (val: number) => void;
+  logoPadding?: number;
+  onLogoPaddingChange?: (val: number) => void;
   avatarShape?: "circle" | "rounded" | "square";
   onAvatarShapeChange?: (shape: "circle" | "rounded" | "square") => void;
   avatarBorderWidth?: number;
@@ -86,6 +88,8 @@ export default function CardPhotoTools({
   onLogoSizeChange,
   logoOpacity = 100,
   onLogoOpacityChange,
+  logoPadding = 4,
+  onLogoPaddingChange,
   avatarShape = "circle",
   onAvatarShapeChange,
   avatarBorderWidth = 3,
@@ -519,7 +523,7 @@ export default function CardPhotoTools({
 
       {/* Logo Upload */}
       {onLogoChange && (
-        <LogoUploader logoUrl={logoUrl} onLogoChange={onLogoChange} logoFrostedBg={logoFrostedBg} onLogoFrostedBgChange={onLogoFrostedBgChange} logoGlow={logoGlow} onLogoGlowChange={onLogoGlowChange} logoPosition={logoPosition} onLogoPositionChange={onLogoPositionChange} logoSize={logoSize} onLogoSizeChange={onLogoSizeChange} logoOpacity={logoOpacity} onLogoOpacityChange={onLogoOpacityChange} />
+        <LogoUploader logoUrl={logoUrl} onLogoChange={onLogoChange} logoFrostedBg={logoFrostedBg} onLogoFrostedBgChange={onLogoFrostedBgChange} logoGlow={logoGlow} onLogoGlowChange={onLogoGlowChange} logoPosition={logoPosition} onLogoPositionChange={onLogoPositionChange} logoSize={logoSize} onLogoSizeChange={onLogoSizeChange} logoOpacity={logoOpacity} onLogoOpacityChange={onLogoOpacityChange} logoPadding={logoPadding} onLogoPaddingChange={onLogoPaddingChange} />
       )}
 
       {/* Profile Photo Crop Dialog */}

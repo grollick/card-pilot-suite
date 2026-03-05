@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
-export type LogoPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right";
+export type LogoPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name";
 export type LogoSize = "small" | "medium" | "large";
 
 interface LogoUploaderProps {
@@ -24,6 +24,8 @@ interface LogoUploaderProps {
   onLogoSizeChange?: (size: LogoSize) => void;
   logoOpacity?: number;
   onLogoOpacityChange?: (val: number) => void;
+  logoPadding?: number;
+  onLogoPaddingChange?: (val: number) => void;
 }
 
 const POSITIONS: { value: LogoPosition; label: string }[] = [
@@ -31,6 +33,7 @@ const POSITIONS: { value: LogoPosition; label: string }[] = [
   { value: "top-right", label: "↗" },
   { value: "bottom-left", label: "↙" },
   { value: "bottom-right", label: "↘" },
+  { value: "beside-name", label: "≡" },
 ];
 
 const SIZES: { value: LogoSize; label: string }[] = [
@@ -52,6 +55,8 @@ export default function LogoUploader({
   onLogoSizeChange,
   logoOpacity = 100,
   onLogoOpacityChange,
+  logoPadding = 4,
+  onLogoPaddingChange,
 }: LogoUploaderProps) {
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -160,6 +165,22 @@ export default function LogoUploader({
                 min={10}
                 max={100}
                 step={5}
+              />
+            </div>
+          )}
+          {/* Padding slider */}
+          {onLogoPaddingChange && (
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Padding</span>
+                <span className="text-[10px] text-muted-foreground tabular-nums">{logoPadding}px</span>
+              </div>
+              <Slider
+                value={[logoPadding]}
+                onValueChange={([v]) => onLogoPaddingChange(v)}
+                min={0}
+                max={24}
+                step={1}
               />
             </div>
           )}
