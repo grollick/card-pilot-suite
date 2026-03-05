@@ -52,6 +52,8 @@ interface CardPhotoToolsProps {
   onAvatarBannerBgChange?: (val: string) => void;
   avatarBannerPosition?: "top" | "bottom";
   onAvatarBannerPositionChange?: (val: "top" | "bottom") => void;
+  avatarBannerAnimation?: "none" | "pulse" | "bounce" | "shimmer";
+  onAvatarBannerAnimationChange?: (val: "none" | "pulse" | "bounce" | "shimmer") => void;
 }
 
 export default function CardPhotoTools({
@@ -84,6 +86,8 @@ export default function CardPhotoTools({
   onAvatarBannerBgChange,
   avatarBannerPosition = "bottom",
   onAvatarBannerPositionChange,
+  avatarBannerAnimation = "none",
+  onAvatarBannerAnimationChange,
 }: CardPhotoToolsProps) {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
@@ -348,37 +352,56 @@ export default function CardPhotoTools({
                 maxLength={20}
               />
               {avatarBannerText && (
-                <div className="flex items-center gap-2 mt-1">
-                  {onAvatarBannerBgChange && (
-                    <>
-                      <input
-                        type="color"
-                        value={avatarBannerBg || "#4361ee"}
-                        onChange={(e) => onAvatarBannerBgChange(e.target.value)}
-                        className="h-7 w-7 rounded cursor-pointer border border-border"
-                      />
-                      <span className="text-[10px] text-muted-foreground">Color</span>
-                    </>
-                  )}
-                  {onAvatarBannerPositionChange && (
-                    <div className="flex items-center gap-1 ml-auto">
-                      <button
-                        type="button"
-                        onClick={() => onAvatarBannerPositionChange("top")}
-                        className={`text-[10px] px-2 py-0.5 rounded-l border border-border ${avatarBannerPosition === "top" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
-                      >
-                        Top
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onAvatarBannerPositionChange("bottom")}
-                        className={`text-[10px] px-2 py-0.5 rounded-r border border-l-0 border-border ${avatarBannerPosition === "bottom" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
-                      >
-                        Bottom
-                      </button>
+                <>
+                  <div className="flex items-center gap-2 mt-1">
+                    {onAvatarBannerBgChange && (
+                      <>
+                        <input
+                          type="color"
+                          value={avatarBannerBg || "#4361ee"}
+                          onChange={(e) => onAvatarBannerBgChange(e.target.value)}
+                          className="h-7 w-7 rounded cursor-pointer border border-border"
+                        />
+                        <span className="text-[10px] text-muted-foreground">Color</span>
+                      </>
+                    )}
+                    {onAvatarBannerPositionChange && (
+                      <div className="flex items-center gap-1 ml-auto">
+                        <button
+                          type="button"
+                          onClick={() => onAvatarBannerPositionChange("top")}
+                          className={`text-[10px] px-2 py-0.5 rounded-l border border-border ${avatarBannerPosition === "top" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+                        >
+                          Top
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onAvatarBannerPositionChange("bottom")}
+                          className={`text-[10px] px-2 py-0.5 rounded-r border border-l-0 border-border ${avatarBannerPosition === "bottom" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
+                        >
+                          Bottom
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  {onAvatarBannerAnimationChange && (
+                    <div className="flex items-center gap-1 mt-1.5">
+                      <span className="text-[10px] text-muted-foreground mr-1">Effect</span>
+                      {(["none", "pulse", "bounce", "shimmer"] as const).map((anim) => (
+                        <button
+                          key={anim}
+                          type="button"
+                          onClick={() => onAvatarBannerAnimationChange(anim)}
+                          className={`text-[10px] px-2 py-0.5 border border-border capitalize ${
+                            avatarBannerAnimation === anim ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                          } ${anim === "none" ? "rounded-l" : ""} ${anim === "shimmer" ? "rounded-r" : ""} ${anim !== "none" ? "border-l-0" : ""}`}
+                        >
+                          {anim === "none" ? "Off" : anim}
+                        </button>
+                      ))}
                     </div>
                   )}
-                </div>
+                </>
               )}
             </div>
           )}
