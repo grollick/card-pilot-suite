@@ -227,6 +227,9 @@ export default function CardHeader({ theme, name, boldLastName, profession, comp
         borderRadius: borderRadiusTop ? `${radii.card} ${radii.card} 0 0` : undefined,
         overflow: "hidden",
         position: "relative",
+        marginLeft: -8,
+        marginRight: -8,
+        marginTop: borderRadiusTop ? -8 : undefined,
         background: coverUrl
           ? undefined
           : `linear-gradient(135deg, ${palette.primary}30, ${palette.accent}20)`,
