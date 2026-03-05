@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { Camera, Eraser, ImagePlus, Loader2, RotateCw, Wand2, Paintbrush } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import CoverPositioner from "./CoverPositioner";
 import LogoUploader from "./LogoUploader";
+import ImageCropDialog from "./ImageCropDialog";
 
 const BG_PRESETS = [
   { label: "None", value: "transparent" },
@@ -58,6 +59,7 @@ export default function CardPhotoTools({
   const [generatingBackdrop, setGeneratingBackdrop] = useState(false);
   const [customPrompt, setCustomPrompt] = useState("");
   const [bgRemoved, setBgRemoved] = useState(false);
+  const [cropSrc, setCropSrc] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const coverFileInputRef = useRef<HTMLInputElement>(null);
@@ -78,13 +80,24 @@ export default function CardPhotoTools({
     return new File([blob], filename, { type: blob.type || "image/png" });
   };
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user) return;
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setCropSrc(reader.result as string);
+    reader.readAsDataURL(file);
+    // Reset inputs so same file can be re-selected
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (cameraInputRef.current) cameraInputRef.current.value = "";
+  };
+
+  const handleCroppedUpload = useCallback(async (blob: Blob) => {
+    setCropSrc(null);
+    if (!user) return;
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop() || "jpg";
-      const path = `${user.id}/avatar.${ext}`;
+      const file = new File([blob], "avatar.png", { type: "image/png" });
+      const path = `${user.id}/avatar.png`;
       const url = await uploadFile(file, path);
       await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
       onAvatarChange(url);
@@ -95,10 +108,8 @@ export default function CardPhotoTools({
       toast.error(err.message || "Failed to upload photo");
     } finally {
       setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
-      if (cameraInputRef.current) cameraInputRef.current.value = "";
     }
-  };
+  }, [user, onAvatarChange, onAvatarRotationChange]);
 
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -186,8 +197,8 @@ export default function CardPhotoTools({
       {/* Upload / Take Profile Photo */}
       <div className="space-y-2">
         <Label className="text-xs text-muted-foreground">Profile Photo</Label>
-        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
-        <input ref={cameraInputRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handlePhotoUpload} />
+        <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handlePhotoSelected} />
+        <input ref={cameraInputRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handlePhotoSelected} />
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="flex-1" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
             {uploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <ImagePlus className="h-4 w-4 mr-2" />}
@@ -308,6 +319,16 @@ export default function CardPhotoTools({
       {onLogoChange && (
         <LogoUploader logoUrl={logoUrl} onLogoChange={onLogoChange} />
       )}
+
+      {/* Image Crop Dialog */}
+      <ImageCropDialog
+        open={!!cropSrc}
+        imageSrc={cropSrc || ""}
+        onClose={() => setCropSrc(null)}
+        onCropComplete={handleCroppedUpload}
+        aspect={1}
+        title="Crop Profile Photo"
+      />
     </div>
   );
 }
