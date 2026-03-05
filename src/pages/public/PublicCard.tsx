@@ -961,6 +961,26 @@ export default function PublicCard() {
             )}
           </div>
 
+          {/* ── Save Contact Button ── */}
+          <CardButton
+            theme={theme}
+            fullWidth
+            metallicEffect={metallicEffect}
+            onClick={() =>
+              downloadVCard({
+                name: profile.name,
+                email: profile.email,
+                phone: profile.phone,
+                company: profile.company,
+                handle: profile.handle,
+                profession: professionName,
+              })
+            }
+          >
+            <Download className="h-4 w-4" />
+            <span>Save Contact</span>
+          </CardButton>
+
           {/* ── Footer / Branding ── */}
           {showsBranding((profile as any)?.plan ?? "free") && (
             <div style={{ textAlign: "center", paddingTop: 8 }}>
