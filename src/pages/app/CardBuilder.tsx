@@ -698,6 +698,11 @@ export default function CardBuilder() {
                 const existing = (card?.theme_json as any)?.tokens ?? {};
                 saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarBannerPosition: val } } });
               }}
+              avatarBannerAnimation={((card?.theme_json as any)?.tokens?.header?.avatarBannerAnimation) ?? "none"}
+              onAvatarBannerAnimationChange={(val) => {
+                const existing = (card?.theme_json as any)?.tokens ?? {};
+                saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarBannerAnimation: val } } });
+              }}
             />
           </div>
 

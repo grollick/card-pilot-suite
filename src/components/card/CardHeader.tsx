@@ -17,6 +17,7 @@ interface CardHeaderProps {
   avatarBannerColor?: string;
   avatarBannerBg?: string;
   avatarBannerPosition?: "top" | "bottom";
+  avatarBannerAnimation?: "none" | "pulse" | "bounce" | "shimmer";
   coverOffsetY?: number;
   logoUrl?: string | null;
   logoFrostedBg?: boolean;
@@ -28,7 +29,7 @@ interface CardHeaderProps {
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false }: CardHeaderProps) {
+export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -74,31 +75,55 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     transition: { duration: 3, repeat: Infinity, ease: "easeInOut" as const },
   };
 
+  const bannerAnimationStyle: React.CSSProperties = (() => {
+    switch (avatarBannerAnimation) {
+      case "pulse":
+        return { animation: "pulse 2s cubic-bezier(0.4,0,0.6,1) infinite" };
+      case "bounce":
+        return { animation: "bounce 1.5s infinite" };
+      case "shimmer":
+        return {
+          backgroundSize: "200% 100%",
+          animation: "shimmer 2s linear infinite",
+        };
+      default:
+        return {};
+    }
+  })();
+
   const bannerEl = avatarBannerText ? (
-    <div
-      style={{
-        position: "absolute",
-        ...(avatarBannerPosition === "top"
-          ? { top: 0, transform: "translateX(-50%) translateY(-40%)" }
-          : { bottom: 0, transform: "translateX(-50%) translateY(40%)" }),
-        left: "50%",
-        background: avatarBannerBg || palette.primary,
-        color: avatarBannerColor,
-        fontSize: Math.max(9, avatarSize * 0.12),
-        fontWeight: 700,
-        fontFamily: `'${fonts.primary}', sans-serif`,
-        padding: "2px 10px",
-        borderRadius: 999,
-        whiteSpace: "nowrap",
-        lineHeight: 1.4,
-        boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
-        zIndex: 2,
-        letterSpacing: "0.02em",
-        textTransform: "uppercase" as const,
-      }}
-    >
-      {avatarBannerText}
-    </div>
+    <>
+      {avatarBannerAnimation === "shimmer" && (
+        <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
+      )}
+      <div
+        style={{
+          position: "absolute",
+          ...(avatarBannerPosition === "top"
+            ? { top: 0, transform: "translateX(-50%) translateY(-40%)" }
+            : { bottom: 0, transform: "translateX(-50%) translateY(40%)" }),
+          left: "50%",
+          background: avatarBannerAnimation === "shimmer"
+            ? `linear-gradient(90deg, ${avatarBannerBg || palette.primary}, ${palette.accent || avatarBannerBg || palette.primary}AA, ${avatarBannerBg || palette.primary})`
+            : (avatarBannerBg || palette.primary),
+          color: avatarBannerColor,
+          fontSize: Math.max(9, avatarSize * 0.12),
+          fontWeight: 700,
+          fontFamily: `'${fonts.primary}', sans-serif`,
+          padding: "2px 10px",
+          borderRadius: 999,
+          whiteSpace: "nowrap",
+          lineHeight: 1.4,
+          boxShadow: "0 2px 6px rgba(0,0,0,0.15)",
+          zIndex: 2,
+          letterSpacing: "0.02em",
+          textTransform: "uppercase" as const,
+          ...bannerAnimationStyle,
+        }}
+      >
+        {avatarBannerText}
+      </div>
+    </>
   ) : null;
 
   const avatarEl = avatarUrl ? (
