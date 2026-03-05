@@ -54,9 +54,11 @@ export function useAnalyticsStats(days = 7) {
       const clicks = curr.filter(e => e.event_type === "button_click").length;
       const formSubmits = curr.filter(e => e.event_type === "form_submit").length;
       const bookingEvents = curr.filter(e => e.event_type === "booking_created").length;
+      const contactSaves = curr.filter(e => e.event_type === "contact_saved").length;
 
       const prevViews = prev.filter(e => e.event_type === "card_view").length;
       const prevClicks = prev.filter(e => e.event_type === "button_click").length;
+      const prevContactSaves = prev.filter(e => e.event_type === "contact_saved").length;
 
       const conversionRate = views > 0 ? ((newContacts ?? 0) / views * 100) : 0;
       const prevConversionRate = prevViews > 0 ? ((prevContacts ?? 0) / prevViews * 100) : 0;
@@ -66,6 +68,7 @@ export function useAnalyticsStats(days = 7) {
         clicks,
         formSubmits,
         bookingEvents,
+        contactSaves,
         contacts: newContacts ?? 0,
         bookings: newBookings ?? 0,
         conversionRate: Math.round(conversionRate * 10) / 10,
@@ -74,6 +77,7 @@ export function useAnalyticsStats(days = 7) {
         clicksChange: calcChange(clicks, prevClicks),
         contactsChange: calcChange(newContacts ?? 0, prevContacts ?? 0),
         bookingsChange: calcChange(newBookings ?? 0, prevBookings ?? 0),
+        contactSavesChange: calcChange(contactSaves, prevContactSaves),
         conversionChange: Math.round((conversionRate - prevConversionRate) * 10) / 10,
         // Daily breakdown
         dailyData: buildDailyBreakdown(curr, days),

@@ -1,4 +1,4 @@
-import { Eye, MousePointer, Users, TrendingUp, Mail, BarChart3, Calendar, Globe, Smartphone, Monitor, Tablet } from "lucide-react";
+import { Eye, MousePointer, Users, TrendingUp, Mail, BarChart3, Calendar, Globe, Smartphone, Monitor, Tablet, Download } from "lucide-react";
 import KPICard from "@/components/KPICard";
 import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -51,17 +51,19 @@ export default function Analytics() {
 
       {/* KPIs */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-          {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} className="h-28 rounded-xl" />)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+          {[1, 2, 3, 4, 5, 6].map(i => <Skeleton key={i} className="h-28 rounded-xl" />)}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
           <KPICard icon={Eye} title="Card Views" value={stats?.views ?? 0}
             change={fmtChange(stats?.viewsChange).text} changeType={fmtChange(stats?.viewsChange).type} />
           <KPICard icon={MousePointer} title="CTA Clicks" value={stats?.clicks ?? 0}
             change={fmtChange(stats?.clicksChange).text} changeType={fmtChange(stats?.clicksChange).type} />
           <KPICard icon={Users} title="Leads Captured" value={stats?.contacts ?? 0}
             change={fmtChange(stats?.contactsChange).text} changeType={fmtChange(stats?.contactsChange).type} />
+          <KPICard icon={Download} title="Contact Saves" value={stats?.contactSaves ?? 0}
+            change={fmtChange(stats?.contactSavesChange).text} changeType={fmtChange(stats?.contactSavesChange).type} />
           <KPICard icon={Calendar} title="Bookings" value={stats?.bookings ?? 0}
             change={fmtChange(stats?.bookingsChange).text} changeType={fmtChange(stats?.bookingsChange).type} />
           <KPICard icon={TrendingUp} title="Conversion Rate" value={`${stats?.conversionRate ?? 0}%`}
