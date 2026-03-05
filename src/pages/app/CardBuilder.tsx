@@ -49,6 +49,8 @@ export default function CardBuilder() {
             setJobTitle={s.setJobTitle}
             boldLastName={s.boldLastName}
             setBoldLastName={s.setBoldLastName}
+            uppercaseName={s.uppercaseName}
+            setUppercaseName={s.setUppercaseName}
             professionName={s.professionName}
             identitySaveTimers={s.identitySaveTimers}
             identitySaveState={s.identitySaveState}
@@ -181,6 +183,7 @@ export default function CardBuilder() {
             editCompany={s.editCompany}
             displayJobTitle={s.displayJobTitle}
             boldLastName={s.boldLastName}
+            uppercaseName={s.uppercaseName}
             onAvatarChange={s.handleAvatarChange}
             setEditingSection={s.setEditingSection}
           />

@@ -497,6 +497,7 @@ export default function PublicCard() {
             theme={theme}
             name={profile.name || "Your Name"}
             boldLastName={themeJson.bold_last_name === true}
+            uppercaseName={themeJson.uppercase_name === true}
             profession={displayJobTitle}
             company={profile.company ?? undefined}
             avatarUrl={profile.avatar_url}
