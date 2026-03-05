@@ -163,7 +163,8 @@ export function usePublicCard(handle: string | undefined) {
           .from("cards")
           .select("sections_json, theme_json, status")
           .eq("user_id", profile.id)
-          .eq("status", "published")
+          .order("updated_at", { ascending: false })
+          .limit(1)
           .maybeSingle(),
         supabase
           .from("booking_services")
