@@ -140,6 +140,14 @@ export default function Onboarding() {
     setSaving(true);
 
     try {
+      // Check if this is a re-onboarding (user already completed before)
+      const { data: currentProfile } = await supabase
+        .from("profiles")
+        .select("onboarding_completed")
+        .eq("id", user.id)
+        .single();
+      const isReOnboarding = currentProfile?.onboarding_completed === true;
+
       const handle = generateHandle(name || user.email || "user");
       const palette = effectivePack?.default_palettes?.[0] || {};
 
@@ -173,8 +181,10 @@ export default function Onboarding() {
       }, { onConflict: "user_id" });
       if (cardErr) throw cardErr;
 
-      // 3. Replace pipeline stages (clear old defaults first)
-      await supabase.from("pipeline_stages").delete().eq("user_id", user.id);
+      // 3. Create pipeline stages (only clear on re-onboarding)
+      if (isReOnboarding) {
+        await supabase.from("pipeline_stages").delete().eq("user_id", user.id);
+      }
       const stages = (selectedProfession.default_pipeline_stages as string[]) || [];
       if (stages.length > 0) {
         const stageRows = stages.map((stageName: string, i: number) => ({
@@ -186,8 +196,10 @@ export default function Onboarding() {
         if (stagesErr) throw stagesErr;
       }
 
-      // 4. Replace booking services
-      await supabase.from("booking_services").delete().eq("user_id", user.id);
+      // 4. Create booking services (only clear on re-onboarding)
+      if (isReOnboarding) {
+        await supabase.from("booking_services").delete().eq("user_id", user.id);
+      }
       const services = (selectedProfession.default_booking_services as any[]) || [];
       if (services.length > 0) {
         const serviceRows = services.map((s: any) => ({
@@ -202,8 +214,10 @@ export default function Onboarding() {
         if (servicesErr) throw servicesErr;
       }
 
-      // 5. Replace email templates
-      await supabase.from("email_templates").delete().eq("user_id", user.id);
+      // 5. Create email templates (only clear on re-onboarding)
+      if (isReOnboarding) {
+        await supabase.from("email_templates").delete().eq("user_id", user.id);
+      }
       const templates = (selectedProfession.default_email_templates as any[]) || [];
       if (templates.length > 0) {
         const templateRows = templates.map((t: any) => ({
