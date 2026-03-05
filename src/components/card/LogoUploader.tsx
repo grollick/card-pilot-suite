@@ -26,6 +26,8 @@ interface LogoUploaderProps {
   onLogoOpacityChange?: (val: number) => void;
   logoPadding?: number;
   onLogoPaddingChange?: (val: number) => void;
+  logoNameGap?: number;
+  onLogoNameGapChange?: (val: number) => void;
 }
 
 const POSITIONS: { value: LogoPosition; label: string }[] = [
@@ -58,6 +60,8 @@ export default function LogoUploader({
   onLogoOpacityChange,
   logoPadding = 4,
   onLogoPaddingChange,
+  logoNameGap = 8,
+  onLogoNameGapChange,
 }: LogoUploaderProps) {
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -182,6 +186,22 @@ export default function LogoUploader({
                 min={0}
                 max={24}
                 step={1}
+              />
+            </div>
+          )}
+          {/* Name gap slider — only for beside-name positions */}
+          {onLogoNameGapChange && (logoPosition === "beside-name" || logoPosition === "beside-name-right") && (
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Name spacing</span>
+                <span className="text-[10px] text-muted-foreground tabular-nums">{logoNameGap ?? 8}px</span>
+              </div>
+              <Slider
+                value={[logoNameGap ?? 8]}
+                onValueChange={([v]) => onLogoNameGapChange(v)}
+                min={0}
+                max={32}
+                step={2}
               />
             </div>
           )}
