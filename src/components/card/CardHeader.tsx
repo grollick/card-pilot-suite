@@ -11,6 +11,7 @@ interface CardHeaderProps {
   coverUrl?: string | null;
   avatarBgColor?: string;
   avatarRotation?: number;
+  avatarBorderWidth?: number;
   coverOffsetY?: number;
   logoUrl?: string | null;
   logoFrostedBg?: boolean;
@@ -22,7 +23,7 @@ interface CardHeaderProps {
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false }: CardHeaderProps) {
+export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -57,7 +58,7 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     width: 80,
     height: 80,
     borderRadius: avatarBorderRadius,
-    border: `3px solid #FFFFFF`,
+    border: `${avatarBorderWidth}px solid #FFFFFF`,
     overflow: "hidden",
     backgroundColor: avatarBgColor === "transparent" ? undefined : avatarBgColor,
     boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
