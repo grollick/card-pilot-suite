@@ -20,6 +20,8 @@ interface Props {
   setUppercaseName: (v: boolean) => void;
   nameLetterSpacing: number;
   setNameLetterSpacing: (v: number) => void;
+  nameFontWeight: number;
+  setNameFontWeight: (v: number) => void;
   professionName: string;
   identitySaveTimers: React.MutableRefObject<Record<string, ReturnType<typeof setTimeout>>>;
   identitySaveState: Record<string, "saving" | "saved" | null>;
@@ -40,6 +42,7 @@ export default function CardBuilderIdentity({
   editJobTitle, setEditJobTitle, jobTitle, setJobTitle, boldLastName, setBoldLastName,
   uppercaseName, setUppercaseName,
   nameLetterSpacing, setNameLetterSpacing,
+  nameFontWeight, setNameFontWeight,
   professionName, identitySaveTimers, identitySaveState, setIdentitySaveState,
   saveThemeField, qc, hideWrapper,
 }: Props) {
@@ -114,6 +117,20 @@ export default function CardBuilderIdentity({
             step={0.5}
             value={[nameLetterSpacing]}
             onValueChange={([v]) => { setNameLetterSpacing(v); saveThemeField({ name_letter_spacing: v }); }}
+            className="w-full"
+          />
+        </div>
+        <div className="mt-1.5">
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[11px] text-muted-foreground">Font weight</label>
+            <span className="text-[10px] text-muted-foreground tabular-nums">{nameFontWeight}</span>
+          </div>
+          <Slider
+            min={100}
+            max={900}
+            step={100}
+            value={[nameFontWeight]}
+            onValueChange={([v]) => { setNameFontWeight(v); saveThemeField({ name_font_weight: v }); }}
             className="w-full"
           />
         </div>

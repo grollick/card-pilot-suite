@@ -31,6 +31,7 @@ interface Props {
   boldLastName?: boolean;
   uppercaseName?: boolean;
   nameLetterSpacing?: number;
+  nameFontWeight?: number;
   onAvatarChange: (url: string) => void;
   setEditingSection: (id: string | null) => void;
 }
@@ -102,7 +103,7 @@ export default function CardBuilderPreview({
   coverUrl, coverOffsetY, avatarUrl, avatarBgColor, avatarRotation,
   logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity,
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
-  boldLastName, uppercaseName, nameLetterSpacing, onAvatarChange, setEditingSection,
+  boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, onAvatarChange, setEditingSection,
 }: Props) {
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -227,7 +228,7 @@ export default function CardBuilderPreview({
                       }}
                     />
 
-                    <h3 className="text-lg font-bold" style={{ color: previewTheme.palette.secondary, fontFamily: `'${previewTheme.fonts.primary}', sans-serif`, ...(uppercaseName ? { textTransform: 'uppercase' as const } : {}), ...(nameLetterSpacing ? { letterSpacing: `${nameLetterSpacing}px` } : {}) }}>
+                    <h3 className="text-lg" style={{ color: previewTheme.palette.secondary, fontFamily: `'${previewTheme.fonts.primary}', sans-serif`, fontWeight: nameFontWeight ?? 700, ...(uppercaseName ? { textTransform: 'uppercase' as const } : {}), ...(nameLetterSpacing ? { letterSpacing: `${nameLetterSpacing}px` } : {}) }}>
                       {boldLastName ? (() => {
                         const full = (editName ?? profile?.name) || "Your Name";
                         const parts = full.trim().split(/\s+/);

@@ -499,6 +499,7 @@ export default function PublicCard() {
             boldLastName={themeJson.bold_last_name === true}
             uppercaseName={themeJson.uppercase_name === true}
             nameLetterSpacing={typeof themeJson.name_letter_spacing === "number" ? themeJson.name_letter_spacing : 0}
+            nameFontWeight={typeof themeJson.name_font_weight === "number" ? themeJson.name_font_weight : 700}
             profession={displayJobTitle}
             company={profile.company ?? undefined}
             avatarUrl={profile.avatar_url}

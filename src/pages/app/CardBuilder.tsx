@@ -70,6 +70,8 @@ export default function CardBuilder() {
                     setIdentitySaveState={s.setIdentitySaveState}
                     nameLetterSpacing={s.nameLetterSpacing}
                     setNameLetterSpacing={s.setNameLetterSpacing}
+                    nameFontWeight={s.nameFontWeight}
+                    setNameFontWeight={s.setNameFontWeight}
                     saveThemeField={s.saveThemeField}
                     qc={s.qc}
                     hideWrapper
@@ -230,6 +232,8 @@ export default function CardBuilder() {
                     setIdentitySaveState={s.setIdentitySaveState}
                     nameLetterSpacing={s.nameLetterSpacing}
                     setNameLetterSpacing={s.setNameLetterSpacing}
+                    nameFontWeight={s.nameFontWeight}
+                    setNameFontWeight={s.setNameFontWeight}
                     saveThemeField={s.saveThemeField}
                     qc={s.qc}
                     hideWrapper
@@ -390,6 +394,7 @@ export default function CardBuilder() {
             boldLastName={s.boldLastName}
             uppercaseName={s.uppercaseName}
             nameLetterSpacing={s.nameLetterSpacing}
+            nameFontWeight={s.nameFontWeight}
             onAvatarChange={s.handleAvatarChange}
             setEditingSection={s.setEditingSection}
           />
