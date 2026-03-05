@@ -169,6 +169,9 @@ export default function CardBuilderPreview({
 
                   {/* Cover */}
                   <div className="h-28 relative overflow-hidden z-[2]" style={{
+                    marginLeft: -8,
+                    marginRight: -8,
+                    marginTop: -8,
                     background: coverUrl ? undefined : `linear-gradient(135deg, ${previewTheme.palette.primary}33, ${previewTheme.palette.primary}0D)`,
                   }}>
                     {coverUrl && (
