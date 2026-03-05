@@ -300,7 +300,8 @@ export default function PublicBooking() {
                       }}
                       className={cn("p-3 pointer-events-auto rounded-xl border border-border")}
                     />
-                  )
+                  )}
+
 
                   {selectedDate && (
                     <div>
