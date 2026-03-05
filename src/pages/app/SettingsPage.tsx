@@ -1,11 +1,15 @@
-import { Settings as SettingsIcon, User, Palette, Bell, RotateCw } from "lucide-react";
+import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useProfile } from "@/hooks/useCard";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,10 +20,65 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function SettingsPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const { data: profile, isLoading } = useProfile();
   const [showReOnboard, setShowReOnboard] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const [name, setName] = useState("");
+  const [handle, setHandle] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [company, setCompany] = useState("");
+
+  // Seed form when profile loads
+  useEffect(() => {
+    if (!profile) return;
+    setName(profile.name ?? "");
+    setHandle(profile.handle ?? "");
+    setEmail(profile.email ?? "");
+    setPhone(profile.phone ?? "");
+    setCompany(profile.company ?? "");
+  }, [profile]);
+
+  const handleSave = async () => {
+    if (!profile) return;
+    if (!name.trim()) {
+      toast.error("Name is required");
+      return;
+    }
+    if (!handle.trim()) {
+      toast.error("Handle is required");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          name: name.trim(),
+          handle: handle.trim().toLowerCase().replace(/[^a-z0-9_-]/g, ""),
+          email: email.trim() || null,
+          phone: phone.trim() || null,
+          company: company.trim() || null,
+        })
+        .eq("id", profile.id);
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Profile saved!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save profile");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const initials = (name || "U").split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -38,38 +97,55 @@ export default function SettingsPage() {
         <TabsContent value="profile" className="mt-4 space-y-4">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="rounded-xl border border-border bg-card p-6 space-y-5">
-            <div className="flex items-center gap-4">
-              <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-                <User className="h-7 w-7 text-primary" />
+
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
-              <div>
-                <h3 className="font-semibold">Profile Photo</h3>
-                <Button variant="outline" size="sm" className="mt-1">Upload Photo</Button>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Full Name</Label>
-                <Input placeholder="Your name" />
-              </div>
-              <div className="space-y-2">
-                <Label>Handle</Label>
-                <Input placeholder="yourhandle" />
-              </div>
-              <div className="space-y-2">
-                <Label>Email</Label>
-                <Input type="email" placeholder="you@example.com" />
-              </div>
-              <div className="space-y-2">
-                <Label>Phone</Label>
-                <Input placeholder="(555) 123-4567" />
-              </div>
-              <div className="space-y-2 sm:col-span-2">
-                <Label>Company</Label>
-                <Input placeholder="Your company" />
-              </div>
-            </div>
-            <Button className="shadow-glow">Save Changes</Button>
+            ) : (
+              <>
+                <div className="flex items-center gap-4">
+                  <Avatar className="h-16 w-16 rounded-2xl">
+                    <AvatarImage src={profile?.avatar_url ?? undefined} alt={name} />
+                    <AvatarFallback className="rounded-2xl bg-primary/10 text-primary text-lg">{initials}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="font-semibold">{name || "Your Name"}</h3>
+                    <p className="text-xs text-muted-foreground">
+                      {profile?.professions?.name ?? "No profession set"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="settings-name">Full Name</Label>
+                    <Input id="settings-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="settings-handle">Handle</Label>
+                    <Input id="settings-handle" value={handle} onChange={(e) => setHandle(e.target.value)} placeholder="yourhandle" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="settings-email">Email</Label>
+                    <Input id="settings-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="settings-phone">Phone</Label>
+                    <Input id="settings-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(555) 123-4567" />
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="settings-company">Company</Label>
+                    <Input id="settings-company" value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Your company" />
+                  </div>
+                </div>
+
+                <Button className="shadow-glow" onClick={handleSave} disabled={saving}>
+                  {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                  Save Changes
+                </Button>
+              </>
+            )}
           </motion.div>
 
           {/* Re-onboard section */}
