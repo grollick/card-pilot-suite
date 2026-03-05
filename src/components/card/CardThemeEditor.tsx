@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Palette, Type, Check, RotateCcw, Layout, Square, Layers, Sparkles, Sun, Moon, Circle } from "lucide-react";
+import { Palette, Type, Check, RotateCcw, Layout, Square, Layers, Sparkles, Sun, Moon, Circle, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -106,6 +106,16 @@ const PALETTE_CATEGORIES: PaletteCategory[] = [
       { name: "Warm Gray", palette: { primary: "#57534e", secondary: "#a8a29e", accent: "#78716c", background: "#fafaf9" } },
       { name: "Ink", palette: { primary: "#1e293b", secondary: "#64748b", accent: "#475569", background: "#ffffff" } },
       { name: "Sand", palette: { primary: "#92702c", secondary: "#8b8680", accent: "#b8972e", background: "#faf7f2" } },
+    ],
+  },
+  {
+    label: "Social",
+    icon: <Share2 className="h-3.5 w-3.5" />,
+    palettes: [
+      { name: "LinkedIn", palette: { primary: "#0a66c2", secondary: "#64748b", accent: "#0073b1", background: "#f3f6f8" } },
+      { name: "YouTube", palette: { primary: "#ff0000", secondary: "#606060", accent: "#cc0000", background: "#ffffff" } },
+      { name: "Facebook", palette: { primary: "#1877f2", secondary: "#65676b", accent: "#166fe5", background: "#f0f2f5" } },
+      { name: "X", palette: { primary: "#000000", secondary: "#71767b", accent: "#1d9bf0", background: "#ffffff" } },
     ],
   },
 ];
