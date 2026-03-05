@@ -331,7 +331,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
           {parallaxCover(160, true)}
           <div style={{ padding: "0 24px", marginTop: -40, display: "flex", flexDirection: "column", position: "relative", zIndex: 2 }}>
             {avatarEl}
-            <div style={{ display: "flex", alignItems: "center", gap: logoNameGap, marginTop: 12 }}>
+            <div style={{ display: "flex", alignItems: inlineAlignItems, gap: logoNameGap, marginTop: 12 }}>
               {logoPosition === "beside-name" && inlineLogoEl}
               <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 24 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
               {logoPosition === "beside-name-right" && inlineLogoEl}
@@ -353,7 +353,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
           }}>
             {avatarEl}
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: logoNameGap }}>
+              <div style={{ display: "flex", alignItems: inlineAlignItems, gap: logoNameGap }}>
                 {logoPosition === "beside-name" && inlineLogoEl}
                 <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 22 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
                 {logoPosition === "beside-name-right" && inlineLogoEl}
@@ -384,7 +384,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
                 },
               })}
             </div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: logoNameGap }}>
+            <div style={{ display: "flex", alignItems: inlineAlignItems, justifyContent: "center", gap: logoNameGap }}>
               {logoPosition === "beside-name" && inlineLogoEl}
               <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 28 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
               {logoPosition === "beside-name-right" && inlineLogoEl}
@@ -409,7 +409,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
               {avatarEl}
             </div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: logoNameGap }}>
+            <div style={{ display: "flex", alignItems: inlineAlignItems, justifyContent: "center", gap: logoNameGap }}>
               {logoPosition === "beside-name" && inlineLogoEl}
               <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 22 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
               {logoPosition === "beside-name-right" && inlineLogoEl}
