@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import PricingSection from "@/components/landing/PricingSection";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
@@ -360,72 +361,7 @@ export default function Index() {
       </section>
 
       {/* ── Pricing ── */}
-      <section id="pricing" className="max-w-6xl mx-auto px-4 py-20">
-        <motion.div
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeUp}
-          custom={0}
-          className="text-center mb-16"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold">Simple, transparent pricing</h2>
-          <p className="text-muted-foreground mt-3">Start free. Upgrade when you're ready.</p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {visiblePlans.map((plan, i) => (
-            <motion.div
-              key={plan.key}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={fadeUp}
-              custom={i}
-              className={`rounded-xl border bg-card p-6 flex flex-col ${
-                plan.popular ? "border-primary ring-2 ring-primary/20 relative" : "border-border"
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-primary text-primary-foreground text-xs font-bold">
-                  Most Popular
-                </div>
-              )}
-              <div className="mb-4">
-                <h3 className="text-lg font-bold">{plan.name}</h3>
-                <p className="text-xs text-muted-foreground">{plan.tagline}</p>
-              </div>
-              <div className="mb-8">
-                <span className="text-4xl font-extrabold tracking-tight">${plan.price}</span>
-                <span className="text-muted-foreground text-sm ml-1">/mo</span>
-              </div>
-              <ul className="space-y-2 mb-6 flex-1">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-sm">
-                    <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link to="/onboarding">
-                <Button className={`w-full ${plan.popular ? "shadow-glow" : ""}`} variant={plan.popular ? "default" : "outline"}>
-                  {plan.price === 0 ? "Start Free" : "Get Started"}
-                </Button>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Agency callout */}
-        <div className="mt-8 text-center">
-          <p className="text-sm text-muted-foreground">
-            Running a team?{" "}
-            <Link to="/onboarding" className="text-primary font-medium hover:underline">
-              See Agency plan at $249/mo →
-            </Link>
-          </p>
-        </div>
-      </section>
+      <PricingSection visiblePlans={visiblePlans} />
 
       {/* ── Final CTA ── */}
       <section className="bg-primary/5 py-20">
