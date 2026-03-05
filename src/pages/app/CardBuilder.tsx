@@ -61,6 +61,8 @@ export default function CardBuilder() {
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoFrostedBg, setLogoFrostedBg] = useState(true);
   const [logoGlow, setLogoGlow] = useState(false);
+  const [logoPosition, setLogoPosition] = useState<"top-left" | "top-right" | "bottom-left" | "bottom-right">("top-right");
+  const [logoSize, setLogoSize] = useState<"small" | "medium" | "large">("medium");
   const [ctaConfig, setCtaConfig] = useState<CtaItem[]>(DEFAULT_CTA_CONFIG);
   const [ctaIconsOnly, setCtaIconsOnly] = useState(false);
   const [showSectionIcons, setShowSectionIcons] = useState(false);
@@ -119,6 +121,8 @@ export default function CardBuilder() {
       if (themeJson?.logo_url) setLogoUrl(themeJson.logo_url);
       if (typeof themeJson?.logo_frosted_bg === "boolean") setLogoFrostedBg(themeJson.logo_frosted_bg);
       if (typeof themeJson?.logo_glow === "boolean") setLogoGlow(themeJson.logo_glow);
+      if (themeJson?.logo_position) setLogoPosition(themeJson.logo_position as any);
+      if (themeJson?.logo_size) setLogoSize(themeJson.logo_size as any);
       if (themeJson?.job_title) { setJobTitle(themeJson.job_title); }
       if (typeof themeJson?.section_icons === "boolean") setShowSectionIcons(themeJson.section_icons);
       if (typeof themeJson?.cta_icons_only === "boolean") setCtaIconsOnly(themeJson.cta_icons_only);
@@ -313,6 +317,16 @@ export default function CardBuilder() {
   const handleLogoGlowChange = (val: boolean) => {
     setLogoGlow(val);
     saveThemeField({ logo_glow: val });
+  };
+
+  const handleLogoPositionChange = (pos: "top-left" | "top-right" | "bottom-left" | "bottom-right") => {
+    setLogoPosition(pos);
+    saveThemeField({ logo_position: pos });
+  };
+
+  const handleLogoSizeChange = (size: "small" | "medium" | "large") => {
+    setLogoSize(size);
+    saveThemeField({ logo_size: size });
   };
 
   const handleCoverChange = async (url: string) => {
@@ -709,6 +723,10 @@ export default function CardBuilder() {
               onLogoFrostedBgChange={handleLogoFrostedBgChange}
               logoGlow={logoGlow}
               onLogoGlowChange={handleLogoGlowChange}
+              logoPosition={logoPosition}
+              onLogoPositionChange={handleLogoPositionChange}
+              logoSize={logoSize}
+              onLogoSizeChange={handleLogoSizeChange}
               avatarShape={previewTheme.header.avatarShape}
               onAvatarShapeChange={(shape) => {
                 const existing = (card?.theme_json as any)?.tokens ?? {};
@@ -921,11 +939,23 @@ export default function CardBuilder() {
                     style={{ objectPosition: `center ${coverOffsetY}%` }}
                   />
                 )}
-                {logoUrl && (
-                  <div className={`absolute top-2 right-2 h-12 w-12 rounded-lg flex items-center justify-center ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm p-1 shadow-sm' : ''}`}>
-                    <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
-                  </div>
-                )}
+                {logoUrl && (() => {
+                  const logoPx = logoSize === "small" ? 36 : logoSize === "large" ? 64 : 48;
+                  const posMap: Record<string, string> = {
+                    "top-left": "top-2 left-2",
+                    "top-right": "top-2 right-2",
+                    "bottom-left": "bottom-2 left-2",
+                    "bottom-right": "bottom-2 right-2",
+                  };
+                  return (
+                    <div
+                      className={`absolute ${posMap[logoPosition]} rounded-lg flex items-center justify-center ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm p-1 shadow-sm' : ''}`}
+                      style={{ height: logoPx, width: logoPx }}
+                    >
+                      <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
+                    </div>
+                  );
+                })()}
               </div>
 
               <div className="px-5 pb-5 -mt-10 relative z-[2]">

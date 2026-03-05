@@ -22,6 +22,8 @@ interface CardHeaderProps {
   logoUrl?: string | null;
   logoFrostedBg?: boolean;
   logoGlow?: boolean;
+  logoPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+  logoSize?: "small" | "medium" | "large";
 }
 
 /**
@@ -29,7 +31,7 @@ interface CardHeaderProps {
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false }: CardHeaderProps) {
+export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium" }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -168,6 +170,17 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     </motion.div>
   );
 
+  // Logo size mapping
+  const logoPx = logoSize === "small" ? 36 : logoSize === "large" ? 64 : 48;
+
+  // Logo position mapping
+  const logoPosStyle: Record<string, React.CSSProperties> = {
+    "top-left": { top: 8, left: 8 },
+    "top-right": { top: 8, right: 8 },
+    "bottom-left": { bottom: 8, left: 8 },
+    "bottom-right": { bottom: 8, right: 8 },
+  };
+
   // Shared logo element
   const logoEl = logoUrl ? (
     <motion.div
@@ -180,8 +193,9 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
       } : undefined}
       transition={logoGlow ? { duration: 2.5, repeat: Infinity, ease: "easeInOut" as const } : undefined}
       style={{
-        position: "absolute", top: 8, right: 8,
-        height: 48, width: 48, borderRadius: 8,
+        position: "absolute",
+        ...logoPosStyle[logoPosition],
+        height: logoPx, width: logoPx, borderRadius: 8,
         background: logoFrostedBg ? "rgba(255,255,255,0.85)" : "transparent",
         backdropFilter: logoFrostedBg ? "blur(4px)" : undefined,
         display: "flex", alignItems: "center", justifyContent: "center",
