@@ -222,6 +222,7 @@ export default function PublicCard() {
   const primaryCtaItem = enabledCtas.find(c => c.isPrimary) || enabledCtas[0];
   const secondaryCtaItems = enabledCtas.filter(c => c !== primaryCtaItem);
   const primaryCta = primaryCtaItem?.id ?? "call";
+  const ctaIconsOnly = themeJson.cta_icons_only === true;
 
   const handleCtaClick = (cta: string) => {
     supabase.from("analytics_events").insert({
@@ -513,42 +514,71 @@ export default function PublicCard() {
         )}
 
         <div style={{ padding: `${spacing.section}px`, display: "flex", flexDirection: "column", gap: spacing.section, position: "relative", zIndex: 2 }}>
-          {/* ── Primary CTA ── */}
+          {/* ── CTA Buttons ── */}
           {primaryCtaItem && (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <CardButton theme={theme} fullWidth onClick={() => handleCtaClick(primaryCta)}>
-              {CTA_ICONS[primaryCta]}
-              <span>{primaryCtaItem.label}</span>
-            </CardButton>
+            {ctaIconsOnly ? (
+              <div style={{ display: "flex", justifyContent: "center", gap: 12 }}>
+                {enabledCtas.map((ctaItem) => (
+                  <button
+                    key={ctaItem.id}
+                    onClick={() => handleCtaClick(ctaItem.id)}
+                    title={ctaItem.label}
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: "50%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      transition: "all 0.2s",
+                      background: ctaItem.isPrimary ? palette.primary : "transparent",
+                      color: ctaItem.isPrimary ? palette.background : palette.primary,
+                      border: ctaItem.isPrimary ? "none" : `1.5px solid ${palette.primary}40`,
+                    }}
+                  >
+                    {CTA_ICONS[ctaItem.id]}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <>
+                <CardButton theme={theme} fullWidth onClick={() => handleCtaClick(primaryCta)}>
+                  {CTA_ICONS[primaryCta]}
+                  <span>{primaryCtaItem.label}</span>
+                </CardButton>
 
-            {secondaryCtaItems.length > 0 && (
-            <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(secondaryCtaItems.length, 3)}, 1fr)`, gap: 8 }}>
-              {secondaryCtaItems.map((ctaItem) => (
-                <button
-                  key={ctaItem.id}
-                  onClick={() => handleCtaClick(ctaItem.id)}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 4,
-                    padding: "12px 8px",
-                    borderRadius: radii.button,
-                    border: `1px solid ${palette.primary}20`,
-                    background: `${palette.primary}06`,
-                    color: palette.primary,
-                    cursor: "pointer",
-                    fontSize: 11,
-                    fontWeight: 500,
-                    fontFamily: `'${fonts.secondary}', sans-serif`,
-                    transition: "all 0.2s",
-                  }}
-                >
-                  {CTA_ICONS[ctaItem.id]}
-                  {ctaItem.label}
-                </button>
-              ))}
-            </div>
+                {secondaryCtaItems.length > 0 && (
+                <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(secondaryCtaItems.length, 3)}, 1fr)`, gap: 8 }}>
+                  {secondaryCtaItems.map((ctaItem) => (
+                    <button
+                      key={ctaItem.id}
+                      onClick={() => handleCtaClick(ctaItem.id)}
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 4,
+                        padding: "12px 8px",
+                        borderRadius: radii.button,
+                        border: `1px solid ${palette.primary}20`,
+                        background: `${palette.primary}06`,
+                        color: palette.primary,
+                        cursor: "pointer",
+                        fontSize: 11,
+                        fontWeight: 500,
+                        fontFamily: `'${fonts.secondary}', sans-serif`,
+                        transition: "all 0.2s",
+                      }}
+                    >
+                      {CTA_ICONS[ctaItem.id]}
+                      {ctaItem.label}
+                    </button>
+                  ))}
+                </div>
+                )}
+              </>
             )}
           </div>
           )}

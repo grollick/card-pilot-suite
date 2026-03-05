@@ -33,7 +33,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-const CTA_ICON_MAP: Record<string, React.ReactNode> = {
+export const CTA_ICON_MAP: Record<string, React.ReactNode> = {
   call: <Phone className="h-4 w-4" />,
   text: <MessageSquare className="h-4 w-4" />,
   email: <Mail className="h-4 w-4" />,
