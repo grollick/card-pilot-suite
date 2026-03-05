@@ -1,4 +1,5 @@
-import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick } from "lucide-react";
+import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick, Check } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import CtaEditor, { type CtaItem, DEFAULT_CTA_CONFIG } from "@/components/card/CtaEditor";
 import { resolveCardTheme, type ResolvedCardTheme } from "@/lib/cardTokens";
 import QRShareDialog from "@/components/card/QRShareDialog";
@@ -58,6 +59,8 @@ export default function CardBuilder() {
   const [ctaConfig, setCtaConfig] = useState<CtaItem[]>(DEFAULT_CTA_CONFIG);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
+  const [editName, setEditName] = useState<string | null>(null);
+  const [editCompany, setEditCompany] = useState<string | null>(null);
   const hydrated = useRef(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -461,6 +464,74 @@ export default function CardBuilder() {
           animate={{ opacity: 1, x: 0 }}
           className="lg:col-span-1 space-y-4"
         >
+          {/* Name & Title */}
+          <div className="rounded-xl border border-border bg-card p-5 space-y-3">
+            <div className="flex items-center gap-2">
+              <Pencil className="h-4 w-4 text-primary" />
+              <h2 className="font-semibold">Identity</h2>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs text-muted-foreground">Display Name</label>
+              <div className="flex gap-2">
+                <Input
+                  value={editName ?? profile?.name ?? ""}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="Your Name"
+                  className="text-sm"
+                />
+                {editName !== null && editName !== (profile?.name ?? "") && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="shrink-0"
+                    onClick={async () => {
+                      if (!profile) return;
+                      const { supabase } = await import("@/integrations/supabase/client");
+                      const { error } = await supabase.from("profiles").update({ name: editName }).eq("id", profile.id);
+                      if (error) { toast.error("Failed to save name"); return; }
+                      qc.invalidateQueries({ queryKey: ["profile"] });
+                      qc.invalidateQueries({ queryKey: ["public-card"] });
+                      setEditName(null);
+                      toast.success("Name updated");
+                    }}
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs text-muted-foreground">Company / Title</label>
+              <div className="flex gap-2">
+                <Input
+                  value={editCompany ?? profile?.company ?? ""}
+                  onChange={(e) => setEditCompany(e.target.value)}
+                  placeholder="Your Company"
+                  className="text-sm"
+                />
+                {editCompany !== null && editCompany !== (profile?.company ?? "") && (
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="shrink-0"
+                    onClick={async () => {
+                      if (!profile) return;
+                      const { supabase } = await import("@/integrations/supabase/client");
+                      const { error } = await supabase.from("profiles").update({ company: editCompany }).eq("id", profile.id);
+                      if (error) { toast.error("Failed to save company"); return; }
+                      qc.invalidateQueries({ queryKey: ["profile"] });
+                      qc.invalidateQueries({ queryKey: ["public-card"] });
+                      setEditCompany(null);
+                      toast.success("Company updated");
+                    }}
+                  >
+                    <Check className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Photo & Backdrop */}
           <div className="rounded-xl border border-border bg-card p-5">
             <CardPhotoTools
