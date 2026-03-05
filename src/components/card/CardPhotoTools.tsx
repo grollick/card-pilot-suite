@@ -335,6 +335,17 @@ export default function CardPhotoTools({
                   </button>
                 ))}
               </div>
+              <div className="flex items-center gap-2">
+                <Slider
+                  min={40}
+                  max={200}
+                  step={2}
+                  value={[avatarSize]}
+                  onValueChange={([v]) => onAvatarSizeChange(v)}
+                  className="flex-1"
+                />
+                <span className="text-[10px] text-muted-foreground tabular-nums w-8 text-right">{avatarSize}px</span>
+              </div>
             </div>
           )}
 
