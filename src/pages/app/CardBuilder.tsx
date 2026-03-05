@@ -801,7 +801,7 @@ export default function CardBuilder() {
             }}>
               {currentThemeOverrides.bgPattern?.type && currentThemeOverrides.bgPattern.type !== "none" && (
                 <div
-                  className="absolute inset-0 pointer-events-none z-[1]"
+                  className={`absolute inset-0 pointer-events-none ${(currentThemeOverrides.bgPattern as any).coverage === "gaps" ? "z-[0]" : "z-[1]"}`}
                   style={{
                     opacity: currentThemeOverrides.bgPattern.opacity,
                     backgroundImage: getPatternSvg(currentThemeOverrides.bgPattern.type, currentThemeOverrides.bgPattern.color || previewTheme.palette.secondary),
