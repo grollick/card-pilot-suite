@@ -500,7 +500,7 @@ export default function CardBuilder() {
             <Button variant="outline" asChild>
               <a href={`/${profile.handle}`} target="_blank" rel="noreferrer">
                 <Eye className="h-4 w-4 mr-2" />
-                View Card
+                Preview as Visitor
               </a>
             </Button>
           )}
