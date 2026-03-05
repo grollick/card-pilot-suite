@@ -50,6 +50,8 @@ interface CardPhotoToolsProps {
   onLogoPaddingChange?: (val: number) => void;
   logoNameGap?: number;
   onLogoNameGapChange?: (val: number) => void;
+  logoVerticalAlign?: "top" | "center" | "bottom";
+  onLogoVerticalAlignChange?: (val: "top" | "center" | "bottom") => void;
   avatarShape?: "circle" | "rounded" | "square";
   onAvatarShapeChange?: (shape: "circle" | "rounded" | "square") => void;
   avatarBorderWidth?: number;
@@ -94,6 +96,8 @@ export default function CardPhotoTools({
   onLogoPaddingChange,
   logoNameGap = 8,
   onLogoNameGapChange,
+  logoVerticalAlign = "center",
+  onLogoVerticalAlignChange,
   avatarShape = "circle",
   onAvatarShapeChange,
   avatarBorderWidth = 3,
@@ -527,7 +531,7 @@ export default function CardPhotoTools({
 
       {/* Logo Upload */}
       {onLogoChange && (
-        <LogoUploader logoUrl={logoUrl} onLogoChange={onLogoChange} logoFrostedBg={logoFrostedBg} onLogoFrostedBgChange={onLogoFrostedBgChange} logoGlow={logoGlow} onLogoGlowChange={onLogoGlowChange} logoPosition={logoPosition} onLogoPositionChange={onLogoPositionChange} logoSize={logoSize} onLogoSizeChange={onLogoSizeChange} logoOpacity={logoOpacity} onLogoOpacityChange={onLogoOpacityChange} logoPadding={logoPadding} onLogoPaddingChange={onLogoPaddingChange} logoNameGap={logoNameGap} onLogoNameGapChange={onLogoNameGapChange} />
+        <LogoUploader logoUrl={logoUrl} onLogoChange={onLogoChange} logoFrostedBg={logoFrostedBg} onLogoFrostedBgChange={onLogoFrostedBgChange} logoGlow={logoGlow} onLogoGlowChange={onLogoGlowChange} logoPosition={logoPosition} onLogoPositionChange={onLogoPositionChange} logoSize={logoSize} onLogoSizeChange={onLogoSizeChange} logoOpacity={logoOpacity} onLogoOpacityChange={onLogoOpacityChange} logoPadding={logoPadding} onLogoPaddingChange={onLogoPaddingChange} logoNameGap={logoNameGap} onLogoNameGapChange={onLogoNameGapChange} logoVerticalAlign={logoVerticalAlign} onLogoVerticalAlignChange={onLogoVerticalAlignChange} />
       )}
 
       {/* Profile Photo Crop Dialog */}

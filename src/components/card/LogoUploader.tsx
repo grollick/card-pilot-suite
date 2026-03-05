@@ -10,6 +10,7 @@ import { toast } from "sonner";
 
 export type LogoPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name" | "beside-name-right";
 export type LogoSize = "small" | "medium" | "large";
+export type LogoVerticalAlign = "top" | "center" | "bottom";
 
 interface LogoUploaderProps {
   logoUrl: string | null;
@@ -28,6 +29,8 @@ interface LogoUploaderProps {
   onLogoPaddingChange?: (val: number) => void;
   logoNameGap?: number;
   onLogoNameGapChange?: (val: number) => void;
+  logoVerticalAlign?: LogoVerticalAlign;
+  onLogoVerticalAlignChange?: (val: LogoVerticalAlign) => void;
 }
 
 const POSITIONS: { value: LogoPosition; label: string }[] = [
@@ -62,6 +65,8 @@ export default function LogoUploader({
   onLogoPaddingChange,
   logoNameGap = 8,
   onLogoNameGapChange,
+  logoVerticalAlign = "center",
+  onLogoVerticalAlignChange,
 }: LogoUploaderProps) {
   const { user } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -203,6 +208,32 @@ export default function LogoUploader({
                 max={32}
                 step={2}
               />
+            </div>
+          )}
+          {/* Vertical alignment — only for beside-name positions */}
+          {onLogoVerticalAlignChange && (logoPosition === "beside-name" || logoPosition === "beside-name-right") && (
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">Vertical align</span>
+              <div className="flex gap-0.5 rounded-md border border-border bg-muted/50 p-0.5">
+                {([
+                  { value: "top" as const, label: "↑" },
+                  { value: "center" as const, label: "—" },
+                  { value: "bottom" as const, label: "↓" },
+                ] as const).map((a) => (
+                  <button
+                    key={a.value}
+                    onClick={() => onLogoVerticalAlignChange(a.value)}
+                    className={`w-7 h-7 rounded text-xs font-medium transition-colors ${
+                      logoVerticalAlign === a.value
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                    title={a.value}
+                  >
+                    {a.label}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
           {onLogoFrostedBgChange && (
