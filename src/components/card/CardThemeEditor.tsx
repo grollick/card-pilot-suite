@@ -59,11 +59,14 @@ export interface CardGradientBg {
 
 export type BgPatternType = "none" | "dots" | "lines" | "grid" | "noise";
 
+export type BgPatternCoverage = "full" | "gaps";
+
 export interface CardBgPattern {
   type: BgPatternType;
   opacity: number;
   color?: string;
   scale?: number;
+  coverage?: BgPatternCoverage;
 }
 
 export interface CardThemeOverrides {
@@ -643,6 +646,27 @@ export default function CardThemeEditor({
                         className="w-full"
                       />
                       <span className="text-[10px] text-muted-foreground">{bgPattern.scale ?? 20}px</span>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs text-muted-foreground">Coverage</Label>
+                      <div className="flex gap-1.5">
+                        {([
+                          { value: "full", label: "Full card" },
+                          { value: "gaps", label: "Background only" },
+                        ] as const).map((opt) => (
+                          <button
+                            key={opt.value}
+                            onClick={() => setBgPattern(prev => ({ ...prev, coverage: opt.value }))}
+                            className={`flex-1 px-2 py-1.5 rounded-md text-[10px] font-medium border transition-all ${
+                              (bgPattern.coverage ?? "full") === opt.value
+                                ? "border-primary bg-primary/10 text-primary"
+                                : "border-border/50 text-muted-foreground hover:border-border hover:bg-muted/30"
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </>
                 )}

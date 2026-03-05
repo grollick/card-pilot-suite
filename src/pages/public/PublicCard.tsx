@@ -462,7 +462,7 @@ export default function PublicCard() {
               position: "absolute",
               inset: 0,
               pointerEvents: "none",
-              zIndex: 1,
+              zIndex: (bgPattern as any).coverage === "gaps" ? 0 : 1,
               opacity: bgPattern.opacity,
               backgroundImage: getPatternSvg(bgPattern.type as any, (bgPattern as any).color || palette.secondary),
               backgroundSize: bgPattern.type === "noise" ? "200px 200px" : `${(bgPattern as any).scale ?? 20}px ${(bgPattern as any).scale ?? 20}px`,
