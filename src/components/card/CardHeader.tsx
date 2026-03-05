@@ -12,6 +12,7 @@ interface CardHeaderProps {
   avatarBgColor?: string;
   avatarRotation?: number;
   avatarBorderWidth?: number;
+  avatarSize?: number;
   coverOffsetY?: number;
   logoUrl?: string | null;
   logoFrostedBg?: boolean;
@@ -23,7 +24,7 @@ interface CardHeaderProps {
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false }: CardHeaderProps) {
+export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -55,8 +56,8 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
   };
 
   const avatarContainerStyle: React.CSSProperties = {
-    width: 80,
-    height: 80,
+    width: avatarSize,
+    height: avatarSize,
     borderRadius: avatarBorderRadius,
     border: `${avatarBorderWidth}px solid #FFFFFF`,
     overflow: "hidden",
@@ -86,8 +87,8 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     <motion.div
       animate={floatAnimation}
       style={{
-        width: 80,
-        height: 80,
+        width: avatarSize,
+        height: avatarSize,
         borderRadius: avatarBorderRadius,
         background: `${palette.primary}18`,
         display: "flex",

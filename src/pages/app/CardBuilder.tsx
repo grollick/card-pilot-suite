@@ -623,6 +623,11 @@ export default function CardBuilder() {
                 const existing = (card?.theme_json as any)?.tokens ?? {};
                 saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarBorderWidth: val } } });
               }}
+              avatarSize={((card?.theme_json as any)?.tokens?.header?.avatarSize) ?? 80}
+              onAvatarSizeChange={(val) => {
+                const existing = (card?.theme_json as any)?.tokens ?? {};
+                saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarSize: val } } });
+              }}
             />
           </div>
 
