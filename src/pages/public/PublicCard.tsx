@@ -44,6 +44,7 @@ import CardSectionWrapper from "@/components/card/CardSectionWrapper";
 import QRShareDialog from "@/components/card/QRShareDialog";
 import NFCShareDialog from "@/components/card/NFCShareDialog";
 import WalletPassDialog from "@/components/card/WalletPassDialog";
+import QuoteRequestForm from "@/components/card/QuoteRequestForm";
 import { showsBranding } from "@/lib/plans";
 
 // ── Visitor meta for analytics ──

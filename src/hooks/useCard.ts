@@ -24,6 +24,7 @@ export const DEFAULT_SECTIONS = [
   { id: "testimonials", label: "Testimonials", enabled: true },
   { id: "gallery", label: "Gallery", enabled: false },
   { id: "contact", label: "Contact Form", enabled: true },
+  { id: "quote_request", label: "Quote Request", enabled: false },
   { id: "booking", label: "Booking", enabled: true },
   { id: "social", label: "Social Links", enabled: false },
 ];
