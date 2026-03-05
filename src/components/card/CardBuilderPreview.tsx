@@ -108,7 +108,7 @@ function getSectionPreview(section: CardSection) {
 export default function CardBuilderPreview({
   profile, previewTheme, currentThemeOverrides, sections,
   coverUrl, coverOffsetY, avatarUrl, avatarBgColor, avatarRotation,
-  logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap = 8,
+  logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap = 8, logoVerticalAlign = "center",
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
   boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, onAvatarChange, setEditingSection,
 }: Props) {
@@ -235,7 +235,7 @@ export default function CardBuilderPreview({
                       }}
                     />
 
-                    <div style={{ display: "flex", alignItems: "center", gap: logoNameGap }}>
+                    <div style={{ display: "flex", alignItems: logoVerticalAlign === "top" ? "flex-start" : logoVerticalAlign === "bottom" ? "flex-end" : "center", gap: logoNameGap }}>
                       {logoUrl && logoPosition === "beside-name" && (
                         <div
                           className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
