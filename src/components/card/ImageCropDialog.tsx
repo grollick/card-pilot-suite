@@ -10,7 +10,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Circle, Square, RectangleHorizontal, Loader2 } from "lucide-react";
+
+const CROP_PRESETS = [
+  { label: "Circle", value: "circle", aspect: 1, shape: "round" as const, icon: Circle },
+  { label: "Square", value: "square", aspect: 1, shape: "rect" as const, icon: Square },
+  { label: "4:3", value: "4:3", aspect: 4 / 3, shape: "rect" as const, icon: RectangleHorizontal },
+];
 
 interface ImageCropDialogProps {
   open: boolean;
@@ -63,13 +69,16 @@ export default function ImageCropDialog({
   imageSrc,
   onClose,
   onCropComplete,
-  aspect = 1,
+  aspect: _initialAspect = 1,
   title = "Crop Photo",
 }: ImageCropDialogProps) {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedArea, setCroppedArea] = useState<Area | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [activePreset, setActivePreset] = useState("circle");
+
+  const currentPreset = CROP_PRESETS.find((p) => p.value === activePreset) ?? CROP_PRESETS[0];
 
   const onCropDone = useCallback(
     (_: Area, croppedAreaPixels: Area) => {
@@ -78,6 +87,12 @@ export default function ImageCropDialog({
     []
   );
 
+  const handlePresetChange = (value: string) => {
+    setActivePreset(value);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+  };
+
   const handleConfirm = async () => {
     if (!croppedArea) return;
     setProcessing(true);
@@ -85,7 +100,6 @@ export default function ImageCropDialog({
       const blob = await getCroppedBlob(imageSrc, croppedArea);
       onCropComplete(blob);
     } catch {
-      // fallback: pass original as blob
       const res = await fetch(imageSrc);
       const blob = await res.blob();
       onCropComplete(blob);
@@ -101,14 +115,36 @@ export default function ImageCropDialog({
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
 
+        {/* Aspect ratio presets */}
+        <div className="px-4 pb-2 flex gap-1.5">
+          {CROP_PRESETS.map((preset) => {
+            const Icon = preset.icon;
+            const isActive = activePreset === preset.value;
+            return (
+              <button
+                key={preset.value}
+                onClick={() => handlePresetChange(preset.value)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border transition-all ${
+                  isActive
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-background text-muted-foreground hover:border-primary/50"
+                }`}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {preset.label}
+              </button>
+            );
+          })}
+        </div>
+
         <div className="relative w-full h-72 bg-muted">
           <Cropper
             image={imageSrc}
             crop={crop}
             zoom={zoom}
-            aspect={aspect}
-            cropShape="round"
-            showGrid={false}
+            aspect={currentPreset.aspect}
+            cropShape={currentPreset.shape}
+            showGrid={currentPreset.shape === "rect"}
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={onCropDone}
