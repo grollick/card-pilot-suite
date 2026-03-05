@@ -173,7 +173,8 @@ export default function Onboarding() {
       }, { onConflict: "user_id" });
       if (cardErr) throw cardErr;
 
-      // 3. Create pipeline stages
+      // 3. Replace pipeline stages (clear old defaults first)
+      await supabase.from("pipeline_stages").delete().eq("user_id", user.id);
       const stages = (selectedProfession.default_pipeline_stages as string[]) || [];
       if (stages.length > 0) {
         const stageRows = stages.map((stageName: string, i: number) => ({
@@ -185,7 +186,8 @@ export default function Onboarding() {
         if (stagesErr) throw stagesErr;
       }
 
-      // 4. Create booking services
+      // 4. Replace booking services
+      await supabase.from("booking_services").delete().eq("user_id", user.id);
       const services = (selectedProfession.default_booking_services as any[]) || [];
       if (services.length > 0) {
         const serviceRows = services.map((s: any) => ({
@@ -200,7 +202,8 @@ export default function Onboarding() {
         if (servicesErr) throw servicesErr;
       }
 
-      // 5. Create email templates
+      // 5. Replace email templates
+      await supabase.from("email_templates").delete().eq("user_id", user.id);
       const templates = (selectedProfession.default_email_templates as any[]) || [];
       if (templates.length > 0) {
         const templateRows = templates.map((t: any) => ({
