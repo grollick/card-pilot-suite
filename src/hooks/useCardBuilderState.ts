@@ -41,6 +41,7 @@ export function useCardBuilderState() {
   const [logoSize, setLogoSize] = useState<"small" | "medium" | "large">("medium");
   const [logoOpacity, setLogoOpacity] = useState(100);
   const [logoPadding, setLogoPadding] = useState(4);
+  const [logoNameGap, setLogoNameGap] = useState(8);
   const [ctaConfig, setCtaConfig] = useState<CtaItem[]>(DEFAULT_CTA_CONFIG);
   const [ctaIconsOnly, setCtaIconsOnly] = useState(false);
   const [socialIconsOnly, setSocialIconsOnly] = useState(true);
@@ -92,6 +93,7 @@ export function useCardBuilderState() {
       if (t?.logo_size) setLogoSize(t.logo_size);
       if (typeof t?.logo_opacity === "number") setLogoOpacity(t.logo_opacity);
       if (typeof t?.logo_padding === "number") setLogoPadding(t.logo_padding);
+      if (typeof t?.logo_name_gap === "number") setLogoNameGap(t.logo_name_gap);
       if (t?.job_title) setJobTitle(t.job_title);
       if (typeof t?.bold_last_name === "boolean") setBoldLastName(t.bold_last_name);
       if (typeof t?.uppercase_name === "boolean") setUppercaseName(t.uppercase_name);
@@ -254,6 +256,7 @@ export function useCardBuilderState() {
   const handleLogoGlowChange = makeThemeHandler("logo_glow", setLogoGlow);
   const handleLogoOpacityChange = makeThemeHandler("logo_opacity", setLogoOpacity);
   const handleLogoPaddingChange = makeThemeHandler("logo_padding", setLogoPadding);
+  const handleLogoNameGapChange = makeThemeHandler("logo_name_gap", setLogoNameGap);
   const handleLogoPositionChange = makeThemeHandler("logo_position", setLogoPosition);
   const handleLogoSizeChange = makeThemeHandler("logo_size", setLogoSize);
   const handleCtaConfigChange = useCallback((newConfig: CtaItem[]) => {
@@ -368,11 +371,11 @@ export function useCardBuilderState() {
     identitySaveTimers, identitySaveState, setIdentitySaveState,
     // Photos / Logo
     avatarUrl, coverUrl, avatarBgColor, avatarRotation, coverOffsetY,
-    logoUrl, logoFrostedBg, logoGlow, logoPosition, logoSize, logoOpacity, logoPadding,
+    logoUrl, logoFrostedBg, logoGlow, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap,
     handleAvatarChange, handleCoverChange,
     handleAvatarBgColorChange, handleAvatarRotationChange, handleCoverOffsetYChange,
     handleLogoChange, handleLogoFrostedBgChange, handleLogoGlowChange,
-    handleLogoOpacityChange, handleLogoPaddingChange, handleLogoPositionChange, handleLogoSizeChange,
+    handleLogoOpacityChange, handleLogoPaddingChange, handleLogoPositionChange, handleLogoSizeChange, handleLogoNameGapChange,
     // CTA & Social
     ctaConfig, ctaIconsOnly, setCtaIconsOnly,
     socialIconsOnly, setSocialIconsOnly, socialBtnColor, setSocialBtnColor,

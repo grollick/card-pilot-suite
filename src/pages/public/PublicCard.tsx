@@ -525,6 +525,7 @@ export default function PublicCard() {
             logoSize={(themeJson.logo_size as any) ?? "medium"}
             logoOpacity={typeof themeJson.logo_opacity === "number" ? (themeJson.logo_opacity as number) : 100}
             logoPadding={typeof themeJson.logo_padding === "number" ? (themeJson.logo_padding as number) : 4}
+            logoNameGap={typeof themeJson.logo_name_gap === "number" ? (themeJson.logo_name_gap as number) : 8}
             metallicEffect={metallicEffect}
           />
           </div>
