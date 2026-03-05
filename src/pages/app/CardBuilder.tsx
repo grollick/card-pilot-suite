@@ -1,6 +1,6 @@
 import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick, Check, Cloud, CloudOff, Smartphone, Tablet, Link2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import CtaEditor, { type CtaItem, DEFAULT_CTA_CONFIG } from "@/components/card/CtaEditor";
+import CtaEditor, { type CtaItem, DEFAULT_CTA_CONFIG, CTA_ICON_MAP } from "@/components/card/CtaEditor";
 import { resolveCardTheme, type ResolvedCardTheme } from "@/lib/cardTokens";
 import QRShareDialog from "@/components/card/QRShareDialog";
 import NFCShareDialog from "@/components/card/NFCShareDialog";
@@ -62,6 +62,7 @@ export default function CardBuilder() {
   const [logoFrostedBg, setLogoFrostedBg] = useState(true);
   const [logoGlow, setLogoGlow] = useState(false);
   const [ctaConfig, setCtaConfig] = useState<CtaItem[]>(DEFAULT_CTA_CONFIG);
+  const [ctaIconsOnly, setCtaIconsOnly] = useState(false);
   const [showSectionIcons, setShowSectionIcons] = useState(false);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
@@ -120,6 +121,7 @@ export default function CardBuilder() {
       if (typeof themeJson?.logo_glow === "boolean") setLogoGlow(themeJson.logo_glow);
       if (themeJson?.job_title) { setJobTitle(themeJson.job_title); }
       if (typeof themeJson?.section_icons === "boolean") setShowSectionIcons(themeJson.section_icons);
+      if (typeof themeJson?.cta_icons_only === "boolean") setCtaIconsOnly(themeJson.cta_icons_only);
       if (themeJson?.cta_config && Array.isArray(themeJson.cta_config)) {
         setCtaConfig(themeJson.cta_config as CtaItem[]);
       }
@@ -798,9 +800,22 @@ export default function CardBuilder() {
 
             {/* CTA Buttons */}
             <div className="pt-3 border-t border-border/50 space-y-3">
-              <div className="flex items-center gap-2">
-                <MousePointerClick className="h-4 w-4 text-primary" />
-                <h2 className="font-semibold text-sm">CTA Buttons</h2>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MousePointerClick className="h-4 w-4 text-primary" />
+                  <h2 className="font-semibold text-sm">CTA Buttons</h2>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] text-muted-foreground">Icons only</span>
+                  <Switch
+                    checked={ctaIconsOnly}
+                    onCheckedChange={(v) => {
+                      setCtaIconsOnly(v);
+                      saveThemeField({ cta_icons_only: v });
+                    }}
+                    className="scale-75"
+                  />
+                </div>
               </div>
               <CtaEditor ctas={ctaConfig} onChange={handleCtaConfigChange} />
             </div>
@@ -972,6 +987,28 @@ export default function CardBuilder() {
                   const enabledCtas = ctaConfig.filter(c => c.enabled);
                   const primaryCta = enabledCtas.find(c => c.isPrimary) || enabledCtas[0];
                   const secondaryCtas = enabledCtas.filter(c => c !== primaryCta);
+
+                  if (ctaIconsOnly) {
+                    return (
+                      <div className="flex items-center justify-center gap-3 mt-4">
+                        {enabledCtas.map(c => (
+                          <button
+                            key={c.id}
+                            className="h-10 w-10 rounded-full flex items-center justify-center transition-colors"
+                            style={{
+                              background: c.isPrimary ? previewTheme.palette.primary : "transparent",
+                              color: c.isPrimary ? previewTheme.palette.background : previewTheme.palette.primary,
+                              border: c.isPrimary ? "none" : `1.5px solid ${previewTheme.palette.primary}40`,
+                            }}
+                            title={c.label}
+                          >
+                            {CTA_ICON_MAP[c.id]}
+                          </button>
+                        ))}
+                      </div>
+                    );
+                  }
+
                   return (
                     <div className="space-y-2 mt-4">
                       {primaryCta && (
