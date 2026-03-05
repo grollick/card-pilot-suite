@@ -69,7 +69,7 @@ export default function ContactSummaryCard({ contact }: Props) {
   return (
     <div className="space-y-4">
       {/* Identity */}
-      <div className="rounded-xl border border-border bg-card p-5 space-y-4">
+      <div className="rounded-xl border border-border bg-muted p-5 space-y-4">
         <div className="flex items-center gap-3">
           <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center text-lg font-semibold text-primary shrink-0">{initials}</div>
           <div className="flex-1 min-w-0">
@@ -137,7 +137,7 @@ export default function ContactSummaryCard({ contact }: Props) {
       </div>
 
       {/* Properties */}
-      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+      <div className="rounded-xl border border-border bg-muted p-4 space-y-3">
         <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Properties</p>
         {properties.map((prop, i) => (
           <div key={i} className="flex items-center gap-2 text-sm">
