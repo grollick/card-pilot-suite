@@ -1,4 +1,4 @@
-import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick, Check, Cloud, CloudOff } from "lucide-react";
+import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick, Check, Cloud, CloudOff, Smartphone, Tablet } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import CtaEditor, { type CtaItem, DEFAULT_CTA_CONFIG } from "@/components/card/CtaEditor";
 import { resolveCardTheme, type ResolvedCardTheme } from "@/lib/cardTokens";
@@ -50,6 +50,7 @@ export default function CardBuilder() {
 
   const [sections, setSections] = useState<CardSection[]>(DEFAULT_SECTIONS);
   const [published, setPublished] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [avatarBgColor, setAvatarBgColor] = useState("transparent");
@@ -789,27 +790,65 @@ export default function CardBuilder() {
           transition={{ delay: 0.1 }}
           className="lg:col-span-2 space-y-3 lg:sticky lg:top-20 lg:self-start"
         >
-          {profile?.handle && (
-            <div className="flex justify-end">
+          {/* Toolbar above preview */}
+          <div className="flex items-center justify-between">
+            {/* Device toggle */}
+            <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/50 p-0.5">
+              <button
+                onClick={() => setPreviewDevice("phone")}
+                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  previewDevice === "phone"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Smartphone className="h-3.5 w-3.5" /> Phone
+              </button>
+              <button
+                onClick={() => setPreviewDevice("tablet")}
+                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  previewDevice === "tablet"
+                    ? "bg-background text-foreground shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Tablet className="h-3.5 w-3.5" /> Tablet
+              </button>
+            </div>
+            {profile?.handle && (
               <Button variant="outline" size="sm" asChild className="gap-2">
                 <a href={`/${profile.handle}`} target="_blank" rel="noreferrer">
                   <Eye className="h-4 w-4" />
                   Preview as Visitor
                 </a>
               </Button>
-            </div>
-          )}
-          <div className="flex items-start justify-center py-4">
-            {/* Phone frame */}
-            <div className="relative mx-auto w-[300px]">
-              {/* Notch */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 z-30 w-[120px] h-[26px] bg-foreground/90 rounded-b-2xl" />
+            )}
+          </div>
+          <div className="flex items-start justify-center py-4 transition-all duration-300">
+            {/* Device frame */}
+            <div className={`relative mx-auto transition-all duration-300 ${
+              previewDevice === "phone" ? "w-[300px]" : "w-[500px]"
+            }`}>
+              {/* Notch (phone only) */}
+              {previewDevice === "phone" && (
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 z-30 w-[120px] h-[26px] bg-foreground/90 rounded-b-2xl" />
+              )}
+              {/* Camera dot (tablet) */}
+              {previewDevice === "tablet" && (
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-[8px] h-[8px] bg-foreground/40 rounded-full" />
+              )}
               {/* Outer shell */}
-              <div className="rounded-[2.5rem] border-[6px] border-foreground/90 bg-foreground/90 shadow-xl overflow-hidden">
+              <div className={`border-[6px] border-foreground/90 bg-foreground/90 shadow-xl overflow-hidden transition-all duration-300 ${
+                previewDevice === "phone" ? "rounded-[2.5rem]" : "rounded-[1.5rem]"
+              }`}>
                 {/* Screen area */}
-                <div className="rounded-[2rem] overflow-hidden bg-background relative pb-6">
+                <div className={`overflow-hidden bg-background relative pb-6 transition-all duration-300 ${
+                  previewDevice === "phone" ? "rounded-[2rem]" : "rounded-[1rem]"
+                }`}>
                   {/* Home indicator */}
-                  <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-30 w-[100px] h-[4px] rounded-full bg-foreground/30" />
+                  <div className={`absolute bottom-1.5 left-1/2 -translate-x-1/2 z-30 h-[4px] rounded-full bg-foreground/30 ${
+                    previewDevice === "phone" ? "w-[100px]" : "w-[140px]"
+                  }`} />
                   <div className="lg:max-h-[calc(100vh-10rem)] overflow-y-auto scroll-smooth snap-y snap-proximity">
                     <div className="relative" style={{
                       background: currentThemeOverrides.gradientBg?.enabled
