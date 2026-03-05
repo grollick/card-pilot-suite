@@ -23,6 +23,7 @@ interface Props {
   setIdentitySaveState: React.Dispatch<React.SetStateAction<Record<string, "saving" | "saved" | null>>>;
   saveThemeField: (fields: Record<string, any>) => void;
   qc: any;
+  hideWrapper?: boolean;
 }
 
 function SaveIndicator({ state }: { state: "saving" | "saved" | null }) {
@@ -36,7 +37,7 @@ export default function CardBuilderIdentity({
   editJobTitle, setEditJobTitle, jobTitle, setJobTitle, boldLastName, setBoldLastName,
   uppercaseName, setUppercaseName,
   professionName, identitySaveTimers, identitySaveState, setIdentitySaveState,
-  saveThemeField, qc,
+  saveThemeField, qc, hideWrapper,
 }: Props) {
   const makeHandler = (field: string, dbField: string, setter: (v: string | null) => void) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,11 +70,13 @@ export default function CardBuilderIdentity({
     };
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-      <div className="flex items-center gap-2">
-        <Pencil className="h-4 w-4 text-primary" />
-        <h2 className="font-semibold">Identity</h2>
-      </div>
+    <div className={hideWrapper ? "space-y-3" : "rounded-xl border border-border bg-card p-4 space-y-3"}>
+      {!hideWrapper && (
+        <div className="flex items-center gap-2">
+          <Pencil className="h-4 w-4 text-primary" />
+          <h2 className="font-semibold">Identity</h2>
+        </div>
+      )}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label className="text-xs text-muted-foreground">Display Name</label>
