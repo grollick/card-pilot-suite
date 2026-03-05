@@ -221,6 +221,7 @@ function buildDailyBreakdown(events: { event_type: string; created_at: string }[
       date: dayStr,
       views: dayEvents.filter(e => e.event_type === "card_view").length,
       clicks: dayEvents.filter(e => e.event_type === "button_click").length,
+      contactSaves: dayEvents.filter(e => e.event_type === "contact_saved").length,
     };
   });
 }
