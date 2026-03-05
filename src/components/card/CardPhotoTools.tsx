@@ -36,6 +36,8 @@ interface CardPhotoToolsProps {
   onCoverOffsetYChange?: (y: number) => void;
   logoUrl?: string | null;
   onLogoChange?: (url: string | null) => void;
+  logoFrostedBg?: boolean;
+  onLogoFrostedBgChange?: (val: boolean) => void;
 }
 
 export default function CardPhotoTools({
@@ -52,6 +54,8 @@ export default function CardPhotoTools({
   onCoverOffsetYChange,
   logoUrl = null,
   onLogoChange,
+  logoFrostedBg = true,
+  onLogoFrostedBgChange,
 }: CardPhotoToolsProps) {
   const { user } = useAuth();
   const [uploading, setUploading] = useState(false);
@@ -326,7 +330,7 @@ export default function CardPhotoTools({
 
       {/* Logo Upload */}
       {onLogoChange && (
-        <LogoUploader logoUrl={logoUrl} onLogoChange={onLogoChange} />
+        <LogoUploader logoUrl={logoUrl} onLogoChange={onLogoChange} logoFrostedBg={logoFrostedBg} onLogoFrostedBgChange={onLogoFrostedBgChange} />
       )}
 
       {/* Profile Photo Crop Dialog */}

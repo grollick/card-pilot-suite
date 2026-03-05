@@ -12,13 +12,14 @@ interface CardHeaderProps {
   avatarRotation?: number;
   coverOffsetY?: number;
   logoUrl?: string | null;
+  logoFrostedBg?: boolean;
 }
 
 /**
  * Renders one of 4 header layouts based on theme tokens:
  * cover | split | classic | hero
  */
-export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, coverOffsetY = 0, logoUrl }: CardHeaderProps) {
+export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, coverOffsetY = 0, logoUrl, logoFrostedBg = true }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
 
@@ -80,6 +81,20 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
     </div>
   );
 
+  // Shared logo element
+  const logoEl = logoUrl ? (
+    <div style={{
+      position: "absolute", top: 8, right: 8,
+      height: 48, width: 48, borderRadius: 8,
+      background: logoFrostedBg ? "rgba(255,255,255,0.85)" : "transparent",
+      backdropFilter: logoFrostedBg ? "blur(4px)" : undefined,
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: logoFrostedBg ? 4 : 0,
+    }}>
+      <img src={logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
+    </div>
+  ) : null;
+
   // Shared cover/backdrop banner element for non-cover layouts
   const coverBanner = (coverUrl || logoUrl) ? (
     <div
@@ -105,16 +120,7 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
           }}
         />
       )}
-      {logoUrl && (
-        <div style={{
-          position: "absolute", top: 8, right: 8,
-          height: 32, width: 32, borderRadius: 6,
-          background: "rgba(255,255,255,0.85)", backdropFilter: "blur(4px)",
-          display: "flex", alignItems: "center", justifyContent: "center", padding: 4,
-        }}>
-          <img src={logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
-        </div>
-      )}
+      {logoEl}
     </div>
   ) : null;
 
@@ -146,16 +152,7 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
                 }}
               />
             )}
-            {logoUrl && (
-              <div style={{
-                position: "absolute", top: 8, right: 8,
-                height: 32, width: 32, borderRadius: 6,
-                background: "rgba(255,255,255,0.85)", backdropFilter: "blur(4px)",
-                display: "flex", alignItems: "center", justifyContent: "center", padding: 4,
-              }}>
-                <img src={logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
-              </div>
-            )}
+            {logoEl}
           </div>
           <div style={{ padding: "0 24px", marginTop: -40, display: "flex", flexDirection: "column" }}>
             {avatarEl}

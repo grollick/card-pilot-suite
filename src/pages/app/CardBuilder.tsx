@@ -56,6 +56,7 @@ export default function CardBuilder() {
   const [avatarRotation, setAvatarRotation] = useState(0);
   const [coverOffsetY, setCoverOffsetY] = useState(0);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoFrostedBg, setLogoFrostedBg] = useState(true);
   const [ctaConfig, setCtaConfig] = useState<CtaItem[]>(DEFAULT_CTA_CONFIG);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
@@ -103,6 +104,7 @@ export default function CardBuilder() {
       if (typeof themeJson?.avatar_rotation === "number") setAvatarRotation(themeJson.avatar_rotation);
       if (typeof themeJson?.cover_offset_y === "number") setCoverOffsetY(themeJson.cover_offset_y);
       if (themeJson?.logo_url) setLogoUrl(themeJson.logo_url);
+      if (typeof themeJson?.logo_frosted_bg === "boolean") setLogoFrostedBg(themeJson.logo_frosted_bg);
       if (themeJson?.cta_config && Array.isArray(themeJson.cta_config)) {
         setCtaConfig(themeJson.cta_config as CtaItem[]);
       }
@@ -271,6 +273,11 @@ export default function CardBuilder() {
   const handleLogoChange = (url: string | null) => {
     setLogoUrl(url);
     saveThemeField({ logo_url: url });
+  };
+
+  const handleLogoFrostedBgChange = (val: boolean) => {
+    setLogoFrostedBg(val);
+    saveThemeField({ logo_frosted_bg: val });
   };
 
   const handleCoverChange = async (url: string) => {
@@ -548,6 +555,8 @@ export default function CardBuilder() {
               onCoverOffsetYChange={handleCoverOffsetYChange}
               logoUrl={logoUrl}
               onLogoChange={handleLogoChange}
+              logoFrostedBg={logoFrostedBg}
+              onLogoFrostedBgChange={handleLogoFrostedBgChange}
             />
           </div>
 
@@ -634,7 +643,7 @@ export default function CardBuilder() {
                   />
                 )}
                 {logoUrl && (
-                  <div className="absolute top-2 right-2 h-8 w-8 rounded bg-white/80 backdrop-blur-sm flex items-center justify-center p-1 shadow-sm">
+                  <div className={`absolute top-2 right-2 h-12 w-12 rounded-lg flex items-center justify-center ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm p-1 shadow-sm' : ''}`}>
                     <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
                   </div>
                 )}
