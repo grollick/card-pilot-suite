@@ -548,40 +548,34 @@ export default function PublicCard() {
 
             if (!hasCardServices && !hasDbServices) return null;
 
-            return (
-              <div>
+              <CardSectionWrapper theme={theme} index={1}>
                 <SectionTitle id="services" label="Services" />
-                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {hasCardServices
                     ? cardServices!.filter((s) => s.name).map((s, i) => (
-                        <CardSectionWrapper key={i} theme={theme} index={i + 1}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                            <div>
-                              <span style={{ fontSize: 14, fontWeight: 500, color: palette.primary }}>{s.name}</span>
-                              {s.description && (
-                                <p style={{ fontSize: 12, color: palette.secondary, margin: "4px 0 0", opacity: 0.8 }}>{s.description}</p>
-                              )}
-                            </div>
-                            {s.price && (
-                              <span style={{ fontSize: 13, color: palette.secondary, fontWeight: 500 }}>{s.price}</span>
-                            )}
-                          </div>
-                        </CardSectionWrapper>
-                      ))
-                    : services.map((s, i) => (
-                        <CardSectionWrapper key={s.id} theme={theme} index={i + 1}>
-                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <div>
                             <span style={{ fontSize: 14, fontWeight: 500, color: palette.primary }}>{s.name}</span>
-                            {s.price != null && (
-                              <span style={{ fontSize: 13, color: palette.secondary }}>${Number(s.price).toFixed(0)}</span>
+                            {s.description && (
+                              <p style={{ fontSize: 12, color: palette.secondary, margin: "4px 0 0", opacity: 0.8 }}>{s.description}</p>
                             )}
                           </div>
-                        </CardSectionWrapper>
+                          {s.price && (
+                            <span style={{ fontSize: 13, color: palette.secondary, fontWeight: 500 }}>{s.price}</span>
+                          )}
+                        </div>
+                      ))
+                    : services.map((s) => (
+                        <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <span style={{ fontSize: 14, fontWeight: 500, color: palette.primary }}>{s.name}</span>
+                          {s.price != null && (
+                            <span style={{ fontSize: 13, color: palette.secondary }}>${Number(s.price).toFixed(0)}</span>
+                          )}
+                        </div>
                       ))
                   }
                 </div>
-              </div>
-            );
+              </CardSectionWrapper>
           })()}
 
           {/* ── Booking ── */}
