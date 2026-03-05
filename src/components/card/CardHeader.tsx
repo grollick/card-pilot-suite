@@ -1,6 +1,8 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { type ResolvedCardTheme, getAvatarRadius } from "@/lib/cardTokens";
+import type { MetallicEffect } from "@/components/card/CardThemeEditor";
+import { METALLIC_GRADIENTS } from "@/components/card/CardThemeEditor";
 
 interface CardHeaderProps {
   theme: ResolvedCardTheme;
@@ -33,6 +35,7 @@ interface CardHeaderProps {
   logoSize?: "small" | "medium" | "large";
   logoOpacity?: number;
   logoPadding?: number;
+  metallicEffect?: MetallicEffect;
 }
 
 function renderName(name: string, bold?: boolean, uppercase?: boolean, firstNameWeight?: number | null) {
@@ -56,7 +59,7 @@ function renderName(name: string, bold?: boolean, uppercase?: boolean, firstName
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, nameFontSize, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4 }: CardHeaderProps) {
+export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, nameFontSize, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4, metallicEffect }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -71,14 +74,23 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
   // Subtle scale for depth
   const coverScale = useTransform(scrollYProgress, [0, 1], [1.08, 1]);
 
+  const hasMetallicName = metallicEffect?.type && metallicEffect.type !== "none" && metallicEffect.applyToName;
+  const metallicGrad = hasMetallicName ? METALLIC_GRADIENTS[metallicEffect!.type as Exclude<import("@/components/card/CardThemeEditor").MetallicType, "none">] : undefined;
+
   const titleStyle: React.CSSProperties = {
     fontFamily: `'${fonts.primary}', sans-serif`,
     fontWeight: nameFontWeight ?? header.titleWeight,
-    color: palette.primary,
+    color: hasMetallicName ? "transparent" : palette.primary,
     margin: 0,
     lineHeight: 1.2,
     letterSpacing: nameLetterSpacing ? `${nameLetterSpacing}px` : undefined,
     fontStyle: nameItalic ? "italic" : undefined,
+    ...(hasMetallicName ? {
+      background: metallicGrad,
+      WebkitBackgroundClip: "text",
+      WebkitTextFillColor: "transparent",
+      backgroundClip: "text",
+    } : {}),
   };
 
   const subtitleStyle: React.CSSProperties = {
