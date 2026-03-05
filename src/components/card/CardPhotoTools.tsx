@@ -531,7 +531,7 @@ export default function CardPhotoTools({
 
       {/* Logo Upload */}
       {onLogoChange && (
-        <LogoUploader logoUrl={logoUrl} onLogoChange={onLogoChange} logoFrostedBg={logoFrostedBg} onLogoFrostedBgChange={onLogoFrostedBgChange} logoGlow={logoGlow} onLogoGlowChange={onLogoGlowChange} logoPosition={logoPosition} onLogoPositionChange={onLogoPositionChange} logoSize={logoSize} onLogoSizeChange={onLogoSizeChange} logoOpacity={logoOpacity} onLogoOpacityChange={onLogoOpacityChange} logoPadding={logoPadding} onLogoPaddingChange={onLogoPaddingChange} logoNameGap={logoNameGap} onLogoNameGapChange={onLogoNameGapChange} />
+        <LogoUploader logoUrl={logoUrl} onLogoChange={onLogoChange} logoFrostedBg={logoFrostedBg} onLogoFrostedBgChange={onLogoFrostedBgChange} logoGlow={logoGlow} onLogoGlowChange={onLogoGlowChange} logoPosition={logoPosition} onLogoPositionChange={onLogoPositionChange} logoSize={logoSize} onLogoSizeChange={onLogoSizeChange} logoOpacity={logoOpacity} onLogoOpacityChange={onLogoOpacityChange} logoPadding={logoPadding} onLogoPaddingChange={onLogoPaddingChange} logoNameGap={logoNameGap} onLogoNameGapChange={onLogoNameGapChange} logoVerticalAlign={logoVerticalAlign} onLogoVerticalAlignChange={onLogoVerticalAlignChange} />
       )}
 
       {/* Profile Photo Crop Dialog */}
