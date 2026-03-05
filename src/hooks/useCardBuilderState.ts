@@ -57,6 +57,8 @@ export function useCardBuilderState() {
   const [uppercaseName, setUppercaseName] = useState(false);
   const [nameLetterSpacing, setNameLetterSpacing] = useState(0);
   const [nameFontWeight, setNameFontWeight] = useState(700);
+  const [firstNameFontWeight, setFirstNameFontWeight] = useState<number | null>(null);
+  const [nameItalic, setNameItalic] = useState(false);
   const identitySaveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const [identitySaveState, setIdentitySaveState] = useState<Record<string, "saving" | "saved" | null>>({});
   const [globalSaveState, setGlobalSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -91,6 +93,8 @@ export function useCardBuilderState() {
       if (typeof t?.uppercase_name === "boolean") setUppercaseName(t.uppercase_name);
       if (typeof t?.name_letter_spacing === "number") setNameLetterSpacing(t.name_letter_spacing);
       if (typeof t?.name_font_weight === "number") setNameFontWeight(t.name_font_weight);
+      if (typeof t?.first_name_font_weight === "number") setFirstNameFontWeight(t.first_name_font_weight);
+      if (typeof t?.name_italic === "boolean") setNameItalic(t.name_italic);
       if (typeof t?.section_icons === "boolean") setShowSectionIcons(t.section_icons);
       if (typeof t?.cta_icons_only === "boolean") setCtaIconsOnly(t.cta_icons_only);
       if (typeof t?.social_icons_only === "boolean") setSocialIconsOnly(t.social_icons_only);
@@ -349,6 +353,8 @@ export function useCardBuilderState() {
     uppercaseName, setUppercaseName,
     nameLetterSpacing, setNameLetterSpacing,
     nameFontWeight, setNameFontWeight,
+    firstNameFontWeight, setFirstNameFontWeight,
+    nameItalic, setNameItalic,
     identitySaveTimers, identitySaveState, setIdentitySaveState,
     // Photos / Logo
     avatarUrl, coverUrl, avatarBgColor, avatarRotation, coverOffsetY,

@@ -22,6 +22,10 @@ interface Props {
   setNameLetterSpacing: (v: number) => void;
   nameFontWeight: number;
   setNameFontWeight: (v: number) => void;
+  firstNameFontWeight: number | null;
+  setFirstNameFontWeight: (v: number | null) => void;
+  nameItalic: boolean;
+  setNameItalic: (v: boolean) => void;
   professionName: string;
   identitySaveTimers: React.MutableRefObject<Record<string, ReturnType<typeof setTimeout>>>;
   identitySaveState: Record<string, "saving" | "saved" | null>;
@@ -43,6 +47,8 @@ export default function CardBuilderIdentity({
   uppercaseName, setUppercaseName,
   nameLetterSpacing, setNameLetterSpacing,
   nameFontWeight, setNameFontWeight,
+  firstNameFontWeight, setFirstNameFontWeight,
+  nameItalic, setNameItalic,
   professionName, identitySaveTimers, identitySaveState, setIdentitySaveState,
   saveThemeField, qc, hideWrapper,
 }: Props) {
@@ -132,6 +138,35 @@ export default function CardBuilderIdentity({
             value={[nameFontWeight]}
             onValueChange={([v]) => { setNameFontWeight(v); saveThemeField({ name_font_weight: v }); }}
             className="w-full"
+          />
+        </div>
+        <div className="mt-1.5">
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[11px] text-muted-foreground">First name weight</label>
+            <span className="text-[10px] text-muted-foreground tabular-nums">{firstNameFontWeight ?? "Same"}</span>
+          </div>
+          <Slider
+            min={100}
+            max={900}
+            step={100}
+            value={[firstNameFontWeight ?? nameFontWeight]}
+            onValueChange={([v]) => { setFirstNameFontWeight(v); saveThemeField({ first_name_font_weight: v }); }}
+            className="w-full"
+          />
+          {firstNameFontWeight !== null && (
+            <button
+              type="button"
+              onClick={() => { setFirstNameFontWeight(null); saveThemeField({ first_name_font_weight: null }); }}
+              className="text-[10px] text-primary hover:underline mt-0.5"
+            >Reset to same</button>
+          )}
+        </div>
+        <div className="flex items-center justify-between mt-1">
+          <label className="text-[11px] text-muted-foreground">Italic name</label>
+          <Switch
+            checked={nameItalic}
+            onCheckedChange={(v) => { setNameItalic(v); saveThemeField({ name_italic: v }); }}
+            className="scale-75 origin-right"
           />
         </div>
       </div>
