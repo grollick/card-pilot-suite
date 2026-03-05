@@ -1,4 +1,4 @@
-import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick, Check } from "lucide-react";
+import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick, Check, Cloud, CloudOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import CtaEditor, { type CtaItem, DEFAULT_CTA_CONFIG } from "@/components/card/CtaEditor";
 import { resolveCardTheme, type ResolvedCardTheme } from "@/lib/cardTokens";
@@ -68,6 +68,8 @@ export default function CardBuilder() {
   const [jobTitle, setJobTitle] = useState<string | null>(null);
   const identitySaveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const [identitySaveState, setIdentitySaveState] = useState<Record<string, "saving" | "saved" | null>>({});
+  const [globalSaveState, setGlobalSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const globalSaveTimer = useRef<ReturnType<typeof setTimeout>>();
   const hydrated = useRef(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -130,13 +132,20 @@ export default function CardBuilder() {
       clearTimeout(saveTimer.current);
       const doSave = async () => {
         try {
+          setGlobalSaveState("saving");
           await upsertCard.mutateAsync({
             sections_json: newSections as any,
             status: published ? "published" : "draft",
             theme_json: { ...(card?.theme_json as any ?? {}), cover_url: coverUrlRef.current } as any,
           });
+          setGlobalSaveState("saved");
+          clearTimeout(globalSaveTimer.current);
+          globalSaveTimer.current = setTimeout(() => setGlobalSaveState("idle"), 2500);
           toast.success("Card saved");
         } catch {
+          setGlobalSaveState("error");
+          clearTimeout(globalSaveTimer.current);
+          globalSaveTimer.current = setTimeout(() => setGlobalSaveState("idle"), 4000);
           toast.error("Failed to save");
         }
       };
@@ -254,14 +263,20 @@ export default function CardBuilder() {
 
   const saveThemeField = async (fields: Record<string, any>) => {
     try {
+      setGlobalSaveState("saving");
       const existing = (card?.theme_json as any) ?? {};
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: published ? "published" : "draft",
         theme_json: { ...existing, cover_url: coverUrlRef.current, ...fields } as any,
       });
+      setGlobalSaveState("saved");
+      clearTimeout(globalSaveTimer.current);
+      globalSaveTimer.current = setTimeout(() => setGlobalSaveState("idle"), 2500);
     } catch {
-      // silent — debounced visual updates don't need error toasts
+      setGlobalSaveState("error");
+      clearTimeout(globalSaveTimer.current);
+      globalSaveTimer.current = setTimeout(() => setGlobalSaveState("idle"), 4000);
     }
   };
 
@@ -489,6 +504,46 @@ export default function CardBuilder() {
           )}
         </div>
       </div>
+
+      {/* Global auto-save status bar */}
+      <motion.div
+        initial={{ opacity: 0, y: -4 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`flex items-center gap-2 rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+          globalSaveState === "saving"
+            ? "border-primary/30 bg-primary/5 text-primary"
+            : globalSaveState === "saved"
+            ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-600"
+            : globalSaveState === "error"
+            ? "border-destructive/30 bg-destructive/5 text-destructive"
+            : "border-border bg-muted/50 text-muted-foreground"
+        }`}
+      >
+        {globalSaveState === "saving" && (
+          <>
+            <Loader2 className="h-3 w-3 animate-spin" />
+            <span>Saving changes…</span>
+          </>
+        )}
+        {globalSaveState === "saved" && (
+          <>
+            <Cloud className="h-3 w-3" />
+            <span>All changes saved</span>
+          </>
+        )}
+        {globalSaveState === "error" && (
+          <>
+            <CloudOff className="h-3 w-3" />
+            <span>Save failed — retrying on next edit</span>
+          </>
+        )}
+        {globalSaveState === "idle" && (
+          <>
+            <Cloud className="h-3 w-3" />
+            <span>Up to date</span>
+          </>
+        )}
+      </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left panel */}
