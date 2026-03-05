@@ -14,6 +14,7 @@ interface CardHeaderProps {
   firstNameFontWeight?: number | null;
   nameItalic?: boolean;
   nameFontSize?: number | null;
+  subtitleFontSize?: number | null;
   profession?: string;
   company?: string;
   avatarUrl?: string | null;
@@ -59,7 +60,7 @@ function renderName(name: string, bold?: boolean, uppercase?: boolean, firstName
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, nameFontSize, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4, metallicEffect }: CardHeaderProps) {
+export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, nameFontSize, subtitleFontSize, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4, metallicEffect }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -96,7 +97,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
   const subtitleStyle: React.CSSProperties = {
     fontFamily: `'${fonts.secondary}', sans-serif`,
     color: palette.secondary,
-    fontSize: 14,
+    fontSize: subtitleFontSize ?? 14,
     margin: 0,
     marginTop: 4,
   };
