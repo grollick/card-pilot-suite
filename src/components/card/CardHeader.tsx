@@ -32,7 +32,7 @@ interface CardHeaderProps {
   logoUrl?: string | null;
   logoFrostedBg?: boolean;
   logoGlow?: boolean;
-  logoPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name";
+  logoPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name" | "beside-name-right";
   logoSize?: "small" | "medium" | "large";
   logoOpacity?: number;
   logoPadding?: number;
@@ -224,7 +224,8 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
   };
 
   // Shared logo element (absolute positioned on cover)
-  const logoEl = logoUrl && logoPosition !== "beside-name" ? (
+  const isInlineLogo = logoPosition === "beside-name" || logoPosition === "beside-name-right";
+  const logoEl = logoUrl && !isInlineLogo ? (
     <motion.div
       animate={logoGlow ? {
         boxShadow: [
@@ -251,7 +252,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
   ) : null;
 
   // Inline logo element (beside the name)
-  const inlineLogoEl = logoUrl && logoPosition === "beside-name" ? (
+  const inlineLogoEl = logoUrl && isInlineLogo ? (
     <motion.div
       animate={logoGlow ? {
         boxShadow: [
@@ -325,8 +326,9 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
           <div style={{ padding: "0 24px", marginTop: -40, display: "flex", flexDirection: "column", position: "relative", zIndex: 2 }}>
             {avatarEl}
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12 }}>
-              {inlineLogoEl}
+              {logoPosition === "beside-name" && inlineLogoEl}
               <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 24 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
+              {logoPosition === "beside-name-right" && inlineLogoEl}
             </div>
             {profession && <p style={subtitleStyle}>{profession}</p>}
             {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
@@ -346,8 +348,9 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
             {avatarEl}
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                {inlineLogoEl}
+                {logoPosition === "beside-name" && inlineLogoEl}
                 <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 22 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
+                {logoPosition === "beside-name-right" && inlineLogoEl}
               </div>
               {profession && <p style={subtitleStyle}>{profession}</p>}
               {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
@@ -376,8 +379,9 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
               })}
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
-              {inlineLogoEl}
+              {logoPosition === "beside-name" && inlineLogoEl}
               <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 28 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
+              {logoPosition === "beside-name-right" && inlineLogoEl}
             </div>
             {profession && <p style={{ ...subtitleStyle, fontSize: 16 }}>{profession}</p>}
             {company && <p style={{ ...subtitleStyle, fontSize: 14, opacity: 0.7 }}>{company}</p>}
@@ -400,8 +404,9 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
               {avatarEl}
             </div>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-              {inlineLogoEl}
+              {logoPosition === "beside-name" && inlineLogoEl}
               <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 22 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
+              {logoPosition === "beside-name-right" && inlineLogoEl}
             </div>
             {profession && <p style={subtitleStyle}>{profession}</p>}
             {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}

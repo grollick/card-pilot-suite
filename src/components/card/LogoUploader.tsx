@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
-export type LogoPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name";
+export type LogoPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name" | "beside-name-right";
 export type LogoSize = "small" | "medium" | "large";
 
 interface LogoUploaderProps {
@@ -33,7 +33,8 @@ const POSITIONS: { value: LogoPosition; label: string }[] = [
   { value: "top-right", label: "↗" },
   { value: "bottom-left", label: "↙" },
   { value: "bottom-right", label: "↘" },
-  { value: "beside-name", label: "≡" },
+  { value: "beside-name", label: "≡←" },
+  { value: "beside-name-right", label: "→≡" },
 ];
 
 const SIZES: { value: LogoSize; label: string }[] = [
