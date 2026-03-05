@@ -1,4 +1,4 @@
-import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick, Check } from "lucide-react";
+import { CreditCard, Eye, Paintbrush, Palette, Globe, Sparkles, Loader2, Pencil, MousePointerClick } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import CtaEditor, { type CtaItem, DEFAULT_CTA_CONFIG } from "@/components/card/CtaEditor";
 import { resolveCardTheme, type ResolvedCardTheme } from "@/lib/cardTokens";
@@ -66,6 +66,7 @@ export default function CardBuilder() {
   const [editCompany, setEditCompany] = useState<string | null>(null);
   const [editJobTitle, setEditJobTitle] = useState<string | null>(null);
   const [jobTitle, setJobTitle] = useState<string | null>(null);
+  const identitySaveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const hydrated = useRef(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -503,90 +504,66 @@ export default function CardBuilder() {
             </div>
             <div className="space-y-2">
               <label className="text-xs text-muted-foreground">Display Name</label>
-              <div className="flex gap-2">
-                <Input
-                  value={editName ?? profile?.name ?? ""}
-                  onChange={(e) => setEditName(e.target.value)}
-                  placeholder="Your Name"
-                  className="text-sm"
-                />
-                {editName !== null && editName !== (profile?.name ?? "") && (
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="shrink-0"
-                    onClick={async () => {
-                      if (!profile) return;
-                      const { supabase } = await import("@/integrations/supabase/client");
-                      const { error } = await supabase.from("profiles").update({ name: editName }).eq("id", profile.id);
-                      if (error) { toast.error("Failed to save name"); return; }
-                      qc.invalidateQueries({ queryKey: ["profile"] });
-                      qc.invalidateQueries({ queryKey: ["public-card"] });
-                      setEditName(null);
-                      toast.success("Name updated");
-                    }}
-                  >
-                    <Check className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
+              <Input
+                value={editName ?? profile?.name ?? ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setEditName(val);
+                  clearTimeout(identitySaveTimers.current.name);
+                  identitySaveTimers.current.name = setTimeout(async () => {
+                    if (!profile) return;
+                    const { supabase } = await import("@/integrations/supabase/client");
+                    const { error } = await supabase.from("profiles").update({ name: val }).eq("id", profile.id);
+                    if (error) { toast.error("Failed to save name"); return; }
+                    qc.invalidateQueries({ queryKey: ["profile"] });
+                    qc.invalidateQueries({ queryKey: ["public-card"] });
+                    setEditName(null);
+                  }, 800);
+                }}
+                placeholder="Your Name"
+                className="text-sm"
+              />
             </div>
             <div className="space-y-2">
               <label className="text-xs text-muted-foreground">Company / Title</label>
-              <div className="flex gap-2">
-                <Input
-                  value={editCompany ?? profile?.company ?? ""}
-                  onChange={(e) => setEditCompany(e.target.value)}
-                  placeholder="Your Company"
-                  className="text-sm"
-                />
-                {editCompany !== null && editCompany !== (profile?.company ?? "") && (
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="shrink-0"
-                    onClick={async () => {
-                      if (!profile) return;
-                      const { supabase } = await import("@/integrations/supabase/client");
-                      const { error } = await supabase.from("profiles").update({ company: editCompany }).eq("id", profile.id);
-                      if (error) { toast.error("Failed to save company"); return; }
-                      qc.invalidateQueries({ queryKey: ["profile"] });
-                      qc.invalidateQueries({ queryKey: ["public-card"] });
-                      setEditCompany(null);
-                      toast.success("Company updated");
-                    }}
-                  >
-                    <Check className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
+              <Input
+                value={editCompany ?? profile?.company ?? ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setEditCompany(val);
+                  clearTimeout(identitySaveTimers.current.company);
+                  identitySaveTimers.current.company = setTimeout(async () => {
+                    if (!profile) return;
+                    const { supabase } = await import("@/integrations/supabase/client");
+                    const { error } = await supabase.from("profiles").update({ company: val }).eq("id", profile.id);
+                    if (error) { toast.error("Failed to save company"); return; }
+                    qc.invalidateQueries({ queryKey: ["profile"] });
+                    qc.invalidateQueries({ queryKey: ["public-card"] });
+                    setEditCompany(null);
+                  }, 800);
+                }}
+                placeholder="Your Company"
+                className="text-sm"
+              />
             </div>
             <div className="space-y-2">
               <label className="text-xs text-muted-foreground">Job Title</label>
-              <div className="flex gap-2">
-                <Input
-                  value={editJobTitle ?? jobTitle ?? ""}
-                  onChange={(e) => setEditJobTitle(e.target.value)}
-                  placeholder={professionName}
-                  className="text-sm"
-                />
-                {editJobTitle !== null && editJobTitle !== (jobTitle ?? "") && (
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="shrink-0"
-                    onClick={() => {
-                      const val = editJobTitle.trim() || null;
-                      setJobTitle(val);
-                      setEditJobTitle(null);
-                      saveThemeField({ job_title: val });
-                      toast.success("Job title updated");
-                    }}
-                  >
-                    <Check className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
+              <Input
+                value={editJobTitle ?? jobTitle ?? ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setEditJobTitle(val);
+                  clearTimeout(identitySaveTimers.current.jobTitle);
+                  identitySaveTimers.current.jobTitle = setTimeout(() => {
+                    const trimmed = val.trim() || null;
+                    setJobTitle(trimmed);
+                    setEditJobTitle(null);
+                    saveThemeField({ job_title: trimmed });
+                  }, 800);
+                }}
+                placeholder={professionName}
+                className="text-sm"
+              />
               {jobTitle && (
                 <p className="text-[10px] text-muted-foreground">Clear to use default: {professionName}</p>
               )}
