@@ -219,11 +219,12 @@ interface Props {
   stylePackFonts?: CardFonts;
   stylePackTokens?: Record<string, any>;
   onSave: (overrides: CardThemeOverrides) => void;
+  onPreview?: (overrides: CardThemeOverrides) => void;
 }
 
 export default function CardThemeEditor({
   open, onOpenChange, currentOverrides,
-  stylePackPalettes, stylePackFonts, stylePackTokens, onSave,
+  stylePackPalettes, stylePackFonts, stylePackTokens, onSave, onPreview,
 }: Props) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -279,6 +280,16 @@ export default function CardThemeEditor({
     setBgPattern(currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 });
     if (open) fetchCustomPalettes();
   }, [open]);
+
+  // ── Live preview: push overrides on every change ──
+  useEffect(() => {
+    if (!open || !onPreview) return;
+    onPreview({
+      palette, fonts, tokens,
+      gradientBg: gradientBg.enabled ? gradientBg : undefined,
+      bgPattern: bgPattern.type !== "none" ? bgPattern : undefined,
+    });
+  }, [palette, fonts, tokens, gradientBg, bgPattern, open, onPreview]);
 
   const handleColorChange = useCallback((key: keyof CardPalette, value: string) => {
     setPalette((prev) => ({ ...prev, [key]: value }));
