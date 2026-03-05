@@ -496,14 +496,6 @@ export default function CardBuilder() {
               name={profile.name || "Card"}
             />
           )}
-          {profile?.handle && (
-            <Button variant="outline" asChild>
-              <a href={`/${profile.handle}`} target="_blank" rel="noreferrer">
-                <Eye className="h-4 w-4 mr-2" />
-                Preview as Visitor
-              </a>
-            </Button>
-          )}
         </div>
       </div>
 
@@ -791,8 +783,19 @@ export default function CardBuilder() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="lg:col-span-2 rounded-xl border border-border bg-muted/30 p-6 min-h-[600px] flex items-start justify-center"
+          className="lg:col-span-2 space-y-3"
         >
+          {profile?.handle && (
+            <div className="flex justify-end">
+              <Button variant="outline" size="sm" asChild className="gap-2">
+                <a href={`/${profile.handle}`} target="_blank" rel="noreferrer">
+                  <Eye className="h-4 w-4" />
+                  Preview as Visitor
+                </a>
+              </Button>
+            </div>
+          )}
+          <div className="rounded-xl border border-border bg-muted/30 p-6 min-h-[600px] flex items-start justify-center">
           <div className="w-full max-w-sm mx-auto">
             <div className="rounded-2xl border border-border overflow-hidden shadow-card relative" style={{
               background: currentThemeOverrides.gradientBg?.enabled
@@ -939,6 +942,7 @@ export default function CardBuilder() {
                   ))}
               </div>
             </div>
+          </div>
           </div>
         </motion.div>
       </div>
