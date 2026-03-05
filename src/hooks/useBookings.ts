@@ -138,7 +138,7 @@ export function usePublicBookingData(handle: string | undefined) {
     queryFn: async () => {
       const { data: profile, error: pErr } = await supabase
         .from("profiles")
-        .select("id, name, handle, avatar_url")
+        .select("id, name, handle, avatar_url, email, phone")
         .eq("handle", handle!)
         .single();
       if (pErr) throw pErr;
