@@ -803,7 +803,9 @@ export default function CardBuilder() {
               {/* Outer shell */}
               <div className="rounded-[2.5rem] border-[6px] border-foreground/90 bg-foreground/90 shadow-xl overflow-hidden">
                 {/* Screen area */}
-                <div className="rounded-[2rem] overflow-hidden bg-background">
+                <div className="rounded-[2rem] overflow-hidden bg-background relative pb-6">
+                  {/* Home indicator */}
+                  <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 z-30 w-[100px] h-[4px] rounded-full bg-foreground/30" />
                   <div className="lg:max-h-[calc(100vh-10rem)] overflow-y-auto scroll-smooth snap-y snap-proximity">
                     <div className="relative" style={{
                       background: currentThemeOverrides.gradientBg?.enabled
