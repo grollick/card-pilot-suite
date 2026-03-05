@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useEffect, useRef, useMemo } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { Link, useParams } from "react-router-dom";
 import { usePublicCard, CTA_TYPES, type CardSection } from "@/hooks/useCard";
@@ -82,6 +83,7 @@ const DEFAULT_PALETTE = {
 
 export default function PublicCard() {
   const { handle } = useParams();
+  const { user } = useAuth();
   const { data, isLoading, isError } = usePublicCard(handle);
   const [formSent, setFormSent] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
@@ -167,6 +169,17 @@ export default function PublicCard() {
   }
 
   const { card, services } = data!;
+  const isOwner = user?.id === profile.id;
+  const isUnpublished = !card || card.status !== "published";
+
+  // Non-owners cannot see unpublished cards
+  if (isUnpublished && !isOwner) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground">This card is not published yet</p>
+      </div>
+    );
+  }
   const sections: CardSection[] =
     card && Array.isArray(card.sections_json) ? (card.sections_json as unknown as CardSection[]) : [];
   const enabledSections = new Set(sections.filter((s) => s.enabled).map((s) => s.id));
