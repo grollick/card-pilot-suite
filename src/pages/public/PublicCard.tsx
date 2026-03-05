@@ -532,7 +532,7 @@ export default function PublicCard() {
 
           {/* ── About ── */}
           {enabledSections.has("about") && (
-            <CardSectionWrapper theme={theme}>
+            <CardSectionWrapper theme={theme} index={0}>
               <SectionTitle id="about" label="About" />
               <p style={{ fontSize: 14, lineHeight: 1.7, color: palette.secondary, margin: 0 }}>
                 {sectionContent("about")?.text || "Passionate professional dedicated to delivering exceptional results."}
@@ -554,7 +554,7 @@ export default function PublicCard() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                   {hasCardServices
                     ? cardServices!.filter((s) => s.name).map((s, i) => (
-                        <CardSectionWrapper key={i} theme={theme}>
+                        <CardSectionWrapper key={i} theme={theme} index={i + 1}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                             <div>
                               <span style={{ fontSize: 14, fontWeight: 500, color: palette.primary }}>{s.name}</span>
@@ -568,8 +568,8 @@ export default function PublicCard() {
                           </div>
                         </CardSectionWrapper>
                       ))
-                    : services.map((s) => (
-                        <CardSectionWrapper key={s.id} theme={theme}>
+                    : services.map((s, i) => (
+                        <CardSectionWrapper key={s.id} theme={theme} index={i + 1}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                             <span style={{ fontSize: 14, fontWeight: 500, color: palette.primary }}>{s.name}</span>
                             {s.price != null && (
@@ -607,7 +607,7 @@ export default function PublicCard() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {hasContent
                     ? testimonials!.map((t, i) => (
-                        <CardSectionWrapper key={i} theme={theme}>
+                        <CardSectionWrapper key={i} theme={theme} index={i + 2}>
                           <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
                             {[...Array(5)].map((_, j) => (
                               <Star key={j} className="h-3.5 w-3.5" style={{ fill: "#f59e0b", color: "#f59e0b" }} />
@@ -622,7 +622,7 @@ export default function PublicCard() {
                         </CardSectionWrapper>
                       ))
                     : (
-                        <CardSectionWrapper theme={theme}>
+                        <CardSectionWrapper theme={theme} index={2}>
                           <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
                             {[...Array(5)].map((_, i) => (
                               <Star key={i} className="h-3.5 w-3.5" style={{ fill: "#f59e0b", color: "#f59e0b" }} />
@@ -762,7 +762,7 @@ export default function PublicCard() {
                   </p>
                 </motion.div>
               ) : (
-                <CardSectionWrapper theme={theme}>
+                <CardSectionWrapper theme={theme} index={4}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     <input
                       placeholder="Your name *"

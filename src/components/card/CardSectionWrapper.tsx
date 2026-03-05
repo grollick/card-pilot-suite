@@ -9,6 +9,8 @@ interface CardSectionWrapperProps {
   theme: ResolvedCardTheme;
   children: React.ReactNode;
   className?: string;
+  /** Zero-based index used for stagger delay */
+  index?: number;
 }
 
 /**
@@ -16,12 +18,14 @@ interface CardSectionWrapperProps {
  * (solid / frosted / elevated / soft / glow) derived from tokens.
  * Animates in with a lifted tile + glow effect on scroll.
  */
-export default function CardSectionWrapper({ theme, children, className = "" }: CardSectionWrapperProps) {
+export default function CardSectionWrapper({ theme, children, className = "", index = 0 }: CardSectionWrapperProps) {
   const sectionStyle: React.CSSProperties = {
     borderRadius: theme.radii.card,
     padding: theme.spacing.inner,
     ...cardStyleMap(theme),
   };
+
+  const staggerDelay = index * 0.1;
 
   return (
     <motion.div
@@ -34,7 +38,7 @@ export default function CardSectionWrapper({ theme, children, className = "" }: 
         boxShadow: `0 8px 32px -8px ${theme.palette.primary}25, 0 0 20px ${theme.palette.primary}10`,
       }}
       viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.5, delay: staggerDelay, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{
         y: -2,
         boxShadow: `0 12px 40px -8px ${theme.palette.primary}35, 0 0 28px ${theme.palette.primary}15`,
