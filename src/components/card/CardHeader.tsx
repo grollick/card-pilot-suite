@@ -28,9 +28,10 @@ interface CardHeaderProps {
   logoUrl?: string | null;
   logoFrostedBg?: boolean;
   logoGlow?: boolean;
-  logoPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+  logoPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name";
   logoSize?: "small" | "medium" | "large";
   logoOpacity?: number;
+  logoPadding?: number;
 }
 
 function renderName(name: string, bold?: boolean, uppercase?: boolean, firstNameWeight?: number | null) {
@@ -54,7 +55,7 @@ function renderName(name: string, bold?: boolean, uppercase?: boolean, firstName
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100 }: CardHeaderProps) {
+export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4 }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -208,8 +209,8 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     "bottom-right": { bottom: 8, right: 8 },
   };
 
-  // Shared logo element
-  const logoEl = logoUrl ? (
+  // Shared logo element (absolute positioned on cover)
+  const logoEl = logoUrl && logoPosition !== "beside-name" ? (
     <motion.div
       animate={logoGlow ? {
         boxShadow: [
@@ -226,9 +227,34 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
         background: logoFrostedBg ? "rgba(255,255,255,0.85)" : "transparent",
         backdropFilter: logoFrostedBg ? "blur(4px)" : undefined,
         display: "flex", alignItems: "center", justifyContent: "center",
-        padding: logoFrostedBg ? 4 : 0,
+        padding: logoPadding,
         zIndex: 2,
         opacity: logoOpacity / 100,
+      }}
+    >
+      <img src={logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
+    </motion.div>
+  ) : null;
+
+  // Inline logo element (beside the name)
+  const inlineLogoEl = logoUrl && logoPosition === "beside-name" ? (
+    <motion.div
+      animate={logoGlow ? {
+        boxShadow: [
+          `0 0 12px ${palette.primary}40, 0 0 24px ${palette.primary}20`,
+          `0 0 20px ${palette.primary}60, 0 0 40px ${palette.primary}30`,
+          `0 0 12px ${palette.primary}40, 0 0 24px ${palette.primary}20`,
+        ],
+      } : undefined}
+      transition={logoGlow ? { duration: 2.5, repeat: Infinity, ease: "easeInOut" as const } : undefined}
+      style={{
+        height: logoPx, width: logoPx, borderRadius: 8,
+        background: logoFrostedBg ? "rgba(255,255,255,0.85)" : "transparent",
+        backdropFilter: logoFrostedBg ? "blur(4px)" : undefined,
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        padding: logoPadding,
+        opacity: logoOpacity / 100,
+        flexShrink: 0,
       }}
     >
       <img src={logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
@@ -284,7 +310,10 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
           {parallaxCover(160, true)}
           <div style={{ padding: "0 24px", marginTop: -40, display: "flex", flexDirection: "column", position: "relative", zIndex: 2 }}>
             {avatarEl}
-            <h1 style={{ ...titleStyle, fontSize: 24, marginTop: 12 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12 }}>
+              {inlineLogoEl}
+              <h1 style={{ ...titleStyle, fontSize: 24 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
+            </div>
             {profession && <p style={subtitleStyle}>{profession}</p>}
             {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
           </div>
@@ -302,7 +331,10 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
           }}>
             {avatarEl}
             <div>
-              <h1 style={{ ...titleStyle, fontSize: 22 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {inlineLogoEl}
+                <h1 style={{ ...titleStyle, fontSize: 22 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
+              </div>
               {profession && <p style={subtitleStyle}>{profession}</p>}
               {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
             </div>
@@ -329,7 +361,10 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
                 },
               })}
             </div>
-            <h1 style={{ ...titleStyle, fontSize: 28 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10 }}>
+              {inlineLogoEl}
+              <h1 style={{ ...titleStyle, fontSize: 28 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
+            </div>
             {profession && <p style={{ ...subtitleStyle, fontSize: 16 }}>{profession}</p>}
             {company && <p style={{ ...subtitleStyle, fontSize: 14, opacity: 0.7 }}>{company}</p>}
           </div>
@@ -350,7 +385,10 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
               {avatarEl}
             </div>
-            <h1 style={{ ...titleStyle, fontSize: 22 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+              {inlineLogoEl}
+              <h1 style={{ ...titleStyle, fontSize: 22 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
+            </div>
             {profession && <p style={subtitleStyle}>{profession}</p>}
             {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
           </div>

@@ -115,6 +115,8 @@ export default function CardBuilder() {
                     onLogoSizeChange={s.handleLogoSizeChange}
                     logoOpacity={s.logoOpacity}
                     onLogoOpacityChange={s.handleLogoOpacityChange}
+                    logoPadding={s.logoPadding}
+                    onLogoPaddingChange={s.handleLogoPaddingChange}
                     avatarShape={s.previewTheme.header.avatarShape}
                     onAvatarShapeChange={(shape) => {
                       const existing = (s.card?.theme_json as any)?.tokens ?? {};
@@ -281,6 +283,8 @@ export default function CardBuilder() {
                     onLogoSizeChange={s.handleLogoSizeChange}
                     logoOpacity={s.logoOpacity}
                     onLogoOpacityChange={s.handleLogoOpacityChange}
+                    logoPadding={s.logoPadding}
+                    onLogoPaddingChange={s.handleLogoPaddingChange}
                     avatarShape={s.previewTheme.header.avatarShape}
                     onAvatarShapeChange={(shape) => {
                       const existing = (s.card?.theme_json as any)?.tokens ?? {};
@@ -394,6 +398,7 @@ export default function CardBuilder() {
             logoPosition={s.logoPosition}
             logoSize={s.logoSize}
             logoOpacity={s.logoOpacity}
+            logoPadding={s.logoPadding}
             ctaConfig={s.ctaConfig}
             ctaIconsOnly={s.ctaIconsOnly}
             editName={s.editName}

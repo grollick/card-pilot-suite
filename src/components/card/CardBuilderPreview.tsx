@@ -23,6 +23,7 @@ interface Props {
   logoPosition: string;
   logoSize: string;
   logoOpacity: number;
+  logoPadding: number;
   ctaConfig: CtaItem[];
   ctaIconsOnly: boolean;
   editName: string | null;
@@ -103,7 +104,7 @@ function getSectionPreview(section: CardSection) {
 export default function CardBuilderPreview({
   profile, previewTheme, currentThemeOverrides, sections,
   coverUrl, coverOffsetY, avatarUrl, avatarBgColor, avatarRotation,
-  logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity,
+  logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity, logoPadding,
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
   boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, onAvatarChange, setEditingSection,
 }: Props) {
@@ -182,10 +183,10 @@ export default function CardBuilderPreview({
                     {coverUrl && (
                       <img src={coverUrl} alt="cover" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: `center ${coverOffsetY}%` }} />
                     )}
-                    {logoUrl && (
+                    {logoUrl && logoPosition !== "beside-name" && (
                       <div
-                        className={`absolute ${posMap[logoPosition]} rounded-lg flex items-center justify-center ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm p-1 shadow-sm' : ''}`}
-                        style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100 }}
+                        className={`absolute ${posMap[logoPosition]} rounded-lg flex items-center justify-center ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
+                        style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
                       >
                         <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
                       </div>
@@ -230,23 +231,33 @@ export default function CardBuilderPreview({
                       }}
                     />
 
-                    <h3 className="text-lg" style={{ color: previewTheme.palette.secondary, fontFamily: `'${previewTheme.fonts.primary}', sans-serif`, fontWeight: nameFontWeight ?? 700, fontStyle: nameItalic ? "italic" : undefined, ...(uppercaseName ? { textTransform: 'uppercase' as const } : {}), ...(nameLetterSpacing ? { letterSpacing: `${nameLetterSpacing}px` } : {}) }}>
-                      {(() => {
-                        const full = (editName ?? profile?.name) || "Your Name";
-                        const display = uppercaseName ? full.toUpperCase() : full;
-                        const parts = display.trim().split(/\s+/);
-                        if (parts.length <= 1) {
-                          if (firstNameFontWeight != null) return <span style={{ fontWeight: firstNameFontWeight }}>{display}</span>;
-                          if (boldLastName) return <span style={{ fontWeight: 800 }}>{display}</span>;
-                          return display;
-                        }
-                        const last = parts.pop()!;
-                        const firstName = parts.join(" ");
-                        const firstStyle = firstNameFontWeight != null ? { fontWeight: firstNameFontWeight } : undefined;
-                        const lastStyle = boldLastName ? { fontWeight: 800 } : undefined;
-                        return <>{firstStyle ? <span style={firstStyle}>{firstName}</span> : firstName} {lastStyle ? <span style={lastStyle}>{last}</span> : last}</>;
-                      })()}
-                    </h3>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      {logoUrl && logoPosition === "beside-name" && (
+                        <div
+                          className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
+                          style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
+                        >
+                          <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
+                        </div>
+                      )}
+                      <h3 className="text-lg" style={{ color: previewTheme.palette.secondary, fontFamily: `'${previewTheme.fonts.primary}', sans-serif`, fontWeight: nameFontWeight ?? 700, fontStyle: nameItalic ? "italic" : undefined, ...(uppercaseName ? { textTransform: 'uppercase' as const } : {}), ...(nameLetterSpacing ? { letterSpacing: `${nameLetterSpacing}px` } : {}) }}>
+                        {(() => {
+                          const full = (editName ?? profile?.name) || "Your Name";
+                          const display = uppercaseName ? full.toUpperCase() : full;
+                          const parts = display.trim().split(/\s+/);
+                          if (parts.length <= 1) {
+                            if (firstNameFontWeight != null) return <span style={{ fontWeight: firstNameFontWeight }}>{display}</span>;
+                            if (boldLastName) return <span style={{ fontWeight: 800 }}>{display}</span>;
+                            return display;
+                          }
+                          const last = parts.pop()!;
+                          const firstName = parts.join(" ");
+                          const firstStyle = firstNameFontWeight != null ? { fontWeight: firstNameFontWeight } : undefined;
+                          const lastStyle = boldLastName ? { fontWeight: 800 } : undefined;
+                          return <>{firstStyle ? <span style={firstStyle}>{firstName}</span> : firstName} {lastStyle ? <span style={lastStyle}>{last}</span> : last}</>;
+                        })()}
+                      </h3>
+                    </div>
                     <p className="text-sm" style={{ color: `${previewTheme.palette.secondary}99` }}>{displayJobTitle}</p>
                     {(editCompany ?? profile?.company) && (
                       <p className="text-xs mt-0.5" style={{ color: `${previewTheme.palette.secondary}70` }}>{editCompany ?? profile?.company}</p>
