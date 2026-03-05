@@ -221,6 +221,7 @@ export default function Analytics() {
           <div className="grid grid-cols-2 gap-4">
             {[
               { label: "Card Views", value: stats?.views ?? 0 },
+              { label: "Contact Saves", value: stats?.contactSaves ?? 0 },
               { label: "Form Submits", value: stats?.formSubmits ?? 0 },
               { label: "Bookings", value: stats?.bookings ?? 0 },
               { label: "Booking Events", value: stats?.bookingEvents ?? 0 },
