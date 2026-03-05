@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { type ResolvedCardTheme, getAvatarRadius } from "@/lib/cardTokens";
 
 interface CardHeaderProps {
@@ -18,10 +19,22 @@ interface CardHeaderProps {
 /**
  * Renders one of 4 header layouts based on theme tokens:
  * cover | split | classic | hero
+ * Cover images include a parallax scroll effect.
  */
 export default function CardHeader({ theme, name, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, coverOffsetY = 0, logoUrl, logoFrostedBg = true }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
+  const coverRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: coverRef,
+    offset: ["start start", "end start"],
+  });
+
+  // Parallax: image moves slower than scroll (0 → 40px shift)
+  const coverY = useTransform(scrollYProgress, [0, 1], [0, 40]);
+  // Subtle scale for depth
+  const coverScale = useTransform(scrollYProgress, [0, 1], [1.08, 1]);
 
   const titleStyle: React.CSSProperties = {
     fontFamily: `'${fonts.primary}', sans-serif`,
@@ -90,17 +103,19 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
       backdropFilter: logoFrostedBg ? "blur(4px)" : undefined,
       display: "flex", alignItems: "center", justifyContent: "center",
       padding: logoFrostedBg ? 4 : 0,
+      zIndex: 2,
     }}>
       <img src={logoUrl} alt="logo" style={{ maxHeight: "100%", maxWidth: "100%", objectFit: "contain" }} />
     </div>
   ) : null;
 
-  // Shared cover/backdrop banner element for non-cover layouts
-  const coverBanner = (coverUrl || logoUrl) ? (
+  // Parallax cover image element — reused in cover layout and banner
+  const parallaxCover = (height: number, borderRadiusTop: boolean) => (
     <div
+      ref={coverRef}
       style={{
-        height: 120,
-        borderRadius: `${radii.card} ${radii.card} 0 0`,
+        height,
+        borderRadius: borderRadiusTop ? `${radii.card} ${radii.card} 0 0` : undefined,
         overflow: "hidden",
         position: "relative",
         background: coverUrl
@@ -109,52 +124,36 @@ export default function CardHeader({ theme, name, profession, company, avatarUrl
       }}
     >
       {coverUrl && (
-        <img
+        <motion.img
           src={coverUrl}
           alt=""
           style={{
             width: "100%",
-            height: "100%",
+            height: "120%",
             objectFit: "cover",
             objectPosition: `center ${coverOffsetY}%`,
+            y: coverY,
+            scale: coverScale,
+            position: "absolute",
+            top: 0,
+            left: 0,
           }}
         />
       )}
       {logoEl}
     </div>
-  ) : null;
+  );
+
+  // Shared cover/backdrop banner element for non-cover layouts
+  const coverBanner = (coverUrl || logoUrl) ? parallaxCover(120, true) : null;
 
   switch (header.layout) {
     // ─── Cover: full-width cover image, avatar overlapping ─────
     case "cover":
       return (
         <div style={{ position: "relative" }}>
-          <div
-            style={{
-              height: 160,
-              borderRadius: `${radii.card} ${radii.card} 0 0`,
-              overflow: "hidden",
-              position: "relative",
-              background: coverUrl
-                ? undefined
-                : `linear-gradient(135deg, ${palette.primary}30, ${palette.accent}20)`,
-            }}
-          >
-            {coverUrl && (
-              <img
-                src={coverUrl}
-                alt=""
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  objectPosition: `center ${coverOffsetY}%`,
-                }}
-              />
-            )}
-            {logoEl}
-          </div>
-          <div style={{ padding: "0 24px", marginTop: -40, display: "flex", flexDirection: "column" }}>
+          {parallaxCover(160, true)}
+          <div style={{ padding: "0 24px", marginTop: -40, display: "flex", flexDirection: "column", position: "relative", zIndex: 2 }}>
             {avatarEl}
             <h1 style={{ ...titleStyle, fontSize: 24, marginTop: 12 }}>{name}</h1>
             {profession && <p style={subtitleStyle}>{profession}</p>}
