@@ -488,6 +488,7 @@ export default function PublicCard() {
         )}
         {/* ── Header ── */}
         {enabledSections.has("hero") && (
+          <div style={{ position: "relative", zIndex: 2 }}>
           <CardHeader
             theme={theme}
             name={profile.name || "Your Name"}
@@ -508,9 +509,10 @@ export default function PublicCard() {
             logoFrostedBg={themeJson.logo_frosted_bg !== false}
             logoGlow={themeJson.logo_glow === true}
           />
+          </div>
         )}
 
-        <div style={{ padding: `${spacing.section}px`, display: "flex", flexDirection: "column", gap: spacing.section }}>
+        <div style={{ padding: `${spacing.section}px`, display: "flex", flexDirection: "column", gap: spacing.section, position: "relative", zIndex: 2 }}>
           {/* ── Primary CTA ── */}
           {primaryCtaItem && (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
