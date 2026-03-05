@@ -366,7 +366,7 @@ export default function CardBuilder() {
       case "services":
         return c.items?.length ? (
           <div className="space-y-1.5">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Services</p>
+            
             {c.items.map((item: any, i: number) => (
               <div key={i} className="flex items-center justify-between text-xs">
                 <span>{item.name || "Untitled"}</span>
@@ -379,7 +379,6 @@ export default function CardBuilder() {
       case "testimonials":
         return c.testimonials?.length ? (
           <div className="space-y-2">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Testimonials</p>
             {c.testimonials.map((t: any, i: number) => (
               <div key={i} className="text-xs italic">
                 "{t.text}" — <span className="font-medium not-italic">{t.name}</span>
