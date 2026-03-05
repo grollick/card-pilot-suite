@@ -52,7 +52,7 @@ export default function CardSectionWrapper({ theme, children, className = "", in
             height: 1,
             width: `${theme.section.dividerWidth ?? 100}%`,
             margin: `${theme.spacing.inner}px auto 0`,
-            background: `${theme.palette.secondary}20`,
+            background: theme.section.dividerColor || `${theme.palette.secondary}20`,
           }}
         />
       )}
