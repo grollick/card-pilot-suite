@@ -60,6 +60,7 @@ export default function CardPhotoTools({
   const [customPrompt, setCustomPrompt] = useState("");
   const [bgRemoved, setBgRemoved] = useState(false);
   const [cropSrc, setCropSrc] = useState<string | null>(null);
+  const [coverCropSrc, setCoverCropSrc] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const coverFileInputRef = useRef<HTMLInputElement>(null);
@@ -111,13 +112,23 @@ export default function CardPhotoTools({
     }
   }, [user, onAvatarChange, onAvatarRotationChange]);
 
-  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCoverSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user) return;
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setCoverCropSrc(reader.result as string);
+    reader.readAsDataURL(file);
+    if (coverFileInputRef.current) coverFileInputRef.current.value = "";
+    if (coverCameraInputRef.current) coverCameraInputRef.current.value = "";
+  };
+
+  const handleCroppedCoverUpload = useCallback(async (blob: Blob) => {
+    setCoverCropSrc(null);
+    if (!user) return;
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop() || "jpg";
-      const path = `${user.id}/cover.${ext}`;
+      const file = new File([blob], "cover.png", { type: "image/png" });
+      const path = `${user.id}/cover.png`;
       const url = await uploadFile(file, path);
       onCoverChange(url);
       toast.success("Cover photo uploaded!");
@@ -125,10 +136,8 @@ export default function CardPhotoTools({
       toast.error(err.message || "Failed to upload cover");
     } finally {
       setUploading(false);
-      if (coverFileInputRef.current) coverFileInputRef.current.value = "";
-      if (coverCameraInputRef.current) coverCameraInputRef.current.value = "";
     }
-  };
+  }, [user, onCoverChange]);
 
   const handleRemoveBackground = async () => {
     if (!avatarUrl || !user) return;
@@ -280,8 +289,8 @@ export default function CardPhotoTools({
       {/* Cover Photo Upload */}
       <div className="space-y-2 pt-2 border-t border-border/50">
         <Label className="text-xs text-muted-foreground">Cover Photo</Label>
-        <input ref={coverFileInputRef} type="file" accept="image/*" className="hidden" onChange={handleCoverUpload} />
-        <input ref={coverCameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleCoverUpload} />
+        <input ref={coverFileInputRef} type="file" accept="image/*" className="hidden" onChange={handleCoverSelected} />
+        <input ref={coverCameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={handleCoverSelected} />
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="flex-1" onClick={() => coverFileInputRef.current?.click()} disabled={uploading}>
             <ImagePlus className="h-4 w-4 mr-2" />
@@ -320,7 +329,7 @@ export default function CardPhotoTools({
         <LogoUploader logoUrl={logoUrl} onLogoChange={onLogoChange} />
       )}
 
-      {/* Image Crop Dialog */}
+      {/* Profile Photo Crop Dialog */}
       <ImageCropDialog
         open={!!cropSrc}
         imageSrc={cropSrc || ""}
@@ -328,6 +337,16 @@ export default function CardPhotoTools({
         onCropComplete={handleCroppedUpload}
         aspect={1}
         title="Crop Profile Photo"
+      />
+
+      {/* Cover Photo Crop Dialog */}
+      <ImageCropDialog
+        open={!!coverCropSrc}
+        imageSrc={coverCropSrc || ""}
+        onClose={() => setCoverCropSrc(null)}
+        onCropComplete={handleCroppedCoverUpload}
+        aspect={16 / 9}
+        title="Crop Cover Photo"
       />
     </div>
   );

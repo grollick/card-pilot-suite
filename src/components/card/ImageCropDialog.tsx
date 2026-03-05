@@ -12,10 +12,16 @@ import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { Circle, Square, RectangleHorizontal, Loader2 } from "lucide-react";
 
-const CROP_PRESETS = [
+const PROFILE_PRESETS = [
   { label: "Circle", value: "circle", aspect: 1, shape: "round" as const, icon: Circle },
   { label: "Square", value: "square", aspect: 1, shape: "rect" as const, icon: Square },
   { label: "4:3", value: "4:3", aspect: 4 / 3, shape: "rect" as const, icon: RectangleHorizontal },
+];
+
+const COVER_PRESETS = [
+  { label: "16:9", value: "16:9", aspect: 16 / 9, shape: "rect" as const, icon: RectangleHorizontal },
+  { label: "4:3", value: "4:3", aspect: 4 / 3, shape: "rect" as const, icon: RectangleHorizontal },
+  { label: "Square", value: "square", aspect: 1, shape: "rect" as const, icon: Square },
 ];
 
 interface ImageCropDialogProps {
@@ -76,9 +82,11 @@ export default function ImageCropDialog({
   const [zoom, setZoom] = useState(1);
   const [croppedArea, setCroppedArea] = useState<Area | null>(null);
   const [processing, setProcessing] = useState(false);
-  const [activePreset, setActivePreset] = useState("circle");
+  const isWide = _initialAspect > 1.1;
+  const presets = isWide ? COVER_PRESETS : PROFILE_PRESETS;
+  const [activePreset, setActivePreset] = useState(presets[0].value);
 
-  const currentPreset = CROP_PRESETS.find((p) => p.value === activePreset) ?? CROP_PRESETS[0];
+  const currentPreset = presets.find((p) => p.value === activePreset) ?? presets[0];
 
   const onCropDone = useCallback(
     (_: Area, croppedAreaPixels: Area) => {
@@ -117,7 +125,7 @@ export default function ImageCropDialog({
 
         {/* Aspect ratio presets */}
         <div className="px-4 pb-2 flex gap-1.5">
-          {CROP_PRESETS.map((preset) => {
+          {presets.map((preset) => {
             const Icon = preset.icon;
             const isActive = activePreset === preset.value;
             return (
