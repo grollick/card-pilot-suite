@@ -816,7 +816,6 @@ export default function CardBuilder() {
                 </div>
               </div>
             </div>
-          </div>
         </motion.div>
 
         {/* Live preview */}

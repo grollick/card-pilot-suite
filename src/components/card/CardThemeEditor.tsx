@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Palette, Type, Check, RotateCcw, Layout, Square, Layers, Sparkles, Sun, Moon, Circle, Share2, Save, Trash2, Plus } from "lucide-react";
+import { Palette, Type, Check, RotateCcw, Layers, Sun, Moon, Circle, Share2, Save, Trash2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -17,14 +17,8 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetDescription,
 } from "@/components/ui/sheet";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { ButtonShape, ButtonStyle, ButtonSize, HeaderLayout, SectionCardStyle, SectionDivider } from "@/lib/cardTokens";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -58,7 +52,6 @@ export interface CardGradientBg {
 }
 
 export type BgPatternType = "none" | "dots" | "lines" | "grid" | "noise";
-
 export type BgPatternCoverage = "full" | "gaps";
 
 export interface CardBgPattern {
@@ -83,7 +76,6 @@ const FONT_OPTIONS = [
   "Crimson Pro", "Libre Baskerville", "Josefin Sans", "Bebas Neue",
 ];
 
-/** Returns an inline SVG data URL for a given pattern type */
 function getPatternSvg(type: BgPatternType, color: string): string {
   const hex = encodeURIComponent(color);
   switch (type) {
@@ -100,8 +92,9 @@ function getPatternSvg(type: BgPatternType, color: string): string {
   }
 }
 
-/** Exported for use in PublicCard / CardBuilder */
 export { getPatternSvg };
+
+// ── Palette Data ──────────────────────────────────────────
 
 interface PaletteCategory {
   label: string;
@@ -112,7 +105,7 @@ interface PaletteCategory {
 const PALETTE_CATEGORIES: PaletteCategory[] = [
   {
     label: "Light",
-    icon: <Sun className="h-3.5 w-3.5" />,
+    icon: <Sun className="h-3 w-3" />,
     palettes: [
       { name: "Ocean", palette: { primary: "#4361ee", secondary: "#6b7280", accent: "#7c3aed", background: "#ffffff" } },
       { name: "Sage", palette: { primary: "#4a7c6f", secondary: "#64748b", accent: "#2dd4bf", background: "#f8faf9" } },
@@ -126,7 +119,7 @@ const PALETTE_CATEGORIES: PaletteCategory[] = [
   },
   {
     label: "Dark",
-    icon: <Moon className="h-3.5 w-3.5" />,
+    icon: <Moon className="h-3 w-3" />,
     palettes: [
       { name: "Midnight", palette: { primary: "#818cf8", secondary: "#94a3b8", accent: "#c084fc", background: "#0f172a" } },
       { name: "Carbon", palette: { primary: "#f0f0f0", secondary: "#a1a1aa", accent: "#e4e4e7", background: "#18181b" } },
@@ -136,7 +129,7 @@ const PALETTE_CATEGORIES: PaletteCategory[] = [
   },
   {
     label: "Neutral",
-    icon: <Circle className="h-3.5 w-3.5" />,
+    icon: <Circle className="h-3 w-3" />,
     palettes: [
       { name: "Slate", palette: { primary: "#475569", secondary: "#94a3b8", accent: "#334155", background: "#f8fafc" } },
       { name: "Warm Gray", palette: { primary: "#57534e", secondary: "#a8a29e", accent: "#78716c", background: "#fafaf9" } },
@@ -146,7 +139,7 @@ const PALETTE_CATEGORIES: PaletteCategory[] = [
   },
   {
     label: "Social",
-    icon: <Share2 className="h-3.5 w-3.5" />,
+    icon: <Share2 className="h-3 w-3" />,
     palettes: [
       { name: "LinkedIn", palette: { primary: "#0a66c2", secondary: "#64748b", accent: "#0073b1", background: "#f3f6f8" } },
       { name: "YouTube", palette: { primary: "#ff0000", secondary: "#606060", accent: "#cc0000", background: "#ffffff" } },
@@ -154,18 +147,69 @@ const PALETTE_CATEGORIES: PaletteCategory[] = [
       { name: "X", palette: { primary: "#000000", secondary: "#71767b", accent: "#1d9bf0", background: "#ffffff" } },
       { name: "TikTok", palette: { primary: "#000000", secondary: "#71767b", accent: "#fe2c55", background: "#ffffff" } },
       { name: "Instagram", palette: { primary: "#e1306c", secondary: "#8e8e8e", accent: "#833ab4", background: "#fafafa" } },
-      { name: "Snapchat", palette: { primary: "#fffc00", secondary: "#333333", accent: "#000000", background: "#ffffff" } },
       { name: "WhatsApp", palette: { primary: "#25d366", secondary: "#667781", accent: "#128c7e", background: "#f0f2f5" } },
-      { name: "Pinterest", palette: { primary: "#e60023", secondary: "#767676", accent: "#bd081c", background: "#ffffff" } },
-      { name: "Twitch", palette: { primary: "#9146ff", secondary: "#53535f", accent: "#772ce8", background: "#f7f7f8" } },
       { name: "Spotify", palette: { primary: "#1db954", secondary: "#b3b3b3", accent: "#1ed760", background: "#121212" } },
       { name: "Discord", palette: { primary: "#5865f2", secondary: "#949ba4", accent: "#4752c4", background: "#f2f3f5" } },
-      { name: "Telegram", palette: { primary: "#0088cc", secondary: "#708499", accent: "#179cde", background: "#f5f5f5" } },
     ],
   },
 ];
 
 const PRESET_PALETTES = PALETTE_CATEGORIES.flatMap((c) => c.palettes);
+
+// ── Subcomponents ─────────────────────────────────────────
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{children}</Label>;
+}
+
+function OptionGrid({ options, value, onChange, cols = 3 }: {
+  options: { value: string; label: string }[];
+  value: string;
+  onChange: (v: string) => void;
+  cols?: number;
+}) {
+  return (
+    <div className={`grid gap-1`} style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}>
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          onClick={() => onChange(opt.value)}
+          className={`px-2 py-1.5 rounded-md text-[11px] font-medium border transition-all ${
+            value === opt.value
+              ? "border-primary bg-primary/10 text-primary"
+              : "border-border/50 text-muted-foreground hover:border-border hover:bg-muted/30"
+          }`}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+  return (
+    <div className="space-y-1">
+      <Label className="text-[11px] text-muted-foreground">{label}</Label>
+      <div className="flex items-center gap-1.5">
+        <input
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-8 w-8 rounded-md border border-border cursor-pointer bg-transparent p-0.5 shrink-0"
+        />
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-8 text-[11px] font-mono uppercase"
+          maxLength={7}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ── Main Component ────────────────────────────────────────
 
 interface Props {
   open: boolean;
@@ -178,13 +222,8 @@ interface Props {
 }
 
 export default function CardThemeEditor({
-  open,
-  onOpenChange,
-  currentOverrides,
-  stylePackPalettes,
-  stylePackFonts,
-  stylePackTokens,
-  onSave,
+  open, onOpenChange, currentOverrides,
+  stylePackPalettes, stylePackFonts, stylePackTokens, onSave,
 }: Props) {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -217,18 +256,13 @@ export default function CardThemeEditor({
     if (!user || !newPaletteName.trim()) return;
     setSavingPalette(true);
     const { error } = await supabase.from("custom_palettes").insert({
-      user_id: user.id,
-      name: newPaletteName.trim(),
-      palette: palette as any,
+      user_id: user.id, name: newPaletteName.trim(), palette: palette as any,
     });
     setSavingPalette(false);
-    if (error) {
-      toast({ title: "Error saving palette", variant: "destructive" });
-    } else {
+    if (error) { toast({ title: "Error saving palette", variant: "destructive" }); }
+    else {
       toast({ title: `"${newPaletteName.trim()}" saved` });
-      setNewPaletteName("");
-      setShowSaveInput(false);
-      fetchCustomPalettes();
+      setNewPaletteName(""); setShowSaveInput(false); fetchCustomPalettes();
     }
   }, [user, newPaletteName, palette, toast, fetchCustomPalettes]);
 
@@ -250,14 +284,8 @@ export default function CardThemeEditor({
     setPalette((prev) => ({ ...prev, [key]: value }));
   }, []);
 
-  const handlePreset = useCallback((preset: CardPalette) => {
-    setPalette(preset);
-  }, []);
-
   const handleReset = useCallback(() => {
-    setPalette(defaultPalette);
-    setFonts(defaultFonts);
-    setTokens({});
+    setPalette(defaultPalette); setFonts(defaultFonts); setTokens({});
     setGradientBg({ enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
     setBgPattern({ type: "none", opacity: 0.08 });
   }, [defaultPalette, defaultFonts]);
@@ -276,32 +304,28 @@ export default function CardThemeEditor({
   }, []);
 
   const updateNestedToken = useCallback((group: "button" | "header" | "section" | "shadow" | "radius", field: string, value: any) => {
-    setTokens((prev) => ({
-      ...prev,
-      [group]: { ...(prev[group] as any ?? {}), [field]: value },
-    }));
+    setTokens((prev) => ({ ...prev, [group]: { ...(prev[group] as any ?? {}), [field]: value } }));
   }, []);
 
-  const resolvedButton = {
+  // Resolved values
+  const rb = {
     shape: tokens.button?.shape ?? (stylePackTokens?.button?.shape ?? "rounded"),
     style: tokens.button?.style ?? (stylePackTokens?.button?.style ?? "filled"),
     size: tokens.button?.size ?? (stylePackTokens?.button?.size ?? "lg"),
   };
-  const resolvedHeader = {
+  const rh = {
     layout: tokens.header?.layout ?? (stylePackTokens?.header?.layout ?? "classic"),
     avatarShape: tokens.header?.avatarShape ?? (stylePackTokens?.header?.avatarShape ?? "circle"),
   };
-  const resolvedSection = {
+  const rs = {
     cardStyle: tokens.section?.cardStyle ?? (stylePackTokens?.section?.cardStyle ?? "solid"),
     divider: tokens.section?.divider ?? (stylePackTokens?.section?.divider ?? "none"),
     dividerWidth: tokens.section?.dividerWidth ?? (stylePackTokens?.section?.dividerWidth ?? 100),
     dividerColor: tokens.section?.dividerColor ?? (stylePackTokens?.section?.dividerColor ?? ""),
   };
-  const resolvedSpacing = tokens.spacingScale ?? (stylePackTokens?.spacingScale ?? "comfortable");
-  const resolvedShadowCard = tokens.shadow?.card ?? (stylePackTokens?.shadow?.card ?? "soft");
-  const resolvedShadowButton = tokens.shadow?.button ?? (stylePackTokens?.shadow?.button ?? "soft");
-  const resolvedRadiusCard = tokens.radius?.card ?? (stylePackTokens?.radius?.card ?? 16);
-  const resolvedRadiusButton = tokens.radius?.button ?? (stylePackTokens?.radius?.button ?? 12);
+  const rSpacing = tokens.spacingScale ?? (stylePackTokens?.spacingScale ?? "comfortable");
+  const rShadow = tokens.shadow?.card ?? (stylePackTokens?.shadow?.card ?? "soft");
+  const rRadius = tokens.radius?.card ?? (stylePackTokens?.radius?.card ?? 16);
 
   const COLOR_FIELDS: { key: keyof CardPalette; label: string }[] = [
     { key: "primary", label: "Primary" },
@@ -310,100 +334,91 @@ export default function CardThemeEditor({
     { key: "background", label: "Background" },
   ];
 
-  const OptionGrid = ({ options, value, onChange }: { options: { value: string; label: string }[]; value: string; onChange: (v: string) => void }) => (
-    <div className="grid grid-cols-3 gap-1.5">
-      {options.map((opt) => (
-        <button
-          key={opt.value}
-          onClick={() => onChange(opt.value)}
-          className={`px-2 py-1.5 rounded-md text-xs font-medium border transition-all ${
-            value === opt.value
-              ? "border-primary bg-primary/10 text-primary"
-              : "border-border/50 text-muted-foreground hover:border-border hover:bg-muted/30"
-          }`}
-        >
-          {opt.label}
-        </button>
-      ))}
-    </div>
-  );
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="overflow-y-auto sm:max-w-full w-full h-full">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
-            <Palette className="h-5 w-5 text-primary" />
-            Theme & Styling
-          </SheetTitle>
-          <SheetDescription>
-            Customize colors, typography, and card styling
-          </SheetDescription>
-        </SheetHeader>
+      <SheetContent className="overflow-y-auto sm:max-w-md w-full p-0">
+        {/* Header */}
+        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border px-5 py-4">
+          <SheetHeader className="space-y-0">
+            <SheetTitle className="flex items-center gap-2 text-base">
+              <Palette className="h-4 w-4 text-primary" />
+              Theme & Styling
+            </SheetTitle>
+          </SheetHeader>
+        </div>
 
-        <Accordion type="multiple" defaultValue={["colors", "card-style"]} className="mt-6">
-          {/* ── Colors ── */}
-          <AccordionItem value="colors">
-            <AccordionTrigger className="text-sm font-semibold">
-              <span className="flex items-center gap-2">
-                <Palette className="h-4 w-4" /> Colors
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="space-y-4 pt-2">
-              {/* Preset Palettes by Category */}
-              <div className="space-y-1">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Presets</Label>
-                <Accordion type="multiple" defaultValue={["Light"]} className="space-y-0">
-                  {PALETTE_CATEGORIES.map((category) => {
-                    const hasActive = category.palettes.some(
-                      (p) => p.palette.primary === palette.primary && p.palette.accent === palette.accent
-                    );
-                    return (
-                      <AccordionItem key={category.label} value={category.label} className="border-b-0">
-                        <AccordionTrigger className="py-2 text-xs font-medium hover:no-underline">
-                          <span className={`flex items-center gap-1.5 ${hasActive ? "text-primary" : "text-muted-foreground"}`}>
-                            {category.icon}
-                            {category.label}
-                            <span className="text-[10px] text-muted-foreground/60 font-normal">({category.palettes.length})</span>
-                          </span>
-                        </AccordionTrigger>
-                        <AccordionContent className="pb-2 pt-0">
-                          <div className="grid grid-cols-4 gap-2">
-                            {category.palettes.map((preset) => {
-                              const isActive = preset.palette.primary === palette.primary && preset.palette.accent === palette.accent;
-                              return (
-                                <button
-                                  key={preset.name}
-                                  onClick={() => handlePreset(preset.palette)}
-                                  className={`relative flex flex-col items-center gap-1.5 p-2 rounded-lg border transition-all ${
-                                    isActive ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border/50 hover:border-border hover:bg-muted/30"
-                                  }`}
-                                >
-                                  <div className="flex gap-0.5">
-                                    <div className="h-5 w-5 rounded-full border border-border/30" style={{ background: preset.palette.primary }} />
-                                    <div className="h-5 w-5 rounded-full border border-border/30" style={{ background: preset.palette.accent }} />
-                                  </div>
-                                  <span className="text-[10px] font-medium text-muted-foreground">{preset.name}</span>
-                                  {isActive && <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </AccordionContent>
-                      </AccordionItem>
-                    );
-                  })}
-                </Accordion>
+        {/* Tabs Navigation */}
+        <Tabs defaultValue="colors" className="flex flex-col h-[calc(100%-130px)]">
+          <div className="px-5 pt-3">
+            <TabsList className="w-full grid grid-cols-3 h-9">
+              <TabsTrigger value="colors" className="text-xs gap-1">
+                <Palette className="h-3 w-3" /> Colors
+              </TabsTrigger>
+              <TabsTrigger value="layout" className="text-xs gap-1">
+                <Layers className="h-3 w-3" /> Layout
+              </TabsTrigger>
+              <TabsTrigger value="type" className="text-xs gap-1">
+                <Type className="h-3 w-3" /> Type
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          <div className="flex-1 overflow-y-auto px-5 pb-4">
+            {/* ── Colors Tab ── */}
+            <TabsContent value="colors" className="mt-3 space-y-4">
+              {/* Palette Presets */}
+              <div className="space-y-2">
+                <SectionLabel>Presets</SectionLabel>
+                {PALETTE_CATEGORIES.map((category) => {
+                  const hasActive = category.palettes.some(
+                    (p) => p.palette.primary === palette.primary && p.palette.accent === palette.accent
+                  );
+                  return (
+                    <div key={category.label} className="space-y-1.5">
+                      <button className="flex items-center gap-1.5 text-[11px] font-medium w-full text-left">
+                        <span className={hasActive ? "text-primary" : "text-muted-foreground"}>
+                          {category.icon}
+                        </span>
+                        <span className={hasActive ? "text-primary" : "text-muted-foreground"}>
+                          {category.label}
+                        </span>
+                      </button>
+                      <div className="grid grid-cols-4 gap-1.5">
+                        {category.palettes.map((preset) => {
+                          const isActive = preset.palette.primary === palette.primary && preset.palette.accent === palette.accent;
+                          return (
+                            <button
+                              key={preset.name}
+                              onClick={() => setPalette(preset.palette)}
+                              className={`relative flex flex-col items-center gap-1 p-1.5 rounded-lg border transition-all ${
+                                isActive ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border/40 hover:border-border hover:bg-muted/30"
+                              }`}
+                            >
+                              <div className="flex gap-px">
+                                <div className="h-4 w-4 rounded-full border border-border/20" style={{ background: preset.palette.primary }} />
+                                <div className="h-4 w-4 rounded-full border border-border/20" style={{ background: preset.palette.accent }} />
+                              </div>
+                              <span className="text-[9px] font-medium text-muted-foreground leading-none">{preset.name}</span>
+                              {isActive && <Check className="absolute top-0.5 right-0.5 h-2.5 w-2.5 text-primary" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
+
+              {/* Style Pack Palettes */}
               {stylePackPalettes && stylePackPalettes.length > 1 && (
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">From Your Style Pack</Label>
-                  <div className="flex gap-2 flex-wrap">
+                <div className="space-y-1.5">
+                  <SectionLabel>Style Pack</SectionLabel>
+                  <div className="flex gap-1.5 flex-wrap">
                     {stylePackPalettes.map((sp, i) => (
-                      <button key={i} onClick={() => handlePreset(sp)} className="flex gap-0.5 p-1.5 rounded-lg border border-border/50 hover:border-primary/40 transition-all">
-                        <div className="h-4 w-4 rounded-full" style={{ background: sp.primary }} />
-                        <div className="h-4 w-4 rounded-full" style={{ background: sp.accent }} />
-                        <div className="h-4 w-4 rounded-full" style={{ background: sp.background }} />
+                      <button key={i} onClick={() => setPalette(sp)} className="flex gap-px p-1.5 rounded-lg border border-border/40 hover:border-primary/40 transition-all">
+                        <div className="h-3.5 w-3.5 rounded-full" style={{ background: sp.primary }} />
+                        <div className="h-3.5 w-3.5 rounded-full" style={{ background: sp.accent }} />
+                        <div className="h-3.5 w-3.5 rounded-full" style={{ background: sp.background }} />
                       </button>
                     ))}
                   </div>
@@ -411,272 +426,144 @@ export default function CardThemeEditor({
               )}
 
               {/* Saved Palettes */}
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Saved Palettes</Label>
+                  <SectionLabel>Saved</SectionLabel>
                   <button
                     onClick={() => setShowSaveInput(!showSaveInput)}
-                    className="flex items-center gap-1 text-[10px] font-medium text-primary hover:text-primary/80 transition-colors"
+                    className="flex items-center gap-0.5 text-[10px] font-medium text-primary hover:text-primary/80 transition-colors"
                   >
-                    <Plus className="h-3 w-3" />
-                    Save Current
+                    <Plus className="h-2.5 w-2.5" /> Save Current
                   </button>
                 </div>
                 {showSaveInput && (
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <Input
                       value={newPaletteName}
                       onChange={(e) => setNewPaletteName(e.target.value)}
-                      placeholder="Palette name…"
-                      className="h-8 text-xs flex-1"
+                      placeholder="Name…"
+                      className="h-7 text-xs flex-1"
                       onKeyDown={(e) => e.key === "Enter" && handleSavePalette()}
                       autoFocus
                     />
-                    <Button size="sm" className="h-8 px-3 text-xs" onClick={handleSavePalette} disabled={savingPalette || !newPaletteName.trim()}>
-                      <Save className="h-3 w-3 mr-1" />
-                      Save
+                    <Button size="sm" className="h-7 px-2 text-[10px]" onClick={handleSavePalette} disabled={savingPalette || !newPaletteName.trim()}>
+                      <Save className="h-2.5 w-2.5 mr-1" /> Save
                     </Button>
                   </div>
                 )}
                 {customPalettes.length > 0 ? (
-                  <div className="grid grid-cols-4 gap-2">
+                  <div className="grid grid-cols-4 gap-1.5">
                     {customPalettes.map((cp) => {
                       const isActive = cp.palette.primary === palette.primary && cp.palette.accent === palette.accent && cp.palette.background === palette.background;
                       return (
                         <div key={cp.id} className="relative group">
                           <button
-                            onClick={() => handlePreset(cp.palette)}
-                            className={`w-full flex flex-col items-center gap-1.5 p-2 rounded-lg border transition-all ${
-                              isActive ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border/50 hover:border-border hover:bg-muted/30"
+                            onClick={() => setPalette(cp.palette)}
+                            className={`w-full flex flex-col items-center gap-1 p-1.5 rounded-lg border transition-all ${
+                              isActive ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border/40 hover:border-border hover:bg-muted/30"
                             }`}
                           >
-                            <div className="flex gap-0.5">
-                              <div className="h-5 w-5 rounded-full border border-border/30" style={{ background: cp.palette.primary }} />
-                              <div className="h-5 w-5 rounded-full border border-border/30" style={{ background: cp.palette.accent }} />
+                            <div className="flex gap-px">
+                              <div className="h-4 w-4 rounded-full border border-border/20" style={{ background: cp.palette.primary }} />
+                              <div className="h-4 w-4 rounded-full border border-border/20" style={{ background: cp.palette.accent }} />
                             </div>
-                            <span className="text-[10px] font-medium text-muted-foreground truncate w-full text-center">{cp.name}</span>
-                            {isActive && <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />}
+                            <span className="text-[9px] font-medium text-muted-foreground truncate w-full text-center">{cp.name}</span>
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); handleDeletePalette(cp.id); }}
-                            className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            className="absolute -top-1 -right-1 h-3.5 w-3.5 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                           >
-                            <Trash2 className="h-2.5 w-2.5" />
+                            <Trash2 className="h-2 w-2" />
                           </button>
                         </div>
                       );
                     })}
                   </div>
                 ) : (
-                  <p className="text-[10px] text-muted-foreground text-center py-2">No saved palettes yet</p>
+                  <p className="text-[10px] text-muted-foreground text-center py-1.5">No saved palettes</p>
                 )}
               </div>
 
               {/* Custom Colors */}
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Custom Colors</Label>
-                <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <SectionLabel>Custom Colors</SectionLabel>
+                <div className="grid grid-cols-2 gap-2">
                   {COLOR_FIELDS.map(({ key, label }) => (
-                    <div key={key} className="space-y-1.5">
-                      <Label className="text-xs text-muted-foreground">{label}</Label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="color"
-                          value={palette[key]}
-                          onChange={(e) => handleColorChange(key, e.target.value)}
-                          className="h-9 w-9 rounded-lg border border-border cursor-pointer bg-transparent p-0.5"
-                        />
-                        <Input
-                          value={palette[key]}
-                          onChange={(e) => handleColorChange(key, e.target.value)}
-                          className="h-9 text-xs font-mono uppercase"
-                          maxLength={7}
-                        />
-                      </div>
-                    </div>
+                    <ColorField key={key} label={label} value={palette[key]} onChange={(v) => handleColorChange(key, v)} />
                   ))}
                 </div>
               </div>
 
-              {/* Gradient Background */}
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Gradient Background</Label>
+              {/* Gradient */}
+              <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Enable gradient</span>
-                  <Switch checked={gradientBg.enabled} onCheckedChange={(v) => setGradientBg(prev => ({ ...prev, enabled: v }))} />
+                  <SectionLabel>Gradient Background</SectionLabel>
+                  <Switch checked={gradientBg.enabled} onCheckedChange={(v) => setGradientBg(prev => ({ ...prev, enabled: v }))} className="scale-75" />
                 </div>
                 {gradientBg.enabled && (
-                  <div className="space-y-3 pt-1">
-                    <div className="space-y-1.5">
-                      <Label className="text-xs text-muted-foreground">Second Color</Label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="color"
-                          value={gradientBg.color2}
-                          onChange={(e) => setGradientBg(prev => ({ ...prev, color2: e.target.value }))}
-                          className="h-9 w-9 rounded-lg border border-border cursor-pointer bg-transparent p-0.5"
-                        />
-                        <Input
-                          value={gradientBg.color2}
-                          onChange={(e) => setGradientBg(prev => ({ ...prev, color2: e.target.value }))}
-                          className="h-9 text-xs font-mono uppercase"
-                          maxLength={7}
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label className="text-xs text-muted-foreground">Direction</Label>
-                      <div className="grid grid-cols-4 gap-1.5">
-                        {([
+                  <div className="space-y-2 pl-1">
+                    <ColorField label="Second Color" value={gradientBg.color2} onChange={(v) => setGradientBg(prev => ({ ...prev, color2: v }))} />
+                    <div className="space-y-1">
+                      <Label className="text-[11px] text-muted-foreground">Direction</Label>
+                      <OptionGrid
+                        cols={4}
+                        options={[
                           { value: "to bottom", label: "↓" },
                           { value: "to right", label: "→" },
                           { value: "to bottom right", label: "↘" },
                           { value: "to top right", label: "↗" },
-                        ] as const).map((dir) => (
-                          <button
-                            key={dir.value}
-                            onClick={() => setGradientBg(prev => ({ ...prev, direction: dir.value }))}
-                            className={`px-2 py-1.5 rounded-md text-sm font-medium border transition-all ${
-                              gradientBg.direction === dir.value
-                                ? "border-primary bg-primary/10 text-primary"
-                                : "border-border/50 text-muted-foreground hover:border-border hover:bg-muted/30"
-                            }`}
-                          >
-                            {dir.label}
-                          </button>
-                        ))}
-                      </div>
+                        ]}
+                        value={gradientBg.direction}
+                        onChange={(v) => setGradientBg(prev => ({ ...prev, direction: v as any }))}
+                      />
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* Background Pattern */}
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Pattern Overlay</Label>
-                <div className="grid grid-cols-5 gap-1.5">
-                  {([
+              {/* Pattern */}
+              <div className="space-y-1.5">
+                <SectionLabel>Pattern Overlay</SectionLabel>
+                <OptionGrid
+                  cols={5}
+                  options={[
                     { value: "none", label: "None" },
                     { value: "dots", label: "Dots" },
                     { value: "lines", label: "Lines" },
                     { value: "grid", label: "Grid" },
                     { value: "noise", label: "Noise" },
-                  ] as const).map((p) => (
-                    <button
-                      key={p.value}
-                      onClick={() => setBgPattern(prev => ({ ...prev, type: p.value }))}
-                      className={`px-1.5 py-1.5 rounded-md text-[10px] font-medium border transition-all ${
-                        bgPattern.type === p.value
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border/50 text-muted-foreground hover:border-border hover:bg-muted/30"
-                      }`}
-                    >
-                      {p.label}
-                    </button>
-                  ))}
-                </div>
+                  ]}
+                  value={bgPattern.type}
+                  onChange={(v) => setBgPattern(prev => ({ ...prev, type: v as BgPatternType }))}
+                />
                 {bgPattern.type !== "none" && (
-                  <>
+                  <div className="space-y-2 pl-1">
                     <div className="space-y-1">
-                      <Label className="text-xs text-muted-foreground">Pattern Color</Label>
-                      <div className="flex items-center gap-1.5 mb-1.5">
-                        {[
-                          { label: "Primary", value: palette.primary },
-                          { label: "Secondary", value: palette.secondary },
-                          { label: "Accent", value: palette.accent },
-                          { label: "Background", value: palette.background },
-                        ].map((preset) => (
-                          <button
-                            key={preset.label}
-                            onClick={() => setBgPattern(prev => ({ ...prev, color: preset.value }))}
-                            className={`flex items-center gap-1 px-1.5 py-1 rounded-md text-[10px] font-medium border transition-all ${
-                              (bgPattern.color || palette.secondary) === preset.value
-                                ? "border-primary bg-primary/10 text-primary"
-                                : "border-border/50 text-muted-foreground hover:border-border hover:bg-muted/30"
-                            }`}
-                            title={preset.value}
-                          >
-                            <span className="h-2.5 w-2.5 rounded-full shrink-0 border border-border/30" style={{ backgroundColor: preset.value }} />
-                            {preset.label}
-                          </button>
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="color"
-                          value={bgPattern.color || palette.secondary}
-                          onChange={(e) => setBgPattern(prev => ({ ...prev, color: e.target.value }))}
-                          className="w-8 h-8 rounded-md border border-border/50 cursor-pointer bg-transparent p-0.5"
-                        />
-                        <Input
-                          value={bgPattern.color || palette.secondary}
-                          onChange={(e) => setBgPattern(prev => ({ ...prev, color: e.target.value }))}
-                          className="h-8 text-xs font-mono flex-1"
-                        />
-                        {bgPattern.color && (
-                          <button
-                            onClick={() => setBgPattern(prev => ({ ...prev, color: undefined }))}
-                            className="text-[10px] text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
-                          >
-                            Reset
-                          </button>
-                        )}
-                      </div>
+                      <Label className="text-[11px] text-muted-foreground">Opacity — {Math.round(bgPattern.opacity * 100)}%</Label>
+                      <Slider value={[bgPattern.opacity * 100]} onValueChange={([v]) => setBgPattern(prev => ({ ...prev, opacity: v / 100 }))} min={2} max={25} step={1} />
                     </div>
                     <div className="space-y-1">
-                      <Label className="text-xs text-muted-foreground">Opacity</Label>
-                      <Slider
-                        value={[bgPattern.opacity * 100]}
-                        onValueChange={([v]) => setBgPattern(prev => ({ ...prev, opacity: v / 100 }))}
-                        min={2}
-                        max={25}
-                        step={1}
-                        className="w-full"
-                      />
-                      <span className="text-[10px] text-muted-foreground">{Math.round(bgPattern.opacity * 100)}%</span>
+                      <Label className="text-[11px] text-muted-foreground">Scale — {bgPattern.scale ?? 20}px</Label>
+                      <Slider value={[bgPattern.scale ?? 20]} onValueChange={([v]) => setBgPattern(prev => ({ ...prev, scale: v }))} min={8} max={80} step={2} />
                     </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs text-muted-foreground">Scale</Label>
-                      <Slider
-                        value={[bgPattern.scale ?? 20]}
-                        onValueChange={([v]) => setBgPattern(prev => ({ ...prev, scale: v }))}
-                        min={8}
-                        max={80}
-                        step={2}
-                        className="w-full"
-                      />
-                      <span className="text-[10px] text-muted-foreground">{bgPattern.scale ?? 20}px</span>
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs text-muted-foreground">Coverage</Label>
-                      <div className="flex gap-1.5">
-                        {([
-                          { value: "full", label: "Full card" },
-                          { value: "gaps", label: "Background only" },
-                        ] as const).map((opt) => (
-                          <button
-                            key={opt.value}
-                            onClick={() => setBgPattern(prev => ({ ...prev, coverage: opt.value }))}
-                            className={`flex-1 px-2 py-1.5 rounded-md text-[10px] font-medium border transition-all ${
-                              (bgPattern.coverage ?? "full") === opt.value
-                                ? "border-primary bg-primary/10 text-primary"
-                                : "border-border/50 text-muted-foreground hover:border-border hover:bg-muted/30"
-                            }`}
-                          >
-                            {opt.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </>
+                    <OptionGrid
+                      cols={2}
+                      options={[
+                        { value: "full", label: "Full card" },
+                        { value: "gaps", label: "Background only" },
+                      ]}
+                      value={bgPattern.coverage ?? "full"}
+                      onChange={(v) => setBgPattern(prev => ({ ...prev, coverage: v as BgPatternCoverage }))}
+                    />
+                  </div>
                 )}
               </div>
 
-              {/* Preview */}
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Preview</Label>
+              {/* Mini Preview */}
+              <div className="space-y-1.5">
+                <SectionLabel>Preview</SectionLabel>
                 <div
-                  className="rounded-xl p-4 border border-border/50 relative overflow-hidden"
+                  className="rounded-lg p-3 border border-border/40 relative overflow-hidden"
                   style={{
                     background: gradientBg.enabled
                       ? `linear-gradient(${gradientBg.direction}, ${palette.background}, ${gradientBg.color2})`
@@ -684,244 +571,172 @@ export default function CardThemeEditor({
                   }}
                 >
                   {bgPattern.type !== "none" && (
-                    <div
-                      className="absolute inset-0 pointer-events-none"
-                      style={{
-                        opacity: bgPattern.opacity,
-                        backgroundImage: getPatternSvg(bgPattern.type, bgPattern.color || palette.secondary),
-                        backgroundSize: bgPattern.type === "noise" ? "200px 200px" : "20px 20px",
-                      }}
-                    />
+                    <div className="absolute inset-0 pointer-events-none" style={{
+                      opacity: bgPattern.opacity,
+                      backgroundImage: getPatternSvg(bgPattern.type, bgPattern.color || palette.secondary),
+                      backgroundSize: bgPattern.type === "noise" ? "200px 200px" : `${bgPattern.scale ?? 20}px ${bgPattern.scale ?? 20}px`,
+                    }} />
                   )}
                   <div className="relative z-[1]">
-                    <div className="h-3 w-20 rounded-full mb-2" style={{ background: palette.primary }} />
-                    <div className="h-2 w-32 rounded-full mb-3" style={{ background: palette.secondary, opacity: 0.5 }} />
-                    <div className="flex gap-2 mt-3">
-                      <div className="h-8 flex-1 rounded-lg flex items-center justify-center text-xs font-semibold" style={{ background: palette.primary, color: palette.background }}>Button</div>
-                      <div className="h-8 flex-1 rounded-lg flex items-center justify-center text-xs font-semibold" style={{ background: `linear-gradient(135deg, ${palette.primary}, ${palette.accent})`, color: "#fff" }}>Accent</div>
+                    <div className="h-2.5 w-16 rounded-full mb-1.5" style={{ background: palette.primary }} />
+                    <div className="h-2 w-24 rounded-full mb-2.5" style={{ background: palette.secondary, opacity: 0.4 }} />
+                    <div className="flex gap-1.5">
+                      <div className="h-7 flex-1 rounded-md flex items-center justify-center text-[10px] font-semibold" style={{ background: palette.primary, color: palette.background }}>Button</div>
+                      <div className="h-7 flex-1 rounded-md flex items-center justify-center text-[10px] font-semibold" style={{ background: `linear-gradient(135deg, ${palette.primary}, ${palette.accent})`, color: "#fff" }}>Accent</div>
                     </div>
                   </div>
                 </div>
               </div>
-            </AccordionContent>
-          </AccordionItem>
+            </TabsContent>
 
-          {/* ── Card Styling ── */}
-          <AccordionItem value="card-style">
-            <AccordionTrigger className="text-sm font-semibold">
-              <span className="flex items-center gap-2">
-                <Layers className="h-4 w-4" /> Card Styling
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="space-y-5 pt-2">
-              {/* Button Style */}
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Button Style</Label>
-                <OptionGrid
-                  options={[
-                    { value: "filled", label: "Filled" },
-                    { value: "outline", label: "Outline" },
-                    { value: "gradient", label: "Gradient" },
-                  ]}
-                  value={resolvedButton.style}
-                  onChange={(v) => updateNestedToken("button", "style", v)}
-                />
-              </div>
-
-              {/* Button Shape */}
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Button Shape</Label>
-                <OptionGrid
-                  options={[
-                    { value: "rounded", label: "Rounded" },
-                    { value: "pill", label: "Pill" },
-                  ]}
-                  value={resolvedButton.shape}
-                  onChange={(v) => updateNestedToken("button", "shape", v)}
-                />
-              </div>
-
-              {/* Button Size */}
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Button Size</Label>
-                <OptionGrid
-                  options={[
-                    { value: "sm", label: "Small" },
-                    { value: "md", label: "Medium" },
-                    { value: "lg", label: "Large" },
-                  ]}
-                  value={resolvedButton.size}
-                  onChange={(v) => updateNestedToken("button", "size", v)}
-                />
-              </div>
-
-              {/* Section Card Style */}
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Section Style</Label>
-                <OptionGrid
-                  options={[
-                    { value: "solid", label: "Solid" },
-                    { value: "frosted", label: "Frosted" },
-                    { value: "elevated", label: "Elevated" },
-                  ]}
-                  value={resolvedSection.cardStyle}
-                  onChange={(v) => updateNestedToken("section", "cardStyle", v)}
-                />
-                <OptionGrid
-                  options={[
-                    { value: "soft", label: "Soft" },
-                    { value: "glow", label: "Glow" },
-                  ]}
-                  value={resolvedSection.cardStyle}
-                  onChange={(v) => updateNestedToken("section", "cardStyle", v)}
-                />
-              </div>
-
-              {/* Section Divider */}
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Section Divider</Label>
-                <OptionGrid
-                  options={[
-                    { value: "none", label: "None" },
-                    { value: "hairline", label: "Hairline" },
-                  ]}
-                  value={resolvedSection.divider}
-                  onChange={(v) => updateNestedToken("section", "divider", v)}
-                />
-              </div>
-
-              {/* Divider Width */}
-              {resolvedSection.divider === "hairline" && (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Divider Length</Label>
-                    <span className="text-xs text-muted-foreground">{resolvedSection.dividerWidth}%</span>
-                  </div>
-                  <Slider
-                    min={20}
-                    max={100}
-                    step={5}
-                    value={[resolvedSection.dividerWidth]}
-                    onValueChange={([v]) => updateNestedToken("section", "dividerWidth", v)}
-                    className="w-full"
-                  />
-                </div>
-              )}
-
-              {/* Divider Color */}
-              {resolvedSection.divider === "hairline" && (
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Divider Color</Label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={resolvedSection.dividerColor || palette.secondary}
-                      onChange={(e) => updateNestedToken("section", "dividerColor", e.target.value)}
-                      className="h-9 w-9 rounded-lg border border-border cursor-pointer bg-transparent p-0.5"
-                    />
-                    <Input
-                      value={resolvedSection.dividerColor || "auto"}
-                      onChange={(e) => updateNestedToken("section", "dividerColor", e.target.value)}
-                      placeholder="auto"
-                      className="h-9 text-xs font-mono uppercase"
-                      maxLength={7}
-                    />
-                    {resolvedSection.dividerColor && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-9 px-2 text-xs"
-                        onClick={() => updateNestedToken("section", "dividerColor", "")}
-                      >
-                        Reset
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Header Layout */}
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Header Layout</Label>
+            {/* ── Layout Tab ── */}
+            <TabsContent value="layout" className="mt-3 space-y-4">
+              <div className="space-y-1.5">
+                <SectionLabel>Header Layout</SectionLabel>
                 <OptionGrid
                   options={[
                     { value: "classic", label: "Classic" },
                     { value: "cover", label: "Cover" },
                     { value: "hero", label: "Hero" },
                   ]}
-                  value={resolvedHeader.layout}
+                  value={rh.layout}
                   onChange={(v) => updateNestedToken("header", "layout", v)}
                 />
               </div>
 
-              {/* Avatar Shape */}
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Avatar Shape</Label>
+              <div className="space-y-1.5">
+                <SectionLabel>Avatar Shape</SectionLabel>
                 <OptionGrid
                   options={[
                     { value: "circle", label: "Circle" },
                     { value: "rounded", label: "Rounded" },
                     { value: "square", label: "Square" },
                   ]}
-                  value={resolvedHeader.avatarShape}
+                  value={rh.avatarShape}
                   onChange={(v) => updateNestedToken("header", "avatarShape", v)}
                 />
               </div>
 
-              {/* Spacing */}
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Spacing</Label>
+              <div className="space-y-1.5">
+                <SectionLabel>Button Style</SectionLabel>
+                <OptionGrid
+                  options={[
+                    { value: "filled", label: "Filled" },
+                    { value: "outline", label: "Outline" },
+                    { value: "gradient", label: "Gradient" },
+                  ]}
+                  value={rb.style}
+                  onChange={(v) => updateNestedToken("button", "style", v)}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <SectionLabel>Button Shape</SectionLabel>
+                <OptionGrid
+                  cols={2}
+                  options={[
+                    { value: "rounded", label: "Rounded" },
+                    { value: "pill", label: "Pill" },
+                  ]}
+                  value={rb.shape}
+                  onChange={(v) => updateNestedToken("button", "shape", v)}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <SectionLabel>Button Size</SectionLabel>
+                <OptionGrid
+                  options={[
+                    { value: "sm", label: "Small" },
+                    { value: "md", label: "Medium" },
+                    { value: "lg", label: "Large" },
+                  ]}
+                  value={rb.size}
+                  onChange={(v) => updateNestedToken("button", "size", v)}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <SectionLabel>Section Style</SectionLabel>
+                <OptionGrid
+                  cols={5}
+                  options={[
+                    { value: "solid", label: "Solid" },
+                    { value: "frosted", label: "Frosted" },
+                    { value: "elevated", label: "Elevated" },
+                    { value: "soft", label: "Soft" },
+                    { value: "glow", label: "Glow" },
+                  ]}
+                  value={rs.cardStyle}
+                  onChange={(v) => updateNestedToken("section", "cardStyle", v)}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <SectionLabel>Section Divider</SectionLabel>
+                <OptionGrid
+                  cols={2}
+                  options={[
+                    { value: "none", label: "None" },
+                    { value: "hairline", label: "Hairline" },
+                  ]}
+                  value={rs.divider}
+                  onChange={(v) => updateNestedToken("section", "divider", v)}
+                />
+                {rs.divider === "hairline" && (
+                  <div className="space-y-2 pl-1 pt-1">
+                    <div className="space-y-1">
+                      <Label className="text-[11px] text-muted-foreground">Length — {rs.dividerWidth}%</Label>
+                      <Slider min={20} max={100} step={5} value={[rs.dividerWidth]} onValueChange={([v]) => updateNestedToken("section", "dividerWidth", v)} />
+                    </div>
+                    <ColorField
+                      label="Color"
+                      value={rs.dividerColor || palette.secondary}
+                      onChange={(v) => updateNestedToken("section", "dividerColor", v)}
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-1.5">
+                <SectionLabel>Spacing</SectionLabel>
                 <OptionGrid
                   options={[
                     { value: "compact", label: "Compact" },
                     { value: "comfortable", label: "Comfort" },
                     { value: "airy", label: "Airy" },
                   ]}
-                  value={resolvedSpacing}
+                  value={rSpacing}
                   onChange={(v) => updateToken("spacingScale", v as any)}
                 />
               </div>
 
-              {/* Shadow */}
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Card Shadow</Label>
+              <div className="space-y-1.5">
+                <SectionLabel>Card Shadow</SectionLabel>
                 <OptionGrid
                   options={[
                     { value: "none", label: "None" },
                     { value: "subtle", label: "Subtle" },
                     { value: "soft", label: "Soft" },
                   ]}
-                  value={resolvedShadowCard}
+                  value={rShadow}
                   onChange={(v) => updateNestedToken("shadow", "card", v)}
                 />
               </div>
 
-              {/* Radius */}
-              <div className="space-y-2">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Corner Radius — {resolvedRadiusCard}px
-                </Label>
-                <Slider
-                  value={[resolvedRadiusCard]}
-                  onValueChange={([v]) => updateNestedToken("radius", "card", v)}
-                  min={0}
-                  max={32}
-                  step={2}
-                />
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* ── Typography ── */}
-          <AccordionItem value="typography">
-            <AccordionTrigger className="text-sm font-semibold">
-              <span className="flex items-center gap-2">
-                <Type className="h-4 w-4" /> Typography
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="space-y-3 pt-2">
               <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">Heading Font</Label>
+                <div className="flex items-center justify-between">
+                  <SectionLabel>Corner Radius</SectionLabel>
+                  <span className="text-[10px] text-muted-foreground tabular-nums">{rRadius}px</span>
+                </div>
+                <Slider value={[rRadius]} onValueChange={([v]) => updateNestedToken("radius", "card", v)} min={0} max={32} step={2} />
+              </div>
+            </TabsContent>
+
+            {/* ── Typography Tab ── */}
+            <TabsContent value="type" className="mt-3 space-y-4">
+              <div className="space-y-1.5">
+                <SectionLabel>Heading Font</SectionLabel>
                 <Select value={fonts.primary} onValueChange={(v) => setFonts((f) => ({ ...f, primary: v }))}>
                   <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -934,7 +749,7 @@ export default function CardThemeEditor({
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs text-muted-foreground">Body Font</Label>
+                <SectionLabel>Body Font</SectionLabel>
                 <Select value={fonts.secondary} onValueChange={(v) => setFonts((f) => ({ ...f, secondary: v }))}>
                   <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -946,19 +761,27 @@ export default function CardThemeEditor({
                   </SelectContent>
                 </Select>
               </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
 
-        {/* ── Actions ── */}
-        <div className="flex gap-2 pt-4 mt-2">
-          <Button variant="outline" size="sm" onClick={handleReset}>
-            <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
-            Reset
+              {/* Font Preview */}
+              <div className="rounded-lg border border-border/40 p-3 space-y-1.5">
+                <p className="text-sm font-semibold" style={{ fontFamily: `'${fonts.primary}', sans-serif` }}>
+                  Heading Preview
+                </p>
+                <p className="text-xs text-muted-foreground" style={{ fontFamily: `'${fonts.secondary}', sans-serif` }}>
+                  Body text preview — The quick brown fox jumps over the lazy dog.
+                </p>
+              </div>
+            </TabsContent>
+          </div>
+        </Tabs>
+
+        {/* Sticky Actions */}
+        <div className="sticky bottom-0 bg-background/95 backdrop-blur-sm border-t border-border px-5 py-3 flex gap-2">
+          <Button variant="outline" size="sm" onClick={handleReset} className="h-9">
+            <RotateCcw className="h-3 w-3 mr-1.5" /> Reset
           </Button>
-          <Button size="sm" className="flex-1" onClick={handleSave}>
-            <Check className="h-3.5 w-3.5 mr-1.5" />
-            Apply Theme
+          <Button size="sm" className="flex-1 h-9" onClick={handleSave}>
+            <Check className="h-3 w-3 mr-1.5" /> Apply Theme
           </Button>
         </div>
       </SheetContent>
