@@ -150,6 +150,9 @@ const PALETTE_CATEGORIES: PaletteCategory[] = [
       { name: "WhatsApp", palette: { primary: "#25d366", secondary: "#667781", accent: "#128c7e", background: "#f0f2f5" } },
       { name: "Pinterest", palette: { primary: "#e60023", secondary: "#767676", accent: "#bd081c", background: "#ffffff" } },
       { name: "Twitch", palette: { primary: "#9146ff", secondary: "#53535f", accent: "#772ce8", background: "#f7f7f8" } },
+      { name: "Spotify", palette: { primary: "#1db954", secondary: "#b3b3b3", accent: "#1ed760", background: "#121212" } },
+      { name: "Discord", palette: { primary: "#5865f2", secondary: "#949ba4", accent: "#4752c4", background: "#f2f3f5" } },
+      { name: "Telegram", palette: { primary: "#0088cc", secondary: "#708499", accent: "#179cde", background: "#f5f5f5" } },
     ],
   },
 ];
