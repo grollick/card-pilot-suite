@@ -374,11 +374,11 @@ export function useCardBuilderState() {
     identitySaveTimers, identitySaveState, setIdentitySaveState,
     // Photos / Logo
     avatarUrl, coverUrl, avatarBgColor, avatarRotation, coverOffsetY,
-    logoUrl, logoFrostedBg, logoGlow, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap,
+    logoUrl, logoFrostedBg, logoGlow, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap, logoVerticalAlign,
     handleAvatarChange, handleCoverChange,
     handleAvatarBgColorChange, handleAvatarRotationChange, handleCoverOffsetYChange,
     handleLogoChange, handleLogoFrostedBgChange, handleLogoGlowChange,
-    handleLogoOpacityChange, handleLogoPaddingChange, handleLogoPositionChange, handleLogoSizeChange, handleLogoNameGapChange,
+    handleLogoOpacityChange, handleLogoPaddingChange, handleLogoPositionChange, handleLogoSizeChange, handleLogoNameGapChange, handleLogoVerticalAlignChange,
     // CTA & Social
     ctaConfig, ctaIconsOnly, setCtaIconsOnly,
     socialIconsOnly, setSocialIconsOnly, socialBtnColor, setSocialBtnColor,
