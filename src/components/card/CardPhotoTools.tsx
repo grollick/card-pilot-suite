@@ -50,6 +50,8 @@ interface CardPhotoToolsProps {
   onLogoPaddingChange?: (val: number) => void;
   logoNameGap?: number;
   onLogoNameGapChange?: (val: number) => void;
+  logoVerticalAlign?: "top" | "center" | "bottom";
+  onLogoVerticalAlignChange?: (val: "top" | "center" | "bottom") => void;
   avatarShape?: "circle" | "rounded" | "square";
   onAvatarShapeChange?: (shape: "circle" | "rounded" | "square") => void;
   avatarBorderWidth?: number;
@@ -94,6 +96,8 @@ export default function CardPhotoTools({
   onLogoPaddingChange,
   logoNameGap = 8,
   onLogoNameGapChange,
+  logoVerticalAlign = "center",
+  onLogoVerticalAlignChange,
   avatarShape = "circle",
   onAvatarShapeChange,
   avatarBorderWidth = 3,
