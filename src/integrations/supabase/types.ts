@@ -1017,6 +1017,62 @@ export type Database = {
           },
         ]
       }
+      quote_requests: {
+        Row: {
+          budget: string | null
+          created_at: string
+          description: string | null
+          form_answers: Json | null
+          id: string
+          lead_id: string | null
+          location: string | null
+          photo_urls: string[] | null
+          project_type: string | null
+          status: string
+          timeline: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          budget?: string | null
+          created_at?: string
+          description?: string | null
+          form_answers?: Json | null
+          id?: string
+          lead_id?: string | null
+          location?: string | null
+          photo_urls?: string[] | null
+          project_type?: string | null
+          status?: string
+          timeline?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          budget?: string | null
+          created_at?: string
+          description?: string | null
+          form_answers?: Json | null
+          id?: string
+          lead_id?: string | null
+          location?: string | null
+          photo_urls?: string[] | null
+          project_type?: string | null
+          status?: string
+          timeline?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_requests_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       social_accounts: {
         Row: {
           account_name: string | null
