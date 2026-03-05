@@ -1,0 +1,1 @@
+ALTER TYPE public.analytics_event_type ADD VALUE IF NOT EXISTS 'contact_saved';

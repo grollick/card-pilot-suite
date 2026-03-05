@@ -1319,6 +1319,7 @@ export type Database = {
         | "button_click"
         | "form_submit"
         | "booking_created"
+        | "contact_saved"
       app_role: "admin" | "user"
       booking_status:
         | "pending"
@@ -1471,6 +1472,7 @@ export const Constants = {
         "button_click",
         "form_submit",
         "booking_created",
+        "contact_saved",
       ],
       app_role: ["admin", "user"],
       booking_status: [

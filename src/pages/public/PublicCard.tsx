@@ -963,7 +963,13 @@ export default function PublicCard() {
 
           {/* ── Save Contact Button ── */}
           <button
-            onClick={() =>
+            onClick={() => {
+              supabase.from("analytics_events").insert({
+                user_id: profile.id,
+                handle: handle!,
+                event_type: "contact_saved" as const,
+                meta_json: getVisitorMeta(),
+              }).then();
               downloadVCard({
                 name: profile.name,
                 email: profile.email,
@@ -971,8 +977,8 @@ export default function PublicCard() {
                 company: profile.company,
                 handle: profile.handle,
                 profession: professionName,
-              })
-            }
+              });
+            }}
             style={{
               width: "100%",
               display: "inline-flex",
