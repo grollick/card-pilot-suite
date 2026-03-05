@@ -24,8 +24,8 @@ export default function NFCShareDialog({ url, name = "Card" }: NFCShareDialogPro
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Nfc className="h-4 w-4 mr-1.5" /> NFC
+        <Button variant="outline" size="icon" className="h-8 w-8" title="Write NFC tag">
+          <Nfc className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-xs">
