@@ -15,6 +15,8 @@ interface Props {
   setJobTitle: (v: string | null) => void;
   boldLastName: boolean;
   setBoldLastName: (v: boolean) => void;
+  uppercaseName: boolean;
+  setUppercaseName: (v: boolean) => void;
   professionName: string;
   identitySaveTimers: React.MutableRefObject<Record<string, ReturnType<typeof setTimeout>>>;
   identitySaveState: Record<string, "saving" | "saved" | null>;
@@ -32,6 +34,7 @@ function SaveIndicator({ state }: { state: "saving" | "saved" | null }) {
 export default function CardBuilderIdentity({
   profile, editName, setEditName, editCompany, setEditCompany,
   editJobTitle, setEditJobTitle, jobTitle, setJobTitle, boldLastName, setBoldLastName,
+  uppercaseName, setUppercaseName,
   professionName, identitySaveTimers, identitySaveState, setIdentitySaveState,
   saveThemeField, qc,
 }: Props) {
@@ -82,6 +85,14 @@ export default function CardBuilderIdentity({
           <Switch
             checked={boldLastName}
             onCheckedChange={(v) => { setBoldLastName(v); saveThemeField({ bold_last_name: v }); }}
+            className="scale-75 origin-right"
+          />
+        </div>
+        <div className="flex items-center justify-between mt-1">
+          <label className="text-[11px] text-muted-foreground">Uppercase name</label>
+          <Switch
+            checked={uppercaseName}
+            onCheckedChange={(v) => { setUppercaseName(v); saveThemeField({ uppercase_name: v }); }}
             className="scale-75 origin-right"
           />
         </div>

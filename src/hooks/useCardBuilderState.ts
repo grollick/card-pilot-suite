@@ -54,6 +54,7 @@ export function useCardBuilderState() {
   const [editJobTitle, setEditJobTitle] = useState<string | null>(null);
   const [jobTitle, setJobTitle] = useState<string | null>(null);
   const [boldLastName, setBoldLastName] = useState(false);
+  const [uppercaseName, setUppercaseName] = useState(false);
   const identitySaveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const [identitySaveState, setIdentitySaveState] = useState<Record<string, "saving" | "saved" | null>>({});
   const [globalSaveState, setGlobalSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -85,6 +86,7 @@ export function useCardBuilderState() {
       if (typeof t?.logo_opacity === "number") setLogoOpacity(t.logo_opacity);
       if (t?.job_title) setJobTitle(t.job_title);
       if (typeof t?.bold_last_name === "boolean") setBoldLastName(t.bold_last_name);
+      if (typeof t?.uppercase_name === "boolean") setUppercaseName(t.uppercase_name);
       if (typeof t?.section_icons === "boolean") setShowSectionIcons(t.section_icons);
       if (typeof t?.cta_icons_only === "boolean") setCtaIconsOnly(t.cta_icons_only);
       if (typeof t?.social_icons_only === "boolean") setSocialIconsOnly(t.social_icons_only);
@@ -340,6 +342,7 @@ export function useCardBuilderState() {
     editName, setEditName, editCompany, setEditCompany, editJobTitle, setEditJobTitle,
     jobTitle, setJobTitle, professionName, displayJobTitle,
     boldLastName, setBoldLastName,
+    uppercaseName, setUppercaseName,
     identitySaveTimers, identitySaveState, setIdentitySaveState,
     // Photos / Logo
     avatarUrl, coverUrl, avatarBgColor, avatarRotation, coverOffsetY,
