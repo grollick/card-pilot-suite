@@ -3,6 +3,8 @@ import { Input } from "@/components/ui/input";
 import CtaEditor, { type CtaItem, DEFAULT_CTA_CONFIG } from "@/components/card/CtaEditor";
 import { resolveCardTheme, type ResolvedCardTheme } from "@/lib/cardTokens";
 import QRShareDialog from "@/components/card/QRShareDialog";
+import NFCShareDialog from "@/components/card/NFCShareDialog";
+import WalletPassDialog from "@/components/card/WalletPassDialog";
 import CardPhotoTools from "@/components/card/CardPhotoTools";
 import SectionEditor, { type SectionContent } from "@/components/card/SectionEditor";
 import CardAssistant from "@/components/card/CardAssistant";
@@ -511,6 +513,14 @@ export default function CardBuilder() {
               </Button>
               <QRShareDialog
                 url={`${window.location.origin}/${profile.handle}`}
+                name={profile.name || "Card"}
+              />
+              <NFCShareDialog
+                url={`${window.location.origin}/${profile.handle}`}
+                name={profile.name || "Card"}
+              />
+              <WalletPassDialog
+                handle={profile.handle}
                 name={profile.name || "Card"}
               />
             </>

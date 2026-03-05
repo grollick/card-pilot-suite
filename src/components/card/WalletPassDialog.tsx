@@ -36,8 +36,8 @@ export default function WalletPassDialog({ handle, name = "Card" }: WalletPassDi
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          <Wallet className="h-4 w-4 mr-1.5" /> Wallet
+        <Button variant="outline" size="icon" className="h-8 w-8" title="Add to Wallet">
+          <Wallet className="h-4 w-4" />
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-xs">
