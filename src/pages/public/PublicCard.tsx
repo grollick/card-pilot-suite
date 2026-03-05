@@ -207,6 +207,7 @@ export default function PublicCard() {
   const displayJobTitle = (themeJson.job_title as string) || professionName;
   const coverUrl = themeJson.cover_url as string | undefined;
   const showSectionIcons = themeJson.section_icons === true;
+  const metallicEffect = themeJson.metallicEffect as import("@/components/card/CardThemeEditor").MetallicEffect | undefined;
 
   // CTA config from theme_json or fallback to legacy primary_cta
   type CtaItem = { id: string; label: string; enabled: boolean; isPrimary: boolean };
@@ -523,6 +524,7 @@ export default function PublicCard() {
             logoSize={(themeJson.logo_size as any) ?? "medium"}
             logoOpacity={typeof themeJson.logo_opacity === "number" ? (themeJson.logo_opacity as number) : 100}
             logoPadding={typeof themeJson.logo_padding === "number" ? (themeJson.logo_padding as number) : 4}
+            metallicEffect={metallicEffect}
           />
           </div>
         )}
@@ -558,7 +560,7 @@ export default function PublicCard() {
               </div>
             ) : (
               <>
-                <CardButton theme={theme} fullWidth onClick={() => handleCtaClick(primaryCta)}>
+                <CardButton theme={theme} fullWidth onClick={() => handleCtaClick(primaryCta)} metallicEffect={metallicEffect}>
                   {CTA_ICONS[primaryCta]}
                   <span>{primaryCtaItem.label}</span>
                 </CardButton>
@@ -606,7 +608,7 @@ export default function PublicCard() {
 
           {/* ── About ── */}
           {enabledSections.has("about") && (
-            <CardSectionWrapper theme={theme} index={0}>
+            <CardSectionWrapper theme={theme} index={0} metallicEffect={metallicEffect}>
               <SectionTitle id="about" label="About" />
               <p style={{ fontSize: 14, lineHeight: 1.7, color: palette.secondary, margin: 0 }}>
                 {sectionContent("about")?.text || "Passionate professional dedicated to delivering exceptional results."}
@@ -623,7 +625,7 @@ export default function PublicCard() {
             if (!hasCardServices && !hasDbServices) return null;
 
             return (
-              <CardSectionWrapper theme={theme} index={1}>
+              <CardSectionWrapper theme={theme} index={1} metallicEffect={metallicEffect}>
                 <SectionTitle id="services" label="Services" />
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {hasCardServices
@@ -658,7 +660,7 @@ export default function PublicCard() {
           {enabledSections.has("booking") && (
             <div id="booking-section">
               <Link to={`/book/${handle}`} style={{ textDecoration: "none" }}>
-                <CardButton theme={theme} fullWidth>
+                <CardButton theme={theme} fullWidth metallicEffect={metallicEffect}>
                   <Calendar className="h-4 w-4" />
                   <span>{sectionContent("booking")?.bookingHeading || "Book an Appointment"}</span>
                 </CardButton>
@@ -677,7 +679,7 @@ export default function PublicCard() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {hasContent
                     ? testimonials!.map((t, i) => (
-                        <CardSectionWrapper key={i} theme={theme} index={i + 2}>
+                        <CardSectionWrapper key={i} theme={theme} index={i + 2} metallicEffect={metallicEffect}>
                           <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
                             {[...Array(5)].map((_, j) => (
                               <Star key={j} className="h-3.5 w-3.5" style={{ fill: "#f59e0b", color: "#f59e0b" }} />
@@ -692,7 +694,7 @@ export default function PublicCard() {
                         </CardSectionWrapper>
                       ))
                     : (
-                        <CardSectionWrapper theme={theme} index={2}>
+                        <CardSectionWrapper theme={theme} index={2} metallicEffect={metallicEffect}>
                           <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
                             {[...Array(5)].map((_, i) => (
                               <Star key={i} className="h-3.5 w-3.5" style={{ fill: "#f59e0b", color: "#f59e0b" }} />
@@ -840,7 +842,7 @@ export default function PublicCard() {
                   </p>
                 </motion.div>
               ) : (
-                <CardSectionWrapper theme={theme} index={4}>
+                <CardSectionWrapper theme={theme} index={4} metallicEffect={metallicEffect}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                     <input
                       placeholder="Your name *"
@@ -908,6 +910,7 @@ export default function PublicCard() {
                     <CardButton
                       theme={theme}
                       fullWidth
+                      metallicEffect={metallicEffect}
                       onClick={handleFormSubmit}
                     >
                       <Send className="h-4 w-4" />

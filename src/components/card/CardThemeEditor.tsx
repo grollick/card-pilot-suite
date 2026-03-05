@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Palette, Type, Check, RotateCcw, Layers, Sun, Moon, Circle, Share2, Save, Trash2, Plus, Undo2, Redo2 } from "lucide-react";
+import { Palette, Type, Check, RotateCcw, Layers, Sun, Moon, Circle, Share2, Save, Trash2, Plus, Undo2, Redo2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -62,12 +62,39 @@ export interface CardBgPattern {
   coverage?: BgPatternCoverage;
 }
 
+export type MetallicType = "none" | "gold" | "silver" | "rose-gold" | "bronze" | "platinum";
+
+export interface MetallicEffect {
+  type: MetallicType;
+  intensity: number; // 0-100
+  applyToName: boolean;
+  applyToButtons: boolean;
+  applyToSections: boolean;
+}
+
+export const METALLIC_GRADIENTS: Record<Exclude<MetallicType, "none">, string> = {
+  gold: "linear-gradient(135deg, #BF953F 0%, #FCF6BA 25%, #B38728 50%, #FBF5B7 75%, #AA771C 100%)",
+  silver: "linear-gradient(135deg, #C0C0C0 0%, #F5F5F5 25%, #A8A8A8 50%, #E8E8E8 75%, #909090 100%)",
+  "rose-gold": "linear-gradient(135deg, #B76E79 0%, #EECDA3 30%, #B76E79 60%, #F0D5C9 100%)",
+  bronze: "linear-gradient(135deg, #CD7F32 0%, #E6BE8A 30%, #8C5E2A 60%, #D4A76A 100%)",
+  platinum: "linear-gradient(135deg, #E5E4E2 0%, #FFFFFF 30%, #C0C0C0 60%, #E5E4E2 100%)",
+};
+
+export const METALLIC_TEXT_COLORS: Record<Exclude<MetallicType, "none">, string> = {
+  gold: "#BF953F",
+  silver: "#A8A8A8",
+  "rose-gold": "#B76E79",
+  bronze: "#CD7F32",
+  platinum: "#C0C0C0",
+};
+
 export interface CardThemeOverrides {
   palette?: CardPalette;
   fonts?: CardFonts;
   tokens?: CardStyleTokens;
   gradientBg?: CardGradientBg;
   bgPattern?: CardBgPattern;
+  metallicEffect?: MetallicEffect;
 }
 
 const FONT_OPTIONS = [
@@ -150,6 +177,20 @@ const PALETTE_CATEGORIES: PaletteCategory[] = [
       { name: "WhatsApp", palette: { primary: "#25d366", secondary: "#667781", accent: "#128c7e", background: "#f0f2f5" } },
       { name: "Spotify", palette: { primary: "#1db954", secondary: "#b3b3b3", accent: "#1ed760", background: "#121212" } },
       { name: "Discord", palette: { primary: "#5865f2", secondary: "#949ba4", accent: "#4752c4", background: "#f2f3f5" } },
+    ],
+  },
+  {
+    label: "Metallic",
+    icon: <Sparkles className="h-3 w-3" />,
+    palettes: [
+      { name: "Gold", palette: { primary: "#BF953F", secondary: "#6b5c3e", accent: "#D4AF37", background: "#1a1608" } },
+      { name: "Silver", palette: { primary: "#A8A8A8", secondary: "#6b6b6b", accent: "#C0C0C0", background: "#0f0f0f" } },
+      { name: "Rose Gold", palette: { primary: "#B76E79", secondary: "#7a5c60", accent: "#EECDA3", background: "#1a0f10" } },
+      { name: "Bronze", palette: { primary: "#CD7F32", secondary: "#7a6040", accent: "#E6BE8A", background: "#1a1208" } },
+      { name: "Platinum", palette: { primary: "#E5E4E2", secondary: "#8a8a8a", accent: "#C0C0C0", background: "#121214" } },
+      { name: "Gold Light", palette: { primary: "#9A7B2F", secondary: "#6b5c3e", accent: "#C9A94F", background: "#FFFDF5" } },
+      { name: "Silver Light", palette: { primary: "#6b6b6b", secondary: "#999999", accent: "#888888", background: "#F8F8FA" } },
+      { name: "Rose Light", palette: { primary: "#B76E79", secondary: "#9a7a7f", accent: "#D4A0A7", background: "#FFF5F5" } },
     ],
   },
 ];
@@ -236,16 +277,18 @@ export default function CardThemeEditor({
   const [tokens, _setTokens] = useState<CardStyleTokens>(currentOverrides.tokens ?? {});
   const [gradientBg, _setGradientBg] = useState<CardGradientBg>(currentOverrides.gradientBg ?? { enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
   const [bgPattern, _setBgPattern] = useState<CardBgPattern>(currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 });
+  const DEFAULT_METALLIC: MetallicEffect = { type: "none", intensity: 80, applyToName: true, applyToButtons: true, applyToSections: true };
+  const [metallicEffect, _setMetallicEffect] = useState<MetallicEffect>(currentOverrides.metallicEffect ?? DEFAULT_METALLIC);
 
   // ── Undo / Redo history ──
-  interface ThemeSnapshot { palette: CardPalette; fonts: CardFonts; tokens: CardStyleTokens; gradientBg: CardGradientBg; bgPattern: CardBgPattern }
+  interface ThemeSnapshot { palette: CardPalette; fonts: CardFonts; tokens: CardStyleTokens; gradientBg: CardGradientBg; bgPattern: CardBgPattern; metallicEffect: MetallicEffect }
   const historyRef = useRef<ThemeSnapshot[]>([]);
   const historyIndexRef = useRef(-1);
   const [historyLen, setHistoryLen] = useState(0);
   const [historyIdx, setHistoryIdx] = useState(-1);
   const skipHistoryRef = useRef(false);
 
-  const getSnapshot = useCallback((): ThemeSnapshot => ({ palette, fonts, tokens, gradientBg, bgPattern }), [palette, fonts, tokens, gradientBg, bgPattern]);
+  const getSnapshot = useCallback((): ThemeSnapshot => ({ palette, fonts, tokens, gradientBg, bgPattern, metallicEffect }), [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect]);
 
   const pushHistory = useCallback((snap: ThemeSnapshot) => {
     if (skipHistoryRef.current) return;
@@ -267,6 +310,7 @@ export default function CardThemeEditor({
     _setTokens(snap.tokens);
     _setGradientBg(snap.gradientBg);
     _setBgPattern(snap.bgPattern);
+    _setMetallicEffect(snap.metallicEffect);
     // Allow next tick to re-enable history
     requestAnimationFrame(() => { skipHistoryRef.current = false; });
   }, []);
@@ -297,7 +341,7 @@ export default function CardThemeEditor({
       pushHistory(getSnapshot());
     }, 300);
     return () => clearTimeout(historyTimer.current);
-  }, [palette, fonts, tokens, gradientBg, bgPattern, open, pushHistory, getSnapshot]);
+  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, open, pushHistory, getSnapshot]);
 
   // Wrapped setters that go through normal state (history is pushed via effect)
   const setPalette = _setPalette;
@@ -305,6 +349,7 @@ export default function CardThemeEditor({
   const setTokens = _setTokens;
   const setGradientBg = _setGradientBg;
   const setBgPattern = _setBgPattern;
+  const setMetallicEffect = _setMetallicEffect;
 
   // Custom palettes
   const [customPalettes, setCustomPalettes] = useState<{ id: string; name: string; palette: CardPalette }[]>([]);
@@ -347,10 +392,11 @@ export default function CardThemeEditor({
     const t = currentOverrides.tokens ?? {};
     const g = currentOverrides.gradientBg ?? { enabled: false, color2: "#e0e7ff", direction: "to bottom right" };
     const b = currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 };
-    _setPalette(p); _setFonts(f); _setTokens(t); _setGradientBg(g); _setBgPattern(b);
+    const m = currentOverrides.metallicEffect ?? DEFAULT_METALLIC;
+    _setPalette(p); _setFonts(f); _setTokens(t); _setGradientBg(g); _setBgPattern(b); _setMetallicEffect(m);
     if (open) {
       // Reset history when opening
-      historyRef.current = [{ palette: p, fonts: f, tokens: t, gradientBg: g, bgPattern: b }];
+      historyRef.current = [{ palette: p, fonts: f, tokens: t, gradientBg: g, bgPattern: b, metallicEffect: m }];
       historyIndexRef.current = 0;
       setHistoryLen(1);
       setHistoryIdx(0);
@@ -365,8 +411,9 @@ export default function CardThemeEditor({
       palette, fonts, tokens,
       gradientBg: gradientBg.enabled ? gradientBg : undefined,
       bgPattern: bgPattern.type !== "none" ? bgPattern : undefined,
+      metallicEffect: metallicEffect.type !== "none" ? metallicEffect : undefined,
     });
-  }, [palette, fonts, tokens, gradientBg, bgPattern, open, onPreview]);
+  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, open, onPreview]);
 
   const handleColorChange = useCallback((key: keyof CardPalette, value: string) => {
     setPalette((prev) => ({ ...prev, [key]: value }));
@@ -376,6 +423,7 @@ export default function CardThemeEditor({
     setPalette(defaultPalette); setFonts(defaultFonts); setTokens({});
     setGradientBg({ enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
     setBgPattern({ type: "none", opacity: 0.08 });
+    setMetallicEffect(DEFAULT_METALLIC);
   }, [defaultPalette, defaultFonts]);
 
   const handleSave = useCallback(() => {
@@ -383,9 +431,10 @@ export default function CardThemeEditor({
       palette, fonts, tokens,
       gradientBg: gradientBg.enabled ? gradientBg : undefined,
       bgPattern: bgPattern.type !== "none" ? bgPattern : undefined,
+      metallicEffect: metallicEffect.type !== "none" ? metallicEffect : undefined,
     });
     onOpenChange(false);
-  }, [palette, fonts, tokens, gradientBg, bgPattern, onSave, onOpenChange]);
+  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, onSave, onOpenChange]);
 
   const updateToken = useCallback(<K extends keyof CardStyleTokens>(key: K, value: CardStyleTokens[K]) => {
     setTokens((prev) => ({ ...prev, [key]: value }));
@@ -647,7 +696,53 @@ export default function CardThemeEditor({
                 )}
               </div>
 
-              {/* Mini Preview */}
+              {/* Metallic Effect */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <SectionLabel>Metallic Effect</SectionLabel>
+                  <Sparkles className="h-3 w-3 text-muted-foreground" />
+                </div>
+                <OptionGrid
+                  cols={3}
+                  options={[
+                    { value: "none", label: "None" },
+                    { value: "gold", label: "Gold" },
+                    { value: "silver", label: "Silver" },
+                    { value: "rose-gold", label: "Rose" },
+                    { value: "bronze", label: "Bronze" },
+                    { value: "platinum", label: "Platinum" },
+                  ]}
+                  value={metallicEffect.type}
+                  onChange={(v) => setMetallicEffect(prev => ({ ...prev, type: v as MetallicType }))}
+                />
+                {metallicEffect.type !== "none" && (
+                  <div className="space-y-2 pl-1 pt-1">
+                    {/* Metallic preview swatch */}
+                    <div className="h-6 rounded-md" style={{ background: METALLIC_GRADIENTS[metallicEffect.type as Exclude<MetallicType, "none">] }} />
+                    <div className="space-y-1">
+                      <Label className="text-[11px] text-muted-foreground">Intensity — {metallicEffect.intensity}%</Label>
+                      <Slider value={[metallicEffect.intensity]} onValueChange={([v]) => setMetallicEffect(prev => ({ ...prev, intensity: v }))} min={20} max={100} step={5} />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[11px] text-muted-foreground">Apply to</Label>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] text-muted-foreground">Name text</span>
+                        <Switch checked={metallicEffect.applyToName} onCheckedChange={(v) => setMetallicEffect(prev => ({ ...prev, applyToName: v }))} className="scale-75" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] text-muted-foreground">Buttons</span>
+                        <Switch checked={metallicEffect.applyToButtons} onCheckedChange={(v) => setMetallicEffect(prev => ({ ...prev, applyToButtons: v }))} className="scale-75" />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-[11px] text-muted-foreground">Section backgrounds</span>
+                        <Switch checked={metallicEffect.applyToSections} onCheckedChange={(v) => setMetallicEffect(prev => ({ ...prev, applyToSections: v }))} className="scale-75" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+
               <div className="space-y-1.5">
                 <SectionLabel>Preview</SectionLabel>
                 <div

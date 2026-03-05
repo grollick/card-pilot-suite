@@ -4,6 +4,8 @@ import {
   type ResolvedCardTheme,
   getSectionStyles,
 } from "@/lib/cardTokens";
+import type { MetallicEffect } from "@/components/card/CardThemeEditor";
+import { METALLIC_GRADIENTS } from "@/components/card/CardThemeEditor";
 
 interface CardSectionWrapperProps {
   theme: ResolvedCardTheme;
@@ -11,6 +13,7 @@ interface CardSectionWrapperProps {
   className?: string;
   /** Zero-based index used for stagger delay */
   index?: number;
+  metallicEffect?: MetallicEffect;
 }
 
 /**
@@ -18,11 +21,15 @@ interface CardSectionWrapperProps {
  * (solid / frosted / elevated / soft / glow) derived from tokens.
  * Animates in with a lifted tile + glow effect on scroll.
  */
-export default function CardSectionWrapper({ theme, children, className = "", index = 0 }: CardSectionWrapperProps) {
+export default function CardSectionWrapper({ theme, children, className = "", index = 0, metallicEffect }: CardSectionWrapperProps) {
+  const hasMetallic = metallicEffect?.type && metallicEffect.type !== "none" && metallicEffect.applyToSections;
+
   const sectionStyle: React.CSSProperties = {
     borderRadius: theme.radii.card,
     padding: theme.spacing.inner,
     ...cardStyleMap(theme),
+    position: "relative" as const,
+    overflow: "hidden" as const,
   };
 
   const staggerDelay = index * 0.1;
@@ -45,7 +52,21 @@ export default function CardSectionWrapper({ theme, children, className = "", in
         transition: { duration: 0.2 },
       }}
     >
-      {children}
+      {hasMetallic && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: METALLIC_GRADIENTS[metallicEffect!.type as Exclude<import("@/components/card/CardThemeEditor").MetallicType, "none">],
+            opacity: (metallicEffect!.intensity / 100) * 0.12,
+            pointerEvents: "none",
+            borderRadius: theme.radii.card,
+          }}
+        />
+      )}
+      <div style={{ position: "relative", zIndex: 1 }}>
+        {children}
+      </div>
       {theme.section.divider === "hairline" && (
         <div
           style={{
@@ -53,6 +74,8 @@ export default function CardSectionWrapper({ theme, children, className = "", in
             width: `${theme.section.dividerWidth ?? 100}%`,
             margin: `${theme.spacing.inner}px auto 0`,
             background: theme.section.dividerColor || `${theme.palette.secondary}20`,
+            position: "relative",
+            zIndex: 1,
           }}
         />
       )}

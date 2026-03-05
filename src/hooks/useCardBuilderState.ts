@@ -276,6 +276,7 @@ export function useCardBuilderState() {
     tokens: (card?.theme_json as any)?.tokens ?? undefined,
     gradientBg: (card?.theme_json as any)?.gradientBg ?? undefined,
     bgPattern: (card?.theme_json as any)?.bgPattern ?? undefined,
+    metallicEffect: (card?.theme_json as any)?.metallicEffect ?? undefined,
   };
 
   // When theme editor is open, show live preview overrides; otherwise show saved
@@ -321,7 +322,7 @@ export function useCardBuilderState() {
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: published ? "published" : "draft",
-        theme_json: { ...existing, cover_url: coverUrl, palette: overrides.palette, fonts: overrides.fonts, tokens: overrides.tokens, gradientBg: overrides.gradientBg, bgPattern: overrides.bgPattern } as any,
+        theme_json: { ...existing, cover_url: coverUrl, palette: overrides.palette, fonts: overrides.fonts, tokens: overrides.tokens, gradientBg: overrides.gradientBg, bgPattern: overrides.bgPattern, metallicEffect: overrides.metallicEffect } as any,
       });
       toast.success("Theme updated!");
     } catch { toast.error("Failed to save theme"); }
