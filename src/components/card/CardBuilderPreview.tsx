@@ -35,6 +35,7 @@ interface Props {
   nameFontWeight?: number;
   firstNameFontWeight?: number | null;
   nameItalic?: boolean;
+  nameFontSize?: number | null;
   onAvatarChange: (url: string) => void;
   setEditingSection: (id: string | null) => void;
 }
@@ -106,7 +107,7 @@ export default function CardBuilderPreview({
   coverUrl, coverOffsetY, avatarUrl, avatarBgColor, avatarRotation,
   logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity, logoPadding,
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
-  boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, onAvatarChange, setEditingSection,
+  boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, onAvatarChange, setEditingSection,
 }: Props) {
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -240,7 +241,7 @@ export default function CardBuilderPreview({
                           <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
                         </div>
                       )}
-                      <h3 className="text-lg" style={{ color: previewTheme.palette.secondary, fontFamily: `'${previewTheme.fonts.primary}', sans-serif`, fontWeight: nameFontWeight ?? 700, fontStyle: nameItalic ? "italic" : undefined, ...(uppercaseName ? { textTransform: 'uppercase' as const } : {}), ...(nameLetterSpacing ? { letterSpacing: `${nameLetterSpacing}px` } : {}) }}>
+                      <h3 style={{ color: previewTheme.palette.secondary, fontFamily: `'${previewTheme.fonts.primary}', sans-serif`, fontWeight: nameFontWeight ?? 700, fontStyle: nameItalic ? "italic" : undefined, fontSize: nameFontSize ?? 18, ...(uppercaseName ? { textTransform: 'uppercase' as const } : {}), ...(nameLetterSpacing ? { letterSpacing: `${nameLetterSpacing}px` } : {}) }}>
                         {(() => {
                           const full = (editName ?? profile?.name) || "Your Name";
                           const display = uppercaseName ? full.toUpperCase() : full;

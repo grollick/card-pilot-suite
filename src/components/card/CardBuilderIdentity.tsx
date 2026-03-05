@@ -26,6 +26,8 @@ interface Props {
   setFirstNameFontWeight: (v: number | null) => void;
   nameItalic: boolean;
   setNameItalic: (v: boolean) => void;
+  nameFontSize: number | null;
+  setNameFontSize: (v: number | null) => void;
   professionName: string;
   identitySaveTimers: React.MutableRefObject<Record<string, ReturnType<typeof setTimeout>>>;
   identitySaveState: Record<string, "saving" | "saved" | null>;
@@ -49,6 +51,7 @@ export default function CardBuilderIdentity({
   nameFontWeight, setNameFontWeight,
   firstNameFontWeight, setFirstNameFontWeight,
   nameItalic, setNameItalic,
+  nameFontSize, setNameFontSize,
   professionName, identitySaveTimers, identitySaveState, setIdentitySaveState,
   saveThemeField, qc, hideWrapper,
 }: Props) {
@@ -168,6 +171,27 @@ export default function CardBuilderIdentity({
             onCheckedChange={(v) => { setNameItalic(v); saveThemeField({ name_italic: v }); }}
             className="scale-75 origin-right"
           />
+        </div>
+        <div className="mt-1.5">
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[11px] text-muted-foreground">Font size</label>
+            <span className="text-[10px] text-muted-foreground tabular-nums">{nameFontSize ?? "Auto"}</span>
+          </div>
+          <Slider
+            min={14}
+            max={48}
+            step={1}
+            value={[nameFontSize ?? 22]}
+            onValueChange={([v]) => { setNameFontSize(v); saveThemeField({ name_font_size: v }); }}
+            className="w-full"
+          />
+          {nameFontSize !== null && (
+            <button
+              type="button"
+              onClick={() => { setNameFontSize(null); saveThemeField({ name_font_size: null }); }}
+              className="text-[10px] text-primary hover:underline mt-0.5"
+            >Reset to auto</button>
+          )}
         </div>
       </div>
       <div className="space-y-2">

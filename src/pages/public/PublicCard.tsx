@@ -502,6 +502,7 @@ export default function PublicCard() {
             nameFontWeight={typeof themeJson.name_font_weight === "number" ? themeJson.name_font_weight : 700}
             firstNameFontWeight={typeof themeJson.first_name_font_weight === "number" ? themeJson.first_name_font_weight : null}
             nameItalic={themeJson.name_italic === true}
+            nameFontSize={typeof themeJson.name_font_size === "number" ? themeJson.name_font_size : null}
             profession={displayJobTitle}
             company={profile.company ?? undefined}
             avatarUrl={profile.avatar_url}
