@@ -37,6 +37,7 @@ interface Props {
   setSocialBtnColor: (v: string) => void;
   socialBtnStyle: "auto" | "filled" | "outline";
   setSocialBtnStyle: (v: "auto" | "filled" | "outline") => void;
+  hideWrapper?: boolean;
 }
 
 export default function CardBuilderSections({
@@ -45,7 +46,7 @@ export default function CardBuilderSections({
   isGenerating, aiContent, onAIGenerate,
   ctaConfig, ctaIconsOnly, setCtaIconsOnly, onCtaConfigChange,
   socialIconsOnly, setSocialIconsOnly, socialBtnColor, setSocialBtnColor,
-  socialBtnStyle, setSocialBtnStyle,
+  socialBtnStyle, setSocialBtnStyle, hideWrapper,
 }: Props) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -65,17 +66,25 @@ export default function CardBuilderSections({
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Paintbrush className="h-4 w-4 text-primary" />
-          <h2 className="font-semibold">Sections</h2>
+    <div className={hideWrapper ? "space-y-3" : "rounded-xl border border-border bg-card p-4 space-y-3"}>
+      {!hideWrapper && (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Paintbrush className="h-4 w-4 text-primary" />
+            <h2 className="font-semibold">Sections</h2>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Icons</span>
+            <Switch checked={showSectionIcons} onCheckedChange={(val) => { setShowSectionIcons(val); saveThemeField({ section_icons: val }); }} />
+          </div>
         </div>
-        <div className="flex items-center gap-2">
+      )}
+      {hideWrapper && (
+        <div className="flex items-center justify-end gap-2">
           <span className="text-xs text-muted-foreground">Icons</span>
           <Switch checked={showSectionIcons} onCheckedChange={(val) => { setShowSectionIcons(val); saveThemeField({ section_icons: val }); }} />
         </div>
-      </div>
+      )}
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
