@@ -19,7 +19,7 @@ function plural(s: string): string {
 }
 
 export default function SeoLandingPage() {
-  const { slug } = useParams<{ slug: string }>();
+  const { handle: slug } = useParams<{ handle: string }>();
 
   const parsed = useMemo(() => {
     if (!slug) return null;
