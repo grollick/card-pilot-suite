@@ -27,10 +27,34 @@ export function useLogActivity() {
         occurred_at: new Date().toISOString(),
       });
       if (error) throw error;
+
+      // Auto-cancel pending followups when a reply is logged
+      if (activity.activity_type === "email_replied") {
+        const now = new Date().toISOString();
+
+        // Mark pending followups as cancelled
+        await supabase
+          .from("scheduled_followups")
+          .update({ status: "cancelled" })
+          .eq("lead_id", activity.lead_id)
+          .eq("user_id", user!.id)
+          .eq("status", "pending");
+
+        // Set replied_at on sent followups that haven't been marked yet
+        await supabase
+          .from("scheduled_followups")
+          .update({ replied_at: now })
+          .eq("lead_id", activity.lead_id)
+          .eq("user_id", user!.id)
+          .eq("status", "sent")
+          .is("replied_at", null);
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["contact-activities"] });
-      qc.invalidateQueries({ queryKey: ["contacts"] }); // last_activity_at updated by trigger
+      qc.invalidateQueries({ queryKey: ["contact-followups"] });
+      qc.invalidateQueries({ queryKey: ["contact-followup-history"] });
+      qc.invalidateQueries({ queryKey: ["contacts"] });
     },
   });
 }
