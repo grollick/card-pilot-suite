@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail, Clock, CheckCircle, AlertTriangle, Clock3, TrendingUp, Send } from "lucide-react";
+import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail, Clock, CheckCircle, AlertTriangle, Clock3, TrendingUp, Send, Plus, Trash2, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -239,51 +239,149 @@ export default function SettingsPage() {
   );
 }
 
-// ── Follow-Up Settings Component ──
+// ── Follow-Up Sequence Builder ──
+interface SequenceStep {
+  id?: string;
+  step_number: number;
+  delay_minutes: number;
+  subject: string;
+  body: string;
+  enabled: boolean;
+}
+
+const DEFAULT_STEPS: SequenceStep[] = [
+  { step_number: 1, delay_minutes: 120, subject: "Thanks for connecting, {{name}}!", body: "Hi {{name}},\n\nThanks for reaching out! I wanted to follow up personally and let you know I received your information.\n\nI'd love to chat more about how I can help. Feel free to reply to this email or book a time on my calendar.\n\nLooking forward to connecting!", enabled: true },
+  { step_number: 2, delay_minutes: 1440, subject: "Quick follow-up, {{first_name}}", body: "Hi {{first_name}},\n\nJust checking in — I wanted to make sure you received my previous message.\n\nIf you have any questions or would like to discuss further, I'm here to help!\n\nBest regards", enabled: true },
+  { step_number: 3, delay_minutes: 4320, subject: "One last thing, {{first_name}}", body: "Hi {{first_name}},\n\nI know things get busy, so I wanted to reach out one more time.\n\nIf now isn't the right time, no worries at all. But if you'd like to connect, just reply to this email — I'd love to hear from you.\n\nAll the best!", enabled: false },
+];
+
+const DELAY_PRESETS = [
+  { label: "30 min", value: 30 },
+  { label: "1 hr", value: 60 },
+  { label: "2 hrs", value: 120 },
+  { label: "4 hrs", value: 240 },
+  { label: "12 hrs", value: 720 },
+  { label: "24 hrs", value: 1440 },
+  { label: "3 days", value: 4320 },
+  { label: "7 days", value: 10080 },
+];
+
+function formatDelay(minutes: number): string {
+  if (minutes < 60) return `${minutes} min`;
+  if (minutes < 1440) return `${Math.round(minutes / 60)} hr${minutes >= 120 ? "s" : ""}`;
+  const days = Math.round(minutes / 1440);
+  return `${days} day${days > 1 ? "s" : ""}`;
+}
+
 function FollowUpSettings({ profile, queryClient }: { profile: any; queryClient: any }) {
   const [enabled, setEnabled] = useState(false);
-  const [delayMinutes, setDelayMinutes] = useState(120);
-  const [subject, setSubject] = useState("Thanks for connecting, {{name}}!");
-  const [body, setBody] = useState("");
+  const [steps, setSteps] = useState<SequenceStep[]>([]);
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [expandedStep, setExpandedStep] = useState<number | null>(null);
 
+  // Load steps from DB or defaults
   useEffect(() => {
     if (!profile) return;
     setEnabled((profile as any).followup_enabled ?? false);
-    setDelayMinutes((profile as any).followup_delay_minutes ?? 120);
-    setSubject((profile as any).followup_subject ?? "Thanks for connecting, {{name}}!");
-    setBody((profile as any).followup_body ?? "");
+
+    const loadSteps = async () => {
+      setLoading(true);
+      const { data } = await supabase
+        .from("followup_steps")
+        .select("*")
+        .eq("user_id", profile.id)
+        .order("step_number", { ascending: true });
+
+      if (data && data.length > 0) {
+        setSteps(data.map((s: any) => ({
+          id: s.id,
+          step_number: s.step_number,
+          delay_minutes: s.delay_minutes,
+          subject: s.subject,
+          body: s.body,
+          enabled: s.enabled,
+        })));
+      } else {
+        setSteps(DEFAULT_STEPS);
+      }
+      setLoading(false);
+    };
+    loadSteps();
   }, [profile]);
 
-  const delayOptions = [
-    { label: "30 min", value: 30 },
-    { label: "1 hour", value: 60 },
-    { label: "2 hours", value: 120 },
-    { label: "4 hours", value: 240 },
-    { label: "24 hours", value: 1440 },
-  ];
+  const updateStep = (index: number, updates: Partial<SequenceStep>) => {
+    setSteps((prev) => prev.map((s, i) => i === index ? { ...s, ...updates } : s));
+  };
+
+  const addStep = () => {
+    const nextNum = steps.length + 1;
+    const lastDelay = steps.length > 0 ? steps[steps.length - 1].delay_minutes : 120;
+    setSteps((prev) => [
+      ...prev,
+      {
+        step_number: nextNum,
+        delay_minutes: lastDelay * 2,
+        subject: `Follow-up #${nextNum}, {{first_name}}`,
+        body: `Hi {{first_name}},\n\nJust following up on my previous message. Would love to connect!\n\nBest regards`,
+        enabled: true,
+      },
+    ]);
+    setExpandedStep(steps.length);
+  };
+
+  const removeStep = (index: number) => {
+    setSteps((prev) => prev.filter((_, i) => i !== index).map((s, i) => ({ ...s, step_number: i + 1 })));
+  };
 
   const handleSave = async () => {
     if (!profile) return;
     setSaving(true);
     try {
-      const { error } = await supabase
+      // Update profile enabled flag
+      await supabase
         .from("profiles")
-        .update({
-          followup_enabled: enabled,
-          followup_delay_minutes: delayMinutes,
-          followup_subject: subject,
-          followup_body: body,
-        } as any)
+        .update({ followup_enabled: enabled } as any)
         .eq("id", profile.id);
-      if (error) throw error;
+
+      // Delete existing steps and re-insert
+      await supabase
+        .from("followup_steps")
+        .delete()
+        .eq("user_id", profile.id);
+
+      if (steps.length > 0) {
+        const rows = steps.map((s, i) => ({
+          user_id: profile.id,
+          step_number: i + 1,
+          delay_minutes: s.delay_minutes,
+          subject: s.subject,
+          body: s.body,
+          enabled: s.enabled,
+        }));
+        const { error } = await supabase
+          .from("followup_steps")
+          .insert(rows as any);
+        if (error) throw error;
+      }
+
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      toast.success("Follow-up settings saved!");
+      toast.success("Follow-up sequence saved!");
     } catch (err: any) {
       toast.error(err.message || "Failed to save");
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleToggle = async (val: boolean) => {
+    setEnabled(val);
+    // Immediately persist the toggle
+    await supabase
+      .from("profiles")
+      .update({ followup_enabled: val } as any)
+      .eq("id", profile?.id);
+    queryClient.invalidateQueries({ queryKey: ["profile"] });
   };
 
   return (
@@ -292,62 +390,129 @@ function FollowUpSettings({ profile, queryClient }: { profile: any; queryClient:
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Mail className="h-4 w-4 text-primary" />
-          <h2 className="font-semibold">Auto Follow-Up Emails</h2>
+          <h2 className="font-semibold">Auto Follow-Up Sequence</h2>
         </div>
-        <Switch checked={enabled} onCheckedChange={setEnabled} />
+        <Switch checked={enabled} onCheckedChange={handleToggle} />
       </div>
       <p className="text-sm text-muted-foreground">
-        Automatically send a personalized follow-up email after someone submits the contact form on your card.
+        Build a multi-step email sequence that sends automatically after someone submits the contact form on your card.
       </p>
 
       {enabled && (
-        <div className="space-y-4 pt-2">
-          <div className="space-y-2">
-            <Label className="flex items-center gap-1.5">
-              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
-              Delay before sending
-            </Label>
-            <div className="flex flex-wrap gap-2">
-              {delayOptions.map((opt) => (
-                <Button
-                  key={opt.value}
-                  size="sm"
-                  variant={delayMinutes === opt.value ? "default" : "outline"}
-                  onClick={() => setDelayMinutes(opt.value)}
-                >
-                  {opt.label}
-                </Button>
-              ))}
-            </div>
+        loading ? (
+          <div className="flex items-center justify-center py-6">
+            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
+        ) : (
+          <div className="space-y-3 pt-2">
+            {/* Sequence timeline */}
+            {steps.map((step, index) => {
+              const isExpanded = expandedStep === index;
+              return (
+                <div key={index} className={`relative rounded-lg border transition-colors ${step.enabled ? "border-border bg-background" : "border-border/50 bg-muted/30 opacity-60"}`}>
+                  {/* Step header */}
+                  <div
+                    className="flex items-center gap-3 p-3 cursor-pointer"
+                    onClick={() => setExpandedStep(isExpanded ? null : index)}
+                  >
+                    {/* Timeline dot */}
+                    <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${step.enabled ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                      {index + 1}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{step.subject || `Step ${index + 1}`}</p>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        Send after {formatDelay(step.delay_minutes)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <Switch
+                        checked={step.enabled}
+                        onCheckedChange={(val) => { updateStep(index, { enabled: val }); }}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                      {steps.length > 1 && (
+                        <Button
+                          variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                          onClick={(e) => { e.stopPropagation(); removeStep(index); }}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
 
-          <div className="space-y-2">
-            <Label>Email Subject</Label>
-            <Input
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="Thanks for connecting, {{name}}!"
-            />
-            <p className="text-xs text-muted-foreground">
-              Use <code className="bg-muted px-1 rounded">{"{{name}}"}</code> and <code className="bg-muted px-1 rounded">{"{{first_name}}"}</code> for personalization.
-            </p>
-          </div>
+                  {/* Expanded editor */}
+                  {isExpanded && (
+                    <div className="px-3 pb-4 space-y-3 border-t border-border pt-3">
+                      <div className="space-y-2">
+                        <Label className="text-xs flex items-center gap-1.5">
+                          <Clock className="h-3 w-3 text-muted-foreground" />
+                          Delay after form submission
+                        </Label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {DELAY_PRESETS.map((opt) => (
+                            <Button
+                              key={opt.value}
+                              size="sm"
+                              variant={step.delay_minutes === opt.value ? "default" : "outline"}
+                              className="h-7 text-xs"
+                              onClick={() => updateStep(index, { delay_minutes: opt.value })}
+                            >
+                              {opt.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
 
-          <div className="space-y-2">
-            <Label>Email Body</Label>
-            <Textarea
-              value={body}
-              onChange={(e) => setBody(e.target.value)}
-              rows={6}
-              placeholder="Hi {{name}},&#10;&#10;Thanks for reaching out!..."
-            />
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Subject</Label>
+                        <Input
+                          value={step.subject}
+                          onChange={(e) => updateStep(index, { subject: e.target.value })}
+                          placeholder="Email subject..."
+                          className="h-8 text-sm"
+                        />
+                      </div>
+
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">Body</Label>
+                        <Textarea
+                          value={step.body}
+                          onChange={(e) => updateStep(index, { body: e.target.value })}
+                          rows={5}
+                          className="text-sm"
+                          placeholder="Hi {{name}}..."
+                        />
+                        <p className="text-[10px] text-muted-foreground">
+                          Variables: <code className="bg-muted px-1 rounded">{"{{name}}"}</code> <code className="bg-muted px-1 rounded">{"{{first_name}}"}</code> <code className="bg-muted px-1 rounded">{"{{sender_name}}"}</code>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Connector line */}
+                  {index < steps.length - 1 && (
+                    <div className="absolute -bottom-3 left-[22px] w-px h-3 bg-border z-10" />
+                  )}
+                </div>
+              );
+            })}
+
+            {/* Add step */}
+            {steps.length < 5 && (
+              <Button variant="outline" size="sm" className="w-full" onClick={addStep}>
+                <Plus className="h-3.5 w-3.5 mr-1.5" /> Add Step
+              </Button>
+            )}
           </div>
-        </div>
+        )
       )}
 
       <Button className="shadow-glow" onClick={handleSave} disabled={saving}>
         {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-        Save Follow-Up Settings
+        Save Sequence
       </Button>
     </motion.div>
   );

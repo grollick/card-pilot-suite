@@ -609,6 +609,42 @@ export type Database = {
           },
         ]
       }
+      followup_steps: {
+        Row: {
+          body: string
+          created_at: string
+          delay_minutes: number
+          enabled: boolean
+          id: string
+          step_number: number
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string
+          created_at?: string
+          delay_minutes?: number
+          enabled?: boolean
+          id?: string
+          step_number?: number
+          subject?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          delay_minutes?: number
+          enabled?: boolean
+          id?: string
+          step_number?: number
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           address: string | null
@@ -1095,6 +1131,8 @@ export type Database = {
           send_at: string
           sent_at: string | null
           status: string
+          step_id: string | null
+          step_number: number | null
           trigger_type: string
           user_id: string
         }
@@ -1107,6 +1145,8 @@ export type Database = {
           send_at: string
           sent_at?: string | null
           status?: string
+          step_id?: string | null
+          step_number?: number | null
           trigger_type?: string
           user_id: string
         }
@@ -1119,6 +1159,8 @@ export type Database = {
           send_at?: string
           sent_at?: string | null
           status?: string
+          step_id?: string | null
+          step_number?: number | null
           trigger_type?: string
           user_id?: string
         }
@@ -1128,6 +1170,13 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_followups_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "followup_steps"
             referencedColumns: ["id"]
           },
         ]
