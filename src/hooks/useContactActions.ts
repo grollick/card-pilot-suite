@@ -29,16 +29,20 @@ export function useLogActivity() {
       if (error) throw error;
 
       // Auto-cancel pending followups when a reply is logged
+      let cancelledCount = 0;
       if (activity.activity_type === "email_replied") {
         const now = new Date().toISOString();
 
         // Mark pending followups as cancelled
-        await supabase
+        const { data: cancelled } = await supabase
           .from("scheduled_followups")
           .update({ status: "cancelled" })
           .eq("lead_id", activity.lead_id)
           .eq("user_id", user!.id)
-          .eq("status", "pending");
+          .eq("status", "pending")
+          .select("id");
+
+        cancelledCount = cancelled?.length ?? 0;
 
         // Set replied_at on sent followups that haven't been marked yet
         await supabase
@@ -49,6 +53,8 @@ export function useLogActivity() {
           .eq("status", "sent")
           .is("replied_at", null);
       }
+
+      return { cancelledCount };
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["contact-activities"] });
