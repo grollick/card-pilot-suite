@@ -143,9 +143,17 @@ export default function SettingsPage() {
                     <Label htmlFor="settings-phone">Phone</Label>
                     <Input id="settings-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(555) 123-4567" />
                   </div>
-                  <div className="space-y-2 sm:col-span-2">
+                  <div className="space-y-2">
                     <Label htmlFor="settings-company">Company</Label>
                     <Input id="settings-company" value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Your company" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="settings-city">City</Label>
+                    <Input id="settings-city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Toronto, ON" />
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="settings-bio">Bio</Label>
+                    <Textarea id="settings-bio" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="A short bio about you and your business…" rows={3} />
                   </div>
                 </div>
 
