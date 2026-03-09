@@ -52,6 +52,8 @@ const ReferralsPage = lazy(() => import("./pages/app/ReferralsPage"));
 const ProjectsPage = lazy(() => import("./pages/app/ProjectsPage"));
 const ReviewsPage = lazy(() => import("./pages/app/ReviewsPage"));
 const EstimatesPage = lazy(() => import("./pages/app/EstimatesPage"));
+const JobsPage = lazy(() => import("./pages/app/JobsPage"));
+const JobDetailPage = lazy(() => import("./pages/app/JobDetailPage"));
 
 const LazyFallback = () => (
   <div className="min-h-screen flex items-center justify-center">
