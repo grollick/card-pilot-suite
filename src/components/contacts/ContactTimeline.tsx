@@ -119,11 +119,23 @@ export default function ContactTimeline({ activities, filter, onFilterChange, on
                 {item.description && (
                   <p className="text-xs text-muted-foreground mt-1 whitespace-pre-wrap bg-muted/30 rounded-lg p-2">{item.description}</p>
                 )}
-                <p className="text-xs text-muted-foreground mt-1">
-                  {formatDistanceToNow(new Date(item.occurred_at), { addSuffix: true })}
-                  {" · "}
-                  {format(new Date(item.occurred_at), "MMM d, h:mm a")}
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-xs text-muted-foreground">
+                    {formatDistanceToNow(new Date(item.occurred_at), { addSuffix: true })}
+                    {" · "}
+                    {format(new Date(item.occurred_at), "MMM d, h:mm a")}
+                  </p>
+                  {item.activity_type === "email_sent" && onMarkReplied && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-5 px-1.5 text-[10px] gap-1 text-muted-foreground hover:text-[hsl(var(--success))]"
+                      onClick={() => onMarkReplied(item.id, item.lead_id)}
+                    >
+                      <Reply className="h-3 w-3" /> Mark replied
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           );
