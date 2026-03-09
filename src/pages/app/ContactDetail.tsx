@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import { useContact, useContactActivities, useContactTasks, useContactBookings, useContactFollowups, useContactFollowupHistory } from "@/hooks/useContactDetail";
-import { useLogActivity, useReactivateFollowups } from "@/hooks/useContactActions";
+import { useLogActivity, useReactivateFollowups, useCancelFollowup } from "@/hooks/useContactActions";
 import { useCreateTask, useUpdateTask } from "@/hooks/useTasks";
 import { toast } from "sonner";
 import {
@@ -48,6 +48,7 @@ export default function ContactDetail() {
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
   const reactivateFollowups = useReactivateFollowups();
+  const cancelFollowup = useCancelFollowup();
 
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
@@ -275,12 +276,48 @@ export default function ContactDetail() {
                               </Badge>
                             )}
                           </div>
-                          <Badge
-                            variant={f.status === "sent" ? "default" : f.status === "cancelled" ? "destructive" : "outline"}
-                            className="text-xs shrink-0"
-                          >
-                            {config.label}
-                          </Badge>
+                          <div className="flex items-center gap-2 shrink-0">
+                            {f.status === "pending" && (
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                                    disabled={cancelFollowup.isPending}
+                                  >
+                                    <X className="h-3.5 w-3.5" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Cancel this follow-up?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This will cancel the follow-up scheduled for {format(new Date(f.send_at), "MMM d, h:mm a")}. You can reactivate it later.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Keep it</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                      onClick={async () => {
+                                        await cancelFollowup.mutateAsync(f.id);
+                                        toast.success("Follow-up cancelled");
+                                      }}
+                                    >
+                                      Cancel follow-up
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            )}
+                            <Badge
+                              variant={f.status === "sent" ? "default" : f.status === "cancelled" ? "destructive" : "outline"}
+                              className="text-xs"
+                            >
+                              {config.label}
+                            </Badge>
+                          </div>
                         </div>
                       );
                     })}
