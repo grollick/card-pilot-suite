@@ -841,7 +841,130 @@ export default function PublicCard() {
             );
           })()}
 
-          {/* ── Gallery ── */}
+          {/* ── Client Reviews (from database) ── */}
+          {publicReviews.length > 0 && (() => {
+            const avgRating = publicReviews.reduce((sum, r) => sum + r.rating, 0) / publicReviews.length;
+            const distribution = [5, 4, 3, 2, 1].map(n => ({
+              stars: n,
+              count: publicReviews.filter(r => r.rating === n).length,
+              pct: Math.round((publicReviews.filter(r => r.rating === n).length / publicReviews.length) * 100),
+            }));
+
+            return (
+              <div>
+                <SectionTitle id="reviews" label="Client Reviews" />
+
+                {/* Aggregated rating summary */}
+                <CardSectionWrapper theme={theme} index={6} metallicEffect={metallicEffect}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+                    <div style={{ textAlign: "center", minWidth: 80 }}>
+                      <p style={{ fontSize: 36, fontWeight: 700, color: palette.primary, margin: 0, lineHeight: 1 }}>
+                        {avgRating.toFixed(1)}
+                      </p>
+                      <div style={{ display: "flex", justifyContent: "center", gap: 2, margin: "6px 0 4px" }}>
+                        {[1, 2, 3, 4, 5].map(s => (
+                          <Star
+                            key={s}
+                            className="h-3.5 w-3.5"
+                            style={{
+                              fill: s <= Math.round(avgRating) ? "#f59e0b" : `${palette.secondary}30`,
+                              color: s <= Math.round(avgRating) ? "#f59e0b" : `${palette.secondary}30`,
+                            }}
+                          />
+                        ))}
+                      </div>
+                      <p style={{ fontSize: 11, color: palette.secondary, margin: 0, opacity: 0.7 }}>
+                        {publicReviews.length} review{publicReviews.length !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 3 }}>
+                      {distribution.map(d => (
+                        <div key={d.stars} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          <span style={{ fontSize: 11, color: palette.secondary, width: 12, textAlign: "right" }}>{d.stars}</span>
+                          <Star className="h-2.5 w-2.5" style={{ fill: "#f59e0b", color: "#f59e0b" }} />
+                          <div style={{ flex: 1, height: 6, borderRadius: 3, background: `${palette.secondary}15` }}>
+                            <div style={{ width: `${d.pct}%`, height: "100%", borderRadius: 3, background: "#f59e0b", transition: "width 0.3s" }} />
+                          </div>
+                          <span style={{ fontSize: 10, color: `${palette.secondary}80`, width: 20 }}>{d.count}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </CardSectionWrapper>
+
+                {/* Individual reviews */}
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
+                  {publicReviews.slice(0, 6).map((review, i) => (
+                    <CardSectionWrapper key={review.id} theme={theme} index={i + 7} metallicEffect={metallicEffect}>
+                      <div style={{ display: "flex", gap: 2, marginBottom: 6 }}>
+                        {[1, 2, 3, 4, 5].map(s => (
+                          <Star
+                            key={s}
+                            className="h-3 w-3"
+                            style={{
+                              fill: s <= review.rating ? "#f59e0b" : `${palette.secondary}30`,
+                              color: s <= review.rating ? "#f59e0b" : `${palette.secondary}30`,
+                            }}
+                          />
+                        ))}
+                      </div>
+                      {review.review_text && (
+                        <p style={{ fontSize: 13, color: palette.secondary, margin: 0, lineHeight: 1.6, fontStyle: "italic" }}>
+                          "{review.review_text}"
+                        </p>
+                      )}
+                      <p style={{ fontSize: 12, color: `${palette.secondary}99`, margin: "6px 0 0", fontWeight: 500 }}>
+                        — {review.reviewer_name}
+                      </p>
+                    </CardSectionWrapper>
+                  ))}
+                </div>
+
+                {/* Leave a review button */}
+                {!showReviewForm ? (
+                  <button
+                    onClick={() => setShowReviewForm(true)}
+                    style={{
+                      width: "100%",
+                      marginTop: 10,
+                      padding: "10px 20px",
+                      borderRadius: theme.button.shape === "pill" ? "9999px" : radii.button,
+                      border: `1.5px solid ${palette.primary}30`,
+                      background: `${palette.primary}08`,
+                      color: palette.primary,
+                      fontSize: 13,
+                      fontWeight: 500,
+                      fontFamily: `'${fonts.secondary}', sans-serif`,
+                      cursor: "pointer",
+                      transition: "all 0.2s",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <Star className="h-4 w-4" />
+                    Leave a Review
+                  </button>
+                ) : (
+                  <CardSectionWrapper theme={theme} index={14} metallicEffect={metallicEffect}>
+                    <ReviewForm userId={profile.id} onSuccess={() => setShowReviewForm(false)} />
+                  </CardSectionWrapper>
+                )}
+              </div>
+            );
+          })()}
+
+          {/* Review form when no reviews exist but ?review=1 */}
+          {publicReviews.length === 0 && showReviewForm && (
+            <div>
+              <SectionTitle id="reviews" label="Leave a Review" />
+              <CardSectionWrapper theme={theme} index={6} metallicEffect={metallicEffect}>
+                <ReviewForm userId={profile.id} onSuccess={() => setShowReviewForm(false)} />
+              </CardSectionWrapper>
+            </div>
+          )}
+
           {enabledSections.has("gallery") && (() => {
             const images = sectionContent("gallery")?.images as { url: string; caption?: string }[] | undefined;
             if (!images || images.length === 0) return null;
