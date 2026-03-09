@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
-import { useContact, useContactActivities, useContactTasks, useContactBookings } from "@/hooks/useContactDetail";
+import { useContact, useContactActivities, useContactTasks, useContactBookings, useContactFollowups } from "@/hooks/useContactDetail";
 import { useLogActivity } from "@/hooks/useContactActions";
 import { useCreateTask, useUpdateTask } from "@/hooks/useTasks";
 import { toast } from "sonner";
