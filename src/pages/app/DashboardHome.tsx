@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import {
-  Users, Calendar, ArrowUpRight, Circle, Plus,
-  Loader2, FileText, TrendingUp, QrCode, MessageSquareQuote,
+  Users, ArrowUpRight, Circle, Plus,
+  FileText, QrCode, MessageSquareQuote,
   UserPlus, CalendarCheck
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,9 @@ import { useTasks, useUpdateTask } from "@/hooks/useTasks";
 import { useDashboardStats, useRecentActivity } from "@/hooks/useDashboardStats";
 import { formatDistanceToNow, format } from "date-fns";
 import AIInsightsWidget from "@/components/dashboard/AIInsightsWidget";
+import BusinessPerformancePanel from "@/components/dashboard/BusinessPerformancePanel";
+import YesterdaySnapshot from "@/components/dashboard/YesterdaySnapshot";
+import MissedOpportunities from "@/components/dashboard/MissedOpportunities";
 
 const priorityColors: Record<string, string> = {
   high: "text-destructive",
@@ -46,114 +49,93 @@ export default function DashboardHome() {
   const todayTasks = allTasks.filter((t: any) => t.due_date && t.due_date <= today);
   const upcomingTasks = allTasks.filter((t: any) => t.due_date && t.due_date > today).slice(0, 4);
 
-  const kpis = [
-    { label: "New Leads Today", value: stats?.leadsToday ?? 0, icon: UserPlus, color: "text-primary bg-primary/10" },
-    { label: "Bookings This Week", value: stats?.bookingsWeek ?? 0, icon: CalendarCheck, color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10" },
-    { label: "Active Opportunities", value: stats?.activeOpportunities ?? 0, icon: TrendingUp, color: "text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10" },
-    { label: "Pipeline Leads", value: stats?.pipelineValue ?? 0, icon: Users, color: "text-accent-foreground bg-accent" },
-  ];
-
   const maxStageCount = Math.max(...(stats?.stageCounts ?? []).map(s => s.count), 1);
 
   return (
-    <div className="space-y-8 max-w-6xl">
+    <div className="space-y-6 max-w-6xl">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Command Center</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Business Growth Center</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Real-time overview of your business activity.
+          Track your leads, bookings, and revenue in real time.
         </p>
       </div>
 
-      {/* KPI Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {kpis.map((kpi, i) => (
-          <motion.div
-            key={kpi.label}
-            {...anim}
-            transition={{ delay: i * 0.05 }}
-            className="rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-card-hover transition-shadow"
-          >
-            <div className="flex items-start justify-between">
-              <div className="space-y-1.5">
-                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{kpi.label}</p>
-                {statsLoading ? (
-                  <Skeleton className="h-8 w-16" />
-                ) : (
-                  <p className="text-3xl font-bold tracking-tight">{kpi.value}</p>
-                )}
-              </div>
-              <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${kpi.color}`}>
-                <kpi.icon className="h-5 w-5" />
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+      {/* Business Performance Panel */}
+      <BusinessPerformancePanel />
 
-      {/* Main Grid: Activity Feed + Pipeline + Tasks */}
+      {/* Yesterday's Snapshot */}
+      <YesterdaySnapshot />
+
+      {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* Activity Feed — spans 2 cols */}
-        <motion.div {...anim} transition={{ delay: 0.1 }}
-          className="lg:col-span-2 rounded-xl border border-border bg-card p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold">Recent Activity</h2>
-            <Badge variant="secondary" className="text-[10px]">Last 7 days</Badge>
-          </div>
-          {feedLoading ? (
-            <div className="space-y-3">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex gap-3 items-center">
-                  <Skeleton className="h-8 w-8 rounded-full" />
-                  <div className="flex-1 space-y-1">
-                    <Skeleton className="h-3.5 w-32" />
-                    <Skeleton className="h-3 w-48" />
-                  </div>
-                  <Skeleton className="h-3 w-14" />
-                </div>
-              ))}
-            </div>
-          ) : feed.length === 0 ? (
-            <p className="text-sm text-muted-foreground text-center py-8">No recent activity yet.</p>
-          ) : (
-            <div className="space-y-1">
-              {feed.map(item => {
-                const Icon = feedIcons[item.type] ?? FileText;
-                return (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/30 transition-colors cursor-pointer"
-                    onClick={() => {
-                      if (item.type === "lead" || item.type === "quote") navigate(`/app/contacts/${item.id}`);
-                      else if (item.type === "booking") navigate("/app/bookings");
-                      else if (item.type === "qr_scan") navigate("/app/qr");
-                    }}
-                  >
-                    <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${feedColors[item.type]}`}>
-                      <Icon className="h-3.5 w-3.5" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{item.title}</p>
-                      <p className="text-xs text-muted-foreground truncate">{item.subtitle}</p>
-                    </div>
-                    <span className="text-[10px] text-muted-foreground shrink-0">
-                      {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </motion.div>
+        {/* Left: Activity Feed + Missed Opportunities */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Missed Opportunities */}
+          <MissedOpportunities />
 
-        {/* Right Column: Pipeline + Tasks */}
+          {/* Activity Feed */}
+          <motion.div {...anim} transition={{ delay: 0.15 }}
+            className="rounded-xl border border-border bg-card p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-semibold text-sm">Recent Activity</h2>
+              <Badge variant="secondary" className="text-[10px]">Last 7 days</Badge>
+            </div>
+            {feedLoading ? (
+              <div className="space-y-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="flex gap-3 items-center">
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                    <div className="flex-1 space-y-1">
+                      <Skeleton className="h-3.5 w-32" />
+                      <Skeleton className="h-3 w-48" />
+                    </div>
+                    <Skeleton className="h-3 w-14" />
+                  </div>
+                ))}
+              </div>
+            ) : feed.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">No recent activity yet.</p>
+            ) : (
+              <div className="space-y-1">
+                {feed.map(item => {
+                  const Icon = feedIcons[item.type] ?? FileText;
+                  return (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/30 transition-colors cursor-pointer"
+                      onClick={() => {
+                        if (item.type === "lead" || item.type === "quote") navigate(`/app/contacts/${item.id}`);
+                        else if (item.type === "booking") navigate("/app/bookings");
+                        else if (item.type === "qr_scan") navigate("/app/qr");
+                      }}
+                    >
+                      <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${feedColors[item.type]}`}>
+                        <Icon className="h-3.5 w-3.5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{item.title}</p>
+                        <p className="text-xs text-muted-foreground truncate">{item.subtitle}</p>
+                      </div>
+                      <span className="text-[10px] text-muted-foreground shrink-0">
+                        {formatDistanceToNow(new Date(item.created_at), { addSuffix: true })}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </motion.div>
+        </div>
+
+        {/* Right Column */}
         <div className="space-y-6">
           {/* Pipeline Snapshot */}
           <motion.div {...anim} transition={{ delay: 0.15 }}
             className="rounded-xl border border-border bg-card p-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold">Pipeline</h2>
+              <h2 className="font-semibold text-sm">Pipeline</h2>
               <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => navigate("/app/pipeline")}>
                 Open <ArrowUpRight className="h-3 w-3" />
               </Button>
@@ -195,7 +177,7 @@ export default function DashboardHome() {
           <motion.div {...anim} transition={{ delay: 0.2 }}
             className="rounded-xl border border-border bg-card p-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold">Today's Tasks ({todayTasks.length})</h2>
+              <h2 className="font-semibold text-sm">Today's Tasks ({todayTasks.length})</h2>
               <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => navigate("/app/tasks")}>
                 View all <ArrowUpRight className="h-3 w-3" />
               </Button>
