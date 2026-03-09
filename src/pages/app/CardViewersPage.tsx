@@ -124,10 +124,10 @@ export default function CardViewersPage() {
 
                 return (
                   <div key={viewer.id}
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors"
+                    className={`flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors ${viewer.isReturning ? "ring-1 ring-inset ring-[hsl(var(--warning))]/30 bg-[hsl(var(--warning))]/5" : ""}`}
                   >
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <DeviceIcon className="h-4.5 w-4.5 text-primary" />
+                    <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${viewer.isReturning ? "bg-[hsl(var(--warning))]/15" : "bg-primary/10"}`}>
+                      <DeviceIcon className={`h-4.5 w-4.5 ${viewer.isReturning ? "text-[hsl(var(--warning))]" : "text-primary"}`} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -137,6 +137,12 @@ export default function CardViewersPage() {
                         <Badge variant="outline" className="text-[10px] px-1.5 py-0">
                           {viewer.browser}
                         </Badge>
+                        {viewer.isReturning && (
+                          <Badge className="text-[10px] px-1.5 py-0 bg-[hsl(var(--warning))]/15 text-[hsl(var(--warning))] border-[hsl(var(--warning))]/30 hover:bg-[hsl(var(--warning))]/20">
+                            <RotateCw className="h-2.5 w-2.5 mr-0.5" />
+                            Returning · {viewer.visitCount}x
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex items-center gap-3 mt-0.5">
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
