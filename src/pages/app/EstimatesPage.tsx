@@ -117,10 +117,10 @@ export default function EstimatesPage() {
       </div>
 
       {limitReached && (
-        <UpgradePrompt
-          title="Estimate limit reached"
-          description="Free plan allows 3 estimates per month. Upgrade for unlimited estimates, branded PDFs, and approval workflows."
-        />
+        <Alert>
+          <AlertTitle>Estimate limit reached</AlertTitle>
+          <AlertDescription>Free plan allows 3 estimates per month. Upgrade for unlimited estimates, branded PDFs, and approval workflows.</AlertDescription>
+        </Alert>
       )}
 
       {/* Filters */}
