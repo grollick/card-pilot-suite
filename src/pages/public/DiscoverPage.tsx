@@ -116,17 +116,18 @@ export default function DiscoverPage() {
             </div>
             <div className="flex flex-wrap gap-2">
               {cities.map((c) => (
-                <Badge key={c} variant="outline" className="cursor-pointer hover:bg-primary/10 hover:border-primary/30 transition-colors" asChild>
-                  <Link
-                    to={
-                      profession
-                        ? `/discover/${profession}/${c.toLowerCase().replace(/\s+/g, "-")}`
-                        : `/discover`
-                    }
-                  >
+                <Link
+                  key={c}
+                  to={
+                    profession
+                      ? `/discover/${profession}/${c.toLowerCase().replace(/\s+/g, "-")}`
+                      : `/discover`
+                  }
+                >
+                  <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 hover:border-primary/30 transition-colors">
                     {c}
-                  </Link>
-                </Badge>
+                  </Badge>
+                </Link>
               ))}
             </div>
           </div>
