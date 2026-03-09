@@ -609,6 +609,165 @@ export type Database = {
           },
         ]
       }
+      estimate_line_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          estimate_id: string
+          id: string
+          labor_hours: number | null
+          labor_rate: number | null
+          line_total: number
+          markup_percent: number | null
+          material_cost: number | null
+          quantity: number
+          sort_order: number
+          tax_percent: number | null
+          title: string
+          unit: string | null
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          estimate_id: string
+          id?: string
+          labor_hours?: number | null
+          labor_rate?: number | null
+          line_total?: number
+          markup_percent?: number | null
+          material_cost?: number | null
+          quantity?: number
+          sort_order?: number
+          tax_percent?: number | null
+          title: string
+          unit?: string | null
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          estimate_id?: string
+          id?: string
+          labor_hours?: number | null
+          labor_rate?: number | null
+          line_total?: number
+          markup_percent?: number | null
+          material_cost?: number | null
+          quantity?: number
+          sort_order?: number
+          tax_percent?: number | null
+          title?: string
+          unit?: string | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estimate_line_items_estimate_id_fkey"
+            columns: ["estimate_id"]
+            isOneToOne: false
+            referencedRelation: "estimates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      estimates: {
+        Row: {
+          booking_id: string | null
+          created_at: string
+          estimate_number: string
+          expiry_date: string | null
+          grand_total: number
+          id: string
+          issue_date: string
+          job_address: string | null
+          job_type: string | null
+          labor_total: number
+          lead_id: string | null
+          markup_total: number
+          material_total: number
+          notes: string | null
+          org_id: string | null
+          scope_of_work: string | null
+          status: Database["public"]["Enums"]["estimate_status"]
+          subtotal: number
+          tax_total: number
+          template_key: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          booking_id?: string | null
+          created_at?: string
+          estimate_number: string
+          expiry_date?: string | null
+          grand_total?: number
+          id?: string
+          issue_date?: string
+          job_address?: string | null
+          job_type?: string | null
+          labor_total?: number
+          lead_id?: string | null
+          markup_total?: number
+          material_total?: number
+          notes?: string | null
+          org_id?: string | null
+          scope_of_work?: string | null
+          status?: Database["public"]["Enums"]["estimate_status"]
+          subtotal?: number
+          tax_total?: number
+          template_key?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          booking_id?: string | null
+          created_at?: string
+          estimate_number?: string
+          expiry_date?: string | null
+          grand_total?: number
+          id?: string
+          issue_date?: string
+          job_address?: string | null
+          job_type?: string | null
+          labor_total?: number
+          lead_id?: string | null
+          markup_total?: number
+          material_total?: number
+          notes?: string | null
+          org_id?: string | null
+          scope_of_work?: string | null
+          status?: Database["public"]["Enums"]["estimate_status"]
+          subtotal?: number
+          tax_total?: number
+          template_key?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estimates_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "estimates_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "estimates_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       followup_steps: {
         Row: {
           body: string
@@ -1754,6 +1913,13 @@ export type Database = {
       campaign_email_status: "pending" | "sent" | "failed" | "bounced"
       campaign_status: "draft" | "sending" | "sent" | "paused"
       card_status: "draft" | "published" | "unpublished"
+      estimate_status:
+        | "draft"
+        | "sent"
+        | "viewed"
+        | "approved"
+        | "declined"
+        | "expired"
       lead_source:
         | "card_form"
         | "booking"
@@ -1909,6 +2075,14 @@ export const Constants = {
       campaign_email_status: ["pending", "sent", "failed", "bounced"],
       campaign_status: ["draft", "sending", "sent", "paused"],
       card_status: ["draft", "published", "unpublished"],
+      estimate_status: [
+        "draft",
+        "sent",
+        "viewed",
+        "approved",
+        "declined",
+        "expired",
+      ],
       lead_source: [
         "card_form",
         "booking",
