@@ -250,6 +250,9 @@ export default function DashboardHome() {
           </motion.div>
         </div>
       </div>
+
+      {/* AI Insights */}
+      <AIInsightsWidget />
     </div>
   );
 }
