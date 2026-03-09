@@ -53,8 +53,22 @@ export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const navigate = useNavigate();
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile-handle"],
+    enabled: !!user,
+    staleTime: 10 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("handle")
+        .eq("id", user!.id)
+        .single();
+      return data;
+    },
+  });
 
   const isActive = (path: string) =>
     path === "/app" ? location.pathname === "/app" : location.pathname.startsWith(path);
