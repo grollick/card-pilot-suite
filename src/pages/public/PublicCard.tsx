@@ -1159,6 +1159,33 @@ export default function PublicCard() {
           )}
         </div>
       </motion.div>
+
+      {/* Smart engagement popup after delay */}
+      {!isOwner && (
+        <SmartEngagementPopup
+          handle={handle!}
+          profileName={profile.name ?? ""}
+          palette={palette}
+          fonts={fonts}
+          delaySeconds={8}
+          onAction={(action) => {
+            if (action === "quote") {
+              const el = document.getElementById("quote-request-section");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            } else if (action === "book") {
+              const el = document.getElementById("booking-section");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            } else if (action === "ask") {
+              const el = document.getElementById("contact-form-section");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+              else {
+                const quote = document.getElementById("quote-request-section");
+                if (quote) quote.scrollIntoView({ behavior: "smooth" });
+              }
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
