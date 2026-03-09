@@ -32,9 +32,9 @@ export default function CardViewersPage() {
 
   const kpis = [
     { label: "Total Views", value: stats.totalViews, icon: Eye, color: "text-primary bg-primary/10" },
-    { label: "Unique Locations", value: stats.uniqueLocations, icon: MapPin, color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10" },
-    { label: "Top Device", value: stats.topDevices[0]?.[0] || "—", icon: Smartphone, color: "text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10" },
-    { label: "Top Source", value: stats.topSources[0]?.[0] || "Direct", icon: Globe, color: "text-accent-foreground bg-accent" },
+    { label: "Returning Visitors", value: stats.returningCount, icon: RotateCw, color: "text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10" },
+    { label: "Unique Visitors", value: stats.uniqueVisitors, icon: UserCheck, color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10" },
+    { label: "Unique Locations", value: stats.uniqueLocations, icon: MapPin, color: "text-accent-foreground bg-accent" },
   ];
 
   return (
