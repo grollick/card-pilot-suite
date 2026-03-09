@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import UpgradePrompt from "@/components/UpgradePrompt";
 import { formatDistanceToNow, format } from "date-fns";
 import {
   Eye, Smartphone, Monitor, Tablet, MapPin, Globe,
@@ -26,6 +28,9 @@ const deviceIcons: Record<string, typeof Monitor> = {
 const anim = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 } };
 
 export default function CardViewersPage() {
+  const { planKey } = usePlanLimits();
+  const isGated = planKey === "free" || planKey === "starter";
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const [days, setDays] = useState(30);
   const { data: viewers = [], isLoading } = useCardViewers(days);
   const stats = useViewerStats(days);
@@ -36,6 +41,48 @@ export default function CardViewersPage() {
     { label: "Unique Visitors", value: stats.uniqueVisitors, icon: UserCheck, color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10" },
     { label: "Unique Locations", value: stats.uniqueLocations, icon: MapPin, color: "text-accent-foreground bg-accent" },
   ];
+
+  if (isGated) {
+    return (
+      <>
+        <UpgradePrompt open={showUpgrade} onOpenChange={setShowUpgrade} feature="Who Viewed Your Card" currentPlan={planKey} />
+        <div className="space-y-8 max-w-6xl">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+              <Eye className="h-6 w-6 text-primary" />
+              Who Viewed Your Card
+            </h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              Real-time visitor tracking with device & location data.
+            </p>
+          </div>
+          <div className="relative rounded-xl border border-border bg-card p-12 text-center">
+            <div className="absolute inset-0 bg-background/60 backdrop-blur-sm rounded-xl z-10 flex flex-col items-center justify-center gap-4">
+              <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
+                <Eye className="h-7 w-7 text-primary" />
+              </div>
+              <h2 className="text-xl font-semibold">Unlock Visitor Insights</h2>
+              <p className="text-muted-foreground text-sm max-w-md">
+                See who's viewing your card, where they're from, what device they use, and spot returning visitors. Available on Pro and above.
+              </p>
+              <Button onClick={() => setShowUpgrade(true)} className="shadow-glow mt-2">
+                <ArrowUpRight className="h-4 w-4 mr-1.5" /> Upgrade to Pro
+              </Button>
+            </div>
+            {/* Blurred placeholder content */}
+            <div className="filter blur-sm pointer-events-none select-none">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                {[1,2,3,4].map(i => (
+                  <div key={i} className="rounded-xl border border-border bg-muted/30 p-5 h-24" />
+                ))}
+              </div>
+              <div className="rounded-xl border border-border bg-muted/30 h-64" />
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="space-y-8 max-w-6xl">
