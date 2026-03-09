@@ -68,3 +68,21 @@ export function useContactBookings(leadId: string | undefined) {
     },
   });
 }
+
+export function useContactFollowups(leadId: string | undefined) {
+  return useQuery({
+    queryKey: ["contact-followups", leadId],
+    enabled: !!leadId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("scheduled_followups")
+        .select("*, followup_variants(variant_key, subject)")
+        .eq("lead_id", leadId!)
+        .eq("status", "pending")
+        .order("send_at", { ascending: true })
+        .limit(20);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
