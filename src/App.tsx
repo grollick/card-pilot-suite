@@ -1,4 +1,5 @@
 import { lazy, Suspense } from "react";
+import { HelmetProvider } from "react-helmet-async";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,11 +11,11 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { Loader2 } from "lucide-react";
 
 // Public routes — loaded eagerly for fast <500ms render
-import PublicCard from "./pages/public/PublicCard";
 import PublicBooking from "./pages/public/PublicBooking";
 import QRLanding from "./pages/public/QRLanding";
 import ProductsPage from "./pages/public/ProductsPage";
 import DiscoverPage from "./pages/public/DiscoverPage";
+import HandleOrSeoRoute from "./pages/public/HandleOrSeoRoute";
 
 // Auth & marketing — loaded eagerly (small)
 import Index from "./pages/Index";
@@ -57,6 +58,7 @@ const LazyFallback = () => (
 const queryClient = new QueryClient();
 
 const App = () => (
+  <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -109,8 +111,8 @@ const App = () => (
               <Route path="admin" element={<Suspense fallback={<LazyFallback />}><AdminPage /></Suspense>} />
             </Route>
 
-            {/* Public card — must be last to avoid catching other routes */}
-            <Route path="/:handle" element={<PublicCard />} />
+            {/* Public card OR SEO landing — smart routing by slug pattern */}
+            <Route path="/:handle" element={<HandleOrSeoRoute />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
@@ -119,6 +121,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;
