@@ -35,6 +35,7 @@ const activityColors: Record<string, string> = {
   booking_cancelled: "text-destructive",
   email_sent: "text-muted-foreground",
   email_opened: "text-primary",
+  email_replied: "text-[hsl(var(--success))]",
   note_added: "text-muted-foreground",
   call: "text-primary",
   text: "text-primary",
