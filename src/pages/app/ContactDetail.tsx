@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import { useContact, useContactActivities, useContactTasks, useContactBookings, useContactFollowups, useContactFollowupHistory } from "@/hooks/useContactDetail";
-import { useLogActivity, useReactivateFollowups } from "@/hooks/useContactActions";
+import { useLogActivity, useReactivateFollowups, useCancelFollowup } from "@/hooks/useContactActions";
 import { useCreateTask, useUpdateTask } from "@/hooks/useTasks";
 import { toast } from "sonner";
 import {
