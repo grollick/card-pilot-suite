@@ -43,6 +43,9 @@ const AdminPage = lazy(() => import("./pages/app/AdminPage"));
 const TeamPage = lazy(() => import("./pages/app/TeamPage"));
 const LeadsCRM = lazy(() => import("./pages/app/LeadsCRM"));
 const CardViewersPage = lazy(() => import("./pages/app/CardViewersPage"));
+const RevenueForecast = lazy(() => import("./pages/app/RevenueForecast"));
+const PromotionsPage = lazy(() => import("./pages/app/PromotionsPage"));
+const ReferralsPage = lazy(() => import("./pages/app/ReferralsPage"));
 
 const LazyFallback = () => (
   <div className="min-h-screen flex items-center justify-center">
@@ -96,6 +99,9 @@ const App = () => (
               <Route path="settings" element={<Suspense fallback={<LazyFallback />}><SettingsPage /></Suspense>} />
               <Route path="team" element={<Suspense fallback={<LazyFallback />}><TeamPage /></Suspense>} />
               <Route path="viewers" element={<Suspense fallback={<LazyFallback />}><CardViewersPage /></Suspense>} />
+              <Route path="revenue" element={<Suspense fallback={<LazyFallback />}><RevenueForecast /></Suspense>} />
+              <Route path="promotions" element={<Suspense fallback={<LazyFallback />}><PromotionsPage /></Suspense>} />
+              <Route path="referrals" element={<Suspense fallback={<LazyFallback />}><ReferralsPage /></Suspense>} />
               <Route path="admin" element={<Suspense fallback={<LazyFallback />}><AdminPage /></Suspense>} />
             </Route>
 

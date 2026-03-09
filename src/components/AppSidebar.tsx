@@ -1,7 +1,8 @@
 import {
   LayoutDashboard, Users, Kanban, Calendar, Mail, Share2,
   BarChart3, Settings, Shield, ChevronLeft, LogOut,
-  FileText, Zap, Megaphone, CreditCard, Building2, QrCode, Eye
+  FileText, Zap, Megaphone, CreditCard, Building2, QrCode, Eye,
+  DollarSign, Tag, Gift
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
@@ -30,8 +31,14 @@ const marketingItems = [
 const insightItems = [
   { title: "Who Viewed", url: "/app/viewers", icon: Eye },
   { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
+  { title: "Revenue", url: "/app/revenue", icon: DollarSign },
   { title: "QR Campaigns", url: "/app/qr-campaigns", icon: QrCode },
   { title: "Automation", url: "/app/automation", icon: Zap },
+];
+
+const growthItems = [
+  { title: "Promotions", url: "/app/promotions", icon: Tag },
+  { title: "Referrals", url: "/app/referrals", icon: Gift },
 ];
 
 const bottomItems = [
@@ -128,6 +135,7 @@ export function AppSidebar() {
         {renderGroup("CRM", crmItems)}
         {renderGroup("Marketing", marketingItems)}
         {renderGroup("Insights", insightItems)}
+        {renderGroup("Growth", growthItems)}
       </SidebarContent>
 
       <SidebarFooter className="px-2 pb-4">

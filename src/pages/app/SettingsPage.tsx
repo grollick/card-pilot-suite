@@ -207,6 +207,8 @@ export default function SettingsPage() {
           <FollowUpAnalytics userId={profile?.id} />
           <FollowUpSettings profile={profile} queryClient={queryClient} />
 
+          <DailyReportToggle profile={profile} queryClient={queryClient} />
+
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="rounded-xl border border-border bg-card p-6 space-y-4">
             <div className="flex items-center gap-2 mb-2">
@@ -654,6 +656,41 @@ function FollowUpAnalytics({ userId }: { userId?: string }) {
           </div>
         </>
       )}
+    </motion.div>
+  );
+}
+
+// ── Daily Report Toggle ──
+function DailyReportToggle({ profile, queryClient }: { profile: any; queryClient: any }) {
+  const [enabled, setEnabled] = useState(profile?.daily_report_enabled ?? false);
+
+  useEffect(() => {
+    if (profile) setEnabled(profile.daily_report_enabled ?? false);
+  }, [profile]);
+
+  const handleToggle = async (val: boolean) => {
+    setEnabled(val);
+    await supabase
+      .from("profiles")
+      .update({ daily_report_enabled: val } as any)
+      .eq("id", profile?.id);
+    queryClient.invalidateQueries({ queryKey: ["profile"] });
+    toast.success(val ? "Daily report enabled" : "Daily report disabled");
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+      className="rounded-xl border border-border bg-card p-6 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <TrendingUp className="h-4 w-4 text-primary" />
+          <h2 className="font-semibold">Daily Business Report</h2>
+        </div>
+        <Switch checked={enabled} onCheckedChange={handleToggle} />
+      </div>
+      <p className="text-sm text-muted-foreground">
+        Receive a daily email summary with your card views, new leads, bookings, and estimated revenue.
+      </p>
     </motion.div>
   );
 }
