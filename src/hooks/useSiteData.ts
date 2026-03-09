@@ -53,9 +53,8 @@ export function useSiteData(handle: string | undefined) {
       ]);
 
       // Extract card section content
-      const sections = Array.isArray(cardResult.data?.sections_json)
-        ? cardResult.data.sections_json
-        : [];
+      const sectionsRaw = cardResult.data?.sections_json;
+      const sections: any[] = Array.isArray(sectionsRaw) ? sectionsRaw : [];
       const aboutSection = sections.find((s: any) => s.id === "about");
       const testimonialsSection = sections.find((s: any) => s.id === "testimonials");
 
