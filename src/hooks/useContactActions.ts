@@ -127,13 +127,33 @@ export function useUpdateContact() {
   });
 }
 
+export function useCancelFollowup() {
+  const qc = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async (followupId: string) => {
+      const { error } = await supabase
+        .from("scheduled_followups")
+        .update({ status: "cancelled" })
+        .eq("id", followupId)
+        .eq("user_id", user!.id)
+        .eq("status", "pending");
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["contact-followups"] });
+      qc.invalidateQueries({ queryKey: ["contact-followup-history"] });
+    },
+  });
+}
+
 export function useReactivateFollowups() {
   const qc = useQueryClient();
   const { user } = useAuth();
 
   return useMutation({
     mutationFn: async (leadId: string) => {
-      // Get cancelled followups for this lead
       const { data: cancelled, error: fetchErr } = await supabase
         .from("scheduled_followups")
         .select("id, step_number")
@@ -146,7 +166,6 @@ export function useReactivateFollowups() {
       if (!cancelled || cancelled.length === 0) return { reactivatedCount: 0 };
 
       const now = new Date();
-      // Re-schedule each cancelled followup with 2-hour gaps
       for (let i = 0; i < cancelled.length; i++) {
         const newSendAt = new Date(now.getTime() + (i + 1) * 2 * 60 * 60 * 1000).toISOString();
         const { error } = await supabase
