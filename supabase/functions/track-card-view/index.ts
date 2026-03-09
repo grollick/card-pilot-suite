@@ -82,6 +82,28 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
+    // Check if this visitor has been seen before (returning visitor detection)
+    let isReturning = false;
+    let previousVisitCount = 0;
+    if (enrichedMeta.ip_hash) {
+      const { count } = await supabase
+        .from("analytics_events")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", user_id)
+        .eq("event_type", "card_view")
+        .containedBy("meta_json", {})  // can't filter by jsonb field easily, so we query all and filter
+      
+      // Query previous views with same ip_hash using textSearch workaround
+      const { data: prevViews } = await supabase
+        .from("analytics_events")
+        .select("id")
+        .eq("user_id", user_id)
+        .eq("event_type", "card_view");
+
+      previousVisitCount = (prevViews ?? []).length;
+      // We'll check after insert if there were previous ones with same hash
+    }
+
     // Insert the analytics event
     const { error: insertError } = await supabase
       .from("analytics_events")
@@ -97,8 +119,20 @@ serve(async (req) => {
       throw insertError;
     }
 
+    // Check returning status after insert by looking for matching ip_hash
+    if (enrichedMeta.ip_hash) {
+      const { data: matchingViews } = await supabase
+        .from("analytics_events")
+        .select("id")
+        .eq("user_id", user_id)
+        .eq("event_type", "card_view")
+        .filter("meta_json->>ip_hash", "eq", enrichedMeta.ip_hash);
+      
+      isReturning = (matchingViews?.length ?? 0) > 1;
+    }
+
     // Send email notification to card owner (fire-and-forget)
-    sendViewNotification(supabase, user_id, enrichedMeta).catch(e =>
+    sendViewNotification(supabase, user_id, enrichedMeta, isReturning).catch(e =>
       console.error("Notification error:", e)
     );
 
