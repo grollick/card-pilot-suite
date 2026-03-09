@@ -2,11 +2,13 @@ import {
   LayoutDashboard, Users, Kanban, Calendar, Mail, Share2,
   BarChart3, Settings, Shield, ChevronLeft, LogOut,
   FileText, Zap, Megaphone, CreditCard, Building2, QrCode, Eye,
-  DollarSign, Tag, Gift
+  DollarSign, Tag, Gift, Globe
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
