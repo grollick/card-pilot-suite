@@ -31,8 +31,14 @@ const marketingItems = [
 const insightItems = [
   { title: "Who Viewed", url: "/app/viewers", icon: Eye },
   { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
+  { title: "Revenue", url: "/app/revenue", icon: DollarSign },
   { title: "QR Campaigns", url: "/app/qr-campaigns", icon: QrCode },
   { title: "Automation", url: "/app/automation", icon: Zap },
+];
+
+const growthItems = [
+  { title: "Promotions", url: "/app/promotions", icon: Tag },
+  { title: "Referrals", url: "/app/referrals", icon: Gift },
 ];
 
 const bottomItems = [
