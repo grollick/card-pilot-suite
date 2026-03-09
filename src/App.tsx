@@ -43,6 +43,9 @@ const AdminPage = lazy(() => import("./pages/app/AdminPage"));
 const TeamPage = lazy(() => import("./pages/app/TeamPage"));
 const LeadsCRM = lazy(() => import("./pages/app/LeadsCRM"));
 const CardViewersPage = lazy(() => import("./pages/app/CardViewersPage"));
+const RevenueForecast = lazy(() => import("./pages/app/RevenueForecast"));
+const PromotionsPage = lazy(() => import("./pages/app/PromotionsPage"));
+const ReferralsPage = lazy(() => import("./pages/app/ReferralsPage"));
 
 const LazyFallback = () => (
   <div className="min-h-screen flex items-center justify-center">
