@@ -1,4 +1,4 @@
-import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail, Clock } from "lucide-react";
+import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail, Clock, CheckCircle, AlertTriangle, Clock3, TrendingUp, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
