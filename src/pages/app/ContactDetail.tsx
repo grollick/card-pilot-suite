@@ -65,6 +65,15 @@ export default function ContactDetail() {
     toast.success(title);
   };
 
+  const handleMarkReplied = async (_activityId: string, leadId: string) => {
+    await logActivity.mutateAsync({
+      lead_id: leadId,
+      activity_type: "email_replied",
+      title: "Replied (marked from timeline)",
+    });
+    toast.success("Marked as replied");
+  };
+
   const handleCreateTask = async () => {
     if (!taskTitle.trim()) return;
     await createTask.mutateAsync({ title: taskTitle, lead_id: contact.id, type: taskType, due_date: taskDue || null, priority: taskPriority });
@@ -170,7 +179,7 @@ export default function ContactDetail() {
 
             <TabsContent value="timeline" className="mt-4">
               <div className="rounded-xl border border-border bg-card p-5">
-                <ContactTimeline activities={activities} filter={timelineFilter} onFilterChange={setTimelineFilter} />
+                <ContactTimeline activities={activities} filter={timelineFilter} onFilterChange={setTimelineFilter} onMarkReplied={handleMarkReplied} />
               </div>
             </TabsContent>
 

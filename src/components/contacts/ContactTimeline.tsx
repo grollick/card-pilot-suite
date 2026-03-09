@@ -1,8 +1,9 @@
 import { format, formatDistanceToNow } from "date-fns";
 import {
   Eye, MousePointer, Users, Calendar, Mail, MessageSquare,
-  Phone, FileText, CheckCircle2, Circle, ArrowRight, Reply
+  Phone, FileText, CheckCircle2, Circle, ArrowRight, Reply, MailCheck
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const activityIcons: Record<string, typeof Eye> = {
   card_view: Eye,
@@ -52,6 +53,7 @@ interface Props {
   activities: any[];
   filter: TimelineFilter;
   onFilterChange: (f: TimelineFilter) => void;
+  onMarkReplied?: (activityId: string, leadId: string) => void;
 }
 
 const filterMap: Record<TimelineFilter, string[]> = {
@@ -70,7 +72,7 @@ const filters: { key: TimelineFilter; label: string }[] = [
   { key: "bookings", label: "Bookings" },
 ];
 
-export default function ContactTimeline({ activities, filter, onFilterChange }: Props) {
+export default function ContactTimeline({ activities, filter, onFilterChange, onMarkReplied }: Props) {
   const filtered = filter === "all"
     ? activities
     : activities.filter(a => filterMap[filter].includes(a.activity_type));
@@ -117,11 +119,23 @@ export default function ContactTimeline({ activities, filter, onFilterChange }: 
                 {item.description && (
                   <p className="text-xs text-muted-foreground mt-1 whitespace-pre-wrap bg-muted/30 rounded-lg p-2">{item.description}</p>
                 )}
-                <p className="text-xs text-muted-foreground mt-1">
-                  {formatDistanceToNow(new Date(item.occurred_at), { addSuffix: true })}
-                  {" · "}
-                  {format(new Date(item.occurred_at), "MMM d, h:mm a")}
-                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <p className="text-xs text-muted-foreground">
+                    {formatDistanceToNow(new Date(item.occurred_at), { addSuffix: true })}
+                    {" · "}
+                    {format(new Date(item.occurred_at), "MMM d, h:mm a")}
+                  </p>
+                  {item.activity_type === "email_sent" && onMarkReplied && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-5 px-1.5 text-[10px] gap-1 text-muted-foreground hover:text-[hsl(var(--success))]"
+                      onClick={() => onMarkReplied(item.id, item.lead_id)}
+                    >
+                      <Reply className="h-3 w-3" /> Mark replied
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           );
