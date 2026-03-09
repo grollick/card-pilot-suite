@@ -136,6 +136,51 @@ export default function ActivityComposer({ contactId, contactName }: { contactId
         </div>
       )}
 
+      {activeTab === "reply" && (
+        <div className="p-4 space-y-3">
+          <Select value={replyChannel} onValueChange={setReplyChannel}>
+            <SelectTrigger className="h-8 text-xs w-40"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="email">Email reply</SelectItem>
+              <SelectItem value="phone">Phone call</SelectItem>
+              <SelectItem value="text">Text / SMS</SelectItem>
+              <SelectItem value="in_person">In person</SelectItem>
+            </SelectContent>
+          </Select>
+          <Textarea
+            placeholder="Optional notes about the reply..."
+            value={replyNote}
+            onChange={e => setReplyNote(e.target.value)}
+            rows={2}
+            className="text-sm resize-none"
+          />
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" size="sm" onClick={() => setActiveTab(null)}>Cancel</Button>
+            <Button
+              size="sm"
+              disabled={logActivity.isPending}
+              onClick={async () => {
+                const channelLabels: Record<string, string> = {
+                  email: "Email", phone: "Phone call", text: "Text/SMS", in_person: "In person"
+                };
+                await logActivity.mutateAsync({
+                  lead_id: contactId,
+                  activity_type: "email_replied",
+                  title: `Replied via ${channelLabels[replyChannel] ?? replyChannel}`,
+                  description: replyNote || undefined,
+                });
+                toast.success("Reply logged");
+                setReplyNote("");
+                setReplyChannel("email");
+                setActiveTab(null);
+              }}
+            >
+              Log Reply
+            </Button>
+          </div>
+        </div>
+      )}
+
       {activeTab === "email" && (
         <div className="p-4 text-center text-sm text-muted-foreground py-8">
           Email composer coming soon. Use the <strong>Send Email</strong> quick action.
