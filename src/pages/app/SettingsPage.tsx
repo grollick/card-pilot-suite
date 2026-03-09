@@ -1,7 +1,9 @@
-import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2 } from "lucide-react";
+import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -200,14 +202,16 @@ export default function SettingsPage() {
           </motion.div>
         </TabsContent>
 
-        <TabsContent value="notifications" className="mt-4">
+        <TabsContent value="notifications" className="mt-4 space-y-4">
+          <FollowUpSettings profile={profile} queryClient={queryClient} />
+
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="rounded-xl border border-border bg-card p-6 space-y-4">
             <div className="flex items-center gap-2 mb-2">
               <Bell className="h-4 w-4 text-primary" />
-              <h2 className="font-semibold">Notification Preferences</h2>
+              <h2 className="font-semibold">Other Notifications</h2>
             </div>
-            <p className="text-sm text-muted-foreground">Notification settings will be available once backend is connected.</p>
+            <p className="text-sm text-muted-foreground">Additional notification preferences coming soon.</p>
           </motion.div>
         </TabsContent>
       </Tabs>
@@ -230,5 +234,119 @@ export default function SettingsPage() {
         </AlertDialogContent>
       </AlertDialog>
     </div>
+  );
+}
+
+// ── Follow-Up Settings Component ──
+function FollowUpSettings({ profile, queryClient }: { profile: any; queryClient: any }) {
+  const [enabled, setEnabled] = useState(false);
+  const [delayMinutes, setDelayMinutes] = useState(120);
+  const [subject, setSubject] = useState("Thanks for connecting, {{name}}!");
+  const [body, setBody] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!profile) return;
+    setEnabled((profile as any).followup_enabled ?? false);
+    setDelayMinutes((profile as any).followup_delay_minutes ?? 120);
+    setSubject((profile as any).followup_subject ?? "Thanks for connecting, {{name}}!");
+    setBody((profile as any).followup_body ?? "");
+  }, [profile]);
+
+  const delayOptions = [
+    { label: "30 min", value: 30 },
+    { label: "1 hour", value: 60 },
+    { label: "2 hours", value: 120 },
+    { label: "4 hours", value: 240 },
+    { label: "24 hours", value: 1440 },
+  ];
+
+  const handleSave = async () => {
+    if (!profile) return;
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("profiles")
+        .update({
+          followup_enabled: enabled,
+          followup_delay_minutes: delayMinutes,
+          followup_subject: subject,
+          followup_body: body,
+        } as any)
+        .eq("id", profile.id);
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ["profile"] });
+      toast.success("Follow-up settings saved!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to save");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+      className="rounded-xl border border-border bg-card p-6 space-y-5">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Mail className="h-4 w-4 text-primary" />
+          <h2 className="font-semibold">Auto Follow-Up Emails</h2>
+        </div>
+        <Switch checked={enabled} onCheckedChange={setEnabled} />
+      </div>
+      <p className="text-sm text-muted-foreground">
+        Automatically send a personalized follow-up email after someone submits the contact form on your card.
+      </p>
+
+      {enabled && (
+        <div className="space-y-4 pt-2">
+          <div className="space-y-2">
+            <Label className="flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+              Delay before sending
+            </Label>
+            <div className="flex flex-wrap gap-2">
+              {delayOptions.map((opt) => (
+                <Button
+                  key={opt.value}
+                  size="sm"
+                  variant={delayMinutes === opt.value ? "default" : "outline"}
+                  onClick={() => setDelayMinutes(opt.value)}
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Email Subject</Label>
+            <Input
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Thanks for connecting, {{name}}!"
+            />
+            <p className="text-xs text-muted-foreground">
+              Use <code className="bg-muted px-1 rounded">{"{{name}}"}</code> and <code className="bg-muted px-1 rounded">{"{{first_name}}"}</code> for personalization.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Email Body</Label>
+            <Textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              rows={6}
+              placeholder="Hi {{name}},&#10;&#10;Thanks for reaching out!..."
+            />
+          </div>
+        </div>
+      )}
+
+      <Button className="shadow-glow" onClick={handleSave} disabled={saving}>
+        {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+        Save Follow-Up Settings
+      </Button>
+    </motion.div>
   );
 }

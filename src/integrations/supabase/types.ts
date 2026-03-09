@@ -851,6 +851,10 @@ export type Database = {
           created_at: string
           current_org_id: string | null
           email: string | null
+          followup_body: string | null
+          followup_delay_minutes: number
+          followup_enabled: boolean
+          followup_subject: string | null
           handle: string | null
           id: string
           name: string | null
@@ -868,6 +872,10 @@ export type Database = {
           created_at?: string
           current_org_id?: string | null
           email?: string | null
+          followup_body?: string | null
+          followup_delay_minutes?: number
+          followup_enabled?: boolean
+          followup_subject?: string | null
           handle?: string | null
           id: string
           name?: string | null
@@ -885,6 +893,10 @@ export type Database = {
           created_at?: string
           current_org_id?: string | null
           email?: string | null
+          followup_body?: string | null
+          followup_delay_minutes?: number
+          followup_enabled?: boolean
+          followup_subject?: string | null
           handle?: string | null
           id?: string
           name?: string | null
@@ -1066,6 +1078,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "quote_requests_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scheduled_followups: {
+        Row: {
+          created_at: string
+          id: string
+          lead_id: string | null
+          recipient_email: string | null
+          recipient_name: string | null
+          send_at: string
+          sent_at: string | null
+          status: string
+          trigger_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          recipient_email?: string | null
+          recipient_name?: string | null
+          send_at: string
+          sent_at?: string | null
+          status?: string
+          trigger_type?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          recipient_email?: string | null
+          recipient_name?: string | null
+          send_at?: string
+          sent_at?: string | null
+          status?: string
+          trigger_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_followups_lead_id_fkey"
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
