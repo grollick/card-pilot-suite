@@ -147,20 +147,29 @@ export default function PublicCard() {
     document.head.appendChild(link);
   }, [fontsUrl]);
 
-  // ── Track card view ──
+  // ── Track card view via edge function (enriches with geo/device data + sends notification) ──
   useEffect(() => {
     if (!handle || !profile?.id || viewTracked.current) return;
     viewTracked.current = true;
     const track = () => {
-      supabase
-        .from("analytics_events")
-        .insert({
+      supabase.functions.invoke("track-card-view", {
+        body: {
           user_id: profile.id,
           handle,
-          event_type: "card_view" as const,
-          meta_json: getVisitorMeta(),
-        })
-        .then();
+          meta: getVisitorMeta(),
+        },
+      }).catch(() => {
+        // Fallback: direct insert if edge function fails
+        supabase
+          .from("analytics_events")
+          .insert({
+            user_id: profile.id,
+            handle,
+            event_type: "card_view" as const,
+            meta_json: getVisitorMeta(),
+          })
+          .then();
+      });
     };
     if ("requestIdleCallback" in window) {
       (window as any).requestIdleCallback(track);

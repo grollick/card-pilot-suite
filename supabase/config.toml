@@ -23,3 +23,6 @@ verify_jwt = false
 
 [functions.ai-section-writer]
 verify_jwt = false
+
+[functions.track-card-view]
+verify_jwt = false

@@ -28,6 +28,7 @@ const marketingItems = [
 ];
 
 const insightItems = [
+  { title: "Who Viewed", url: "/app/viewers", icon: Eye },
   { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
   { title: "QR Campaigns", url: "/app/qr-campaigns", icon: QrCode },
   { title: "Automation", url: "/app/automation", icon: Zap },
