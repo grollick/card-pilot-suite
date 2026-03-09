@@ -402,6 +402,31 @@ export default function PublicCard() {
         }).catch(() => {}); // fire-and-forget
       }
 
+      // Schedule automated follow-up email (fire-and-forget)
+      if (leadId && formData.email) {
+        supabase.functions.invoke("track-card-view", { body: {} }).catch(() => {}); // no-op, just to wake
+        // Get owner's followup delay setting via a lightweight query
+        supabase
+          .from("profiles")
+          .select("followup_enabled, followup_delay_minutes")
+          .eq("id", profile.id)
+          .single()
+          .then(({ data: ownerProfile }) => {
+            if (ownerProfile?.followup_enabled) {
+              const delayMs = (ownerProfile.followup_delay_minutes || 120) * 60 * 1000;
+              const sendAt = new Date(Date.now() + delayMs).toISOString();
+              supabase.from("scheduled_followups").insert({
+                user_id: profile.id,
+                lead_id: leadId,
+                trigger_type: "form_submit",
+                recipient_name: formData.name,
+                recipient_email: formData.email,
+                send_at: sendAt,
+              } as any).then();
+            }
+          });
+      }
+
       setFormSent(true);
     } catch {
       toast.error("Something went wrong");
