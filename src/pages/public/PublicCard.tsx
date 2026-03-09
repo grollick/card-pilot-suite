@@ -138,6 +138,7 @@ function PromoBanner({ userId, palette, fonts }: { userId: string; palette: any;
   );
 }
 
+export default function PublicCard() {
   const { handle } = useParams();
   const { user } = useAuth();
   const { data, isLoading, isError } = usePublicCard(handle);
