@@ -42,20 +42,35 @@ serve(async (req) => {
 
     for (const followup of followups) {
       try {
-        // Get card owner's profile for sender info and template
+        // Get card owner's profile for sender info
         const { data: profile } = await supabase
           .from("profiles")
-          .select("name, email, handle, followup_subject, followup_body, followup_enabled")
+          .select("name, email, handle, followup_enabled, followup_subject, followup_body")
           .eq("id", followup.user_id)
           .single();
 
         if (!profile || !profile.followup_enabled || !followup.recipient_email) {
-          // Mark as skipped
           await supabase
             .from("scheduled_followups")
             .update({ status: "skipped", sent_at: new Date().toISOString() })
             .eq("id", followup.id);
           continue;
+        }
+
+        // Get step-specific template if step_id exists, else fall back to profile defaults
+        let subject = profile.followup_subject || "Thanks for connecting!";
+        let body = profile.followup_body || "Thanks for reaching out!";
+
+        if (followup.step_id) {
+          const { data: step } = await supabase
+            .from("followup_steps")
+            .select("subject, body")
+            .eq("id", followup.step_id)
+            .single();
+          if (step) {
+            subject = step.subject;
+            body = step.body;
+          }
         }
 
         // Replace template variables
@@ -68,10 +83,8 @@ serve(async (req) => {
           "{{card_link}}": profile.handle
             ? `${Deno.env.get("SUPABASE_URL")?.replace(".supabase.co", "")?.includes("localhost") ? "http://localhost:5173" : "https://" + (profile.handle + ".cardpilot.app")}/${profile.handle}`
             : "",
+          "{{step_number}}": String(followup.step_number || 1),
         };
-
-        let subject = profile.followup_subject || "Thanks for connecting!";
-        let body = profile.followup_body || "Thanks for reaching out!";
 
         for (const [key, value] of Object.entries(variables)) {
           subject = subject.replaceAll(key, value);

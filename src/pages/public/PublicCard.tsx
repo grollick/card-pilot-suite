@@ -402,28 +402,56 @@ export default function PublicCard() {
         }).catch(() => {}); // fire-and-forget
       }
 
-      // Schedule automated follow-up email (fire-and-forget)
+      // Schedule automated follow-up sequence (fire-and-forget)
       if (leadId && formData.email) {
-        supabase.functions.invoke("track-card-view", { body: {} }).catch(() => {}); // no-op, just to wake
-        // Get owner's followup delay setting via a lightweight query
         supabase
           .from("profiles")
-          .select("followup_enabled, followup_delay_minutes")
+          .select("followup_enabled")
           .eq("id", profile.id)
           .single()
           .then(({ data: ownerProfile }) => {
-            if (ownerProfile?.followup_enabled) {
-              const delayMs = (ownerProfile.followup_delay_minutes || 120) * 60 * 1000;
-              const sendAt = new Date(Date.now() + delayMs).toISOString();
-              supabase.from("scheduled_followups").insert({
-                user_id: profile.id,
-                lead_id: leadId,
-                trigger_type: "form_submit",
-                recipient_name: formData.name,
-                recipient_email: formData.email,
-                send_at: sendAt,
-              } as any).then();
-            }
+            if (!ownerProfile?.followup_enabled) return;
+            // Fetch all enabled sequence steps
+            supabase
+              .from("followup_steps")
+              .select("id, step_number, delay_minutes")
+              .eq("user_id", profile.id)
+              .eq("enabled", true)
+              .order("step_number", { ascending: true })
+              .then(({ data: steps }) => {
+                if (!steps || steps.length === 0) {
+                  // Fallback: use legacy single-step from profile
+                  supabase.from("profiles")
+                    .select("followup_delay_minutes")
+                    .eq("id", profile.id)
+                    .single()
+                    .then(({ data: p }) => {
+                      const delayMs = ((p as any)?.followup_delay_minutes || 120) * 60 * 1000;
+                      supabase.from("scheduled_followups").insert({
+                        user_id: profile.id,
+                        lead_id: leadId,
+                        trigger_type: "form_submit",
+                        recipient_name: formData.name,
+                        recipient_email: formData.email,
+                        send_at: new Date(Date.now() + delayMs).toISOString(),
+                        step_number: 1,
+                      } as any).then();
+                    });
+                  return;
+                }
+                // Schedule each step
+                const inserts = steps.map((step: any) => ({
+                  user_id: profile.id,
+                  lead_id: leadId,
+                  trigger_type: "form_submit",
+                  recipient_name: formData.name,
+                  recipient_email: formData.email,
+                  send_at: new Date(Date.now() + step.delay_minutes * 60 * 1000).toISOString(),
+                  step_id: step.id,
+                  step_number: step.step_number,
+                }));
+                supabase.from("scheduled_followups").insert(inserts as any).then();
+              });
           });
       }
 
