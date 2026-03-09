@@ -16,6 +16,7 @@ import QRLanding from "./pages/public/QRLanding";
 import ProductsPage from "./pages/public/ProductsPage";
 import DiscoverPage from "./pages/public/DiscoverPage";
 import HandleOrSeoRoute from "./pages/public/HandleOrSeoRoute";
+import PublicSite from "./pages/public/PublicSite";
 
 // Auth & marketing — loaded eagerly (small)
 import Index from "./pages/Index";
@@ -80,6 +81,7 @@ const App = () => (
             <Route path="/q/:campaign" element={<QRLanding />} />
             <Route path="/book/:handle" element={<PublicBooking />} />
             <Route path="/products" element={<ProductsPage />} />
+            <Route path="/site/:handle" element={<PublicSite />} />
             <Route path="/discover" element={<DiscoverPage />} />
             <Route path="/discover/:profession" element={<DiscoverPage />} />
             <Route path="/discover/:profession/:city" element={<DiscoverPage />} />
