@@ -16,6 +16,7 @@ import PublicBooking from "./pages/public/PublicBooking";
 import QRLanding from "./pages/public/QRLanding";
 import ProductsPage from "./pages/public/ProductsPage";
 import DiscoverPage from "./pages/public/DiscoverPage";
+import SeoLandingPage from "./pages/public/SeoLandingPage";
 
 // Auth & marketing — loaded eagerly (small)
 import Index from "./pages/Index";
