@@ -351,3 +351,81 @@ function FollowUpSettings({ profile, queryClient }: { profile: any; queryClient:
     </motion.div>
   );
 }
+
+// ── Follow-Up Analytics Component ──
+function FollowUpAnalytics({ userId }: { userId?: string }) {
+  const [stats, setStats] = useState<{ sent: number; pending: number; failed: number; skipped: number } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!userId) return;
+    const fetchStats = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("scheduled_followups")
+        .select("status")
+        .eq("user_id", userId);
+
+      if (!error && data) {
+        const counts = { sent: 0, pending: 0, failed: 0, skipped: 0 };
+        data.forEach((row: any) => {
+          if (row.status === "sent") counts.sent++;
+          else if (row.status === "pending") counts.pending++;
+          else if (row.status === "failed") counts.failed++;
+          else if (row.status === "skipped") counts.skipped++;
+        });
+        setStats(counts);
+      }
+      setLoading(false);
+    };
+    fetchStats();
+  }, [userId]);
+
+  const total = stats ? stats.sent + stats.failed : 0;
+  const successRate = total > 0 ? Math.round((stats!.sent / total) * 100) : 0;
+
+  const kpis = stats
+    ? [
+        { label: "Sent", value: stats.sent, icon: CheckCircle, color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10" },
+        { label: "Pending", value: stats.pending, icon: Clock3, color: "text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10" },
+        { label: "Failed", value: stats.failed, icon: AlertTriangle, color: "text-destructive bg-destructive/10" },
+        { label: "Success Rate", value: `${successRate}%`, icon: TrendingUp, color: "text-primary bg-primary/10" },
+      ]
+    : [];
+
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+      className="rounded-xl border border-border bg-card p-6 space-y-4">
+      <div className="flex items-center gap-2">
+        <Send className="h-4 w-4 text-primary" />
+        <h2 className="font-semibold">Follow-Up Analytics</h2>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-6">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        </div>
+      ) : !stats || (stats.sent === 0 && stats.pending === 0 && stats.failed === 0) ? (
+        <div className="text-center py-6">
+          <Send className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">No follow-up emails yet.</p>
+          <p className="text-xs text-muted-foreground mt-1">Enable auto follow-ups below to get started.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {kpis.map((kpi) => (
+            <div key={kpi.label} className="rounded-lg border border-border bg-background p-4 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{kpi.label}</span>
+                <div className={`h-8 w-8 rounded-md flex items-center justify-center ${kpi.color}`}>
+                  <kpi.icon className="h-4 w-4" />
+                </div>
+              </div>
+              <p className="text-xl font-bold tracking-tight">{kpi.value}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+}
