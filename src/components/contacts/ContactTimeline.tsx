@@ -72,7 +72,7 @@ const filters: { key: TimelineFilter; label: string }[] = [
   { key: "bookings", label: "Bookings" },
 ];
 
-export default function ContactTimeline({ activities, filter, onFilterChange }: Props) {
+export default function ContactTimeline({ activities, filter, onFilterChange, onMarkReplied }: Props) {
   const filtered = filter === "all"
     ? activities
     : activities.filter(a => filterMap[filter].includes(a.activity_type));
