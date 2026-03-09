@@ -69,12 +69,15 @@ export default function ContactDetail() {
   };
 
   const handleMarkReplied = async (_activityId: string, leadId: string) => {
-    await logActivity.mutateAsync({
+    const result = await logActivity.mutateAsync({
       lead_id: leadId,
       activity_type: "email_replied",
       title: "Replied (marked from timeline)",
     });
     toast.success("Marked as replied");
+    if (result.cancelledCount > 0) {
+      toast.info(`${result.cancelledCount} pending follow-up${result.cancelledCount > 1 ? "s" : ""} auto-cancelled`);
+    }
   };
 
   const handleCreateTask = async () => {
