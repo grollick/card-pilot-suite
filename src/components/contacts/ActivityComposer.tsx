@@ -36,6 +36,9 @@ export default function ActivityComposer({ contactId, contactName }: { contactId
 
   // Note state
   const [noteText, setNoteText] = useState("");
+  // Reply state
+  const [replyChannel, setReplyChannel] = useState("email");
+  const [replyNote, setReplyNote] = useState("");
   // Task state
   const [taskTitle, setTaskTitle] = useState("");
   const [taskType, setTaskType] = useState("follow_up");
