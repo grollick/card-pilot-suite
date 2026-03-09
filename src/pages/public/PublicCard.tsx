@@ -88,7 +88,56 @@ const DEFAULT_PALETTE = {
   background: "#ffffff",
 };
 
-export default function PublicCard() {
+// ── Promotion Banner Component ──
+function PromoBanner({ userId, palette, fonts }: { userId: string; palette: any; fonts: any }) {
+  const [promo, setPromo] = useState<any>(null);
+  useEffect(() => {
+    supabase
+      .from("promotions")
+      .select("title, description, badge_text, discount_text, expires_at")
+      .eq("user_id", userId)
+      .eq("active", true)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          const p = data[0];
+          if (!p.expires_at || new Date(p.expires_at) > new Date()) {
+            setPromo(p);
+          }
+        }
+      });
+  }, [userId]);
+
+  if (!promo) return null;
+
+  return (
+    <div
+      style={{
+        background: `linear-gradient(90deg, ${palette.primary}, ${palette.accent || palette.primary})`,
+        color: "#fff",
+        padding: "10px 16px",
+        fontFamily: `'${fonts.secondary}', sans-serif`,
+        textAlign: "center",
+        position: "relative",
+        zIndex: 5,
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+        {promo.badge_text && (
+          <span style={{ background: "rgba(255,255,255,0.2)", borderRadius: 4, padding: "2px 8px", fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            {promo.badge_text}
+          </span>
+        )}
+        <span style={{ fontSize: 13, fontWeight: 600 }}>{promo.discount_text || promo.title}</span>
+      </div>
+      {promo.description && (
+        <p style={{ fontSize: 11, opacity: 0.9, marginTop: 2 }}>{promo.description}</p>
+      )}
+    </div>
+  );
+}
+
   const { handle } = useParams();
   const { user } = useAuth();
   const { data, isLoading, isError } = usePublicCard(handle);
