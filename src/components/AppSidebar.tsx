@@ -1,8 +1,8 @@
 import {
   LayoutDashboard, Users, Kanban, Calendar, Mail, Share2,
   BarChart3, Settings, Shield, ChevronLeft, LogOut,
-  FileText, Zap, Megaphone, CreditCard, Building2, QrCode, Eye,
-  DollarSign, Tag, Gift, Globe, FolderOpen, Star
+  Zap, CreditCard, Building2, QrCode, Eye,
+  DollarSign, Tag, Gift, Globe, FolderOpen, Star, Megaphone
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,11 +15,11 @@ import {
   SidebarHeader, SidebarFooter, useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 
 const crmItems = [
   { title: "Contacts", url: "/app/contacts", icon: Users },
   { title: "Pipeline", url: "/app/pipeline", icon: Kanban },
-  { title: "Tasks", url: "/app/tasks", icon: FileText },
   { title: "Bookings", url: "/app/bookings", icon: Calendar },
   { title: "Card Editor", url: "/app/card", icon: CreditCard },
   { title: "Projects", url: "/app/projects", icon: FolderOpen },
@@ -64,7 +64,7 @@ export function AppSidebar() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("handle")
+        .select("handle, name, avatar_url")
         .eq("id", user!.id)
         .single();
       return data;
@@ -81,7 +81,7 @@ export function AppSidebar() {
 
   const renderGroup = (label: string, items: typeof crmItems) => (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-[10px] uppercase tracking-widest text-muted-foreground/50 px-3 mb-1">
+      <SidebarGroupLabel className="text-2xs uppercase tracking-widest text-muted-foreground/50 px-3 mb-0.5 font-semibold">
         {!collapsed && label}
       </SidebarGroupLabel>
       <SidebarGroupContent>
@@ -92,10 +92,12 @@ export function AppSidebar() {
                 <NavLink
                   to={item.url}
                   end={item.url === "/app"}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-sidebar-accent"
-                  activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-all hover:bg-muted/60 ${
+                    isActive(item.url) ? "bg-primary/8 text-primary font-medium" : "text-sidebar-foreground"
+                  }`}
+                  activeClassName="bg-primary/8 text-primary font-medium"
                 >
-                  <item.icon className="h-4 w-4 shrink-0" />
+                  <item.icon className="h-[18px] w-[18px] shrink-0" />
                   {!collapsed && <span>{item.title}</span>}
                 </NavLink>
               </SidebarMenuButton>
@@ -106,28 +108,39 @@ export function AppSidebar() {
     </SidebarGroup>
   );
 
+  const initials = profile?.name
+    ? profile.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
+    : "U";
+
   return (
-    <Sidebar collapsible="icon" className="border-r border-sidebar-border">
-      <SidebarHeader className="p-4">
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
+      <SidebarHeader className="p-4 pb-2">
         <div className="flex items-center justify-between">
           {!collapsed && (
-            <div>
-              <span className="text-lg font-bold tracking-tight gradient-text">CardPilot</span>
-              <p className="text-[10px] text-muted-foreground/60 leading-tight mt-0.5">Auto follow-up. Auto close.</p>
+            <div className="flex items-center gap-2.5">
+              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-glow">
+                <span className="text-xs font-bold text-primary-foreground">CP</span>
+              </div>
+              <div>
+                <span className="text-sm font-bold tracking-tight">CardPilot</span>
+                <p className="text-2xs text-muted-foreground leading-tight">Business Growth Platform</p>
+              </div>
             </div>
           )}
           <Button
             variant="ghost"
             size="icon"
             onClick={toggleSidebar}
-            className="h-8 w-8 text-muted-foreground"
+            className="h-7 w-7 text-muted-foreground hover:text-foreground"
           >
-            <ChevronLeft className={`h-4 w-4 transition-transform ${collapsed ? "rotate-180" : ""}`} />
+            <ChevronLeft className={`h-3.5 w-3.5 transition-transform duration-200 ${collapsed ? "rotate-180" : ""}`} />
           </Button>
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="px-2">
+      {!collapsed && <Separator className="mx-4 w-auto opacity-50" />}
+
+      <SidebarContent className="px-2 pt-1">
         {/* Home */}
         <SidebarGroup>
           <SidebarGroupContent>
@@ -137,11 +150,13 @@ export function AppSidebar() {
                   <NavLink
                     to="/app"
                     end
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-sidebar-accent"
-                    activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
+                    className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-all hover:bg-muted/60 ${
+                      isActive("/app") && location.pathname === "/app" ? "bg-primary/8 text-primary font-medium" : "text-sidebar-foreground"
+                    }`}
+                    activeClassName="bg-primary/8 text-primary font-medium"
                   >
-                    <LayoutDashboard className="h-4 w-4 shrink-0" />
-                    {!collapsed && <span>Home</span>}
+                    <LayoutDashboard className="h-[18px] w-[18px] shrink-0" />
+                    {!collapsed && <span>Dashboard</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -149,7 +164,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {renderGroup("CRM", crmItems)}
+        {renderGroup("Workspace", crmItems)}
         {renderGroup("Marketing", marketingItems)}
         {renderGroup("Insights", insightItems)}
         {renderGroup("Growth", growthItems)}
@@ -165,10 +180,10 @@ export function AppSidebar() {
                       href={`/site/${profile.handle}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-primary/10 text-primary font-medium"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-all hover:bg-primary/10 text-primary font-medium"
                     >
-                      <Globe className="h-4 w-4 shrink-0" />
-                      {!collapsed && <span>View My Website</span>}
+                      <Globe className="h-[18px] w-[18px] shrink-0" />
+                      {!collapsed && <span>View Website</span>}
                     </a>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -178,32 +193,62 @@ export function AppSidebar() {
         )}
       </SidebarContent>
 
-      <SidebarFooter className="px-2 pb-4">
+      <SidebarFooter className="px-2 pb-3">
+        {!collapsed && <Separator className="mx-2 mb-2 w-auto opacity-50" />}
         <SidebarMenu>
           {bottomItems.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton asChild>
                 <NavLink
                   to={item.url}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-sidebar-accent"
-                  activeClassName="bg-sidebar-accent text-sidebar-primary font-medium"
+                  className={`flex items-center gap-3 rounded-lg px-3 py-1.5 text-[13px] transition-all hover:bg-muted/60 ${
+                    isActive(item.url) ? "bg-primary/8 text-primary font-medium" : "text-sidebar-foreground"
+                  }`}
+                  activeClassName="bg-primary/8 text-primary font-medium"
                 >
-                  <item.icon className="h-4 w-4 shrink-0" />
+                  <item.icon className="h-[18px] w-[18px] shrink-0" />
                   {!collapsed && <span>{item.title}</span>}
                 </NavLink>
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
+        </SidebarMenu>
+
+        {/* User section */}
+        {!collapsed && (
+          <div className="mt-2 mx-1 p-2.5 rounded-lg bg-muted/40 flex items-center gap-2.5">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover ring-2 ring-background" />
+            ) : (
+              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary">
+                {initials}
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium truncate">{profile?.name || "User"}</p>
+              <p className="text-2xs text-muted-foreground truncate">@{profile?.handle || "—"}</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleSignOut}
+              className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
+              title="Sign out"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        )}
+        {collapsed && (
           <SidebarMenuItem>
             <SidebarMenuButton
               onClick={handleSignOut}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-destructive/10 text-muted-foreground hover:text-destructive cursor-pointer"
+              className="flex items-center gap-3 rounded-lg px-3 py-1.5 text-[13px] transition-all hover:bg-destructive/10 text-muted-foreground hover:text-destructive cursor-pointer"
             >
-              <LogOut className="h-4 w-4 shrink-0" />
-              {!collapsed && <span>Sign Out</span>}
+              <LogOut className="h-[18px] w-[18px] shrink-0" />
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
+        )}
       </SidebarFooter>
     </Sidebar>
   );
