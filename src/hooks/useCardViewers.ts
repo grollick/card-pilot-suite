@@ -68,12 +68,7 @@ export function useCardViewers(days = 30) {
   });
 }
 
-function parseDevice(ua?: string): string {
-  if (!ua) return "Unknown";
-  if (/mobile|android|iphone/i.test(ua)) return "Mobile";
-  if (/ipad|tablet/i.test(ua)) return "Tablet";
-  return "Desktop";
-}
+// parseDevice is now imported from @/lib/analytics
 
 export function useViewerStats(days = 30) {
   const { data: viewers = [] } = useCardViewers(days);
