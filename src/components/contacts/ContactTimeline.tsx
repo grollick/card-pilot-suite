@@ -1,7 +1,7 @@
 import { format, formatDistanceToNow } from "date-fns";
 import {
   Eye, MousePointer, Users, Calendar, Mail, MessageSquare,
-  Phone, FileText, CheckCircle2, Circle, ArrowRight
+  Phone, FileText, CheckCircle2, Circle, ArrowRight, Reply
 } from "lucide-react";
 
 const activityIcons: Record<string, typeof Eye> = {
@@ -14,6 +14,7 @@ const activityIcons: Record<string, typeof Eye> = {
   booking_cancelled: Calendar,
   email_sent: Mail,
   email_opened: Mail,
+  email_replied: Reply,
   note_added: MessageSquare,
   call: Phone,
   text: MessageSquare,
@@ -34,6 +35,7 @@ const activityColors: Record<string, string> = {
   booking_cancelled: "text-destructive",
   email_sent: "text-muted-foreground",
   email_opened: "text-primary",
+  email_replied: "text-[hsl(var(--success))]",
   note_added: "text-muted-foreground",
   call: "text-primary",
   text: "text-primary",
@@ -56,7 +58,7 @@ const filterMap: Record<TimelineFilter, string[]> = {
   all: [],
   notes: ["note_added", "call"],
   tasks: ["task_created", "task_completed"],
-  emails: ["email_sent", "email_opened"],
+  emails: ["email_sent", "email_opened", "email_replied"],
   bookings: ["booking_created", "booking_confirmed", "booking_cancelled"],
 };
 
