@@ -163,10 +163,14 @@ serve(async (req) => {
           continue;
         }
 
-        // Mark as sent
+        // Mark as sent and record which variant was used
         await supabase
           .from("scheduled_followups")
-          .update({ status: "sent", sent_at: new Date().toISOString() })
+          .update({ 
+            status: "sent", 
+            sent_at: new Date().toISOString(),
+            variant_id: selectedVariantId 
+          })
           .eq("id", followup.id);
 
         // Log activity on the lead
