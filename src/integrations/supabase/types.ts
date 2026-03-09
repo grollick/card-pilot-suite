@@ -1017,6 +1017,59 @@ export type Database = {
           },
         ]
       }
+      projects: {
+        Row: {
+          after_image_url: string | null
+          before_image_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean
+          location: string | null
+          org_id: string | null
+          services_used: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          after_image_url?: string | null
+          before_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          location?: string | null
+          org_id?: string | null
+          services_used?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          after_image_url?: string | null
+          before_image_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          location?: string | null
+          org_id?: string | null
+          services_used?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       promotions: {
         Row: {
           active: boolean
@@ -1248,6 +1301,60 @@ export type Database = {
           status?: string
         }
         Relationships: []
+      }
+      reviews: {
+        Row: {
+          created_at: string
+          id: string
+          is_public: boolean
+          lead_id: string | null
+          project_id: string | null
+          rating: number
+          review_text: string | null
+          reviewer_email: string | null
+          reviewer_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          lead_id?: string | null
+          project_id?: string | null
+          rating?: number
+          review_text?: string | null
+          reviewer_email?: string | null
+          reviewer_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          lead_id?: string | null
+          project_id?: string | null
+          rating?: number
+          review_text?: string | null
+          reviewer_email?: string | null
+          reviewer_name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       scheduled_followups: {
         Row: {
