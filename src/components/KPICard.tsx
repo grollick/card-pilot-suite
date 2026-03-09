@@ -26,7 +26,7 @@ function Sparkline({ data }: { data: number[] }) {
     <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="overflow-visible">
       <defs>
         <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.2" />
+          <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.15" />
           <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
         </linearGradient>
       </defs>
@@ -41,15 +41,15 @@ export default function KPICard({ title, value, change, changeType = "neutral", 
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-card-hover transition-shadow"
+      className="dash-card p-5"
     >
       <div className="flex items-start justify-between">
         <div className="space-y-1.5">
-          <p className="text-sm text-muted-foreground">{title}</p>
-          <p className="text-2xl font-semibold tracking-tight">{value}</p>
+          <p className="text-xs text-muted-foreground font-medium">{title}</p>
+          <p className="text-2xl font-bold tracking-tight tabular-nums">{value}</p>
         </div>
-        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-          <Icon className="h-5 w-5 text-primary" />
+        <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Icon className="h-4 w-4 text-primary" />
         </div>
       </div>
       {sparklineData && sparklineData.length > 1 && (
@@ -58,8 +58,8 @@ export default function KPICard({ title, value, change, changeType = "neutral", 
         </div>
       )}
       {change && (
-        <p className={`text-xs mt-2 ${
-          changeType === "positive" ? "text-[hsl(var(--success))]" :
+        <p className={`text-xs mt-2 font-medium ${
+          changeType === "positive" ? "text-success" :
           changeType === "negative" ? "text-destructive" :
           "text-muted-foreground"
         }`}>
