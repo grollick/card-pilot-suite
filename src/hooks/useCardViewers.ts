@@ -97,6 +97,4 @@ export function useViewerStats(days = 30) {
   return { totalViews, uniqueLocations, uniqueVisitors, returningCount, topDevices, topLocations, topSources };
 }
 
-function getDomain(url: string): string {
-  try { return new URL(url).hostname.replace("www.", ""); } catch { return url.slice(0, 30); }
-}
+// getDomain is now imported from @/lib/analytics

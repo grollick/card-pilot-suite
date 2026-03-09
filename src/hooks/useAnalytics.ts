@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { subDays, startOfDay, format, eachDayOfInterval } from "date-fns";
+import { subDays, format, eachDayOfInterval } from "date-fns";
+import { parseDevice } from "@/lib/analytics";
 
 // ── Core stats for a given period ──
 export function useAnalyticsStats(days = 7) {
