@@ -159,7 +159,8 @@ async function hashIP(ip: string): Promise<string> {
 async function sendViewNotification(
   supabase: any,
   cardOwnerId: string,
-  meta: Record<string, any>
+  meta: Record<string, any>,
+  isReturning: boolean
 ) {
   // Get owner profile
   const { data: profile } = await supabase
@@ -189,6 +190,24 @@ async function sendViewNotification(
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   if (!RESEND_API_KEY) return;
 
+  const returningBanner = isReturning
+    ? `<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:12px 16px;margin:0 0 16px;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:18px;">🔄</span>
+        <div>
+          <strong style="color:#92400e;font-size:13px;">They're Back!</strong>
+          <p style="color:#a16207;font-size:12px;margin:2px 0 0;">This visitor has viewed your card before — they may be ready to reach out.</p>
+        </div>
+      </div>`
+    : "";
+
+  const subject = isReturning
+    ? "🔄 They're back! A returning visitor viewed your card"
+    : "👀 Someone just viewed your card";
+
+  const headline = isReturning
+    ? "A returning visitor viewed your card"
+    : "Someone viewed your card";
+
   await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -198,10 +217,11 @@ async function sendViewNotification(
     body: JSON.stringify({
       from: "CardPilot <onboarding@resend.dev>",
       to: [profile.email],
-      subject: "👀 Someone just viewed your card",
+      subject,
       html: `
         <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#ffffff;">
-          <h2 style="color:#4361ee;margin:0 0 16px;">Someone viewed your card</h2>
+          <h2 style="color:#4361ee;margin:0 0 16px;">${headline}</h2>
+          ${returningBanner}
           <p style="color:#374151;margin:0 0 20px;">Hey ${profile.name || "there"}, someone just visited your digital card.</p>
           <table style="width:100%;border-collapse:collapse;background:#f9fafb;border-radius:8px;overflow:hidden;">
             <tr><td style="padding:12px 16px;color:#6b7280;font-size:13px;">Device</td><td style="padding:12px 16px;color:#111827;font-weight:600;font-size:13px;">${meta.device_type} · ${meta.os}</td></tr>
