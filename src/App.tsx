@@ -78,6 +78,9 @@ const App = () => (
             <Route path="/q/:campaign" element={<QRLanding />} />
             <Route path="/book/:handle" element={<PublicBooking />} />
             <Route path="/products" element={<ProductsPage />} />
+            <Route path="/discover" element={<DiscoverPage />} />
+            <Route path="/discover/:profession" element={<DiscoverPage />} />
+            <Route path="/discover/:profession/:city" element={<DiscoverPage />} />
 
             {/* App dashboard — auth required, lazy loaded */}
             <Route path="/app" element={
