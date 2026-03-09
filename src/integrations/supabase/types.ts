@@ -611,16 +611,22 @@ export type Database = {
       }
       estimate_line_items: {
         Row: {
+          calc_depth: number
+          calc_length: number
+          calc_mode: string
+          calc_width: number
           created_at: string
           description: string | null
           estimate_id: string
           id: string
+          is_optional: boolean
           labor_hours: number | null
           labor_rate: number | null
           line_total: number
           markup_percent: number | null
           material_cost: number | null
           quantity: number
+          section_id: string | null
           sort_order: number
           tax_percent: number | null
           title: string
@@ -628,16 +634,22 @@ export type Database = {
           unit_price: number
         }
         Insert: {
+          calc_depth?: number
+          calc_length?: number
+          calc_mode?: string
+          calc_width?: number
           created_at?: string
           description?: string | null
           estimate_id: string
           id?: string
+          is_optional?: boolean
           labor_hours?: number | null
           labor_rate?: number | null
           line_total?: number
           markup_percent?: number | null
           material_cost?: number | null
           quantity?: number
+          section_id?: string | null
           sort_order?: number
           tax_percent?: number | null
           title: string
@@ -645,16 +657,22 @@ export type Database = {
           unit_price?: number
         }
         Update: {
+          calc_depth?: number
+          calc_length?: number
+          calc_mode?: string
+          calc_width?: number
           created_at?: string
           description?: string | null
           estimate_id?: string
           id?: string
+          is_optional?: boolean
           labor_hours?: number | null
           labor_rate?: number | null
           line_total?: number
           markup_percent?: number | null
           material_cost?: number | null
           quantity?: number
+          section_id?: string | null
           sort_order?: number
           tax_percent?: number | null
           title?: string
@@ -669,16 +687,96 @@ export type Database = {
             referencedRelation: "estimates"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "estimate_line_items_section_id_fkey"
+            columns: ["section_id"]
+            isOneToOne: false
+            referencedRelation: "estimate_sections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      estimate_presets: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          preset_type: string
+          sort_order: number
+          user_id: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          preset_type: string
+          sort_order?: number
+          user_id: string
+          value?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          preset_type?: string
+          sort_order?: number
+          user_id?: string
+          value?: number
+        }
+        Relationships: []
+      }
+      estimate_sections: {
+        Row: {
+          created_at: string
+          estimate_id: string
+          id: string
+          name: string
+          notes: string | null
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          estimate_id: string
+          id?: string
+          name: string
+          notes?: string | null
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          estimate_id?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estimate_sections_estimate_id_fkey"
+            columns: ["estimate_id"]
+            isOneToOne: false
+            referencedRelation: "estimates"
+            referencedColumns: ["id"]
+          },
         ]
       }
       estimates: {
         Row: {
+          approved_at: string | null
           booking_id: string | null
+          converted_booking_id: string | null
           created_at: string
+          declined_at: string | null
+          deposit_amount: number
+          deposit_percent: number
+          discount_amount: number
+          discount_percent: number
           estimate_number: string
           expiry_date: string | null
           grand_total: number
           id: string
+          internal_notes: string | null
           issue_date: string
           job_address: string | null
           job_type: string | null
@@ -693,16 +791,25 @@ export type Database = {
           subtotal: number
           tax_total: number
           template_key: string | null
+          terms_conditions: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          approved_at?: string | null
           booking_id?: string | null
+          converted_booking_id?: string | null
           created_at?: string
+          declined_at?: string | null
+          deposit_amount?: number
+          deposit_percent?: number
+          discount_amount?: number
+          discount_percent?: number
           estimate_number: string
           expiry_date?: string | null
           grand_total?: number
           id?: string
+          internal_notes?: string | null
           issue_date?: string
           job_address?: string | null
           job_type?: string | null
@@ -717,16 +824,25 @@ export type Database = {
           subtotal?: number
           tax_total?: number
           template_key?: string | null
+          terms_conditions?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          approved_at?: string | null
           booking_id?: string | null
+          converted_booking_id?: string | null
           created_at?: string
+          declined_at?: string | null
+          deposit_amount?: number
+          deposit_percent?: number
+          discount_amount?: number
+          discount_percent?: number
           estimate_number?: string
           expiry_date?: string | null
           grand_total?: number
           id?: string
+          internal_notes?: string | null
           issue_date?: string
           job_address?: string | null
           job_type?: string | null
@@ -741,6 +857,7 @@ export type Database = {
           subtotal?: number
           tax_total?: number
           template_key?: string | null
+          terms_conditions?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -748,6 +865,13 @@ export type Database = {
           {
             foreignKeyName: "estimates_booking_id_fkey"
             columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "estimates_converted_booking_id_fkey"
+            columns: ["converted_booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
             referencedColumns: ["id"]
