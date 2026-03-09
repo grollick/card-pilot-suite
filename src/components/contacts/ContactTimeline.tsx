@@ -1,8 +1,9 @@
 import { format, formatDistanceToNow } from "date-fns";
 import {
   Eye, MousePointer, Users, Calendar, Mail, MessageSquare,
-  Phone, FileText, CheckCircle2, Circle, ArrowRight, Reply
+  Phone, FileText, CheckCircle2, Circle, ArrowRight, Reply, MailCheck
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const activityIcons: Record<string, typeof Eye> = {
   card_view: Eye,
