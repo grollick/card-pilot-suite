@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { formatDistanceToNow, format } from "date-fns";
 import {
   Eye, Smartphone, Monitor, Tablet, MapPin, Globe,
-  Clock, ArrowUpRight, Loader2, ChevronDown
+  Clock, ArrowUpRight, Loader2, ChevronDown, RotateCw, UserCheck
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
