@@ -49,6 +49,8 @@ const CardViewersPage = lazy(() => import("./pages/app/CardViewersPage"));
 const RevenueForecast = lazy(() => import("./pages/app/RevenueForecast"));
 const PromotionsPage = lazy(() => import("./pages/app/PromotionsPage"));
 const ReferralsPage = lazy(() => import("./pages/app/ReferralsPage"));
+const ProjectsPage = lazy(() => import("./pages/app/ProjectsPage"));
+const ReviewsPage = lazy(() => import("./pages/app/ReviewsPage"));
 
 const LazyFallback = () => (
   <div className="min-h-screen flex items-center justify-center">
@@ -110,6 +112,8 @@ const App = () => (
               <Route path="revenue" element={<Suspense fallback={<LazyFallback />}><RevenueForecast /></Suspense>} />
               <Route path="promotions" element={<Suspense fallback={<LazyFallback />}><PromotionsPage /></Suspense>} />
               <Route path="referrals" element={<Suspense fallback={<LazyFallback />}><ReferralsPage /></Suspense>} />
+              <Route path="projects" element={<Suspense fallback={<LazyFallback />}><ProjectsPage /></Suspense>} />
+              <Route path="reviews" element={<Suspense fallback={<LazyFallback />}><ReviewsPage /></Suspense>} />
               <Route path="admin" element={<Suspense fallback={<LazyFallback />}><AdminPage /></Suspense>} />
             </Route>
 

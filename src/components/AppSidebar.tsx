@@ -2,7 +2,7 @@ import {
   LayoutDashboard, Users, Kanban, Calendar, Mail, Share2,
   BarChart3, Settings, Shield, ChevronLeft, LogOut,
   FileText, Zap, Megaphone, CreditCard, Building2, QrCode, Eye,
-  DollarSign, Tag, Gift, Globe
+  DollarSign, Tag, Gift, Globe, FolderOpen, Star
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
@@ -22,8 +22,9 @@ const crmItems = [
   { title: "Tasks", url: "/app/tasks", icon: FileText },
   { title: "Bookings", url: "/app/bookings", icon: Calendar },
   { title: "Card Editor", url: "/app/card", icon: CreditCard },
+  { title: "Projects", url: "/app/projects", icon: FolderOpen },
+  { title: "Reviews", url: "/app/reviews", icon: Star },
 ];
-
 const marketingItems = [
   { title: "Email", url: "/app/email", icon: Mail },
   { title: "Social", url: "/app/social", icon: Share2 },

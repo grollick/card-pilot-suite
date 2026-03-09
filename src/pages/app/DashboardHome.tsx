@@ -15,6 +15,7 @@ import AIInsightsWidget from "@/components/dashboard/AIInsightsWidget";
 import BusinessPerformancePanel from "@/components/dashboard/BusinessPerformancePanel";
 import YesterdaySnapshot from "@/components/dashboard/YesterdaySnapshot";
 import MissedOpportunities from "@/components/dashboard/MissedOpportunities";
+import FirstLeadAssistant from "@/components/dashboard/FirstLeadAssistant";
 
 const priorityColors: Record<string, string> = {
   high: "text-destructive",
@@ -230,6 +231,9 @@ export default function DashboardHome() {
               <Plus className="h-3 w-3" /> Add Task
             </Button>
           </motion.div>
+
+          {/* First Lead Checklist */}
+          <FirstLeadAssistant />
         </div>
       </div>
 
