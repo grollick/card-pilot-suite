@@ -645,6 +645,47 @@ export type Database = {
         }
         Relationships: []
       }
+      followup_variants: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          step_id: string
+          subject: string
+          updated_at: string
+          variant_key: string
+          weight: number
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          step_id: string
+          subject: string
+          updated_at?: string
+          variant_key: string
+          weight?: number
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          step_id?: string
+          subject?: string
+          updated_at?: string
+          variant_key?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "followup_variants_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "followup_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           address: string | null
@@ -1126,8 +1167,10 @@ export type Database = {
           created_at: string
           id: string
           lead_id: string | null
+          opened_at: string | null
           recipient_email: string | null
           recipient_name: string | null
+          replied_at: string | null
           send_at: string
           sent_at: string | null
           status: string
@@ -1135,13 +1178,16 @@ export type Database = {
           step_number: number | null
           trigger_type: string
           user_id: string
+          variant_id: string | null
         }
         Insert: {
           created_at?: string
           id?: string
           lead_id?: string | null
+          opened_at?: string | null
           recipient_email?: string | null
           recipient_name?: string | null
+          replied_at?: string | null
           send_at: string
           sent_at?: string | null
           status?: string
@@ -1149,13 +1195,16 @@ export type Database = {
           step_number?: number | null
           trigger_type?: string
           user_id: string
+          variant_id?: string | null
         }
         Update: {
           created_at?: string
           id?: string
           lead_id?: string | null
+          opened_at?: string | null
           recipient_email?: string | null
           recipient_name?: string | null
+          replied_at?: string | null
           send_at?: string
           sent_at?: string | null
           status?: string
@@ -1163,6 +1212,7 @@ export type Database = {
           step_number?: number | null
           trigger_type?: string
           user_id?: string
+          variant_id?: string | null
         }
         Relationships: [
           {
@@ -1177,6 +1227,13 @@ export type Database = {
             columns: ["step_id"]
             isOneToOne: false
             referencedRelation: "followup_steps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "scheduled_followups_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "followup_variants"
             referencedColumns: ["id"]
           },
         ]
