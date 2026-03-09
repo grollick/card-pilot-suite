@@ -178,10 +178,13 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {renderGroup("Workspace", crmItems)}
+        {renderGroup("Card", cardItems)}
+        {renderGroup("CRM", crmItems)}
+        {renderGroup("Booking", bookingItems)}
+        {renderGroup("Analytics", analyticsItems)}
         {renderGroup("Marketing", marketingItems)}
-        {renderGroup("Insights", insightItems)}
-        {renderGroup("Growth", growthItems)}
+        {renderGroup("Automation", automationItems)}
+        {renderGroup("Marketplace", marketplaceItems)}
 
         {/* View My Website */}
         {profile?.handle && (
