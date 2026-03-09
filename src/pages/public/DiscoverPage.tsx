@@ -97,9 +97,11 @@ export default function DiscoverPage() {
             </div>
             <div className="flex flex-wrap gap-2">
               {POPULAR_PROFESSIONS.map((p) => (
-                <Badge key={p} variant="outline" className="cursor-pointer hover:bg-primary/10 hover:border-primary/30 transition-colors" asChild>
-                  <Link to={`/discover/${p.toLowerCase().replace(/\s+/g, "-")}`}>{p}</Link>
-                </Badge>
+                <Link key={p} to={`/discover/${p.toLowerCase().replace(/\s+/g, "-")}`}>
+                  <Badge variant="outline" className="cursor-pointer hover:bg-primary/10 hover:border-primary/30 transition-colors">
+                    {p}
+                  </Badge>
+                </Link>
               ))}
             </div>
           </div>
