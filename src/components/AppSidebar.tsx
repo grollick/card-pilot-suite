@@ -22,7 +22,8 @@ const crmItems = [
   { title: "Tasks", url: "/app/tasks", icon: FileText },
   { title: "Bookings", url: "/app/bookings", icon: Calendar },
   { title: "Card Editor", url: "/app/card", icon: CreditCard },
-];
+  { title: "Projects", url: "/app/projects", icon: FolderOpen },
+  { title: "Reviews", url: "/app/reviews", icon: Star },
 
 const marketingItems = [
   { title: "Email", url: "/app/email", icon: Mail },

@@ -231,6 +231,9 @@ export default function DashboardHome() {
               <Plus className="h-3 w-3" /> Add Task
             </Button>
           </motion.div>
+
+          {/* First Lead Checklist */}
+          <FirstLeadAssistant />
         </div>
       </div>
 
