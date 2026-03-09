@@ -16,6 +16,10 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle
 } from "@/components/ui/dialog";
 import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
+} from "@/components/ui/alert-dialog";
+import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
 import {
@@ -205,21 +209,40 @@ export default function ContactDetail() {
                         <p className="text-sm text-muted-foreground">
                           {followupHistory.filter((f: any) => f.status === "cancelled").length} cancelled follow-up{followupHistory.filter((f: any) => f.status === "cancelled").length > 1 ? "s" : ""}
                         </p>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="gap-1.5"
-                          disabled={reactivateFollowups.isPending}
-                          onClick={async () => {
-                            const result = await reactivateFollowups.mutateAsync(contact.id);
-                            if (result.reactivatedCount > 0) {
-                              toast.success(`${result.reactivatedCount} follow-up${result.reactivatedCount > 1 ? "s" : ""} reactivated`);
-                            }
-                          }}
-                        >
-                          {reactivateFollowups.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />}
-                          Reactivate
-                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1.5"
+                              disabled={reactivateFollowups.isPending}
+                            >
+                              {reactivateFollowups.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />}
+                              Reactivate
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Reactivate follow-ups?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This will re-schedule {followupHistory.filter((f: any) => f.status === "cancelled").length} cancelled follow-up{followupHistory.filter((f: any) => f.status === "cancelled").length > 1 ? "s" : ""} with 2-hour intervals starting now.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={async () => {
+                                  const result = await reactivateFollowups.mutateAsync(contact.id);
+                                  if (result.reactivatedCount > 0) {
+                                    toast.success(`${result.reactivatedCount} follow-up${result.reactivatedCount > 1 ? "s" : ""} reactivated`);
+                                  }
+                                }}
+                              >
+                                Reactivate
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     )}
                     {followupHistory.map((f: any) => {
