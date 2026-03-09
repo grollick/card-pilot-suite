@@ -48,6 +48,8 @@ export default function SettingsPage() {
     setEmail(profile.email ?? "");
     setPhone(profile.phone ?? "");
     setCompany(profile.company ?? "");
+    setCity((profile as any).city ?? "");
+    setBio((profile as any).bio ?? "");
   }, [profile]);
 
   const handleSave = async () => {
