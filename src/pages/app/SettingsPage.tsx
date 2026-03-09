@@ -203,6 +203,7 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="notifications" className="mt-4 space-y-4">
+          <FollowUpAnalytics userId={profile?.id} />
           <FollowUpSettings profile={profile} queryClient={queryClient} />
 
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
