@@ -152,6 +152,7 @@ export default function PublicCard() {
   const viewTracked = useRef(false);
 
   const profile = data?.profile;
+  const { data: publicReviews = [] } = usePublicReviews(profile?.id);
 
   // ── Resolve theme from style pack ──
   const theme: ResolvedCardTheme = useMemo(() => {
