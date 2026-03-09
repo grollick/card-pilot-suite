@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Plus, Trash2, Loader2 } from "lucide-react";
+import { Plus, Trash2, Loader2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,8 +15,11 @@ import { useContacts } from "@/hooks/useContacts";
 import {
   useEstimate, useCreateEstimate, useUpdateEstimate,
   generateEstimateNumber, calculateLineTotals, calculateEstimateTotals,
-  TRADES_TEMPLATES, type EstimateLineItem, type EstimateFormData
+  type EstimateLineItem, type EstimateFormData
 } from "@/hooks/useEstimates";
+import { TRADES_TEMPLATES } from "@/lib/estimateTemplates";
+import { exportEstimatePDF } from "@/lib/estimatePdf";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
 
 const EMPTY_LINE_ITEM: EstimateLineItem = {
   title: "", description: "", quantity: 1, unit: "each",
@@ -39,10 +42,12 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
   const { data: contacts = [] } = useContacts();
   const createEstimate = useCreateEstimate();
   const updateEstimate = useUpdateEstimate();
+  const { planKey, profile } = usePlanLimits();
 
   const [leadId, setLeadId] = useState<string>("");
   const [bookingId] = useState(defaultBookingId ?? "");
   const [estimateNumber, setEstimateNumber] = useState(generateEstimateNumber());
+  const [status, setStatus] = useState<string>("draft");
   const [issueDate, setIssueDate] = useState(new Date().toISOString().split("T")[0]);
   const [expiryDate, setExpiryDate] = useState("");
   const [jobAddress, setJobAddress] = useState("");
@@ -52,11 +57,12 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
   const [templateKey, setTemplateKey] = useState("");
   const [lineItems, setLineItems] = useState<EstimateLineItem[]>([{ ...EMPTY_LINE_ITEM }]);
 
-  // Populate from existing
+  // Populate from existing on edit
   useEffect(() => {
     if (isEdit && existing) {
       setLeadId(existing.lead_id ?? "");
       setEstimateNumber(existing.estimate_number);
+      setStatus(existing.status);
       setIssueDate(existing.issue_date);
       setExpiryDate(existing.expiry_date ?? "");
       setJobAddress(existing.job_address ?? "");
@@ -65,21 +71,30 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
       setNotes(existing.notes ?? "");
       setTemplateKey(existing.template_key ?? "");
       if (existing.estimate_line_items?.length) {
-        setLineItems(existing.estimate_line_items.sort((a: any, b: any) => a.sort_order - b.sort_order));
+        setLineItems(
+          [...existing.estimate_line_items].sort((a: any, b: any) => a.sort_order - b.sort_order)
+        );
+      } else {
+        setLineItems([{ ...EMPTY_LINE_ITEM }]);
       }
     } else if (!isEdit && open) {
-      setLeadId(defaultLeadId ?? "");
-      setEstimateNumber(generateEstimateNumber());
-      setIssueDate(new Date().toISOString().split("T")[0]);
-      setExpiryDate("");
-      setJobAddress("");
-      setJobType("");
-      setScope("");
-      setNotes("");
-      setTemplateKey("");
-      setLineItems([{ ...EMPTY_LINE_ITEM }]);
+      resetForm();
     }
-  }, [isEdit, existing, open, defaultLeadId]);
+  }, [isEdit, existing, open]);
+
+  function resetForm() {
+    setLeadId(defaultLeadId ?? "");
+    setEstimateNumber(generateEstimateNumber());
+    setStatus("draft");
+    setIssueDate(new Date().toISOString().split("T")[0]);
+    setExpiryDate("");
+    setJobAddress("");
+    setJobType("");
+    setScope("");
+    setNotes("");
+    setTemplateKey("");
+    setLineItems([{ ...EMPTY_LINE_ITEM }]);
+  }
 
   const handleTemplateChange = (key: string) => {
     setTemplateKey(key);
@@ -109,7 +124,7 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
       lead_id: leadId || null,
       booking_id: bookingId || null,
       estimate_number: estimateNumber,
-      status: "draft",
+      status: (isEdit ? status : "draft") as any,
       issue_date: issueDate,
       expiry_date: expiryDate || null,
       job_address: jobAddress,
@@ -127,20 +142,48 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
     onOpenChange(false);
   };
 
+  const handleExportPDF = () => {
+    const selectedContact = contacts.find((c: any) => c.id === leadId);
+    exportEstimatePDF({
+      estimate: {
+        estimate_number: estimateNumber,
+        issue_date: issueDate,
+        expiry_date: expiryDate || null,
+        job_address: jobAddress,
+        job_type: jobType,
+        scope_of_work: scope,
+        notes,
+        status,
+        leads: selectedContact ? { name: selectedContact.name, email: selectedContact.email, phone: selectedContact.phone, company: selectedContact.company } : existing?.leads,
+      },
+      lineItems,
+      totals,
+      profile: profile as any,
+      planKey,
+    });
+  };
+
   const saving = createEstimate.isPending || updateEstimate.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit Estimate" : "New Estimate"}</DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle>{isEdit ? `Edit ${estimateNumber}` : "New Estimate"}</DialogTitle>
+            {(isEdit || lineItems.some(li => li.title)) && (
+              <Button variant="outline" size="sm" onClick={handleExportPDF} className="gap-1.5">
+                <Download className="h-3.5 w-3.5" /> PDF
+              </Button>
+            )}
+          </div>
         </DialogHeader>
 
         {isEdit && loadingExisting ? (
           <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
         ) : (
           <div className="space-y-6">
-            {/* Template selector */}
+            {/* Template selector (new only) */}
             {!isEdit && (
               <div>
                 <Label>Trades Template</Label>
@@ -267,10 +310,10 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
             {/* Totals */}
             <div className="rounded-lg border border-border p-4 bg-muted/20 space-y-2">
               <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span className="tabular-nums">${totals.subtotal.toFixed(2)}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Labor</span><span className="tabular-nums">${totals.labor_total.toFixed(2)}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Materials</span><span className="tabular-nums">${totals.material_total.toFixed(2)}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Markup</span><span className="tabular-nums">${totals.markup_total.toFixed(2)}</span></div>
-              <div className="flex justify-between text-sm"><span className="text-muted-foreground">Tax</span><span className="tabular-nums">${totals.tax_total.toFixed(2)}</span></div>
+              {totals.labor_total > 0 && <div className="flex justify-between text-sm"><span className="text-muted-foreground">Labor</span><span className="tabular-nums">${totals.labor_total.toFixed(2)}</span></div>}
+              {totals.material_total > 0 && <div className="flex justify-between text-sm"><span className="text-muted-foreground">Materials</span><span className="tabular-nums">${totals.material_total.toFixed(2)}</span></div>}
+              {totals.markup_total > 0 && <div className="flex justify-between text-sm"><span className="text-muted-foreground">Markup</span><span className="tabular-nums">${totals.markup_total.toFixed(2)}</span></div>}
+              {totals.tax_total > 0 && <div className="flex justify-between text-sm"><span className="text-muted-foreground">Tax</span><span className="tabular-nums">${totals.tax_total.toFixed(2)}</span></div>}
               <Separator />
               <div className="flex justify-between text-base font-bold"><span>Grand Total</span><span className="tabular-nums">${totals.grand_total.toFixed(2)}</span></div>
             </div>
