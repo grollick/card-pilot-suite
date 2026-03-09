@@ -12,6 +12,7 @@ import {
 const tabs = [
   { key: "note", label: "Note" },
   { key: "task", label: "Task" },
+  { key: "reply", label: "Reply" },
   { key: "email", label: "Email" },
   { key: "booking", label: "Booking" },
 ] as const;

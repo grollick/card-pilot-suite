@@ -1,7 +1,7 @@
 import { format, formatDistanceToNow } from "date-fns";
 import {
   Eye, MousePointer, Users, Calendar, Mail, MessageSquare,
-  Phone, FileText, CheckCircle2, Circle, ArrowRight
+  Phone, FileText, CheckCircle2, Circle, ArrowRight, Reply
 } from "lucide-react";
 
 const activityIcons: Record<string, typeof Eye> = {
