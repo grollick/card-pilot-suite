@@ -2,14 +2,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
   ArrowLeft, Phone, Mail, Calendar, FileText, MessageSquare,
-  Plus, Loader2, ChevronDown, Trash2, MoreHorizontal, Clock, Send, X, CheckCircle2
+  Plus, Loader2, ChevronDown, Trash2, MoreHorizontal, Clock, Send, X, CheckCircle2, RotateCcw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import { useContact, useContactActivities, useContactTasks, useContactBookings, useContactFollowups, useContactFollowupHistory } from "@/hooks/useContactDetail";
-import { useLogActivity } from "@/hooks/useContactActions";
+import { useLogActivity, useReactivateFollowups } from "@/hooks/useContactActions";
 import { useCreateTask, useUpdateTask } from "@/hooks/useTasks";
 import { toast } from "sonner";
 import {
@@ -43,6 +43,7 @@ export default function ContactDetail() {
   const logActivity = useLogActivity();
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
+  const reactivateFollowups = useReactivateFollowups();
 
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
@@ -199,6 +200,28 @@ export default function ContactDetail() {
                   <p className="text-sm text-muted-foreground text-center py-6">No follow-ups scheduled yet.</p>
                 ) : (
                   <div className="space-y-3">
+                    {followupHistory.some((f: any) => f.status === "cancelled") && (
+                      <div className="flex items-center justify-between p-3 rounded-lg bg-muted/30 border border-border/50">
+                        <p className="text-sm text-muted-foreground">
+                          {followupHistory.filter((f: any) => f.status === "cancelled").length} cancelled follow-up{followupHistory.filter((f: any) => f.status === "cancelled").length > 1 ? "s" : ""}
+                        </p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1.5"
+                          disabled={reactivateFollowups.isPending}
+                          onClick={async () => {
+                            const result = await reactivateFollowups.mutateAsync(contact.id);
+                            if (result.reactivatedCount > 0) {
+                              toast.success(`${result.reactivatedCount} follow-up${result.reactivatedCount > 1 ? "s" : ""} reactivated`);
+                            }
+                          }}
+                        >
+                          {reactivateFollowups.isPending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RotateCcw className="h-3.5 w-3.5" />}
+                          Reactivate
+                        </Button>
+                      </div>
+                    )}
                     {followupHistory.map((f: any) => {
                       const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
                         pending: { icon: Clock, color: "text-warning", label: "Pending" },
