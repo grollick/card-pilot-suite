@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { startOfDay, startOfWeek, subDays } from "date-fns";
+import { startOfDay, startOfWeek, startOfMonth, subDays } from "date-fns";
 
 export function useDashboardStats() {
   return useQuery({
@@ -10,19 +10,16 @@ export function useDashboardStats() {
       const todayStart = startOfDay(now).toISOString();
       const weekStart = startOfWeek(now, { weekStartsOn: 1 }).toISOString();
 
-      // New leads today
       const { count: leadsToday } = await supabase
         .from("leads")
         .select("*", { count: "exact", head: true })
         .gte("created_at", todayStart);
 
-      // Bookings this week
       const { count: bookingsWeek } = await supabase
         .from("bookings")
         .select("*", { count: "exact", head: true })
         .gte("created_at", weekStart);
 
-      // Active opportunities (open leads with a stage that isn't won/lost)
       const { data: openLeads } = await supabase
         .from("leads")
         .select("id, pipeline_stages(is_won, is_lost)")
@@ -33,7 +30,6 @@ export function useDashboardStats() {
         return !s?.is_won && !s?.is_lost;
       });
 
-      // Pipeline snapshot — leads per stage
       const { data: stages } = await supabase
         .from("pipeline_stages")
         .select("id, name, sort_order")
@@ -63,13 +59,123 @@ export function useDashboardStats() {
   });
 }
 
+export function useBusinessPerformance() {
+  return useQuery({
+    queryKey: ["business-performance"],
+    queryFn: async () => {
+      const now = new Date();
+      const monthStart = startOfMonth(now).toISOString();
+
+      // Card views this month
+      const { count: viewsThisMonth } = await supabase
+        .from("analytics_events")
+        .select("*", { count: "exact", head: true })
+        .eq("event_type", "card_view")
+        .gte("created_at", monthStart);
+
+      // Leads this month
+      const { count: leadsThisMonth } = await supabase
+        .from("leads")
+        .select("*", { count: "exact", head: true })
+        .gte("created_at", monthStart);
+
+      // Bookings this month
+      const { data: bookingsThisMonth } = await supabase
+        .from("bookings")
+        .select("id, service_id")
+        .gte("created_at", monthStart);
+
+      const bookingCount = bookingsThisMonth?.length ?? 0;
+
+      // Average service price
+      const { data: services } = await supabase
+        .from("booking_services")
+        .select("price")
+        .eq("active", true);
+
+      const prices = (services ?? []).map(s => s.price ?? 0).filter(p => p > 0);
+      const avgPrice = prices.length > 0 ? prices.reduce((a, b) => a + b, 0) / prices.length : 0;
+
+      const estimatedRevenue = Math.round(bookingCount * avgPrice);
+      const conversionRate = (viewsThisMonth ?? 0) > 0
+        ? Math.round(((leadsThisMonth ?? 0) / (viewsThisMonth ?? 1)) * 100)
+        : 0;
+
+      return {
+        views: viewsThisMonth ?? 0,
+        leads: leadsThisMonth ?? 0,
+        bookings: bookingCount,
+        estimatedRevenue,
+        conversionRate,
+        avgPrice: Math.round(avgPrice),
+      };
+    },
+    refetchInterval: 60_000,
+  });
+}
+
+export function useYesterdaySnapshot() {
+  return useQuery({
+    queryKey: ["yesterday-snapshot"],
+    queryFn: async () => {
+      const now = new Date();
+      const yesterdayStart = startOfDay(subDays(now, 1)).toISOString();
+      const todayStart = startOfDay(now).toISOString();
+
+      const { count: views } = await supabase
+        .from("analytics_events")
+        .select("*", { count: "exact", head: true })
+        .eq("event_type", "card_view")
+        .gte("created_at", yesterdayStart)
+        .lt("created_at", todayStart);
+
+      const { count: leads } = await supabase
+        .from("leads")
+        .select("*", { count: "exact", head: true })
+        .gte("created_at", yesterdayStart)
+        .lt("created_at", todayStart);
+
+      const { data: bookings } = await supabase
+        .from("bookings")
+        .select("id, service_id")
+        .gte("created_at", yesterdayStart)
+        .lt("created_at", todayStart);
+
+      const { data: services } = await supabase
+        .from("booking_services")
+        .select("price")
+        .eq("active", true);
+
+      const prices = (services ?? []).map(s => s.price ?? 0).filter(p => p > 0);
+      const avgPrice = prices.length > 0 ? prices.reduce((a, b) => a + b, 0) / prices.length : 0;
+
+      const bookingCount = bookings?.length ?? 0;
+
+      // Follow-ups needed (open tasks due today or overdue)
+      const { count: followupsNeeded } = await supabase
+        .from("tasks")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "open")
+        .lte("due_date", todayStart.split("T")[0]);
+
+      return {
+        views: views ?? 0,
+        leads: leads ?? 0,
+        bookings: bookingCount,
+        potentialRevenue: Math.round(bookingCount * avgPrice),
+        followupsNeeded: followupsNeeded ?? 0,
+      };
+    },
+    refetchInterval: 120_000,
+  });
+}
+
 export function useRecentActivity() {
   return useQuery({
     queryKey: ["dashboard-recent-activity"],
     queryFn: async () => {
       const since = subDays(new Date(), 7).toISOString();
 
-      // Recent leads
       const { data: recentLeads } = await supabase
         .from("leads")
         .select("id, name, source, created_at")
@@ -77,7 +183,6 @@ export function useRecentActivity() {
         .order("created_at", { ascending: false })
         .limit(10);
 
-      // Recent bookings
       const { data: recentBookings } = await supabase
         .from("bookings")
         .select("id, customer_name, status, created_at, booking_services(name)")
@@ -85,7 +190,6 @@ export function useRecentActivity() {
         .order("created_at", { ascending: false })
         .limit(10);
 
-      // Recent quote requests
       const { data: recentQuotes } = await supabase
         .from("quote_requests")
         .select("id, project_type, status, created_at, leads(name)")
@@ -93,7 +197,6 @@ export function useRecentActivity() {
         .order("created_at", { ascending: false })
         .limit(10);
 
-      // Recent QR scans
       const { data: recentScans } = await supabase
         .from("qr_scans")
         .select("id, device, created_at, qr_campaigns(name)")
@@ -101,7 +204,6 @@ export function useRecentActivity() {
         .order("created_at", { ascending: false })
         .limit(10);
 
-      // Merge into unified feed
       type FeedItem = {
         id: string;
         type: "lead" | "booking" | "quote" | "qr_scan";
