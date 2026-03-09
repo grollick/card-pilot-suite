@@ -79,6 +79,8 @@ export function useViewerStats(days = 30) {
 
   const totalViews = viewers.length;
   const uniqueLocations = new Set(viewers.map(v => `${v.city}-${v.country}`).filter(l => !l.includes("Unknown"))).size;
+  const returningCount = new Set(viewers.filter(v => v.isReturning && v.ip_hash).map(v => v.ip_hash)).size;
+  const uniqueVisitors = new Set(viewers.filter(v => v.ip_hash).map(v => v.ip_hash)).size || viewers.length;
 
   const deviceCounts: Record<string, number> = {};
   const locationCounts: Record<string, number> = {};
@@ -96,7 +98,7 @@ export function useViewerStats(days = 30) {
   const topLocations = Object.entries(locationCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const topSources = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-  return { totalViews, uniqueLocations, topDevices, topLocations, topSources };
+  return { totalViews, uniqueLocations, uniqueVisitors, returningCount, topDevices, topLocations, topSources };
 }
 
 function getDomain(url: string): string {
