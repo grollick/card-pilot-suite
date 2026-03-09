@@ -110,11 +110,8 @@ const App = () => (
               <Route path="admin" element={<Suspense fallback={<LazyFallback />}><AdminPage /></Suspense>} />
             </Route>
 
-            {/* SEO landing pages — pattern: /barber-in-toronto */}
-            <Route path="/seo/:slug" element={<SeoLandingPage />} />
-
-            {/* Public card — must be last to avoid catching other routes */}
-            <Route path="/:handle" element={<PublicCard />} />
+            {/* Public card OR SEO landing — smart routing by slug pattern */}
+            <Route path="/:handle" element={<HandleOrSeoRoute />} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
