@@ -111,6 +111,9 @@ const App = () => (
               <Route path="admin" element={<Suspense fallback={<LazyFallback />}><AdminPage /></Suspense>} />
             </Route>
 
+            {/* SEO landing pages — pattern: /barber-in-toronto */}
+            <Route path="/seo/:slug" element={<SeoLandingPage />} />
+
             {/* Public card — must be last to avoid catching other routes */}
             <Route path="/:handle" element={<PublicCard />} />
 
