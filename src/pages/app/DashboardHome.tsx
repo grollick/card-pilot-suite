@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { useTasks, useUpdateTask } from "@/hooks/useTasks";
 import { useDashboardStats, useRecentActivity } from "@/hooks/useDashboardStats";
 import { formatDistanceToNow, format } from "date-fns";
+import AIInsightsWidget from "@/components/dashboard/AIInsightsWidget";
 
 const priorityColors: Record<string, string> = {
   high: "text-destructive",
