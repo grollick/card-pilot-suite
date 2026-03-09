@@ -207,6 +207,8 @@ export default function SettingsPage() {
           <FollowUpAnalytics userId={profile?.id} />
           <FollowUpSettings profile={profile} queryClient={queryClient} />
 
+          <DailyReportToggle profile={profile} queryClient={queryClient} />
+
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="rounded-xl border border-border bg-card p-6 space-y-4">
             <div className="flex items-center gap-2 mb-2">
