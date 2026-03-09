@@ -251,6 +251,9 @@ export default function DashboardHome() {
         </div>
       </div>
 
+      {/* Job Metrics */}
+      <JobMetrics />
+
       {/* AI Insights */}
       <AIInsightsWidget />
     </div>
