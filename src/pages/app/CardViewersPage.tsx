@@ -34,7 +34,6 @@ export default function CardViewersPage() {
   const [days, setDays] = useState(30);
   const { data: viewers = [], isLoading } = useCardViewers(days);
   const stats = useViewerStats(days);
-  const stats = useViewerStats(days);
 
   const kpis = [
     { label: "Total Views", value: stats.totalViews, icon: Eye, color: "text-primary bg-primary/10" },
