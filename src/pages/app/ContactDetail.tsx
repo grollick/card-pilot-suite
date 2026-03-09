@@ -43,6 +43,7 @@ export default function ContactDetail() {
   const logActivity = useLogActivity();
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
+  const reactivateFollowups = useReactivateFollowups();
 
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
