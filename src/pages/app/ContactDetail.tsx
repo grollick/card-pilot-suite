@@ -28,6 +28,7 @@ import ContactTimeline, { type TimelineFilter } from "@/components/contacts/Cont
 import NextActivityPanel from "@/components/contacts/NextActivityPanel";
 import ContactSummaryCard from "@/components/contacts/ContactSummaryCard";
 import ContactTasksList from "@/components/contacts/ContactTasksList";
+import PendingFollowups from "@/components/contacts/PendingFollowups";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function ContactDetail() {
