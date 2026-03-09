@@ -2,11 +2,13 @@ import {
   LayoutDashboard, Users, Kanban, Calendar, Mail, Share2,
   BarChart3, Settings, Shield, ChevronLeft, LogOut,
   FileText, Zap, Megaphone, CreditCard, Building2, QrCode, Eye,
-  DollarSign, Tag, Gift
+  DollarSign, Tag, Gift, Globe
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
@@ -51,8 +53,22 @@ export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const navigate = useNavigate();
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile-handle"],
+    enabled: !!user,
+    staleTime: 10 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("handle")
+        .eq("id", user!.id)
+        .single();
+      return data;
+    },
+  });
 
   const isActive = (path: string) =>
     path === "/app" ? location.pathname === "/app" : location.pathname.startsWith(path);
@@ -136,6 +152,29 @@ export function AppSidebar() {
         {renderGroup("Marketing", marketingItems)}
         {renderGroup("Insights", insightItems)}
         {renderGroup("Growth", growthItems)}
+
+        {/* View My Website */}
+        {profile?.handle && (
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <a
+                      href={`/site/${profile.handle}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-primary/10 text-primary font-medium"
+                    >
+                      <Globe className="h-4 w-4 shrink-0" />
+                      {!collapsed && <span>View My Website</span>}
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="px-2 pb-4">
