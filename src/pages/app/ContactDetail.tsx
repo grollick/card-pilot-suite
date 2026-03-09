@@ -179,7 +179,7 @@ export default function ContactDetail() {
 
             <TabsContent value="timeline" className="mt-4">
               <div className="rounded-xl border border-border bg-card p-5">
-                <ContactTimeline activities={activities} filter={timelineFilter} onFilterChange={setTimelineFilter} />
+                <ContactTimeline activities={activities} filter={timelineFilter} onFilterChange={setTimelineFilter} onMarkReplied={handleMarkReplied} />
               </div>
             </TabsContent>
 
