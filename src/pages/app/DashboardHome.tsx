@@ -15,6 +15,7 @@ import AIInsightsWidget from "@/components/dashboard/AIInsightsWidget";
 import BusinessPerformancePanel from "@/components/dashboard/BusinessPerformancePanel";
 import YesterdaySnapshot from "@/components/dashboard/YesterdaySnapshot";
 import MissedOpportunities from "@/components/dashboard/MissedOpportunities";
+import FirstLeadAssistant from "@/components/dashboard/FirstLeadAssistant";
 
 const priorityColors: Record<string, string> = {
   high: "text-destructive",
