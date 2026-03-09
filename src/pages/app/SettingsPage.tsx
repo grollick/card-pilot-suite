@@ -37,6 +37,8 @@ export default function SettingsPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
+  const [city, setCity] = useState("");
+  const [bio, setBio] = useState("");
 
   // Seed form when profile loads
   useEffect(() => {
