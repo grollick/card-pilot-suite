@@ -192,6 +192,9 @@ export default function PipelinePage() {
                                 <DropdownMenuItem onClick={() => navigate(`/app/bookings?new=1`)}>
                                   <Calendar className="h-3.5 w-3.5 mr-2" /> Book
                                 </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => navigate(`/app/estimates?lead=${contact.id}`)}>
+                                  <FileText className="h-3.5 w-3.5 mr-2" /> Estimate
+                                </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
