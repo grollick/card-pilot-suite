@@ -175,6 +175,9 @@ export default function ContactDetail() {
           <Tabs value={rightTab} onValueChange={setRightTab}>
             <TabsList className="w-full justify-start bg-transparent border-b border-border rounded-none h-auto p-0">
               <TabsTrigger value="timeline" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-none px-4 pb-2">Timeline</TabsTrigger>
+              <TabsTrigger value="followups" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-none px-4 pb-2">
+                Followups {followupHistory.length > 0 && <Badge variant="secondary" className="ml-1.5 text-[10px] h-4">{followupHistory.length}</Badge>}
+              </TabsTrigger>
               <TabsTrigger value="bookings" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-none px-4 pb-2">
                 Bookings {bookings.length > 0 && <Badge variant="secondary" className="ml-1.5 text-[10px] h-4">{bookings.length}</Badge>}
               </TabsTrigger>
@@ -184,6 +187,56 @@ export default function ContactDetail() {
             <TabsContent value="timeline" className="mt-4">
               <div className="rounded-xl border border-border bg-card p-5">
                 <ContactTimeline activities={activities} filter={timelineFilter} onFilterChange={setTimelineFilter} onMarkReplied={handleMarkReplied} />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="followups" className="mt-4">
+              <div className="rounded-xl border border-border bg-card p-5">
+                {followupHistory.length === 0 ? (
+                  <p className="text-sm text-muted-foreground text-center py-6">No follow-ups scheduled yet.</p>
+                ) : (
+                  <div className="space-y-3">
+                    {followupHistory.map((f: any) => {
+                      const statusConfig: Record<string, { icon: typeof Clock; color: string; label: string }> = {
+                        pending: { icon: Clock, color: "text-warning", label: "Pending" },
+                        sent: { icon: Send, color: "text-primary", label: "Sent" },
+                        cancelled: { icon: X, color: "text-destructive", label: "Cancelled" },
+                        replied: { icon: CheckCircle2, color: "text-[hsl(var(--success))]", label: "Replied" },
+                      };
+                      const config = statusConfig[f.status] ?? statusConfig.pending;
+                      const StatusIcon = config.icon;
+
+                      return (
+                        <div key={f.id} className="flex items-start gap-3 p-3 rounded-lg border border-border/50 hover:bg-muted/20 transition-colors">
+                          <StatusIcon className={`h-4 w-4 mt-0.5 shrink-0 ${config.color}`} />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {f.followup_variants?.subject || `Step ${f.step_number ?? 1}`}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {f.status === "sent" && f.sent_at
+                                ? `Sent ${format(new Date(f.sent_at), "MMM d, h:mm a")}`
+                                : f.status === "cancelled"
+                                ? `Cancelled · was scheduled for ${format(new Date(f.send_at), "MMM d, h:mm a")}`
+                                : `Scheduled for ${format(new Date(f.send_at), "MMM d, h:mm a")}`}
+                            </p>
+                            {f.followup_variants?.variant_key && (
+                              <Badge variant="outline" className="text-[9px] h-3.5 mt-1">
+                                Variant {f.followup_variants.variant_key}
+                              </Badge>
+                            )}
+                          </div>
+                          <Badge
+                            variant={f.status === "sent" ? "default" : f.status === "cancelled" ? "destructive" : "outline"}
+                            className="text-xs shrink-0"
+                          >
+                            {config.label}
+                          </Badge>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </TabsContent>
 
