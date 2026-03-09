@@ -164,6 +164,7 @@ export default function ContactDetail() {
 
           <NextActivityPanel nextTask={nextTask} onCreateTask={() => setTaskDialogOpen(true)} onSnooze={handleSnooze} />
           <ContactTasksList contactId={contact.id} tasks={tasks} onCreateTask={() => setTaskDialogOpen(true)} />
+          <PendingFollowups followups={followups} contactName={contact.name} />
         </motion.div>
 
         {/* RIGHT COLUMN */}
