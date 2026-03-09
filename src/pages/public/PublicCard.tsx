@@ -558,6 +558,8 @@ export default function PublicCard() {
             Draft Preview — only you can see this
           </div>
         )}
+        {/* Promotion Banner */}
+        <PromoBanner userId={profile.id} palette={palette} fonts={fonts} />
         {/* ── Header ── */}
         {enabledSections.has("hero") && (
           <div style={{ position: "relative", zIndex: 2 }}>
