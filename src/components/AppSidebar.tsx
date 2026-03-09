@@ -135,6 +135,7 @@ export function AppSidebar() {
         {renderGroup("CRM", crmItems)}
         {renderGroup("Marketing", marketingItems)}
         {renderGroup("Insights", insightItems)}
+        {renderGroup("Growth", growthItems)}
       </SidebarContent>
 
       <SidebarFooter className="px-2 pb-4">
