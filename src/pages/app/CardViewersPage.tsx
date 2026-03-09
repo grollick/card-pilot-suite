@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import UpgradePrompt from "@/components/UpgradePrompt";
 import { formatDistanceToNow, format } from "date-fns";
 import {
   Eye, Smartphone, Monitor, Tablet, MapPin, Globe,
