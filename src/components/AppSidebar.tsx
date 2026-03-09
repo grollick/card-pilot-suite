@@ -2,7 +2,8 @@ import {
   LayoutDashboard, Users, Kanban, Calendar, Mail, Share2,
   BarChart3, Settings, Shield, ChevronLeft, LogOut,
   Zap, CreditCard, Building2, QrCode, Eye,
-  DollarSign, Tag, Gift, Globe, FolderOpen, Star, Megaphone
+  DollarSign, Tag, Gift, Globe, FolderOpen, Star, Megaphone,
+  CheckSquare, Search as SearchIcon
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,31 +18,44 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
+// ── 7 core modules ──
+
+const cardItems = [
+  { title: "Card Editor", url: "/app/card", icon: CreditCard },
+];
+
 const crmItems = [
   { title: "Contacts", url: "/app/contacts", icon: Users },
   { title: "Pipeline", url: "/app/pipeline", icon: Kanban },
-  { title: "Bookings", url: "/app/bookings", icon: Calendar },
-  { title: "Card Editor", url: "/app/card", icon: CreditCard },
-  { title: "Projects", url: "/app/projects", icon: FolderOpen },
-  { title: "Reviews", url: "/app/reviews", icon: Star },
+  { title: "Tasks", url: "/app/tasks", icon: CheckSquare },
 ];
+
+const bookingItems = [
+  { title: "Bookings", url: "/app/bookings", icon: Calendar },
+];
+
+const analyticsItems = [
+  { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
+  { title: "Who Viewed", url: "/app/viewers", icon: Eye },
+  { title: "Revenue", url: "/app/revenue", icon: DollarSign },
+  { title: "QR Campaigns", url: "/app/qr-campaigns", icon: QrCode },
+];
+
 const marketingItems = [
   { title: "Email", url: "/app/email", icon: Mail },
   { title: "Social", url: "/app/social", icon: Share2 },
   { title: "Content", url: "/app/content", icon: Megaphone },
+  { title: "Promotions", url: "/app/promotions", icon: Tag },
+  { title: "Referrals", url: "/app/referrals", icon: Gift },
 ];
 
-const insightItems = [
-  { title: "Who Viewed", url: "/app/viewers", icon: Eye },
-  { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
-  { title: "Revenue", url: "/app/revenue", icon: DollarSign },
-  { title: "QR Campaigns", url: "/app/qr-campaigns", icon: QrCode },
+const automationItems = [
   { title: "Automation", url: "/app/automation", icon: Zap },
 ];
 
-const growthItems = [
-  { title: "Promotions", url: "/app/promotions", icon: Tag },
-  { title: "Referrals", url: "/app/referrals", icon: Gift },
+const marketplaceItems = [
+  { title: "Projects", url: "/app/projects", icon: FolderOpen },
+  { title: "Reviews", url: "/app/reviews", icon: Star },
 ];
 
 const bottomItems = [
