@@ -167,9 +167,7 @@ export function useDeviceBreakdown(days = 30) {
       const counts: Record<string, number> = {};
       (data ?? []).forEach(e => {
         const meta = e.meta_json as any;
-        const ua = (meta?.user_agent || meta?.device || "").toLowerCase();
-        let device = "Desktop";
-        if (/mobile|android|iphone|ipad/i.test(ua)) device = /ipad|tablet/i.test(ua) ? "Tablet" : "Mobile";
+        const device = parseDevice(meta?.user_agent || meta?.device || "");
         counts[device] = (counts[device] || 0) + 1;
       });
 
