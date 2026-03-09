@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { formatDistanceToNow, format } from "date-fns";
 import {
   Eye, Smartphone, Monitor, Tablet, MapPin, Globe,
-  Clock, ArrowUpRight, Loader2, ChevronDown
+  Clock, ArrowUpRight, Loader2, ChevronDown, RotateCw, UserCheck
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,9 +32,9 @@ export default function CardViewersPage() {
 
   const kpis = [
     { label: "Total Views", value: stats.totalViews, icon: Eye, color: "text-primary bg-primary/10" },
-    { label: "Unique Locations", value: stats.uniqueLocations, icon: MapPin, color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10" },
-    { label: "Top Device", value: stats.topDevices[0]?.[0] || "—", icon: Smartphone, color: "text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10" },
-    { label: "Top Source", value: stats.topSources[0]?.[0] || "Direct", icon: Globe, color: "text-accent-foreground bg-accent" },
+    { label: "Returning Visitors", value: stats.returningCount, icon: RotateCw, color: "text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10" },
+    { label: "Unique Visitors", value: stats.uniqueVisitors, icon: UserCheck, color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10" },
+    { label: "Unique Locations", value: stats.uniqueLocations, icon: MapPin, color: "text-accent-foreground bg-accent" },
   ];
 
   return (
@@ -124,10 +124,10 @@ export default function CardViewersPage() {
 
                 return (
                   <div key={viewer.id}
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors"
+                    className={`flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors ${viewer.isReturning ? "ring-1 ring-inset ring-[hsl(var(--warning))]/30 bg-[hsl(var(--warning))]/5" : ""}`}
                   >
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <DeviceIcon className="h-4.5 w-4.5 text-primary" />
+                    <div className={`h-10 w-10 rounded-full flex items-center justify-center shrink-0 ${viewer.isReturning ? "bg-[hsl(var(--warning))]/15" : "bg-primary/10"}`}>
+                      <DeviceIcon className={`h-4.5 w-4.5 ${viewer.isReturning ? "text-[hsl(var(--warning))]" : "text-primary"}`} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -137,6 +137,12 @@ export default function CardViewersPage() {
                         <Badge variant="outline" className="text-[10px] px-1.5 py-0">
                           {viewer.browser}
                         </Badge>
+                        {viewer.isReturning && (
+                          <Badge className="text-[10px] px-1.5 py-0 bg-[hsl(var(--warning))]/15 text-[hsl(var(--warning))] border-[hsl(var(--warning))]/30 hover:bg-[hsl(var(--warning))]/20">
+                            <RotateCw className="h-2.5 w-2.5 mr-0.5" />
+                            Returning · {viewer.visitCount}x
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex items-center gap-3 mt-0.5">
                         <span className="text-xs text-muted-foreground flex items-center gap-1">

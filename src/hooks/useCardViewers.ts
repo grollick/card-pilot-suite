@@ -14,6 +14,9 @@ export interface CardViewer {
   country: string;
   referrer: string | null;
   utm_source: string | null;
+  ip_hash: string | null;
+  isReturning: boolean;
+  visitCount: number;
 }
 
 export function useCardViewers(days = 30) {
@@ -30,12 +33,20 @@ export function useCardViewers(days = 30) {
         .eq("event_type", "card_view")
         .gte("created_at", since)
         .order("created_at", { ascending: false })
-        .limit(100);
+        .limit(200);
 
       if (error) throw error;
 
+      // Count occurrences per ip_hash to detect returning visitors
+      const hashCounts: Record<string, number> = {};
+      (data ?? []).forEach(e => {
+        const h = (e.meta_json as Record<string, any>)?.ip_hash;
+        if (h) hashCounts[h] = (hashCounts[h] || 0) + 1;
+      });
+
       return (data ?? []).map((e): CardViewer => {
         const m = (e.meta_json as Record<string, any>) ?? {};
+        const ipHash = m.ip_hash || null;
         return {
           id: e.id,
           created_at: e.created_at,
@@ -47,6 +58,9 @@ export function useCardViewers(days = 30) {
           country: m.country || "Unknown",
           referrer: m.referrer || null,
           utm_source: m.utm_source || null,
+          ip_hash: ipHash,
+          isReturning: ipHash ? (hashCounts[ipHash] ?? 0) > 1 : false,
+          visitCount: ipHash ? (hashCounts[ipHash] ?? 1) : 1,
         };
       });
     },
@@ -65,6 +79,8 @@ export function useViewerStats(days = 30) {
 
   const totalViews = viewers.length;
   const uniqueLocations = new Set(viewers.map(v => `${v.city}-${v.country}`).filter(l => !l.includes("Unknown"))).size;
+  const returningCount = new Set(viewers.filter(v => v.isReturning && v.ip_hash).map(v => v.ip_hash)).size;
+  const uniqueVisitors = new Set(viewers.filter(v => v.ip_hash).map(v => v.ip_hash)).size || viewers.length;
 
   const deviceCounts: Record<string, number> = {};
   const locationCounts: Record<string, number> = {};
@@ -82,7 +98,7 @@ export function useViewerStats(days = 30) {
   const topLocations = Object.entries(locationCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
   const topSources = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-  return { totalViews, uniqueLocations, topDevices, topLocations, topSources };
+  return { totalViews, uniqueLocations, uniqueVisitors, returningCount, topDevices, topLocations, topSources };
 }
 
 function getDomain(url: string): string {
