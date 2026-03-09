@@ -148,6 +148,7 @@ export default function PublicCard() {
   const [formSent, setFormSent] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(() => new URLSearchParams(window.location.search).get("review") === "1");
   const viewTracked = useRef(false);
 
   const profile = data?.profile;
