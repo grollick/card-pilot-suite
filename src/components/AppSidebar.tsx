@@ -152,6 +152,29 @@ export function AppSidebar() {
         {renderGroup("Marketing", marketingItems)}
         {renderGroup("Insights", insightItems)}
         {renderGroup("Growth", growthItems)}
+
+        {/* View My Website */}
+        {profile?.handle && (
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton asChild>
+                    <a
+                      href={`/site/${profile.handle}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-primary/10 text-primary font-medium"
+                    >
+                      <Globe className="h-4 w-4 shrink-0" />
+                      {!collapsed && <span>View My Website</span>}
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="px-2 pb-4">
