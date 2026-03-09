@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CheckCircle2, Circle, Rocket, ArrowRight } from "lucide-react";
@@ -55,44 +54,48 @@ export default function FirstLeadAssistant() {
   const allDone = completedCount === checklist.length && checklist.length > 0;
   const progress = checklist.length > 0 ? (completedCount / checklist.length) * 100 : 0;
 
-  // Hide once all done
   if (allDone) return null;
 
   const nextItem = checklist.find(c => !c.done);
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 14 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 via-card to-primary/5 p-5"
+      transition={{ duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
+      className="rounded-xl border border-primary/20 gradient-subtle p-5"
     >
-      <div className="flex items-center gap-2 mb-3">
-        <Rocket className="h-4 w-4 text-primary" />
-        <h2 className="font-semibold text-sm">Get Your First Lead</h2>
-        <span className="text-[10px] text-muted-foreground ml-auto">{completedCount}/{checklist.length}</span>
+      <div className="flex items-center gap-2.5 mb-3">
+        <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Rocket className="h-3.5 w-3.5 text-primary" />
+        </div>
+        <div className="flex-1">
+          <h2 className="font-semibold text-sm">Get Your First Lead</h2>
+        </div>
+        <span className="text-2xs text-muted-foreground font-medium tabular-nums">{completedCount}/{checklist.length}</span>
       </div>
 
       <Progress value={progress} className="h-1.5 mb-4" />
 
-      <div className="space-y-2">
+      <div className="space-y-1">
         {checklist.map((item) => (
           <button
             key={item.key}
             onClick={() => !item.done && navigate(item.route)}
-            className={`flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg transition-colors text-sm ${
+            className={`flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg transition-all text-sm ${
               item.done
-                ? "text-muted-foreground line-through opacity-60"
-                : "hover:bg-muted/50 cursor-pointer"
+                ? "text-muted-foreground line-through opacity-50"
+                : "hover:bg-primary/5 cursor-pointer"
             }`}
             disabled={item.done}
           >
             {item.done ? (
-              <CheckCircle2 className="h-4 w-4 text-[hsl(var(--success))] shrink-0" />
+              <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
             ) : (
-              <Circle className="h-4 w-4 text-muted-foreground/40 shrink-0" />
+              <Circle className="h-4 w-4 text-muted-foreground/30 shrink-0" />
             )}
             <span className="flex-1">{item.label}</span>
-            {!item.done && <ArrowRight className="h-3 w-3 text-muted-foreground" />}
+            {!item.done && <ArrowRight className="h-3 w-3 text-muted-foreground/50" />}
           </button>
         ))}
       </div>
