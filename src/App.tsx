@@ -11,12 +11,11 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { Loader2 } from "lucide-react";
 
 // Public routes — loaded eagerly for fast <500ms render
-import PublicCard from "./pages/public/PublicCard";
 import PublicBooking from "./pages/public/PublicBooking";
 import QRLanding from "./pages/public/QRLanding";
 import ProductsPage from "./pages/public/ProductsPage";
 import DiscoverPage from "./pages/public/DiscoverPage";
-import SeoLandingPage from "./pages/public/SeoLandingPage";
+import HandleOrSeoRoute from "./pages/public/HandleOrSeoRoute";
 
 // Auth & marketing — loaded eagerly (small)
 import Index from "./pages/Index";
