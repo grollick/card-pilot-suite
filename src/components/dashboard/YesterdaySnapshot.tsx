@@ -15,33 +15,37 @@ export default function YesterdaySnapshot() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 14 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.05 }}
-      className="rounded-xl border border-border bg-card p-5"
+      transition={{ delay: 0.05, duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
+      className="dash-card"
     >
-      <div className="flex items-center justify-between mb-3">
+      <div className="dash-card-header">
         <h2 className="font-semibold text-sm">Yesterday's Results</h2>
         {!isLoading && (data?.followupsNeeded ?? 0) > 0 && (
-          <div className="flex items-center gap-1.5 text-xs font-medium text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10 px-2.5 py-1 rounded-full">
+          <div className="stat-pill text-warning bg-warning/10">
             <Bell className="h-3 w-3" />
             {data!.followupsNeeded} follow-ups needed
           </div>
         )}
       </div>
 
-      <div className="grid grid-cols-4 gap-2">
-        {items.map(item => (
-          <div key={item.label} className="text-center py-2">
-            <item.icon className="h-4 w-4 mx-auto text-muted-foreground mb-1" />
-            {isLoading ? (
-              <Skeleton className="h-6 w-10 mx-auto" />
-            ) : (
-              <p className="text-lg font-bold tracking-tight">{item.value}</p>
-            )}
-            <p className="text-[10px] text-muted-foreground mt-0.5">{item.label}</p>
-          </div>
-        ))}
+      <div className="dash-card-body">
+        <div className="grid grid-cols-4 gap-3">
+          {items.map(item => (
+            <div key={item.label} className="text-center py-2 rounded-lg hover:bg-muted/30 transition-colors">
+              <div className="h-8 w-8 rounded-lg bg-muted/60 flex items-center justify-center mx-auto mb-2">
+                <item.icon className="h-4 w-4 text-muted-foreground" />
+              </div>
+              {isLoading ? (
+                <Skeleton className="h-6 w-10 mx-auto" />
+              ) : (
+                <p className="text-lg font-bold tracking-tight tabular-nums">{item.value}</p>
+              )}
+              <p className="text-2xs text-muted-foreground mt-0.5 font-medium">{item.label}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </motion.div>
   );
