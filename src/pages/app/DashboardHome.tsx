@@ -16,6 +16,7 @@ import BusinessPerformancePanel from "@/components/dashboard/BusinessPerformance
 import YesterdaySnapshot from "@/components/dashboard/YesterdaySnapshot";
 import MissedOpportunities from "@/components/dashboard/MissedOpportunities";
 import FirstLeadAssistant from "@/components/dashboard/FirstLeadAssistant";
+import JobMetrics from "@/components/dashboard/JobMetrics";
 
 const priorityColors: Record<string, string> = {
   high: "text-destructive",
@@ -249,6 +250,9 @@ export default function DashboardHome() {
           <FirstLeadAssistant />
         </div>
       </div>
+
+      {/* Job Metrics */}
+      <JobMetrics />
 
       {/* AI Insights */}
       <AIInsightsWidget />

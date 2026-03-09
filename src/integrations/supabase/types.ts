@@ -969,6 +969,214 @@ export type Database = {
           },
         ]
       }
+      job_materials: {
+        Row: {
+          created_at: string
+          id: string
+          job_id: string
+          name: string
+          notes: string | null
+          quantity: number
+          unit_cost: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_id: string
+          name: string
+          notes?: string | null
+          quantity?: number
+          unit_cost?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_id?: string
+          name?: string
+          notes?: string | null
+          quantity?: number
+          unit_cost?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_materials_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_photos: {
+        Row: {
+          caption: string | null
+          category: string
+          created_at: string
+          id: string
+          job_id: string
+          photo_url: string
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          job_id: string
+          photo_url: string
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          category?: string
+          created_at?: string
+          id?: string
+          job_id?: string
+          photo_url?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_photos_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_tasks: {
+        Row: {
+          assigned_to_user_id: string | null
+          created_at: string
+          due_date: string | null
+          id: string
+          job_id: string
+          notes: string | null
+          sort_order: number
+          status: string
+          title: string
+        }
+        Insert: {
+          assigned_to_user_id?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          job_id: string
+          notes?: string | null
+          sort_order?: number
+          status?: string
+          title: string
+        }
+        Update: {
+          assigned_to_user_id?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          job_id?: string
+          notes?: string | null
+          sort_order?: number
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_tasks_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      jobs: {
+        Row: {
+          actual_end: string | null
+          actual_start: string | null
+          booking_id: string | null
+          created_at: string
+          estimate_id: string | null
+          id: string
+          internal_notes: string | null
+          job_address: string | null
+          job_number: string
+          job_type: string | null
+          lead_id: string | null
+          notes: string | null
+          org_id: string | null
+          scheduled_end: string | null
+          scheduled_start: string | null
+          status: Database["public"]["Enums"]["job_status"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          actual_end?: string | null
+          actual_start?: string | null
+          booking_id?: string | null
+          created_at?: string
+          estimate_id?: string | null
+          id?: string
+          internal_notes?: string | null
+          job_address?: string | null
+          job_number: string
+          job_type?: string | null
+          lead_id?: string | null
+          notes?: string | null
+          org_id?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          status?: Database["public"]["Enums"]["job_status"]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          actual_end?: string | null
+          actual_start?: string | null
+          booking_id?: string | null
+          created_at?: string
+          estimate_id?: string | null
+          id?: string
+          internal_notes?: string | null
+          job_address?: string | null
+          job_number?: string
+          job_type?: string | null
+          lead_id?: string | null
+          notes?: string | null
+          org_id?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string | null
+          status?: Database["public"]["Enums"]["job_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_estimate_id_fkey"
+            columns: ["estimate_id"]
+            isOneToOne: false
+            referencedRelation: "estimates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           address: string | null
@@ -2044,6 +2252,13 @@ export type Database = {
         | "approved"
         | "declined"
         | "expired"
+      job_status:
+        | "draft"
+        | "scheduled"
+        | "in_progress"
+        | "paused"
+        | "completed"
+        | "cancelled"
       lead_source:
         | "card_form"
         | "booking"
@@ -2206,6 +2421,14 @@ export const Constants = {
         "approved",
         "declined",
         "expired",
+      ],
+      job_status: [
+        "draft",
+        "scheduled",
+        "in_progress",
+        "paused",
+        "completed",
+        "cancelled",
       ],
       lead_source: [
         "card_form",

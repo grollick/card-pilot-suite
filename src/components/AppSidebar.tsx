@@ -3,7 +3,7 @@ import {
   BarChart3, Settings, Shield, ChevronLeft, LogOut,
   Zap, CreditCard, Building2, QrCode, Eye,
   DollarSign, Tag, Gift, Globe, FolderOpen, Star, Megaphone,
-  CheckSquare, Search as SearchIcon, FileText
+  CheckSquare, Search as SearchIcon, FileText, Briefcase
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
@@ -33,6 +33,7 @@ const crmItems = [
 const bookingItems = [
   { title: "Bookings", url: "/app/bookings", icon: Calendar },
   { title: "Estimates", url: "/app/estimates", icon: FileText },
+  { title: "Jobs", url: "/app/jobs", icon: Briefcase },
 ];
 
 const analyticsItems = [
