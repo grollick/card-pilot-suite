@@ -42,6 +42,7 @@ const SettingsPage = lazy(() => import("./pages/app/SettingsPage"));
 const AdminPage = lazy(() => import("./pages/app/AdminPage"));
 const TeamPage = lazy(() => import("./pages/app/TeamPage"));
 const LeadsCRM = lazy(() => import("./pages/app/LeadsCRM"));
+const CardViewersPage = lazy(() => import("./pages/app/CardViewersPage"));
 
 const LazyFallback = () => (
   <div className="min-h-screen flex items-center justify-center">
@@ -94,6 +95,7 @@ const App = () => (
               <Route path="qr-campaigns" element={<Suspense fallback={<LazyFallback />}><QRCampaignsPage /></Suspense>} />
               <Route path="settings" element={<Suspense fallback={<LazyFallback />}><SettingsPage /></Suspense>} />
               <Route path="team" element={<Suspense fallback={<LazyFallback />}><TeamPage /></Suspense>} />
+              <Route path="viewers" element={<Suspense fallback={<LazyFallback />}><CardViewersPage /></Suspense>} />
               <Route path="admin" element={<Suspense fallback={<LazyFallback />}><AdminPage /></Suspense>} />
             </Route>
 
