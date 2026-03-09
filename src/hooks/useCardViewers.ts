@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { subDays } from "date-fns";
+import { parseDevice, getDomain } from "@/lib/analytics";
 
 export interface CardViewer {
   id: string;
@@ -67,12 +68,7 @@ export function useCardViewers(days = 30) {
   });
 }
 
-function parseDevice(ua?: string): string {
-  if (!ua) return "Unknown";
-  if (/mobile|android|iphone/i.test(ua)) return "Mobile";
-  if (/ipad|tablet/i.test(ua)) return "Tablet";
-  return "Desktop";
-}
+// parseDevice is now imported from @/lib/analytics
 
 export function useViewerStats(days = 30) {
   const { data: viewers = [] } = useCardViewers(days);
@@ -101,6 +97,4 @@ export function useViewerStats(days = 30) {
   return { totalViews, uniqueLocations, uniqueVisitors, returningCount, topDevices, topLocations, topSources };
 }
 
-function getDomain(url: string): string {
-  try { return new URL(url).hostname.replace("www.", ""); } catch { return url.slice(0, 30); }
-}
+// getDomain is now imported from @/lib/analytics

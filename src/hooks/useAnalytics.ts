@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { subDays, startOfDay, format, eachDayOfInterval } from "date-fns";
+import { subDays, format, eachDayOfInterval } from "date-fns";
+import { parseDevice } from "@/lib/analytics";
 
 // ── Core stats for a given period ──
 export function useAnalyticsStats(days = 7) {
@@ -166,9 +167,7 @@ export function useDeviceBreakdown(days = 30) {
       const counts: Record<string, number> = {};
       (data ?? []).forEach(e => {
         const meta = e.meta_json as any;
-        const ua = (meta?.user_agent || meta?.device || "").toLowerCase();
-        let device = "Desktop";
-        if (/mobile|android|iphone|ipad/i.test(ua)) device = /ipad|tablet/i.test(ua) ? "Tablet" : "Mobile";
+        const device = parseDevice(meta?.user_agent || meta?.device || "");
         counts[device] = (counts[device] || 0) + 1;
       });
 

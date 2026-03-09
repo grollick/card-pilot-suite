@@ -44,7 +44,7 @@ const QRCampaignsPage = lazy(() => import("./pages/app/QRCampaignsPage"));
 const SettingsPage = lazy(() => import("./pages/app/SettingsPage"));
 const AdminPage = lazy(() => import("./pages/app/AdminPage"));
 const TeamPage = lazy(() => import("./pages/app/TeamPage"));
-const LeadsCRM = lazy(() => import("./pages/app/LeadsCRM"));
+
 const CardViewersPage = lazy(() => import("./pages/app/CardViewersPage"));
 const RevenueForecast = lazy(() => import("./pages/app/RevenueForecast"));
 const PromotionsPage = lazy(() => import("./pages/app/PromotionsPage"));

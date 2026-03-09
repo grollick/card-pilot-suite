@@ -4,7 +4,7 @@ import {
   Calendar, Clock, Plus, Settings, Loader2, CheckCircle2,
   XCircle, AlertCircle, MoreHorizontal, User
 } from "lucide-react";
-import { useSendEmail } from "@/hooks/useSendEmail";
+import { useSendEmail } from "@/hooks/useEmail";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
