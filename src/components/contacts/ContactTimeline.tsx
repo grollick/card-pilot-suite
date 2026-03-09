@@ -14,6 +14,7 @@ const activityIcons: Record<string, typeof Eye> = {
   booking_cancelled: Calendar,
   email_sent: Mail,
   email_opened: Mail,
+  email_replied: Reply,
   note_added: MessageSquare,
   call: Phone,
   text: MessageSquare,
