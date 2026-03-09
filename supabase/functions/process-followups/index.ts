@@ -60,16 +60,43 @@ serve(async (req) => {
         // Get step-specific template if step_id exists, else fall back to profile defaults
         let subject = profile.followup_subject || "Thanks for connecting!";
         let body = profile.followup_body || "Thanks for reaching out!";
+        let selectedVariantId = null;
 
         if (followup.step_id) {
-          const { data: step } = await supabase
-            .from("followup_steps")
-            .select("subject, body")
-            .eq("id", followup.step_id)
-            .single();
-          if (step) {
-            subject = step.subject;
-            body = step.body;
+          // First try to get variants for A/B testing
+          const { data: variants } = await supabase
+            .from("followup_variants")
+            .select("id, subject, body, weight")
+            .eq("step_id", followup.step_id)
+            .order("variant_key");
+
+          if (variants && variants.length > 0) {
+            // Weighted random selection
+            const totalWeight = variants.reduce((sum, v) => sum + v.weight, 0);
+            if (totalWeight > 0) {
+              let random = Math.random() * totalWeight;
+              
+              for (const variant of variants) {
+                random -= variant.weight;
+                if (random <= 0) {
+                  subject = variant.subject;
+                  body = variant.body;
+                  selectedVariantId = variant.id;
+                  break;
+                }
+              }
+            }
+          } else {
+            // Fall back to default step template if no variants
+            const { data: step } = await supabase
+              .from("followup_steps")
+              .select("subject, body")
+              .eq("id", followup.step_id)
+              .single();
+            if (step) {
+              subject = step.subject;
+              body = step.body;
+            }
           }
         }
 
