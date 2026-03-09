@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import type { CalcMode } from "@/lib/estimateCalculators";
 
 // ── Types ──
 
@@ -10,6 +11,7 @@ export type EstimateStatus = "draft" | "sent" | "viewed" | "approved" | "decline
 export interface EstimateLineItem {
   id?: string;
   estimate_id?: string;
+  section_id?: string | null;
   title: string;
   description?: string;
   quantity: number;
@@ -22,6 +24,21 @@ export interface EstimateLineItem {
   tax_percent: number;
   line_total: number;
   sort_order: number;
+  calc_mode: CalcMode;
+  calc_length: number;
+  calc_width: number;
+  calc_depth: number;
+  is_optional: boolean;
+}
+
+export interface EstimateSection {
+  _tempId?: string;
+  id?: string;
+  estimate_id?: string;
+  name: string;
+  notes?: string;
+  sort_order: number;
+  items: EstimateLineItem[];
 }
 
 export interface EstimateFormData {
@@ -36,7 +53,13 @@ export interface EstimateFormData {
   scope_of_work?: string;
   notes?: string;
   template_key?: string;
-  line_items: EstimateLineItem[];
+  discount_amount?: number;
+  discount_percent?: number;
+  deposit_percent?: number;
+  deposit_amount?: number;
+  terms_conditions?: string;
+  internal_notes?: string;
+  sections: EstimateSection[];
 }
 
 export interface EstimateTotals {
@@ -44,8 +67,12 @@ export interface EstimateTotals {
   labor_total: number;
   material_total: number;
   markup_total: number;
+  discount_total: number;
   tax_total: number;
   grand_total: number;
+  deposit_due: number;
+  balance_due: number;
+  optional_total: number;
 }
 
 // ── Calculation helpers ──
@@ -57,35 +84,73 @@ export function calculateLineTotals(item: Omit<EstimateLineItem, "line_total"> &
   const markup = baseCost * ((item.markup_percent || 0) / 100);
   const subtotalBeforeTax = baseCost + markup;
   const tax = subtotalBeforeTax * ((item.tax_percent || 0) / 100);
-  return { ...item, line_total: Math.round((subtotalBeforeTax + tax) * 100) / 100 };
+  return { ...item, line_total: Math.round((subtotalBeforeTax + tax) * 100) / 100 } as EstimateLineItem;
 }
 
-export function calculateEstimateTotals(items: EstimateLineItem[]): EstimateTotals {
-  let subtotal = 0, labor_total = 0, material_total = 0, markup_total = 0, tax_total = 0;
-  for (const item of items) {
-    const qty = item.quantity || 1;
-    const base = qty * (item.unit_price || 0);
-    const labor = (item.labor_hours || 0) * (item.labor_rate || 0);
-    const mat = item.material_cost || 0;
-    const lineBase = base + labor + mat;
-    const markup = lineBase * ((item.markup_percent || 0) / 100);
-    const preTax = lineBase + markup;
-    const tax = preTax * ((item.tax_percent || 0) / 100);
-    subtotal += base;
-    labor_total += labor;
-    material_total += mat;
-    markup_total += markup;
-    tax_total += tax;
+export function calculateEstimateTotals(
+  sections: EstimateSection[],
+  opts?: { discount_amount?: number; discount_percent?: number; deposit_amount?: number; deposit_percent?: number },
+): EstimateTotals {
+  let subtotal = 0, labor_total = 0, material_total = 0, markup_total = 0, tax_total = 0, optional_total = 0;
+
+  for (const section of sections) {
+    for (const item of section.items) {
+      const qty = item.quantity || 1;
+      const base = qty * (item.unit_price || 0);
+      const labor = (item.labor_hours || 0) * (item.labor_rate || 0);
+      const mat = item.material_cost || 0;
+      const lineBase = base + labor + mat;
+      const markup = lineBase * ((item.markup_percent || 0) / 100);
+      const preTax = lineBase + markup;
+      const tax = preTax * ((item.tax_percent || 0) / 100);
+
+      if (item.is_optional) {
+        optional_total += preTax + tax;
+        continue; // optional items don't count in totals
+      }
+
+      subtotal += base;
+      labor_total += labor;
+      material_total += mat;
+      markup_total += markup;
+      tax_total += tax;
+    }
   }
-  const grand_total = subtotal + labor_total + material_total + markup_total + tax_total;
+
+  const preDiscount = subtotal + labor_total + material_total + markup_total + tax_total;
+  const discAmt = opts?.discount_amount || 0;
+  const discPct = opts?.discount_percent || 0;
+  const discount_total = discAmt + preDiscount * (discPct / 100);
+  const grand_total = Math.max(0, preDiscount - discount_total);
+  const depAmt = opts?.deposit_amount || 0;
+  const depPct = opts?.deposit_percent || 0;
+  const deposit_due = depAmt > 0 ? depAmt : grand_total * (depPct / 100);
+  const balance_due = grand_total - deposit_due;
+
   const round = (n: number) => Math.round(n * 100) / 100;
-  return { subtotal: round(subtotal), labor_total: round(labor_total), material_total: round(material_total), markup_total: round(markup_total), tax_total: round(tax_total), grand_total: round(grand_total) };
+  return {
+    subtotal: round(subtotal), labor_total: round(labor_total), material_total: round(material_total),
+    markup_total: round(markup_total), discount_total: round(discount_total), tax_total: round(tax_total),
+    grand_total: round(grand_total), deposit_due: round(deposit_due), balance_due: round(balance_due),
+    optional_total: round(optional_total),
+  };
+}
+
+/** Flat helper for backward compat (flat item list → single section) */
+export function calculateEstimateTotalsFlat(items: EstimateLineItem[], opts?: Parameters<typeof calculateEstimateTotals>[1]): EstimateTotals {
+  return calculateEstimateTotals([{ name: "General", sort_order: 0, items }], opts);
 }
 
 /** Strip client-side fields that shouldn't go to the DB */
-function cleanLineItemForDB(li: EstimateLineItem, estimateId: string, idx: number) {
+function cleanLineItemForDB(li: EstimateLineItem, estimateId: string, idx: number, sectionId?: string | null) {
   const { id: _id, estimate_id: _eid, ...rest } = li;
-  return { ...rest, estimate_id: estimateId, sort_order: idx, line_total: calculateLineTotals(rest).line_total };
+  return {
+    ...rest,
+    estimate_id: estimateId,
+    section_id: sectionId ?? null,
+    sort_order: idx,
+    line_total: calculateLineTotals(rest).line_total,
+  };
 }
 
 // ── Estimate number generator ──
@@ -129,7 +194,15 @@ export function useEstimate(id?: string) {
         .eq("id", id!)
         .single();
       if (error) throw error;
-      return data;
+
+      // Fetch sections separately
+      const { data: sections } = await supabase
+        .from("estimate_sections" as any)
+        .select("*")
+        .eq("estimate_id", id!)
+        .order("sort_order");
+
+      return { ...data, estimate_sections: sections ?? [] };
     },
   });
 }
@@ -139,19 +212,46 @@ export function useCreateEstimate() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (form: EstimateFormData) => {
-      const totals = calculateEstimateTotals(form.line_items);
-      const { line_items, ...rest } = form;
+      const totals = calculateEstimateTotals(form.sections, {
+        discount_amount: form.discount_amount, discount_percent: form.discount_percent,
+        deposit_amount: form.deposit_amount, deposit_percent: form.deposit_percent,
+      });
+      const { sections, ...rest } = form;
       const { data: estimate, error } = await supabase
         .from("estimates")
-        .insert({ ...rest, ...totals, user_id: user!.id })
+        .insert({
+          ...rest, ...totals, user_id: user!.id,
+          discount_amount: form.discount_amount ?? 0,
+          discount_percent: form.discount_percent ?? 0,
+          deposit_amount: form.deposit_amount ?? 0,
+          deposit_percent: form.deposit_percent ?? 0,
+          terms_conditions: form.terms_conditions ?? null,
+          internal_notes: form.internal_notes ?? null,
+        } as any)
         .select()
         .single();
       if (error) throw error;
 
-      if (line_items.length > 0) {
-        const cleaned = line_items.map((li, i) => cleanLineItemForDB(li, estimate.id, i));
-        const { error: liError } = await supabase.from("estimate_line_items").insert(cleaned);
-        if (liError) throw liError;
+      // Create sections and line items
+      for (let si = 0; si < sections.length; si++) {
+        const sec = sections[si];
+        let sectionId: string | null = null;
+
+        if (sections.length > 1 || sec.name !== "General") {
+          const { data: secData, error: secErr } = await supabase
+            .from("estimate_sections" as any)
+            .insert({ estimate_id: estimate.id, name: sec.name, notes: sec.notes ?? null, sort_order: si } as any)
+            .select()
+            .single();
+          if (secErr) throw secErr;
+          sectionId = (secData as any).id;
+        }
+
+        if (sec.items.length > 0) {
+          const cleaned = sec.items.map((li, i) => cleanLineItemForDB(li, estimate.id, i, sectionId));
+          const { error: liError } = await supabase.from("estimate_line_items").insert(cleaned as any);
+          if (liError) throw liError;
+        }
       }
 
       if (form.lead_id) {
@@ -177,17 +277,45 @@ export function useUpdateEstimate() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...form }: EstimateFormData & { id: string }) => {
-      const totals = calculateEstimateTotals(form.line_items);
-      const { line_items, ...rest } = form;
-      const { error } = await supabase.from("estimates").update({ ...rest, ...totals }).eq("id", id);
+      const totals = calculateEstimateTotals(form.sections, {
+        discount_amount: form.discount_amount, discount_percent: form.discount_percent,
+        deposit_amount: form.deposit_amount, deposit_percent: form.deposit_percent,
+      });
+      const { sections, ...rest } = form;
+      const { error } = await supabase.from("estimates").update({
+        ...rest, ...totals,
+        discount_amount: form.discount_amount ?? 0,
+        discount_percent: form.discount_percent ?? 0,
+        deposit_amount: form.deposit_amount ?? 0,
+        deposit_percent: form.deposit_percent ?? 0,
+        terms_conditions: form.terms_conditions ?? null,
+        internal_notes: form.internal_notes ?? null,
+      } as any).eq("id", id);
       if (error) throw error;
 
-      // Replace line items atomically
+      // Replace sections and line items atomically
       await supabase.from("estimate_line_items").delete().eq("estimate_id", id);
-      if (line_items.length > 0) {
-        const cleaned = line_items.map((li, i) => cleanLineItemForDB(li, id, i));
-        const { error: liError } = await supabase.from("estimate_line_items").insert(cleaned);
-        if (liError) throw liError;
+      await supabase.from("estimate_sections" as any).delete().eq("estimate_id", id);
+
+      for (let si = 0; si < sections.length; si++) {
+        const sec = sections[si];
+        let sectionId: string | null = null;
+
+        if (sections.length > 1 || sec.name !== "General") {
+          const { data: secData, error: secErr } = await supabase
+            .from("estimate_sections" as any)
+            .insert({ estimate_id: id, name: sec.name, notes: sec.notes ?? null, sort_order: si } as any)
+            .select()
+            .single();
+          if (secErr) throw secErr;
+          sectionId = (secData as any).id;
+        }
+
+        if (sec.items.length > 0) {
+          const cleaned = sec.items.map((li, i) => cleanLineItemForDB(li, id, i, sectionId));
+          const { error: liError } = await supabase.from("estimate_line_items").insert(cleaned as any);
+          if (liError) throw liError;
+        }
       }
       return { id };
     },
@@ -211,22 +339,22 @@ export function useUpdateEstimateStatus() {
       status: EstimateStatus;
       lead_id?: string | null;
       estimate_number?: string;
-      /** Optional: move the contact to a specific pipeline stage */
       updatePipelineStage?: { stageId: string } | null;
     }) => {
-      const { error } = await supabase.from("estimates").update({ status }).eq("id", id);
+      const extra: Record<string, any> = { status };
+      if (status === "approved") extra.approved_at = new Date().toISOString();
+      if (status === "declined") extra.declined_at = new Date().toISOString();
+
+      const { error } = await supabase.from("estimates").update(extra as any).eq("id", id);
       if (error) throw error;
 
       if (lead_id) {
-        // Log activity
         await supabase.from("contact_activities").insert({
           lead_id, user_id: user!.id,
           activity_type: `estimate_${status}`,
           title: `Estimate ${estimate_number ?? ""} ${status}`,
           related_id: id,
         });
-
-        // Move pipeline stage if requested
         if (updatePipelineStage?.stageId) {
           await supabase.from("leads").update({ stage_id: updatePipelineStage.stageId }).eq("id", lead_id);
         }
@@ -245,16 +373,93 @@ export function useUpdateEstimateStatus() {
   });
 }
 
+export function useConvertEstimateToJob() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ estimateId, leadId, estimateNumber, startDatetime, endDatetime, serviceId }: {
+      estimateId: string;
+      leadId?: string | null;
+      estimateNumber: string;
+      startDatetime: string;
+      endDatetime: string;
+      serviceId?: string | null;
+    }) => {
+      // Create booking
+      const { data: booking, error } = await supabase.from("bookings").insert({
+        user_id: user!.id,
+        lead_id: leadId ?? null,
+        service_id: serviceId ?? null,
+        customer_name: "From Estimate",
+        start_datetime: startDatetime,
+        end_datetime: endDatetime,
+        status: "confirmed",
+        internal_notes: `Created from estimate ${estimateNumber}`,
+      } as any).select().single();
+      if (error) throw error;
+
+      // Link booking to estimate
+      await supabase.from("estimates").update({ converted_booking_id: booking.id, status: "approved" } as any).eq("id", estimateId);
+
+      // Log activity
+      if (leadId) {
+        await supabase.from("contact_activities").insert({
+          lead_id: leadId, user_id: user!.id,
+          activity_type: "estimate_converted",
+          title: `Estimate ${estimateNumber} converted to job`,
+          related_id: estimateId,
+        });
+      }
+      return booking;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["estimates"] });
+      qc.invalidateQueries({ queryKey: ["bookings"] });
+      qc.invalidateQueries({ queryKey: ["contact-activities"] });
+      toast.success("Estimate converted to job");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+}
+
 export function useDuplicateEstimate() {
   const createEstimate = useCreateEstimate();
   return useMutation({
     mutationFn: async (est: any) => {
-      // Fetch line items from original
       const { data: items } = await supabase
         .from("estimate_line_items")
         .select("*")
         .eq("estimate_id", est.id)
         .order("sort_order");
+
+      const { data: sections } = await supabase
+        .from("estimate_sections" as any)
+        .select("*")
+        .eq("estimate_id", est.id)
+        .order("sort_order");
+
+      const sectionsList = (sections ?? []) as any[];
+      const itemsList = (items ?? []) as any[];
+
+      // Reconstruct sections with items
+      let formSections: EstimateSection[];
+      if (sectionsList.length > 0) {
+        formSections = sectionsList.map((s: any, si: number) => ({
+          name: s.name,
+          notes: s.notes,
+          sort_order: si,
+          items: itemsList
+            .filter((li: any) => li.section_id === s.id)
+            .map((li: any) => ({ ...li, id: undefined, estimate_id: undefined, section_id: undefined })),
+        }));
+        // Items without section
+        const unsectioned = itemsList.filter((li: any) => !li.section_id);
+        if (unsectioned.length > 0) {
+          formSections.push({ name: "General", sort_order: formSections.length, items: unsectioned.map((li: any) => ({ ...li, id: undefined, estimate_id: undefined, section_id: undefined })) });
+        }
+      } else {
+        formSections = [{ name: "General", sort_order: 0, items: itemsList.map((li: any) => ({ ...li, id: undefined, estimate_id: undefined, section_id: undefined })) }];
+      }
 
       return createEstimate.mutateAsync({
         lead_id: est.lead_id,
@@ -268,13 +473,13 @@ export function useDuplicateEstimate() {
         scope_of_work: est.scope_of_work,
         notes: est.notes,
         template_key: est.template_key,
-        line_items: (items ?? []).map((li: any) => ({
-          title: li.title, description: li.description,
-          quantity: li.quantity, unit: li.unit, unit_price: li.unit_price,
-          labor_hours: li.labor_hours, labor_rate: li.labor_rate,
-          material_cost: li.material_cost, markup_percent: li.markup_percent,
-          tax_percent: li.tax_percent, line_total: li.line_total, sort_order: li.sort_order,
-        })),
+        discount_amount: est.discount_amount,
+        discount_percent: est.discount_percent,
+        deposit_amount: est.deposit_amount,
+        deposit_percent: est.deposit_percent,
+        terms_conditions: est.terms_conditions,
+        internal_notes: est.internal_notes,
+        sections: formSections,
       });
     },
   });
