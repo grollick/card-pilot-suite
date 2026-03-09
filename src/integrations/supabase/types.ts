@@ -927,6 +927,7 @@ export type Database = {
           company: string | null
           created_at: string
           current_org_id: string | null
+          daily_report_enabled: boolean
           email: string | null
           followup_body: string | null
           followup_delay_minutes: number
@@ -940,6 +941,8 @@ export type Database = {
           plan: string
           primary_cta: string | null
           profession_id: string | null
+          referral_code: string | null
+          referred_by: string | null
           style_pack: string | null
           updated_at: string
         }
@@ -948,6 +951,7 @@ export type Database = {
           company?: string | null
           created_at?: string
           current_org_id?: string | null
+          daily_report_enabled?: boolean
           email?: string | null
           followup_body?: string | null
           followup_delay_minutes?: number
@@ -961,6 +965,8 @@ export type Database = {
           plan?: string
           primary_cta?: string | null
           profession_id?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
           style_pack?: string | null
           updated_at?: string
         }
@@ -969,6 +975,7 @@ export type Database = {
           company?: string | null
           created_at?: string
           current_org_id?: string | null
+          daily_report_enabled?: boolean
           email?: string | null
           followup_body?: string | null
           followup_delay_minutes?: number
@@ -982,6 +989,8 @@ export type Database = {
           plan?: string
           primary_cta?: string | null
           profession_id?: string | null
+          referral_code?: string | null
+          referred_by?: string | null
           style_pack?: string | null
           updated_at?: string
         }
@@ -1001,6 +1010,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      promotions: {
+        Row: {
+          active: boolean
+          badge_text: string | null
+          created_at: string
+          description: string | null
+          discount_text: string | null
+          expires_at: string | null
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          badge_text?: string | null
+          created_at?: string
+          description?: string | null
+          discount_text?: string | null
+          expires_at?: string | null
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          badge_text?: string | null
+          created_at?: string
+          description?: string | null
+          discount_text?: string | null
+          expires_at?: string | null
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       qr_campaigns: {
         Row: {
@@ -1161,6 +1209,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          referral_code: string
+          referred_email: string
+          referred_user_id: string | null
+          referrer_id: string
+          rewarded: boolean
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referral_code: string
+          referred_email: string
+          referred_user_id?: string | null
+          referrer_id: string
+          rewarded?: boolean
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referral_code?: string
+          referred_email?: string
+          referred_user_id?: string | null
+          referrer_id?: string
+          rewarded?: boolean
+          status?: string
+        }
+        Relationships: []
       }
       scheduled_followups: {
         Row: {
