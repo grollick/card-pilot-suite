@@ -37,6 +37,8 @@ export default function SettingsPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
+  const [city, setCity] = useState("");
+  const [bio, setBio] = useState("");
 
   // Seed form when profile loads
   useEffect(() => {
@@ -46,6 +48,8 @@ export default function SettingsPage() {
     setEmail(profile.email ?? "");
     setPhone(profile.phone ?? "");
     setCompany(profile.company ?? "");
+    setCity((profile as any).city ?? "");
+    setBio((profile as any).bio ?? "");
   }, [profile]);
 
   const handleSave = async () => {
@@ -69,6 +73,8 @@ export default function SettingsPage() {
           email: email.trim() || null,
           phone: phone.trim() || null,
           company: company.trim() || null,
+          city: city.trim() || null,
+          bio: bio.trim() || null,
         })
         .eq("id", profile.id);
       if (error) throw error;
@@ -137,9 +143,17 @@ export default function SettingsPage() {
                     <Label htmlFor="settings-phone">Phone</Label>
                     <Input id="settings-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(555) 123-4567" />
                   </div>
-                  <div className="space-y-2 sm:col-span-2">
+                  <div className="space-y-2">
                     <Label htmlFor="settings-company">Company</Label>
                     <Input id="settings-company" value={company} onChange={(e) => setCompany(e.target.value)} placeholder="Your company" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="settings-city">City</Label>
+                    <Input id="settings-city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Toronto, ON" />
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label htmlFor="settings-bio">Bio</Label>
+                    <Textarea id="settings-bio" value={bio} onChange={(e) => setBio(e.target.value)} placeholder="A short bio about you and your business…" rows={3} />
                   </div>
                 </div>
 
