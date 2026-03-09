@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/hooks/useCard";
 import { useQueryClient } from "@tanstack/react-query";
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -355,26 +356,55 @@ function FollowUpSettings({ profile, queryClient }: { profile: any; queryClient:
 // ── Follow-Up Analytics Component ──
 function FollowUpAnalytics({ userId }: { userId?: string }) {
   const [stats, setStats] = useState<{ sent: number; pending: number; failed: number; skipped: number } | null>(null);
+  const [dailyData, setDailyData] = useState<{ date: string; sent: number; failed: number }[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!userId) return;
     const fetchStats = async () => {
       setLoading(true);
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
       const { data, error } = await supabase
         .from("scheduled_followups")
-        .select("status")
+        .select("status, sent_at, created_at")
         .eq("user_id", userId);
 
       if (!error && data) {
         const counts = { sent: 0, pending: 0, failed: 0, skipped: 0 };
+        const dayMap: Record<string, { sent: number; failed: number }> = {};
+
+        // Pre-fill last 30 days
+        for (let i = 29; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const key = d.toISOString().slice(0, 10);
+          dayMap[key] = { sent: 0, failed: 0 };
+        }
+
         data.forEach((row: any) => {
           if (row.status === "sent") counts.sent++;
           else if (row.status === "pending") counts.pending++;
           else if (row.status === "failed") counts.failed++;
           else if (row.status === "skipped") counts.skipped++;
+
+          // Aggregate daily for sent/failed
+          if (row.status === "sent" || row.status === "failed") {
+            const dateStr = (row.sent_at || row.created_at || "").slice(0, 10);
+            if (dayMap[dateStr]) {
+              dayMap[dateStr][row.status as "sent" | "failed"]++;
+            }
+          }
         });
+
         setStats(counts);
+        setDailyData(
+          Object.entries(dayMap).map(([date, vals]) => ({
+            date: new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+            ...vals,
+          }))
+        );
       }
       setLoading(false);
     };
@@ -383,6 +413,7 @@ function FollowUpAnalytics({ userId }: { userId?: string }) {
 
   const total = stats ? stats.sent + stats.failed : 0;
   const successRate = total > 0 ? Math.round((stats!.sent / total) * 100) : 0;
+  const hasData = stats && (stats.sent > 0 || stats.pending > 0 || stats.failed > 0);
 
   const kpis = stats
     ? [
@@ -405,26 +436,58 @@ function FollowUpAnalytics({ userId }: { userId?: string }) {
         <div className="flex items-center justify-center py-6">
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
-      ) : !stats || (stats.sent === 0 && stats.pending === 0 && stats.failed === 0) ? (
+      ) : !hasData ? (
         <div className="text-center py-6">
           <Send className="h-8 w-8 text-muted-foreground/30 mx-auto mb-2" />
           <p className="text-sm text-muted-foreground">No follow-up emails yet.</p>
           <p className="text-xs text-muted-foreground mt-1">Enable auto follow-ups below to get started.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {kpis.map((kpi) => (
-            <div key={kpi.label} className="rounded-lg border border-border bg-background p-4 space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{kpi.label}</span>
-                <div className={`h-8 w-8 rounded-md flex items-center justify-center ${kpi.color}`}>
-                  <kpi.icon className="h-4 w-4" />
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {kpis.map((kpi) => (
+              <div key={kpi.label} className="rounded-lg border border-border bg-background p-4 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{kpi.label}</span>
+                  <div className={`h-8 w-8 rounded-md flex items-center justify-center ${kpi.color}`}>
+                    <kpi.icon className="h-4 w-4" />
+                  </div>
                 </div>
+                <p className="text-xl font-bold tracking-tight">{kpi.value}</p>
               </div>
-              <p className="text-xl font-bold tracking-tight">{kpi.value}</p>
+            ))}
+          </div>
+
+          {/* Daily trend chart */}
+          <div className="pt-2">
+            <h3 className="text-sm font-medium text-muted-foreground mb-3">Daily Trend (Last 30 Days)</h3>
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={dailyData} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+                  <defs>
+                    <linearGradient id="sentGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(var(--success))" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="hsl(var(--success))" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="failedGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor="hsl(var(--destructive))" stopOpacity={0.3} />
+                      <stop offset="100%" stopColor="hsl(var(--destructive))" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis dataKey="date" tick={{ fontSize: 10 }} className="text-muted-foreground" interval="preserveStartEnd" />
+                  <YAxis allowDecimals={false} tick={{ fontSize: 10 }} className="text-muted-foreground" />
+                  <Tooltip
+                    contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8, fontSize: 12 }}
+                    labelStyle={{ color: "hsl(var(--foreground))", fontWeight: 600 }}
+                  />
+                  <Area type="monotone" dataKey="sent" name="Sent" stroke="hsl(var(--success))" fill="url(#sentGrad)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="failed" name="Failed" stroke="hsl(var(--destructive))" fill="url(#failedGrad)" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
-          ))}
-        </div>
+          </div>
+        </>
       )}
     </motion.div>
   );
