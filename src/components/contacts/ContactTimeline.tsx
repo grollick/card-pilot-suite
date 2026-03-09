@@ -53,6 +53,7 @@ interface Props {
   activities: any[];
   filter: TimelineFilter;
   onFilterChange: (f: TimelineFilter) => void;
+  onMarkReplied?: (activityId: string, leadId: string) => void;
 }
 
 const filterMap: Record<TimelineFilter, string[]> = {
