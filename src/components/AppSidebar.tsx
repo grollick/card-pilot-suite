@@ -2,7 +2,7 @@ import {
   LayoutDashboard, Users, Kanban, Calendar, Mail, Share2,
   BarChart3, Settings, Shield, ChevronLeft, LogOut,
   FileText, Zap, Megaphone, CreditCard, Building2, QrCode, Eye,
-  DollarSign, Tag, Gift, Globe
+  DollarSign, Tag, Gift, Globe, FolderOpen, Star
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
