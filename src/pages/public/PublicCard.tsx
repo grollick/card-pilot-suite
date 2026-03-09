@@ -29,6 +29,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { Link, useParams } from "react-router-dom";
 import { usePublicCard, CTA_TYPES, type CardSection } from "@/hooks/useCard";
+import { usePublicReviews } from "@/hooks/useReviews";
+import ReviewForm from "@/components/public/ReviewForm";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { downloadVCard } from "@/lib/vcard";
