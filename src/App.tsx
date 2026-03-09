@@ -16,6 +16,7 @@ import QRLanding from "./pages/public/QRLanding";
 import ProductsPage from "./pages/public/ProductsPage";
 import DiscoverPage from "./pages/public/DiscoverPage";
 import HandleOrSeoRoute from "./pages/public/HandleOrSeoRoute";
+import PublicSite from "./pages/public/PublicSite";
 
 // Auth & marketing — loaded eagerly (small)
 import Index from "./pages/Index";
