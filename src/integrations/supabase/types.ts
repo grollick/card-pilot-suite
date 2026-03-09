@@ -1341,6 +1341,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_workspace_from_profession: {
+        Args: {
+          p_owner_user_id: string
+          p_profession_code: string
+          p_workspace_id: string
+        }
+        Returns: Json
+      }
       has_org_role: {
         Args: {
           _org_id: string
