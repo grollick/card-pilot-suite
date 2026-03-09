@@ -73,6 +73,8 @@ export default function SettingsPage() {
           email: email.trim() || null,
           phone: phone.trim() || null,
           company: company.trim() || null,
+          city: city.trim() || null,
+          bio: bio.trim() || null,
         })
         .eq("id", profile.id);
       if (error) throw error;
