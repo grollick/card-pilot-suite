@@ -32,6 +32,7 @@ const crmItems = [
 
 const bookingItems = [
   { title: "Bookings", url: "/app/bookings", icon: Calendar },
+  { title: "Estimates", url: "/app/estimates", icon: FileText },
 ];
 
 const analyticsItems = [
