@@ -86,3 +86,20 @@ export function useContactFollowups(leadId: string | undefined) {
     },
   });
 }
+
+export function useContactFollowupHistory(leadId: string | undefined) {
+  return useQuery({
+    queryKey: ["contact-followup-history", leadId],
+    enabled: !!leadId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("scheduled_followups")
+        .select("*, followup_variants(variant_key, subject)")
+        .eq("lead_id", leadId!)
+        .order("send_at", { ascending: false })
+        .limit(50);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+}
