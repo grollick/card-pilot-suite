@@ -136,6 +136,9 @@ export default function ContactDetail() {
               <DropdownMenuItem onClick={() => navigate("/app/bookings?new=1")}>
                 <Calendar className="h-4 w-4 mr-2" /> Booking
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate(`/app/estimates?lead=${contact.id}`)}>
+                <FileText className="h-4 w-4 mr-2" /> Estimate
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <DropdownMenu>
