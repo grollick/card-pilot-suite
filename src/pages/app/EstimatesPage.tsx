@@ -20,7 +20,7 @@ import {
 } from "@/hooks/useEstimates";
 import EstimateBuilderDialog from "@/components/estimates/EstimateBuilderDialog";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
-import UpgradePrompt from "@/components/UpgradePrompt";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const STATUS_COLORS: Record<EstimateStatus, string> = {
   draft: "bg-muted text-muted-foreground",
