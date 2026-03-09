@@ -58,7 +58,7 @@ const filterMap: Record<TimelineFilter, string[]> = {
   all: [],
   notes: ["note_added", "call"],
   tasks: ["task_created", "task_completed"],
-  emails: ["email_sent", "email_opened"],
+  emails: ["email_sent", "email_opened", "email_replied"],
   bookings: ["booking_created", "booking_confirmed", "booking_cancelled"],
 };
 
