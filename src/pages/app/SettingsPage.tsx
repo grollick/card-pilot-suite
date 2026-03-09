@@ -202,14 +202,16 @@ export default function SettingsPage() {
           </motion.div>
         </TabsContent>
 
-        <TabsContent value="notifications" className="mt-4">
+        <TabsContent value="notifications" className="mt-4 space-y-4">
+          <FollowUpSettings profile={profile} queryClient={queryClient} />
+
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="rounded-xl border border-border bg-card p-6 space-y-4">
             <div className="flex items-center gap-2 mb-2">
               <Bell className="h-4 w-4 text-primary" />
-              <h2 className="font-semibold">Notification Preferences</h2>
+              <h2 className="font-semibold">Other Notifications</h2>
             </div>
-            <p className="text-sm text-muted-foreground">Notification settings will be available once backend is connected.</p>
+            <p className="text-sm text-muted-foreground">Additional notification preferences coming soon.</p>
           </motion.div>
         </TabsContent>
       </Tabs>
