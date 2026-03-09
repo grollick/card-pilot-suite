@@ -38,6 +38,7 @@ export default function ContactDetail() {
   const { data: activities = [] } = useContactActivities(id);
   const { data: tasks = [] } = useContactTasks(id);
   const { data: bookings = [] } = useContactBookings(id);
+  const { data: followups = [] } = useContactFollowups(id);
   const logActivity = useLogActivity();
   const createTask = useCreateTask();
   const updateTask = useUpdateTask();
