@@ -49,6 +49,7 @@ export default function Index() {
       </nav>
 
       <HeroSection />
+      <InstantCardGenerator />
       <SocialProofSection />
       <ProblemSection />
       <SolutionSection />
