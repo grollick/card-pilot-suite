@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const ANNUAL_DISCOUNT = 0.2; // 20% off
+const ANNUAL_DISCOUNT = 0.2;
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -48,7 +48,7 @@ export default function PricingSection({ visiblePlans }: PricingSectionProps) {
         className="text-center mb-10"
       >
         <h2 className="text-3xl md:text-4xl font-bold">Simple, transparent pricing</h2>
-        <p className="text-muted-foreground mt-3">Start free. Upgrade when you're ready.</p>
+        <p className="text-muted-foreground mt-3">Start free. Upgrade as your business grows.</p>
       </motion.div>
 
       {/* Toggle */}
@@ -108,8 +108,12 @@ export default function PricingSection({ visiblePlans }: PricingSectionProps) {
                 <p className="text-xs text-muted-foreground">{plan.tagline}</p>
               </div>
               <div className="mb-8">
-                <span className="text-4xl font-extrabold tracking-tight">${displayPrice}</span>
-                <span className="text-muted-foreground text-sm ml-1">/mo</span>
+                <span className="text-4xl font-extrabold tracking-tight">
+                  {displayPrice === 0 ? "Free" : `$${displayPrice}`}
+                </span>
+                {displayPrice > 0 && (
+                  <span className="text-muted-foreground text-sm ml-1">/mo</span>
+                )}
                 {annual && plan.price > 0 && (
                   <div className="mt-1">
                     <span className="text-xs text-muted-foreground line-through">${plan.price}/mo</span>
@@ -136,16 +140,6 @@ export default function PricingSection({ visiblePlans }: PricingSectionProps) {
             </motion.div>
           );
         })}
-      </div>
-
-      {/* Agency callout */}
-      <div className="mt-8 text-center">
-        <p className="text-sm text-muted-foreground">
-          Running a team?{" "}
-          <Link to="/onboarding" className="text-primary font-medium hover:underline">
-            See Agency plan at ${annual ? "$199" : "$249"}/mo →
-          </Link>
-        </p>
       </div>
     </section>
   );

@@ -1,17 +1,19 @@
 // ── CardPilot Pricing Tiers ──
-// Positioning: "The digital business card that automatically captures and follows up with leads."
+// 4-tier model: Starter (free) → Growth → Pro → Agency
 
 export const PLAN_TIERS = [
   {
-    key: "free",
-    name: "Free",
+    key: "starter",
+    name: "Starter",
     price: 0,
     interval: "month" as const,
-    tagline: "Try it out — forever free",
+    tagline: "Get started — forever free",
     popular: false,
     features: [
-      "1 digital card",
+      "1 digital business card",
       "20 contacts",
+      "3 estimates / month",
+      "5 social posts / month",
       "Basic lead capture",
       "QR code sharing",
       "CardPilot branding on card",
@@ -19,6 +21,8 @@ export const PLAN_TIERS = [
     limits: {
       contacts: 20,
       cards: 1,
+      estimates: 3,
+      social_posts: 5,
       booking_services: 0,
       team_members: 1,
       automations: 0,
@@ -27,79 +31,57 @@ export const PLAN_TIERS = [
     },
   },
   {
-    key: "starter",
-    name: "Starter",
-    price: 19,
+    key: "growth",
+    name: "Growth",
+    price: 29,
     interval: "month" as const,
-    tagline: "For individuals just starting",
-    popular: false,
+    tagline: "Unlock your full business toolkit",
+    popular: true,
     features: [
-      "1 digital card",
-      "100 contacts",
-      "Basic lead capture",
-      "Contact CRM",
-      "Task tracking",
-      "QR code sharing",
-      "Basic analytics",
+      "Unlimited contacts",
+      "CRM pipeline",
+      "Unlimited estimates",
+      "Job management",
+      "Social scheduler",
+      "Marketing tools",
+      "AI Growth Coach",
       "Remove CardPilot branding",
     ],
     limits: {
-      contacts: 100,
-      cards: 1,
-      booking_services: 1,
+      contacts: -1,
+      cards: 2,
+      estimates: -1,
+      social_posts: -1,
+      booking_services: 5,
       team_members: 1,
-      automations: 0,
-      email_templates: 0,
-      qr_campaigns: 1,
+      automations: 5,
+      email_templates: -1,
+      qr_campaigns: 3,
     },
   },
   {
     key: "pro",
     name: "Pro",
-    price: 49,
+    price: 79,
     interval: "month" as const,
-    tagline: "For professionals serious about leads",
-    popular: true,
-    features: [
-      "Everything in Starter",
-      "Unlimited contacts",
-      "Pipeline CRM",
-      "Booking system",
-      "Email templates",
-      "Automation rules",
-      "Advanced analytics",
-      "AI card content generator",
-    ],
-    limits: {
-      contacts: -1, // unlimited
-      cards: 3,
-      booking_services: 5,
-      team_members: 1,
-      automations: 10,
-      email_templates: -1,
-      qr_campaigns: 5,
-    },
-  },
-  {
-    key: "business",
-    name: "Business",
-    price: 99,
-    interval: "month" as const,
-    tagline: "For serious lead generators",
+    tagline: "Advanced automation & analytics",
     popular: false,
     features: [
-      "Everything in Pro",
-      "Unlimited cards",
-      "Team members (up to 5)",
-      "Advanced automation",
-      "QR campaign analytics",
+      "Everything in Growth",
+      "AI Autopilot",
+      "Advanced industry insights",
+      "Automation workflows",
+      "Premium marketplace placement",
+      "Advanced reporting",
       "Priority support",
     ],
     limits: {
       contacts: -1,
       cards: -1,
+      estimates: -1,
+      social_posts: -1,
       booking_services: -1,
-      team_members: 5,
+      team_members: 3,
       automations: -1,
       email_templates: -1,
       qr_campaigns: -1,
@@ -110,24 +92,23 @@ export const PLAN_TIERS = [
     name: "Agency",
     price: 249,
     interval: "month" as const,
-    tagline: "For agencies managing multiple clients",
+    tagline: "Manage multiple clients at scale",
     popular: false,
     features: [
-      "Everything in Business",
+      "Everything in Pro",
       "Unlimited client workspaces",
-      "White-label cards & branding",
+      "White-label branding",
       "Agency command center",
-      "Client workspace switching",
-      "Bulk actions across clients",
+      "Bulk marketing tools",
       "Per-client analytics",
-      "Client invites (limited edit)",
       "Custom domain support",
-      "Remove 'Powered by CardPilot'",
-      "Priority support",
+      "Dedicated support",
     ],
     limits: {
       contacts: -1,
       cards: -1,
+      estimates: -1,
+      social_posts: -1,
       booking_services: -1,
       team_members: -1,
       automations: -1,
@@ -142,6 +123,8 @@ export type PlanKey = (typeof PLAN_TIERS)[number]["key"];
 export interface PlanLimits {
   contacts: number;
   cards: number;
+  estimates: number;
+  social_posts: number;
   booking_services: number;
   team_members: number;
   automations: number;
@@ -156,8 +139,8 @@ export function getPlanByKey(key: string): (typeof PLAN_TIERS)[number] | undefin
 export function getPlanLimits(key: string): PlanLimits {
   const plan = getPlanByKey(key);
   if (!plan) {
-    // Default to free limits for unknown plans
-    return PLAN_TIERS[0].limits;
+    // Default to starter (free) limits for unknown plans
+    return { ...PLAN_TIERS[0].limits };
   }
   return { ...plan.limits };
 }
@@ -170,5 +153,12 @@ export function isLimitReached(limit: number, current: number): boolean {
 
 /** Whether this plan shows "Powered by CardPilot" branding */
 export function showsBranding(planKey: string): boolean {
-  return planKey === "free" || !planKey;
+  return planKey === "starter" || planKey === "free" || !planKey;
+}
+
+/** Returns the next tier up from the current plan, or null if already at top */
+export function getNextTier(currentKey: string): (typeof PLAN_TIERS)[number] | null {
+  const idx = PLAN_TIERS.findIndex((p) => p.key === currentKey);
+  if (idx === -1 || idx >= PLAN_TIERS.length - 1) return null;
+  return PLAN_TIERS[idx + 1];
 }
