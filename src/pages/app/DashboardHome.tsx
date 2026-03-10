@@ -70,6 +70,9 @@ export default function DashboardHome() {
         </p>
       </div>
 
+      {/* Mobile Job Dashboard */}
+      {isMobile && <MobileJobDashboard />}
+
       {/* Business Performance Panel */}
       <BusinessPerformancePanel />
 
