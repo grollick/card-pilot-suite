@@ -23,6 +23,7 @@ import { Separator } from "@/components/ui/separator";
 
 const cardItems = [
   { title: "Card Editor", url: "/app/card", icon: CreditCard },
+  { title: "QR Code", url: "/app/card/qr", icon: QrCode },
 ];
 
 const crmItems = [
