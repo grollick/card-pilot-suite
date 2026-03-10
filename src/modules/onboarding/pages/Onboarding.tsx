@@ -436,8 +436,52 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* ── Step 2: AI Setup Assistant ── */}
+            {/* ── Step 2: Business Description ── */}
             {step === 2 && (
+              <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                <div>
+                  <h2 className="text-lg font-semibold">Describe your business</h2>
+                  <p className="text-sm text-muted-foreground">Tell us in one sentence what you do — AI will craft your entire card from this.</p>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
+                  <div className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--gradient-primary)" }}>
+                    <Sparkles className="h-4 w-4 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Hi! I can help set up your card in seconds.</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Describe your business and I'll generate your tagline, bio, services, and more.</p>
+                  </div>
+                </div>
+
+                <textarea
+                  value={businessDescription}
+                  onChange={e => setBusinessDescription(e.target.value)}
+                  placeholder={`e.g. "Landscaping company specializing in patios and garden design."`}
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-ring resize-none placeholder:text-muted-foreground"
+                />
+
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
+                    <ArrowLeft className="h-4 w-4 mr-1" /> Back
+                  </Button>
+                  <Button onClick={handleDescriptionNext} className="flex-1">
+                    <Sparkles className="h-4 w-4 mr-1" /> Generate My Card <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+
+                <button
+                  onClick={() => { setStep(3); generateAISetup(); }}
+                  className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors text-center"
+                >
+                  Skip — set up without a description
+                </button>
+              </motion.div>
+            )}
+
+            {/* ── Step 3: AI Setup Assistant ── */}
+            {step === 3 && (
               <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
                 {aiLoading ? (
                   <div className="text-center py-10 space-y-5">
