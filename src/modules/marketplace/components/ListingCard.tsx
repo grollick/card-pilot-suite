@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, ArrowRight, Star, Crown, MessageSquare } from "lucide-react";
+import { MapPin, Calendar, ArrowRight, Star, Crown, MessageSquare, Rocket } from "lucide-react";
 import type { MarketplaceListing } from "@/hooks/useMarketplace";
 
 function StarRating({ rating, count }: { rating: number; count: number }) {
