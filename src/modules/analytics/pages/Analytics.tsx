@@ -1,10 +1,11 @@
-import { Eye, MousePointer, Users, TrendingUp, Mail, BarChart3, Calendar, Globe, Smartphone, Monitor, Tablet, Download } from "lucide-react";
+import { Eye, MousePointer, Users, TrendingUp, Mail, BarChart3, Calendar, Globe, Smartphone, Monitor, Tablet, Download, Clock, RefreshCw, ArrowDown } from "lucide-react";
 import KPICard from "@/components/KPICard";
 import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
-import { useAnalyticsStats, useCtaBreakdown, useEmailStats, useReferrerBreakdown, useDeviceBreakdown } from "@/hooks/useAnalytics";
+import { useAnalyticsStats, useCtaBreakdown, useEmailStats, useReferrerBreakdown, useDeviceBreakdown, useConversionFunnel, useLeadResponseTime, useRepeatCustomers } from "@/hooks/useAnalytics";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 
 const DEVICE_ICONS: Record<string, React.ReactNode> = {
   Mobile: <Smartphone className="h-3.5 w-3.5" />,
@@ -20,6 +21,9 @@ export default function Analytics() {
   const { data: emailStats } = useEmailStats(days);
   const { data: referrerData = [] } = useReferrerBreakdown(days);
   const { data: deviceData = [] } = useDeviceBreakdown(days);
+  const { data: funnel } = useConversionFunnel(days);
+  const { data: responseTime } = useLeadResponseTime(days);
+  const { data: repeatData } = useRepeatCustomers();
 
   const fmtChange = (c?: { value: number; type: string }) => {
     if (!c || c.type === "neutral") return { text: `${days}d`, type: "neutral" as const };
@@ -72,6 +76,113 @@ export default function Analytics() {
             changeType={(stats?.conversionChange ?? 0) > 0 ? "positive" : (stats?.conversionChange ?? 0) < 0 ? "negative" : "neutral"} />
         </div>
       )}
+
+      {/* Conversion Funnel + Response Time + Repeat Customers */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Conversion Funnel */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+          className="rounded-xl border border-border bg-card p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp className="h-4 w-4 text-primary" />
+            <h2 className="font-semibold">Conversion Funnel</h2>
+          </div>
+          {funnel ? (
+            <div className="space-y-1">
+              {[
+                { label: "Visitors", value: funnel.visitors, pct: 100 },
+                { label: "Leads", value: funnel.leads, pct: funnel.visitorToLead },
+                { label: "Bookings", value: funnel.bookings, pct: funnel.leadToBooking },
+              ].map((step, i) => (
+                <div key={step.label}>
+                  {i > 0 && (
+                    <div className="flex justify-center my-0.5">
+                      <ArrowDown className="h-3 w-3 text-muted-foreground/40" />
+                    </div>
+                  )}
+                  <div className="rounded-lg bg-muted/30 p-3">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-sm font-medium">{step.label}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg font-bold tabular-nums">{step.value.toLocaleString()}</span>
+                        {i > 0 && <Badge variant="secondary" className="text-2xs">{step.pct}%</Badge>}
+                      </div>
+                    </div>
+                    <div className="h-2 rounded-full bg-muted overflow-hidden">
+                      <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${Math.max(step.pct, 2)}%` }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <Skeleton className="h-40" />
+          )}
+        </motion.div>
+
+        {/* Lead Response Time */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
+          className="rounded-xl border border-border bg-card p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Clock className="h-4 w-4 text-warning" />
+            <h2 className="font-semibold">Lead Response Time</h2>
+          </div>
+          {responseTime ? (
+            <div className="space-y-4">
+              <div className="text-center py-4">
+                <p className="text-4xl font-bold tracking-tight">{responseTime.avgFormatted}</p>
+                <p className="text-sm text-muted-foreground mt-1">Average response time</p>
+              </div>
+              <div className="rounded-lg bg-muted/30 p-3 text-center">
+                <p className="text-2xl font-bold">{responseTime.respondedPct}%</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Leads responded to</p>
+              </div>
+              <p className="text-2xs text-muted-foreground text-center">
+                {responseTime.avgMinutes <= 60
+                  ? "⚡ Great! You're responding fast."
+                  : responseTime.avgMinutes <= 240
+                  ? "⏱ Good — keep it up!"
+                  : "⚠ Try to respond within 1 hour for best conversion."}
+              </p>
+            </div>
+          ) : (
+            <Skeleton className="h-40" />
+          )}
+        </motion.div>
+
+        {/* Repeat Customers */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.11 }}
+          className="rounded-xl border border-border bg-card p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <RefreshCw className="h-4 w-4 text-success" />
+            <h2 className="font-semibold">Repeat Customers</h2>
+          </div>
+          {repeatData ? (
+            <div className="space-y-4">
+              <div className="text-center py-4">
+                <p className="text-4xl font-bold tracking-tight">{repeatData.repeatPct}%</p>
+                <p className="text-sm text-muted-foreground mt-1">Repeat rate</p>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="rounded-lg bg-muted/30 p-3 text-center">
+                  <p className="text-xl font-bold">{repeatData.totalCustomers}</p>
+                  <p className="text-2xs text-muted-foreground mt-0.5">Total customers</p>
+                </div>
+                <div className="rounded-lg bg-muted/30 p-3 text-center">
+                  <p className="text-xl font-bold">{repeatData.repeatCustomers}</p>
+                  <p className="text-2xs text-muted-foreground mt-0.5">Repeat bookings</p>
+                </div>
+              </div>
+              <p className="text-2xs text-muted-foreground text-center">
+                {repeatData.repeatPct >= 30
+                  ? "🎉 Strong loyalty — customers keep coming back!"
+                  : "💡 Send follow-up offers after jobs to boost repeat bookings."}
+              </p>
+            </div>
+          ) : (
+            <Skeleton className="h-40" />
+          )}
+        </motion.div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Daily Chart */}
