@@ -64,21 +64,23 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         }
       }
 
-      let listings: MarketplaceListing[] = (profilesData ?? []).map((p: any) => ({
-        id: p.id,
-        name: p.name,
-        handle: p.handle,
-        avatar_url: p.avatar_url,
-        company: p.company,
-        city: p.city,
-        bio: p.bio,
-        profession_name: p.professions?.name ?? null,
-        profession_category: p.professions?.category ?? null,
-        service_area: p.service_area ?? null,
-        featured: p.featured ?? false,
-        avg_rating: ratingsMap[p.id]?.avg ?? null,
-        review_count: ratingsMap[p.id]?.count ?? 0,
-      }));
+      let listings: MarketplaceListing[] = (profilesData ?? [])
+        .filter((p: any) => p.marketplace_enabled)
+        .map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          handle: p.handle,
+          avatar_url: p.avatar_url,
+          company: p.company,
+          city: p.city,
+          bio: p.bio,
+          profession_name: p.professions?.name ?? null,
+          profession_category: p.professions?.category ?? null,
+          service_area: p.service_area ?? null,
+          featured: p.featured ?? false,
+          avg_rating: ratingsMap[p.id]?.avg ?? null,
+          review_count: ratingsMap[p.id]?.count ?? 0,
+        }));
 
       // Client-side filtering
       if (filters.profession) {
