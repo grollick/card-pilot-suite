@@ -14,6 +14,7 @@ import PricingSection from "@/modules/landing/components/PricingSection";
 import FinalCTASection from "@/modules/landing/components/FinalCTASection";
 import FooterSection from "@/modules/landing/components/FooterSection";
 import CardDemoBuilder from "@/modules/landing/components/CardDemoBuilder";
+import ComparisonSection from "@/modules/landing/components/ComparisonSection";
 
 export default function Index() {
   const visiblePlans = PLAN_TIERS.filter((p) => p.key !== "agency");
