@@ -319,10 +319,10 @@ export default function InteractiveCardBuilder() {
           className="text-center mb-10"
         >
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-4">
-            <Sparkles className="h-3 w-3" /> Interactive Demo
+            <Sparkles className="h-3 w-3" /> No credit card required
           </div>
           <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-2">
-            Build Your Card in 30 Seconds
+            Build Your Smart Business Card in 30 Seconds
           </h2>
           <p className="text-muted-foreground max-w-md mx-auto text-sm">
             See what your card looks like — instantly, no signup required.
