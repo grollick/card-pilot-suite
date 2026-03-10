@@ -51,6 +51,7 @@ import SmartEngagementPopup from "@/modules/card/components/SmartEngagementPopup
 import StickyActionBar from "@/modules/card/components/StickyActionBar";
 import GalleryLightbox from "@/modules/card/components/GalleryLightbox";
 import ProjectShowcase from "@/modules/card/components/ProjectShowcase";
+import QuoteCalculator from "@/modules/card/components/QuoteCalculator";
 import { getHeroBackgroundForProfession, getHeroBackgroundById } from "@/lib/heroBackgrounds";
 import { showsBranding } from "@/lib/plans";
 
@@ -557,6 +558,7 @@ export default function PublicCard() {
     about: User,
     services: Briefcase,
     projects: Image,
+    quote_calculator: FileText,
     testimonials: Star,
     gallery: Image,
     social: Share2,
@@ -929,6 +931,20 @@ export default function PublicCard() {
               </div>
             );
           })()}
+
+          {/* ── Instant Quote Calculator ── */}
+          {enabledSections.has("quote_calculator") && (
+            <div id="quote-calculator-section">
+              <SectionTitle id="quote_calculator" label={sectionContent("quote_calculator")?.heading || "Instant Quote"} />
+              <QuoteCalculator
+                theme={theme}
+                profileId={profile.id}
+                handle={handle!}
+                profession={professionName}
+                metallicEffect={metallicEffect}
+              />
+            </div>
+          )}
 
           {enabledSections.has("booking") && (
             <div id="booking-section">
