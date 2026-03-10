@@ -422,11 +422,11 @@ export default function LandingPage() {
             </div>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2} className="mt-8">
-            <Link to="/card/demo">
+            <a href="#demo-card">
               <Button size="lg" variant="outline" className="rounded-xl">
                 <ExternalLink className="h-4 w-4 mr-1.5" /> Open Full Demo
               </Button>
-            </Link>
+            </a>
           </motion.div>
         </div>
       </section>
