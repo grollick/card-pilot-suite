@@ -31,7 +31,7 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
       // Fetch profiles with marketplace_enabled
       const query = supabase
         .from("profiles")
-        .select("id, name, handle, avatar_url, company, city, bio, professions(name, category)")
+        .select("id, name, handle, avatar_url, company, city, bio, service_area, featured, marketplace_enabled, professions(name, category)" as any)
         .not("handle", "is", null)
         .not("name", "is", null)
         .order("name");
