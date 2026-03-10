@@ -13,7 +13,7 @@ import { useDashboardStats, useRecentActivity } from "@/hooks/useDashboardStats"
 import { formatDistanceToNow, format } from "date-fns";
 import AIInsightsWidget from "@/modules/dashboard/components/AIInsightsWidget";
 import BusinessPerformancePanel from "@/modules/dashboard/components/BusinessPerformancePanel";
-import YesterdaySnapshot from "@/modules/dashboard/components/YesterdaySnapshot";
+import DailyScorecard from "@/modules/dashboard/components/DailyScorecard";
 import MissedOpportunities from "@/modules/dashboard/components/MissedOpportunities";
 import FirstLeadAssistant from "@/modules/dashboard/components/FirstLeadAssistant";
 import JobMetrics from "@/modules/dashboard/components/JobMetrics";
