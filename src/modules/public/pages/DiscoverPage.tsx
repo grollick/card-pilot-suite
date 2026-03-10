@@ -1,15 +1,16 @@
 import { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { useMarketplaceListings, useMarketplaceProfessions } from "@/hooks/useMarketplace";
 import ListingCard from "@/modules/marketplace/components/ListingCard";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, MapPin, Users, Loader2, Briefcase } from "lucide-react";
+import { Search, MapPin, Users, Loader2, Briefcase, Crown, Star, TrendingUp } from "lucide-react";
 
 const POPULAR_PROFESSIONS = [
   "Barber", "Plumber", "Photographer", "Realtor", "Personal Trainer",
-  "Electrician", "Hair Stylist", "Tattoo Artist",
+  "Electrician", "Hair Stylist", "Tattoo Artist", "Landscaper", "Contractor",
 ];
 
 export default function DiscoverPage() {
@@ -35,6 +36,13 @@ export default function DiscoverPage() {
     return "Discover Local Businesses";
   }, [displayProfession, displayCity]);
 
+  const metaDescription = useMemo(() => {
+    if (displayProfession && displayCity)
+      return `Find trusted ${displayProfession}s in ${capitalize(displayCity)}. Book appointments, request quotes, and connect with local professionals.`;
+    if (displayProfession) return `Browse top ${displayProfession}s on CardPilot. View profiles, read reviews, and book services instantly.`;
+    return "Discover and book trusted local businesses on CardPilot. Search by profession, location, and services.";
+  }, [displayProfession, displayCity]);
+
   const cities = useMemo(() => {
     if (!listings) return [];
     const set = new Set<string>();
@@ -42,8 +50,16 @@ export default function DiscoverPage() {
     return Array.from(set).sort().slice(0, 12);
   }, [listings]);
 
+  const featuredListings = useMemo(() => listings?.filter((l) => l.featured) ?? [], [listings]);
+  const regularListings = useMemo(() => listings?.filter((l) => !l.featured) ?? [], [listings]);
+
   return (
     <div className="min-h-screen bg-background">
+      <Helmet>
+        <title>{title} | CardPilot</title>
+        <meta name="description" content={metaDescription} />
+      </Helmet>
+
       {/* Hero */}
       <div className="bg-gradient-to-br from-primary/8 via-background to-primary/4 border-b border-border/40">
         <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
@@ -71,7 +87,7 @@ export default function DiscoverPage() {
             {title}
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mb-8">
-            Find and book trusted local professionals. Each listing links directly to their digital business card.
+            Find and book trusted local professionals. View ratings, request quotes, and connect directly.
           </p>
 
           {/* Search */}
@@ -84,11 +100,28 @@ export default function DiscoverPage() {
               className="pl-10 h-12 text-base bg-card border-border/60"
             />
           </div>
+
+          {/* Stats bar */}
+          {!isLoading && listings && (
+            <div className="flex items-center gap-6 mt-6 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <Users className="h-4 w-4" /> {listings.length} businesses
+              </span>
+              {featuredListings.length > 0 && (
+                <span className="flex items-center gap-1.5">
+                  <Crown className="h-4 w-4 text-primary" /> {featuredListings.length} featured
+                </span>
+              )}
+              <span className="flex items-center gap-1.5">
+                <Star className="h-4 w-4" /> {listings.filter(l => l.review_count > 0).length} with reviews
+              </span>
+            </div>
+          )}
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Profession pills (show on main /discover) */}
+        {/* Profession pills */}
         {!profession && !city && (
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-3">
@@ -133,12 +166,27 @@ export default function DiscoverPage() {
           </div>
         )}
 
+        {/* Featured section */}
+        {featuredListings.length > 0 && !search && (
+          <div className="mb-10">
+            <div className="flex items-center gap-2 mb-4">
+              <Crown className="h-4 w-4 text-primary" />
+              <h2 className="text-lg font-semibold text-foreground">Featured Businesses</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {featuredListings.map((l) => (
+                <ListingCard key={l.id} listing={l} />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Results header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <TrendingUp className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">
-              {isLoading ? "Loading…" : `${listings?.length ?? 0} businesses found`}
+              {isLoading ? "Loading…" : `${regularListings.length} businesses`}
             </span>
           </div>
         </div>
@@ -148,13 +196,13 @@ export default function DiscoverPage() {
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
-        ) : listings && listings.length > 0 ? (
+        ) : regularListings.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {listings.map((l) => (
+            {regularListings.map((l) => (
               <ListingCard key={l.id} listing={l} />
             ))}
           </div>
-        ) : (
+        ) : featuredListings.length === 0 ? (
           <div className="text-center py-20">
             <Users className="h-10 w-10 mx-auto text-muted-foreground/40 mb-4" />
             <h3 className="text-lg font-semibold text-foreground mb-1">No businesses found</h3>
@@ -165,7 +213,7 @@ export default function DiscoverPage() {
               <Link to="/discover">Browse all</Link>
             </Button>
           </div>
-        )}
+        ) : null}
 
         {/* SEO footer */}
         <div className="mt-16 pt-8 border-t border-border/40">

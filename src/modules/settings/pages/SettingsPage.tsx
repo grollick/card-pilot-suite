@@ -1,4 +1,5 @@
-import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail, Clock, CheckCircle, AlertTriangle, Clock3, TrendingUp, Send, Plus, Trash2, GripVertical } from "lucide-react";
+import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail, Clock, CheckCircle, AlertTriangle, Clock3, TrendingUp, Send, Plus, Trash2, GripVertical, Store } from "lucide-react";
+import MarketplaceSettings from "@/modules/settings/components/MarketplaceSettings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -99,6 +100,7 @@ export default function SettingsPage() {
       <Tabs defaultValue="profile">
         <TabsList>
           <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
           <TabsTrigger value="brand">Brand Kit</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
         </TabsList>
@@ -180,6 +182,10 @@ export default function SettingsPage() {
               Re-run Setup Wizard
             </Button>
           </motion.div>
+        </TabsContent>
+
+        <TabsContent value="marketplace" className="mt-4">
+          <MarketplaceSettings profile={profile} />
         </TabsContent>
 
         <TabsContent value="brand" className="mt-4">
