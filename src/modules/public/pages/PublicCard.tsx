@@ -1274,14 +1274,38 @@ export default function PublicCard() {
           </p>
 
           {showsBranding((profile as any)?.plan ?? "free") && (
-            <div style={{ textAlign: "center", paddingTop: 8 }}>
+            <div style={{ textAlign: "center", paddingTop: 12, borderTop: `1px solid ${palette.secondary}15`, marginTop: 8 }}>
               <a
-                href="/"
-                style={{ fontSize: 10, color: `${palette.secondary}80`, textDecoration: "none" }}
+                href={`/?ref=card&from=${handle}`}
+                onClick={() => {
+                  supabase.from("analytics_events").insert({
+                    user_id: profile.id,
+                    handle: handle!,
+                    event_type: "button_click" as const,
+                    meta_json: { cta: "powered_by_footer", referrer_handle: handle },
+                  }).then();
+                }}
+                style={{ fontSize: 11, color: `${palette.secondary}90`, textDecoration: "none", display: "inline-block" }}
               >
                 Powered by{" "}
                 <span style={{ fontWeight: 700, color: palette.primary }}>CardPilot</span>
               </a>
+              <p style={{ fontSize: 10, color: `${palette.secondary}60`, margin: "4px 0 0" }}>
+                <a
+                  href={`/auth?ref=card&from=${handle}`}
+                  onClick={() => {
+                    supabase.from("analytics_events").insert({
+                      user_id: profile.id,
+                      handle: handle!,
+                      event_type: "button_click" as const,
+                      meta_json: { cta: "create_your_own", referrer_handle: handle },
+                    }).then();
+                  }}
+                  style={{ color: palette.primary, textDecoration: "none", fontWeight: 500 }}
+                >
+                  Create your own smart business card →
+                </a>
+              </p>
             </div>
           )}
         </div>
