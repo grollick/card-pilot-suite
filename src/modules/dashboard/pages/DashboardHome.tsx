@@ -13,7 +13,7 @@ import { useDashboardStats, useRecentActivity } from "@/hooks/useDashboardStats"
 import { formatDistanceToNow, format } from "date-fns";
 import AIInsightsWidget from "@/modules/dashboard/components/AIInsightsWidget";
 import BusinessPerformancePanel from "@/modules/dashboard/components/BusinessPerformancePanel";
-import YesterdaySnapshot from "@/modules/dashboard/components/YesterdaySnapshot";
+import DailyScorecard from "@/modules/dashboard/components/DailyScorecard";
 import MissedOpportunities from "@/modules/dashboard/components/MissedOpportunities";
 import FirstLeadAssistant from "@/modules/dashboard/components/FirstLeadAssistant";
 import JobMetrics from "@/modules/dashboard/components/JobMetrics";
@@ -76,8 +76,8 @@ export default function DashboardHome() {
       {/* Business Performance Panel */}
       <BusinessPerformancePanel />
 
-      {/* Yesterday's Snapshot */}
-      <YesterdaySnapshot />
+      {/* Daily Business Scorecard */}
+      <DailyScorecard />
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
