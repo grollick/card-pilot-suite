@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { generateInvoiceNumber } from "@/hooks/useInvoices";
 
 export type JobStatus = "draft" | "scheduled" | "in_progress" | "paused" | "completed" | "cancelled";
 
@@ -136,8 +137,9 @@ export function useUpdateJobStatus() {
   const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, status, lead_id, job_number }: {
+    mutationFn: async ({ id, status, lead_id, job_number, title, grandTotal }: {
       id: string; status: JobStatus; lead_id?: string | null; job_number?: string;
+      title?: string; grandTotal?: number;
     }) => {
       const updates: any = { status };
       if (status === "in_progress" && !updates.actual_start) updates.actual_start = new Date().toISOString();
@@ -154,13 +156,37 @@ export function useUpdateJobStatus() {
           related_id: id,
         });
       }
+
+      // Auto-generate draft invoice when job is completed
+      if (status === "completed") {
+        const dueDate = new Date();
+        dueDate.setDate(dueDate.getDate() + 14);
+        const total = grandTotal ?? 0;
+
+        await supabase.from("invoices").insert({
+          user_id: user!.id,
+          job_id: id,
+          lead_id: lead_id ?? null,
+          invoice_number: generateInvoiceNumber(),
+          status: "draft" as any,
+          due_date: dueDate.toISOString().split("T")[0],
+          subtotal: total,
+          grand_total: total,
+        });
+      }
+
       return { id, status };
     },
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["jobs"] });
       qc.invalidateQueries({ queryKey: ["job", vars.id] });
       qc.invalidateQueries({ queryKey: ["contact-activities"] });
-      toast.success(`Job marked as ${JOB_STATUS_LABELS[vars.status]}`);
+      qc.invalidateQueries({ queryKey: ["invoices"] });
+      if (vars.status === "completed") {
+        toast.success(`Job completed — draft invoice created`);
+      } else {
+        toast.success(`Job marked as ${JOB_STATUS_LABELS[vars.status]}`);
+      }
     },
     onError: (e: any) => toast.error(e.message),
   });

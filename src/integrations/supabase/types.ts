@@ -1130,6 +1130,156 @@ export type Database = {
           },
         ]
       }
+      invoice_line_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          invoice_id: string
+          line_total: number
+          quantity: number
+          sort_order: number
+          title: string
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          invoice_id: string
+          line_total?: number
+          quantity?: number
+          sort_order?: number
+          title: string
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          invoice_id?: string
+          line_total?: number
+          quantity?: number
+          sort_order?: number
+          title?: string
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_line_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          amount_paid: number
+          created_at: string
+          discount_amount: number
+          due_date: string | null
+          grand_total: number
+          id: string
+          invoice_number: string
+          issue_date: string
+          job_id: string | null
+          last_reminder_at: string | null
+          lead_id: string | null
+          notes: string | null
+          org_id: string | null
+          paid_at: string | null
+          payment_method: string | null
+          reminder_count: number
+          sent_at: string | null
+          status: Database["public"]["Enums"]["invoice_status"]
+          stripe_payment_intent_id: string | null
+          subtotal: number
+          tax_total: number
+          terms: string | null
+          updated_at: string
+          user_id: string
+          viewed_at: string | null
+        }
+        Insert: {
+          amount_paid?: number
+          created_at?: string
+          discount_amount?: number
+          due_date?: string | null
+          grand_total?: number
+          id?: string
+          invoice_number: string
+          issue_date?: string
+          job_id?: string | null
+          last_reminder_at?: string | null
+          lead_id?: string | null
+          notes?: string | null
+          org_id?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          reminder_count?: number
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["invoice_status"]
+          stripe_payment_intent_id?: string | null
+          subtotal?: number
+          tax_total?: number
+          terms?: string | null
+          updated_at?: string
+          user_id: string
+          viewed_at?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          created_at?: string
+          discount_amount?: number
+          due_date?: string | null
+          grand_total?: number
+          id?: string
+          invoice_number?: string
+          issue_date?: string
+          job_id?: string | null
+          last_reminder_at?: string | null
+          lead_id?: string | null
+          notes?: string | null
+          org_id?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          reminder_count?: number
+          sent_at?: string | null
+          status?: Database["public"]["Enums"]["invoice_status"]
+          stripe_payment_intent_id?: string | null
+          subtotal?: number
+          tax_total?: number
+          terms?: string | null
+          updated_at?: string
+          user_id?: string
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_materials: {
         Row: {
           created_at: string
@@ -2715,6 +2865,13 @@ export type Database = {
         | "approved"
         | "declined"
         | "expired"
+      invoice_status:
+        | "draft"
+        | "sent"
+        | "viewed"
+        | "paid"
+        | "overdue"
+        | "cancelled"
       job_status:
         | "draft"
         | "scheduled"
@@ -2895,6 +3052,14 @@ export const Constants = {
         "approved",
         "declined",
         "expired",
+      ],
+      invoice_status: [
+        "draft",
+        "sent",
+        "viewed",
+        "paid",
+        "overdue",
+        "cancelled",
       ],
       job_status: [
         "draft",
