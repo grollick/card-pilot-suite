@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ArrowRight, ArrowLeft, Sparkles, Check, Loader2, Pencil } from "lucide-react";
+import { Search, ArrowRight, ArrowLeft, Sparkles, Check, Loader2, Pencil, LayoutTemplate } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { pickStylePackKey, getRecommendedPacks, type StylePack } from "@/lib/stylePackSelection";
 import { useGenerateCardContent, type GeneratedCardContent } from "@/hooks/useGenerateContent";
+import { getBestTemplateForProfession, getTemplate } from "@/lib/cardTemplates";
+import TemplateSelector from "@/modules/card/components/TemplateSelector";
 
 interface Profession {
   id: string;
