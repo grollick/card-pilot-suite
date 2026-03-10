@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useMarketplaceListings, useMarketplaceProfessions } from "@/hooks/useMarketplace";
-import ListingCard from "@/components/marketplace/ListingCard";
+import ListingCard from "@/modules/marketplace/components/ListingCard";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";

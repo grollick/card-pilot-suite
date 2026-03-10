@@ -27,12 +27,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format, formatDistanceToNow, addDays } from "date-fns";
-import ActivityComposer from "@/components/contacts/ActivityComposer";
-import ContactTimeline, { type TimelineFilter } from "@/components/contacts/ContactTimeline";
-import NextActivityPanel from "@/components/contacts/NextActivityPanel";
-import ContactSummaryCard from "@/components/contacts/ContactSummaryCard";
-import ContactTasksList from "@/components/contacts/ContactTasksList";
-import PendingFollowups from "@/components/contacts/PendingFollowups";
+import ActivityComposer from "@/modules/crm/components/ActivityComposer";
+import ContactTimeline, { type TimelineFilter } from "@/modules/crm/components/ContactTimeline";
+import NextActivityPanel from "@/modules/crm/components/NextActivityPanel";
+import ContactSummaryCard from "@/modules/crm/components/ContactSummaryCard";
+import ContactTasksList from "@/modules/crm/components/ContactTasksList";
+import PendingFollowups from "@/modules/crm/components/PendingFollowups";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function ContactDetail() {

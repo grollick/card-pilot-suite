@@ -1,7 +1,7 @@
 import { useMemo, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useMarketplaceListings } from "@/hooks/useMarketplace";
-import ListingCard from "@/components/marketplace/ListingCard";
+import ListingCard from "@/modules/marketplace/components/ListingCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Users, Star, Shield, MapPin, ArrowRight } from "lucide-react";

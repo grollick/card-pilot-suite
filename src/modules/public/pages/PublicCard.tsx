@@ -272,7 +272,7 @@ export default function PublicCard() {
   const displayJobTitle = (themeJson.job_title as string) || professionName;
   const coverUrl = themeJson.cover_url as string | undefined;
   const showSectionIcons = themeJson.section_icons === true;
-  const metallicEffect = themeJson.metallicEffect as import("@/components/card/CardThemeEditor").MetallicEffect | undefined;
+  const metallicEffect = themeJson.metallicEffect as import("@/modules/card/components/CardThemeEditor").MetallicEffect | undefined;
 
   // CTA config from theme_json or fallback to legacy primary_cta
   type CtaItem = { id: string; label: string; enabled: boolean; isPrimary: boolean };

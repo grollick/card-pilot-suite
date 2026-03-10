@@ -1,7 +1,7 @@
 import React from "react";
 import { type ResolvedCardTheme, getButtonStyles } from "@/lib/cardTokens";
-import type { MetallicEffect } from "@/components/card/CardThemeEditor";
-import { METALLIC_GRADIENTS } from "@/components/card/CardThemeEditor";
+import type { MetallicEffect } from "@/modules/card/components/CardThemeEditor";
+import { METALLIC_GRADIENTS } from "@/modules/card/components/CardThemeEditor";
 
 interface CardButtonProps {
   theme: ResolvedCardTheme;

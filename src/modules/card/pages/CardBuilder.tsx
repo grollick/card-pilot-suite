@@ -2,14 +2,14 @@ import { Palette, Pencil, Camera, LayoutList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import CardPhotoTools from "@/components/card/CardPhotoTools";
-import SectionEditor, { type SectionContent } from "@/components/card/SectionEditor";
-import CardAssistant from "@/components/card/CardAssistant";
-import CardThemeEditor from "@/components/card/CardThemeEditor";
-import CardBuilderHeader from "@/components/card/CardBuilderHeader";
-import CardBuilderIdentity from "@/components/card/CardBuilderIdentity";
-import CardBuilderSections from "@/components/card/CardBuilderSections";
-import CardBuilderPreview from "@/components/card/CardBuilderPreview";
+import CardPhotoTools from "@/modules/card/components/CardPhotoTools";
+import SectionEditor, { type SectionContent } from "@/modules/card/components/SectionEditor";
+import CardAssistant from "@/modules/card/components/CardAssistant";
+import CardThemeEditor from "@/modules/card/components/CardThemeEditor";
+import CardBuilderHeader from "@/modules/card/components/CardBuilderHeader";
+import CardBuilderIdentity from "@/modules/card/components/CardBuilderIdentity";
+import CardBuilderSections from "@/modules/card/components/CardBuilderSections";
+import CardBuilderPreview from "@/modules/card/components/CardBuilderPreview";
 import { useCardBuilderState } from "@/hooks/useCardBuilderState";
 
 export default function CardBuilder() {

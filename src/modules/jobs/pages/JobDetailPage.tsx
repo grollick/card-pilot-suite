@@ -29,9 +29,9 @@ import {
 } from "@/hooks/useJobs";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import MobileQuickActions from "@/components/jobs/MobileQuickActions";
-import SignaturePad from "@/components/jobs/SignaturePad";
-import JobSummaryDialog from "@/components/jobs/JobSummaryDialog";
+import MobileQuickActions from "@/modules/jobs/components/MobileQuickActions";
+import SignaturePad from "@/modules/jobs/components/SignaturePad";
+import JobSummaryDialog from "@/modules/jobs/components/JobSummaryDialog";
 
 const STATUS_FLOW: Record<JobStatus, { next: JobStatus; label: string; icon: typeof Play; variant: "default" | "outline" | "destructive" }[]> = {
   draft: [{ next: "scheduled", label: "Schedule Job", icon: Play, variant: "default" }],

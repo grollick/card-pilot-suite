@@ -35,7 +35,7 @@ import { usePlanLimits } from "@/hooks/usePlanLimits";
 import { exportEstimatePDF } from "@/lib/estimatePdf";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import EstimateBuilderDialog from "@/components/estimates/EstimateBuilderDialog";
+import EstimateBuilderDialog from "@/modules/estimates/components/EstimateBuilderDialog";
 
 const STATUS_COLORS: Record<EstimateStatus, string> = {
   draft: "bg-muted text-muted-foreground",

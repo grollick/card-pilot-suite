@@ -11,13 +11,13 @@ import { motion } from "framer-motion";
 import { useTasks, useUpdateTask } from "@/hooks/useTasks";
 import { useDashboardStats, useRecentActivity } from "@/hooks/useDashboardStats";
 import { formatDistanceToNow, format } from "date-fns";
-import AIInsightsWidget from "@/components/dashboard/AIInsightsWidget";
-import BusinessPerformancePanel from "@/components/dashboard/BusinessPerformancePanel";
-import YesterdaySnapshot from "@/components/dashboard/YesterdaySnapshot";
-import MissedOpportunities from "@/components/dashboard/MissedOpportunities";
-import FirstLeadAssistant from "@/components/dashboard/FirstLeadAssistant";
-import JobMetrics from "@/components/dashboard/JobMetrics";
-import MobileJobDashboard from "@/components/dashboard/MobileJobDashboard";
+import AIInsightsWidget from "@/modules/dashboard/components/AIInsightsWidget";
+import BusinessPerformancePanel from "@/modules/dashboard/components/BusinessPerformancePanel";
+import YesterdaySnapshot from "@/modules/dashboard/components/YesterdaySnapshot";
+import MissedOpportunities from "@/modules/dashboard/components/MissedOpportunities";
+import FirstLeadAssistant from "@/modules/dashboard/components/FirstLeadAssistant";
+import JobMetrics from "@/modules/dashboard/components/JobMetrics";
+import MobileJobDashboard from "@/modules/dashboard/components/MobileJobDashboard";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const priorityColors: Record<string, string> = {

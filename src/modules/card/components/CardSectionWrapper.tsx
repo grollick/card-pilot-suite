@@ -4,8 +4,8 @@ import {
   type ResolvedCardTheme,
   getSectionStyles,
 } from "@/lib/cardTokens";
-import type { MetallicEffect } from "@/components/card/CardThemeEditor";
-import { METALLIC_GRADIENTS } from "@/components/card/CardThemeEditor";
+import type { MetallicEffect } from "@/modules/card/components/CardThemeEditor";
+import { METALLIC_GRADIENTS } from "@/modules/card/components/CardThemeEditor";
 
 interface CardSectionWrapperProps {
   theme: ResolvedCardTheme;

@@ -2,15 +2,15 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { PLAN_TIERS } from "@/lib/plans";
-import HeroSection from "@/components/landing/HeroSection";
-import ProfessionsBar from "@/components/landing/ProfessionsBar";
-import HowItWorksSection from "@/components/landing/HowItWorksSection";
-import FeaturesSection from "@/components/landing/FeaturesSection";
-import WorkflowSection from "@/components/landing/WorkflowSection";
-import QRProductsSection from "@/components/landing/QRProductsSection";
-import TestimonialsSection from "@/components/landing/TestimonialsSection";
-import PricingSection from "@/components/landing/PricingSection";
-import FooterSection from "@/components/landing/FooterSection";
+import HeroSection from "@/modules/landing/components/HeroSection";
+import ProfessionsBar from "@/modules/landing/components/ProfessionsBar";
+import HowItWorksSection from "@/modules/landing/components/HowItWorksSection";
+import FeaturesSection from "@/modules/landing/components/FeaturesSection";
+import WorkflowSection from "@/modules/landing/components/WorkflowSection";
+import QRProductsSection from "@/modules/landing/components/QRProductsSection";
+import TestimonialsSection from "@/modules/landing/components/TestimonialsSection";
+import PricingSection from "@/modules/landing/components/PricingSection";
+import FooterSection from "@/modules/landing/components/FooterSection";
 
 export default function Index() {
   const visiblePlans = PLAN_TIERS.filter((p) => p.key !== "agency");

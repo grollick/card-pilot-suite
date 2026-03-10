@@ -1,8 +1,8 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { type ResolvedCardTheme, getAvatarRadius } from "@/lib/cardTokens";
-import type { MetallicEffect } from "@/components/card/CardThemeEditor";
-import { METALLIC_GRADIENTS } from "@/components/card/CardThemeEditor";
+import type { MetallicEffect } from "@/modules/card/components/CardThemeEditor";
+import { METALLIC_GRADIENTS } from "@/modules/card/components/CardThemeEditor";
 
 interface CardHeaderProps {
   theme: ResolvedCardTheme;
