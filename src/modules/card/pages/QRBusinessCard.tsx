@@ -148,8 +148,13 @@ export default function QRBusinessCard() {
 
   // ── Scan analytics data ──
   const scansByDay = useMemo(() => {
-    if (!stats?.timeline) return [];
-    return stats.timeline.map((d: any) => ({ day: d.day, scans: d.count }));
+    if (!stats?.recentScans) return [];
+    const byDay: Record<string, number> = {};
+    stats.recentScans.forEach((s: any) => {
+      const day = new Date(s.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      byDay[day] = (byDay[day] || 0) + 1;
+    });
+    return Object.entries(byDay).map(([day, scans]) => ({ day, scans }));
   }, [stats]);
 
   if (!handle) {
