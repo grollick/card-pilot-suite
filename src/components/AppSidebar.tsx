@@ -1,9 +1,16 @@
 import {
-  LayoutDashboard, Users, Kanban, Calendar, Mail, Share2,
-  BarChart3, Settings, Shield, ChevronLeft, LogOut,
-  Zap, CreditCard, Building2, QrCode, Eye,
-  DollarSign, Tag, Gift, Globe, FolderOpen, Star, Megaphone,
-  CheckSquare, Search as SearchIcon, FileText, Briefcase, Bot, Package, RefreshCw
+  LayoutDashboard, Users, Briefcase, UserCheck, Megaphone, Settings,
+  ChevronLeft, LogOut, Globe, ChevronDown,
+  // Leads sub-items
+  Inbox, FileText, Calendar, Kanban,
+  // Jobs sub-items
+  ClipboardList, RefreshCw, DollarSign,
+  // Customers sub-items
+  UserCircle, History, CreditCard,
+  // Marketing sub-items
+  Mail, Share2, Gift, Star, Package, Zap, Bot, Eye, BarChart3, QrCode, Tag,
+  // Settings sub-items
+  Shield, Building2, CheckSquare
 } from "lucide-react";
 import ClientSwitcher from "@/modules/agency/components/ClientSwitcher";
 import { NavLink } from "@/components/NavLink";
@@ -11,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
@@ -18,67 +26,68 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import {
+  Collapsible, CollapsibleContent, CollapsibleTrigger
+} from "@/components/ui/collapsible";
 
-// ── 7 core modules ──
+// ── Navigation structure: 6 primary groups ──
 
-const cardItems = [
-  { title: "Card Editor", url: "/app/card", icon: CreditCard },
-  { title: "QR Code", url: "/app/card/qr", icon: QrCode },
+const primaryNav = [
+  { title: "Dashboard", url: "/app", icon: LayoutDashboard, end: true },
 ];
 
-const crmItems = [
-  { title: "Contacts", url: "/app/contacts", icon: Users },
+const leadsItems = [
+  { title: "All Leads", url: "/app/contacts", icon: Inbox },
   { title: "Pipeline", url: "/app/pipeline", icon: Kanban },
+  { title: "Bookings", url: "/app/bookings", icon: Calendar },
+  { title: "Estimates", url: "/app/estimates", icon: FileText },
   { title: "Tasks", url: "/app/tasks", icon: CheckSquare },
 ];
 
-const bookingItems = [
-  { title: "Bookings", url: "/app/bookings", icon: Calendar },
-  { title: "Estimates", url: "/app/estimates", icon: FileText },
-  { title: "Jobs", url: "/app/jobs", icon: Briefcase },
-  { title: "Job Pipeline", url: "/app/job-pipeline", icon: Kanban },
-  { title: "Invoices", url: "/app/invoices", icon: DollarSign },
+const jobsItems = [
+  { title: "All Jobs", url: "/app/jobs", icon: Briefcase },
+  { title: "Job Pipeline", url: "/app/job-pipeline", icon: ClipboardList },
   { title: "Recurring", url: "/app/recurring", icon: RefreshCw },
+  { title: "Invoices", url: "/app/invoices", icon: DollarSign },
 ];
 
-const analyticsItems = [
-  { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
-  { title: "Who Viewed", url: "/app/viewers", icon: Eye },
-  { title: "Revenue", url: "/app/revenue", icon: DollarSign },
-  { title: "Industry", url: "/app/industry-insights", icon: Globe },
-  { title: "QR Campaigns", url: "/app/qr-campaigns", icon: QrCode },
+const customersItems = [
+  { title: "Customers", url: "/app/contacts?stage=customer", icon: UserCircle },
+  { title: "Reviews", url: "/app/reviews", icon: Star },
+  { title: "Projects", url: "/app/projects", icon: History },
 ];
 
 const marketingItems = [
-  { title: "Email", url: "/app/email", icon: Mail },
   { title: "Social", url: "/app/social", icon: Share2 },
+  { title: "Email", url: "/app/email", icon: Mail },
   { title: "Content", url: "/app/content", icon: Megaphone },
-  { title: "Promotions", url: "/app/promotions", icon: Tag },
-  { title: "Boost", url: "/app/boost", icon: Zap },
   { title: "Referrals", url: "/app/referrals", icon: Gift },
+  { title: "Boost", url: "/app/boost", icon: Zap },
+  { title: "Promotions", url: "/app/promotions", icon: Tag },
+  { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
 ];
 
-const automationItems = [
-  { title: "Automation", url: "/app/automation", icon: Zap },
-  { title: "AI Autopilot", url: "/app/autopilot", icon: Bot },
+const moreItems = [
   { title: "AI Assistant", url: "/app/assistant", icon: Bot },
-];
-
-const marketplaceItems = [
-  { title: "Projects", url: "/app/projects", icon: FolderOpen },
-  { title: "Reviews", url: "/app/reviews", icon: Star },
+  { title: "Autopilot", url: "/app/autopilot", icon: Bot },
+  { title: "Automation", url: "/app/automation", icon: Zap },
+  { title: "Card Editor", url: "/app/card", icon: CreditCard },
+  { title: "QR Code", url: "/app/card/qr", icon: QrCode },
+  { title: "Card Viewers", url: "/app/viewers", icon: Eye },
+  { title: "Revenue", url: "/app/revenue", icon: DollarSign },
+  { title: "Industry", url: "/app/industry-insights", icon: Globe },
+  { title: "QR Campaigns", url: "/app/qr-campaigns", icon: QrCode },
   { title: "App Store", url: "/app/marketplace", icon: Package },
-];
-
-const agencyItems = [
   { title: "Agency", url: "/app/agency", icon: Building2 },
 ];
 
-const bottomItems = [
-  { title: "Team", url: "/app/team", icon: Building2 },
+const settingsItems = [
   { title: "Settings", url: "/app/settings", icon: Settings },
+  { title: "Team", url: "/app/team", icon: Building2 },
   { title: "Admin", url: "/app/admin", icon: Shield },
 ];
+
+type NavItem = { title: string; url: string; icon: any; end?: boolean };
 
 export function AppSidebar() {
   const { state, toggleSidebar } = useSidebar();
@@ -101,45 +110,80 @@ export function AppSidebar() {
     },
   });
 
-  const isActive = (path: string) =>
-    path === "/app" ? location.pathname === "/app" : location.pathname.startsWith(path);
+  const isActive = (path: string, end?: boolean) => {
+    if (end) return location.pathname === path;
+    // Handle query params in url definition
+    const basePath = path.split("?")[0];
+    return location.pathname.startsWith(basePath) && location.pathname !== "/app";
+  };
+
+  const isGroupActive = (items: NavItem[]) =>
+    items.some((item) => isActive(item.url, item.end));
 
   const handleSignOut = async () => {
     await signOut();
     navigate("/auth");
   };
 
-  const renderGroup = (label: string, items: typeof crmItems) => (
-    <SidebarGroup>
-      <SidebarGroupLabel className="text-2xs uppercase tracking-widest text-muted-foreground/50 px-3 mb-0.5 font-semibold">
-        {!collapsed && label}
-      </SidebarGroupLabel>
-      <SidebarGroupContent>
-        <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild>
-                <NavLink
-                  to={item.url}
-                  end={item.url === "/app"}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-all hover:bg-muted/60 ${
-                    isActive(item.url) ? "bg-primary/8 text-primary font-medium" : "text-sidebar-foreground"
-                  }`}
-                  activeClassName="bg-primary/8 text-primary font-medium"
-                >
-                  <item.icon className="h-[18px] w-[18px] shrink-0" />
-                  {!collapsed && <span>{item.title}</span>}
-                </NavLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroupContent>
-    </SidebarGroup>
+  const renderItem = (item: NavItem) => (
+    <SidebarMenuItem key={item.title}>
+      <SidebarMenuButton asChild>
+        <NavLink
+          to={item.url}
+          end={item.end}
+          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-all hover:bg-muted/60 ${
+            isActive(item.url, item.end) ? "bg-primary/8 text-primary font-medium" : "text-sidebar-foreground"
+          }`}
+          activeClassName="bg-primary/8 text-primary font-medium"
+        >
+          <item.icon className="h-[18px] w-[18px] shrink-0" />
+          {!collapsed && <span>{item.title}</span>}
+        </NavLink>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 
+  const renderCollapsibleGroup = (label: string, icon: any, items: NavItem[]) => {
+    const groupActive = isGroupActive(items);
+    const Icon = icon;
+
+    if (collapsed) {
+      // In collapsed mode, show only the icon for the group
+      return (
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items.map(renderItem)}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      );
+    }
+
+    return (
+      <Collapsible defaultOpen={groupActive} className="group/collapsible">
+        <SidebarGroup>
+          <CollapsibleTrigger asChild>
+            <SidebarGroupLabel className="text-[13px] px-3 py-2 cursor-pointer hover:bg-muted/40 rounded-lg flex items-center gap-3 font-medium text-sidebar-foreground transition-colors select-none">
+              <Icon className={`h-[18px] w-[18px] shrink-0 ${groupActive ? "text-primary" : ""}`} />
+              <span className={`flex-1 ${groupActive ? "text-primary" : ""}`}>{label}</span>
+              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground/60 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
+            </SidebarGroupLabel>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <SidebarGroupContent>
+              <SidebarMenu className="pl-3">
+                {items.map(renderItem)}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </CollapsibleContent>
+        </SidebarGroup>
+      </Collapsible>
+    );
+  };
+
   const initials = profile?.name
-    ? profile.name.split(" ").map(n => n[0]).join("").slice(0, 2).toUpperCase()
+    ? profile.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()
     : "U";
 
   return (
@@ -178,37 +222,21 @@ export function AppSidebar() {
       )}
 
       <SidebarContent className="px-2 pt-1">
-        {/* Home */}
+        {/* Dashboard — top-level, no group */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink
-                    to="/app"
-                    end
-                    className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-all hover:bg-muted/60 ${
-                      isActive("/app") && location.pathname === "/app" ? "bg-primary/8 text-primary font-medium" : "text-sidebar-foreground"
-                    }`}
-                    activeClassName="bg-primary/8 text-primary font-medium"
-                  >
-                    <LayoutDashboard className="h-[18px] w-[18px] shrink-0" />
-                    {!collapsed && <span>Dashboard</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+              {primaryNav.map(renderItem)}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {renderGroup("Card", cardItems)}
-        {renderGroup("CRM", crmItems)}
-        {renderGroup("Booking", bookingItems)}
-        {renderGroup("Analytics", analyticsItems)}
-        {renderGroup("Marketing", marketingItems)}
-        {renderGroup("Automation", automationItems)}
-        {renderGroup("Marketplace", marketplaceItems)}
-        {renderGroup("Agency", agencyItems)}
+        {/* Core workflow groups */}
+        {renderCollapsibleGroup("Leads", Inbox, leadsItems)}
+        {renderCollapsibleGroup("Jobs", Briefcase, jobsItems)}
+        {renderCollapsibleGroup("Customers", UserCheck, customersItems)}
+        {renderCollapsibleGroup("Marketing", Megaphone, marketingItems)}
+        {renderCollapsibleGroup("More Tools", Package, moreItems)}
 
         {/* View My Website */}
         {profile?.handle && (
@@ -237,22 +265,7 @@ export function AppSidebar() {
       <SidebarFooter className="px-2 pb-3">
         {!collapsed && <Separator className="mx-2 mb-2 w-auto opacity-50" />}
         <SidebarMenu>
-          {bottomItems.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild>
-                <NavLink
-                  to={item.url}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-1.5 text-[13px] transition-all hover:bg-muted/60 ${
-                    isActive(item.url) ? "bg-primary/8 text-primary font-medium" : "text-sidebar-foreground"
-                  }`}
-                  activeClassName="bg-primary/8 text-primary font-medium"
-                >
-                  <item.icon className="h-[18px] w-[18px] shrink-0" />
-                  {!collapsed && <span>{item.title}</span>}
-                </NavLink>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+          {settingsItems.map(renderItem)}
         </SidebarMenu>
 
         {/* User section */}
