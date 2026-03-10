@@ -786,12 +786,17 @@ export default function PublicCard() {
                         </motion.div>
                       ))
                     : services.map((s) => (
-                        <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <motion.div
+                          key={s.id}
+                          style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", borderRadius: radii.button, cursor: "default" }}
+                          whileHover={{ backgroundColor: `${palette.primary}08`, x: 4 }}
+                          transition={{ duration: 0.15 }}
+                        >
                           <span style={{ fontSize: 14, fontWeight: 500, color: palette.primary }}>{s.name}</span>
                           {s.price != null && (
                             <span style={{ fontSize: 13, color: palette.secondary }}>${Number(s.price).toFixed(0)}</span>
                           )}
-                        </div>
+                        </motion.div>
                       ))
                   }
                 </div>
