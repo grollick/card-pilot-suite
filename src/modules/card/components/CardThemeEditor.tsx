@@ -291,7 +291,7 @@ export default function CardThemeEditor({
   const [historyIdx, setHistoryIdx] = useState(-1);
   const skipHistoryRef = useRef(false);
 
-  const getSnapshot = useCallback((): ThemeSnapshot => ({ palette, fonts, tokens, gradientBg, bgPattern, metallicEffect }), [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect]);
+  const getSnapshot = useCallback((): ThemeSnapshot => ({ palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId }), [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId]);
 
   const pushHistory = useCallback((snap: ThemeSnapshot) => {
     if (skipHistoryRef.current) return;
