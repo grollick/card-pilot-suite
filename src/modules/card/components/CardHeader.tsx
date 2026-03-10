@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { type ResolvedCardTheme, getAvatarRadius } from "@/lib/cardTokens";
+import type { HeroBackground } from "@/lib/heroBackgrounds";
 import type { MetallicEffect } from "@/modules/card/components/CardThemeEditor";
 import { METALLIC_GRADIENTS } from "@/modules/card/components/CardThemeEditor";
 
