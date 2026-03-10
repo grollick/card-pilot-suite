@@ -40,6 +40,8 @@ interface CardHeaderProps {
   logoNameGap?: number;
   logoVerticalAlign?: "top" | "center" | "bottom";
   metallicEffect?: MetallicEffect;
+  /** Dynamic hero background (profession-based or user-selected) */
+  heroBackground?: HeroBackground | null;
 }
 
 function renderName(name: string, bold?: boolean, uppercase?: boolean, firstNameWeight?: number | null) {
