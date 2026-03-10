@@ -17,6 +17,8 @@ import YesterdaySnapshot from "@/components/dashboard/YesterdaySnapshot";
 import MissedOpportunities from "@/components/dashboard/MissedOpportunities";
 import FirstLeadAssistant from "@/components/dashboard/FirstLeadAssistant";
 import JobMetrics from "@/components/dashboard/JobMetrics";
+import MobileJobDashboard from "@/components/dashboard/MobileJobDashboard";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const priorityColors: Record<string, string> = {
   high: "text-destructive",
