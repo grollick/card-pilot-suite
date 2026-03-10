@@ -2238,6 +2238,103 @@ export type Database = {
           },
         ]
       }
+      recurring_plans: {
+        Row: {
+          billing_cycle: Database["public"]["Enums"]["recurring_billing_cycle"]
+          created_at: string
+          custom_interval_days: number | null
+          end_date: string | null
+          frequency: Database["public"]["Enums"]["recurring_frequency"]
+          id: string
+          job_id: string | null
+          last_completed_at: string | null
+          lead_id: string | null
+          next_service_date: string | null
+          notes: string | null
+          org_id: string | null
+          preferred_day_of_week: number | null
+          preferred_time: string | null
+          price: number
+          service_name: string
+          skip_next: boolean
+          start_date: string
+          status: Database["public"]["Enums"]["recurring_plan_status"]
+          updated_at: string
+          user_id: string
+          visits_completed: number
+        }
+        Insert: {
+          billing_cycle?: Database["public"]["Enums"]["recurring_billing_cycle"]
+          created_at?: string
+          custom_interval_days?: number | null
+          end_date?: string | null
+          frequency?: Database["public"]["Enums"]["recurring_frequency"]
+          id?: string
+          job_id?: string | null
+          last_completed_at?: string | null
+          lead_id?: string | null
+          next_service_date?: string | null
+          notes?: string | null
+          org_id?: string | null
+          preferred_day_of_week?: number | null
+          preferred_time?: string | null
+          price?: number
+          service_name: string
+          skip_next?: boolean
+          start_date?: string
+          status?: Database["public"]["Enums"]["recurring_plan_status"]
+          updated_at?: string
+          user_id: string
+          visits_completed?: number
+        }
+        Update: {
+          billing_cycle?: Database["public"]["Enums"]["recurring_billing_cycle"]
+          created_at?: string
+          custom_interval_days?: number | null
+          end_date?: string | null
+          frequency?: Database["public"]["Enums"]["recurring_frequency"]
+          id?: string
+          job_id?: string | null
+          last_completed_at?: string | null
+          lead_id?: string | null
+          next_service_date?: string | null
+          notes?: string | null
+          org_id?: string | null
+          preferred_day_of_week?: number | null
+          preferred_time?: string | null
+          price?: number
+          service_name?: string
+          skip_next?: boolean
+          start_date?: string
+          status?: Database["public"]["Enums"]["recurring_plan_status"]
+          updated_at?: string
+          user_id?: string
+          visits_completed?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recurring_plans_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_plans_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_plans_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       referrals: {
         Row: {
           created_at: string
@@ -2887,6 +2984,14 @@ export type Database = {
         | "referral"
         | "other"
       org_role: "owner" | "admin" | "member"
+      recurring_billing_cycle: "per_visit" | "monthly" | "custom"
+      recurring_frequency:
+        | "weekly"
+        | "biweekly"
+        | "monthly"
+        | "quarterly"
+        | "custom"
+      recurring_plan_status: "active" | "paused" | "cancelled" | "completed"
       social_post_status: "draft" | "scheduled" | "published" | "failed"
     }
     CompositeTypes: {
@@ -3078,6 +3183,15 @@ export const Constants = {
         "other",
       ],
       org_role: ["owner", "admin", "member"],
+      recurring_billing_cycle: ["per_visit", "monthly", "custom"],
+      recurring_frequency: [
+        "weekly",
+        "biweekly",
+        "monthly",
+        "quarterly",
+        "custom",
+      ],
+      recurring_plan_status: ["active", "paused", "cancelled", "completed"],
       social_post_status: ["draft", "scheduled", "published", "failed"],
     },
   },
