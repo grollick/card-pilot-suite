@@ -309,7 +309,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── SOLUTION ─── */}
-      <section id="features" className="py-16 md:py-24">
+      <section id="features" className="py-16 md:py-28">
         <div className="max-w-5xl mx-auto px-4">
           <motion.div
             initial="hidden"
@@ -317,35 +317,54 @@ export default function LandingPage() {
             viewport={{ once: true }}
             variants={fade}
             custom={0}
-            className="text-center mb-12"
+            className="text-center mb-16"
           >
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">
-              The fix
+              The platform
             </p>
-            <h2 className="text-3xl md:text-4xl font-extrabold">
-              Everything you need,{" "}
-              <span className="gradient-text">one platform</span>
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-3">
+              Everything you need to run your service business{" "}
+              <span className="gradient-text">from one smart card.</span>
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {features.map((f, i) => (
-              <motion.div
-                key={f.title}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fade}
-                custom={i}
-                className="rounded-2xl border border-border bg-card p-6 hover:shadow-card-hover transition-shadow group"
-              >
-                <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/15 transition-colors">
-                  <f.icon className="h-5 w-5 text-primary" />
-                </div>
-                <h3 className="font-bold mb-1.5">{f.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
-              </motion.div>
-            ))}
+          <div className="space-y-20 md:space-y-28">
+            {features.map((f, i) => {
+              const reversed = i % 2 === 1;
+              return (
+                <motion.div
+                  key={f.title}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, margin: "-60px" }}
+                  variants={fade}
+                  custom={0}
+                  className={`flex flex-col ${reversed ? "md:flex-row-reverse" : "md:flex-row"} items-center gap-10 md:gap-14`}
+                >
+                  {/* Text */}
+                  <div className="flex-1 space-y-4">
+                    <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <f.icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-foreground">{f.title}</h3>
+                    <p className="text-muted-foreground leading-relaxed">{f.desc}</p>
+                    <ul className="space-y-2.5 pt-1">
+                      {f.bullets.map((b) => (
+                        <li key={b} className="flex items-start gap-2.5 text-sm text-foreground">
+                          <CheckCircle2 className="h-4 w-4 text-success mt-0.5 shrink-0" />
+                          <span>{b}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Visual preview mock */}
+                  <div className="flex-1 w-full">
+                    <FeaturePreview feature={f} />
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
