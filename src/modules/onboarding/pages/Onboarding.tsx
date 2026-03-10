@@ -581,6 +581,58 @@ export default function Onboarding() {
                         )}
                       </div>
 
+                      {/* About */}
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                          <Wand2 className="h-3 w-3" /> About
+                        </label>
+                        {editingField === "about" ? (
+                          <textarea
+                            value={aiSetup.about}
+                            onChange={e => setAiSetup({ ...aiSetup, about: e.target.value })}
+                            onBlur={() => setEditingField(null)}
+                            autoFocus
+                            rows={3}
+                            className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm outline-none focus:ring-1 focus:ring-ring resize-none"
+                          />
+                        ) : (
+                          <button
+                            onClick={() => setEditingField("about")}
+                            className="w-full text-left px-3 py-2 rounded-lg border border-border bg-muted/30 text-sm hover:border-primary/30 transition-colors flex items-center justify-between group"
+                          >
+                            <span className="line-clamp-3">{aiSetup.about}</span>
+                            <Edit3 className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Marketplace Summary */}
+                      {aiSetup.marketplace_summary && (
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                            <Wand2 className="h-3 w-3" /> Marketplace Summary
+                          </label>
+                          {editingField === "marketplace_summary" ? (
+                            <textarea
+                              value={aiSetup.marketplace_summary}
+                              onChange={e => setAiSetup({ ...aiSetup, marketplace_summary: e.target.value })}
+                              onBlur={() => setEditingField(null)}
+                              autoFocus
+                              rows={2}
+                              className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm outline-none focus:ring-1 focus:ring-ring resize-none"
+                            />
+                          ) : (
+                            <button
+                              onClick={() => setEditingField("marketplace_summary")}
+                              className="w-full text-left px-3 py-2 rounded-lg border border-border bg-muted/30 text-sm hover:border-primary/30 transition-colors flex items-center justify-between group"
+                            >
+                              <span className="line-clamp-2">{aiSetup.marketplace_summary}</span>
+                              <Edit3 className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                            </button>
+                          )}
+                        </div>
+                      )}
+
                       {/* Services preview */}
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
