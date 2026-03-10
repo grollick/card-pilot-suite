@@ -158,6 +158,7 @@ export default function PublicCard() {
 
   const profile = data?.profile;
   const { data: publicReviews = [] } = usePublicReviews(profile?.id);
+  const { data: dbProjects = [] } = usePublicProjects(profile?.id);
 
   // ── Resolve theme from style pack ──
   const theme: ResolvedCardTheme = useMemo(() => {
