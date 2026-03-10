@@ -38,6 +38,7 @@ const DashboardHome = lazy(() => import("@/modules/dashboard/pages/DashboardHome
 
 // Card Builder
 const CardBuilder = lazy(() => import("@/modules/card/pages/CardBuilder"));
+const QRBusinessCard = lazy(() => import("@/modules/card/pages/QRBusinessCard"));
 
 // CRM
 const ContactsPage = lazy(() => import("@/modules/crm/pages/ContactsPage"));
