@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { OrgProvider } from "@/contexts/OrgContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { Loader2 } from "lucide-react";
 
 // ── Public routes — loaded eagerly for fast <500ms render ──
@@ -95,7 +96,28 @@ const LazyFallback = () => (
   </div>
 );
 
-const queryClient = new QueryClient();
+/** Wrap lazy-loaded routes in error boundary + suspense */
+function LazyRoute({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<LazyFallback />}>{children}</Suspense>
+    </ErrorBoundary>
+  );
+}
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 2 * 60 * 1000, // 2 min — avoid refetch storms on navigation
+      gcTime: 10 * 60 * 1000,   // 10 min garbage collection
+      retry: 1,                  // single retry on failure
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 0,
+    },
+  },
+});
 
 const App = () => (
   <HelmetProvider>
