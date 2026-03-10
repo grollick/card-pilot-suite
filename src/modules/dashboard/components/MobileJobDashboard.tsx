@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import {
-  Briefcase, Camera, FileText, UserPlus,
+  Briefcase, Camera, FileText, UserPlus, Sparkles,
   ChevronRight, Clock, AlertTriangle, Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
