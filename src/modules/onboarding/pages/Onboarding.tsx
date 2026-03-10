@@ -144,6 +144,7 @@ export default function Onboarding() {
   const [launched, setLaunched] = useState(false);
   const [services, setServices] = useState<string[]>([]);
   const [newService, setNewService] = useState("");
+  const [businessDescription, setBusinessDescription] = useState("");
 
   // AI state
   const [aiSetup, setAiSetup] = useState<AISetup | null>(null);
