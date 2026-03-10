@@ -169,6 +169,9 @@ export default function DashboardHome() {
           {/* Revenue / Job Overview */}
           <JobMetrics />
 
+          {/* Top Customers */}
+          <TopCustomersWidget />
+
           {/* Pipeline Snapshot */}
           <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.15 }}
             className="dash-card">
