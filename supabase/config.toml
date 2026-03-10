@@ -35,3 +35,6 @@ verify_jwt = false
 
 [functions.ai-onboarding-setup]
 verify_jwt = false
+
+[functions.ai-photo-import]
+verify_jwt = false
