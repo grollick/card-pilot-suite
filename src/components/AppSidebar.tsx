@@ -41,6 +41,7 @@ const analyticsItems = [
   { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
   { title: "Who Viewed", url: "/app/viewers", icon: Eye },
   { title: "Revenue", url: "/app/revenue", icon: DollarSign },
+  { title: "Industry", url: "/app/industry-insights", icon: Globe },
   { title: "QR Campaigns", url: "/app/qr-campaigns", icon: QrCode },
 ];
 
