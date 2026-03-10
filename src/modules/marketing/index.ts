@@ -5,6 +5,6 @@ export {
   useCreateTemplate,
   useUpdateTemplate,
 } from "@/hooks/useEmail";
-export { useSocial } from "@/hooks/useSocial";
+export { useSocialPosts, useCreatePost, useUpdatePost, useDeletePost, useSocialAccounts, useToggleAccount } from "@/hooks/useSocial";
 export { useQRCampaigns } from "@/hooks/useQRCampaigns";
-export { useAutomation } from "@/hooks/useAutomation";
+export { useAutomationRules, useCreateRule, useUpdateRule, useToggleRule, useDeleteRule, runAutomation } from "@/hooks/useAutomation";

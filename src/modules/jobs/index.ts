@@ -11,7 +11,6 @@ export {
   useDeleteJobTask,
   useJobMaterials,
   useCreateJobMaterial,
-  useUpdateJobMaterial,
   useDeleteJobMaterial,
   useJobPhotos,
   useUploadJobPhoto,
