@@ -13,6 +13,7 @@ import QRProductsSection from "@/modules/landing/components/QRProductsSection";
 import PricingSection from "@/modules/landing/components/PricingSection";
 import FinalCTASection from "@/modules/landing/components/FinalCTASection";
 import FooterSection from "@/modules/landing/components/FooterSection";
+import CardDemoBuilder from "@/modules/landing/components/CardDemoBuilder";
 
 export default function Index() {
   const visiblePlans = PLAN_TIERS.filter((p) => p.key !== "agency");
@@ -51,6 +52,7 @@ export default function Index() {
       <FeaturesSection />
       <WorkflowSection />
       <IndustriesSection />
+      <CardDemoBuilder />
       <QRProductsSection />
       <PricingSection visiblePlans={visiblePlans} />
       <FinalCTASection />
