@@ -290,11 +290,11 @@ export default function LandingPage() {
                     Build Your Card Free <ArrowRight className="h-4 w-4 ml-1.5" />
                   </Button>
                 </a>
-                <Link to="/card/demo">
+                <a href="#demo-card">
                   <Button variant="outline" size="lg" className="text-base h-13 px-8 rounded-xl">
                     <ExternalLink className="h-4 w-4 mr-1.5" /> View Example
                   </Button>
-                </Link>
+                </a>
               </motion.div>
               <motion.p initial="hidden" animate="visible" variants={fade} custom={3} className="text-xs text-muted-foreground mt-5">
                 Free forever • No credit card • Setup in 2 min
