@@ -144,6 +144,7 @@ const App = () => (
               <Route path="team" element={<Suspense fallback={<LazyFallback />}><TeamPage /></Suspense>} />
               <Route path="viewers" element={<Suspense fallback={<LazyFallback />}><CardViewersPage /></Suspense>} />
               <Route path="revenue" element={<Suspense fallback={<LazyFallback />}><RevenueForecast /></Suspense>} />
+              <Route path="industry-insights" element={<Suspense fallback={<LazyFallback />}><IndustryInsightsPage /></Suspense>} />
               <Route path="promotions" element={<Suspense fallback={<LazyFallback />}><PromotionsPage /></Suspense>} />
               <Route path="referrals" element={<Suspense fallback={<LazyFallback />}><ReferralsPage /></Suspense>} />
               <Route path="projects" element={<Suspense fallback={<LazyFallback />}><ProjectsPage /></Suspense>} />
