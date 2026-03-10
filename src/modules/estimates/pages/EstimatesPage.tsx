@@ -73,7 +73,7 @@ export default function EstimatesPage() {
   const [convertDate, setConvertDate] = useState("");
   const [convertTime, setConvertTime] = useState("09:00");
 
-  const isFree = planKey === "free";
+  const isFree = planKey === "starter";
   const thisMonth = estimates.filter((e: any) => { const d = new Date(e.created_at); const now = new Date(); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); });
   const limitReached = isFree && thisMonth.length >= 3;
 
