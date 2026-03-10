@@ -5,6 +5,7 @@ import {
   DollarSign, Tag, Gift, Globe, FolderOpen, Star, Megaphone,
   CheckSquare, Search as SearchIcon, FileText, Briefcase, Bot
 } from "lucide-react";
+import ClientSwitcher from "@/modules/agency/components/ClientSwitcher";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
