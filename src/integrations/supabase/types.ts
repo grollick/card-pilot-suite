@@ -1319,31 +1319,46 @@ export type Database = {
       }
       organizations: {
         Row: {
+          brand_color: string | null
           created_at: string
           created_by: string
+          custom_domain: string | null
+          custom_email_from: string | null
           id: string
           logo_url: string | null
           name: string
+          powered_by_text: string | null
           slug: string
           updated_at: string
+          white_label_enabled: boolean
         }
         Insert: {
+          brand_color?: string | null
           created_at?: string
           created_by: string
+          custom_domain?: string | null
+          custom_email_from?: string | null
           id?: string
           logo_url?: string | null
           name: string
+          powered_by_text?: string | null
           slug: string
           updated_at?: string
+          white_label_enabled?: boolean
         }
         Update: {
+          brand_color?: string | null
           created_at?: string
           created_by?: string
+          custom_domain?: string | null
+          custom_email_from?: string | null
           id?: string
           logo_url?: string | null
           name?: string
+          powered_by_text?: string | null
           slug?: string
           updated_at?: string
+          white_label_enabled?: boolean
         }
         Relationships: []
       }
