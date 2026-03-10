@@ -345,7 +345,7 @@ export default function CardThemeEditor({
       pushHistory(getSnapshot());
     }, 300);
     return () => clearTimeout(historyTimer.current);
-  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, open, pushHistory, getSnapshot]);
+  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId, open, pushHistory, getSnapshot]);
 
   // Wrapped setters that go through normal state (history is pushed via effect)
   const setPalette = _setPalette;
@@ -354,6 +354,7 @@ export default function CardThemeEditor({
   const setGradientBg = _setGradientBg;
   const setBgPattern = _setBgPattern;
   const setMetallicEffect = _setMetallicEffect;
+  const setHeroBackgroundId = _setHeroBackgroundId;
 
   // Custom palettes
   const [customPalettes, setCustomPalettes] = useState<{ id: string; name: string; palette: CardPalette }[]>([]);
