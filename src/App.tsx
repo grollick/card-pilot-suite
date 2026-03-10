@@ -19,6 +19,9 @@ import DiscoverPage from "@/modules/public/pages/DiscoverPage";
 import HandleOrSeoRoute from "@/modules/public/pages/HandleOrSeoRoute";
 import PublicSite from "@/modules/public/pages/PublicSite";
 
+// Client Portal — loaded eagerly (public, token-based)
+const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
+
 // ── Auth & marketing — loaded eagerly (small) ──
 import LandingPage from "@/modules/landing/pages/LandingPage";
 import AuthPage from "@/modules/auth/pages/AuthPage";
@@ -155,6 +158,7 @@ const App = () => (
             <Route path="/discover" element={<DiscoverPage />} />
             <Route path="/discover/:profession" element={<DiscoverPage />} />
             <Route path="/discover/:profession/:city" element={<DiscoverPage />} />
+            <Route path="/portal/:token" element={<LazyRoute><ClientPortal /></LazyRoute>} />
 
             {/* App dashboard — auth required, lazy loaded */}
             <Route path="/app" element={

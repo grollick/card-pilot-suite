@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
   ArrowLeft, Phone, Mail, Calendar, FileText, MessageSquare,
-  Plus, Loader2, ChevronDown, Trash2, MoreHorizontal, Clock, Send, X, CheckCircle2, RotateCcw
+  Plus, Loader2, ChevronDown, Trash2, MoreHorizontal, Clock, Send, X, CheckCircle2, RotateCcw, ExternalLink
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { useContact, useContactActivities, useContactTasks, useContactBookings, useContactFollowups, useContactFollowupHistory } from "@/hooks/useContactDetail";
 import { useLogActivity, useReactivateFollowups, useCancelFollowup } from "@/hooks/useContactActions";
 import { useCreateTask, useUpdateTask } from "@/hooks/useTasks";
+import { useCreatePortalToken } from "@/hooks/useClientPortal";
 import { toast } from "sonner";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle
@@ -49,6 +50,7 @@ export default function ContactDetail() {
   const updateTask = useUpdateTask();
   const reactivateFollowups = useReactivateFollowups();
   const cancelFollowup = useCancelFollowup();
+  const createPortalToken = useCreatePortalToken();
 
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
@@ -145,7 +147,15 @@ export default function ContactDetail() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm"><MoreHorizontal className="h-4 w-4" /></Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={async () => {
+                const token = await createPortalToken.mutateAsync(contact.id);
+                const url = `${window.location.origin}/portal/${token}`;
+                await navigator.clipboard.writeText(url);
+                toast.success("Portal link copied to clipboard");
+              }}>
+                <ExternalLink className="h-4 w-4 mr-2" /> Copy Portal Link
+              </DropdownMenuItem>
               <DropdownMenuItem className="text-destructive" onClick={handleDeleteContact}>
                 <Trash2 className="h-4 w-4 mr-2" /> Delete
               </DropdownMenuItem>
