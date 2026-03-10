@@ -1,5 +1,6 @@
-import { Palette, Pencil, Camera, LayoutList } from "lucide-react";
+import { Palette, Pencil, Camera, LayoutList, LayoutTemplate } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import CardPhotoTools from "@/modules/card/components/CardPhotoTools";
@@ -10,10 +11,37 @@ import CardBuilderHeader from "@/modules/card/components/CardBuilderHeader";
 import CardBuilderIdentity from "@/modules/card/components/CardBuilderIdentity";
 import CardBuilderSections from "@/modules/card/components/CardBuilderSections";
 import CardBuilderPreview from "@/modules/card/components/CardBuilderPreview";
+import TemplateSelector from "@/modules/card/components/TemplateSelector";
+import { getTemplate } from "@/lib/cardTemplates";
 import { useCardBuilderState } from "@/hooks/useCardBuilderState";
 
 export default function CardBuilder() {
   const s = useCardBuilderState();
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+
+  const handleApplyTemplate = (templateId: string) => {
+    setSelectedTemplateId(templateId);
+    const template = getTemplate(templateId);
+    if (!template) return;
+    // Apply template sections to card builder
+    const newSections = template.sections.map(ts => {
+      const existing = s.sections.find(es => es.id === ts.id);
+      return {
+        id: ts.id,
+        label: existing?.label || ts.id.charAt(0).toUpperCase() + ts.id.slice(1).replace(/_/g, " "),
+        enabled: ts.enabled,
+        content: existing?.content,
+      };
+    });
+    // Add any existing sections not in the template
+    s.sections.forEach(es => {
+      if (!newSections.find(ns => ns.id === es.id)) {
+        newSections.push({ ...es, enabled: false } as any);
+      }
+    });
+    s.setSections(newSections);
+    s.saveSections(newSections, true);
+  };
 
   const editingSec = s.sections.find((sec) => sec.id === s.editingSection);
 
@@ -42,6 +70,22 @@ export default function CardBuilder() {
           {/* ── Desktop: collapsible accordion panels ── */}
           <div className="hidden lg:block">
             <Accordion type="multiple" defaultValue={["identity", "photos", "sections"]} className="space-y-2">
+              <AccordionItem value="template" className="rounded-xl border border-border bg-card px-4 overflow-hidden">
+                <AccordionTrigger className="py-3 hover:no-underline">
+                  <span className="flex items-center gap-2 text-sm font-semibold">
+                    <LayoutTemplate className="h-4 w-4 text-primary" />
+                    Template
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-3 pt-0">
+                  <TemplateSelector
+                    selectedTemplateId={selectedTemplateId}
+                    onSelect={handleApplyTemplate}
+                    professionName={s.professionName}
+                    compact
+                  />
+                </AccordionContent>
+              </AccordionItem>
               <AccordionItem value="identity" className="rounded-xl border border-border bg-card px-4 overflow-hidden">
                 <AccordionTrigger className="py-3 hover:no-underline">
                   <span className="flex items-center gap-2 text-sm font-semibold">

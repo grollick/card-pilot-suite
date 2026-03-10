@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ArrowRight, ArrowLeft, Sparkles, Check, Loader2, Pencil } from "lucide-react";
+import { Search, ArrowRight, ArrowLeft, Sparkles, Check, Loader2, Pencil, LayoutTemplate } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -11,6 +11,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { pickStylePackKey, getRecommendedPacks, type StylePack } from "@/lib/stylePackSelection";
 import { useGenerateCardContent, type GeneratedCardContent } from "@/hooks/useGenerateContent";
+import { getBestTemplateForProfession, getTemplate } from "@/lib/cardTemplates";
+import TemplateSelector from "@/modules/card/components/TemplateSelector";
 
 interface Profession {
   id: string;
@@ -60,6 +62,7 @@ export default function Onboarding() {
   const [selectedStyle, setSelectedStyle] = useState("Modern");
   const [selectedPackKey, setSelectedPackKey] = useState("");
   const [selectedCTA, setSelectedCTA] = useState("call");
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [phone, setPhone] = useState("");
@@ -172,7 +175,15 @@ export default function Onboarding() {
         tokens: effectivePack?.theme_tokens || {},
         palette,
       };
-      const sectionsJson = selectedProfession.default_card_sections || [];
+      // Use template sections if a template was selected, otherwise profession defaults
+      const selectedTemplate = selectedTemplateId ? getTemplate(selectedTemplateId) : null;
+      const sectionsJson = selectedTemplate
+        ? selectedTemplate.sections.map(s => ({
+            id: s.id,
+            label: s.id.charAt(0).toUpperCase() + s.id.slice(1).replace(/_/g, " "),
+            enabled: s.enabled,
+          }))
+        : (selectedProfession.default_card_sections || []);
       const { error: cardErr } = await supabase.from("cards").upsert({
         user_id: user.id,
         theme_json: themeJson,
@@ -241,11 +252,11 @@ export default function Onboarding() {
     }
   };
 
-  const totalSteps = 5;
+  const totalSteps = 6;
 
   const handleGenerateContent = async () => {
     if (!selectedProfession) return;
-    setStep(4);
+    setStep(5);
     await generate({
       profession: selectedProfession.name,
       name,
@@ -372,9 +383,34 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* Step 3: Essentials */}
+            {/* Step 3: Template Selection */}
             {step === 3 && (
               <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                <div>
+                  <h2 className="text-lg font-semibold flex items-center gap-2">
+                    <LayoutTemplate className="h-5 w-5 text-primary" /> Choose a template
+                  </h2>
+                  <p className="text-sm text-muted-foreground">Pick a layout optimized for your profession</p>
+                </div>
+                <div className="max-h-80 overflow-y-auto pr-1">
+                  <TemplateSelector
+                    selectedTemplateId={selectedTemplateId}
+                    onSelect={setSelectedTemplateId}
+                    professionName={selectedProfession?.name}
+                    professionCategoryKey={categoryKey}
+                    compact
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setStep(2)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
+                  <Button onClick={() => setStep(4)} className="flex-1">Continue <ArrowRight className="h-4 w-4 ml-1" /></Button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 4: Essentials */}
+            {step === 4 && (
+              <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold">The essentials</h2>
                   <p className="text-sm text-muted-foreground">Add your basic info</p>
@@ -385,7 +421,7 @@ export default function Onboarding() {
                 <Input placeholder="Phone number" value={phone} onChange={e => setPhone(e.target.value)} />
                 <Input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(2)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
+                  <Button variant="outline" onClick={() => setStep(3)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
                   <Button onClick={handleGenerateContent} className="flex-1" disabled={!name}>
                     <Sparkles className="h-4 w-4 mr-1" /> Generate Card <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
@@ -393,9 +429,9 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* Step 4: AI-Generated Content Review */}
-            {step === 4 && (
-              <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+            {/* Step 5: AI-Generated Content Review */}
+            {step === 5 && (
+              <motion.div key="s5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-primary" /> AI-Generated Content
@@ -458,8 +494,8 @@ export default function Onboarding() {
                 )}
 
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(3)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
-                  <Button onClick={() => setStep(5)} className="flex-1" disabled={isGenerating || !aiContent}>
+                  <Button variant="outline" onClick={() => setStep(4)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
+                  <Button onClick={() => setStep(6)} className="flex-1" disabled={isGenerating || !aiContent}>
                     Looks Great <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
                 </div>
@@ -472,9 +508,9 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* Step 5: CTA */}
-            {step === 5 && (
-              <motion.div key="s5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+            {/* Step 6: CTA */}
+            {step === 6 && (
+              <motion.div key="s6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold">Primary action</h2>
                   <p className="text-sm text-muted-foreground">What should visitors do first?</p>
@@ -491,7 +527,7 @@ export default function Onboarding() {
                   ))}
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(4)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
+                  <Button variant="outline" onClick={() => setStep(5)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
                   <Button onClick={handleLaunch} disabled={saving} className="flex-1 shadow-glow">
                     {saving ? (
                       <div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full" />
