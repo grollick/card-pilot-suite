@@ -172,65 +172,52 @@ export function useRecentActivity() {
     queryFn: async () => {
       const since = subDays(new Date(), 7).toISOString();
 
-      const { data: recentLeads } = await supabase
-        .from("leads")
-        .select("id, name, source, created_at")
-        .gte("created_at", since)
-        .order("created_at", { ascending: false })
-        .limit(10);
-
-      const { data: recentBookings } = await supabase
-        .from("bookings")
-        .select("id, customer_name, status, created_at, booking_services(name)")
-        .gte("created_at", since)
-        .order("created_at", { ascending: false })
-        .limit(10);
-
-      const { data: recentQuotes } = await supabase
-        .from("quote_requests")
-        .select("id, project_type, status, created_at, leads(name)")
-        .gte("created_at", since)
-        .order("created_at", { ascending: false })
-        .limit(10);
-
-      const { data: recentScans } = await supabase
-        .from("qr_scans")
-        .select("id, device, created_at, qr_campaigns(name)")
-        .gte("created_at", since)
-        .order("created_at", { ascending: false })
-        .limit(10);
+      // Parallelize all queries
+      const [leadsRes, bookingsRes, scansRes] = await Promise.all([
+        supabase
+          .from("leads")
+          .select("id, name, source, created_at")
+          .gte("created_at", since)
+          .order("created_at", { ascending: false })
+          .limit(10),
+        supabase
+          .from("bookings")
+          .select("id, customer_name, status, created_at, booking_services(name)")
+          .gte("created_at", since)
+          .order("created_at", { ascending: false })
+          .limit(10),
+        supabase
+          .from("qr_scans")
+          .select("id, device, created_at, qr_campaigns(name)")
+          .gte("created_at", since)
+          .order("created_at", { ascending: false })
+          .limit(10),
+      ]);
 
       type FeedItem = {
         id: string;
-        type: "lead" | "booking" | "quote" | "qr_scan";
+        type: "lead" | "booking" | "qr_scan";
         title: string;
         subtitle: string;
         created_at: string;
       };
 
       const feed: FeedItem[] = [
-        ...(recentLeads ?? []).map(l => ({
+        ...(leadsRes.data ?? []).map(l => ({
           id: l.id,
           type: "lead" as const,
           title: l.name,
           subtitle: `New lead via ${l.source.replace("_", " ")}`,
           created_at: l.created_at,
         })),
-        ...(recentBookings ?? []).map(b => ({
+        ...(bookingsRes.data ?? []).map(b => ({
           id: b.id,
           type: "booking" as const,
           title: b.customer_name,
           subtitle: `Booking ${b.status}${(b as any).booking_services?.name ? ` · ${(b as any).booking_services.name}` : ""}`,
           created_at: b.created_at,
         })),
-        ...(recentQuotes ?? []).map(q => ({
-          id: q.id,
-          type: "quote" as const,
-          title: (q as any).leads?.name ?? "Quote request",
-          subtitle: `Quote${q.project_type ? ` · ${q.project_type}` : ""} — ${q.status}`,
-          created_at: q.created_at,
-        })),
-        ...(recentScans ?? []).map(s => ({
+        ...(scansRes.data ?? []).map(s => ({
           id: s.id,
           type: "qr_scan" as const,
           title: (s as any).qr_campaigns?.name ?? "QR Scan",
