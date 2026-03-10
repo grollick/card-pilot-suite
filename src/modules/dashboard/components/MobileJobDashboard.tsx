@@ -34,12 +34,13 @@ export default function MobileJobDashboard() {
   return (
     <div className="space-y-4">
       {/* Quick Actions */}
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-5 gap-2">
         {[
           { icon: Briefcase, label: "Jobs", onClick: () => navigate("/app/jobs"), color: "text-primary" },
           { icon: Camera, label: "Photo", onClick: () => navigate("/app/jobs"), color: "text-accent" },
           { icon: FileText, label: "Estimate", onClick: () => navigate("/app/estimates"), color: "text-warning" },
           { icon: UserPlus, label: "Contact", onClick: () => navigate("/app/contacts"), color: "text-success" },
+          { icon: Sparkles, label: "AI Assist", onClick: () => navigate("/app/assistant"), color: "text-primary" },
         ].map((action) => (
           <Button
             key={action.label}
