@@ -909,22 +909,26 @@ export default function Onboarding() {
                   </div>
                 </motion.div>
 
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="grid grid-cols-2 gap-3">
-                  <Button onClick={() => navigate("/app/card")} className="gap-2">
-                    <Eye className="h-4 w-4" /> View Card
-                  </Button>
-                  <Button variant="outline" onClick={() => {
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="space-y-3">
+                  {/* Primary CTA */}
+                  <Button onClick={() => {
                     navigator.clipboard.writeText(window.location.origin + "/c/" + (name || "").toLowerCase().replace(/[^a-z0-9]+/g, ""));
-                    toast({ title: "Link copied!" });
-                  }} className="gap-2">
-                    <Share2 className="h-4 w-4" /> Share Link
+                    toast({ title: "Link copied to clipboard!" });
+                  }} className="w-full gap-2 h-11 text-sm font-semibold">
+                    <Share2 className="h-4 w-4" /> Copy Card Link
                   </Button>
-                  <Button variant="outline" onClick={() => navigate("/app/card")} className="gap-2">
-                    <QrCode className="h-4 w-4" /> QR Code
-                  </Button>
-                  <Button variant="outline" onClick={() => navigate("/app")} className="gap-2">
-                    <LayoutDashboard className="h-4 w-4" /> Dashboard
-                  </Button>
+                  
+                  <div className="grid grid-cols-3 gap-2">
+                    <Button variant="outline" onClick={() => navigate("/app/card")} className="gap-1.5 text-xs">
+                      <QrCode className="h-4 w-4" /> QR Code
+                    </Button>
+                    <Button variant="outline" onClick={() => navigate("/app/card")} className="gap-1.5 text-xs">
+                      <Eye className="h-4 w-4" /> Preview
+                    </Button>
+                    <Button variant="outline" onClick={() => navigate("/app")} className="gap-1.5 text-xs">
+                      <LayoutDashboard className="h-4 w-4" /> Dashboard
+                    </Button>
+                  </div>
                 </motion.div>
 
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.9 }} className="pt-4 border-t border-border">
