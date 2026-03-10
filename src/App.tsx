@@ -58,6 +58,10 @@ const JobsPage = lazy(() => import("@/modules/jobs/pages/JobsPage"));
 const JobDetailPage = lazy(() => import("@/modules/jobs/pages/JobDetailPage"));
 const JobPipelinePage = lazy(() => import("@/modules/jobs/pages/JobPipelinePage"));
 
+// Invoices
+const InvoicesPage = lazy(() => import("@/modules/invoices/pages/InvoicesPage"));
+const InvoiceDetailPage = lazy(() => import("@/modules/invoices/pages/InvoiceDetailPage"));
+
 // Marketing
 const EmailMarketing = lazy(() => import("@/modules/marketing/pages/EmailMarketing"));
 const SocialScheduler = lazy(() => import("@/modules/marketing/pages/SocialScheduler"));
