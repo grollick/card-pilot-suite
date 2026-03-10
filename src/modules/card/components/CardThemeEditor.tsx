@@ -95,6 +95,7 @@ export interface CardThemeOverrides {
   gradientBg?: CardGradientBg;
   bgPattern?: CardBgPattern;
   metallicEffect?: MetallicEffect;
+  heroBackgroundId?: string;
 }
 
 const FONT_OPTIONS = [
