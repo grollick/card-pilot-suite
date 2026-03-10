@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Phone, MessageSquare, User, FileText, Plus, Trash2,
   Loader2, Camera, CheckCircle2, Circle, Package, Play, Pause,
-  Clock, MapPin, Navigation, ChevronDown, PenTool, RefreshCw
+  Clock, MapPin, Navigation, ChevronDown, PenTool, RefreshCw, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
