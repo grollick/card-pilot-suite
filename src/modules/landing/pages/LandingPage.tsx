@@ -289,7 +289,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── SOLUTION ─── */}
-      <section className="py-16 md:py-24">
+      <section id="features" className="py-16 md:py-24">
         <div className="max-w-5xl mx-auto px-4">
           <motion.div
             initial="hidden"
