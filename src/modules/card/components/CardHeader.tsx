@@ -292,6 +292,11 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     </motion.div>
   ) : null;
 
+  // Dynamic fallback background: hero background gradient → palette gradient
+  const fallbackBg = heroBackground
+    ? heroBackground.gradient
+    : `linear-gradient(135deg, ${palette.primary}30, ${palette.accent}20)`;
+
   // Parallax cover image element — reused in cover layout and banner
   const parallaxCover = (height: number, borderRadiusTop: boolean) => (
     <div
@@ -304,15 +309,14 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
         marginLeft: -8,
         marginRight: -8,
         marginTop: borderRadiusTop ? -8 : undefined,
-        background: coverUrl
-          ? undefined
-          : `linear-gradient(135deg, ${palette.primary}30, ${palette.accent}20)`,
+        background: coverUrl ? undefined : fallbackBg,
       }}
     >
       {coverUrl && (
         <motion.img
           src={coverUrl}
           alt=""
+          loading="lazy"
           style={{
             width: "100%",
             height: "120%",
@@ -326,12 +330,26 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
           }}
         />
       )}
-      {logoEl}
+      {/* Gradient overlay for text readability */}
+      {(coverUrl || heroBackground) && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: coverUrl
+              ? "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.35) 100%)"
+              : heroBackground?.overlay ?? "none",
+            pointerEvents: "none",
+            zIndex: 1,
+          }}
+        />
+      )}
+      {logoEl && <div style={{ position: "relative", zIndex: 2 }}>{logoEl}</div>}
     </div>
   );
 
   // Shared cover/backdrop banner element for non-cover layouts
-  const coverBanner = (coverUrl || logoUrl) ? parallaxCover(120, true) : null;
+  const coverBanner = (coverUrl || logoUrl || heroBackground) ? parallaxCover(120, true) : null;
 
   switch (header.layout) {
     // ─── Cover: full-width cover image, avatar overlapping ─────
