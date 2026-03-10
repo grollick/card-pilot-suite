@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FooterSection from "@/modules/landing/components/FooterSection";
+import InteractiveCardBuilder from "@/modules/landing/components/InteractiveCardBuilder";
 
 /* ── animations ── */
 const fade = {
@@ -333,6 +334,9 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* ─── INTERACTIVE BUILDER ─── */}
+      <InteractiveCardBuilder />
 
       {/* ─── SOCIAL PROOF ─── */}
       <section className="py-16 md:py-24">
