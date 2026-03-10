@@ -67,6 +67,11 @@ const marketingItems = [
   { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
 ];
 
+const teamItems = [
+  { title: "Team Management", url: "/app/team-management", icon: Users },
+  { title: "Tech Dashboard", url: "/app/tech-dashboard", icon: HardHat },
+];
+
 const moreItems = [
   { title: "AI Assistant", url: "/app/assistant", icon: Bot },
   { title: "Autopilot", url: "/app/autopilot", icon: Bot },
