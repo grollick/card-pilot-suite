@@ -318,6 +318,18 @@ export default function AgencyDashboard() {
           </Button>
         </div>
       )}
+
+      {/* Bulk Actions */}
+      {(workspaces ?? []).length > 0 && (
+        <Card className="border-border/60">
+          <CardContent className="p-6">
+            <BulkActionsPanel />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* White Label Settings */}
+      {currentOrg && <WhiteLabelSettings />}
     </div>
   );
 }
