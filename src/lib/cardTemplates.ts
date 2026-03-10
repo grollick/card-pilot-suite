@@ -127,6 +127,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     sections: [
       { id: "hero", enabled: true },
       { id: "gallery", enabled: true },
+      { id: "projects", enabled: true },
       { id: "about", enabled: true },
       { id: "services", enabled: true },
       { id: "testimonials", enabled: true },
