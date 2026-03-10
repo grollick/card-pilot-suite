@@ -1515,6 +1515,68 @@ export type Database = {
         }
         Relationships: []
       }
+      neighborhood_boosts: {
+        Row: {
+          bookings_count: number
+          created_at: string
+          duration_days: number
+          expires_at: string
+          id: string
+          leads_count: number
+          org_id: string | null
+          radius_km: number
+          started_at: string
+          status: string
+          target_city: string | null
+          target_postal_code: string | null
+          updated_at: string
+          user_id: string
+          views_count: number
+        }
+        Insert: {
+          bookings_count?: number
+          created_at?: string
+          duration_days?: number
+          expires_at: string
+          id?: string
+          leads_count?: number
+          org_id?: string | null
+          radius_km?: number
+          started_at?: string
+          status?: string
+          target_city?: string | null
+          target_postal_code?: string | null
+          updated_at?: string
+          user_id: string
+          views_count?: number
+        }
+        Update: {
+          bookings_count?: number
+          created_at?: string
+          duration_days?: number
+          expires_at?: string
+          id?: string
+          leads_count?: number
+          org_id?: string | null
+          radius_km?: number
+          started_at?: string
+          status?: string
+          target_city?: string | null
+          target_postal_code?: string | null
+          updated_at?: string
+          user_id?: string
+          views_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "neighborhood_boosts_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_members: {
         Row: {
           id: string
