@@ -12,7 +12,7 @@ import SocialAnalyticsTab from "../components/social/SocialAnalyticsTab";
 import SocialAccountsPanel from "../components/social/SocialAccountsPanel";
 import SocialComposerDialog from "../components/social/SocialComposerDialog";
 import PostDetailDrawer from "../components/social/PostDetailDrawer";
-import type { SocialPostExtended } from "@/hooks/useSocial";
+import type { SocialPost } from "@/hooks/useSocialPosts";
 
 const TABS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -27,10 +27,10 @@ const TABS = [
 
 export default function SocialScheduler() {
   const [composerOpen, setComposerOpen] = useState(false);
-  const [editPost, setEditPost] = useState<SocialPostExtended | null>(null);
-  const [detailPost, setDetailPost] = useState<SocialPostExtended | null>(null);
+  const [editPost, setEditPost] = useState<SocialPost | null>(null);
+  const [detailPost, setDetailPost] = useState<SocialPost | null>(null);
 
-  const openComposer = (post?: SocialPostExtended) => {
+  const openComposer = (post?: SocialPost) => {
     setEditPost(post ?? null);
     setComposerOpen(true);
   };
