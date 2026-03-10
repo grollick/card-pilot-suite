@@ -75,16 +75,17 @@ export default function StickyActionBar({
   // ── Intersection Observer: show after hero ──
   useEffect(() => {
     // Create a sentinel div at top of page if not existing
-    let sentinel = document.getElementById("sticky-bar-sentinel");
+    let sentinel = document.getElementById("sticky-bar-sentinel") as HTMLDivElement | null;
     if (!sentinel) {
-      sentinel = document.createElement("div");
-      sentinel.id = "sticky-bar-sentinel";
-      sentinel.style.position = "absolute";
-      sentinel.style.top = "300px"; // trigger after hero area
-      sentinel.style.height = "1px";
-      sentinel.style.width = "1px";
-      sentinel.style.pointerEvents = "none";
-      document.body.appendChild(sentinel);
+      const el = document.createElement("div");
+      el.id = "sticky-bar-sentinel";
+      el.style.position = "absolute";
+      el.style.top = "300px";
+      el.style.height = "1px";
+      el.style.width = "1px";
+      el.style.pointerEvents = "none";
+      document.body.appendChild(el);
+      sentinel = el;
     }
     sentinelRef.current = sentinel;
 
