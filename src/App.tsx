@@ -83,6 +83,7 @@ const BoostPage = lazy(() => import("@/modules/marketing/pages/BoostPage"));
 
 // Analytics
 const Analytics = lazy(() => import("@/modules/analytics/pages/Analytics"));
+const GrowthDashboard = lazy(() => import("@/modules/analytics/pages/GrowthDashboard"));
 const CardViewersPage = lazy(() => import("@/modules/analytics/pages/CardViewersPage"));
 const RevenueForecast = lazy(() => import("@/modules/analytics/pages/RevenueForecast"));
 const IndustryInsightsPage = lazy(() => import("@/modules/analytics/pages/IndustryInsightsPage"));
@@ -183,6 +184,7 @@ const App = () => (
               <Route path="social" element={<LazyRoute><SocialScheduler /></LazyRoute>} />
               <Route path="content" element={<LazyRoute><ContentPage /></LazyRoute>} />
               <Route path="analytics" element={<LazyRoute><Analytics /></LazyRoute>} />
+              <Route path="growth" element={<LazyRoute><GrowthDashboard /></LazyRoute>} />
               <Route path="automation" element={<LazyRoute><AutomationPage /></LazyRoute>} />
               <Route path="autopilot" element={<LazyRoute><AutopilotPage /></LazyRoute>} />
               <Route path="qr-campaigns" element={<LazyRoute><QRCampaignsPage /></LazyRoute>} />
