@@ -537,6 +537,20 @@ export default function JobDetailPage() {
         photos={photos}
         materials={materials}
       />
+
+      {/* AI Tech Assistant */}
+      <TechAssistantSheet
+        open={assistOpen}
+        onOpenChange={setAssistOpen}
+        jobId={id}
+        jobTitle={job.title}
+        jobType={job.job_type || undefined}
+        existingNotes={job.notes || ""}
+        onApplyNotes={(newNotes) => {
+          updateJob.mutate({ id: id!, notes: newNotes });
+          refetch();
+        }}
+      />
     </div>
   );
 }
