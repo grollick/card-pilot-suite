@@ -648,8 +648,8 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* ── Step 3: Business Info + Live Preview ── */}
-            {step === 3 && (
+            {/* ── Step 4: Business Info + Live Preview ── */}
+            {step === 4 && (
               <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold">Your business info</h2>
