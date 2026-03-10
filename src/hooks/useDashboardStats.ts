@@ -68,44 +68,41 @@ export function useBusinessPerformance() {
       const now = new Date();
       const monthStart = startOfMonth(now).toISOString();
 
-      // Card views this month
-      const { count: viewsThisMonth } = await supabase
-        .from("analytics_events")
-        .select("*", { count: "exact", head: true })
-        .eq("event_type", "card_view")
-        .gte("created_at", monthStart);
+      // Parallelize all queries
+      const [viewsRes, leadsRes, bookingsRes, servicesRes] = await Promise.all([
+        supabase
+          .from("analytics_events")
+          .select("*", { count: "exact", head: true })
+          .eq("event_type", "card_view")
+          .gte("created_at", monthStart),
+        supabase
+          .from("leads")
+          .select("*", { count: "exact", head: true })
+          .gte("created_at", monthStart),
+        supabase
+          .from("bookings")
+          .select("id, service_id")
+          .gte("created_at", monthStart),
+        supabase
+          .from("booking_services")
+          .select("price")
+          .eq("active", true),
+      ]);
 
-      // Leads this month
-      const { count: leadsThisMonth } = await supabase
-        .from("leads")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", monthStart);
-
-      // Bookings this month
-      const { data: bookingsThisMonth } = await supabase
-        .from("bookings")
-        .select("id, service_id")
-        .gte("created_at", monthStart);
-
-      const bookingCount = bookingsThisMonth?.length ?? 0;
-
-      // Average service price
-      const { data: services } = await supabase
-        .from("booking_services")
-        .select("price")
-        .eq("active", true);
-
-      const prices = (services ?? []).map(s => s.price ?? 0).filter(p => p > 0);
+      const bookingCount = bookingsRes.data?.length ?? 0;
+      const prices = (servicesRes.data ?? []).map(s => s.price ?? 0).filter(p => p > 0);
       const avgPrice = prices.length > 0 ? prices.reduce((a, b) => a + b, 0) / prices.length : 0;
 
       const estimatedRevenue = Math.round(bookingCount * avgPrice);
-      const conversionRate = (viewsThisMonth ?? 0) > 0
-        ? Math.round(((leadsThisMonth ?? 0) / (viewsThisMonth ?? 1)) * 100)
+      const viewsThisMonth = viewsRes.count ?? 0;
+      const leadsThisMonth = leadsRes.count ?? 0;
+      const conversionRate = viewsThisMonth > 0
+        ? Math.round((leadsThisMonth / viewsThisMonth) * 100)
         : 0;
 
       return {
-        views: viewsThisMonth ?? 0,
-        leads: leadsThisMonth ?? 0,
+        views: viewsThisMonth,
+        leads: leadsThisMonth,
         bookings: bookingCount,
         estimatedRevenue,
         conversionRate,
