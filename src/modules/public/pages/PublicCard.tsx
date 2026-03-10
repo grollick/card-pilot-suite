@@ -939,6 +939,14 @@ export default function PublicCard() {
                       <p style={{ fontSize: 12, color: `${palette.secondary}99`, margin: "6px 0 0", fontWeight: 500 }}>
                         — {review.reviewer_name}
                       </p>
+                      {review.owner_response && (
+                        <div style={{ marginTop: 10, paddingLeft: 10, borderLeft: `2px solid ${palette.primary}40` }}>
+                          <p style={{ fontSize: 11, fontWeight: 600, color: palette.primary, margin: 0 }}>Response from business</p>
+                          <p style={{ fontSize: 12, color: palette.secondary, margin: "3px 0 0", lineHeight: 1.5 }}>
+                            {review.owner_response}
+                          </p>
+                        </div>
+                      )}
                     </CardSectionWrapper>
                   ))}
                 </div>
