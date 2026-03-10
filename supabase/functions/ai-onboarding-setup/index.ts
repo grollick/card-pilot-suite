@@ -11,23 +11,25 @@ serve(async (req) => {
   }
 
   try {
-    const { profession, name, company, city } = await req.json();
+    const { profession, name, company, city, business_description } = await req.json();
     if (!profession) throw new Error("Profession is required");
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are an expert business setup consultant for digital business cards. Given a profession, generate a complete business card setup with realistic, industry-specific content.
+    const systemPrompt = `You are an expert business setup consultant for digital business cards. Given a profession and optionally a business description, generate a complete business card setup with realistic, industry-specific content.
 
-Be specific to the profession. Use real-world service names and realistic pricing for the market. Content should be professional but approachable.`;
+Be specific to the profession. Use real-world service names and realistic pricing for the market. Content should be professional but approachable.
+${business_description ? "The user has described their business — use their description to make the content highly personalized and specific to their niche, specialties, and unique selling points." : ""}`;
 
     const userPrompt = `Generate a complete card setup for:
 - Profession: ${profession}
 - Name: ${name || "Not provided"}
 - Company: ${company || "Not provided"}  
 - City: ${city || "Not provided"}
+${business_description ? `- Business Description: "${business_description}"` : ""}
 
-Create realistic, specific content for this exact profession.`;
+Create realistic, specific content for this exact profession${business_description ? " and business description" : ""}.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -54,6 +56,7 @@ Create realistic, specific content for this exact profession.`;
                   bio: { type: "string", description: "1-2 sentence professional bio, max 160 chars" },
                   about: { type: "string", description: "2-3 sentence about section, max 300 chars" },
                   cta_text: { type: "string", description: "Call-to-action button text, max 30 chars" },
+                  marketplace_summary: { type: "string", description: "A 1-2 sentence summary for a public marketplace listing, max 200 chars. Highlight what makes this business stand out." },
                   services: {
                     type: "array",
                     items: {
@@ -80,7 +83,7 @@ Create realistic, specific content for this exact profession.`;
                     description: "2-3 short tips for this profession's card setup",
                   },
                 },
-                required: ["tagline", "bio", "about", "cta_text", "services", "suggested_template", "setup_tips"],
+                required: ["tagline", "bio", "about", "cta_text", "marketplace_summary", "services", "suggested_template", "setup_tips"],
                 additionalProperties: false,
               },
             },

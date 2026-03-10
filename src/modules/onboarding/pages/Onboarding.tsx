@@ -37,6 +37,7 @@ interface AISetup {
   bio: string;
   about: string;
   cta_text: string;
+  marketplace_summary: string;
   services: AIService[];
   suggested_template: string;
   setup_tips: string[];
@@ -143,6 +144,7 @@ export default function Onboarding() {
   const [launched, setLaunched] = useState(false);
   const [services, setServices] = useState<string[]>([]);
   const [newService, setNewService] = useState("");
+  const [businessDescription, setBusinessDescription] = useState("");
 
   // AI state
   const [aiSetup, setAiSetup] = useState<AISetup | null>(null);
@@ -200,6 +202,7 @@ export default function Onboarding() {
           name: name || undefined,
           company: company || undefined,
           city: city || undefined,
+          business_description: businessDescription || undefined,
         },
       });
 
@@ -226,10 +229,15 @@ export default function Onboarding() {
     }
   };
 
-  // When profession selected, move to AI step
+  // When profession selected, move to description input step
   const handleProfessionNext = () => {
     if (!selectedProfession) return;
     setStep(2);
+  };
+
+  // Trigger AI generation from step 2
+  const handleDescriptionNext = () => {
+    setStep(3);
     generateAISetup();
   };
 
@@ -357,7 +365,7 @@ export default function Onboarding() {
 
       await queryClient.invalidateQueries({ queryKey: ["profile-onboarding"] });
       setLaunched(true);
-      setStep(6);
+      setStep(7);
     } catch (err: any) {
       console.error("Onboarding error:", err);
       toast({ title: "Something went wrong", description: err.message, variant: "destructive" });
@@ -366,7 +374,7 @@ export default function Onboarding() {
     }
   };
 
-  const totalSteps = 6;
+  const totalSteps = 7;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -380,7 +388,7 @@ export default function Onboarding() {
         </div>
 
         {/* Progress */}
-        {step < 6 && (
+        {step < 7 && (
           <div className="flex gap-1.5 mb-6">
             {[...Array(totalSteps)].map((_, i) => (
               <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
@@ -390,7 +398,7 @@ export default function Onboarding() {
           </div>
         )}
 
-        <div className={`rounded-2xl border border-border bg-card shadow-lg ${step === 6 ? "p-8" : "p-6"}`}>
+        <div className={`rounded-2xl border border-border bg-card shadow-lg ${step === 7 ? "p-8" : "p-6"}`}>
           <AnimatePresence mode="wait">
             {/* ── Step 1: Profession ── */}
             {step === 1 && (
@@ -428,8 +436,52 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* ── Step 2: AI Setup Assistant ── */}
+            {/* ── Step 2: Business Description ── */}
             {step === 2 && (
+              <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                <div>
+                  <h2 className="text-lg font-semibold">Describe your business</h2>
+                  <p className="text-sm text-muted-foreground">Tell us in one sentence what you do — AI will craft your entire card from this.</p>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-primary/5 border border-primary/10">
+                  <div className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: "var(--gradient-primary)" }}>
+                    <Sparkles className="h-4 w-4 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Hi! I can help set up your card in seconds.</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Describe your business and I'll generate your tagline, bio, services, and more.</p>
+                  </div>
+                </div>
+
+                <textarea
+                  value={businessDescription}
+                  onChange={e => setBusinessDescription(e.target.value)}
+                  placeholder={`e.g. "Landscaping company specializing in patios and garden design."`}
+                  rows={3}
+                  className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm outline-none focus:ring-2 focus:ring-ring resize-none placeholder:text-muted-foreground"
+                />
+
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
+                    <ArrowLeft className="h-4 w-4 mr-1" /> Back
+                  </Button>
+                  <Button onClick={handleDescriptionNext} className="flex-1">
+                    <Sparkles className="h-4 w-4 mr-1" /> Generate My Card <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+
+                <button
+                  onClick={() => { setStep(3); generateAISetup(); }}
+                  className="w-full text-xs text-muted-foreground hover:text-foreground transition-colors text-center"
+                >
+                  Skip — set up without a description
+                </button>
+              </motion.div>
+            )}
+
+            {/* ── Step 3: AI Setup Assistant ── */}
+            {step === 3 && (
               <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-5">
                 {aiLoading ? (
                   <div className="text-center py-10 space-y-5">
@@ -529,6 +581,58 @@ export default function Onboarding() {
                         )}
                       </div>
 
+                      {/* About */}
+                      <div className="space-y-1">
+                        <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                          <Wand2 className="h-3 w-3" /> About
+                        </label>
+                        {editingField === "about" ? (
+                          <textarea
+                            value={aiSetup.about}
+                            onChange={e => setAiSetup({ ...aiSetup, about: e.target.value })}
+                            onBlur={() => setEditingField(null)}
+                            autoFocus
+                            rows={3}
+                            className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm outline-none focus:ring-1 focus:ring-ring resize-none"
+                          />
+                        ) : (
+                          <button
+                            onClick={() => setEditingField("about")}
+                            className="w-full text-left px-3 py-2 rounded-lg border border-border bg-muted/30 text-sm hover:border-primary/30 transition-colors flex items-center justify-between group"
+                          >
+                            <span className="line-clamp-3">{aiSetup.about}</span>
+                            <Edit3 className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Marketplace Summary */}
+                      {aiSetup.marketplace_summary && (
+                        <div className="space-y-1">
+                          <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                            <Wand2 className="h-3 w-3" /> Marketplace Summary
+                          </label>
+                          {editingField === "marketplace_summary" ? (
+                            <textarea
+                              value={aiSetup.marketplace_summary}
+                              onChange={e => setAiSetup({ ...aiSetup, marketplace_summary: e.target.value })}
+                              onBlur={() => setEditingField(null)}
+                              autoFocus
+                              rows={2}
+                              className="w-full px-3 py-2 rounded-lg border border-input bg-background text-sm outline-none focus:ring-1 focus:ring-ring resize-none"
+                            />
+                          ) : (
+                            <button
+                              onClick={() => setEditingField("marketplace_summary")}
+                              className="w-full text-left px-3 py-2 rounded-lg border border-border bg-muted/30 text-sm hover:border-primary/30 transition-colors flex items-center justify-between group"
+                            >
+                              <span className="line-clamp-2">{aiSetup.marketplace_summary}</span>
+                              <Edit3 className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                            </button>
+                          )}
+                        </div>
+                      )}
+
                       {/* Services preview */}
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
@@ -561,14 +665,14 @@ export default function Onboarding() {
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" onClick={() => {
                         setAiSetup(null);
-                        setStep(1);
+                        setStep(2);
                       }}>
                         <ArrowLeft className="h-4 w-4 mr-1" /> Back
                       </Button>
                       <Button variant="ghost" size="sm" onClick={generateAISetup} className="text-muted-foreground">
                         <RefreshCw className="h-3.5 w-3.5 mr-1" /> Regenerate
                       </Button>
-                      <Button onClick={() => setStep(3)} className="flex-1">
+                      <Button onClick={() => setStep(4)} className="flex-1">
                         Looks good! <ArrowRight className="h-4 w-4 ml-1" />
                       </Button>
                     </div>
@@ -584,10 +688,10 @@ export default function Onboarding() {
                       <p className="text-xs text-muted-foreground mt-1">{aiError || "Don't worry — you can set everything up manually!"}</p>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
+                      <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
                         <ArrowLeft className="h-4 w-4 mr-1" /> Back
                       </Button>
-                      <Button onClick={() => setStep(3)} className="flex-1">
+                      <Button onClick={() => setStep(4)} className="flex-1">
                         Continue manually <ArrowRight className="h-4 w-4 ml-1" />
                       </Button>
                     </div>
@@ -596,9 +700,9 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* ── Step 3: Business Info + Live Preview ── */}
-            {step === 3 && (
-              <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+            {/* ── Step 4: Business Info + Live Preview ── */}
+            {step === 4 && (
+              <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold">Your business info</h2>
                   <p className="text-sm text-muted-foreground">This appears on your card</p>
@@ -614,19 +718,19 @@ export default function Onboarding() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
+                  <Button variant="outline" onClick={() => setStep(3)} className="flex-1">
                     <ArrowLeft className="h-4 w-4 mr-1" /> Back
                   </Button>
-                  <Button onClick={() => setStep(4)} disabled={!name} className="flex-1">
+                  <Button onClick={() => setStep(5)} disabled={!name} className="flex-1">
                     Continue <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
                 </div>
               </motion.div>
             )}
 
-            {/* ── Step 4: Template Selection ── */}
-            {step === 4 && (
-              <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+            {/* ── Step 5: Template Selection ── */}
+            {step === 5 && (
+              <motion.div key="s5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold">Choose a layout</h2>
                   <p className="text-sm text-muted-foreground">
@@ -646,19 +750,19 @@ export default function Onboarding() {
                   ))}
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(3)} className="flex-1">
+                  <Button variant="outline" onClick={() => setStep(4)} className="flex-1">
                     <ArrowLeft className="h-4 w-4 mr-1" /> Back
                   </Button>
-                  <Button onClick={() => setStep(5)} className="flex-1">
+                  <Button onClick={() => setStep(6)} className="flex-1">
                     Continue <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
                 </div>
               </motion.div>
             )}
 
-            {/* ── Step 5: Services ── */}
-            {step === 5 && (
-              <motion.div key="s5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+            {/* ── Step 6: Services ── */}
+            {step === 6 && (
+              <motion.div key="s6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold">Your services</h2>
                   <p className="text-sm text-muted-foreground">
@@ -741,7 +845,7 @@ export default function Onboarding() {
                 })()}
 
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(4)} className="flex-1">
+                  <Button variant="outline" onClick={() => setStep(5)} className="flex-1">
                     <ArrowLeft className="h-4 w-4 mr-1" /> Back
                   </Button>
                   <Button onClick={handleLaunch} disabled={saving} className="flex-1">
@@ -755,9 +859,9 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* ── Step 6: Launch Celebration ── */}
-            {step === 6 && launched && (
-              <motion.div key="s6" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center space-y-6">
+            {/* ── Step 7: Launch Celebration ── */}
+            {step === 7 && launched && (
+              <motion.div key="s7" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center space-y-6">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
