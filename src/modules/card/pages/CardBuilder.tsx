@@ -420,6 +420,18 @@ export default function CardBuilder() {
                       s.saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarBannerAnimation: val } } });
                     }}
                   />
+                  {/* AI Photo Import (mobile) */}
+                  <div className="pt-3 mt-3 border-t border-border/50">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setPhotoImportOpen(true)}
+                    >
+                      <Globe className="h-4 w-4 mr-2" />
+                      Import Photos from URL
+                    </Button>
+                  </div>
                 </AccordionContent>
               </AccordionItem>
 
