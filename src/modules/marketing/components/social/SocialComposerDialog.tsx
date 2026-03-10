@@ -196,7 +196,7 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label className="text-xs">Campaign</Label>
-                  <Select value={campaignId} onValueChange={setCampaignId}>
+                  <Select value={campaignId || "__none__"} onValueChange={(v) => setCampaignId(v === "__none__" ? "" : v)}>
                     <SelectTrigger className="h-8 text-xs mt-1"><SelectValue placeholder="None" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="__none__">None</SelectItem>
