@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   Smartphone,
@@ -13,6 +14,8 @@ import {
   CheckCircle2,
   Sparkles,
   ExternalLink,
+  Menu,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FooterSection from "@/modules/landing/components/FooterSection";
@@ -85,27 +88,99 @@ const trustStats = [
   { value: "4.9★", label: "Average rating" },
 ];
 
+/* ── nav links ── */
+const NAV_LINKS = [
+  { label: "Features", href: "#features" },
+  { label: "Example Card", href: "/card/demo" },
+  { label: "Pricing", href: "#pricing" },
+];
+
 /* ── page ── */
 export default function LandingPage() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* ─── Nav ─── */}
       <nav className="border-b border-border/50 bg-card/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link to="/" className="text-lg font-extrabold tracking-tight">
+          <Link to="/" className="text-lg font-extrabold tracking-tight shrink-0">
             <span className="gradient-text">CardPilot</span>
           </Link>
-          <div className="flex items-center gap-2">
+
+          {/* Desktop links */}
+          <div className="hidden md:flex items-center gap-6">
+            {NAV_LINKS.map((l) =>
+              l.href.startsWith("#") ? (
+                <a key={l.label} href={l.href} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  {l.label}
+                </a>
+              ) : (
+                <Link key={l.label} to={l.href} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                  {l.label}
+                </Link>
+              )
+            )}
+          </div>
+
+          {/* Desktop actions */}
+          <div className="hidden md:flex items-center gap-2">
             <Link to="/auth">
               <Button variant="ghost" size="sm">Log in</Button>
             </Link>
             <Link to="/onboarding">
               <Button size="sm" className="shadow-glow">
-                Get Started <ArrowRight className="h-3.5 w-3.5 ml-1" />
+                Create Your Card <ArrowRight className="h-3.5 w-3.5 ml-1" />
               </Button>
             </Link>
           </div>
+
+          {/* Mobile: CTA + hamburger */}
+          <div className="flex md:hidden items-center gap-2">
+            <Link to="/onboarding">
+              <Button size="sm" className="shadow-glow text-xs px-3">
+                Create Card <ArrowRight className="h-3 w-3 ml-0.5" />
+              </Button>
+            </Link>
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="h-9 w-9 flex items-center justify-center rounded-lg hover:bg-muted transition-colors"
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
+
+        {/* Mobile dropdown */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden overflow-hidden border-t border-border/50"
+            >
+              <div className="px-4 py-3 space-y-1">
+                {NAV_LINKS.map((l) =>
+                  l.href.startsWith("#") ? (
+                    <a key={l.label} href={l.href} onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                      {l.label}
+                    </a>
+                  ) : (
+                    <Link key={l.label} to={l.href} onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                      {l.label}
+                    </Link>
+                  )
+                )}
+                <Link to="/auth" onClick={() => setMobileOpen(false)} className="block rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground hover:bg-muted transition-colors">
+                  Log in
+                </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* ─── HERO ─── */}
@@ -214,7 +289,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── SOLUTION ─── */}
-      <section className="py-16 md:py-24">
+      <section id="features" className="py-16 md:py-24">
         <div className="max-w-5xl mx-auto px-4">
           <motion.div
             initial="hidden"
@@ -390,7 +465,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── FINAL CTA ─── */}
-      <section className="relative py-20 md:py-28 overflow-hidden">
+      <section id="pricing" className="relative py-20 md:py-28 overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-primary/[0.03]">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] rounded-full bg-primary/[0.06] blur-[120px]" />
         </div>
