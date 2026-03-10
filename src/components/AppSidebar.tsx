@@ -3,7 +3,7 @@ import {
   BarChart3, Settings, Shield, ChevronLeft, LogOut,
   Zap, CreditCard, Building2, QrCode, Eye,
   DollarSign, Tag, Gift, Globe, FolderOpen, Star, Megaphone,
-  CheckSquare, Search as SearchIcon, FileText, Briefcase, Bot, Package
+  CheckSquare, Search as SearchIcon, FileText, Briefcase, Bot, Package, RefreshCw
 } from "lucide-react";
 import ClientSwitcher from "@/modules/agency/components/ClientSwitcher";
 import { NavLink } from "@/components/NavLink";
