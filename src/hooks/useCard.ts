@@ -21,6 +21,7 @@ export const DEFAULT_SECTIONS = [
   { id: "hero", label: "Hero", enabled: true },
   { id: "about", label: "About", enabled: true },
   { id: "services", label: "Services", enabled: true },
+  { id: "projects", label: "Before / After Projects", enabled: false },
   { id: "testimonials", label: "Testimonials", enabled: true },
   { id: "gallery", label: "Gallery", enabled: false },
   { id: "contact", label: "Contact Form", enabled: true },

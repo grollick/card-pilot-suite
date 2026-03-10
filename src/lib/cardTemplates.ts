@@ -94,6 +94,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     sections: [
       { id: "hero", enabled: true },
       { id: "services", enabled: true },
+      { id: "projects", enabled: true },
       { id: "quote_request", enabled: true },
       { id: "about", enabled: true },
       { id: "testimonials", enabled: true },
@@ -126,6 +127,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     sections: [
       { id: "hero", enabled: true },
       { id: "gallery", enabled: true },
+      { id: "projects", enabled: true },
       { id: "about", enabled: true },
       { id: "services", enabled: true },
       { id: "testimonials", enabled: true },
@@ -221,6 +223,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     sections: [
       { id: "hero", enabled: true },
       { id: "services", enabled: true },
+      { id: "projects", enabled: true },
       { id: "quote_request", enabled: true },
       { id: "gallery", enabled: true },
       { id: "testimonials", enabled: true },
@@ -252,6 +255,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     style: "Modern",
     sections: [
       { id: "hero", enabled: true },
+      { id: "projects", enabled: true },
       { id: "gallery", enabled: true },
       { id: "services", enabled: true },
       { id: "quote_request", enabled: true },

@@ -50,6 +50,7 @@ import QuoteRequestForm from "@/modules/card/components/QuoteRequestForm";
 import SmartEngagementPopup from "@/modules/card/components/SmartEngagementPopup";
 import StickyActionBar from "@/modules/card/components/StickyActionBar";
 import GalleryLightbox from "@/modules/card/components/GalleryLightbox";
+import ProjectShowcase from "@/modules/card/components/ProjectShowcase";
 import { getHeroBackgroundForProfession, getHeroBackgroundById } from "@/lib/heroBackgrounds";
 import { showsBranding } from "@/lib/plans";
 
@@ -555,6 +556,7 @@ export default function PublicCard() {
   const SECTION_ICONS: Record<string, LucideIcon> = {
     about: User,
     services: Briefcase,
+    projects: Image,
     testimonials: Star,
     gallery: Image,
     social: Share2,
@@ -910,7 +912,24 @@ export default function PublicCard() {
             );
           })()}
 
-          {/* ── Booking ── */}
+          {/* ── Before / After Projects ── */}
+          {enabledSections.has("projects") && (() => {
+            const projectItems = sectionContent("projects")?.items as { title: string; beforeImage: string; afterImage: string; description?: string }[] | undefined;
+            if (!projectItems || projectItems.length === 0) return null;
+
+            return (
+              <div>
+                <SectionTitle id="projects" label={sectionContent("projects")?.heading || "Our Work"} />
+                <ProjectShowcase
+                  projects={projectItems}
+                  theme={theme}
+                  metallicEffect={metallicEffect}
+                  baseIndex={15}
+                />
+              </div>
+            );
+          })()}
+
           {enabledSections.has("booking") && (
             <div id="booking-section">
               <Link to={`/book/${handle}`} style={{ textDecoration: "none" }}>
