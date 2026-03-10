@@ -185,6 +185,21 @@ export default function DiscoverPage() {
           </div>
         )}
 
+        {/* Boosted section */}
+        {boostedListings.length > 0 && !search && (
+          <div className="mb-10">
+            <div className="flex items-center gap-2 mb-4">
+              <Rocket className="h-4 w-4 text-accent" />
+              <h2 className="text-lg font-semibold text-foreground">Boosted Businesses</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {boostedListings.map((l) => (
+                <ListingCard key={l.id} listing={l} boosted />
+              ))}
+            </div>
+          </div>
+        )
+
         {/* Results header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
