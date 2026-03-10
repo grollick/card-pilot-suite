@@ -134,7 +134,7 @@ export default function DashboardHome() {
                         key={item.id}
                         className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/40 transition-colors cursor-pointer group"
                         onClick={() => {
-                          if (item.type === "lead" || item.type === "quote") navigate(`/app/contacts/${item.id}`);
+                          if (item.type === "lead") navigate(`/app/contacts/${item.id}`);
                           else if (item.type === "booking") navigate("/app/bookings");
                           else if (item.type === "qr_scan") navigate("/app/qr");
                         }}
