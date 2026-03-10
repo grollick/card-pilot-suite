@@ -256,7 +256,7 @@ export default function Onboarding() {
 
   const handleGenerateContent = async () => {
     if (!selectedProfession) return;
-    setStep(4);
+    setStep(5);
     await generate({
       profession: selectedProfession.name,
       name,
