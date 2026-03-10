@@ -199,7 +199,7 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
                   <Select value={campaignId} onValueChange={setCampaignId}>
                     <SelectTrigger className="h-8 text-xs mt-1"><SelectValue placeholder="None" /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="__none__">None</SelectItem>
                       {campaigns.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
