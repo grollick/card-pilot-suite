@@ -48,6 +48,7 @@ import NFCShareDialog from "@/modules/card/components/NFCShareDialog";
 import WalletPassDialog from "@/modules/card/components/WalletPassDialog";
 import QuoteRequestForm from "@/modules/card/components/QuoteRequestForm";
 import SmartEngagementPopup from "@/modules/card/components/SmartEngagementPopup";
+import StickyActionBar from "@/modules/card/components/StickyActionBar";
 import { showsBranding } from "@/lib/plans";
 
 // ── Visitor meta for analytics ──
@@ -1368,6 +1369,19 @@ export default function PublicCard() {
           }}
         />
       )}
+
+      {/* Sticky Action Bar for conversions */}
+      <StickyActionBar
+        profileId={profile.id}
+        handle={handle!}
+        phone={profile.phone}
+        email={profile.email}
+        professionName={professionName}
+        palette={palette}
+        enabledCtaIds={enabledCtas.map(c => c.id)}
+        onCtaClick={handleCtaClick}
+        isOwner={isOwner}
+      />
     </div>
   );
 }
