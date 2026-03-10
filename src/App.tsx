@@ -77,6 +77,9 @@ const ReviewsPage = lazy(() => import("@/modules/marketplace/pages/ReviewsPage")
 const AssistantPage = lazy(() => import("@/modules/assistant/pages/AssistantPage"));
 const AgencyDashboard = lazy(() => import("@/modules/agency/pages/AgencyDashboard"));
 
+// App Marketplace
+const MarketplacePage = lazy(() => import("@/modules/apps/pages/MarketplacePage"));
+
 // Settings
 const SettingsPage = lazy(() => import("@/modules/settings/pages/SettingsPage"));
 const AdminPage = lazy(() => import("@/modules/settings/pages/AdminPage"));
