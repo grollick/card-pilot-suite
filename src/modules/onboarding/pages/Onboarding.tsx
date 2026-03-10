@@ -175,7 +175,15 @@ export default function Onboarding() {
         tokens: effectivePack?.theme_tokens || {},
         palette,
       };
-      const sectionsJson = selectedProfession.default_card_sections || [];
+      // Use template sections if a template was selected, otherwise profession defaults
+      const selectedTemplate = selectedTemplateId ? getTemplate(selectedTemplateId) : null;
+      const sectionsJson = selectedTemplate
+        ? selectedTemplate.sections.map(s => ({
+            id: s.id,
+            label: s.id.charAt(0).toUpperCase() + s.id.slice(1).replace(/_/g, " "),
+            enabled: s.enabled,
+          }))
+        : (selectedProfession.default_card_sections || []);
       const { error: cardErr } = await supabase.from("cards").upsert({
         user_id: user.id,
         theme_json: themeJson,
