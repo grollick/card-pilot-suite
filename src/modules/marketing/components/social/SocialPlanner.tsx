@@ -4,31 +4,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
-import { useSocialPosts, useUpdatePost, type SocialPostExtended } from "@/hooks/useSocial";
-import { PLANNER_COLUMNS, getPlatformConfig, getLabelConfig } from "./constants";
+import { useSocialPosts, useUpdatePost } from "@/hooks/useSocialPosts";
+import type { SocialPost } from "@/hooks/useSocialPosts";
+import { PLANNER_COLUMNS, STATUS_TO_COLUMN, COLUMN_TO_DB, getPlatformConfig, getStatusConfig, getLabelConfig } from "./constants";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface Props {
-  onEdit: (post: SocialPostExtended) => void;
-  onViewDetail: (post: SocialPostExtended) => void;
+  onEdit: (post: SocialPost) => void;
+  onViewDetail: (post: SocialPost) => void;
 }
-
-const STATUS_TO_COLUMN: Record<string, string> = {
-  draft: "idea",
-  pending_approval: "drafting",
-  approved: "ready",
-  scheduled: "scheduled",
-  published: "published",
-};
-
-const COLUMN_TO_STATUS: Record<string, { approval_status: string; status: string }> = {
-  idea: { approval_status: "draft", status: "draft" },
-  drafting: { approval_status: "pending_approval", status: "draft" },
-  ready: { approval_status: "approved", status: "draft" },
-  scheduled: { approval_status: "scheduled", status: "scheduled" },
-  published: { approval_status: "published", status: "published" },
-};
 
 export default function SocialPlanner({ onEdit, onViewDetail }: Props) {
   const { data: posts = [] } = useSocialPosts();
@@ -36,34 +21,23 @@ export default function SocialPlanner({ onEdit, onViewDetail }: Props) {
   const [draggedPost, setDraggedPost] = useState<string | null>(null);
   const [dragOverCol, setDragOverCol] = useState<string | null>(null);
 
-  const getPostsForColumn = (colId: string) => {
-    return posts.filter(p => {
-      const mappedCol = STATUS_TO_COLUMN[p.approval_status ?? "draft"] ?? "idea";
-      return mappedCol === colId;
-    });
-  };
+  const getPostsForColumn = (colId: string) =>
+    posts.filter(p => (STATUS_TO_COLUMN[p.approval_status ?? "draft"] ?? "draft") === colId);
 
   const handleDragStart = (postId: string) => setDraggedPost(postId);
-  const handleDragOver = (e: React.DragEvent, colId: string) => {
-    e.preventDefault();
-    setDragOverCol(colId);
-  };
+  const handleDragOver = (e: React.DragEvent, colId: string) => { e.preventDefault(); setDragOverCol(colId); };
   const handleDragLeave = () => setDragOverCol(null);
 
   const handleDrop = async (colId: string) => {
     if (!draggedPost) return;
     setDragOverCol(null);
     setDraggedPost(null);
-
-    const target = COLUMN_TO_STATUS[colId];
+    const target = COLUMN_TO_DB[colId];
     if (!target) return;
-
     try {
       await updatePost.mutateAsync({ id: draggedPost, ...target } as any);
       toast.success("Post moved");
-    } catch (e: any) {
-      toast.error(e.message);
-    }
+    } catch (e: any) { toast.error(e.message); }
   };
 
   return (
@@ -75,7 +49,7 @@ export default function SocialPlanner({ onEdit, onViewDetail }: Props) {
             <div
               key={col.id}
               className={cn(
-                "flex-1 min-w-[200px] rounded-xl border-2 bg-muted/20 transition-colors",
+                "flex-1 min-w-[180px] rounded-xl border-2 bg-muted/20 transition-colors",
                 col.color,
                 dragOverCol === col.id && "border-primary bg-primary/5"
               )}
@@ -83,7 +57,6 @@ export default function SocialPlanner({ onEdit, onViewDetail }: Props) {
               onDragLeave={handleDragLeave}
               onDrop={() => handleDrop(col.id)}
             >
-              {/* Column Header */}
               <div className="flex items-center justify-between p-3 pb-2">
                 <div className="flex items-center gap-2">
                   <h4 className="text-xs font-semibold">{col.label}</h4>
@@ -93,8 +66,6 @@ export default function SocialPlanner({ onEdit, onViewDetail }: Props) {
                   <Plus className="h-3 w-3" />
                 </Button>
               </div>
-
-              {/* Cards */}
               <div className="space-y-2 p-2 pt-0 min-h-[200px]">
                 {colPosts.map(post => {
                   const platforms = ((post.platforms_json as any) || []) as string[];
@@ -117,13 +88,9 @@ export default function SocialPlanner({ onEdit, onViewDetail }: Props) {
                           <div className="flex items-center gap-1 mt-1.5 flex-wrap">
                             {platforms.slice(0, 3).map(p => {
                               const cfg = getPlatformConfig(p);
-                              return (
-                                <span key={p} className={`text-[8px] px-1.5 py-0.5 rounded-full ${cfg?.color}`}>{p}</span>
-                              );
+                              return <span key={p} className={`text-[8px] px-1.5 py-0.5 rounded-full ${cfg?.color}`}>{p}</span>;
                             })}
-                            {label && (
-                              <span className={`text-[8px] px-1.5 py-0.5 rounded-full ${label.color}`}>{label.label}</span>
-                            )}
+                            {label && <span className={`text-[8px] px-1.5 py-0.5 rounded-full ${label.color}`}>{label.label}</span>}
                           </div>
                           {post.scheduled_at && (
                             <p className="text-[9px] text-muted-foreground mt-1 flex items-center gap-0.5">

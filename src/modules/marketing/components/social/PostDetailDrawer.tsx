@@ -1,18 +1,20 @@
-import { Edit2, Copy, Trash2, CalendarDays, Send, Clock, ListOrdered, X } from "lucide-react";
+import { Edit2, Copy, Trash2, Send, Clock, ListOrdered } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { useDeletePost, useUpdatePost, type SocialPostExtended } from "@/hooks/useSocial";
-import { getPlatformConfig, getApprovalConfig, getLabelConfig } from "./constants";
+import { useDeletePost, useUpdatePost } from "@/hooks/useSocialPosts";
+import type { SocialPost } from "@/hooks/useSocialPosts";
+import { getPlatformConfig, getStatusConfig, getLabelConfig, deriveDbStatus } from "./constants";
+import type { PostStatus } from "./constants";
 import PlatformPreview from "./PlatformPreview";
 
 interface Props {
-  post: SocialPostExtended | null;
+  post: SocialPost | null;
   onClose: () => void;
-  onEdit: (post: SocialPostExtended) => void;
+  onEdit: (post: SocialPost) => void;
 }
 
 export default function PostDetailDrawer({ post, onClose, onEdit }: Props) {
@@ -22,14 +24,13 @@ export default function PostDetailDrawer({ post, onClose, onEdit }: Props) {
   if (!post) return null;
 
   const platforms = ((post.platforms_json as any) || []) as string[];
-  const approval = getApprovalConfig(post.approval_status ?? "draft");
+  const statusCfg = getStatusConfig(post.approval_status ?? "draft");
   const label = post.content_label ? getLabelConfig(post.content_label) : null;
 
-  const handlePublishNow = async () => {
+  const changeStatus = async (newStatus: PostStatus) => {
     try {
-      await updatePost.mutateAsync({ id: post.id, status: "published", approval_status: "published" } as any);
-      toast.success("Post published");
-      onClose();
+      await updatePost.mutateAsync({ id: post.id, approval_status: newStatus, status: deriveDbStatus(newStatus) } as any);
+      toast.success(`Post marked as ${newStatus}`);
     } catch (e: any) { toast.error(e.message); }
   };
 
@@ -41,26 +42,17 @@ export default function PostDetailDrawer({ post, onClose, onEdit }: Props) {
     } catch (e: any) { toast.error(e.message); }
   };
 
-  const handleApprove = async () => {
-    try {
-      await updatePost.mutateAsync({ id: post.id, approval_status: "approved" } as any);
-      toast.success("Post approved");
-    } catch (e: any) { toast.error(e.message); }
-  };
-
   return (
     <Sheet open={!!post} onOpenChange={(v) => !v && onClose()}>
       <SheetContent className="w-full sm:max-w-md overflow-y-auto">
         <SheetHeader className="pb-4">
-          <div className="flex items-center justify-between">
-            <SheetTitle className="text-base">Post Details</SheetTitle>
-          </div>
+          <SheetTitle className="text-base">Post Details</SheetTitle>
         </SheetHeader>
 
         <div className="space-y-4">
           {/* Status & Labels */}
           <div className="flex items-center gap-2 flex-wrap">
-            <Badge className={`text-[10px] ${approval.color}`}>{approval.label}</Badge>
+            <Badge className={`text-[10px] ${statusCfg.color}`}>{statusCfg.label}</Badge>
             {label && <Badge className={`text-[10px] ${label.color}`}>{label.label}</Badge>}
             {platforms.map(p => {
               const cfg = getPlatformConfig(p);
@@ -70,13 +62,11 @@ export default function PostDetailDrawer({ post, onClose, onEdit }: Props) {
 
           <Separator />
 
-          {/* Content */}
           <div>
             <p className="text-xs text-muted-foreground mb-1">Content</p>
             <p className="text-sm whitespace-pre-wrap">{post.content}</p>
           </div>
 
-          {/* Platform Overrides */}
           {post.platform_overrides && Object.keys(post.platform_overrides).length > 0 && (
             <div>
               <p className="text-xs text-muted-foreground mb-2">Platform Customizations</p>
@@ -93,11 +83,10 @@ export default function PostDetailDrawer({ post, onClose, onEdit }: Props) {
 
           <Separator />
 
-          {/* Schedule */}
           <div className="grid grid-cols-2 gap-3">
             <div>
               <p className="text-xs text-muted-foreground">Status</p>
-              <p className="text-sm font-medium capitalize">{post.status}</p>
+              <p className="text-sm font-medium">{statusCfg.label}</p>
             </div>
             {post.scheduled_at && (
               <div>
@@ -116,7 +105,6 @@ export default function PostDetailDrawer({ post, onClose, onEdit }: Props) {
 
           <Separator />
 
-          {/* Previews */}
           <div>
             <p className="text-xs text-muted-foreground mb-2">Previews</p>
             <div className="space-y-3">
@@ -133,7 +121,6 @@ export default function PostDetailDrawer({ post, onClose, onEdit }: Props) {
 
           <Separator />
 
-          {/* Quick Actions */}
           <div className="space-y-2">
             <p className="text-xs text-muted-foreground">Actions</p>
             <div className="grid grid-cols-2 gap-2">
@@ -144,14 +131,14 @@ export default function PostDetailDrawer({ post, onClose, onEdit }: Props) {
                 <Copy className="h-3 w-3" /> Duplicate
               </Button>
               {post.approval_status === "pending_approval" && (
-                <Button variant="outline" size="sm" className="text-xs h-8 gap-1 text-emerald-600" onClick={handleApprove}>
+                <Button variant="outline" size="sm" className="text-xs h-8 gap-1 text-emerald-600" onClick={() => changeStatus("approved")}>
                   <Send className="h-3 w-3" /> Approve
                 </Button>
               )}
-              <Button variant="outline" size="sm" className="text-xs h-8 gap-1" onClick={handlePublishNow}>
+              <Button variant="outline" size="sm" className="text-xs h-8 gap-1" onClick={() => changeStatus("published")}>
                 <Send className="h-3 w-3" /> Publish Now
               </Button>
-              <Button variant="outline" size="sm" className="text-xs h-8 gap-1">
+              <Button variant="outline" size="sm" className="text-xs h-8 gap-1" onClick={() => changeStatus("queued")}>
                 <ListOrdered className="h-3 w-3" /> Add to Queue
               </Button>
               <Button variant="destructive" size="sm" className="text-xs h-8 gap-1" onClick={handleDelete}>

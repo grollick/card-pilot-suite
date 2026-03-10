@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { Plus, X, Settings, GripVertical, FileText, CalendarDays, Send, MessageCircle, Hash, Bell } from "lucide-react";
+import { Plus, X, GripVertical, FileText, CalendarDays, Send, MessageCircle, Hash, Bell, AlertCircle, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { useSocialPosts, type SocialPostExtended } from "@/hooks/useSocial";
-import { getPlatformConfig } from "./constants";
+import { useSocialPosts } from "@/hooks/useSocialPosts";
+import type { SocialPost } from "@/hooks/useSocialPosts";
+import { getPlatformConfig, STREAM_TYPES } from "./constants";
 
 interface StreamConfig {
   id: string;
@@ -15,59 +16,51 @@ interface StreamConfig {
   label: string;
 }
 
-const STREAM_TYPES = [
-  { value: "drafts", label: "Drafts", icon: FileText },
-  { value: "scheduled", label: "Scheduled", icon: CalendarDays },
-  { value: "published", label: "Published", icon: Send },
-  { value: "comments", label: "Comments", icon: MessageCircle },
-  { value: "mentions", label: "Mentions", icon: Bell },
-  { value: "hashtags", label: "Hashtag Monitor", icon: Hash },
-];
+const STREAM_ICONS: Record<string, any> = {
+  drafts: FileText,
+  in_review: AlertCircle,
+  scheduled: CalendarDays,
+  published: Send,
+  failed: AlertCircle,
+  comments: MessageCircle,
+  mentions: Bell,
+  hashtags: Hash,
+};
 
 interface Props {
-  onViewPost: (post: SocialPostExtended) => void;
+  onViewPost: (post: SocialPost) => void;
 }
 
 export default function SocialStreams({ onViewPost }: Props) {
   const { data: posts = [] } = useSocialPosts();
   const [streams, setStreams] = useState<StreamConfig[]>([
     { id: "1", type: "drafts", label: "Drafts" },
-    { id: "2", type: "scheduled", label: "Scheduled" },
-    { id: "3", type: "published", label: "Published" },
+    { id: "2", type: "in_review", label: "In Review" },
+    { id: "3", type: "scheduled", label: "Scheduled" },
+    { id: "4", type: "published", label: "Published" },
   ]);
 
   const addStream = () => {
-    setStreams(prev => [...prev, {
-      id: String(Date.now()),
-      type: "drafts",
-      label: "New Stream",
-    }]);
+    setStreams(prev => [...prev, { id: String(Date.now()), type: "drafts", label: "New Stream" }]);
   };
 
-  const removeStream = (id: string) => {
-    setStreams(prev => prev.filter(s => s.id !== id));
-  };
+  const removeStream = (id: string) => setStreams(prev => prev.filter(s => s.id !== id));
 
   const updateStreamType = (id: string, type: string) => {
     const cfg = STREAM_TYPES.find(s => s.value === type);
-    setStreams(prev => prev.map(s =>
-      s.id === id ? { ...s, type, label: cfg?.label ?? type } : s
-    ));
+    setStreams(prev => prev.map(s => s.id === id ? { ...s, type, label: cfg?.label ?? type } : s));
   };
 
   const getStreamPosts = (stream: StreamConfig) => {
-    switch (stream.type) {
-      case "drafts": return posts.filter(p => p.status === "draft");
-      case "scheduled": return posts.filter(p => p.status === "scheduled");
-      case "published": return posts.filter(p => p.status === "published");
-      default: return [];
-    }
+    const cfg = STREAM_TYPES.find(s => s.value === stream.type);
+    if (!cfg) return [];
+    return posts.filter(cfg.filterFn);
   };
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground">Drag columns to reorder. Add streams to monitor different feeds.</p>
+        <p className="text-xs text-muted-foreground">Monitor different content streams. Add columns for each feed.</p>
         <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={addStream}>
           <Plus className="h-3 w-3" /> Add Stream
         </Button>
@@ -77,10 +70,10 @@ export default function SocialStreams({ onViewPost }: Props) {
         <div className="flex gap-3 min-w-max pb-4">
           {streams.map(stream => {
             const streamPosts = getStreamPosts(stream);
-            const StreamIcon = STREAM_TYPES.find(s => s.value === stream.type)?.icon ?? FileText;
+            const StreamIcon = STREAM_ICONS[stream.type] ?? FileText;
+            const isPlaceholder = ["comments", "mentions", "hashtags"].includes(stream.type);
             return (
               <div key={stream.id} className="w-[280px] flex-shrink-0 rounded-xl border border-border bg-card">
-                {/* Stream Header */}
                 <div className="flex items-center justify-between p-3 border-b border-border bg-muted/30 rounded-t-xl">
                   <div className="flex items-center gap-2">
                     <GripVertical className="h-3.5 w-3.5 text-muted-foreground cursor-grab" />
@@ -101,42 +94,37 @@ export default function SocialStreams({ onViewPost }: Props) {
                     <X className="h-3 w-3" />
                   </Button>
                 </div>
-
-                {/* Stream Content */}
                 <ScrollArea className="h-[500px]">
                   <div className="p-2 space-y-2">
-                    {streamPosts.length === 0 ? (
+                    {!isPlaceholder && streamPosts.length === 0 && (
                       <div className="text-center py-8">
                         <p className="text-xs text-muted-foreground">No posts in this stream</p>
                       </div>
-                    ) : (
-                      streamPosts.map(post => {
-                        const platforms = ((post.platforms_json as any) || []) as string[];
-                        return (
-                          <button
-                            key={post.id}
-                            onClick={() => onViewPost(post)}
-                            className="w-full text-left rounded-lg border border-border p-2.5 hover:bg-accent/50 transition-colors"
-                          >
-                            <p className="text-[11px] line-clamp-2">{post.content}</p>
-                            <div className="flex items-center gap-1 mt-1.5">
-                              {platforms.slice(0, 2).map(p => {
-                                const cfg = getPlatformConfig(p);
-                                return <span key={p} className={`text-[8px] px-1.5 py-0.5 rounded-full ${cfg?.color}`}>{p}</span>;
-                              })}
-                              {post.scheduled_at && (
-                                <span className="text-[9px] text-muted-foreground ml-auto">
-                                  {format(new Date(post.scheduled_at), "MMM d")}
-                                </span>
-                              )}
-                            </div>
-                          </button>
-                        );
-                      })
                     )}
-
-                    {/* Placeholder for engagement streams */}
-                    {["comments", "mentions", "hashtags"].includes(stream.type) && (
+                    {!isPlaceholder && streamPosts.map(post => {
+                      const platforms = ((post.platforms_json as any) || []) as string[];
+                      return (
+                        <button
+                          key={post.id}
+                          onClick={() => onViewPost(post)}
+                          className="w-full text-left rounded-lg border border-border p-2.5 hover:bg-accent/50 transition-colors"
+                        >
+                          <p className="text-[11px] line-clamp-2">{post.content}</p>
+                          <div className="flex items-center gap-1 mt-1.5">
+                            {platforms.slice(0, 2).map(p => {
+                              const cfg = getPlatformConfig(p);
+                              return <span key={p} className={`text-[8px] px-1.5 py-0.5 rounded-full ${cfg?.color}`}>{p}</span>;
+                            })}
+                            {post.scheduled_at && (
+                              <span className="text-[9px] text-muted-foreground ml-auto">
+                                {format(new Date(post.scheduled_at), "MMM d")}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                    {isPlaceholder && (
                       <div className="text-center py-8 space-y-2">
                         <StreamIcon className="h-8 w-8 text-muted-foreground/30 mx-auto" />
                         <p className="text-xs text-muted-foreground">

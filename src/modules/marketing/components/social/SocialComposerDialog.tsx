@@ -9,20 +9,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { useCreatePost, useUpdatePost, useSocialCampaigns, type SocialPostExtended } from "@/hooks/useSocial";
-import { PLATFORMS, CONTENT_LABELS, getPlatformConfig } from "./constants";
+import { useCreatePost, useUpdatePost } from "@/hooks/useSocialPosts";
+import { useSocialCampaigns } from "@/hooks/useSocialCampaigns";
+import type { SocialPost } from "@/hooks/useSocialPosts";
+import { PLATFORMS, CONTENT_LABELS, getPlatformConfig, deriveDbStatus } from "./constants";
+import type { PostStatus } from "./constants";
 import PlatformPreview from "./PlatformPreview";
 
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  editPost: SocialPostExtended | null;
+  editPost: SocialPost | null;
   onClose: () => void;
 }
 
@@ -41,14 +43,9 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
   const [activePlatformTab, setActivePlatformTab] = useState("base");
 
   const resetForm = useCallback(() => {
-    setContent("");
-    setSelectedPlatforms([]);
-    setPlatformOverrides({});
-    setScheduledDate(undefined);
-    setScheduledTime("10:00");
-    setCampaignId("");
-    setContentLabel("");
-    setActivePlatformTab("base");
+    setContent(""); setSelectedPlatforms([]); setPlatformOverrides({});
+    setScheduledDate(undefined); setScheduledTime("10:00");
+    setCampaignId(""); setContentLabel(""); setActivePlatformTab("base");
   }, []);
 
   useEffect(() => {
@@ -63,25 +60,16 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
         setScheduledDate(d);
         setScheduledTime(format(d, "HH:mm"));
       }
-    } else {
-      resetForm();
-    }
+    } else { resetForm(); }
   }, [editPost, resetForm]);
 
-  const togglePlatform = (p: string) => {
-    setSelectedPlatforms(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
-  };
+  const togglePlatform = (p: string) => setSelectedPlatforms(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
 
   const updateOverride = (platform: string, field: "content" | "hashtags", value: any) => {
-    setPlatformOverrides(prev => ({
-      ...prev,
-      [platform]: { ...prev[platform], [field]: value },
-    }));
+    setPlatformOverrides(prev => ({ ...prev, [platform]: { ...prev[platform], [field]: value } }));
   };
 
-  const getContentForPlatform = (platform: string) => {
-    return platformOverrides[platform]?.content || content;
-  };
+  const getContentForPlatform = (platform: string) => platformOverrides[platform]?.content || content;
 
   const getCharCount = (platform: string) => {
     const text = getContentForPlatform(platform);
@@ -89,7 +77,7 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
     return { current: text.length, limit: cfg?.charLimit ?? 2200 };
   };
 
-  const handleSave = async () => {
+  const handleSave = async (targetStatus?: PostStatus) => {
     if (!content.trim()) { toast.error("Post content is required"); return; }
     if (selectedPlatforms.length === 0) { toast.error("Select at least one platform"); return; }
 
@@ -101,18 +89,18 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
       scheduled_at = d.toISOString();
     }
 
-    const status = scheduled_at ? "scheduled" : "draft";
+    const approvalStatus: PostStatus = targetStatus ?? (scheduled_at ? "scheduled" : "draft");
 
     try {
       const payload = {
         content,
         platforms_json: selectedPlatforms,
         scheduled_at,
-        status,
+        status: deriveDbStatus(approvalStatus),
         campaign_id: campaignId || null,
         content_label: contentLabel || null,
         platform_overrides: platformOverrides,
-        approval_status: scheduled_at ? "scheduled" : "draft",
+        approval_status: approvalStatus,
       };
 
       if (editPost) {
@@ -124,9 +112,7 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
       }
       onClose();
       resetForm();
-    } catch (e: any) {
-      toast.error(e.message);
-    }
+    } catch (e: any) { toast.error(e.message); }
   };
 
   return (
@@ -138,7 +124,6 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
 
         <ScrollArea className="flex-1 pr-2">
           <div className="grid md:grid-cols-[1fr,280px] gap-4">
-            {/* Left: Editor */}
             <div className="space-y-4">
               {/* Platform Selection */}
               <div>
@@ -162,8 +147,8 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
                 </div>
               </div>
 
-              {/* Platform Tabs for Content */}
-              {selectedPlatforms.length > 0 && (
+              {/* Platform Tabs */}
+              {selectedPlatforms.length > 0 ? (
                 <Tabs value={activePlatformTab} onValueChange={setActivePlatformTab}>
                   <TabsList className="h-8">
                     <TabsTrigger value="base" className="text-xs h-7">Base Post</TabsTrigger>
@@ -171,17 +156,10 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
                       <TabsTrigger key={p} value={p} className="text-xs h-7">{p}</TabsTrigger>
                     ))}
                   </TabsList>
-
                   <TabsContent value="base" className="mt-2">
-                    <Textarea
-                      value={content}
-                      onChange={e => setContent(e.target.value)}
-                      placeholder="Write your base post content..."
-                      rows={5}
-                    />
+                    <Textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Write your base post content..." rows={5} />
                     <p className="text-xs text-muted-foreground mt-1">{content.length} characters (base)</p>
                   </TabsContent>
-
                   {selectedPlatforms.map(platform => {
                     const chars = getCharCount(platform);
                     const overrideContent = platformOverrides[platform]?.content ?? "";
@@ -190,50 +168,31 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
                       <TabsContent key={platform} value={platform} className="mt-2 space-y-3">
                         <div>
                           <Label className="text-xs">Customized for {platform}</Label>
-                          <Textarea
-                            value={overrideContent}
-                            onChange={e => updateOverride(platform, "content", e.target.value)}
-                            placeholder={`Leave empty to use base post. Customize for ${platform}...`}
-                            rows={4}
-                          />
+                          <Textarea value={overrideContent} onChange={e => updateOverride(platform, "content", e.target.value)} placeholder={`Leave empty to use base post...`} rows={4} />
                           <div className="flex items-center justify-between mt-1">
                             <p className={cn("text-xs", chars.current > chars.limit ? "text-destructive" : "text-muted-foreground")}>
                               {chars.current} / {chars.limit}
                             </p>
-                            <Button variant="ghost" size="sm" className="h-6 text-xs gap-1">
-                              <Sparkles className="h-3 w-3" /> AI Rewrite
-                            </Button>
+                            <Button variant="ghost" size="sm" className="h-6 text-xs gap-1"><Sparkles className="h-3 w-3" /> AI Rewrite</Button>
                           </div>
                         </div>
                         <div>
                           <Label className="text-xs flex items-center gap-1"><Hash className="h-3 w-3" /> Hashtags</Label>
-                          <Input
-                            value={overrideHashtags}
-                            onChange={e => updateOverride(platform, "hashtags", e.target.value.split(",").map(s => s.trim()).filter(Boolean))}
-                            placeholder="tag1, tag2, tag3"
-                            className="text-xs h-8"
-                          />
+                          <Input value={overrideHashtags} onChange={e => updateOverride(platform, "hashtags", e.target.value.split(",").map(s => s.trim()).filter(Boolean))} placeholder="tag1, tag2, tag3" className="text-xs h-8" />
                         </div>
                       </TabsContent>
                     );
                   })}
                 </Tabs>
-              )}
-
-              {selectedPlatforms.length === 0 && (
+              ) : (
                 <div>
                   <Label className="text-xs">Content</Label>
-                  <Textarea
-                    value={content}
-                    onChange={e => setContent(e.target.value)}
-                    placeholder="Write your post content..."
-                    rows={5}
-                  />
+                  <Textarea value={content} onChange={e => setContent(e.target.value)} placeholder="Write your post content..." rows={5} />
                   <p className="text-xs text-muted-foreground mt-1">{content.length} characters</p>
                 </div>
               )}
 
-              {/* Metadata Row */}
+              {/* Metadata */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label className="text-xs">Campaign</Label>
@@ -241,9 +200,7 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
                     <SelectTrigger className="h-8 text-xs mt-1"><SelectValue placeholder="None" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="">None</SelectItem>
-                      {campaigns.map(c => (
-                        <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                      ))}
+                      {campaigns.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
@@ -253,15 +210,13 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
                     <SelectTrigger className="h-8 text-xs mt-1"><SelectValue placeholder="None" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="">None</SelectItem>
-                      {CONTENT_LABELS.map(l => (
-                        <SelectItem key={l.value} value={l.value}>{l.label}</SelectItem>
-                      ))}
+                      {CONTENT_LABELS.map(l => <SelectItem key={l.value} value={l.value}>{l.label}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
-              {/* Schedule Row */}
+              {/* Schedule */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <Label className="text-xs">Schedule Date</Label>
@@ -285,41 +240,29 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
 
               {/* AI Actions */}
               <div className="flex gap-2 flex-wrap">
-                <Button variant="outline" size="sm" className="text-xs h-7 gap-1">
-                  <Sparkles className="h-3 w-3" /> Generate Post
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs h-7 gap-1">
-                  <RefreshCw className="h-3 w-3" /> Caption Variations
-                </Button>
-                <Button variant="outline" size="sm" className="text-xs h-7 gap-1">
-                  <Hash className="h-3 w-3" /> Generate Hashtags
-                </Button>
+                <Button variant="outline" size="sm" className="text-xs h-7 gap-1"><Sparkles className="h-3 w-3" /> Generate Post</Button>
+                <Button variant="outline" size="sm" className="text-xs h-7 gap-1"><RefreshCw className="h-3 w-3" /> Caption Variations</Button>
+                <Button variant="outline" size="sm" className="text-xs h-7 gap-1"><Hash className="h-3 w-3" /> Generate Hashtags</Button>
               </div>
             </div>
 
-            {/* Right: Platform Preview */}
+            {/* Preview */}
             <div className="hidden md:block">
               <Label className="text-xs mb-2 block">Preview</Label>
               <div className="space-y-3">
                 {(selectedPlatforms.length > 0 ? selectedPlatforms : ["Instagram"]).map(platform => (
-                  <PlatformPreview
-                    key={platform}
-                    platform={platform}
-                    content={getContentForPlatform(platform)}
-                    hashtags={platformOverrides[platform]?.hashtags}
-                  />
+                  <PlatformPreview key={platform} platform={platform} content={getContentForPlatform(platform)} hashtags={platformOverrides[platform]?.hashtags} />
                 ))}
               </div>
             </div>
           </div>
         </ScrollArea>
 
-        <DialogFooter className="pt-2 border-t border-border">
+        <DialogFooter className="pt-2 border-t border-border gap-1">
           <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button variant="outline" onClick={() => { handleSave(); }}>
-            Save Draft
-          </Button>
-          <Button onClick={handleSave} disabled={createPost.isPending || updatePost.isPending}>
+          <Button variant="outline" onClick={() => handleSave("draft")}>Save Draft</Button>
+          <Button variant="outline" onClick={() => handleSave("pending_approval")}>Submit for Approval</Button>
+          <Button onClick={() => handleSave()} disabled={createPost.isPending || updatePost.isPending}>
             {editPost ? "Update" : scheduledDate ? "Schedule" : "Save"}
           </Button>
         </DialogFooter>

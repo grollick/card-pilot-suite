@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Edit2, Trash2, Send, Clock, CheckSquare, Square, MoreHorizontal, Copy, CalendarDays } from "lucide-react";
+import { Edit2, Trash2, Send, Clock, CheckSquare, Square, MoreHorizontal, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -8,12 +8,14 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import EmptyState from "@/components/EmptyState";
-import { useSocialPosts, useDeletePost, useBulkDeletePosts, useBulkUpdatePosts, type SocialPostExtended } from "@/hooks/useSocial";
-import { getPlatformConfig, getApprovalConfig, CONTENT_LABELS } from "./constants";
+import { useSocialPosts, useDeletePost, useBulkDeletePosts, useBulkUpdatePosts } from "@/hooks/useSocialPosts";
+import type { SocialPost } from "@/hooks/useSocialPosts";
+import { getPlatformConfig, getStatusConfig, POST_STATUSES, CONTENT_LABELS, deriveDbStatus } from "./constants";
+import type { PostStatus } from "./constants";
 
 interface Props {
-  onEdit: (post: SocialPostExtended) => void;
-  onViewDetail: (post: SocialPostExtended) => void;
+  onEdit: (post: SocialPost) => void;
+  onViewDetail: (post: SocialPost) => void;
 }
 
 export default function SocialPostsList({ onEdit, onViewDetail }: Props) {
@@ -26,7 +28,7 @@ export default function SocialPostsList({ onEdit, onViewDetail }: Props) {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const filtered = posts.filter(p => {
-    if (statusFilter !== "all" && p.status !== statusFilter) return false;
+    if (statusFilter !== "all" && p.approval_status !== statusFilter) return false;
     if (platformFilter !== "all") {
       const platforms = (p.platforms_json as any) || [];
       if (!platforms.includes(platformFilter)) return false;
@@ -35,19 +37,11 @@ export default function SocialPostsList({ onEdit, onViewDetail }: Props) {
   });
 
   const toggleSelect = (id: string) => {
-    setSelectedIds(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
+    setSelectedIds(prev => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
   };
 
   const selectAll = () => {
-    if (selectedIds.size === filtered.length) {
-      setSelectedIds(new Set());
-    } else {
-      setSelectedIds(new Set(filtered.map(p => p.id)));
-    }
+    setSelectedIds(filtered.length === selectedIds.size ? new Set() : new Set(filtered.map(p => p.id)));
   };
 
   const handleBulkDelete = async () => {
@@ -58,9 +52,9 @@ export default function SocialPostsList({ onEdit, onViewDetail }: Props) {
     } catch (e: any) { toast.error(e.message); }
   };
 
-  const handleBulkStatus = async (status: string) => {
+  const handleBulkStatus = async (newStatus: PostStatus) => {
     try {
-      await bulkUpdate.mutateAsync({ ids: [...selectedIds], updates: { approval_status: status } });
+      await bulkUpdate.mutateAsync({ ids: [...selectedIds], updates: { approval_status: newStatus, status: deriveDbStatus(newStatus) } });
       toast.success(`${selectedIds.size} posts updated`);
       setSelectedIds(new Set());
     } catch (e: any) { toast.error(e.message); }
@@ -68,16 +62,14 @@ export default function SocialPostsList({ onEdit, onViewDetail }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* Filters + Bulk Actions */}
       <div className="flex items-center gap-2 flex-wrap">
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[130px] h-8 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectTrigger className="w-[140px] h-8 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="scheduled">Scheduled</SelectItem>
-            <SelectItem value="published">Published</SelectItem>
-            <SelectItem value="failed">Failed</SelectItem>
+            {POST_STATUSES.map(s => (
+              <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Select value={platformFilter} onValueChange={setPlatformFilter}>
@@ -96,12 +88,12 @@ export default function SocialPostsList({ onEdit, onViewDetail }: Props) {
             <span className="text-xs text-muted-foreground">{selectedIds.size} selected</span>
             <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => handleBulkStatus("approved")}>Approve</Button>
             <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => handleBulkStatus("scheduled")}>Schedule</Button>
+            <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => handleBulkStatus("queued")}>Queue</Button>
             <Button size="sm" variant="destructive" className="h-7 text-xs" onClick={handleBulkDelete}>Delete</Button>
           </div>
         )}
       </div>
 
-      {/* Select All */}
       {filtered.length > 0 && (
         <button onClick={selectAll} className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors">
           {selectedIds.size === filtered.length ? <CheckSquare className="h-3.5 w-3.5" /> : <Square className="h-3.5 w-3.5" />}
@@ -109,16 +101,13 @@ export default function SocialPostsList({ onEdit, onViewDetail }: Props) {
         </button>
       )}
 
-      {/* Posts */}
       {isLoading ? (
-        <div className="space-y-3">
-          {[1, 2, 3].map(i => <div key={i} className="h-20 rounded-xl bg-muted animate-pulse" />)}
-        </div>
+        <div className="space-y-3">{[1, 2, 3].map(i => <div key={i} className="h-20 rounded-xl bg-muted animate-pulse" />)}</div>
       ) : filtered.length === 0 ? (
         <EmptyState icon={Send} title="No posts found" description="Create your first post or adjust filters." />
       ) : (
         filtered.map(post => {
-          const approval = getApprovalConfig(post.approval_status ?? "draft");
+          const statusCfg = getStatusConfig(post.approval_status ?? "draft");
           const label = post.content_label ? CONTENT_LABELS.find(l => l.value === post.content_label) : null;
           return (
             <motion.div
@@ -140,18 +129,10 @@ export default function SocialPostsList({ onEdit, onViewDetail }: Props) {
                   <div className="flex items-center gap-2 mt-2 flex-wrap">
                     {((post.platforms_json as any) || []).map((p: string) => {
                       const cfg = getPlatformConfig(p);
-                      return (
-                        <span key={p} className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${cfg?.color ?? "bg-muted"}`}>{p}</span>
-                      );
+                      return <span key={p} className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${cfg?.color ?? "bg-muted"}`}>{p}</span>;
                     })}
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${approval.color}`}>
-                      {approval.label}
-                    </span>
-                    {label && (
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${label.color}`}>
-                        {label.label}
-                      </span>
-                    )}
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${statusCfg.color}`}>{statusCfg.label}</span>
+                    {label && <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${label.color}`}>{label.label}</span>}
                     {post.scheduled_at && (
                       <span className="text-xs text-muted-foreground flex items-center gap-1 ml-auto">
                         <Clock className="h-3 w-3" />
@@ -170,7 +151,7 @@ export default function SocialPostsList({ onEdit, onViewDetail }: Props) {
                     <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(post); }}>
                       <Edit2 className="h-3.5 w-3.5 mr-2" /> Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => { e.stopPropagation(); }}>
+                    <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
                       <Copy className="h-3.5 w-3.5 mr-2" /> Duplicate
                     </DropdownMenuItem>
                     <DropdownMenuItem
