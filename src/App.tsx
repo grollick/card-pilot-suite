@@ -56,6 +56,7 @@ const EstimatesPage = lazy(() => import("@/modules/estimates/pages/EstimatesPage
 // Jobs
 const JobsPage = lazy(() => import("@/modules/jobs/pages/JobsPage"));
 const JobDetailPage = lazy(() => import("@/modules/jobs/pages/JobDetailPage"));
+const JobPipelinePage = lazy(() => import("@/modules/jobs/pages/JobPipelinePage"));
 
 // Marketing
 const EmailMarketing = lazy(() => import("@/modules/marketing/pages/EmailMarketing"));
@@ -180,6 +181,7 @@ const App = () => (
               <Route path="estimates" element={<LazyRoute><EstimatesPage /></LazyRoute>} />
               <Route path="jobs" element={<LazyRoute><JobsPage /></LazyRoute>} />
               <Route path="jobs/:id" element={<LazyRoute><JobDetailPage /></LazyRoute>} />
+              <Route path="job-pipeline" element={<LazyRoute><JobPipelinePage /></LazyRoute>} />
               <Route path="assistant" element={<LazyRoute><AssistantPage /></LazyRoute>} />
               <Route path="agency" element={<LazyRoute><AgencyDashboard /></LazyRoute>} />
               <Route path="marketplace" element={<LazyRoute><MarketplacePage /></LazyRoute>} />
