@@ -200,10 +200,10 @@ export function useTeamPerformance() {
         .in("id", userIds);
 
       // Get jobs for these users
-      const { data: jobs } = await supabase
+      const { data: jobs } = await (supabase
         .from("jobs")
-        .select("id, status, assigned_to_user_id, scheduled_start")
-        .in("assigned_to_user_id" as any, userIds);
+        .select("id, status, assigned_to_user_id, scheduled_start") as any)
+        .in("assigned_to_user_id", userIds);
 
       const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
 
