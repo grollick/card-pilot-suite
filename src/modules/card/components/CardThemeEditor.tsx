@@ -314,6 +314,7 @@ export default function CardThemeEditor({
     _setGradientBg(snap.gradientBg);
     _setBgPattern(snap.bgPattern);
     _setMetallicEffect(snap.metallicEffect);
+    _setHeroBackgroundId(snap.heroBackgroundId);
     // Allow next tick to re-enable history
     requestAnimationFrame(() => { skipHistoryRef.current = false; });
   }, []);
