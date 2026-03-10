@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Search, ArrowRight, ArrowLeft, Sparkles, Check, Loader2,
   Rocket, Eye, Share2, QrCode, LayoutDashboard, Camera, CalendarCheck, FileText, Plus, X, Star,
-  Wand2, Edit3, RefreshCw
+  Wand2, Edit3, RefreshCw, UserPlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
