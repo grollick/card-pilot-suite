@@ -244,7 +244,7 @@ export default function Onboarding() {
     }
   };
 
-  const totalSteps = 5;
+  const totalSteps = 6;
 
   const handleGenerateContent = async () => {
     if (!selectedProfession) return;
