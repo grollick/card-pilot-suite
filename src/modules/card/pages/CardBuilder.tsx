@@ -297,6 +297,9 @@ export default function CardBuilder() {
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
+
+            {/* Conversion Tips */}
+            <ConversionTips sections={s.sections} />
           </div>
 
           {/* ── Mobile: collapsible accordion panels ── */}
