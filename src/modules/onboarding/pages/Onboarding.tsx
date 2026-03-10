@@ -62,6 +62,7 @@ export default function Onboarding() {
   const [selectedStyle, setSelectedStyle] = useState("Modern");
   const [selectedPackKey, setSelectedPackKey] = useState("");
   const [selectedCTA, setSelectedCTA] = useState("call");
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [phone, setPhone] = useState("");
