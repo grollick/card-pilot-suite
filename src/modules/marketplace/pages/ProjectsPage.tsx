@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Trash2, ExternalLink, Share2, Loader2, Image, MapPin } from "lucide-react";
+import { Plus, Trash2, ExternalLink, Share2, Loader2, Image, MapPin, Facebook, Linkedin, Twitter, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,14 +55,29 @@ export default function ProjectsPage() {
   };
 
   const handleShare = (project: Project) => {
-    const url = `${window.location.origin}/${profile?.handle}?project=${project.id}`;
+    const url = `${window.location.origin}/project/${project.id}`;
     navigator.clipboard.writeText(url);
     toast.success("Project link copied!");
   };
 
+  const shareToFacebook = (project: Project) => {
+    const url = `${window.location.origin}/project/${project.id}`;
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "_blank");
+  };
+
+  const shareToLinkedIn = (project: Project) => {
+    const url = `${window.location.origin}/project/${project.id}`;
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, "_blank");
+  };
+
+  const shareToTwitter = (project: Project) => {
+    const url = `${window.location.origin}/project/${project.id}`;
+    window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(`Check out: ${project.title}`)}`, "_blank");
+  };
+
   const generateSocialPost = (project: Project) => {
-    const url = `${window.location.origin}/${profile?.handle}`;
-    const text = `✨ Check out my latest project: "${project.title}"${project.description ? `\n\n${project.description}` : ""}\n\n📍 ${project.location || ""}${project.services_used.length ? `\n🔧 ${project.services_used.join(", ")}` : ""}\n\n👉 Book your appointment: ${url}`;
+    const url = `${window.location.origin}/project/${project.id}`;
+    const text = `✨ Check out my latest project: "${project.title}"${project.description ? `\n\n${project.description}` : ""}\n\n📍 ${project.location || ""}${project.services_used.length ? `\n🔧 ${project.services_used.join(", ")}` : ""}\n\n👉 See the transformation: ${url}`;
     navigator.clipboard.writeText(text);
     toast.success("Social post copied to clipboard!");
   };
@@ -209,11 +224,20 @@ export default function ProjectsPage() {
                   </div>
                 )}
                 <div className="flex items-center gap-1 pt-2 border-t border-border">
-                  <Button variant="ghost" size="sm" className="text-xs gap-1 flex-1" onClick={() => handleShare(project)}>
-                    <ExternalLink className="h-3 w-3" /> Share
+                  <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => handleShare(project)} title="Copy link">
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => shareToFacebook(project)} title="Share to Facebook">
+                    <Facebook className="h-3 w-3" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => shareToLinkedIn(project)} title="Share to LinkedIn">
+                    <Linkedin className="h-3 w-3" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => shareToTwitter(project)} title="Share to X">
+                    <Twitter className="h-3 w-3" />
                   </Button>
                   <Button variant="ghost" size="sm" className="text-xs gap-1 flex-1" onClick={() => generateSocialPost(project)}>
-                    <Share2 className="h-3 w-3" /> Social Post
+                    <Share2 className="h-3 w-3" /> Post
                   </Button>
                   <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive" onClick={() => { deleteProject.mutate(project.id); toast.success("Project deleted"); }}>
                     <Trash2 className="h-3 w-3" />
