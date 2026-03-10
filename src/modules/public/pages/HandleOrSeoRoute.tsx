@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
-import SeoLandingPage from "@/pages/public/SeoLandingPage";
-import PublicCard from "@/pages/public/PublicCard";
+import SeoLandingPage from "@/modules/public/pages/SeoLandingPage";
+import PublicCard from "@/modules/public/pages/PublicCard";
 
 /**
  * Smart router: if the slug matches "profession-in-city" pattern,
