@@ -914,7 +914,7 @@ export default function PublicCard() {
             );
           })()}
 
-          {/* ── Before / After Projects ── */}
+          {/* ── Before / After Projects (card section content) ── */}
           {enabledSections.has("projects") && (() => {
             const projectItems = sectionContent("projects")?.items as { title: string; beforeImage: string; afterImage: string; description?: string }[] | undefined;
             if (!projectItems || projectItems.length === 0) return null;
@@ -932,7 +932,51 @@ export default function PublicCard() {
             );
           })()}
 
-          {/* ── Instant Quote Calculator ── */}
+          {/* ── Project Gallery from DB ── */}
+          {dbProjects.length > 0 && (
+            <div>
+              <SectionTitle id="project-gallery" label="Project Gallery" />
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
+                {dbProjects.map((proj, i) => (
+                  <a
+                    key={proj.id}
+                    href={`/project/${proj.id}`}
+                    style={{
+                      display: "block",
+                      borderRadius: radii.card,
+                      overflow: "hidden",
+                      border: `1px solid ${palette.secondary}20`,
+                      background: palette.background,
+                      textDecoration: "none",
+                      transition: "transform 0.2s, box-shadow 0.2s",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 4px 16px ${palette.primary}15`; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}
+                  >
+                    {(proj.after_image_url || proj.before_image_url) && (
+                      <img
+                        src={(proj.after_image_url || proj.before_image_url)!}
+                        alt={proj.title}
+                        loading="lazy"
+                        style={{ width: "100%", height: 120, objectFit: "cover" }}
+                      />
+                    )}
+                    <div style={{ padding: "8px 10px" }}>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: palette.primary, margin: 0, fontFamily: `'${fonts.primary}', sans-serif` }}>
+                        {proj.title}
+                      </p>
+                      {proj.location && (
+                        <p style={{ fontSize: 10, color: palette.secondary, margin: "2px 0 0", display: "flex", alignItems: "center", gap: 3 }}>
+                          <MapPin style={{ width: 10, height: 10 }} /> {proj.location}
+                        </p>
+                      )}
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
+
           {enabledSections.has("quote_calculator") && (
             <div id="quote-calculator-section">
               <SectionTitle id="quote_calculator" label={sectionContent("quote_calculator")?.heading || "Instant Quote"} />
