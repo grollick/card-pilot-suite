@@ -35,10 +35,17 @@ serve(async (req) => {
     const yesterdayEnd = new Date(yesterday);
     yesterdayEnd.setHours(23, 59, 59, 999);
 
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
     let sent = 0;
 
     for (const user of users) {
       try {
+        const firstName = (user.name || "").split(" ")[0] || "there";
+
         const [
           { data: events },
           { count: newLeads },
@@ -48,6 +55,9 @@ serve(async (req) => {
           { count: jobsCompleted },
           { count: uncontactedLeads },
           { count: pendingEstimates },
+          { count: todayBookings },
+          { count: todayNewLeads },
+          { count: openTasks },
         ] = await Promise.all([
           supabase.from("analytics_events").select("event_type")
             .eq("user_id", user.id)
@@ -81,6 +91,20 @@ serve(async (req) => {
           supabase.from("estimates").select("*", { count: "exact", head: true })
             .eq("user_id", user.id)
             .eq("status", "sent"),
+          // Today's forward-looking data
+          supabase.from("bookings").select("*", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .gte("start_datetime", todayStart.toISOString())
+            .lte("start_datetime", todayEnd.toISOString())
+            .in("status", ["pending", "confirmed"]),
+          supabase.from("leads").select("*", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("status", "open")
+            .gte("created_at", todayStart.toISOString()),
+          supabase.from("tasks").select("*", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("status", "open")
+            .lte("due_date", todayEnd.toISOString().split("T")[0]),
         ]);
 
         const allEvents = events ?? [];
@@ -97,7 +121,34 @@ serve(async (req) => {
 
         const dateStr = yesterdayStart.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
-        // Build insights HTML
+        // Morning summary items
+        const morningItems: string[] = [];
+        const tLeads = (todayNewLeads ?? 0) + (uncontactedLeads ?? 0);
+        if (tLeads > 0) morningItems.push(`👤 <strong>${tLeads}</strong> lead${tLeads > 1 ? "s" : ""} need${tLeads === 1 ? "s" : ""} your attention`);
+        if ((todayBookings ?? 0) > 0) morningItems.push(`📅 <strong>${todayBookings}</strong> booking${(todayBookings ?? 0) > 1 ? "s" : ""} scheduled today`);
+        if ((pendingEstimates ?? 0) > 0) morningItems.push(`📋 <strong>${pendingEstimates}</strong> estimate${(pendingEstimates ?? 0) > 1 ? "s" : ""} awaiting approval`);
+        if ((openTasks ?? 0) > 0) morningItems.push(`✅ <strong>${openTasks}</strong> task${(openTasks ?? 0) > 1 ? "s" : ""} due today`);
+
+        const morningHtml = `
+          <div style="margin:0 0 28px;padding:20px;background:linear-gradient(135deg,#eef2ff,#faf5ff);border-radius:16px;">
+            <div style="font-size:20px;font-weight:700;color:#1a1a2e;margin:0 0 4px;">Good morning, ${firstName}! ☀️</div>
+            <div style="font-size:13px;color:#6b7280;margin:0 0 16px;">Here's what's on your plate today.</div>
+            ${morningItems.length > 0 ? `
+              <div style="background:#ffffff;border-radius:12px;padding:14px 16px;">
+                ${morningItems.map(item => `
+                  <div style="font-size:14px;color:#1a1a2e;padding:6px 0;${morningItems.indexOf(item) < morningItems.length - 1 ? 'border-bottom:1px solid #f3f4f6;' : ''}">${item}</div>
+                `).join("")}
+              </div>
+            ` : `
+              <div style="background:#ffffff;border-radius:12px;padding:14px 16px;text-align:center;">
+                <div style="font-size:14px;color:#22c55e;font-weight:600;">🎉 All clear! No urgent items today.</div>
+                <div style="font-size:12px;color:#6b7280;margin-top:4px;">Great time to share your card or follow up with past clients.</div>
+              </div>
+            `}
+          </div>
+        `;
+
+        // Action items
         const insightItems: string[] = [];
         if ((uncontactedLeads ?? 0) > 0) {
           insightItems.push(`📞 You have <strong>${uncontactedLeads}</strong> lead${(uncontactedLeads ?? 0) > 1 ? "s" : ""} that haven't been contacted.`);
@@ -113,14 +164,18 @@ serve(async (req) => {
           </div>
         ` : "";
 
+        const appUrl = Deno.env.get("SUPABASE_URL")?.replace(".supabase.co", ".lovable.app") || "#";
+
         await supabase.functions.invoke("send-email", {
           body: {
             to: user.email,
-            subject: `📊 Daily Scorecard: ${views} views, ${leads} leads, $${estimatedRevenue} revenue`,
+            subject: `☀️ Good morning, ${firstName}! ${tLeads > 0 ? `${tLeads} lead${tLeads > 1 ? "s" : ""} waiting` : (todayBookings ?? 0) > 0 ? `${todayBookings} booking${(todayBookings ?? 0) > 1 ? "s" : ""} today` : "Your daily update"}`,
             html: `
               <div style="font-family:'DM Sans',sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#ffffff;">
-                <h1 style="color:#1a1a2e;font-size:22px;margin:0 0 4px;">Daily Business Scorecard</h1>
-                <p style="color:#6b7280;font-size:14px;margin:0 0 24px;">${dateStr}</p>
+                ${morningHtml}
+
+                <h2 style="color:#1a1a2e;font-size:16px;margin:0 0 4px;">Yesterday's Scorecard</h2>
+                <p style="color:#6b7280;font-size:13px;margin:0 0 16px;">${dateStr}</p>
                 
                 <table style="width:100%;border-collapse:collapse;margin:0 0 24px;">
                   <tr>
@@ -155,14 +210,14 @@ serve(async (req) => {
 
                 ${insightsHtml}
 
-                <a href="${Deno.env.get("SUPABASE_URL")?.replace(".supabase.co", ".lovable.app") || "#"}/app" 
-                   style="display:block;text-align:center;padding:12px 24px;background:#4361ee;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">
-                  Open Dashboard
+                <a href="${appUrl}/app" 
+                   style="display:block;text-align:center;padding:14px 24px;background:linear-gradient(135deg,#4361ee,#7c3aed);color:#fff;border-radius:10px;text-decoration:none;font-weight:600;font-size:14px;">
+                  Open Your Dashboard →
                 </a>
 
                 <p style="color:#9ca3af;font-size:11px;text-align:center;margin:24px 0 0;">
                   CardPilot — Your digital business card platform<br/>
-                  <a href="#" style="color:#9ca3af;">Unsubscribe from daily reports</a>
+                  <a href="${appUrl}/app/settings" style="color:#9ca3af;">Manage notification preferences</a>
                 </p>
               </div>
             `,
