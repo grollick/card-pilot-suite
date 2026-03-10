@@ -1115,17 +1115,29 @@ export default function PublicCard() {
               )}
               {formSent ? (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   style={{
-                    padding: 20,
+                    padding: 24,
                     borderRadius: radii.card,
                     background: `${palette.primary}10`,
                     textAlign: "center",
                   }}
                 >
-                  <p style={{ fontSize: 14, fontWeight: 600, color: palette.primary, margin: 0 }}>
-                    ✓ Message sent! We'll be in touch.
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15, delay: 0.15 }}
+                    style={{ fontSize: 36, marginBottom: 8 }}
+                  >
+                    ✓
+                  </motion.div>
+                  <p style={{ fontSize: 15, fontWeight: 600, color: palette.primary, margin: 0 }}>
+                    Message sent!
+                  </p>
+                  <p style={{ fontSize: 13, color: palette.secondary, margin: "4px 0 0" }}>
+                    We'll be in touch shortly.
                   </p>
                 </motion.div>
               ) : (
