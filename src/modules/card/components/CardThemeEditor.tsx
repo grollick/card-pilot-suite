@@ -417,8 +417,9 @@ export default function CardThemeEditor({
       gradientBg: gradientBg.enabled ? gradientBg : undefined,
       bgPattern: bgPattern.type !== "none" ? bgPattern : undefined,
       metallicEffect: metallicEffect.type !== "none" ? metallicEffect : undefined,
+      heroBackgroundId: heroBackgroundId || undefined,
     });
-  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, open, onPreview]);
+  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId, open, onPreview]);
 
   const handleColorChange = useCallback((key: keyof CardPalette, value: string) => {
     setPalette((prev) => ({ ...prev, [key]: value }));
@@ -429,6 +430,7 @@ export default function CardThemeEditor({
     setGradientBg({ enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
     setBgPattern({ type: "none", opacity: 0.08 });
     setMetallicEffect(DEFAULT_METALLIC);
+    setHeroBackgroundId("");
   }, [defaultPalette, defaultFonts]);
 
   const handleSave = useCallback(() => {
@@ -437,9 +439,10 @@ export default function CardThemeEditor({
       gradientBg: gradientBg.enabled ? gradientBg : undefined,
       bgPattern: bgPattern.type !== "none" ? bgPattern : undefined,
       metallicEffect: metallicEffect.type !== "none" ? metallicEffect : undefined,
+      heroBackgroundId: heroBackgroundId || undefined,
     });
     onOpenChange(false);
-  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, onSave, onOpenChange]);
+  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId, onSave, onOpenChange]);
 
   const updateToken = useCallback(<K extends keyof CardStyleTokens>(key: K, value: CardStyleTokens[K]) => {
     setTokens((prev) => ({ ...prev, [key]: value }));
