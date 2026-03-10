@@ -79,6 +79,7 @@ export default function JobDetailPage() {
   const [sigName, setSigName] = useState("");
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [quickNote, setQuickNote] = useState("");
+  const [assistOpen, setAssistOpen] = useState(false);
 
   if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
   if (!job) return <div className="text-center py-12 text-muted-foreground">Job not found</div>;
