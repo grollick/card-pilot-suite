@@ -11,10 +11,10 @@ import {
 } from "@/hooks/useCard";
 import { useGenerateCardContent } from "@/hooks/useGenerateContent";
 import { resolveCardTheme, type ResolvedCardTheme } from "@/lib/cardTokens";
-import type { CtaItem } from "@/components/card/CtaEditor";
-import { DEFAULT_CTA_CONFIG } from "@/components/card/CtaEditor";
-import type { CardThemeOverrides } from "@/components/card/CardThemeEditor";
-import type { SectionContent } from "@/components/card/SectionEditor";
+import type { CtaItem } from "@/modules/card/components/CtaEditor";
+import { DEFAULT_CTA_CONFIG } from "@/modules/card/components/CtaEditor";
+import type { CardThemeOverrides } from "@/modules/card/components/CardThemeEditor";
+import type { SectionContent } from "@/modules/card/components/SectionEditor";
 
 const FALLBACK_PALETTE = { primary: "#4361ee", secondary: "#6b7280", accent: "#7c3aed", background: "#ffffff" };
 

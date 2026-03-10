@@ -10,51 +10,76 @@ import { OrgProvider } from "@/contexts/OrgContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { Loader2 } from "lucide-react";
 
-// Public routes — loaded eagerly for fast <500ms render
-import PublicBooking from "./pages/public/PublicBooking";
-import QRLanding from "./pages/public/QRLanding";
-import ProductsPage from "./pages/public/ProductsPage";
-import DiscoverPage from "./pages/public/DiscoverPage";
-import HandleOrSeoRoute from "./pages/public/HandleOrSeoRoute";
-import PublicSite from "./pages/public/PublicSite";
+// ── Public routes — loaded eagerly for fast <500ms render ──
+import PublicBooking from "@/modules/public/pages/PublicBooking";
+import QRLanding from "@/modules/public/pages/QRLanding";
+import ProductsPage from "@/modules/public/pages/ProductsPage";
+import DiscoverPage from "@/modules/public/pages/DiscoverPage";
+import HandleOrSeoRoute from "@/modules/public/pages/HandleOrSeoRoute";
+import PublicSite from "@/modules/public/pages/PublicSite";
 
-// Auth & marketing — loaded eagerly (small)
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import NotFound from "./pages/NotFound";
+// ── Auth & marketing — loaded eagerly (small) ──
+import LandingPage from "@/modules/landing/pages/LandingPage";
+import AuthPage from "@/modules/auth/pages/AuthPage";
+import ForgotPassword from "@/modules/auth/pages/ForgotPassword";
+import ResetPassword from "@/modules/auth/pages/ResetPassword";
+import NotFound from "@/modules/shared/pages/NotFound";
 
-// App dashboard — lazy loaded (heavy, auth-gated)
-const Onboarding = lazy(() => import("./pages/Onboarding"));
-const DashboardLayout = lazy(() => import("./components/DashboardLayout"));
-const DashboardHome = lazy(() => import("./pages/app/DashboardHome"));
-const CardBuilder = lazy(() => import("./pages/app/CardBuilder"));
-const ContactsPage = lazy(() => import("./pages/app/ContactsPage"));
-const ContactDetail = lazy(() => import("./pages/app/ContactDetail"));
-const PipelinePage = lazy(() => import("./pages/app/PipelinePage"));
-const TasksPage = lazy(() => import("./pages/app/TasksPage"));
-const BookingManager = lazy(() => import("./pages/app/BookingManager"));
-const EmailMarketing = lazy(() => import("./pages/app/EmailMarketing"));
-const SocialScheduler = lazy(() => import("./pages/app/SocialScheduler"));
-const ContentPage = lazy(() => import("./pages/app/ContentPage"));
-const Analytics = lazy(() => import("./pages/app/Analytics"));
-const AutomationPage = lazy(() => import("./pages/app/AutomationPage"));
-const QRCampaignsPage = lazy(() => import("./pages/app/QRCampaignsPage"));
-const SettingsPage = lazy(() => import("./pages/app/SettingsPage"));
-const AdminPage = lazy(() => import("./pages/app/AdminPage"));
-const TeamPage = lazy(() => import("./pages/app/TeamPage"));
+// ── Onboarding ──
+const Onboarding = lazy(() => import("@/modules/onboarding/pages/Onboarding"));
 
-const CardViewersPage = lazy(() => import("./pages/app/CardViewersPage"));
-const RevenueForecast = lazy(() => import("./pages/app/RevenueForecast"));
-const PromotionsPage = lazy(() => import("./pages/app/PromotionsPage"));
-const ReferralsPage = lazy(() => import("./pages/app/ReferralsPage"));
-const ProjectsPage = lazy(() => import("./pages/app/ProjectsPage"));
-const ReviewsPage = lazy(() => import("./pages/app/ReviewsPage"));
-const EstimatesPage = lazy(() => import("./pages/app/EstimatesPage"));
-const JobsPage = lazy(() => import("./pages/app/JobsPage"));
-const JobDetailPage = lazy(() => import("./pages/app/JobDetailPage"));
-const AssistantPage = lazy(() => import("./pages/app/AssistantPage"));
+// ── Dashboard shell ──
+const DashboardLayout = lazy(() => import("@/components/DashboardLayout"));
+
+// ── Module pages — lazy loaded, auth-gated ──
+
+// Dashboard
+const DashboardHome = lazy(() => import("@/modules/dashboard/pages/DashboardHome"));
+
+// Card Builder
+const CardBuilder = lazy(() => import("@/modules/card/pages/CardBuilder"));
+
+// CRM
+const ContactsPage = lazy(() => import("@/modules/crm/pages/ContactsPage"));
+const ContactDetail = lazy(() => import("@/modules/crm/pages/ContactDetail"));
+const PipelinePage = lazy(() => import("@/modules/crm/pages/PipelinePage"));
+const TasksPage = lazy(() => import("@/modules/crm/pages/TasksPage"));
+
+// Booking
+const BookingManager = lazy(() => import("@/modules/booking/pages/BookingManager"));
+
+// Estimates
+const EstimatesPage = lazy(() => import("@/modules/estimates/pages/EstimatesPage"));
+
+// Jobs
+const JobsPage = lazy(() => import("@/modules/jobs/pages/JobsPage"));
+const JobDetailPage = lazy(() => import("@/modules/jobs/pages/JobDetailPage"));
+
+// Marketing
+const EmailMarketing = lazy(() => import("@/modules/marketing/pages/EmailMarketing"));
+const SocialScheduler = lazy(() => import("@/modules/marketing/pages/SocialScheduler"));
+const ContentPage = lazy(() => import("@/modules/marketing/pages/ContentPage"));
+const PromotionsPage = lazy(() => import("@/modules/marketing/pages/PromotionsPage"));
+const ReferralsPage = lazy(() => import("@/modules/marketing/pages/ReferralsPage"));
+const AutomationPage = lazy(() => import("@/modules/marketing/pages/AutomationPage"));
+const QRCampaignsPage = lazy(() => import("@/modules/marketing/pages/QRCampaignsPage"));
+
+// Analytics
+const Analytics = lazy(() => import("@/modules/analytics/pages/Analytics"));
+const CardViewersPage = lazy(() => import("@/modules/analytics/pages/CardViewersPage"));
+const RevenueForecast = lazy(() => import("@/modules/analytics/pages/RevenueForecast"));
+
+// Marketplace
+const ProjectsPage = lazy(() => import("@/modules/marketplace/pages/ProjectsPage"));
+const ReviewsPage = lazy(() => import("@/modules/marketplace/pages/ReviewsPage"));
+
+// AI Assistant
+const AssistantPage = lazy(() => import("@/modules/assistant/pages/AssistantPage"));
+
+// Settings
+const SettingsPage = lazy(() => import("@/modules/settings/pages/SettingsPage"));
+const AdminPage = lazy(() => import("@/modules/settings/pages/AdminPage"));
+const TeamPage = lazy(() => import("@/modules/settings/pages/TeamPage"));
 
 const LazyFallback = () => (
   <div className="min-h-screen flex items-center justify-center">
@@ -75,15 +100,15 @@ const App = () => (
           <OrgProvider>
           <Routes>
             {/* Auth & marketing */}
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/auth" element={<AuthPage />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/onboarding" element={
               <ProtectedRoute><Suspense fallback={<LazyFallback />}><Onboarding /></Suspense></ProtectedRoute>
             } />
 
-            {/* Public routes — no auth required, minimal data access */}
+            {/* Public routes — no auth required */}
             <Route path="/q/:campaign" element={<QRLanding />} />
             <Route path="/book/:handle" element={<PublicBooking />} />
             <Route path="/products" element={<ProductsPage />} />
@@ -125,7 +150,7 @@ const App = () => (
               <Route path="admin" element={<Suspense fallback={<LazyFallback />}><AdminPage /></Suspense>} />
             </Route>
 
-            {/* Public card OR SEO landing — smart routing by slug pattern */}
+            {/* Public card OR SEO landing — smart routing */}
             <Route path="/:handle" element={<HandleOrSeoRoute />} />
 
             <Route path="*" element={<NotFound />} />

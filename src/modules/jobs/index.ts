@@ -1,0 +1,21 @@
+// ── Jobs module barrel ──
+export {
+  useJobs,
+  useJob,
+  useCreateJob,
+  useUpdateJob,
+  useDeleteJob,
+  useJobTasks,
+  useCreateJobTask,
+  useUpdateJobTask,
+  useDeleteJobTask,
+  useJobMaterials,
+  useCreateJobMaterial,
+  useDeleteJobMaterial,
+  useJobPhotos,
+  useUploadJobPhoto,
+  useDeleteJobPhoto,
+  JOB_STATUS_LABELS,
+  JOB_STATUS_COLORS,
+  type JobStatus,
+} from "@/hooks/useJobs";
