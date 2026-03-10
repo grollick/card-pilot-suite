@@ -11,13 +11,17 @@ import { motion } from "framer-motion";
 import { useTasks, useUpdateTask } from "@/hooks/useTasks";
 import { useDashboardStats, useRecentActivity } from "@/hooks/useDashboardStats";
 import { formatDistanceToNow, format } from "date-fns";
-import AIInsightsWidget from "@/modules/dashboard/components/AIInsightsWidget";
 import BusinessPerformancePanel from "@/modules/dashboard/components/BusinessPerformancePanel";
 import DailyScorecard from "@/modules/dashboard/components/DailyScorecard";
 import MissedOpportunities from "@/modules/dashboard/components/MissedOpportunities";
 import FirstLeadAssistant from "@/modules/dashboard/components/FirstLeadAssistant";
 import JobMetrics from "@/modules/dashboard/components/JobMetrics";
 import MobileJobDashboard from "@/modules/dashboard/components/MobileJobDashboard";
+import AIInsightsWidget from "@/modules/dashboard/components/AIInsightsWidget";
+import TodaysSchedule from "@/modules/dashboard/components/TodaysSchedule";
+import ActiveJobsWidget from "@/modules/dashboard/components/ActiveJobsWidget";
+import QuickActionPanel from "@/modules/dashboard/components/QuickActionPanel";
+import MarketingSnapshot from "@/modules/dashboard/components/MarketingSnapshot";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const priorityColors: Record<string, string> = {
@@ -64,14 +68,17 @@ export default function DashboardHome() {
     <div className="space-y-6 max-w-6xl">
       {/* Header */}
       <div className="page-header">
-        <h1 className="page-title">Dashboard</h1>
+        <h1 className="page-title">Command Center</h1>
         <p className="page-description">
-          Track your leads, bookings, and revenue in real time.
+          Your business at a glance — track performance and take action.
         </p>
       </div>
 
       {/* Mobile Job Dashboard */}
       {isMobile && <MobileJobDashboard />}
+
+      {/* Quick Actions (desktop) */}
+      {!isMobile && <QuickActionPanel />}
 
       {/* Business Performance Panel */}
       <BusinessPerformancePanel />
@@ -79,13 +86,19 @@ export default function DashboardHome() {
       {/* Daily Business Scorecard */}
       <DailyScorecard />
 
-      {/* Main Grid */}
+      {/* Main Grid: 2-column layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* Left: Activity Feed + Missed Opportunities */}
+        {/* Left Column */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Missed Opportunities */}
+          {/* Leads Needing Attention */}
           <MissedOpportunities />
+
+          {/* Today's Schedule */}
+          <TodaysSchedule />
+
+          {/* Active Jobs */}
+          <ActiveJobsWidget />
 
           {/* Activity Feed */}
           <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.15 }}
@@ -145,6 +158,12 @@ export default function DashboardHome() {
 
         {/* Right Column */}
         <div className="space-y-6">
+          {/* Marketing Snapshot */}
+          <MarketingSnapshot />
+
+          {/* Revenue / Job Overview */}
+          <JobMetrics />
+
           {/* Pipeline Snapshot */}
           <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.15 }}
             className="dash-card">
@@ -256,9 +275,6 @@ export default function DashboardHome() {
           <FirstLeadAssistant />
         </div>
       </div>
-
-      {/* Job Metrics */}
-      <JobMetrics />
 
       {/* AI Insights */}
       <AIInsightsWidget />
