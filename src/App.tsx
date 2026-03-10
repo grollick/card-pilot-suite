@@ -62,6 +62,10 @@ const JobPipelinePage = lazy(() => import("@/modules/jobs/pages/JobPipelinePage"
 const InvoicesPage = lazy(() => import("@/modules/invoices/pages/InvoicesPage"));
 const InvoiceDetailPage = lazy(() => import("@/modules/invoices/pages/InvoiceDetailPage"));
 
+// Recurring
+const RecurringPlansPage = lazy(() => import("@/modules/recurring/pages/RecurringPlansPage"));
+const RecurringPlanDetailPage = lazy(() => import("@/modules/recurring/pages/RecurringPlanDetailPage"));
+
 // Marketing
 const EmailMarketing = lazy(() => import("@/modules/marketing/pages/EmailMarketing"));
 const SocialScheduler = lazy(() => import("@/modules/marketing/pages/SocialScheduler"));
