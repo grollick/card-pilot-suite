@@ -62,6 +62,7 @@ const ContentPage = lazy(() => import("@/modules/marketing/pages/ContentPage"));
 const PromotionsPage = lazy(() => import("@/modules/marketing/pages/PromotionsPage"));
 const ReferralsPage = lazy(() => import("@/modules/marketing/pages/ReferralsPage"));
 const AutomationPage = lazy(() => import("@/modules/marketing/pages/AutomationPage"));
+const AutopilotPage = lazy(() => import("@/modules/automation/pages/AutopilotPage"));
 const QRCampaignsPage = lazy(() => import("@/modules/marketing/pages/QRCampaignsPage"));
 
 // Analytics
