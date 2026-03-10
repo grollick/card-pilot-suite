@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Palette, Type, Check, RotateCcw, Layers, Sun, Moon, Circle, Share2, Save, Trash2, Plus, Undo2, Redo2, Sparkles } from "lucide-react";
+import { Palette, Type, Check, RotateCcw, Layers, Sun, Moon, Circle, Share2, Save, Trash2, Plus, Undo2, Redo2, Sparkles, Image } from "lucide-react";
+import { HERO_BACKGROUNDS, getHeroBackgroundsByCategory, type HeroBackground } from "@/lib/heroBackgrounds";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -95,6 +96,7 @@ export interface CardThemeOverrides {
   gradientBg?: CardGradientBg;
   bgPattern?: CardBgPattern;
   metallicEffect?: MetallicEffect;
+  heroBackgroundId?: string;
 }
 
 const FONT_OPTIONS = [
@@ -279,16 +281,17 @@ export default function CardThemeEditor({
   const [bgPattern, _setBgPattern] = useState<CardBgPattern>(currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 });
   const DEFAULT_METALLIC: MetallicEffect = { type: "none", intensity: 80, applyToName: true, applyToButtons: true, applyToSections: true };
   const [metallicEffect, _setMetallicEffect] = useState<MetallicEffect>(currentOverrides.metallicEffect ?? DEFAULT_METALLIC);
+  const [heroBackgroundId, _setHeroBackgroundId] = useState<string>(currentOverrides.heroBackgroundId ?? "");
 
   // ── Undo / Redo history ──
-  interface ThemeSnapshot { palette: CardPalette; fonts: CardFonts; tokens: CardStyleTokens; gradientBg: CardGradientBg; bgPattern: CardBgPattern; metallicEffect: MetallicEffect }
+  interface ThemeSnapshot { palette: CardPalette; fonts: CardFonts; tokens: CardStyleTokens; gradientBg: CardGradientBg; bgPattern: CardBgPattern; metallicEffect: MetallicEffect; heroBackgroundId: string }
   const historyRef = useRef<ThemeSnapshot[]>([]);
   const historyIndexRef = useRef(-1);
   const [historyLen, setHistoryLen] = useState(0);
   const [historyIdx, setHistoryIdx] = useState(-1);
   const skipHistoryRef = useRef(false);
 
-  const getSnapshot = useCallback((): ThemeSnapshot => ({ palette, fonts, tokens, gradientBg, bgPattern, metallicEffect }), [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect]);
+  const getSnapshot = useCallback((): ThemeSnapshot => ({ palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId }), [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId]);
 
   const pushHistory = useCallback((snap: ThemeSnapshot) => {
     if (skipHistoryRef.current) return;
@@ -311,6 +314,7 @@ export default function CardThemeEditor({
     _setGradientBg(snap.gradientBg);
     _setBgPattern(snap.bgPattern);
     _setMetallicEffect(snap.metallicEffect);
+    _setHeroBackgroundId(snap.heroBackgroundId);
     // Allow next tick to re-enable history
     requestAnimationFrame(() => { skipHistoryRef.current = false; });
   }, []);
@@ -341,7 +345,7 @@ export default function CardThemeEditor({
       pushHistory(getSnapshot());
     }, 300);
     return () => clearTimeout(historyTimer.current);
-  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, open, pushHistory, getSnapshot]);
+  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId, open, pushHistory, getSnapshot]);
 
   // Wrapped setters that go through normal state (history is pushed via effect)
   const setPalette = _setPalette;
@@ -350,6 +354,7 @@ export default function CardThemeEditor({
   const setGradientBg = _setGradientBg;
   const setBgPattern = _setBgPattern;
   const setMetallicEffect = _setMetallicEffect;
+  const setHeroBackgroundId = _setHeroBackgroundId;
 
   // Custom palettes
   const [customPalettes, setCustomPalettes] = useState<{ id: string; name: string; palette: CardPalette }[]>([]);
@@ -393,10 +398,10 @@ export default function CardThemeEditor({
     const g = currentOverrides.gradientBg ?? { enabled: false, color2: "#e0e7ff", direction: "to bottom right" };
     const b = currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 };
     const m = currentOverrides.metallicEffect ?? DEFAULT_METALLIC;
-    _setPalette(p); _setFonts(f); _setTokens(t); _setGradientBg(g); _setBgPattern(b); _setMetallicEffect(m);
+    const h = currentOverrides.heroBackgroundId ?? "";
+    _setPalette(p); _setFonts(f); _setTokens(t); _setGradientBg(g); _setBgPattern(b); _setMetallicEffect(m); _setHeroBackgroundId(h);
     if (open) {
-      // Reset history when opening
-      historyRef.current = [{ palette: p, fonts: f, tokens: t, gradientBg: g, bgPattern: b, metallicEffect: m }];
+      historyRef.current = [{ palette: p, fonts: f, tokens: t, gradientBg: g, bgPattern: b, metallicEffect: m, heroBackgroundId: h }];
       historyIndexRef.current = 0;
       setHistoryLen(1);
       setHistoryIdx(0);
@@ -412,8 +417,9 @@ export default function CardThemeEditor({
       gradientBg: gradientBg.enabled ? gradientBg : undefined,
       bgPattern: bgPattern.type !== "none" ? bgPattern : undefined,
       metallicEffect: metallicEffect.type !== "none" ? metallicEffect : undefined,
+      heroBackgroundId: heroBackgroundId || undefined,
     });
-  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, open, onPreview]);
+  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId, open, onPreview]);
 
   const handleColorChange = useCallback((key: keyof CardPalette, value: string) => {
     setPalette((prev) => ({ ...prev, [key]: value }));
@@ -424,6 +430,7 @@ export default function CardThemeEditor({
     setGradientBg({ enabled: false, color2: "#e0e7ff", direction: "to bottom right" });
     setBgPattern({ type: "none", opacity: 0.08 });
     setMetallicEffect(DEFAULT_METALLIC);
+    setHeroBackgroundId("");
   }, [defaultPalette, defaultFonts]);
 
   const handleSave = useCallback(() => {
@@ -432,9 +439,10 @@ export default function CardThemeEditor({
       gradientBg: gradientBg.enabled ? gradientBg : undefined,
       bgPattern: bgPattern.type !== "none" ? bgPattern : undefined,
       metallicEffect: metallicEffect.type !== "none" ? metallicEffect : undefined,
+      heroBackgroundId: heroBackgroundId || undefined,
     });
     onOpenChange(false);
-  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, onSave, onOpenChange]);
+  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId, onSave, onOpenChange]);
 
   const updateToken = useCallback(<K extends keyof CardStyleTokens>(key: K, value: CardStyleTokens[K]) => {
     setTokens((prev) => ({ ...prev, [key]: value }));
@@ -696,7 +704,35 @@ export default function CardThemeEditor({
                 )}
               </div>
 
-              {/* Metallic Effect */}
+              {/* Hero Background */}
+              <div className="space-y-1.5">
+                <SectionLabel>Hero Background</SectionLabel>
+                <p className="text-[10px] text-muted-foreground">Gradient shown when no cover image is uploaded</p>
+                <div className="grid grid-cols-4 gap-1.5">
+                  <button
+                    onClick={() => setHeroBackgroundId("")}
+                    className={`h-10 rounded-md border-2 transition-all flex items-center justify-center text-[9px] font-medium ${
+                      !heroBackgroundId ? "border-primary ring-1 ring-primary/30" : "border-border/50 hover:border-border"
+                    }`}
+                    style={{ background: `linear-gradient(135deg, ${palette.primary}30, ${palette.accent || palette.primary}20)` }}
+                  >
+                    Auto
+                  </button>
+                  {HERO_BACKGROUNDS.map(bg => (
+                    <button
+                      key={bg.id}
+                      onClick={() => setHeroBackgroundId(bg.id)}
+                      title={bg.label}
+                      className={`h-10 rounded-md border-2 transition-all ${
+                        heroBackgroundId === bg.id ? "border-primary ring-1 ring-primary/30" : "border-border/50 hover:border-border"
+                      }`}
+                      style={{ background: bg.gradient }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <SectionLabel>Metallic Effect</SectionLabel>

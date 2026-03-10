@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { type ResolvedCardTheme, getAvatarRadius } from "@/lib/cardTokens";
+import type { HeroBackground } from "@/lib/heroBackgrounds";
 import type { MetallicEffect } from "@/modules/card/components/CardThemeEditor";
 import { METALLIC_GRADIENTS } from "@/modules/card/components/CardThemeEditor";
 
@@ -39,6 +40,8 @@ interface CardHeaderProps {
   logoNameGap?: number;
   logoVerticalAlign?: "top" | "center" | "bottom";
   metallicEffect?: MetallicEffect;
+  /** Dynamic hero background (profession-based or user-selected) */
+  heroBackground?: HeroBackground | null;
 }
 
 function renderName(name: string, bold?: boolean, uppercase?: boolean, firstNameWeight?: number | null) {
@@ -62,7 +65,7 @@ function renderName(name: string, bold?: boolean, uppercase?: boolean, firstName
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, nameFontSize, subtitleFontSize, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4, logoNameGap = 8, logoVerticalAlign = "center", metallicEffect }: CardHeaderProps) {
+export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, nameFontSize, subtitleFontSize, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4, logoNameGap = 8, logoVerticalAlign = "center", metallicEffect, heroBackground }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -289,6 +292,11 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     </motion.div>
   ) : null;
 
+  // Dynamic fallback background: hero background gradient → palette gradient
+  const fallbackBg = heroBackground
+    ? heroBackground.gradient
+    : `linear-gradient(135deg, ${palette.primary}30, ${palette.accent}20)`;
+
   // Parallax cover image element — reused in cover layout and banner
   const parallaxCover = (height: number, borderRadiusTop: boolean) => (
     <div
@@ -301,15 +309,14 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
         marginLeft: -8,
         marginRight: -8,
         marginTop: borderRadiusTop ? -8 : undefined,
-        background: coverUrl
-          ? undefined
-          : `linear-gradient(135deg, ${palette.primary}30, ${palette.accent}20)`,
+        background: coverUrl ? undefined : fallbackBg,
       }}
     >
       {coverUrl && (
         <motion.img
           src={coverUrl}
           alt=""
+          loading="lazy"
           style={{
             width: "100%",
             height: "120%",
@@ -323,12 +330,26 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
           }}
         />
       )}
-      {logoEl}
+      {/* Gradient overlay for text readability */}
+      {(coverUrl || heroBackground) && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: coverUrl
+              ? "linear-gradient(180deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.35) 100%)"
+              : heroBackground?.overlay ?? "none",
+            pointerEvents: "none",
+            zIndex: 1,
+          }}
+        />
+      )}
+      {logoEl && <div style={{ position: "relative", zIndex: 2 }}>{logoEl}</div>}
     </div>
   );
 
   // Shared cover/backdrop banner element for non-cover layouts
-  const coverBanner = (coverUrl || logoUrl) ? parallaxCover(120, true) : null;
+  const coverBanner = (coverUrl || logoUrl || heroBackground) ? parallaxCover(120, true) : null;
 
   switch (header.layout) {
     // ─── Cover: full-width cover image, avatar overlapping ─────

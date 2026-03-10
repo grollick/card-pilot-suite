@@ -50,6 +50,7 @@ import QuoteRequestForm from "@/modules/card/components/QuoteRequestForm";
 import SmartEngagementPopup from "@/modules/card/components/SmartEngagementPopup";
 import StickyActionBar from "@/modules/card/components/StickyActionBar";
 import GalleryLightbox from "@/modules/card/components/GalleryLightbox";
+import { getHeroBackgroundForProfession, getHeroBackgroundById } from "@/lib/heroBackgrounds";
 import { showsBranding } from "@/lib/plans";
 
 // ── Visitor meta for analytics ──
@@ -275,6 +276,14 @@ export default function PublicCard() {
   const coverUrl = themeJson.cover_url as string | undefined;
   const showSectionIcons = themeJson.section_icons === true;
   const metallicEffect = themeJson.metallicEffect as import("@/modules/card/components/CardThemeEditor").MetallicEffect | undefined;
+
+  // ── Dynamic hero background ──
+  const resolvedHeroBackground = (() => {
+    const savedId = themeJson.heroBackgroundId as string | undefined;
+    if (savedId) return getHeroBackgroundById(savedId) ?? null;
+    if (!coverUrl) return getHeroBackgroundForProfession(professionName);
+    return null;
+  })();
 
   // CTA config from theme_json or fallback to legacy primary_cta
   type CtaItem = { id: string; label: string; enabled: boolean; isPrimary: boolean };
@@ -654,6 +663,7 @@ export default function PublicCard() {
             logoNameGap={typeof themeJson.logo_name_gap === "number" ? (themeJson.logo_name_gap as number) : 8}
             logoVerticalAlign={(themeJson.logo_vertical_align as any) ?? "center"}
             metallicEffect={metallicEffect}
+            heroBackground={resolvedHeroBackground}
           />
           </div>
         )}
