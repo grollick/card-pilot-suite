@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Plus, Trash2, ExternalLink, Share2, Loader2, Image, MapPin } from "lucide-react";
+import { Plus, Trash2, ExternalLink, Share2, Loader2, Image, MapPin, Facebook, Linkedin, Twitter, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
