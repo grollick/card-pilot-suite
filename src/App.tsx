@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { OrgProvider } from "@/contexts/OrgContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import { Loader2 } from "lucide-react";
 
 // ── Public routes — loaded eagerly for fast <500ms render ──
@@ -95,7 +96,28 @@ const LazyFallback = () => (
   </div>
 );
 
-const queryClient = new QueryClient();
+/** Wrap lazy-loaded routes in error boundary + suspense */
+function LazyRoute({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<LazyFallback />}>{children}</Suspense>
+    </ErrorBoundary>
+  );
+}
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 2 * 60 * 1000, // 2 min — avoid refetch storms on navigation
+      gcTime: 10 * 60 * 1000,   // 10 min garbage collection
+      retry: 1,                  // single retry on failure
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 0,
+    },
+  },
+});
 
 const App = () => (
   <HelmetProvider>
@@ -113,7 +135,7 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/onboarding" element={
-              <ProtectedRoute><Suspense fallback={<LazyFallback />}><Onboarding /></Suspense></ProtectedRoute>
+              <ProtectedRoute><LazyRoute><Onboarding /></LazyRoute></ProtectedRoute>
             } />
 
             {/* Public routes — no auth required */}
@@ -127,41 +149,41 @@ const App = () => (
 
             {/* App dashboard — auth required, lazy loaded */}
             <Route path="/app" element={
-              <ProtectedRoute><Suspense fallback={<LazyFallback />}><DashboardLayout /></Suspense></ProtectedRoute>
+              <ProtectedRoute><LazyRoute><DashboardLayout /></LazyRoute></ProtectedRoute>
             }>
-              <Route index element={<Suspense fallback={<LazyFallback />}><DashboardHome /></Suspense>} />
-              <Route path="dashboard" element={<Suspense fallback={<LazyFallback />}><DashboardHome /></Suspense>} />
-              <Route path="card" element={<Suspense fallback={<LazyFallback />}><CardBuilder /></Suspense>} />
-              <Route path="card/qr" element={<Suspense fallback={<LazyFallback />}><QRBusinessCard /></Suspense>} />
-              <Route path="contacts" element={<Suspense fallback={<LazyFallback />}><ContactsPage /></Suspense>} />
-              <Route path="contacts/:id" element={<Suspense fallback={<LazyFallback />}><ContactDetail /></Suspense>} />
-              <Route path="pipeline" element={<Suspense fallback={<LazyFallback />}><PipelinePage /></Suspense>} />
-              <Route path="tasks" element={<Suspense fallback={<LazyFallback />}><TasksPage /></Suspense>} />
-              <Route path="bookings" element={<Suspense fallback={<LazyFallback />}><BookingManager /></Suspense>} />
-              <Route path="email" element={<Suspense fallback={<LazyFallback />}><EmailMarketing /></Suspense>} />
-              <Route path="social" element={<Suspense fallback={<LazyFallback />}><SocialScheduler /></Suspense>} />
-              <Route path="content" element={<Suspense fallback={<LazyFallback />}><ContentPage /></Suspense>} />
-              <Route path="analytics" element={<Suspense fallback={<LazyFallback />}><Analytics /></Suspense>} />
-              <Route path="automation" element={<Suspense fallback={<LazyFallback />}><AutomationPage /></Suspense>} />
-              <Route path="autopilot" element={<Suspense fallback={<LazyFallback />}><AutopilotPage /></Suspense>} />
-              <Route path="qr-campaigns" element={<Suspense fallback={<LazyFallback />}><QRCampaignsPage /></Suspense>} />
-              <Route path="settings" element={<Suspense fallback={<LazyFallback />}><SettingsPage /></Suspense>} />
-              <Route path="team" element={<Suspense fallback={<LazyFallback />}><TeamPage /></Suspense>} />
-              <Route path="viewers" element={<Suspense fallback={<LazyFallback />}><CardViewersPage /></Suspense>} />
-              <Route path="revenue" element={<Suspense fallback={<LazyFallback />}><RevenueForecast /></Suspense>} />
-              <Route path="industry-insights" element={<Suspense fallback={<LazyFallback />}><IndustryInsightsPage /></Suspense>} />
-              <Route path="promotions" element={<Suspense fallback={<LazyFallback />}><PromotionsPage /></Suspense>} />
-              <Route path="referrals" element={<Suspense fallback={<LazyFallback />}><ReferralsPage /></Suspense>} />
-              <Route path="boost" element={<Suspense fallback={<LazyFallback />}><BoostPage /></Suspense>} />
-              <Route path="projects" element={<Suspense fallback={<LazyFallback />}><ProjectsPage /></Suspense>} />
-              <Route path="reviews" element={<Suspense fallback={<LazyFallback />}><ReviewsPage /></Suspense>} />
-              <Route path="estimates" element={<Suspense fallback={<LazyFallback />}><EstimatesPage /></Suspense>} />
-              <Route path="jobs" element={<Suspense fallback={<LazyFallback />}><JobsPage /></Suspense>} />
-              <Route path="jobs/:id" element={<Suspense fallback={<LazyFallback />}><JobDetailPage /></Suspense>} />
-              <Route path="assistant" element={<Suspense fallback={<LazyFallback />}><AssistantPage /></Suspense>} />
-              <Route path="agency" element={<Suspense fallback={<LazyFallback />}><AgencyDashboard /></Suspense>} />
-              <Route path="marketplace" element={<Suspense fallback={<LazyFallback />}><MarketplacePage /></Suspense>} />
-              <Route path="admin" element={<Suspense fallback={<LazyFallback />}><AdminPage /></Suspense>} />
+              <Route index element={<LazyRoute><DashboardHome /></LazyRoute>} />
+              <Route path="dashboard" element={<LazyRoute><DashboardHome /></LazyRoute>} />
+              <Route path="card" element={<LazyRoute><CardBuilder /></LazyRoute>} />
+              <Route path="card/qr" element={<LazyRoute><QRBusinessCard /></LazyRoute>} />
+              <Route path="contacts" element={<LazyRoute><ContactsPage /></LazyRoute>} />
+              <Route path="contacts/:id" element={<LazyRoute><ContactDetail /></LazyRoute>} />
+              <Route path="pipeline" element={<LazyRoute><PipelinePage /></LazyRoute>} />
+              <Route path="tasks" element={<LazyRoute><TasksPage /></LazyRoute>} />
+              <Route path="bookings" element={<LazyRoute><BookingManager /></LazyRoute>} />
+              <Route path="email" element={<LazyRoute><EmailMarketing /></LazyRoute>} />
+              <Route path="social" element={<LazyRoute><SocialScheduler /></LazyRoute>} />
+              <Route path="content" element={<LazyRoute><ContentPage /></LazyRoute>} />
+              <Route path="analytics" element={<LazyRoute><Analytics /></LazyRoute>} />
+              <Route path="automation" element={<LazyRoute><AutomationPage /></LazyRoute>} />
+              <Route path="autopilot" element={<LazyRoute><AutopilotPage /></LazyRoute>} />
+              <Route path="qr-campaigns" element={<LazyRoute><QRCampaignsPage /></LazyRoute>} />
+              <Route path="settings" element={<LazyRoute><SettingsPage /></LazyRoute>} />
+              <Route path="team" element={<LazyRoute><TeamPage /></LazyRoute>} />
+              <Route path="viewers" element={<LazyRoute><CardViewersPage /></LazyRoute>} />
+              <Route path="revenue" element={<LazyRoute><RevenueForecast /></LazyRoute>} />
+              <Route path="industry-insights" element={<LazyRoute><IndustryInsightsPage /></LazyRoute>} />
+              <Route path="promotions" element={<LazyRoute><PromotionsPage /></LazyRoute>} />
+              <Route path="referrals" element={<LazyRoute><ReferralsPage /></LazyRoute>} />
+              <Route path="boost" element={<LazyRoute><BoostPage /></LazyRoute>} />
+              <Route path="projects" element={<LazyRoute><ProjectsPage /></LazyRoute>} />
+              <Route path="reviews" element={<LazyRoute><ReviewsPage /></LazyRoute>} />
+              <Route path="estimates" element={<LazyRoute><EstimatesPage /></LazyRoute>} />
+              <Route path="jobs" element={<LazyRoute><JobsPage /></LazyRoute>} />
+              <Route path="jobs/:id" element={<LazyRoute><JobDetailPage /></LazyRoute>} />
+              <Route path="assistant" element={<LazyRoute><AssistantPage /></LazyRoute>} />
+              <Route path="agency" element={<LazyRoute><AgencyDashboard /></LazyRoute>} />
+              <Route path="marketplace" element={<LazyRoute><MarketplacePage /></LazyRoute>} />
+              <Route path="admin" element={<LazyRoute><AdminPage /></LazyRoute>} />
             </Route>
 
             {/* Public card OR SEO landing — smart routing */}

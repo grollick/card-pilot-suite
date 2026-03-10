@@ -10,46 +10,48 @@ export function useDashboardStats() {
       const todayStart = startOfDay(now).toISOString();
       const weekStart = startOfWeek(now, { weekStartsOn: 1 }).toISOString();
 
-      const { count: leadsToday } = await supabase
-        .from("leads")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", todayStart);
+      // Parallelize all queries
+      const [leadsRes, bookingsRes, openLeadsRes, stagesRes, leadsWithStageRes] = await Promise.all([
+        supabase
+          .from("leads")
+          .select("*", { count: "exact", head: true })
+          .gte("created_at", todayStart),
+        supabase
+          .from("bookings")
+          .select("*", { count: "exact", head: true })
+          .gte("created_at", weekStart),
+        supabase
+          .from("leads")
+          .select("id, pipeline_stages(is_won, is_lost)")
+          .eq("status", "open"),
+        supabase
+          .from("pipeline_stages")
+          .select("id, name, sort_order")
+          .order("sort_order", { ascending: true }),
+        supabase
+          .from("leads")
+          .select("stage_id")
+          .eq("status", "open"),
+      ]);
 
-      const { count: bookingsWeek } = await supabase
-        .from("bookings")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", weekStart);
-
-      const { data: openLeads } = await supabase
-        .from("leads")
-        .select("id, pipeline_stages(is_won, is_lost)")
-        .eq("status", "open");
-
-      const activeOpps = (openLeads ?? []).filter((l: any) => {
+      const activeOpps = (openLeadsRes.data ?? []).filter((l: any) => {
         const s = l.pipeline_stages;
         return !s?.is_won && !s?.is_lost;
       });
 
-      const { data: stages } = await supabase
-        .from("pipeline_stages")
-        .select("id, name, sort_order")
-        .order("sort_order", { ascending: true });
-
-      const { data: leadsWithStage } = await supabase
-        .from("leads")
-        .select("stage_id")
-        .eq("status", "open");
-
-      const stageCounts = (stages ?? []).map(s => {
-        const count = (leadsWithStage ?? []).filter(l => l.stage_id === s.id).length;
-        return { id: s.id, name: s.name, count };
-      });
+      const stages = stagesRes.data ?? [];
+      const leadsWithStage = leadsWithStageRes.data ?? [];
+      const stageCounts = stages.map(s => ({
+        id: s.id,
+        name: s.name,
+        count: leadsWithStage.filter(l => l.stage_id === s.id).length,
+      }));
 
       const totalPipelineLeads = stageCounts.reduce((s, c) => s + c.count, 0);
 
       return {
-        leadsToday: leadsToday ?? 0,
-        bookingsWeek: bookingsWeek ?? 0,
+        leadsToday: leadsRes.count ?? 0,
+        bookingsWeek: bookingsRes.count ?? 0,
         activeOpportunities: activeOpps.length,
         pipelineValue: totalPipelineLeads,
         stageCounts,
@@ -66,44 +68,41 @@ export function useBusinessPerformance() {
       const now = new Date();
       const monthStart = startOfMonth(now).toISOString();
 
-      // Card views this month
-      const { count: viewsThisMonth } = await supabase
-        .from("analytics_events")
-        .select("*", { count: "exact", head: true })
-        .eq("event_type", "card_view")
-        .gte("created_at", monthStart);
+      // Parallelize all queries
+      const [viewsRes, leadsRes, bookingsRes, servicesRes] = await Promise.all([
+        supabase
+          .from("analytics_events")
+          .select("*", { count: "exact", head: true })
+          .eq("event_type", "card_view")
+          .gte("created_at", monthStart),
+        supabase
+          .from("leads")
+          .select("*", { count: "exact", head: true })
+          .gte("created_at", monthStart),
+        supabase
+          .from("bookings")
+          .select("id, service_id")
+          .gte("created_at", monthStart),
+        supabase
+          .from("booking_services")
+          .select("price")
+          .eq("active", true),
+      ]);
 
-      // Leads this month
-      const { count: leadsThisMonth } = await supabase
-        .from("leads")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", monthStart);
-
-      // Bookings this month
-      const { data: bookingsThisMonth } = await supabase
-        .from("bookings")
-        .select("id, service_id")
-        .gte("created_at", monthStart);
-
-      const bookingCount = bookingsThisMonth?.length ?? 0;
-
-      // Average service price
-      const { data: services } = await supabase
-        .from("booking_services")
-        .select("price")
-        .eq("active", true);
-
-      const prices = (services ?? []).map(s => s.price ?? 0).filter(p => p > 0);
+      const bookingCount = bookingsRes.data?.length ?? 0;
+      const prices = (servicesRes.data ?? []).map(s => s.price ?? 0).filter(p => p > 0);
       const avgPrice = prices.length > 0 ? prices.reduce((a, b) => a + b, 0) / prices.length : 0;
 
       const estimatedRevenue = Math.round(bookingCount * avgPrice);
-      const conversionRate = (viewsThisMonth ?? 0) > 0
-        ? Math.round(((leadsThisMonth ?? 0) / (viewsThisMonth ?? 1)) * 100)
+      const viewsThisMonth = viewsRes.count ?? 0;
+      const leadsThisMonth = leadsRes.count ?? 0;
+      const conversionRate = viewsThisMonth > 0
+        ? Math.round((leadsThisMonth / viewsThisMonth) * 100)
         : 0;
 
       return {
-        views: viewsThisMonth ?? 0,
-        leads: leadsThisMonth ?? 0,
+        views: viewsThisMonth,
+        leads: leadsThisMonth,
         bookings: bookingCount,
         estimatedRevenue,
         conversionRate,
@@ -122,48 +121,45 @@ export function useYesterdaySnapshot() {
       const yesterdayStart = startOfDay(subDays(now, 1)).toISOString();
       const todayStart = startOfDay(now).toISOString();
 
-      const { count: views } = await supabase
-        .from("analytics_events")
-        .select("*", { count: "exact", head: true })
-        .eq("event_type", "card_view")
-        .gte("created_at", yesterdayStart)
-        .lt("created_at", todayStart);
+      // Parallelize all queries
+      const [viewsRes, leadsRes, bookingsRes, servicesRes, followupsRes] = await Promise.all([
+        supabase
+          .from("analytics_events")
+          .select("*", { count: "exact", head: true })
+          .eq("event_type", "card_view")
+          .gte("created_at", yesterdayStart)
+          .lt("created_at", todayStart),
+        supabase
+          .from("leads")
+          .select("*", { count: "exact", head: true })
+          .gte("created_at", yesterdayStart)
+          .lt("created_at", todayStart),
+        supabase
+          .from("bookings")
+          .select("id, service_id")
+          .gte("created_at", yesterdayStart)
+          .lt("created_at", todayStart),
+        supabase
+          .from("booking_services")
+          .select("price")
+          .eq("active", true),
+        supabase
+          .from("tasks")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "open")
+          .lte("due_date", todayStart.split("T")[0]),
+      ]);
 
-      const { count: leads } = await supabase
-        .from("leads")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", yesterdayStart)
-        .lt("created_at", todayStart);
-
-      const { data: bookings } = await supabase
-        .from("bookings")
-        .select("id, service_id")
-        .gte("created_at", yesterdayStart)
-        .lt("created_at", todayStart);
-
-      const { data: services } = await supabase
-        .from("booking_services")
-        .select("price")
-        .eq("active", true);
-
-      const prices = (services ?? []).map(s => s.price ?? 0).filter(p => p > 0);
+      const prices = (servicesRes.data ?? []).map(s => s.price ?? 0).filter(p => p > 0);
       const avgPrice = prices.length > 0 ? prices.reduce((a, b) => a + b, 0) / prices.length : 0;
-
-      const bookingCount = bookings?.length ?? 0;
-
-      // Follow-ups needed (open tasks due today or overdue)
-      const { count: followupsNeeded } = await supabase
-        .from("tasks")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "open")
-        .lte("due_date", todayStart.split("T")[0]);
+      const bookingCount = bookingsRes.data?.length ?? 0;
 
       return {
-        views: views ?? 0,
-        leads: leads ?? 0,
+        views: viewsRes.count ?? 0,
+        leads: leadsRes.count ?? 0,
         bookings: bookingCount,
         potentialRevenue: Math.round(bookingCount * avgPrice),
-        followupsNeeded: followupsNeeded ?? 0,
+        followupsNeeded: followupsRes.count ?? 0,
       };
     },
     refetchInterval: 120_000,
@@ -176,65 +172,52 @@ export function useRecentActivity() {
     queryFn: async () => {
       const since = subDays(new Date(), 7).toISOString();
 
-      const { data: recentLeads } = await supabase
-        .from("leads")
-        .select("id, name, source, created_at")
-        .gte("created_at", since)
-        .order("created_at", { ascending: false })
-        .limit(10);
-
-      const { data: recentBookings } = await supabase
-        .from("bookings")
-        .select("id, customer_name, status, created_at, booking_services(name)")
-        .gte("created_at", since)
-        .order("created_at", { ascending: false })
-        .limit(10);
-
-      const { data: recentQuotes } = await supabase
-        .from("quote_requests")
-        .select("id, project_type, status, created_at, leads(name)")
-        .gte("created_at", since)
-        .order("created_at", { ascending: false })
-        .limit(10);
-
-      const { data: recentScans } = await supabase
-        .from("qr_scans")
-        .select("id, device, created_at, qr_campaigns(name)")
-        .gte("created_at", since)
-        .order("created_at", { ascending: false })
-        .limit(10);
+      // Parallelize all queries
+      const [leadsRes, bookingsRes, scansRes] = await Promise.all([
+        supabase
+          .from("leads")
+          .select("id, name, source, created_at")
+          .gte("created_at", since)
+          .order("created_at", { ascending: false })
+          .limit(10),
+        supabase
+          .from("bookings")
+          .select("id, customer_name, status, created_at, booking_services(name)")
+          .gte("created_at", since)
+          .order("created_at", { ascending: false })
+          .limit(10),
+        supabase
+          .from("qr_scans")
+          .select("id, device, created_at, qr_campaigns(name)")
+          .gte("created_at", since)
+          .order("created_at", { ascending: false })
+          .limit(10),
+      ]);
 
       type FeedItem = {
         id: string;
-        type: "lead" | "booking" | "quote" | "qr_scan";
+        type: "lead" | "booking" | "qr_scan";
         title: string;
         subtitle: string;
         created_at: string;
       };
 
       const feed: FeedItem[] = [
-        ...(recentLeads ?? []).map(l => ({
+        ...(leadsRes.data ?? []).map(l => ({
           id: l.id,
           type: "lead" as const,
           title: l.name,
           subtitle: `New lead via ${l.source.replace("_", " ")}`,
           created_at: l.created_at,
         })),
-        ...(recentBookings ?? []).map(b => ({
+        ...(bookingsRes.data ?? []).map(b => ({
           id: b.id,
           type: "booking" as const,
           title: b.customer_name,
           subtitle: `Booking ${b.status}${(b as any).booking_services?.name ? ` · ${(b as any).booking_services.name}` : ""}`,
           created_at: b.created_at,
         })),
-        ...(recentQuotes ?? []).map(q => ({
-          id: q.id,
-          type: "quote" as const,
-          title: (q as any).leads?.name ?? "Quote request",
-          subtitle: `Quote${q.project_type ? ` · ${q.project_type}` : ""} — ${q.status}`,
-          created_at: q.created_at,
-        })),
-        ...(recentScans ?? []).map(s => ({
+        ...(scansRes.data ?? []).map(s => ({
           id: s.id,
           type: "qr_scan" as const,
           title: (s as any).qr_campaigns?.name ?? "QR Scan",

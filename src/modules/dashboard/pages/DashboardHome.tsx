@@ -35,14 +35,12 @@ const priorityColors: Record<string, string> = {
 const feedIcons: Record<string, typeof Users> = {
   lead: UserPlus,
   booking: CalendarCheck,
-  quote: MessageSquareQuote,
   qr_scan: QrCode,
 };
 
 const feedColors: Record<string, string> = {
   lead: "bg-primary/10 text-primary",
   booking: "bg-success/10 text-success",
-  quote: "bg-warning/10 text-warning",
   qr_scan: "bg-accent/10 text-accent",
 };
 
@@ -134,7 +132,7 @@ export default function DashboardHome() {
                         key={item.id}
                         className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/40 transition-colors cursor-pointer group"
                         onClick={() => {
-                          if (item.type === "lead" || item.type === "quote") navigate(`/app/contacts/${item.id}`);
+                          if (item.type === "lead") navigate(`/app/contacts/${item.id}`);
                           else if (item.type === "booking") navigate("/app/bookings");
                           else if (item.type === "qr_scan") navigate("/app/qr");
                         }}
