@@ -21,6 +21,9 @@ export default function Analytics() {
   const { data: emailStats } = useEmailStats(days);
   const { data: referrerData = [] } = useReferrerBreakdown(days);
   const { data: deviceData = [] } = useDeviceBreakdown(days);
+  const { data: funnel } = useConversionFunnel(days);
+  const { data: responseTime } = useLeadResponseTime(days);
+  const { data: repeatData } = useRepeatCustomers();
 
   const fmtChange = (c?: { value: number; type: string }) => {
     if (!c || c.type === "neutral") return { text: `${days}d`, type: "neutral" as const };
