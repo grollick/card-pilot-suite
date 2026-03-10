@@ -229,10 +229,15 @@ export default function Onboarding() {
     }
   };
 
-  // When profession selected, move to AI step
+  // When profession selected, move to description input step
   const handleProfessionNext = () => {
     if (!selectedProfession) return;
     setStep(2);
+  };
+
+  // Trigger AI generation from step 2
+  const handleDescriptionNext = () => {
+    setStep(3);
     generateAISetup();
   };
 
