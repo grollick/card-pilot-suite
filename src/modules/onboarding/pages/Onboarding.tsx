@@ -374,7 +374,7 @@ export default function Onboarding() {
     }
   };
 
-  const totalSteps = 6;
+  const totalSteps = 7;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
