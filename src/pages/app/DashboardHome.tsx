@@ -49,7 +49,6 @@ const fadeUp = {
 export default function DashboardHome() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const navigate = useNavigate();
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: feed = [], isLoading: feedLoading } = useRecentActivity();
   const { data: allTasks = [], isLoading: tasksLoading } = useTasks({ status: "open" });
