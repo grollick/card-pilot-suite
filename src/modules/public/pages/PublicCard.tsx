@@ -764,8 +764,8 @@ export default function PublicCard() {
         })()}
 
         <div style={{ padding: `${spacing.section}px`, display: "flex", flexDirection: "column", gap: spacing.section, position: "relative", zIndex: 2 }}>
-          {/* ── CTA Buttons ── */}
-          {primaryCtaItem && (
+          {/* ── CTA Buttons (skip if already rendered inside immersive hero) ── */}
+          {primaryCtaItem && theme.header.layout !== "hero" && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
