@@ -5,6 +5,7 @@ import {
   DollarSign, Tag, Gift, Globe, FolderOpen, Star, Megaphone,
   CheckSquare, Search as SearchIcon, FileText, Briefcase, Bot
 } from "lucide-react";
+import ClientSwitcher from "@/modules/agency/components/ClientSwitcher";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -59,6 +60,10 @@ const automationItems = [
 const marketplaceItems = [
   { title: "Projects", url: "/app/projects", icon: FolderOpen },
   { title: "Reviews", url: "/app/reviews", icon: Star },
+];
+
+const agencyItems = [
+  { title: "Agency", url: "/app/agency", icon: Building2 },
 ];
 
 const bottomItems = [
@@ -157,6 +162,13 @@ export function AppSidebar() {
 
       {!collapsed && <Separator className="mx-4 w-auto opacity-50" />}
 
+      {/* Agency client switcher */}
+      {!collapsed && (
+        <div className="px-3 py-1">
+          <ClientSwitcher />
+        </div>
+      )}
+
       <SidebarContent className="px-2 pt-1">
         {/* Home */}
         <SidebarGroup>
@@ -188,6 +200,7 @@ export function AppSidebar() {
         {renderGroup("Marketing", marketingItems)}
         {renderGroup("Automation", automationItems)}
         {renderGroup("Marketplace", marketplaceItems)}
+        {renderGroup("Agency", agencyItems)}
 
         {/* View My Website */}
         {profile?.handle && (
