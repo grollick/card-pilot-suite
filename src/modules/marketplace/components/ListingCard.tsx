@@ -3,8 +3,24 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, ArrowRight } from "lucide-react";
+import { MapPin, Calendar, ArrowRight, Star, Crown, MessageSquare } from "lucide-react";
 import type { MarketplaceListing } from "@/hooks/useMarketplace";
+
+function StarRating({ rating, count }: { rating: number; count: number }) {
+  return (
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((s) => (
+        <Star
+          key={s}
+          className={`h-3 w-3 ${s <= Math.round(rating) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`}
+        />
+      ))}
+      <span className="text-xs text-muted-foreground ml-0.5">
+        {rating.toFixed(1)} ({count})
+      </span>
+    </div>
+  );
+}
 
 export default function ListingCard({ listing }: { listing: MarketplaceListing }) {
   const initials = (listing.name ?? "?")
@@ -15,8 +31,18 @@ export default function ListingCard({ listing }: { listing: MarketplaceListing }
     .toUpperCase();
 
   return (
-    <Card className="group overflow-hidden border border-border/60 hover:border-primary/30 hover:shadow-lg transition-all duration-300">
-      <CardContent className="p-5 flex flex-col gap-4">
+    <Card className={`group overflow-hidden border transition-all duration-300 ${
+      listing.featured
+        ? "border-primary/40 bg-primary/[0.02] shadow-md ring-1 ring-primary/10"
+        : "border-border/60 hover:border-primary/30 hover:shadow-lg"
+    }`}>
+      {listing.featured && (
+        <div className="bg-primary/10 px-4 py-1.5 flex items-center gap-1.5 text-xs font-medium text-primary">
+          <Crown className="h-3 w-3" />
+          Featured Business
+        </div>
+      )}
+      <CardContent className="p-5 flex flex-col gap-3">
         {/* Header */}
         <div className="flex items-start gap-3">
           <Avatar className="h-14 w-14 rounded-xl border-2 border-border">
@@ -46,10 +72,22 @@ export default function ListingCard({ listing }: { listing: MarketplaceListing }
           </div>
         </div>
 
+        {/* Rating */}
+        {listing.avg_rating !== null && listing.review_count > 0 && (
+          <StarRating rating={listing.avg_rating} count={listing.review_count} />
+        )}
+
         {/* Bio */}
         {listing.bio && (
           <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
             {listing.bio}
+          </p>
+        )}
+
+        {/* Service Area */}
+        {listing.service_area && (
+          <p className="text-xs text-muted-foreground flex items-center gap-1">
+            <MapPin className="h-3 w-3" /> Serves: {listing.service_area}
           </p>
         )}
 
@@ -60,9 +98,14 @@ export default function ListingCard({ listing }: { listing: MarketplaceListing }
               View Card <ArrowRight className="h-3.5 w-3.5 ml-1" />
             </Link>
           </Button>
-          <Button asChild variant="outline" size="sm" className="flex-1">
+          <Button asChild variant="outline" size="sm">
             <Link to={`/book/${listing.handle}`}>
-              <Calendar className="h-3.5 w-3.5 mr-1" /> Book
+              <Calendar className="h-3.5 w-3.5" />
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <Link to={`/${listing.handle}?quote=1`}>
+              <MessageSquare className="h-3.5 w-3.5" />
             </Link>
           </Button>
         </div>

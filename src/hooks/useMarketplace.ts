@@ -11,6 +11,10 @@ export interface MarketplaceListing {
   bio: string | null;
   profession_name: string | null;
   profession_category: string | null;
+  service_area: string | null;
+  featured: boolean;
+  avg_rating: number | null;
+  review_count: number;
 }
 
 interface MarketplaceFilters {
@@ -24,17 +28,42 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
     queryKey: ["marketplace", filters],
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      let query = supabase
+      // Fetch profiles with marketplace_enabled
+      const { data: profilesData, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, name, handle, avatar_url, company, city, bio, professions(name, category)")
+        .select("id, name, handle, avatar_url, company, city, bio, service_area, featured, professions(name, category)")
         .not("handle", "is", null)
         .not("name", "is", null)
+        .eq("marketplace_enabled" as any, true)
         .order("name");
 
-      const { data, error } = await query;
-      if (error) throw error;
+      if (profilesError) throw profilesError;
 
-      let listings: MarketplaceListing[] = (data ?? []).map((p: any) => ({
+      // Fetch avg ratings for all users in one query
+      const userIds = (profilesData ?? []).map((p: any) => p.id);
+      let ratingsMap: Record<string, { avg: number; count: number }> = {};
+
+      if (userIds.length > 0) {
+        const { data: reviewsData } = await supabase
+          .from("reviews")
+          .select("user_id, rating")
+          .eq("is_public", true)
+          .in("user_id", userIds);
+
+        if (reviewsData) {
+          const grouped: Record<string, number[]> = {};
+          reviewsData.forEach((r: any) => {
+            if (!grouped[r.user_id]) grouped[r.user_id] = [];
+            grouped[r.user_id].push(r.rating);
+          });
+          for (const [uid, ratings] of Object.entries(grouped)) {
+            const avg = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+            ratingsMap[uid] = { avg: Math.round(avg * 10) / 10, count: ratings.length };
+          }
+        }
+      }
+
+      let listings: MarketplaceListing[] = (profilesData ?? []).map((p: any) => ({
         id: p.id,
         name: p.name,
         handle: p.handle,
@@ -44,9 +73,13 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         bio: p.bio,
         profession_name: p.professions?.name ?? null,
         profession_category: p.professions?.category ?? null,
+        service_area: p.service_area ?? null,
+        featured: p.featured ?? false,
+        avg_rating: ratingsMap[p.id]?.avg ?? null,
+        review_count: ratingsMap[p.id]?.count ?? 0,
       }));
 
-      // Client-side filtering for flexibility
+      // Client-side filtering
       if (filters.profession) {
         const prof = filters.profession.toLowerCase().replace(/-/g, " ");
         listings = listings.filter(
@@ -59,7 +92,9 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
       if (filters.city) {
         const city = filters.city.toLowerCase().replace(/-/g, " ");
         listings = listings.filter(
-          (l) => l.city?.toLowerCase().includes(city)
+          (l) =>
+            l.city?.toLowerCase().includes(city) ||
+            l.service_area?.toLowerCase().includes(city)
         );
       }
 
@@ -70,9 +105,17 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
             l.name?.toLowerCase().includes(s) ||
             l.company?.toLowerCase().includes(s) ||
             l.profession_name?.toLowerCase().includes(s) ||
-            l.city?.toLowerCase().includes(s)
+            l.city?.toLowerCase().includes(s) ||
+            l.service_area?.toLowerCase().includes(s)
         );
       }
+
+      // Sort: featured first, then by rating, then name
+      listings.sort((a, b) => {
+        if (a.featured !== b.featured) return a.featured ? -1 : 1;
+        if ((b.avg_rating ?? 0) !== (a.avg_rating ?? 0)) return (b.avg_rating ?? 0) - (a.avg_rating ?? 0);
+        return (a.name ?? "").localeCompare(b.name ?? "");
+      });
 
       return listings;
     },
