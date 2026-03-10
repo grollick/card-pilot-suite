@@ -1369,6 +1369,19 @@ export default function PublicCard() {
           }}
         />
       )}
+
+      {/* Sticky Action Bar for conversions */}
+      <StickyActionBar
+        profileId={profile.id}
+        handle={handle!}
+        phone={profile.phone}
+        email={profile.email}
+        professionName={professionName}
+        palette={palette}
+        enabledCtaIds={enabledCtas.map(c => c.id)}
+        onCtaClick={handleCtaClick}
+        isOwner={isOwner}
+      />
     </div>
   );
 }
