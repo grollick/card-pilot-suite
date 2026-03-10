@@ -284,7 +284,7 @@ export default function CardThemeEditor({
   const [heroBackgroundId, _setHeroBackgroundId] = useState<string>(currentOverrides.heroBackgroundId ?? "");
 
   // ── Undo / Redo history ──
-  interface ThemeSnapshot { palette: CardPalette; fonts: CardFonts; tokens: CardStyleTokens; gradientBg: CardGradientBg; bgPattern: CardBgPattern; metallicEffect: MetallicEffect }
+  interface ThemeSnapshot { palette: CardPalette; fonts: CardFonts; tokens: CardStyleTokens; gradientBg: CardGradientBg; bgPattern: CardBgPattern; metallicEffect: MetallicEffect; heroBackgroundId: string }
   const historyRef = useRef<ThemeSnapshot[]>([]);
   const historyIndexRef = useRef(-1);
   const [historyLen, setHistoryLen] = useState(0);
