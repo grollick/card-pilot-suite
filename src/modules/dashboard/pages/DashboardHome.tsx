@@ -23,6 +23,7 @@ import ActiveJobsWidget from "@/modules/dashboard/components/ActiveJobsWidget";
 import QuickActionPanel from "@/modules/dashboard/components/QuickActionPanel";
 import MarketingSnapshot from "@/modules/dashboard/components/MarketingSnapshot";
 import BusinessHealthScore from "@/modules/dashboard/components/BusinessHealthScore";
+import TopCustomersWidget from "@/modules/dashboard/components/TopCustomersWidget";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const priorityColors: Record<string, string> = {
