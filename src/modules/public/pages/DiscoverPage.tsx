@@ -25,7 +25,9 @@ export default function DiscoverPage() {
   });
 
   const { data: profData } = useMarketplaceProfessions();
+  const { data: boostedUsers } = useBoostedUserIds();
 
+  const boostedIds = useMemo(() => new Set(boostedUsers?.map(b => b.user_id) ?? []), [boostedUsers]);
   const displayProfession = profession?.replace(/-/g, " ");
   const displayCity = city?.replace(/-/g, " ");
 
