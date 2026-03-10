@@ -21,7 +21,30 @@ import { useCardBuilderState } from "@/hooks/useCardBuilderState";
 
 export default function CardBuilder() {
   const s = useCardBuilderState();
+  const { user } = useAuth();
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [photoImportOpen, setPhotoImportOpen] = useState(false);
+
+  const handlePhotoImport = async (projects: ImportedProject[]) => {
+    if (!user || projects.length === 0) return;
+    try {
+      const inserts = projects.map((p) => ({
+        user_id: user.id,
+        title: p.title,
+        description: p.description || null,
+        after_image_url: p.imageUrl,
+        before_image_url: p.beforeImageUrl || null,
+        is_public: true,
+        services_used: p.category ? [p.category] : [],
+      }));
+      const { error } = await supabase.from("projects").insert(inserts);
+      if (error) throw error;
+      toast.success(`${projects.length} projects added to your gallery!`);
+    } catch (err: any) {
+      console.error("Import error:", err);
+      toast.error(err.message || "Failed to save imported projects");
+    }
+  };
 
   const handleApplyTemplate = (templateId: string) => {
     setSelectedTemplateId(templateId);
