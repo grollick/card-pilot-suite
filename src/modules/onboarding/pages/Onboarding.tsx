@@ -202,6 +202,7 @@ export default function Onboarding() {
           name: name || undefined,
           company: company || undefined,
           city: city || undefined,
+          business_description: businessDescription || undefined,
         },
       });
 
