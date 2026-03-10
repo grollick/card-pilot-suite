@@ -299,6 +299,9 @@ export default function JobDetailPage() {
                 <PenTool className="h-3 w-3" /> Collect Signature
               </Button>
             )}
+          {/* Assignment */}
+          <div className="mt-2">
+            <JobAssignmentSelect jobId={id!} currentAssignee={(job as any).assigned_to_user_id} />
           </div>
         </div>
       </div>
