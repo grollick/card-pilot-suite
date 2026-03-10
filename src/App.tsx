@@ -77,6 +77,9 @@ const ReviewsPage = lazy(() => import("@/modules/marketplace/pages/ReviewsPage")
 const AssistantPage = lazy(() => import("@/modules/assistant/pages/AssistantPage"));
 const AgencyDashboard = lazy(() => import("@/modules/agency/pages/AgencyDashboard"));
 
+// App Marketplace
+const MarketplacePage = lazy(() => import("@/modules/apps/pages/MarketplacePage"));
+
 // Settings
 const SettingsPage = lazy(() => import("@/modules/settings/pages/SettingsPage"));
 const AdminPage = lazy(() => import("@/modules/settings/pages/AdminPage"));
@@ -149,6 +152,7 @@ const App = () => (
               <Route path="jobs/:id" element={<Suspense fallback={<LazyFallback />}><JobDetailPage /></Suspense>} />
               <Route path="assistant" element={<Suspense fallback={<LazyFallback />}><AssistantPage /></Suspense>} />
               <Route path="agency" element={<Suspense fallback={<LazyFallback />}><AgencyDashboard /></Suspense>} />
+              <Route path="marketplace" element={<Suspense fallback={<LazyFallback />}><MarketplacePage /></Suspense>} />
               <Route path="admin" element={<Suspense fallback={<LazyFallback />}><AdminPage /></Suspense>} />
             </Route>
 

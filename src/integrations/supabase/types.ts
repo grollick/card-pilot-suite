@@ -62,6 +62,44 @@ export type Database = {
           },
         ]
       }
+      app_reviews: {
+        Row: {
+          app_id: string
+          created_at: string
+          id: string
+          rating: number
+          review_text: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          app_id: string
+          created_at?: string
+          id?: string
+          rating: number
+          review_text?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          app_id?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          review_text?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_reviews_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_apps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       automation_rules: {
         Row: {
           action_config: Json
@@ -969,6 +1007,54 @@ export type Database = {
           },
         ]
       }
+      installed_apps: {
+        Row: {
+          app_id: string
+          config: Json | null
+          enabled: boolean
+          id: string
+          installed_at: string
+          org_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          app_id: string
+          config?: Json | null
+          enabled?: boolean
+          id?: string
+          installed_at?: string
+          org_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          app_id?: string
+          config?: Json | null
+          enabled?: boolean
+          id?: string
+          installed_at?: string
+          org_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "installed_apps_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_apps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "installed_apps_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_materials: {
         Row: {
           created_at: string
@@ -1281,6 +1367,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      marketplace_apps: {
+        Row: {
+          avg_rating: number
+          category: Database["public"]["Enums"]["app_category"]
+          config_schema: Json | null
+          created_at: string
+          description: string
+          developer_name: string
+          features: string[] | null
+          icon_url: string | null
+          id: string
+          install_count: number
+          is_featured: boolean
+          is_published: boolean
+          long_description: string | null
+          name: string
+          permissions: string[] | null
+          price_amount: number | null
+          pricing_type: Database["public"]["Enums"]["app_pricing_type"]
+          screenshot_urls: string[] | null
+          slug: string
+          updated_at: string
+          webhook_url: string | null
+        }
+        Insert: {
+          avg_rating?: number
+          category?: Database["public"]["Enums"]["app_category"]
+          config_schema?: Json | null
+          created_at?: string
+          description: string
+          developer_name?: string
+          features?: string[] | null
+          icon_url?: string | null
+          id?: string
+          install_count?: number
+          is_featured?: boolean
+          is_published?: boolean
+          long_description?: string | null
+          name: string
+          permissions?: string[] | null
+          price_amount?: number | null
+          pricing_type?: Database["public"]["Enums"]["app_pricing_type"]
+          screenshot_urls?: string[] | null
+          slug: string
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Update: {
+          avg_rating?: number
+          category?: Database["public"]["Enums"]["app_category"]
+          config_schema?: Json | null
+          created_at?: string
+          description?: string
+          developer_name?: string
+          features?: string[] | null
+          icon_url?: string | null
+          id?: string
+          install_count?: number
+          is_featured?: boolean
+          is_published?: boolean
+          long_description?: string | null
+          name?: string
+          permissions?: string[] | null
+          price_amount?: number | null
+          pricing_type?: Database["public"]["Enums"]["app_pricing_type"]
+          screenshot_urls?: string[] | null
+          slug?: string
+          updated_at?: string
+          webhook_url?: string | null
+        }
+        Relationships: []
       }
       organization_members: {
         Row: {
@@ -2380,6 +2538,16 @@ export type Database = {
         | "form_submit"
         | "booking_created"
         | "contact_saved"
+      app_category:
+        | "payments"
+        | "accounting"
+        | "marketing"
+        | "automation"
+        | "analytics"
+        | "industry_tools"
+        | "communication"
+        | "productivity"
+      app_pricing_type: "free" | "paid_once" | "subscription"
       app_role: "admin" | "user"
       booking_status:
         | "pending"
@@ -2548,6 +2716,17 @@ export const Constants = {
         "booking_created",
         "contact_saved",
       ],
+      app_category: [
+        "payments",
+        "accounting",
+        "marketing",
+        "automation",
+        "analytics",
+        "industry_tools",
+        "communication",
+        "productivity",
+      ],
+      app_pricing_type: ["free", "paid_once", "subscription"],
       app_role: ["admin", "user"],
       booking_status: [
         "pending",
