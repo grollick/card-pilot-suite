@@ -29,13 +29,13 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       // Fetch profiles with marketplace_enabled
-      const { data: profilesData, error: profilesError } = await supabase
+      const { data: profilesData, error: profilesError } = await (supabase
         .from("profiles")
         .select("id, name, handle, avatar_url, company, city, bio, service_area, featured, professions(name, category)")
         .not("handle", "is", null)
         .not("name", "is", null)
         .eq("marketplace_enabled" as any, true)
-        .order("name");
+        .order("name") as any);
 
       if (profilesError) throw profilesError;
 
