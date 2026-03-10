@@ -807,9 +807,9 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* ── Step 6: Launch Celebration ── */}
-            {step === 6 && launched && (
-              <motion.div key="s6" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center space-y-6">
+            {/* ── Step 7: Launch Celebration ── */}
+            {step === 7 && launched && (
+              <motion.div key="s7" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center space-y-6">
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
