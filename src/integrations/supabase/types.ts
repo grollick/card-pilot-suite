@@ -147,6 +147,81 @@ export type Database = {
           },
         ]
       }
+      autopilot_log: {
+        Row: {
+          action_type: string
+          created_at: string
+          description: string | null
+          id: string
+          meta_json: Json | null
+          status: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          meta_json?: Json | null
+          status?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          meta_json?: Json | null
+          status?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      autopilot_settings: {
+        Row: {
+          approval_mode: string
+          created_at: string
+          enabled: boolean
+          estimate_reminders: boolean
+          id: string
+          lead_followup: boolean
+          promotions: boolean
+          review_requests: boolean
+          social_posts: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          approval_mode?: string
+          created_at?: string
+          enabled?: boolean
+          estimate_reminders?: boolean
+          id?: string
+          lead_followup?: boolean
+          promotions?: boolean
+          review_requests?: boolean
+          social_posts?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          approval_mode?: string
+          created_at?: string
+          enabled?: boolean
+          estimate_reminders?: boolean
+          id?: string
+          lead_followup?: boolean
+          promotions?: boolean
+          review_requests?: boolean
+          social_posts?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       availability_rules: {
         Row: {
           buffer_min: number
