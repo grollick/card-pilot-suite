@@ -159,6 +159,9 @@ export default function DashboardHome() {
 
         {/* Right Column */}
         <div className="space-y-6">
+          {/* Business Health Score */}
+          <BusinessHealthScore />
+
           {/* Marketing Snapshot */}
           <MarketingSnapshot />
 
