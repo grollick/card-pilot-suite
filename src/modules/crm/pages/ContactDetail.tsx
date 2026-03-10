@@ -147,7 +147,15 @@ export default function ContactDetail() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm"><MoreHorizontal className="h-4 w-4" /></Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40">
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={async () => {
+                const token = await createPortalToken.mutateAsync(contact.id);
+                const url = `${window.location.origin}/portal/${token}`;
+                await navigator.clipboard.writeText(url);
+                toast.success("Portal link copied to clipboard");
+              }}>
+                <ExternalLink className="h-4 w-4 mr-2" /> Copy Portal Link
+              </DropdownMenuItem>
               <DropdownMenuItem className="text-destructive" onClick={handleDeleteContact}>
                 <Trash2 className="h-4 w-4 mr-2" /> Delete
               </DropdownMenuItem>
