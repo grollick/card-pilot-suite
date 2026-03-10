@@ -60,6 +60,7 @@ const automationItems = [
 const marketplaceItems = [
   { title: "Projects", url: "/app/projects", icon: FolderOpen },
   { title: "Reviews", url: "/app/reviews", icon: Star },
+  { title: "App Store", url: "/app/marketplace", icon: Package },
 ];
 
 const agencyItems = [
