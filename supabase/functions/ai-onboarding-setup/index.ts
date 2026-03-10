@@ -83,7 +83,7 @@ Create realistic, specific content for this exact profession${business_descripti
                     description: "2-3 short tips for this profession's card setup",
                   },
                 },
-                required: ["tagline", "bio", "about", "cta_text", "services", "suggested_template", "setup_tips"],
+                required: ["tagline", "bio", "about", "cta_text", "marketplace_summary", "services", "suggested_template", "setup_tips"],
                 additionalProperties: false,
               },
             },
