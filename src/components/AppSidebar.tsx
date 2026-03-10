@@ -53,6 +53,7 @@ const marketingItems = [
 
 const automationItems = [
   { title: "Automation", url: "/app/automation", icon: Zap },
+  { title: "AI Assistant", url: "/app/assistant", icon: Bot },
 ];
 
 const marketplaceItems = [
