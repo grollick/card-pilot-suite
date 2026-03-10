@@ -95,6 +95,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       { id: "hero", enabled: true },
       { id: "services", enabled: true },
       { id: "projects", enabled: true },
+      { id: "quote_calculator", enabled: true },
       { id: "quote_request", enabled: true },
       { id: "about", enabled: true },
       { id: "testimonials", enabled: true },
