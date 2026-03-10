@@ -666,7 +666,7 @@ export default function Onboarding() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
+                  <Button variant="outline" onClick={() => setStep(3)} className="flex-1">
                     <ArrowLeft className="h-4 w-4 mr-1" /> Back
                   </Button>
                   <Button onClick={() => setStep(4)} disabled={!name} className="flex-1">
