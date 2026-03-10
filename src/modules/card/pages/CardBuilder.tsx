@@ -70,6 +70,22 @@ export default function CardBuilder() {
           {/* ── Desktop: collapsible accordion panels ── */}
           <div className="hidden lg:block">
             <Accordion type="multiple" defaultValue={["identity", "photos", "sections"]} className="space-y-2">
+              <AccordionItem value="template" className="rounded-xl border border-border bg-card px-4 overflow-hidden">
+                <AccordionTrigger className="py-3 hover:no-underline">
+                  <span className="flex items-center gap-2 text-sm font-semibold">
+                    <LayoutTemplate className="h-4 w-4 text-primary" />
+                    Template
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-3 pt-0">
+                  <TemplateSelector
+                    selectedTemplateId={selectedTemplateId}
+                    onSelect={handleApplyTemplate}
+                    professionName={s.professionName}
+                    compact
+                  />
+                </AccordionContent>
+              </AccordionItem>
               <AccordionItem value="identity" className="rounded-xl border border-border bg-card px-4 overflow-hidden">
                 <AccordionTrigger className="py-3 hover:no-underline">
                   <span className="flex items-center gap-2 text-sm font-semibold">
