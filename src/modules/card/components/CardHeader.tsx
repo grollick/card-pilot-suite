@@ -395,32 +395,98 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
         </div>
       );
 
-    // ─── Hero: large centered, big title ──────────────────────
+    // ─── Hero: immersive full-bleed layout ──────────────────────
+    // Background image → Gradient overlay → Profile + Name → CTA buttons
     case "hero":
       return (
-        <div style={{ position: "relative" }}>
-          {coverBanner}
-          <div style={{
-            textAlign: "center",
-            padding: "40px 24px 24px",
-            ...(coverBanner ? { marginTop: -50, position: "relative", zIndex: 2 } : {}),
-          }}>
-            <div style={{ display: "flex", justifyContent: "center", marginBottom: 16 }}>
+        <div
+          ref={coverRef}
+          style={{
+            position: "relative",
+            minHeight: 340,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            padding: "48px 24px 28px",
+            overflow: "hidden",
+            borderRadius: `${radii.card} ${radii.card} 0 0`,
+            marginLeft: -8,
+            marginRight: -8,
+            marginTop: -8,
+            background: coverUrl ? undefined : fallbackBg,
+          }}
+        >
+          {/* Layer 1: Background image */}
+          {coverUrl && (
+            <motion.img
+              src={coverUrl}
+              alt=""
+              loading="lazy"
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "120%",
+                objectFit: "cover",
+                objectPosition: `center ${coverOffsetY}%`,
+                y: coverY,
+                scale: coverScale,
+                zIndex: 0,
+              }}
+            />
+          )}
+          {/* Layer 2: Gradient overlay */}
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: coverUrl
+                ? "linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.75) 100%)"
+                : heroBackground?.overlay ?? "linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.3) 100%)",
+              pointerEvents: "none",
+              zIndex: 1,
+            }}
+          />
+          {/* Logo */}
+          {logoEl && <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 3 }}>{logoEl}</div>}
+          {/* Layer 3: Profile image + name */}
+          <div style={{ position: "relative", zIndex: 2, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, width: "100%" }}>
+            <motion.div {...heroEntrance(0.05)}>
               {React.cloneElement(avatarEl as React.ReactElement, {
                 style: {
                   ...(avatarEl as React.ReactElement).props.style,
-                  width: 100,
-                  height: 100,
+                  width: avatarSize > 80 ? avatarSize : 96,
+                  height: avatarSize > 80 ? avatarSize : 96,
                 },
               })}
-            </div>
+            </motion.div>
             <motion.div style={{ display: "flex", alignItems: inlineAlignItems, justifyContent: "center", gap: logoNameGap }} {...heroEntrance(0.15)}>
               {logoPosition === "beside-name" && inlineLogoEl}
-              <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 28 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
+              <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 28, color: hasMetallicName ? "transparent" : "#FFFFFF", textShadow: hasMetallicName ? undefined : "0 1px 8px rgba(0,0,0,0.3)" }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
               {logoPosition === "beside-name-right" && inlineLogoEl}
             </motion.div>
-            {profession && <motion.p style={{ ...subtitleStyle, fontSize: 16 }} {...heroEntrance(0.25)}>{profession}</motion.p>}
-            {company && <motion.p style={{ ...subtitleStyle, fontSize: 14, opacity: 0.7 }} {...heroEntrance(0.3)}>{company}</motion.p>}
+            {profession && (
+              <motion.p style={{ ...subtitleStyle, fontSize: 15, color: "rgba(255,255,255,0.85)", textShadow: "0 1px 4px rgba(0,0,0,0.2)" }} {...heroEntrance(0.25)}>
+                {profession}
+              </motion.p>
+            )}
+            {company && (
+              <motion.p style={{ ...subtitleStyle, fontSize: 13, color: "rgba(255,255,255,0.65)" }} {...heroEntrance(0.3)}>
+                {company}
+              </motion.p>
+            )}
+            {/* Layer 4: CTA buttons inside the hero */}
+            {ctaChildren && (
+              <motion.div
+                style={{ width: "100%", marginTop: 8 }}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {ctaChildren}
+              </motion.div>
+            )}
           </div>
         </div>
       );
