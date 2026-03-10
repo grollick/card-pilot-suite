@@ -793,7 +793,7 @@ export default function Onboarding() {
                 })()}
 
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(4)} className="flex-1">
+                  <Button variant="outline" onClick={() => setStep(5)} className="flex-1">
                     <ArrowLeft className="h-4 w-4 mr-1" /> Back
                   </Button>
                   <Button onClick={handleLaunch} disabled={saving} className="flex-1">
