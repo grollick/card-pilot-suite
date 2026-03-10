@@ -138,6 +138,8 @@ export interface PlanLimits {
   automations: number;
   email_templates: number;
   qr_campaigns: number;
+  gallery_images: number;
+  testimonials: number;
 }
 
 export function getPlanByKey(key: string): (typeof PLAN_TIERS)[number] | undefined {
