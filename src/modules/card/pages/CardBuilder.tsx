@@ -1,6 +1,10 @@
-import { Palette, Pencil, Camera, LayoutList, LayoutTemplate } from "lucide-react";
+import { Palette, Pencil, Camera, LayoutList, LayoutTemplate, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import PhotoImportDialog, { type ImportedProject } from "@/modules/card/components/PhotoImportDialog";
 import { motion } from "framer-motion";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import CardPhotoTools from "@/modules/card/components/CardPhotoTools";
