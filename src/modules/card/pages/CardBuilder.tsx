@@ -1,4 +1,5 @@
 import { Palette, Pencil, Camera, LayoutList, LayoutTemplate, Globe } from "lucide-react";
+import ConversionTips from "@/modules/card/components/ConversionTips";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
