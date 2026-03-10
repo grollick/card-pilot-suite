@@ -22,6 +22,7 @@ import TodaysSchedule from "@/modules/dashboard/components/TodaysSchedule";
 import ActiveJobsWidget from "@/modules/dashboard/components/ActiveJobsWidget";
 import QuickActionPanel from "@/modules/dashboard/components/QuickActionPanel";
 import MarketingSnapshot from "@/modules/dashboard/components/MarketingSnapshot";
+import BusinessHealthScore from "@/modules/dashboard/components/BusinessHealthScore";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const priorityColors: Record<string, string> = {
