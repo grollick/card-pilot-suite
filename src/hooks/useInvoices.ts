@@ -39,7 +39,7 @@ export function useInvoices(statusFilter?: string) {
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       if (statusFilter && statusFilter !== "all") {
-        q = q.eq("status", statusFilter);
+        q = q.eq("status", statusFilter as any);
       }
       const { data, error } = await q;
       if (error) throw error;
