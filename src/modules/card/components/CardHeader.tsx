@@ -416,13 +416,13 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
               {avatarEl}
             </div>
-            <div style={{ display: "flex", alignItems: inlineAlignItems, justifyContent: "center", gap: logoNameGap }}>
+            <motion.div style={{ display: "flex", alignItems: inlineAlignItems, justifyContent: "center", gap: logoNameGap }} {...heroEntrance(0.15)}>
               {logoPosition === "beside-name" && inlineLogoEl}
               <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 22 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
               {logoPosition === "beside-name-right" && inlineLogoEl}
-            </div>
-            {profession && <p style={subtitleStyle}>{profession}</p>}
-            {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
+            </motion.div>
+            {profession && <motion.p style={subtitleStyle} {...heroEntrance(0.25)}>{profession}</motion.p>}
+            {company && <motion.p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }} {...heroEntrance(0.3)}>{company}</motion.p>}
           </div>
         </div>
       );
