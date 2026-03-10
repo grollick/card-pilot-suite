@@ -1,15 +1,6 @@
 import { motion } from "framer-motion";
 import {
-  QrCode,
-  Users,
-  Zap,
-  Calendar,
-  Mail,
-  BarChart3,
-  ClipboardList,
-  Hammer,
-  Calculator,
-  Camera,
+  Smartphone, Users, Calendar, FileText, Hammer, Share2,
 } from "lucide-react";
 
 const fadeUp = {
@@ -23,60 +14,46 @@ const fadeUp = {
 
 const features = [
   {
-    icon: QrCode,
-    title: "Smart QR & NFC Cards",
-    desc: "Share your card with a tap or scan. Every interaction becomes a trackable lead.",
-  },
-  {
-    icon: Users,
-    title: "Automatic Lead Capture",
-    desc: "Every card view, form fill, and booking auto-creates a contact in your CRM.",
-  },
-  {
-    icon: Zap,
-    title: "Follow-Up Automation",
-    desc: "Trigger emails, tasks, and reminders when leads go cold — without lifting a finger.",
+    icon: Smartphone,
+    headline: "Capture leads instantly",
+    benefit: "Turn every card view, QR scan, and form fill into a real contact in your CRM — automatically.",
+    accent: "bg-primary/10 text-primary",
   },
   {
     icon: Calendar,
-    title: "Built-In Booking",
-    desc: "Let prospects book directly from your card. No back-and-forth scheduling.",
+    headline: "Book appointments automatically",
+    benefit: "Let customers schedule time with you online. No back-and-forth texts. No missed calls.",
+    accent: "bg-success/10 text-success",
   },
   {
-    icon: ClipboardList,
-    title: "Trade Estimates & Quotes",
-    desc: "Build professional estimates with room-by-room sections, measurement calculators, and one-tap approval.",
+    icon: FileText,
+    headline: "Send professional estimates",
+    benefit: "Create room-by-room quotes with built-in calculators, templates, and one-tap customer approval.",
+    accent: "bg-warning/10 text-warning",
   },
   {
     icon: Hammer,
-    title: "Job Management",
-    desc: "Track jobs from scheduled to completed. Manage tasks, materials, and photos in one place.",
+    headline: "Manage jobs from your phone",
+    benefit: "Track tasks, photos, materials, and customer signatures — from start to sign-off.",
+    accent: "bg-accent/10 text-accent",
   },
   {
-    icon: Calculator,
-    title: "Built-In Calculators",
-    desc: "Square footage, linear feet, cubic yards, hourly labor — auto-calculate every line item.",
+    icon: Users,
+    headline: "Turn visitors into repeat customers",
+    benefit: "Pipeline CRM, follow-up automations, and review requests keep customers coming back.",
+    accent: "bg-primary/10 text-primary",
   },
   {
-    icon: Camera,
-    title: "Job Photos & Portfolio",
-    desc: "Document before, during, and after photos. Turn completed jobs into portfolio showcases.",
-  },
-  {
-    icon: Mail,
-    title: "Email Campaigns",
-    desc: "Send targeted campaigns to your contacts. Templates included.",
-  },
-  {
-    icon: BarChart3,
-    title: "Analytics Dashboard",
-    desc: "Track card views, QR scans, estimate approval rates, job revenue, and more.",
+    icon: Share2,
+    headline: "Promote your business everywhere",
+    benefit: "Schedule social posts, run email campaigns, and track what drives the most leads.",
+    accent: "bg-success/10 text-success",
   },
 ];
 
 export default function FeaturesSection() {
   return (
-    <section className="bg-muted/30 py-20">
+    <section className="py-20 md:py-28">
       <div className="max-w-6xl mx-auto px-4">
         <motion.div
           initial="hidden"
@@ -86,26 +63,28 @@ export default function FeaturesSection() {
           custom={0}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold">Everything you need to close more deals</h2>
-          <p className="text-muted-foreground mt-3">One platform replaces 5+ tools.</p>
+          <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Platform highlights</p>
+          <h2 className="text-3xl md:text-5xl font-extrabold">
+            Built to help you close more deals
+          </h2>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((f, i) => (
             <motion.div
-              key={f.title}
+              key={f.headline}
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
               variants={fadeUp}
               custom={i}
-              className="rounded-xl border border-border bg-card p-6 hover:shadow-card-hover transition-shadow"
+              className="rounded-2xl border border-border bg-card p-7 hover:shadow-card-hover transition-shadow"
             >
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                <f.icon className="h-5 w-5 text-primary" />
+              <div className={`h-12 w-12 rounded-xl ${f.accent} flex items-center justify-center mb-5`}>
+                <f.icon className="h-6 w-6" />
               </div>
-              <h3 className="font-semibold mb-1">{f.title}</h3>
-              <p className="text-sm text-muted-foreground">{f.desc}</p>
+              <h3 className="text-lg font-bold mb-2">{f.headline}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{f.benefit}</p>
             </motion.div>
           ))}
         </div>
