@@ -55,6 +55,7 @@ const marketingItems = [
 
 const automationItems = [
   { title: "Automation", url: "/app/automation", icon: Zap },
+  { title: "AI Autopilot", url: "/app/autopilot", icon: Bot },
   { title: "AI Assistant", url: "/app/assistant", icon: Bot },
 ];
 
