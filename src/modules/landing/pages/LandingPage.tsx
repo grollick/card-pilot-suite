@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import FooterSection from "@/modules/landing/components/FooterSection";
 import InteractiveCardBuilder from "@/modules/landing/components/InteractiveCardBuilder";
+import HeroPhoneAnimation from "@/modules/landing/components/HeroPhoneAnimation";
 
 /* ── animations ── */
 const fade = {
