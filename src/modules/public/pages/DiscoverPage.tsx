@@ -198,7 +198,7 @@ export default function DiscoverPage() {
               ))}
             </div>
           </div>
-        )
+        )}
 
         {/* Results header */}
         <div className="flex items-center justify-between mb-6">
