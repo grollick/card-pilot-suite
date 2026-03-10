@@ -1,10 +1,11 @@
-import { Eye, MousePointer, Users, TrendingUp, Mail, BarChart3, Calendar, Globe, Smartphone, Monitor, Tablet, Download } from "lucide-react";
+import { Eye, MousePointer, Users, TrendingUp, Mail, BarChart3, Calendar, Globe, Smartphone, Monitor, Tablet, Download, Clock, RefreshCw, ArrowDown } from "lucide-react";
 import KPICard from "@/components/KPICard";
 import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
-import { useAnalyticsStats, useCtaBreakdown, useEmailStats, useReferrerBreakdown, useDeviceBreakdown } from "@/hooks/useAnalytics";
+import { useAnalyticsStats, useCtaBreakdown, useEmailStats, useReferrerBreakdown, useDeviceBreakdown, useConversionFunnel, useLeadResponseTime, useRepeatCustomers } from "@/hooks/useAnalytics";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 
 const DEVICE_ICONS: Record<string, React.ReactNode> = {
   Mobile: <Smartphone className="h-3.5 w-3.5" />,
