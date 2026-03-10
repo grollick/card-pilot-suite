@@ -152,7 +152,16 @@ Conversion rate: ${views > 0 ? Math.round(((leadsWeek ?? 0) / views) * 100) : 0}
       throw new Error("AI gateway error");
     }
 
-    const aiData = await response.json();
+    const responseText = await response.text();
+    let aiData;
+    try {
+      aiData = JSON.parse(responseText);
+    } catch {
+      console.error("ai-insights: failed to parse AI response:", responseText.slice(0, 500));
+      return new Response(JSON.stringify({ insights: [{ title: "AI insights temporarily unavailable", description: "Please try again in a moment.", type: "info" }] }), {
+        status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
     let insights = [];
     if (toolCall?.function?.arguments) {
