@@ -669,7 +669,7 @@ export default function Onboarding() {
                   <Button variant="outline" onClick={() => setStep(3)} className="flex-1">
                     <ArrowLeft className="h-4 w-4 mr-1" /> Back
                   </Button>
-                  <Button onClick={() => setStep(4)} disabled={!name} className="flex-1">
+                  <Button onClick={() => setStep(5)} disabled={!name} className="flex-1">
                     Continue <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
                 </div>
