@@ -51,6 +51,7 @@ const marketingItems = [
   { title: "Social", url: "/app/social", icon: Share2 },
   { title: "Content", url: "/app/content", icon: Megaphone },
   { title: "Promotions", url: "/app/promotions", icon: Tag },
+  { title: "Boost", url: "/app/boost", icon: Zap },
   { title: "Referrals", url: "/app/referrals", icon: Gift },
 ];
 
