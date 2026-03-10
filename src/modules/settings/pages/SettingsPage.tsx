@@ -184,6 +184,10 @@ export default function SettingsPage() {
           </motion.div>
         </TabsContent>
 
+        <TabsContent value="marketplace" className="mt-4">
+          <MarketplaceSettings profile={profile} />
+        </TabsContent>
+
         <TabsContent value="brand" className="mt-4">
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="rounded-xl border border-border bg-card p-6 space-y-5">
