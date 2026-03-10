@@ -108,6 +108,114 @@ const trustStats = [
   { value: "4.9★", label: "Average rating" },
 ];
 
+/* ── feature preview mocks ── */
+function FeaturePreview({ feature }: { feature: typeof features[number] }) {
+  if (feature.title === "Smart Card") {
+    return (
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="rounded-xl bg-gradient-to-br from-primary/10 to-accent/10 p-4 mb-3 flex items-center gap-4">
+          <div className="h-14 w-14 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+            <Smartphone className="h-6 w-6 text-primary" />
+          </div>
+          <div>
+            <p className="font-bold text-foreground text-sm">Alex Johnson</p>
+            <p className="text-xs text-muted-foreground">Premium Landscaping</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {["📞 Call", "💬 Text", "✉️ Email"].map((a) => (
+            <div key={a} className="rounded-lg bg-muted py-2 text-center text-xs font-medium text-foreground">{a}</div>
+          ))}
+        </div>
+        <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
+          <span>3 leads captured today</span>
+        </div>
+      </div>
+    );
+  }
+  if (feature.title === "Booking") {
+    return (
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="grid grid-cols-7 gap-1 mb-3">
+          {["M","T","W","T","F","S","S"].map((d, i) => (
+            <div key={i} className="text-center text-[10px] font-medium text-muted-foreground">{d}</div>
+          ))}
+          {Array.from({ length: 7 }, (_, i) => (
+            <div key={i} className={`text-center text-xs py-1.5 rounded-md ${i === 2 ? "bg-primary text-primary-foreground font-bold" : i === 4 ? "bg-primary/10 text-primary font-medium" : "text-foreground"}`}>
+              {i + 10}
+            </div>
+          ))}
+        </div>
+        <div className="space-y-2">
+          {[{ time: "10:00 AM", name: "Sarah K.", status: "Confirmed" }, { time: "2:30 PM", name: "Mike R.", status: "Pending" }].map((b) => (
+            <div key={b.time} className="flex items-center justify-between rounded-lg bg-muted px-3 py-2">
+              <div>
+                <p className="text-xs font-medium text-foreground">{b.name}</p>
+                <p className="text-[10px] text-muted-foreground">{b.time}</p>
+              </div>
+              <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${b.status === "Confirmed" ? "bg-success/10 text-success" : "bg-warning/10 text-warning"}`}>
+                {b.status}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  if (feature.title === "Estimates") {
+    return (
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-bold text-foreground">Estimate #1042</p>
+          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-warning/10 text-warning">Sent</span>
+        </div>
+        <div className="space-y-1.5 mb-3">
+          {[{ item: "Kitchen Demo", price: "$1,200" }, { item: "Cabinet Install", price: "$3,400" }, { item: "Countertops", price: "$2,100" }].map((l) => (
+            <div key={l.item} className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">{l.item}</span>
+              <span className="font-medium text-foreground">{l.price}</span>
+            </div>
+          ))}
+        </div>
+        <div className="border-t border-border pt-2 flex items-center justify-between">
+          <span className="text-xs font-bold text-foreground">Total</span>
+          <span className="text-sm font-extrabold gradient-text">$6,700</span>
+        </div>
+      </div>
+    );
+  }
+  // CRM
+  return (
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+      <div className="flex items-center gap-3 mb-3">
+        {["New", "Contacted", "Won"].map((s) => (
+          <div key={s} className="flex-1 text-center">
+            <p className="text-[10px] font-medium text-muted-foreground mb-1">{s}</p>
+            <div className={`h-1.5 rounded-full ${s === "New" ? "bg-primary" : s === "Contacted" ? "bg-warning" : "bg-success"}`} />
+          </div>
+        ))}
+      </div>
+      <div className="space-y-2">
+        {[{ name: "Jennifer L.", stage: "Contacted", value: "$4,200" }, { name: "David M.", stage: "New", value: "$1,800" }, { name: "Amy W.", stage: "Won", value: "$6,500" }].map((c) => (
+          <div key={c.name} className="flex items-center justify-between rounded-lg bg-muted px-3 py-2">
+            <div className="flex items-center gap-2">
+              <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
+                {c.name[0]}
+              </div>
+              <div>
+                <p className="text-xs font-medium text-foreground">{c.name}</p>
+                <p className="text-[10px] text-muted-foreground">{c.stage}</p>
+              </div>
+            </div>
+            <span className="text-xs font-semibold text-foreground">{c.value}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ── nav links ── */
 const NAV_LINKS = [
   { label: "Features", href: "#features" },
