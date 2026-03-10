@@ -11,7 +11,7 @@ const actions = [
   { icon: UserPlus, label: "Contact", route: "/app/contacts", color: "text-success", desc: "Add lead" },
   { icon: Share2, label: "Social Post", route: "/app/social", color: "text-accent", desc: "Post content" },
   { icon: Tag, label: "Promotion", route: "/app/promotions", color: "text-destructive", desc: "Run promo" },
-  { icon: QrCode, label: "QR Code", route: "/app/qr", color: "text-primary", desc: "Share card" },
+  { icon: QrCode, label: "QR Code", route: "/app/card/qr", color: "text-primary", desc: "Share card" },
 ];
 
 export default function QuickActionPanel() {
