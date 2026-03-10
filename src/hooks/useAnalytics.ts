@@ -202,6 +202,105 @@ export function useEmailStats(days = 30) {
   });
 }
 
+// ── Conversion Funnel ──
+export function useConversionFunnel(days = 30) {
+  return useQuery({
+    queryKey: ["conversion-funnel", days],
+    queryFn: async () => {
+      const since = subDays(new Date(), days).toISOString();
+      const [{ data: events }, { count: leads }, { count: bookings }] = await Promise.all([
+        supabase.from("analytics_events").select("event_type").eq("event_type", "card_view").gte("created_at", since),
+        supabase.from("leads").select("*", { count: "exact", head: true }).gte("created_at", since),
+        supabase.from("bookings").select("*", { count: "exact", head: true }).gte("created_at", since),
+      ]);
+      const visitors = events?.length ?? 0;
+      return {
+        visitors,
+        leads: leads ?? 0,
+        bookings: bookings ?? 0,
+        visitorToLead: visitors > 0 ? Math.round(((leads ?? 0) / visitors) * 100) : 0,
+        leadToBooking: (leads ?? 0) > 0 ? Math.round(((bookings ?? 0) / (leads ?? 0)) * 100) : 0,
+      };
+    },
+  });
+}
+
+// ── Lead Response Time ──
+export function useLeadResponseTime(days = 30) {
+  return useQuery({
+    queryKey: ["lead-response-time", days],
+    queryFn: async () => {
+      const since = subDays(new Date(), days).toISOString();
+      const { data: leads } = await supabase
+        .from("leads")
+        .select("id, created_at")
+        .gte("created_at", since);
+
+      if (!leads || leads.length === 0) return { avgMinutes: 0, avgFormatted: "N/A", respondedPct: 0 };
+
+      const leadIds = leads.map(l => l.id);
+      const { data: activities } = await supabase
+        .from("contact_activities")
+        .select("lead_id, occurred_at")
+        .in("lead_id", leadIds.slice(0, 100))
+        .order("occurred_at", { ascending: true });
+
+      let totalMinutes = 0;
+      let respondedCount = 0;
+
+      for (const lead of leads.slice(0, 100)) {
+        const firstActivity = (activities ?? []).find(a => a.lead_id === lead.id);
+        if (firstActivity) {
+          const diff = new Date(firstActivity.occurred_at).getTime() - new Date(lead.created_at).getTime();
+          totalMinutes += diff / 60000;
+          respondedCount++;
+        }
+      }
+
+      const avg = respondedCount > 0 ? Math.round(totalMinutes / respondedCount) : 0;
+      const hours = Math.floor(avg / 60);
+      const mins = avg % 60;
+      const formatted = avg === 0 ? "N/A" : hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+
+      return {
+        avgMinutes: avg,
+        avgFormatted: formatted,
+        respondedPct: leads.length > 0 ? Math.round((respondedCount / Math.min(leads.length, 100)) * 100) : 0,
+      };
+    },
+  });
+}
+
+// ── Repeat Customers ──
+export function useRepeatCustomers() {
+  return useQuery({
+    queryKey: ["repeat-customers"],
+    queryFn: async () => {
+      const { data: bookings } = await supabase
+        .from("bookings")
+        .select("customer_email, customer_phone, lead_id");
+
+      if (!bookings || bookings.length === 0) return { repeatPct: 0, totalCustomers: 0, repeatCustomers: 0 };
+
+      // Group by lead_id or email
+      const customerMap = new Map<string, number>();
+      for (const b of bookings) {
+        const key = b.lead_id || b.customer_email || b.customer_phone || "";
+        if (!key) continue;
+        customerMap.set(key, (customerMap.get(key) || 0) + 1);
+      }
+
+      const total = customerMap.size;
+      const repeats = Array.from(customerMap.values()).filter(c => c > 1).length;
+      return {
+        totalCustomers: total,
+        repeatCustomers: repeats,
+        repeatPct: total > 0 ? Math.round((repeats / total) * 100) : 0,
+      };
+    },
+  });
+}
+
 // ── Helpers ──
 function calcChange(curr: number, prev: number): { value: number; type: "positive" | "negative" | "neutral" } {
   if (prev === 0 && curr === 0) return { value: 0, type: "neutral" };
