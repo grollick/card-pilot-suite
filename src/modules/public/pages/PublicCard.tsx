@@ -49,6 +49,7 @@ import WalletPassDialog from "@/modules/card/components/WalletPassDialog";
 import QuoteRequestForm from "@/modules/card/components/QuoteRequestForm";
 import SmartEngagementPopup from "@/modules/card/components/SmartEngagementPopup";
 import StickyActionBar from "@/modules/card/components/StickyActionBar";
+import GalleryLightbox from "@/modules/card/components/GalleryLightbox";
 import { showsBranding } from "@/lib/plans";
 
 // ── Visitor meta for analytics ──
