@@ -620,7 +620,7 @@ export default function Onboarding() {
                       <Button variant="ghost" size="sm" onClick={generateAISetup} className="text-muted-foreground">
                         <RefreshCw className="h-3.5 w-3.5 mr-1" /> Regenerate
                       </Button>
-                      <Button onClick={() => setStep(3)} className="flex-1">
+                      <Button onClick={() => setStep(4)} className="flex-1">
                         Looks good! <ArrowRight className="h-4 w-4 ml-1" />
                       </Button>
                     </div>
