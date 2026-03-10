@@ -1024,22 +1024,7 @@ export default function PublicCard() {
             return (
               <div>
                 <SectionTitle id="gallery" label="Gallery" />
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                  {images.map((img, i) => (
-                    <div key={i} style={{ borderRadius: radii.button, overflow: "hidden" }}>
-                      <img
-                        src={img.url}
-                        alt={img.caption || ""}
-                        style={{ width: "100%", height: 120, objectFit: "cover", display: "block" }}
-                      />
-                      {img.caption && (
-                        <p style={{ fontSize: 11, color: palette.secondary, padding: "4px 0", margin: 0, textAlign: "center" }}>
-                          {img.caption}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                <GalleryLightbox images={images} radii={radii.button} palette={palette} />
               </div>
             );
           })()}
