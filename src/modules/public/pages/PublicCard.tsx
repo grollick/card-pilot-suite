@@ -910,7 +910,24 @@ export default function PublicCard() {
             );
           })()}
 
-          {/* ── Booking ── */}
+          {/* ── Before / After Projects ── */}
+          {enabledSections.has("projects") && (() => {
+            const projectItems = sectionContent("projects")?.items as { title: string; beforeImage: string; afterImage: string; description?: string }[] | undefined;
+            if (!projectItems || projectItems.length === 0) return null;
+
+            return (
+              <div>
+                <SectionTitle id="projects" label={sectionContent("projects")?.heading || "Our Work"} />
+                <ProjectShowcase
+                  projects={projectItems}
+                  theme={theme}
+                  metallicEffect={metallicEffect}
+                  baseIndex={15}
+                />
+              </div>
+            );
+          })()}
+
           {enabledSections.has("booking") && (
             <div id="booking-section">
               <Link to={`/book/${handle}`} style={{ textDecoration: "none" }}>
