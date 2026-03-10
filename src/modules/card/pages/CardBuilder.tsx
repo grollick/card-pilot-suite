@@ -11,6 +11,8 @@ import CardBuilderHeader from "@/modules/card/components/CardBuilderHeader";
 import CardBuilderIdentity from "@/modules/card/components/CardBuilderIdentity";
 import CardBuilderSections from "@/modules/card/components/CardBuilderSections";
 import CardBuilderPreview from "@/modules/card/components/CardBuilderPreview";
+import TemplateSelector from "@/modules/card/components/TemplateSelector";
+import { getTemplate } from "@/lib/cardTemplates";
 import { useCardBuilderState } from "@/hooks/useCardBuilderState";
 
 export default function CardBuilder() {
