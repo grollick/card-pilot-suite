@@ -17,6 +17,7 @@ import CardDemoBuilder from "@/modules/landing/components/CardDemoBuilder";
 import ComparisonSection from "@/modules/landing/components/ComparisonSection";
 import ProductTourSection from "@/modules/landing/components/ProductTourSection";
 import InstantCardGenerator from "@/modules/landing/components/InstantCardGenerator";
+import LeadMagnetSection from "@/modules/landing/components/LeadMagnetSection";
 
 export default function Index() {
   const visiblePlans = PLAN_TIERS.filter((p) => p.key !== "agency");
