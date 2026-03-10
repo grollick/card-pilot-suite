@@ -3,13 +3,15 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { PLAN_TIERS } from "@/lib/plans";
 import HeroSection from "@/modules/landing/components/HeroSection";
-import ProfessionsBar from "@/modules/landing/components/ProfessionsBar";
-import HowItWorksSection from "@/modules/landing/components/HowItWorksSection";
+import SocialProofSection from "@/modules/landing/components/SocialProofSection";
+import ProblemSection from "@/modules/landing/components/ProblemSection";
+import SolutionSection from "@/modules/landing/components/SolutionSection";
 import FeaturesSection from "@/modules/landing/components/FeaturesSection";
 import WorkflowSection from "@/modules/landing/components/WorkflowSection";
+import IndustriesSection from "@/modules/landing/components/IndustriesSection";
 import QRProductsSection from "@/modules/landing/components/QRProductsSection";
-import TestimonialsSection from "@/modules/landing/components/TestimonialsSection";
 import PricingSection from "@/modules/landing/components/PricingSection";
+import FinalCTASection from "@/modules/landing/components/FinalCTASection";
 import FooterSection from "@/modules/landing/components/FooterSection";
 
 export default function Index() {
@@ -19,7 +21,7 @@ export default function Index() {
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
       <nav className="border-b border-border/50 bg-card/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link to="/" className="text-lg font-extrabold tracking-tight">
             <span className="gradient-text">CardPilot</span>
           </Link>
@@ -43,13 +45,15 @@ export default function Index() {
       </nav>
 
       <HeroSection />
-      <ProfessionsBar />
-      <HowItWorksSection />
+      <SocialProofSection />
+      <ProblemSection />
+      <SolutionSection />
       <FeaturesSection />
       <WorkflowSection />
+      <IndustriesSection />
       <QRProductsSection />
-      <TestimonialsSection />
       <PricingSection visiblePlans={visiblePlans} />
+      <FinalCTASection />
       <FooterSection />
     </div>
   );
