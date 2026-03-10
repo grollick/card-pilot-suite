@@ -274,28 +274,43 @@ export default function LandingPage() {
         <div className="absolute inset-0 -z-10">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full bg-primary/[0.04] blur-[100px]" />
         </div>
-        <div className="max-w-3xl mx-auto px-4 pt-24 pb-20 md:pt-36 md:pb-28 text-center">
-          <motion.h1 initial="hidden" animate="visible" variants={fade} custom={0} className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-5">
-            One card to <span className="gradient-text">capture leads, book jobs, and grow.</span>
-          </motion.h1>
-          <motion.p initial="hidden" animate="visible" variants={fade} custom={1} className="text-lg text-muted-foreground max-w-xl mx-auto mb-10">
-            CardPilot replaces your paper card, booking app, estimate tool, and spreadsheet CRM — so you can focus on doing great work.
-          </motion.p>
-          <motion.div initial="hidden" animate="visible" variants={fade} custom={2} className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a href="#card-builder">
-              <Button size="lg" className="shadow-glow text-base h-13 px-10 rounded-xl">
-                Build Your Card Free <ArrowRight className="h-4 w-4 ml-1.5" />
-              </Button>
-            </a>
-            <Link to="/card/demo">
-              <Button variant="outline" size="lg" className="text-base h-13 px-8 rounded-xl">
-                <ExternalLink className="h-4 w-4 mr-1.5" /> View Example Card
-              </Button>
-            </Link>
-          </motion.div>
-          <motion.p initial="hidden" animate="visible" variants={fade} custom={3} className="text-xs text-muted-foreground mt-5">
-            Free forever • No credit card • Setup in 2 min
-          </motion.p>
+        <div className="max-w-6xl mx-auto px-4 pt-20 pb-16 md:pt-28 md:pb-24">
+          <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
+            {/* Left: text */}
+            <div className="flex-1 text-center md:text-left">
+              <motion.h1 initial="hidden" animate="visible" variants={fade} custom={0} className="text-4xl sm:text-5xl md:text-[3.4rem] font-extrabold tracking-tight leading-[1.1] mb-5">
+                One card to <span className="gradient-text">capture leads, book jobs, and grow.</span>
+              </motion.h1>
+              <motion.p initial="hidden" animate="visible" variants={fade} custom={1} className="text-lg text-muted-foreground max-w-xl mb-8">
+                CardPilot replaces your paper card, booking app, estimate tool, and spreadsheet CRM — so you can focus on doing great work.
+              </motion.p>
+              <motion.div initial="hidden" animate="visible" variants={fade} custom={2} className="flex flex-col sm:flex-row items-center md:items-start gap-3">
+                <a href="#card-builder">
+                  <Button size="lg" className="shadow-glow text-base h-13 px-10 rounded-xl">
+                    Build Your Card Free <ArrowRight className="h-4 w-4 ml-1.5" />
+                  </Button>
+                </a>
+                <Link to="/card/demo">
+                  <Button variant="outline" size="lg" className="text-base h-13 px-8 rounded-xl">
+                    <ExternalLink className="h-4 w-4 mr-1.5" /> View Example
+                  </Button>
+                </Link>
+              </motion.div>
+              <motion.p initial="hidden" animate="visible" variants={fade} custom={3} className="text-xs text-muted-foreground mt-5">
+                Free forever • No credit card • Setup in 2 min
+              </motion.p>
+            </div>
+
+            {/* Right: animated phone */}
+            <motion.div
+              initial={{ opacity: 0, y: 30, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
+              className="flex-shrink-0"
+            >
+              <HeroPhoneAnimation />
+            </motion.div>
+          </div>
         </div>
       </section>
 
