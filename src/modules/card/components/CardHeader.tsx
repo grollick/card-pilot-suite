@@ -338,13 +338,13 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
           {parallaxCover(160, true)}
           <div style={{ padding: "0 24px", marginTop: -40, display: "flex", flexDirection: "column", position: "relative", zIndex: 2 }}>
             {avatarEl}
-            <div style={{ display: "flex", alignItems: inlineAlignItems, gap: logoNameGap, marginTop: 12 }}>
+            <motion.div style={{ display: "flex", alignItems: inlineAlignItems, gap: logoNameGap, marginTop: 12 }} {...heroEntrance(0.15)}>
               {logoPosition === "beside-name" && inlineLogoEl}
               <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 24 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
               {logoPosition === "beside-name-right" && inlineLogoEl}
-            </div>
-            {profession && <p style={subtitleStyle}>{profession}</p>}
-            {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
+            </motion.div>
+            {profession && <motion.p style={subtitleStyle} {...heroEntrance(0.25)}>{profession}</motion.p>}
+            {company && <motion.p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }} {...heroEntrance(0.3)}>{company}</motion.p>}
           </div>
         </div>
       );
