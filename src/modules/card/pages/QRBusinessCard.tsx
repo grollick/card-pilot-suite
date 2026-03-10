@@ -501,9 +501,8 @@ export default function QRBusinessCard() {
                 <div className="flex items-center gap-2">
                   {[
                     { label: "Scans", value: stats?.totalScans ?? 0 },
-                    { label: "Card Views", value: stats?.uniqueVisitors ?? 0 },
                     { label: "Leads", value: stats?.leadsGenerated ?? 0 },
-                    { label: "Bookings", value: stats?.bookingsFromScans ?? 0 },
+                    { label: "Rate", value: `${stats?.conversionRate ?? 0}%` },
                   ].map((step, idx, arr) => (
                     <div key={step.label} className="flex items-center gap-2 flex-1">
                       <div className="flex-1 text-center">
