@@ -278,13 +278,12 @@ export default function PublicCard() {
   const metallicEffect = themeJson.metallicEffect as import("@/modules/card/components/CardThemeEditor").MetallicEffect | undefined;
 
   // ── Dynamic hero background ──
-  const resolvedHeroBackground = useMemo(() => {
+  const resolvedHeroBackground = (() => {
     const savedId = themeJson.heroBackgroundId as string | undefined;
     if (savedId) return getHeroBackgroundById(savedId) ?? null;
-    // Auto-detect from profession when no cover image
     if (!coverUrl) return getHeroBackgroundForProfession(professionName);
     return null;
-  }, [themeJson.heroBackgroundId, coverUrl, professionName]);
+  })();
 
   // CTA config from theme_json or fallback to legacy primary_cta
   type CtaItem = { id: string; label: string; enabled: boolean; isPrimary: boolean };
