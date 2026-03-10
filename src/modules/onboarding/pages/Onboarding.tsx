@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Search, ArrowRight, ArrowLeft, Sparkles, Check, Loader2,
   Rocket, Eye, Share2, QrCode, LayoutDashboard, Camera, CalendarCheck, FileText, Plus, X, Star,
-  Wand2, Edit3, RefreshCw
+  Wand2, Edit3, RefreshCw, UserPlus
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -384,7 +384,7 @@ export default function Onboarding() {
           <h1 className="text-2xl font-bold bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-primary)" }}>
             CardPilot
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">Launch your card in under 2 minutes</p>
+          <p className="text-sm text-muted-foreground mt-1">Get more leads, book more customers, grow your business</p>
         </div>
 
         {/* Progress */}
@@ -880,6 +880,34 @@ export default function Onboarding() {
                     {aiSetup ? "AI helped you set up in record time" : "You're ready to start capturing leads"}
                   </motion.p>
                 </div>
+
+                {/* ── Simulated Lead Demo ── */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.2, duration: 0.5 }}
+                  className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-left"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <UserPlus className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-xs font-semibold text-primary">New Lead Captured</p>
+                      <p className="text-[11px] text-muted-foreground">Just now · via your card</p>
+                    </div>
+                    <span className="text-[10px] bg-success/10 text-success px-2 py-0.5 rounded-full font-medium">Demo</span>
+                  </div>
+                  <div className="pl-10 space-y-1">
+                    <p className="text-sm font-medium text-foreground">John Smith</p>
+                    <p className="text-xs text-muted-foreground">Interested in your services · Wants a quote</p>
+                  </div>
+                  <div className="mt-3 pl-10">
+                    <p className="text-[11px] text-muted-foreground italic">
+                      This is how CardPilot captures leads from your card and helps you convert them into bookings and revenue.
+                    </p>
+                  </div>
+                </motion.div>
 
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="grid grid-cols-2 gap-3">
                   <Button onClick={() => navigate("/app/card")} className="gap-2">

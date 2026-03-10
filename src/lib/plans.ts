@@ -23,11 +23,13 @@ export const PLAN_TIERS = [
       cards: 1,
       estimates: 3,
       social_posts: 5,
-      booking_services: 0,
+      booking_services: 3,
       team_members: 1,
       automations: 0,
       email_templates: 0,
       qr_campaigns: 0,
+      gallery_images: 3,
+      testimonials: 2,
     },
   },
   {
@@ -52,11 +54,13 @@ export const PLAN_TIERS = [
       cards: 2,
       estimates: -1,
       social_posts: -1,
-      booking_services: 5,
+      booking_services: -1,
       team_members: 1,
       automations: 5,
       email_templates: -1,
       qr_campaigns: 3,
+      gallery_images: -1,
+      testimonials: -1,
     },
   },
   {
@@ -85,6 +89,8 @@ export const PLAN_TIERS = [
       automations: -1,
       email_templates: -1,
       qr_campaigns: -1,
+      gallery_images: -1,
+      testimonials: -1,
     },
   },
   {
@@ -114,6 +120,8 @@ export const PLAN_TIERS = [
       automations: -1,
       email_templates: -1,
       qr_campaigns: -1,
+      gallery_images: -1,
+      testimonials: -1,
     },
   },
 ] as const;
@@ -130,6 +138,8 @@ export interface PlanLimits {
   automations: number;
   email_templates: number;
   qr_campaigns: number;
+  gallery_images: number;
+  testimonials: number;
 }
 
 export function getPlanByKey(key: string): (typeof PLAN_TIERS)[number] | undefined {
