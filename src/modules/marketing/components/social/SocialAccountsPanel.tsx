@@ -1,8 +1,7 @@
 import { Switch } from "@/components/ui/switch";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useSocialAccounts, useToggleAccount } from "@/hooks/useSocial";
+import { Card, CardContent } from "@/components/ui/card";
+import { useSocialAccounts, useToggleAccount } from "@/hooks/useSocialAccounts";
 import { PLATFORMS, getPlatformConfig } from "./constants";
 
 export default function SocialAccountsPanel() {
@@ -39,9 +38,7 @@ export default function SocialAccountsPanel() {
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-muted-foreground">Status</span>
-                    <span className={connected ? "text-emerald-600" : "text-muted-foreground"}>
-                      {connected ? "Connected" : "Disconnected"}
-                    </span>
+                    <span className={connected ? "text-emerald-600" : "text-muted-foreground"}>{connected ? "Connected" : "Disconnected"}</span>
                   </div>
                   {connected && acct?.account_name && (
                     <div className="flex items-center justify-between text-xs">

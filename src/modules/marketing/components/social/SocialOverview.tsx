@@ -2,14 +2,16 @@ import { CalendarDays, Clock, AlertCircle, Send, Sparkles, TrendingUp, Users } f
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useSocialPosts, useSocialAccounts, useQueueSlots } from "@/hooks/useSocial";
-import { getPlatformConfig, getApprovalConfig } from "./constants";
+import { useSocialPosts } from "@/hooks/useSocialPosts";
+import { useSocialAccounts } from "@/hooks/useSocialAccounts";
+import { useQueueSlots } from "@/hooks/useSocialQueue";
+import { getPlatformConfig, getStatusConfig } from "./constants";
 import { format } from "date-fns";
-import type { SocialPostExtended } from "@/hooks/useSocial";
+import type { SocialPost } from "@/hooks/useSocialPosts";
 
 interface Props {
   onNewPost: () => void;
-  onViewPost: (post: SocialPostExtended) => void;
+  onViewPost: (post: SocialPost) => void;
 }
 
 export default function SocialOverview({ onNewPost, onViewPost }: Props) {
@@ -21,14 +23,12 @@ export default function SocialOverview({ onNewPost, onViewPost }: Props) {
   const scheduledPosts = posts.filter(p => p.status === "scheduled");
   const pendingApproval = posts.filter(p => p.approval_status === "pending_approval");
   const publishedPosts = posts.filter(p => p.status === "published");
-  const draftPosts = posts.filter(p => p.status === "draft");
+  const draftPosts = posts.filter(p => ["draft", "idea"].includes(p.approval_status ?? "draft"));
 
   const now = new Date();
   const weekEnd = new Date(now);
   weekEnd.setDate(weekEnd.getDate() + 7);
-  const scheduledThisWeek = scheduledPosts.filter(p =>
-    p.scheduled_at && new Date(p.scheduled_at) <= weekEnd
-  );
+  const scheduledThisWeek = scheduledPosts.filter(p => p.scheduled_at && new Date(p.scheduled_at) <= weekEnd);
 
   const nextScheduled = scheduledPosts
     .filter(p => p.scheduled_at && new Date(p.scheduled_at) > now)
@@ -38,7 +38,6 @@ export default function SocialOverview({ onNewPost, onViewPost }: Props) {
 
   return (
     <div className="space-y-6">
-      {/* KPI Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="dash-card">
           <CardContent className="p-4">
@@ -95,7 +94,6 @@ export default function SocialOverview({ onNewPost, onViewPost }: Props) {
       </div>
 
       <div className="grid md:grid-cols-3 gap-4">
-        {/* Queue Health */}
         <Card className="dash-card">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -118,15 +116,12 @@ export default function SocialOverview({ onNewPost, onViewPost }: Props) {
             {nextScheduled && (
               <div className="pt-2 border-t border-border">
                 <p className="text-xs text-muted-foreground">Next publish</p>
-                <p className="text-sm font-medium">
-                  {format(new Date(nextScheduled.scheduled_at!), "MMM d, h:mm a")}
-                </p>
+                <p className="text-sm font-medium">{format(new Date(nextScheduled.scheduled_at!), "MMM d, h:mm a")}</p>
               </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Connected Accounts */}
         <Card className="dash-card">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -141,12 +136,8 @@ export default function SocialOverview({ onNewPost, onViewPost }: Props) {
                 const cfg = getPlatformConfig(acct.provider);
                 return (
                   <div key={acct.id} className="flex items-center gap-2">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${cfg?.color ?? "bg-muted"}`}>
-                      {acct.provider}
-                    </span>
-                    <span className="text-xs text-muted-foreground truncate">
-                      {acct.account_name ? `@${acct.account_name}` : "Connected"}
-                    </span>
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${cfg?.color ?? "bg-muted"}`}>{acct.provider}</span>
+                    <span className="text-xs text-muted-foreground truncate">{acct.account_name ? `@${acct.account_name}` : "Connected"}</span>
                     <span className="ml-auto h-2 w-2 rounded-full bg-emerald-500" />
                   </div>
                 );
@@ -155,7 +146,6 @@ export default function SocialOverview({ onNewPost, onViewPost }: Props) {
           </CardContent>
         </Card>
 
-        {/* AI Suggestions */}
         <Card className="dash-card border-primary/20">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -163,23 +153,14 @@ export default function SocialOverview({ onNewPost, onViewPost }: Props) {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-2">
-            <Button variant="ghost" size="sm" className="w-full justify-start text-xs h-8" onClick={onNewPost}>
-              ✨ Generate post from your services
-            </Button>
-            <Button variant="ghost" size="sm" className="w-full justify-start text-xs h-8" onClick={onNewPost}>
-              📝 Create a before & after showcase
-            </Button>
-            <Button variant="ghost" size="sm" className="w-full justify-start text-xs h-8" onClick={onNewPost}>
-              🎯 Write a seasonal promotion
-            </Button>
-            <Button variant="ghost" size="sm" className="w-full justify-start text-xs h-8" onClick={onNewPost}>
-              💬 Draft a customer testimonial post
-            </Button>
+            <Button variant="ghost" size="sm" className="w-full justify-start text-xs h-8" onClick={onNewPost}>✨ Generate post from your services</Button>
+            <Button variant="ghost" size="sm" className="w-full justify-start text-xs h-8" onClick={onNewPost}>📝 Create a before & after showcase</Button>
+            <Button variant="ghost" size="sm" className="w-full justify-start text-xs h-8" onClick={onNewPost}>🎯 Write a seasonal promotion</Button>
+            <Button variant="ghost" size="sm" className="w-full justify-start text-xs h-8" onClick={onNewPost}>💬 Draft a customer testimonial post</Button>
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent Published */}
       <Card className="dash-card">
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -192,7 +173,7 @@ export default function SocialOverview({ onNewPost, onViewPost }: Props) {
           ) : (
             <div className="space-y-2">
               {posts.slice(0, 5).map(post => {
-                const approval = getApprovalConfig(post.approval_status ?? "draft");
+                const statusCfg = getStatusConfig(post.approval_status ?? "draft");
                 return (
                   <button
                     key={post.id}
@@ -205,21 +186,13 @@ export default function SocialOverview({ onNewPost, onViewPost }: Props) {
                         <div className="flex items-center gap-2 mt-1.5">
                           {((post.platforms_json as any) || []).map((p: string) => {
                             const cfg = getPlatformConfig(p);
-                            return (
-                              <span key={p} className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${cfg?.color ?? "bg-muted"}`}>
-                                {p}
-                              </span>
-                            );
+                            return <span key={p} className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${cfg?.color ?? "bg-muted"}`}>{p}</span>;
                           })}
-                          <Badge variant="outline" className={`text-[9px] px-1.5 py-0 h-4 ${approval.color}`}>
-                            {approval.label}
-                          </Badge>
+                          <Badge variant="outline" className={`text-[9px] px-1.5 py-0 h-4 ${statusCfg.color}`}>{statusCfg.label}</Badge>
                         </div>
                       </div>
                       {post.scheduled_at && (
-                        <span className="text-[10px] text-muted-foreground whitespace-nowrap">
-                          {format(new Date(post.scheduled_at), "MMM d")}
-                        </span>
+                        <span className="text-[10px] text-muted-foreground whitespace-nowrap">{format(new Date(post.scheduled_at), "MMM d")}</span>
                       )}
                     </div>
                   </button>
