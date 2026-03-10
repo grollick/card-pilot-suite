@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useClientWorkspaces, useIsAgency } from "@/hooks/useAgency";
+import WhiteLabelSettings from "@/modules/agency/components/WhiteLabelSettings";
+import BulkActionsPanel from "@/modules/agency/components/BulkActionsPanel";
 import { useOrg } from "@/contexts/OrgContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
