@@ -35,14 +35,12 @@ const priorityColors: Record<string, string> = {
 const feedIcons: Record<string, typeof Users> = {
   lead: UserPlus,
   booking: CalendarCheck,
-  quote: MessageSquareQuote,
   qr_scan: QrCode,
 };
 
 const feedColors: Record<string, string> = {
   lead: "bg-primary/10 text-primary",
   booking: "bg-success/10 text-success",
-  quote: "bg-warning/10 text-warning",
   qr_scan: "bg-accent/10 text-accent",
 };
 
