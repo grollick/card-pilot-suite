@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FooterSection from "@/modules/landing/components/FooterSection";
+import InteractiveCardBuilder from "@/modules/landing/components/InteractiveCardBuilder";
 
 /* ── animations ── */
 const fade = {
