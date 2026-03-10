@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import { type ResolvedCardTheme, getButtonStyles } from "@/lib/cardTokens";
 import type { MetallicEffect } from "@/modules/card/components/CardThemeEditor";
 import { METALLIC_GRADIENTS } from "@/modules/card/components/CardThemeEditor";
@@ -14,8 +15,8 @@ interface CardButtonProps {
 }
 
 /**
- * Renders a button styled by the resolved theme tokens:
- * shape (pill / rounded), style (filled / outline / gradient), size.
+ * Renders a button styled by the resolved theme tokens with
+ * scale, tap feedback, and color transition animations.
  */
 export default function CardButton({ theme, children, onClick, href, className = "", fullWidth, metallicEffect }: CardButtonProps) {
   const btnTokens = { button: theme.button, radius: {}, shadow: {} };
@@ -29,6 +30,7 @@ export default function CardButton({ theme, children, onClick, href, className =
     gap: 8,
     textDecoration: "none",
     fontFamily: `'${theme.fonts.secondary}', sans-serif`,
+    cursor: "pointer",
     ...(fullWidth ? { width: "100%" } : {}),
   };
 
@@ -41,19 +43,25 @@ export default function CardButton({ theme, children, onClick, href, className =
     baseStyle.boxShadow = `${theme.shadows.button}, inset 0 1px 0 rgba(255,255,255,0.3)`;
   }
 
-  const style = baseStyle;
+  const motionProps = {
+    style: baseStyle,
+    className,
+    whileHover: { scale: 1.03, boxShadow: `${theme.shadows.button}, 0 6px 20px -4px ${theme.palette.primary}40` },
+    whileTap: { scale: 0.97 },
+    transition: { type: "spring" as const, stiffness: 400, damping: 20 },
+  };
 
   if (href) {
     return (
-      <a href={href} style={style} className={className}>
+      <motion.a href={href} {...motionProps}>
         {children}
-      </a>
+      </motion.a>
     );
   }
 
   return (
-    <button onClick={onClick} style={style} className={className}>
+    <motion.button onClick={onClick} {...motionProps}>
       {children}
-    </button>
+    </motion.button>
   );
 }
