@@ -56,6 +56,7 @@ Create realistic, specific content for this exact profession${business_descripti
                   bio: { type: "string", description: "1-2 sentence professional bio, max 160 chars" },
                   about: { type: "string", description: "2-3 sentence about section, max 300 chars" },
                   cta_text: { type: "string", description: "Call-to-action button text, max 30 chars" },
+                  marketplace_summary: { type: "string", description: "A 1-2 sentence summary for a public marketplace listing, max 200 chars. Highlight what makes this business stand out." },
                   services: {
                     type: "array",
                     items: {
