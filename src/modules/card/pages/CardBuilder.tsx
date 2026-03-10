@@ -36,7 +36,7 @@ export default function CardBuilder() {
     // Add any existing sections not in the template
     s.sections.forEach(es => {
       if (!newSections.find(ns => ns.id === es.id)) {
-        newSections.push({ ...es, enabled: false });
+        newSections.push({ ...es, enabled: false } as any);
       }
     });
     s.setSections(newSections);
