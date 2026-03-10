@@ -704,7 +704,35 @@ export default function CardThemeEditor({
                 )}
               </div>
 
-              {/* Metallic Effect */}
+              {/* Hero Background */}
+              <div className="space-y-1.5">
+                <SectionLabel>Hero Background</SectionLabel>
+                <p className="text-[10px] text-muted-foreground">Gradient shown when no cover image is uploaded</p>
+                <div className="grid grid-cols-4 gap-1.5">
+                  <button
+                    onClick={() => setHeroBackgroundId("")}
+                    className={`h-10 rounded-md border-2 transition-all flex items-center justify-center text-[9px] font-medium ${
+                      !heroBackgroundId ? "border-primary ring-1 ring-primary/30" : "border-border/50 hover:border-border"
+                    }`}
+                    style={{ background: `linear-gradient(135deg, ${palette.primary}30, ${palette.accent || palette.primary}20)` }}
+                  >
+                    Auto
+                  </button>
+                  {HERO_BACKGROUNDS.map(bg => (
+                    <button
+                      key={bg.id}
+                      onClick={() => setHeroBackgroundId(bg.id)}
+                      title={bg.label}
+                      className={`h-10 rounded-md border-2 transition-all ${
+                        heroBackgroundId === bg.id ? "border-primary ring-1 ring-primary/30" : "border-border/50 hover:border-border"
+                      }`}
+                      style={{ background: bg.gradient }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <SectionLabel>Metallic Effect</SectionLabel>
