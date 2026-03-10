@@ -768,7 +768,12 @@ export default function PublicCard() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {hasCardServices
                     ? cardServices!.filter((s) => s.name).map((s, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <motion.div
+                          key={i}
+                          style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", borderRadius: radii.button, cursor: "default" }}
+                          whileHover={{ backgroundColor: `${palette.primary}08`, x: 4 }}
+                          transition={{ duration: 0.15 }}
+                        >
                           <div>
                             <span style={{ fontSize: 14, fontWeight: 500, color: palette.primary }}>{s.name}</span>
                             {s.description && (
@@ -778,7 +783,7 @@ export default function PublicCard() {
                           {s.price && (
                             <span style={{ fontSize: 13, color: palette.secondary, fontWeight: 500 }}>{s.price}</span>
                           )}
-                        </div>
+                        </motion.div>
                       ))
                     : services.map((s) => (
                         <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
