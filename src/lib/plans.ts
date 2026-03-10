@@ -89,6 +89,8 @@ export const PLAN_TIERS = [
       automations: -1,
       email_templates: -1,
       qr_campaigns: -1,
+      gallery_images: -1,
+      testimonials: -1,
     },
   },
   {
