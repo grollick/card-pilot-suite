@@ -48,11 +48,13 @@ export default function JobPipelineCard({ item, type, isDragging, onDragStart, o
       exit={{ opacity: 0, scale: 0.95 }}
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2, ease: [0.21, 0.47, 0.32, 0.98] }}
-      draggable
-      onDragStart={onDragStart}
-      onClick={onClick}
-      className={`interactive-card p-3 group ${isDragging ? "dragging" : ""}`}
     >
+      <div
+        draggable
+        onDragStart={onDragStart}
+        onClick={onClick}
+        className={`interactive-card p-3 group ${isDragging ? "dragging" : ""}`}
+      >
       <div className="flex items-start justify-between gap-1">
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
           <div className={`h-8 w-8 rounded-full flex items-center justify-center text-[10px] font-semibold shrink-0 ${typeColor}`}>
