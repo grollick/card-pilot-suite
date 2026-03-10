@@ -44,6 +44,8 @@ interface CardHeaderProps {
   heroBackground?: HeroBackground | null;
   /** Optional CTA buttons rendered inside the hero (for immersive "hero" layout) */
   ctaChildren?: React.ReactNode;
+  /** Enable glass container behind identity content in hero layout */
+  glassHero?: boolean;
 }
 
 function renderName(name: string, bold?: boolean, uppercase?: boolean, firstNameWeight?: number | null) {
