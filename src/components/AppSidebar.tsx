@@ -36,6 +36,7 @@ const bookingItems = [
   { title: "Bookings", url: "/app/bookings", icon: Calendar },
   { title: "Estimates", url: "/app/estimates", icon: FileText },
   { title: "Jobs", url: "/app/jobs", icon: Briefcase },
+  { title: "Job Pipeline", url: "/app/job-pipeline", icon: Kanban },
 ];
 
 const analyticsItems = [
