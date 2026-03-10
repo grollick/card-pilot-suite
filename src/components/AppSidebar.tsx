@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Users, Briefcase, UserCheck, Megaphone, Settings,
-  ChevronLeft, LogOut, Globe, ChevronDown,
+  ChevronLeft, LogOut, Globe, ChevronDown, Wrench, HardHat,
   // Leads sub-items
   Inbox, FileText, Calendar, Kanban,
   // Jobs sub-items
