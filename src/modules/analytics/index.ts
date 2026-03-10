@@ -12,4 +12,5 @@ export {
   useYesterdaySnapshot,
   useBusinessPerformance,
 } from "@/hooks/useDashboardStats";
+export { useDailyScorecard } from "@/hooks/useDailyScorecard";
 export { useCardViewers, useViewerStats } from "@/hooks/useCardViewers";
