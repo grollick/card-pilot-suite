@@ -200,6 +200,7 @@ export function AppSidebar() {
         {renderGroup("Marketing", marketingItems)}
         {renderGroup("Automation", automationItems)}
         {renderGroup("Marketplace", marketplaceItems)}
+        {renderGroup("Agency", agencyItems)}
 
         {/* View My Website */}
         {profile?.handle && (
