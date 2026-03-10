@@ -121,48 +121,45 @@ export function useYesterdaySnapshot() {
       const yesterdayStart = startOfDay(subDays(now, 1)).toISOString();
       const todayStart = startOfDay(now).toISOString();
 
-      const { count: views } = await supabase
-        .from("analytics_events")
-        .select("*", { count: "exact", head: true })
-        .eq("event_type", "card_view")
-        .gte("created_at", yesterdayStart)
-        .lt("created_at", todayStart);
+      // Parallelize all queries
+      const [viewsRes, leadsRes, bookingsRes, servicesRes, followupsRes] = await Promise.all([
+        supabase
+          .from("analytics_events")
+          .select("*", { count: "exact", head: true })
+          .eq("event_type", "card_view")
+          .gte("created_at", yesterdayStart)
+          .lt("created_at", todayStart),
+        supabase
+          .from("leads")
+          .select("*", { count: "exact", head: true })
+          .gte("created_at", yesterdayStart)
+          .lt("created_at", todayStart),
+        supabase
+          .from("bookings")
+          .select("id, service_id")
+          .gte("created_at", yesterdayStart)
+          .lt("created_at", todayStart),
+        supabase
+          .from("booking_services")
+          .select("price")
+          .eq("active", true),
+        supabase
+          .from("tasks")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "open")
+          .lte("due_date", todayStart.split("T")[0]),
+      ]);
 
-      const { count: leads } = await supabase
-        .from("leads")
-        .select("*", { count: "exact", head: true })
-        .gte("created_at", yesterdayStart)
-        .lt("created_at", todayStart);
-
-      const { data: bookings } = await supabase
-        .from("bookings")
-        .select("id, service_id")
-        .gte("created_at", yesterdayStart)
-        .lt("created_at", todayStart);
-
-      const { data: services } = await supabase
-        .from("booking_services")
-        .select("price")
-        .eq("active", true);
-
-      const prices = (services ?? []).map(s => s.price ?? 0).filter(p => p > 0);
+      const prices = (servicesRes.data ?? []).map(s => s.price ?? 0).filter(p => p > 0);
       const avgPrice = prices.length > 0 ? prices.reduce((a, b) => a + b, 0) / prices.length : 0;
-
-      const bookingCount = bookings?.length ?? 0;
-
-      // Follow-ups needed (open tasks due today or overdue)
-      const { count: followupsNeeded } = await supabase
-        .from("tasks")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "open")
-        .lte("due_date", todayStart.split("T")[0]);
+      const bookingCount = bookingsRes.data?.length ?? 0;
 
       return {
-        views: views ?? 0,
-        leads: leads ?? 0,
+        views: viewsRes.count ?? 0,
+        leads: leadsRes.count ?? 0,
         bookings: bookingCount,
         potentialRevenue: Math.round(bookingCount * avgPrice),
-        followupsNeeded: followupsNeeded ?? 0,
+        followupsNeeded: followupsRes.count ?? 0,
       };
     },
     refetchInterval: 120_000,
