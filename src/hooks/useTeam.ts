@@ -124,14 +124,14 @@ export function useMyAssignedJobs() {
     queryKey: ["my-assigned-jobs", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase
         .from("jobs")
-        .select("id, title, job_number, status, job_type, job_address, scheduled_start, scheduled_end, actual_start, actual_end, notes, lead_id, leads(name, phone, email)")
-        .eq("assigned_to_user_id" as any, user!.id)
+        .select("id, title, job_number, status, job_type, job_address, scheduled_start, scheduled_end, actual_start, actual_end, notes, lead_id, leads(name, phone, email)") as any)
+        .eq("assigned_to_user_id", user!.id)
         .in("status", ["scheduled", "in_progress", "paused"])
         .order("scheduled_start", { ascending: true });
       if (error) throw error;
-      return data;
+      return data as any[];
     },
   });
 }
