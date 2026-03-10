@@ -708,9 +708,9 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* ── Step 5: Services ── */}
-            {step === 5 && (
-              <motion.div key="s5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+            {/* ── Step 6: Services ── */}
+            {step === 6 && (
+              <motion.div key="s6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold">Your services</h2>
                   <p className="text-sm text-muted-foreground">
