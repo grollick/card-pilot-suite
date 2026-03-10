@@ -78,6 +78,9 @@ export default function DashboardHome() {
       {/* Mobile Job Dashboard */}
       {isMobile && <MobileJobDashboard />}
 
+      {/* ★ "What should I do next?" — the #1 thing on the dashboard */}
+      <NextActionsWidget />
+
       {/* Quick Actions (desktop) */}
       {!isMobile && <QuickActionPanel />}
 
