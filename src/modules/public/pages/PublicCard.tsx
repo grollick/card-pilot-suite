@@ -556,6 +556,7 @@ export default function PublicCard() {
   const SECTION_ICONS: Record<string, LucideIcon> = {
     about: User,
     services: Briefcase,
+    projects: Image,
     testimonials: Star,
     gallery: Image,
     social: Share2,
