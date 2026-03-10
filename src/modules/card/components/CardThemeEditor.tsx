@@ -398,10 +398,10 @@ export default function CardThemeEditor({
     const g = currentOverrides.gradientBg ?? { enabled: false, color2: "#e0e7ff", direction: "to bottom right" };
     const b = currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 };
     const m = currentOverrides.metallicEffect ?? DEFAULT_METALLIC;
-    _setPalette(p); _setFonts(f); _setTokens(t); _setGradientBg(g); _setBgPattern(b); _setMetallicEffect(m);
+    const h = currentOverrides.heroBackgroundId ?? "";
+    _setPalette(p); _setFonts(f); _setTokens(t); _setGradientBg(g); _setBgPattern(b); _setMetallicEffect(m); _setHeroBackgroundId(h);
     if (open) {
-      // Reset history when opening
-      historyRef.current = [{ palette: p, fonts: f, tokens: t, gradientBg: g, bgPattern: b, metallicEffect: m }];
+      historyRef.current = [{ palette: p, fonts: f, tokens: t, gradientBg: g, bgPattern: b, metallicEffect: m, heroBackgroundId: h }];
       historyIndexRef.current = 0;
       setHistoryLen(1);
       setHistoryIdx(0);
