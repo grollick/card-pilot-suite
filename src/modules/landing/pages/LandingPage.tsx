@@ -15,6 +15,7 @@ import FinalCTASection from "@/modules/landing/components/FinalCTASection";
 import FooterSection from "@/modules/landing/components/FooterSection";
 import CardDemoBuilder from "@/modules/landing/components/CardDemoBuilder";
 import ComparisonSection from "@/modules/landing/components/ComparisonSection";
+import ProductTourSection from "@/modules/landing/components/ProductTourSection";
 
 export default function Index() {
   const visiblePlans = PLAN_TIERS.filter((p) => p.key !== "agency");
@@ -52,6 +53,7 @@ export default function Index() {
       <SolutionSection />
       <FeaturesSection />
       <ComparisonSection />
+      <ProductTourSection />
       <WorkflowSection />
       <IndustriesSection />
       <CardDemoBuilder />
