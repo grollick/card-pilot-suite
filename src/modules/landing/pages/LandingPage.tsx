@@ -52,6 +52,7 @@ export default function Index() {
       <FeaturesSection />
       <WorkflowSection />
       <IndustriesSection />
+      <CardDemoBuilder />
       <QRProductsSection />
       <PricingSection visiblePlans={visiblePlans} />
       <FinalCTASection />

@@ -79,7 +79,7 @@ export default function CardDemoBuilder() {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-10"
           >
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-green-500/10 text-green-600 text-sm font-medium mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-success/10 text-success text-sm font-medium mb-4">
               <Check className="h-4 w-4" /> Your card is ready
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">

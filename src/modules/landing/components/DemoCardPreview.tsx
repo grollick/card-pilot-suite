@@ -174,7 +174,7 @@ export default function DemoCardPreview({ data }: { data: DemoData }) {
           <div className="px-5 mt-5">
             <div className="flex items-center gap-1 justify-center">
               {[1, 2, 3, 4, 5].map((i) => (
-                <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                <Star key={i} className="h-4 w-4 fill-warning text-warning" />
               ))}
               <span className="text-xs text-muted-foreground ml-1">5.0 (24 reviews)</span>
             </div>
