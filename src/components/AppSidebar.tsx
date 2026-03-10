@@ -62,6 +62,10 @@ const marketplaceItems = [
   { title: "Reviews", url: "/app/reviews", icon: Star },
 ];
 
+const agencyItems = [
+  { title: "Agency", url: "/app/agency", icon: Building2 },
+];
+
 const bottomItems = [
   { title: "Team", url: "/app/team", icon: Building2 },
   { title: "Settings", url: "/app/settings", icon: Settings },
