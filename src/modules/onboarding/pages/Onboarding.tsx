@@ -874,10 +874,10 @@ export default function Onboarding() {
 
                 <div>
                   <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="text-xl font-bold">
-                    Your card is live!
+                    Your card is live! 🚀
                   </motion.h2>
                   <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }} className="text-sm text-muted-foreground mt-1">
-                    {aiSetup ? "AI helped you set up in record time" : "You're ready to start capturing leads"}
+                    Share it everywhere to start capturing leads and bookings.
                   </motion.p>
                 </div>
 
