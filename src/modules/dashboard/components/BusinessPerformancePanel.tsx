@@ -1,16 +1,33 @@
-import { Eye, UserPlus, CalendarCheck, DollarSign, TrendingUp } from "lucide-react";
+import { Eye, UserPlus, CalendarCheck, DollarSign, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
-import { useBusinessPerformance } from "@/hooks/useDashboardStats";
+import { useBusinessPerformance } from "@/hooks/useBusinessPerformance";
+
+function TrendBadge({ value }: { value: number }) {
+  if (value === 0) {
+    return (
+      <span className="inline-flex items-center gap-0.5 text-[11px] font-medium text-muted-foreground">
+        <Minus className="h-3 w-3" /> 0%
+      </span>
+    );
+  }
+  const isPositive = value > 0;
+  return (
+    <span className={`inline-flex items-center gap-0.5 text-[11px] font-semibold ${isPositive ? "text-success" : "text-destructive"}`}>
+      {isPositive ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+      {isPositive ? "+" : ""}{value}%
+    </span>
+  );
+}
 
 export default function BusinessPerformancePanel() {
   const { data, isLoading } = useBusinessPerformance();
 
   const metrics = [
-    { label: "Card Views", value: data?.views ?? 0, icon: Eye, color: "text-primary bg-primary/10" },
-    { label: "Leads Captured", value: data?.leads ?? 0, icon: UserPlus, color: "text-success bg-success/10" },
-    { label: "Bookings", value: data?.bookings ?? 0, icon: CalendarCheck, color: "text-warning bg-warning/10" },
-    { label: "Est. Revenue", value: `$${(data?.estimatedRevenue ?? 0).toLocaleString()}`, icon: DollarSign, color: "text-primary bg-primary/10" },
+    { label: "Card Views", value: data?.views ?? 0, icon: Eye, color: "text-primary bg-primary/10", trend: data?.trends?.views },
+    { label: "Leads Captured", value: data?.leads ?? 0, icon: UserPlus, color: "text-success bg-success/10", trend: data?.trends?.leads },
+    { label: "Bookings", value: data?.bookings ?? 0, icon: CalendarCheck, color: "text-warning bg-warning/10", trend: data?.trends?.bookings },
+    { label: "Est. Revenue", value: `$${(data?.estimatedRevenue ?? 0).toLocaleString()}`, icon: DollarSign, color: "text-primary bg-primary/10", trend: data?.trends?.revenue },
   ];
 
   return (
@@ -46,7 +63,10 @@ export default function BusinessPerformancePanel() {
               {isLoading ? (
                 <Skeleton className="h-7 w-16" />
               ) : (
-                <p className="text-xl font-bold tracking-tight tabular-nums">{m.value}</p>
+                <div className="flex items-end justify-between gap-2">
+                  <p className="text-xl font-bold tracking-tight tabular-nums">{m.value}</p>
+                  {m.trend !== undefined && <TrendBadge value={m.trend} />}
+                </div>
               )}
             </div>
           ))}
