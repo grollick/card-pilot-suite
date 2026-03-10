@@ -171,18 +171,29 @@ export default function ContactDetail() {
           <ContactSummaryCard contact={contact} />
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-4 gap-2">
-            {[
-              { icon: Phone, label: "Call", action: () => handleLogQuickAction("call", "Call logged") },
-              { icon: MessageSquare, label: "Text", action: () => handleLogQuickAction("cta_click", "Text sent") },
-              { icon: Mail, label: "Email", action: () => navigate("/app/email?new=1") },
-              { icon: Calendar, label: "Book", action: () => navigate("/app/bookings?new=1") },
-            ].map(a => (
-              <Button key={a.label} variant="outline" className="flex-col h-16 gap-1 text-xs" onClick={a.action}>
-                <a.icon className="h-5 w-5" />
-                {a.label}
+          <div className="rounded-xl border border-border bg-card p-3">
+            <p className="text-2xs font-medium text-muted-foreground uppercase tracking-wider mb-2">Quick Actions</p>
+            <div className="grid grid-cols-4 gap-2">
+              {[
+                { icon: Phone, label: "Call", action: () => { if (contact.phone) window.open(`tel:${contact.phone}`); handleLogQuickAction("call", "Call logged"); }, color: "text-success" },
+                { icon: MessageSquare, label: "Text", action: () => { if (contact.phone) window.open(`sms:${contact.phone}`); handleLogQuickAction("cta_click", "Text sent"); }, color: "text-primary" },
+                { icon: Mail, label: "Email", action: () => navigate("/app/email?new=1"), color: "text-warning" },
+                { icon: Calendar, label: "Book", action: () => navigate("/app/bookings?new=1"), color: "text-accent" },
+              ].map(a => (
+                <Button key={a.label} variant="outline" className="flex-col h-16 gap-1 text-xs hover:bg-muted/50 transition-all group" onClick={a.action}>
+                  <a.icon className={`h-5 w-5 ${a.color} transition-transform group-hover:scale-110`} />
+                  {a.label}
+                </Button>
+              ))}
+            </div>
+            <div className="grid grid-cols-2 gap-2 mt-2">
+              <Button variant="ghost" size="sm" className="text-xs gap-1.5 h-8" onClick={() => setTaskDialogOpen(true)}>
+                <FileText className="h-3.5 w-3.5" /> Create Task
               </Button>
-            ))}
+              <Button variant="ghost" size="sm" className="text-xs gap-1.5 h-8" onClick={() => navigate(`/app/estimates?lead=${contact.id}`)}>
+                <FileText className="h-3.5 w-3.5" /> Send Estimate
+              </Button>
+            </div>
           </div>
 
           <NextActivityPanel nextTask={nextTask} onCreateTask={() => setTaskDialogOpen(true)} onSnooze={handleSnooze} />
