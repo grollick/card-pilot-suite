@@ -241,6 +241,7 @@ export function AppSidebar() {
         {renderCollapsibleGroup("Jobs", Briefcase, jobsItems)}
         {renderCollapsibleGroup("Customers", UserCheck, customersItems)}
         {renderCollapsibleGroup("Marketing", Megaphone, marketingItems)}
+        {renderCollapsibleGroup("Team", Users, teamItems)}
         {renderCollapsibleGroup("More Tools", Package, moreItems)}
 
         {/* View My Website */}
