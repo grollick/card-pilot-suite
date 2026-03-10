@@ -1,6 +1,10 @@
-import { Palette, Pencil, Camera, LayoutList, LayoutTemplate } from "lucide-react";
+import { Palette, Pencil, Camera, LayoutList, LayoutTemplate, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import PhotoImportDialog, { type ImportedProject } from "@/modules/card/components/PhotoImportDialog";
 import { motion } from "framer-motion";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import CardPhotoTools from "@/modules/card/components/CardPhotoTools";
@@ -17,7 +21,30 @@ import { useCardBuilderState } from "@/hooks/useCardBuilderState";
 
 export default function CardBuilder() {
   const s = useCardBuilderState();
+  const { user } = useAuth();
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [photoImportOpen, setPhotoImportOpen] = useState(false);
+
+  const handlePhotoImport = async (projects: ImportedProject[]) => {
+    if (!user || projects.length === 0) return;
+    try {
+      const inserts = projects.map((p) => ({
+        user_id: user.id,
+        title: p.title,
+        description: p.description || null,
+        after_image_url: p.imageUrl,
+        before_image_url: p.beforeImageUrl || null,
+        is_public: true,
+        services_used: p.category ? [p.category] : [],
+      }));
+      const { error } = await supabase.from("projects").insert(inserts);
+      if (error) throw error;
+      toast.success(`${projects.length} projects added to your gallery!`);
+    } catch (err: any) {
+      console.error("Import error:", err);
+      toast.error(err.message || "Failed to save imported projects");
+    }
+  };
 
   const handleApplyTemplate = (templateId: string) => {
     setSelectedTemplateId(templateId);
@@ -205,6 +232,18 @@ export default function CardBuilder() {
                       s.saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarBannerAnimation: val } } });
                     }}
                   />
+                  {/* AI Photo Import */}
+                  <div className="pt-3 mt-3 border-t border-border/50">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setPhotoImportOpen(true)}
+                    >
+                      <Globe className="h-4 w-4 mr-2" />
+                      Import Photos from URL
+                    </Button>
+                  </div>
                 </AccordionContent>
               </AccordionItem>
 
@@ -381,6 +420,18 @@ export default function CardBuilder() {
                       s.saveThemeField({ tokens: { ...existing, header: { ...(existing.header ?? {}), avatarBannerAnimation: val } } });
                     }}
                   />
+                  {/* AI Photo Import (mobile) */}
+                  <div className="pt-3 mt-3 border-t border-border/50">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setPhotoImportOpen(true)}
+                    >
+                      <Globe className="h-4 w-4 mr-2" />
+                      Import Photos from URL
+                    </Button>
+                  </div>
                 </AccordionContent>
               </AccordionItem>
 
@@ -524,6 +575,13 @@ export default function CardBuilder() {
         }}
         sectionTargets={s.sections.map((sec) => ({ id: sec.id, label: sec.label, enabled: sec.enabled }))}
         onCopyToSection={s.handleCopyToSection}
+      />
+
+      <PhotoImportDialog
+        open={photoImportOpen}
+        onOpenChange={setPhotoImportOpen}
+        profession={s.professionName}
+        onImportComplete={handlePhotoImport}
       />
     </div>
   );
