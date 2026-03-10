@@ -21,6 +21,7 @@ import PublicSite from "@/modules/public/pages/PublicSite";
 
 // Client Portal — loaded eagerly (public, token-based)
 const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
+const PublicProjectPage = lazy(() => import("@/modules/public/pages/PublicProjectPage"));
 
 // ── Auth & marketing — loaded eagerly (small) ──
 import LandingPage from "@/modules/landing/pages/LandingPage";
