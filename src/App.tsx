@@ -97,6 +97,10 @@ const AgencyDashboard = lazy(() => import("@/modules/agency/pages/AgencyDashboar
 // App Marketplace
 const MarketplacePage = lazy(() => import("@/modules/apps/pages/MarketplacePage"));
 
+// Team
+const TeamManagementPage = lazy(() => import("@/modules/team/pages/TeamManagementPage"));
+const TechDashboardPage = lazy(() => import("@/modules/team/pages/TechDashboardPage"));
+
 // Settings
 const SettingsPage = lazy(() => import("@/modules/settings/pages/SettingsPage"));
 const AdminPage = lazy(() => import("@/modules/settings/pages/AdminPage"));
@@ -202,6 +206,8 @@ const App = () => (
               <Route path="agency" element={<LazyRoute><AgencyDashboard /></LazyRoute>} />
               <Route path="marketplace" element={<LazyRoute><MarketplacePage /></LazyRoute>} />
               <Route path="admin" element={<LazyRoute><AdminPage /></LazyRoute>} />
+              <Route path="team-management" element={<LazyRoute><TeamManagementPage /></LazyRoute>} />
+              <Route path="tech-dashboard" element={<LazyRoute><TechDashboardPage /></LazyRoute>} />
             </Route>
 
             {/* Public card OR SEO landing — smart routing */}

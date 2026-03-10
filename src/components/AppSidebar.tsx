@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Users, Briefcase, UserCheck, Megaphone, Settings,
-  ChevronLeft, LogOut, Globe, ChevronDown,
+  ChevronLeft, LogOut, Globe, ChevronDown, Wrench, HardHat,
   // Leads sub-items
   Inbox, FileText, Calendar, Kanban,
   // Jobs sub-items
@@ -65,6 +65,11 @@ const marketingItems = [
   { title: "Boost", url: "/app/boost", icon: Zap },
   { title: "Promotions", url: "/app/promotions", icon: Tag },
   { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
+];
+
+const teamItems = [
+  { title: "Team Management", url: "/app/team-management", icon: Users },
+  { title: "Tech Dashboard", url: "/app/tech-dashboard", icon: HardHat },
 ];
 
 const moreItems = [
@@ -236,6 +241,7 @@ export function AppSidebar() {
         {renderCollapsibleGroup("Jobs", Briefcase, jobsItems)}
         {renderCollapsibleGroup("Customers", UserCheck, customersItems)}
         {renderCollapsibleGroup("Marketing", Megaphone, marketingItems)}
+        {renderCollapsibleGroup("Team", Users, teamItems)}
         {renderCollapsibleGroup("More Tools", Package, moreItems)}
 
         {/* View My Website */}
