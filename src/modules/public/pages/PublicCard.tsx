@@ -558,6 +558,7 @@ export default function PublicCard() {
     about: User,
     services: Briefcase,
     projects: Image,
+    quote_calculator: FileText,
     testimonials: Star,
     gallery: Image,
     social: Share2,
