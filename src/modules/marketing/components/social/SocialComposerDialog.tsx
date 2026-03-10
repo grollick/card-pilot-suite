@@ -206,7 +206,7 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
                 </div>
                 <div>
                   <Label className="text-xs">Content Label</Label>
-                  <Select value={contentLabel} onValueChange={setContentLabel}>
+                  <Select value={contentLabel || "__none__"} onValueChange={(v) => setContentLabel(v === "__none__" ? "" : v)}>
                     <SelectTrigger className="h-8 text-xs mt-1"><SelectValue placeholder="None" /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="__none__">None</SelectItem>
