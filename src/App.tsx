@@ -173,8 +173,8 @@ const App = () => (
             }>
               <Route index element={<LazyRoute><DashboardHome /></LazyRoute>} />
               <Route path="dashboard" element={<LazyRoute><DashboardHome /></LazyRoute>} />
-              <Route path="card" element={<LazyRoute><CardBuilder /></LazyRoute>} />
               <Route path="card/qr" element={<LazyRoute><QRBusinessCard /></LazyRoute>} />
+              <Route path="card" element={<LazyRoute><CardBuilder /></LazyRoute>} />
               <Route path="contacts" element={<LazyRoute><ContactsPage /></LazyRoute>} />
               <Route path="contacts/:id" element={<LazyRoute><ContactDetail /></LazyRoute>} />
               <Route path="pipeline" element={<LazyRoute><PipelinePage /></LazyRoute>} />
