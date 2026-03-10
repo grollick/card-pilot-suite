@@ -384,7 +384,7 @@ export default function Onboarding() {
           <h1 className="text-2xl font-bold bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-primary)" }}>
             CardPilot
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">Launch your card in under 2 minutes</p>
+          <p className="text-sm text-muted-foreground mt-1">Get more leads, book more customers, grow your business</p>
         </div>
 
         {/* Progress */}

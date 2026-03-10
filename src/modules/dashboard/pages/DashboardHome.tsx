@@ -71,7 +71,7 @@ export default function DashboardHome() {
       <div className="page-header">
         <h1 className="page-title">Command Center</h1>
         <p className="page-description">
-          Your business at a glance — track performance and take action.
+          Get more leads, book more customers, and grow your business.
         </p>
       </div>
 
