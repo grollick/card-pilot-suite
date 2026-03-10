@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Phone, MessageSquare, User, FileText, Plus, Trash2,
   Loader2, Camera, CheckCircle2, Circle, Package, Play, Pause,
-  Clock, MapPin, Navigation, ChevronDown, PenTool, RefreshCw
+  Clock, MapPin, Navigation, ChevronDown, PenTool, RefreshCw, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +32,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import MobileQuickActions from "@/modules/jobs/components/MobileQuickActions";
 import SignaturePad from "@/modules/jobs/components/SignaturePad";
 import JobSummaryDialog from "@/modules/jobs/components/JobSummaryDialog";
+import TechAssistantSheet from "@/modules/jobs/components/TechAssistantSheet";
 
 const STATUS_FLOW: Record<JobStatus, { next: JobStatus; label: string; icon: typeof Play; variant: "default" | "outline" | "destructive" }[]> = {
   draft: [{ next: "scheduled", label: "Schedule Job", icon: Play, variant: "default" }],
@@ -78,6 +79,7 @@ export default function JobDetailPage() {
   const [sigName, setSigName] = useState("");
   const [summaryOpen, setSummaryOpen] = useState(false);
   const [quickNote, setQuickNote] = useState("");
+  const [assistOpen, setAssistOpen] = useState(false);
 
   if (isLoading) return <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
   if (!job) return <div className="text-center py-12 text-muted-foreground">Job not found</div>;
@@ -300,8 +302,8 @@ export default function JobDetailPage() {
         </div>
       </div>
 
-      {/* Quick Note - mobile-friendly */}
-      <div className="dash-card p-3">
+      {/* Quick Note + AI Assistant */}
+      <div className="dash-card p-3 space-y-2">
         <div className="flex gap-2">
           <Input
             value={quickNote}
@@ -312,6 +314,14 @@ export default function JobDetailPage() {
           />
           <Button size="sm" onClick={handleQuickNote} disabled={!quickNote.trim()}>Add</Button>
         </div>
+        <Button
+          variant="outline"
+          className={`gap-2 ${isMobile ? "w-full h-12 text-base" : ""}`}
+          onClick={() => setAssistOpen(true)}
+        >
+          <Sparkles className="h-4 w-4 text-primary" />
+          AI Job Assistant
+        </Button>
       </div>
 
       {/* Tabs */}
@@ -526,6 +536,20 @@ export default function JobDetailPage() {
         tasks={tasks}
         photos={photos}
         materials={materials}
+      />
+
+      {/* AI Tech Assistant */}
+      <TechAssistantSheet
+        open={assistOpen}
+        onOpenChange={setAssistOpen}
+        jobId={id}
+        jobTitle={job.title}
+        jobType={job.job_type || undefined}
+        existingNotes={job.notes || ""}
+        onApplyNotes={(newNotes) => {
+          updateJob.mutate({ id: id!, notes: newNotes });
+          refetch();
+        }}
       />
     </div>
   );
