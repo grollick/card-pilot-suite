@@ -44,6 +44,8 @@ interface CardHeaderProps {
   heroBackground?: HeroBackground | null;
   /** Optional CTA buttons rendered inside the hero (for immersive "hero" layout) */
   ctaChildren?: React.ReactNode;
+  /** Enable glass container behind identity content in hero layout */
+  glassHero?: boolean;
 }
 
 function renderName(name: string, bold?: boolean, uppercase?: boolean, firstNameWeight?: number | null) {
@@ -67,7 +69,7 @@ function renderName(name: string, bold?: boolean, uppercase?: boolean, firstName
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, nameFontSize, subtitleFontSize, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4, logoNameGap = 8, logoVerticalAlign = "center", metallicEffect, heroBackground, ctaChildren }: CardHeaderProps) {
+export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, nameFontSize, subtitleFontSize, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4, logoNameGap = 8, logoVerticalAlign = "center", metallicEffect, heroBackground, ctaChildren, glassHero = false }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -450,44 +452,83 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
           />
           {/* Logo */}
           {logoEl && <div style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 3 }}>{logoEl}</div>}
-          {/* Layer 3: Profile image + name */}
-          <div style={{ position: "relative", zIndex: 2, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, width: "100%" }}>
-            <motion.div {...heroEntrance(0.05)}>
-              {React.cloneElement(avatarEl as React.ReactElement, {
-                style: {
-                  ...(avatarEl as React.ReactElement).props.style,
-                  width: avatarSize > 80 ? avatarSize : 96,
-                  height: avatarSize > 80 ? avatarSize : 96,
-                },
-              })}
-            </motion.div>
-            <motion.div style={{ display: "flex", alignItems: inlineAlignItems, justifyContent: "center", gap: logoNameGap }} {...heroEntrance(0.15)}>
-              {logoPosition === "beside-name" && inlineLogoEl}
-              <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 28, color: hasMetallicName ? "transparent" : "#FFFFFF", textShadow: hasMetallicName ? undefined : "0 1px 8px rgba(0,0,0,0.3)" }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
-              {logoPosition === "beside-name-right" && inlineLogoEl}
-            </motion.div>
-            {profession && (
-              <motion.p style={{ ...subtitleStyle, fontSize: 15, color: "rgba(255,255,255,0.85)", textShadow: "0 1px 4px rgba(0,0,0,0.2)" }} {...heroEntrance(0.25)}>
-                {profession}
-              </motion.p>
-            )}
-            {company && (
-              <motion.p style={{ ...subtitleStyle, fontSize: 13, color: "rgba(255,255,255,0.65)" }} {...heroEntrance(0.3)}>
-                {company}
-              </motion.p>
-            )}
-            {/* Layer 4: CTA buttons inside the hero */}
-            {ctaChildren && (
-              <motion.div
-                style={{ width: "100%", marginTop: 8 }}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              >
-                {ctaChildren}
-              </motion.div>
-            )}
-          </div>
+          {/* Layer 3: Profile image + name (optionally in glass container) */}
+          {(() => {
+            const identityContent = (
+              <>
+                <motion.div {...heroEntrance(0.05)}>
+                  {React.cloneElement(avatarEl as React.ReactElement, {
+                    style: {
+                      ...(avatarEl as React.ReactElement).props.style,
+                      width: avatarSize > 80 ? avatarSize : 96,
+                      height: avatarSize > 80 ? avatarSize : 96,
+                    },
+                  })}
+                </motion.div>
+                <motion.div style={{ display: "flex", alignItems: inlineAlignItems, justifyContent: "center", gap: logoNameGap }} {...heroEntrance(0.15)}>
+                  {logoPosition === "beside-name" && inlineLogoEl}
+                  <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 28, color: hasMetallicName ? "transparent" : "#FFFFFF", textShadow: hasMetallicName ? undefined : "0 1px 8px rgba(0,0,0,0.3)" }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
+                  {logoPosition === "beside-name-right" && inlineLogoEl}
+                </motion.div>
+                {profession && (
+                  <motion.p style={{ ...subtitleStyle, fontSize: 15, color: "rgba(255,255,255,0.85)", textShadow: "0 1px 4px rgba(0,0,0,0.2)" }} {...heroEntrance(0.25)}>
+                    {profession}
+                  </motion.p>
+                )}
+                {company && (
+                  <motion.p style={{ ...subtitleStyle, fontSize: 13, color: "rgba(255,255,255,0.65)" }} {...heroEntrance(0.3)}>
+                    {company}
+                  </motion.p>
+                )}
+                {/* Layer 4: CTA buttons inside the hero */}
+                {ctaChildren && (
+                  <motion.div
+                    style={{ width: "100%", marginTop: 8 }}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  >
+                    {ctaChildren}
+                  </motion.div>
+                )}
+              </>
+            );
+
+            if (glassHero) {
+              return (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                  style={{
+                    position: "relative",
+                    zIndex: 2,
+                    textAlign: "center",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 12,
+                    width: "100%",
+                    background: "rgba(255,255,255,0.10)",
+                    backdropFilter: "blur(24px) saturate(1.5)",
+                    WebkitBackdropFilter: "blur(24px) saturate(1.5)",
+                    border: "1px solid rgba(255,255,255,0.18)",
+                    borderRadius: radii.card,
+                    padding: "28px 20px 24px",
+                    boxShadow: "0 8px 32px -8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.25)",
+                  }}
+                >
+                  {identityContent}
+                </motion.div>
+              );
+            }
+
+            return (
+              <div style={{ position: "relative", zIndex: 2, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, width: "100%" }}>
+                {identityContent}
+              </div>
+            );
+          })()}
         </div>
       );
 

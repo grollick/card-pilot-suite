@@ -758,6 +758,7 @@ export default function PublicCard() {
                 metallicEffect={metallicEffect}
                 heroBackground={resolvedHeroBackground}
                 ctaChildren={heroCtaButtons}
+                glassHero={theme.section.cardStyle === "glass"}
               />
             </div>
           );

@@ -124,7 +124,7 @@ export function getAvatarRadius(shape: "circle" | "rounded" | "square"): string 
 }
 
 // ─── Section ──────────────────────────────────────────────
-export type SectionCardStyle = "solid" | "frosted" | "elevated" | "soft" | "glow";
+export type SectionCardStyle = "solid" | "frosted" | "elevated" | "soft" | "glow" | "glass";
 export type SectionDivider = "none" | "hairline";
 
 export function getSectionTokens(tokens: Record<string, any>) {
@@ -181,6 +181,15 @@ export function getSectionStyles(
         background: `${palette.background}E6`,
         boxShadow: `0 0 24px ${palette.primary}30, ${shadows.card}`,
         border: `1px solid ${palette.primary}20`,
+      };
+    case "glass":
+      return {
+        ...base,
+        background: `${palette.background}1A`,
+        backdropFilter: "blur(20px) saturate(1.4)",
+        WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+        border: `1px solid ${palette.primary}18`,
+        boxShadow: `0 8px 32px -8px rgba(0,0,0,0.12), inset 0 1px 0 ${palette.background}30`,
       };
     default:
       return base;

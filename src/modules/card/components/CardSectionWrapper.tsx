@@ -113,6 +113,14 @@ function cardStyleMap(theme: ResolvedCardTheme): React.CSSProperties {
         boxShadow: `0 0 24px ${palette.primary}30, ${shadows.card}`,
         border: `1px solid ${palette.primary}20`,
       };
+    case "glass":
+      return {
+        background: `${palette.background}1A`,
+        backdropFilter: "blur(20px) saturate(1.4)",
+        WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+        border: `1px solid ${palette.primary}18`,
+        boxShadow: `0 8px 32px -8px rgba(0,0,0,0.12), inset 0 1px 0 ${palette.background}30`,
+      };
     default:
       return { background: palette.background };
   }

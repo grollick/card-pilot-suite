@@ -878,13 +878,14 @@ export default function CardThemeEditor({
               <div className="space-y-1.5">
                 <SectionLabel>Section Style</SectionLabel>
                 <OptionGrid
-                  cols={5}
+                  cols={3}
                   options={[
                     { value: "solid", label: "Solid" },
                     { value: "frosted", label: "Frosted" },
                     { value: "elevated", label: "Elevated" },
                     { value: "soft", label: "Soft" },
                     { value: "glow", label: "Glow" },
+                    { value: "glass", label: "Glass" },
                   ]}
                   value={rs.cardStyle}
                   onChange={(v) => updateNestedToken("section", "cardStyle", v)}
