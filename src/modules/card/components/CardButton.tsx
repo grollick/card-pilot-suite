@@ -34,7 +34,7 @@ export default function CardButton({ theme, children, onClick, href, className =
 
   const hasMetallic = metallicEffect?.type && metallicEffect.type !== "none" && metallicEffect.applyToButtons;
   if (hasMetallic) {
-    const grad = METALLIC_GRADIENTS[metallicEffect!.type as Exclude<import("@/components/card/CardThemeEditor").MetallicType, "none">];
+    const grad = METALLIC_GRADIENTS[metallicEffect!.type as Exclude<import("@/modules/card/components/CardThemeEditor").MetallicType, "none">];
     baseStyle.background = grad;
     baseStyle.color = "#1a1a1a";
     baseStyle.border = "none";

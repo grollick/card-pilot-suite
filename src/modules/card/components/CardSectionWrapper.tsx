@@ -57,7 +57,7 @@ export default function CardSectionWrapper({ theme, children, className = "", in
           style={{
             position: "absolute",
             inset: 0,
-            background: METALLIC_GRADIENTS[metallicEffect!.type as Exclude<import("@/components/card/CardThemeEditor").MetallicType, "none">],
+            background: METALLIC_GRADIENTS[metallicEffect!.type as Exclude<import("@/modules/card/components/CardThemeEditor").MetallicType, "none">],
             opacity: (metallicEffect!.intensity / 100) * 0.12,
             pointerEvents: "none",
             borderRadius: theme.radii.card,

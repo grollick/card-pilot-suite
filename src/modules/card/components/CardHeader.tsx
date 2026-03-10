@@ -78,7 +78,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
   const coverScale = useTransform(scrollYProgress, [0, 1], [1.08, 1]);
 
   const hasMetallicName = metallicEffect?.type && metallicEffect.type !== "none" && metallicEffect.applyToName;
-  const metallicGrad = hasMetallicName ? METALLIC_GRADIENTS[metallicEffect!.type as Exclude<import("@/components/card/CardThemeEditor").MetallicType, "none">] : undefined;
+  const metallicGrad = hasMetallicName ? METALLIC_GRADIENTS[metallicEffect!.type as Exclude<import("@/modules/card/components/CardThemeEditor").MetallicType, "none">] : undefined;
 
   const titleStyle: React.CSSProperties = {
     fontFamily: `'${fonts.primary}', sans-serif`,
