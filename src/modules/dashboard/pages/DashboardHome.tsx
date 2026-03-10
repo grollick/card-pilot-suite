@@ -18,6 +18,7 @@ import FirstLeadAssistant from "@/modules/dashboard/components/FirstLeadAssistan
 import JobMetrics from "@/modules/dashboard/components/JobMetrics";
 import MobileJobDashboard from "@/modules/dashboard/components/MobileJobDashboard";
 import AIInsightsWidget from "@/modules/dashboard/components/AIInsightsWidget";
+import NextActionsWidget from "@/modules/dashboard/components/NextActionsWidget";
 import TodaysSchedule from "@/modules/dashboard/components/TodaysSchedule";
 import ActiveJobsWidget from "@/modules/dashboard/components/ActiveJobsWidget";
 import QuickActionPanel from "@/modules/dashboard/components/QuickActionPanel";
@@ -76,6 +77,9 @@ export default function DashboardHome() {
 
       {/* Mobile Job Dashboard */}
       {isMobile && <MobileJobDashboard />}
+
+      {/* ★ "What should I do next?" — the #1 thing on the dashboard */}
+      <NextActionsWidget />
 
       {/* Quick Actions (desktop) */}
       {!isMobile && <QuickActionPanel />}
