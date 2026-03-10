@@ -53,6 +53,7 @@ export default function Index() {
       <SolutionSection />
       <FeaturesSection />
       <ComparisonSection />
+      <ProductTourSection />
       <WorkflowSection />
       <IndustriesSection />
       <CardDemoBuilder />
