@@ -121,6 +121,13 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     transition: { duration: 3, repeat: Infinity, ease: "easeInOut" as const },
   };
 
+  // Staggered entrance for hero elements
+  const heroEntrance = (delay: number) => ({
+    initial: { opacity: 0, y: 16 } as const,
+    animate: { opacity: 1, y: 0 } as const,
+    transition: { duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] as const },
+  });
+
   const bannerAnimationStyle: React.CSSProperties = (() => {
     switch (avatarBannerAnimation) {
       case "pulse":
