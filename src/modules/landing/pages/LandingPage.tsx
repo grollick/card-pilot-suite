@@ -42,22 +42,42 @@ const features = [
   {
     icon: Smartphone,
     title: "Smart Card",
-    desc: "A digital business card that captures leads automatically with every tap and scan.",
+    desc: "A tap-and-scan digital card that turns every interaction into a lead.",
+    bullets: [
+      "Auto-captures visitor contact info",
+      "Works with NFC, QR codes & links",
+      "Tracks views, taps & conversions",
+    ],
   },
   {
     icon: Calendar,
     title: "Booking",
-    desc: "Let customers book time with you directly — no phone tag required.",
+    desc: "Let customers self-book — no back-and-forth required.",
+    bullets: [
+      "Customizable availability rules",
+      "Automated confirmations & reminders",
+      "Syncs directly into your CRM",
+    ],
   },
   {
     icon: FileText,
     title: "Estimates",
-    desc: "Build professional quotes in minutes with built-in trade calculators.",
+    desc: "Send professional quotes on-site in minutes, not hours.",
+    bullets: [
+      "Built-in trade calculators",
+      "One-tap approve & digital signatures",
+      "Auto-converts to jobs when accepted",
+    ],
   },
   {
     icon: Users,
     title: "CRM",
-    desc: "Track every lead, follow up on time, and never miss an opportunity.",
+    desc: "Track every lead and never miss a follow-up again.",
+    bullets: [
+      "Visual pipeline & deal stages",
+      "Automated follow-up sequences",
+      "Full activity timeline per contact",
+    ],
   },
 ];
 
