@@ -55,14 +55,29 @@ export default function ProjectsPage() {
   };
 
   const handleShare = (project: Project) => {
-    const url = `${window.location.origin}/${profile?.handle}?project=${project.id}`;
+    const url = `${window.location.origin}/project/${project.id}`;
     navigator.clipboard.writeText(url);
     toast.success("Project link copied!");
   };
 
+  const shareToFacebook = (project: Project) => {
+    const url = `${window.location.origin}/project/${project.id}`;
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, "_blank");
+  };
+
+  const shareToLinkedIn = (project: Project) => {
+    const url = `${window.location.origin}/project/${project.id}`;
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, "_blank");
+  };
+
+  const shareToTwitter = (project: Project) => {
+    const url = `${window.location.origin}/project/${project.id}`;
+    window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(`Check out: ${project.title}`)}`, "_blank");
+  };
+
   const generateSocialPost = (project: Project) => {
-    const url = `${window.location.origin}/${profile?.handle}`;
-    const text = `✨ Check out my latest project: "${project.title}"${project.description ? `\n\n${project.description}` : ""}\n\n📍 ${project.location || ""}${project.services_used.length ? `\n🔧 ${project.services_used.join(", ")}` : ""}\n\n👉 Book your appointment: ${url}`;
+    const url = `${window.location.origin}/project/${project.id}`;
+    const text = `✨ Check out my latest project: "${project.title}"${project.description ? `\n\n${project.description}` : ""}\n\n📍 ${project.location || ""}${project.services_used.length ? `\n🔧 ${project.services_used.join(", ")}` : ""}\n\n👉 See the transformation: ${url}`;
     navigator.clipboard.writeText(text);
     toast.success("Social post copied to clipboard!");
   };
