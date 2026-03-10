@@ -50,6 +50,7 @@ export default function ContactDetail() {
   const updateTask = useUpdateTask();
   const reactivateFollowups = useReactivateFollowups();
   const cancelFollowup = useCancelFollowup();
+  const createPortalToken = useCreatePortalToken();
 
   const [timelineFilter, setTimelineFilter] = useState<TimelineFilter>("all");
   const [taskDialogOpen, setTaskDialogOpen] = useState(false);
