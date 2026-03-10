@@ -2127,8 +2127,12 @@ export type Database = {
           id: string
           is_public: boolean
           lead_id: string | null
+          owner_response: string | null
+          owner_response_at: string | null
           project_id: string | null
           rating: number
+          reported: boolean
+          reported_reason: string | null
           review_text: string | null
           reviewer_email: string | null
           reviewer_name: string
@@ -2139,8 +2143,12 @@ export type Database = {
           id?: string
           is_public?: boolean
           lead_id?: string | null
+          owner_response?: string | null
+          owner_response_at?: string | null
           project_id?: string | null
           rating?: number
+          reported?: boolean
+          reported_reason?: string | null
           review_text?: string | null
           reviewer_email?: string | null
           reviewer_name: string
@@ -2151,8 +2159,12 @@ export type Database = {
           id?: string
           is_public?: boolean
           lead_id?: string | null
+          owner_response?: string | null
+          owner_response_at?: string | null
           project_id?: string | null
           rating?: number
+          reported?: boolean
+          reported_reason?: string | null
           review_text?: string | null
           reviewer_email?: string | null
           reviewer_name?: string

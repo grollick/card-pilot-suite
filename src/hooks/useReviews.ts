@@ -12,6 +12,10 @@ export interface Review {
   review_text: string | null;
   is_public: boolean;
   project_id: string | null;
+  owner_response: string | null;
+  owner_response_at: string | null;
+  reported: boolean;
+  reported_reason: string | null;
   created_at: string;
 }
 
@@ -74,6 +78,34 @@ export function useDeleteReview() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from("reviews" as any).delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["reviews"] }),
+  });
+}
+
+export function useRespondToReview() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, response }: { id: string; response: string }) => {
+      const { error } = await supabase
+        .from("reviews" as any)
+        .update({ owner_response: response, owner_response_at: new Date().toISOString() } as any)
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["reviews"] }),
+  });
+}
+
+export function useReportReview() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
+      const { error } = await supabase
+        .from("reviews" as any)
+        .update({ reported: true, reported_reason: reason } as any)
+        .eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["reviews"] }),

@@ -849,10 +849,33 @@ export default function PublicCard() {
               count: publicReviews.filter(r => r.rating === n).length,
               pct: Math.round((publicReviews.filter(r => r.rating === n).length / publicReviews.length) * 100),
             }));
+            const isTopRated = avgRating >= 4.5 && publicReviews.length >= 5;
+            const isFavorite = publicReviews.filter(r => r.rating === 5).length >= publicReviews.length * 0.7;
 
             return (
               <div>
-                <SectionTitle id="reviews" label="Client Reviews" />
+                <SectionTitle id="reviews" label="What Customers Are Saying" />
+
+                {/* Trust badges */}
+                {(isTopRated || isFavorite || publicReviews.length >= 10) && (
+                  <div style={{ display: "flex", gap: 6, marginBottom: 10, flexWrap: "wrap" }}>
+                    {isTopRated && (
+                      <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 99, background: "#f59e0b20", color: "#d97706" }}>
+                        ⭐ Top Rated
+                      </span>
+                    )}
+                    {publicReviews.length >= 10 && (
+                      <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 99, background: `${palette.primary}15`, color: palette.primary }}>
+                        ✓ Verified Reviews
+                      </span>
+                    )}
+                    {isFavorite && (
+                      <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 10px", borderRadius: 99, background: "#10b98120", color: "#059669" }}>
+                        ❤ Customer Favorite
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {/* Aggregated rating summary */}
                 <CardSectionWrapper theme={theme} index={6} metallicEffect={metallicEffect}>
@@ -916,6 +939,14 @@ export default function PublicCard() {
                       <p style={{ fontSize: 12, color: `${palette.secondary}99`, margin: "6px 0 0", fontWeight: 500 }}>
                         — {review.reviewer_name}
                       </p>
+                      {review.owner_response && (
+                        <div style={{ marginTop: 10, paddingLeft: 10, borderLeft: `2px solid ${palette.primary}40` }}>
+                          <p style={{ fontSize: 11, fontWeight: 600, color: palette.primary, margin: 0 }}>Response from business</p>
+                          <p style={{ fontSize: 12, color: palette.secondary, margin: "3px 0 0", lineHeight: 1.5 }}>
+                            {review.owner_response}
+                          </p>
+                        </div>
+                      )}
                     </CardSectionWrapper>
                   ))}
                 </div>
