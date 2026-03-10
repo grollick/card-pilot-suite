@@ -138,7 +138,11 @@ export default function JobPipelinePage() {
         break;
       case "mark_completed":
         if (type === "job") {
-          updateJobStatus.mutate({ id: item.id, status: "completed", lead_id: item.lead_id, job_number: item.job_number });
+          updateJobStatus.mutate({
+            id: item.id, status: "completed", lead_id: item.lead_id,
+            job_number: item.job_number, title: item.title,
+            grandTotal: item.estimates?.grand_total ? Number(item.estimates.grand_total) : 0,
+          });
         } else if (type === "estimate") {
           updateEstimateStatus.mutate({ id: item.id, status: "approved", lead_id: item.lead_id, estimate_number: item.estimate_number });
         }
