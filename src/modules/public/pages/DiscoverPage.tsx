@@ -2,11 +2,12 @@ import { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useMarketplaceListings, useMarketplaceProfessions } from "@/hooks/useMarketplace";
+import { useBoostedUserIds } from "@/hooks/useBoosts";
 import ListingCard from "@/modules/marketplace/components/ListingCard";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, MapPin, Users, Loader2, Briefcase, Crown, Star, TrendingUp } from "lucide-react";
+import { Search, MapPin, Users, Loader2, Briefcase, Crown, Star, TrendingUp, Rocket } from "lucide-react";
 
 const POPULAR_PROFESSIONS = [
   "Barber", "Plumber", "Photographer", "Realtor", "Personal Trainer",
