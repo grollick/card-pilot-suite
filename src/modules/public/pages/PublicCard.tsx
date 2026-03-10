@@ -30,7 +30,7 @@ import { motion } from "framer-motion";
 import { Link, useParams } from "react-router-dom";
 import { usePublicCard, CTA_TYPES, type CardSection } from "@/hooks/useCard";
 import { usePublicReviews } from "@/hooks/useReviews";
-import ReviewForm from "@/components/public/ReviewForm";
+import ReviewForm from "@/modules/public/components/ReviewForm";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { downloadVCard } from "@/lib/vcard";
@@ -39,15 +39,15 @@ import {
   getGoogleFontsUrl,
   type ResolvedCardTheme,
 } from "@/lib/cardTokens";
-import CardHeader from "@/components/card/CardHeader";
-import { getPatternSvg } from "@/components/card/CardThemeEditor";
-import CardButton from "@/components/card/CardButton";
-import CardSectionWrapper from "@/components/card/CardSectionWrapper";
-import QRShareDialog from "@/components/card/QRShareDialog";
-import NFCShareDialog from "@/components/card/NFCShareDialog";
-import WalletPassDialog from "@/components/card/WalletPassDialog";
-import QuoteRequestForm from "@/components/card/QuoteRequestForm";
-import SmartEngagementPopup from "@/components/card/SmartEngagementPopup";
+import CardHeader from "@/modules/card/components/CardHeader";
+import { getPatternSvg } from "@/modules/card/components/CardThemeEditor";
+import CardButton from "@/modules/card/components/CardButton";
+import CardSectionWrapper from "@/modules/card/components/CardSectionWrapper";
+import QRShareDialog from "@/modules/card/components/QRShareDialog";
+import NFCShareDialog from "@/modules/card/components/NFCShareDialog";
+import WalletPassDialog from "@/modules/card/components/WalletPassDialog";
+import QuoteRequestForm from "@/modules/card/components/QuoteRequestForm";
+import SmartEngagementPopup from "@/modules/card/components/SmartEngagementPopup";
 import { showsBranding } from "@/lib/plans";
 
 // ── Visitor meta for analytics ──
