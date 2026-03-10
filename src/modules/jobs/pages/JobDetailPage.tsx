@@ -302,8 +302,8 @@ export default function JobDetailPage() {
         </div>
       </div>
 
-      {/* Quick Note - mobile-friendly */}
-      <div className="dash-card p-3">
+      {/* Quick Note + AI Assistant */}
+      <div className="dash-card p-3 space-y-2">
         <div className="flex gap-2">
           <Input
             value={quickNote}
@@ -314,6 +314,14 @@ export default function JobDetailPage() {
           />
           <Button size="sm" onClick={handleQuickNote} disabled={!quickNote.trim()}>Add</Button>
         </div>
+        <Button
+          variant="outline"
+          className={`gap-2 ${isMobile ? "w-full h-12 text-base" : ""}`}
+          onClick={() => setAssistOpen(true)}
+        >
+          <Sparkles className="h-4 w-4 text-primary" />
+          AI Job Assistant
+        </Button>
       </div>
 
       {/* Tabs */}
