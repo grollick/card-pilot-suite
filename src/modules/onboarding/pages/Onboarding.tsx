@@ -1,18 +1,18 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, ArrowRight, ArrowLeft, Sparkles, Check, Loader2, Pencil, LayoutTemplate } from "lucide-react";
+import {
+  Search, ArrowRight, ArrowLeft, Sparkles, Check, Loader2,
+  Rocket, Eye, Share2, QrCode, LayoutDashboard, Camera, CalendarCheck, FileText, Plus, X, Star
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { pickStylePackKey, getRecommendedPacks, type StylePack } from "@/lib/stylePackSelection";
-import { useGenerateCardContent, type GeneratedCardContent } from "@/hooks/useGenerateContent";
-import { getBestTemplateForProfession, getTemplate } from "@/lib/cardTemplates";
-import TemplateSelector from "@/modules/card/components/TemplateSelector";
+import { pickStylePackKey, type StylePack } from "@/lib/stylePackSelection";
+import { getBestTemplateForProfession, getTemplate, CARD_TEMPLATES, type CardTemplate } from "@/lib/cardTemplates";
 
 interface Profession {
   id: string;
@@ -24,20 +24,6 @@ interface Profession {
   default_email_templates: any;
 }
 
-const ctaOptions = [
-  { id: "call", label: "Call Me", icon: "📞" },
-  { id: "text", label: "Text Me", icon: "💬" },
-  { id: "book", label: "Book Now", icon: "📅" },
-  { id: "quote", label: "Get a Quote", icon: "💰" },
-];
-
-const styleChoices = [
-  { id: "Modern", name: "Modern", desc: "Clean lines, bold colors", preview: "bg-gradient-to-br from-primary/20 to-primary/5" },
-  { id: "Elegant", name: "Elegant", desc: "Refined, sophisticated", preview: "bg-gradient-to-br from-amber-100 to-amber-50" },
-  { id: "Bold", name: "Bold", desc: "Strong, high-contrast", preview: "bg-gradient-to-br from-gray-900 to-gray-700" },
-];
-
-// Category key mapping from display name
 const categoryKeyMap: Record<string, string> = {
   "Sales & Advising": "sales_advising",
   "Home & Trade": "home_trade",
@@ -51,6 +37,63 @@ const categoryKeyMap: Record<string, string> = {
   "Pet & Other Services": "pet_other",
 };
 
+/* ── Mini live card preview ── */
+function LiveCardPreview({ name, company, phone, city, profession }: {
+  name: string; company: string; phone: string; city: string; profession?: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-md">
+      {/* Cover */}
+      <div className="h-20 bg-gradient-to-br from-primary to-accent relative">
+        <div className="absolute -bottom-6 left-4 h-12 w-12 rounded-full bg-card border-2 border-card flex items-center justify-center text-primary font-bold text-lg">
+          {name ? name[0].toUpperCase() : "?"}
+        </div>
+      </div>
+      <div className="pt-8 px-4 pb-4 space-y-1">
+        <p className="font-semibold text-sm text-foreground">{name || "Your Name"}</p>
+        {(company || profession) && (
+          <p className="text-xs text-muted-foreground">{company || profession}</p>
+        )}
+        {city && <p className="text-[11px] text-muted-foreground">📍 {city}</p>}
+        {phone && <p className="text-[11px] text-muted-foreground">📞 {phone}</p>}
+        <div className="pt-2 flex gap-2">
+          <span className="flex-1 text-center py-1.5 rounded-lg bg-primary text-primary-foreground text-[11px] font-medium">Call</span>
+          <span className="flex-1 text-center py-1.5 rounded-lg bg-secondary text-secondary-foreground text-[11px] font-medium">Book</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Template mini card ── */
+function TemplateMiniCard({ template, selected, onSelect }: {
+  template: CardTemplate; selected: boolean; onSelect: () => void;
+}) {
+  const enabledSections = template.sections.filter(s => s.enabled).map(s => s.id);
+  return (
+    <button
+      onClick={onSelect}
+      className={`rounded-xl border p-3 text-left transition-all relative ${
+        selected ? "border-primary bg-primary/5 shadow-md ring-1 ring-primary/20" : "border-border hover:border-primary/30"
+      }`}
+    >
+      {selected && <Check className="absolute top-2 right-2 h-4 w-4 text-primary" />}
+      <p className="text-sm font-semibold mb-0.5">{template.name}</p>
+      <p className="text-[11px] text-muted-foreground mb-2 line-clamp-2">{template.description}</p>
+      <div className="flex flex-wrap gap-1">
+        {enabledSections.slice(0, 5).map(s => (
+          <span key={s} className="px-1.5 py-0.5 rounded bg-muted text-[9px] font-medium text-muted-foreground capitalize">
+            {s.replace(/_/g, " ")}
+          </span>
+        ))}
+        {enabledSections.length > 5 && (
+          <span className="px-1.5 py-0.5 rounded bg-muted text-[9px] text-muted-foreground">+{enabledSections.length - 5}</span>
+        )}
+      </div>
+    </button>
+  );
+}
+
 export default function Onboarding() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -59,18 +102,15 @@ export default function Onboarding() {
   const [step, setStep] = useState(1);
   const [search, setSearch] = useState("");
   const [selectedProfessionId, setSelectedProfessionId] = useState("");
-  const [selectedStyle, setSelectedStyle] = useState("Modern");
-  const [selectedPackKey, setSelectedPackKey] = useState("");
-  const [selectedCTA, setSelectedCTA] = useState("call");
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState(user?.email || "");
   const [city, setCity] = useState("");
   const [saving, setSaving] = useState(false);
-  const { generate, isGenerating, content: aiContent, setContent: setAiContent } = useGenerateCardContent();
-  const [editingField, setEditingField] = useState<string | null>(null);
+  const [launched, setLaunched] = useState(false);
+  const [services, setServices] = useState<string[]>([]);
+  const [newService, setNewService] = useState("");
 
   const { data: professions = [] } = useQuery({
     queryKey: ["professions"],
@@ -78,15 +118,6 @@ export default function Onboarding() {
       const { data, error } = await supabase.from("professions").select("*").order("category").order("name");
       if (error) throw error;
       return data as Profession[];
-    },
-  });
-
-  const { data: stylePacks = [] } = useQuery({
-    queryKey: ["style_packs"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from("style_packs").select("*");
-      if (error) throw error;
-      return data as unknown as StylePack[];
     },
   });
 
@@ -102,40 +133,46 @@ export default function Onboarding() {
 
   const selectedProfession = professions.find(p => p.id === selectedProfessionId);
 
-  // Get category key for selected profession
   const categoryKey = useMemo(() => {
     if (!selectedProfession) return "";
     return categoryKeyMap[selectedProfession.category] || selectedProfession.category.toLowerCase().replace(/[^a-z]+/g, "_");
   }, [selectedProfession]);
 
-  // Filter and sort packs for the chosen style, prioritizing recommended ones
-  const availablePacks = useMemo(() => {
-    const packsForStyle = stylePacks.filter(p => p.style === selectedStyle);
-    if (!categoryKey) return packsForStyle;
+  // When profession selected, auto-pick template and seed services
+  const handleProfessionNext = () => {
+    if (!selectedProfession) return;
+    // Auto-select best template
+    const bestTemplate = getBestTemplateForProfession(selectedProfession.name);
+    setSelectedTemplateId(bestTemplate);
+    // Seed suggested services
+    const defaultServices = (selectedProfession.default_booking_services as any[]) || [];
+    setServices(defaultServices.slice(0, 4).map((s: any) => s.name));
+    setStep(2);
+  };
 
-    const recommended = getRecommendedPacks(selectedStyle, categoryKey);
-    return [...packsForStyle].sort((a, b) => {
-      const aIdx = recommended.indexOf(a.key);
-      const bIdx = recommended.indexOf(b.key);
-      if (aIdx >= 0 && bIdx >= 0) return aIdx - bIdx;
-      if (aIdx >= 0) return -1;
-      if (bIdx >= 0) return 1;
-      return 0;
+  // Sorted templates for step 3
+  const sortedTemplates = useMemo(() => {
+    return [...CARD_TEMPLATES].sort((a, b) => {
+      const aMatch = a.recommendedFor.includes(categoryKey) ? 1 : 0;
+      const bMatch = b.recommendedFor.includes(categoryKey) ? 1 : 0;
+      return bMatch - aMatch;
     });
-  }, [stylePacks, selectedStyle, categoryKey]);
-
-  // Auto-select best pack when style or category changes
-  const autoSelectedPackKey = useMemo(() => {
-    if (!categoryKey) return availablePacks[0]?.key || "";
-    return pickStylePackKey(selectedStyle, categoryKey);
-  }, [selectedStyle, categoryKey, availablePacks]);
-
-  // Use explicit selection or auto
-  const effectivePackKey = selectedPackKey || autoSelectedPackKey;
-  const effectivePack = stylePacks.find(p => p.key === effectivePackKey);
+  }, [categoryKey]);
 
   const generateHandle = (fullName: string) => {
     return fullName.toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 20) + Math.floor(Math.random() * 1000);
+  };
+
+  const addService = () => {
+    const trimmed = newService.trim();
+    if (trimmed && !services.includes(trimmed)) {
+      setServices(prev => [...prev, trimmed]);
+      setNewService("");
+    }
+  };
+
+  const removeService = (idx: number) => {
+    setServices(prev => prev.filter((_, i) => i !== idx));
   };
 
   const handleLaunch = async () => {
@@ -143,7 +180,6 @@ export default function Onboarding() {
     setSaving(true);
 
     try {
-      // Check if this is a re-onboarding (user already completed before)
       const { data: currentProfile } = await supabase
         .from("profiles")
         .select("onboarding_completed")
@@ -152,30 +188,24 @@ export default function Onboarding() {
       const isReOnboarding = currentProfile?.onboarding_completed === true;
 
       const handle = generateHandle(name || user.email || "user");
-      const palette = effectivePack?.default_palettes?.[0] || {};
+      const packKey = pickStylePackKey("Modern", categoryKey);
 
       // 1. Update profile
       const { error: profileErr } = await supabase.from("profiles").update({
         name,
         company: company || null,
         phone: phone || null,
-        email,
+        email: user.email,
+        city: city || null,
         handle,
         profession_id: selectedProfession.id,
-        style_pack: effectivePackKey,
-        primary_cta: selectedCTA,
+        style_pack: packKey,
+        primary_cta: "call",
         onboarding_completed: true,
       }).eq("id", user.id);
       if (profileErr) throw profileErr;
 
-      // 2. Create card with profession defaults + style pack tokens
-      const themeJson = {
-        style_pack: effectivePackKey,
-        primary_cta: selectedCTA,
-        tokens: effectivePack?.theme_tokens || {},
-        palette,
-      };
-      // Use template sections if a template was selected, otherwise profession defaults
+      // 2. Create card
       const selectedTemplate = selectedTemplateId ? getTemplate(selectedTemplateId) : null;
       const sectionsJson = selectedTemplate
         ? selectedTemplate.sections.map(s => ({
@@ -186,64 +216,47 @@ export default function Onboarding() {
         : (selectedProfession.default_card_sections || []);
       const { error: cardErr } = await supabase.from("cards").upsert({
         user_id: user.id,
-        theme_json: themeJson,
+        theme_json: { style_pack: packKey, primary_cta: "call" },
         sections_json: sectionsJson,
         status: "draft",
       }, { onConflict: "user_id" });
       if (cardErr) throw cardErr;
 
-      // 3. Create pipeline stages (only clear on re-onboarding)
+      // 3. Pipeline stages
       if (isReOnboarding) {
         await supabase.from("pipeline_stages").delete().eq("user_id", user.id);
       }
       const stages = (selectedProfession.default_pipeline_stages as string[]) || [];
       if (stages.length > 0) {
-        const stageRows = stages.map((stageName: string, i: number) => ({
-          user_id: user.id,
-          name: stageName,
-          sort_order: i,
-        }));
-        const { error: stagesErr } = await supabase.from("pipeline_stages").insert(stageRows);
-        if (stagesErr) throw stagesErr;
+        await supabase.from("pipeline_stages").insert(
+          stages.map((stageName: string, i: number) => ({ user_id: user.id, name: stageName, sort_order: i }))
+        );
       }
 
-      // 4. Create booking services (only clear on re-onboarding)
+      // 4. Booking services
       if (isReOnboarding) {
         await supabase.from("booking_services").delete().eq("user_id", user.id);
       }
-      const services = (selectedProfession.default_booking_services as any[]) || [];
       if (services.length > 0) {
-        const serviceRows = services.map((s: any) => ({
-          user_id: user.id,
-          name: s.name,
-          duration_min: s.durationMin || s.duration_min || 30,
-          price: s.price ?? null,
-          description: s.description || null,
-          active: true,
-        }));
-        const { error: servicesErr } = await supabase.from("booking_services").insert(serviceRows);
-        if (servicesErr) throw servicesErr;
+        await supabase.from("booking_services").insert(
+          services.map(s => ({ user_id: user.id, name: s, duration_min: 30, active: true }))
+        );
       }
 
-      // 5. Create email templates (only clear on re-onboarding)
+      // 5. Email templates
       if (isReOnboarding) {
         await supabase.from("email_templates").delete().eq("user_id", user.id);
       }
       const templates = (selectedProfession.default_email_templates as any[]) || [];
       if (templates.length > 0) {
-        const templateRows = templates.map((t: any) => ({
-          user_id: user.id,
-          name: t.name,
-          subject: t.subject,
-          body: t.body,
-        }));
-        const { error: templatesErr } = await supabase.from("email_templates").insert(templateRows);
-        if (templatesErr) throw templatesErr;
+        await supabase.from("email_templates").insert(
+          templates.map((t: any) => ({ user_id: user.id, name: t.name, subject: t.subject, body: t.body }))
+        );
       }
 
-      toast({ title: "You're all set! 🎉", description: "Your card and workspace are ready." });
       await queryClient.invalidateQueries({ queryKey: ["profile-onboarding"] });
-      navigate("/app");
+      setLaunched(true);
+      setStep(5);
     } catch (err: any) {
       console.error("Onboarding error:", err);
       toast({ title: "Something went wrong", description: err.message, variant: "destructive" });
@@ -252,42 +265,38 @@ export default function Onboarding() {
     }
   };
 
-  const totalSteps = 6;
-
-  const handleGenerateContent = async () => {
-    if (!selectedProfession) return;
-    setStep(5);
-    await generate({
-      profession: selectedProfession.name,
-      name,
-      company: company || undefined,
-      city: city || undefined,
-    });
-  };
+  const totalSteps = 5;
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-lg">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold gradient-text">CardPilot</h1>
-          <p className="text-sm text-muted-foreground mt-1">The card that automatically follows up with every lead</p>
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-primary)" }}>
+            CardPilot
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">Launch your card in under 2 minutes</p>
         </div>
 
         {/* Progress */}
-        <div className="flex gap-1 mb-6">
-          {[...Array(totalSteps)].map((_, i) => (
-            <div key={i} className={`h-1 flex-1 rounded-full transition-colors ${i < step ? "bg-primary" : "bg-muted"}`} />
-          ))}
-        </div>
+        {step < 5 && (
+          <div className="flex gap-1.5 mb-6">
+            {[...Array(totalSteps)].map((_, i) => (
+              <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
+                i < step ? "bg-primary" : i === step - 1 ? "bg-primary" : "bg-muted"
+              }`} />
+            ))}
+          </div>
+        )}
 
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
+        <div className={`rounded-2xl border border-border bg-card shadow-lg ${step === 5 ? "p-8" : "p-6"}`}>
           <AnimatePresence mode="wait">
-            {/* Step 1: Profession */}
+            {/* ── Step 1: Profession ── */}
             {step === 1 && (
               <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold">What do you do?</h2>
-                  <p className="text-sm text-muted-foreground">Choose your profession</p>
+                  <p className="text-sm text-muted-foreground">We'll customize everything for your profession</p>
                 </div>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -297,11 +306,13 @@ export default function Onboarding() {
                   {Object.entries(byCategory).map(([cat, profs]) => (
                     <div key={cat}>
                       <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">{cat}</p>
-                      <div className="space-y-1">
+                      <div className="space-y-0.5">
                         {profs.map(p => (
                           <button key={p.id} onClick={() => setSelectedProfessionId(p.id)}
                             className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all ${
-                              selectedProfessionId === p.id ? "bg-primary/10 text-primary font-medium border border-primary/20" : "hover:bg-muted"
+                              selectedProfessionId === p.id
+                                ? "bg-primary/10 text-primary font-medium border border-primary/20"
+                                : "hover:bg-muted"
                             }`}>
                             {p.name}
                           </button>
@@ -310,232 +321,234 @@ export default function Onboarding() {
                     </div>
                   ))}
                 </div>
-                <Button onClick={() => setStep(2)} disabled={!selectedProfessionId} className="w-full">
+                <Button onClick={handleProfessionNext} disabled={!selectedProfessionId} className="w-full">
                   Continue <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               </motion.div>
             )}
 
-            {/* Step 2: Style + Pack */}
+            {/* ── Step 2: Business Info + Live Preview ── */}
             {step === 2 && (
               <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
-                  <h2 className="text-lg font-semibold">Choose your style</h2>
-                  <p className="text-sm text-muted-foreground">Pick a vibe, then a theme</p>
+                  <h2 className="text-lg font-semibold">Your business info</h2>
+                  <p className="text-sm text-muted-foreground">This appears on your card</p>
                 </div>
 
-                {/* Style selector */}
-                <div className="grid grid-cols-3 gap-3">
-                  {styleChoices.map(s => (
-                    <button key={s.id} onClick={() => { setSelectedStyle(s.id); setSelectedPackKey(""); }}
-                      className={`rounded-xl border p-3 text-center transition-all ${
-                        selectedStyle === s.id ? "border-primary shadow-glow" : "border-border hover:border-primary/30"
-                      }`}>
-                      <div className={`h-12 rounded-lg mb-2 ${s.preview}`} />
-                      <p className="text-xs font-semibold">{s.name}</p>
-                      <p className="text-[10px] text-muted-foreground">{s.desc}</p>
-                    </button>
-                  ))}
-                </div>
+                {/* Live preview */}
+                <LiveCardPreview name={name} company={company} phone={phone} city={city} profession={selectedProfession?.name} />
 
-                {/* Pack sub-selection */}
-                {availablePacks.length > 0 && (
-                  <div className="space-y-2">
-                    <p className="text-xs font-medium text-muted-foreground">Theme variant</p>
-                    <div className="grid grid-cols-2 gap-2">
-                      {availablePacks.map((pack, i) => {
-                        const palette = (pack.default_palettes as any[])?.[0];
-                        const isSelected = effectivePackKey === pack.key;
-                        const isRecommended = i === 0;
-                        return (
-                          <button key={pack.key} onClick={() => setSelectedPackKey(pack.key)}
-                            className={`relative rounded-xl border p-3 text-left transition-all ${
-                              isSelected ? "border-primary bg-primary/5 shadow-glow" : "border-border hover:border-primary/30"
-                            }`}>
-                            {isRecommended && (
-                              <span className="absolute -top-2 right-2 text-[9px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full font-semibold">
-                                Best fit
-                              </span>
-                            )}
-                            {/* Color preview */}
-                            <div className="flex gap-1 mb-2">
-                              {palette && (
-                                <>
-                                  <div className="h-6 w-6 rounded-full border border-border" style={{ background: palette.primary }} />
-                                  <div className="h-6 w-6 rounded-full border border-border" style={{ background: palette.accent }} />
-                                  <div className="h-6 w-6 rounded-full border border-border" style={{ background: palette.background }} />
-                                </>
-                              )}
-                            </div>
-                            <p className="text-xs font-semibold">{pack.name}</p>
-                            {isSelected && <Check className="absolute top-3 right-3 h-3.5 w-3.5 text-primary" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
+                <div className="space-y-3">
+                  <Input placeholder="Full name *" value={name} onChange={e => setName(e.target.value)} />
+                  <Input placeholder="Business name (optional)" value={company} onChange={e => setCompany(e.target.value)} />
+                  <Input placeholder="Phone number" value={phone} onChange={e => setPhone(e.target.value)} />
+                  <Input placeholder="City / Location" value={city} onChange={e => setCity(e.target.value)} />
+                </div>
 
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(1)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
-                  <Button onClick={() => setStep(3)} className="flex-1">Continue <ArrowRight className="h-4 w-4 ml-1" /></Button>
+                  <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
+                    <ArrowLeft className="h-4 w-4 mr-1" /> Back
+                  </Button>
+                  <Button onClick={() => setStep(3)} disabled={!name} className="flex-1">
+                    Continue <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
                 </div>
               </motion.div>
             )}
 
-            {/* Step 3: Template Selection */}
+            {/* ── Step 3: Template Selection ── */}
             {step === 3 && (
               <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
-                  <h2 className="text-lg font-semibold flex items-center gap-2">
-                    <LayoutTemplate className="h-5 w-5 text-primary" /> Choose a template
-                  </h2>
-                  <p className="text-sm text-muted-foreground">Pick a layout optimized for your profession</p>
+                  <h2 className="text-lg font-semibold">Choose a layout</h2>
+                  <p className="text-sm text-muted-foreground">Pick the template that fits your business</p>
                 </div>
-                <div className="max-h-80 overflow-y-auto pr-1">
-                  <TemplateSelector
-                    selectedTemplateId={selectedTemplateId}
-                    onSelect={setSelectedTemplateId}
-                    professionName={selectedProfession?.name}
-                    professionCategoryKey={categoryKey}
-                    compact
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(2)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
-                  <Button onClick={() => setStep(4)} className="flex-1">Continue <ArrowRight className="h-4 w-4 ml-1" /></Button>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Step 4: Essentials */}
-            {step === 4 && (
-              <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-                <div>
-                  <h2 className="text-lg font-semibold">The essentials</h2>
-                  <p className="text-sm text-muted-foreground">Add your basic info</p>
-                </div>
-                <Input placeholder="Full name" value={name} onChange={e => setName(e.target.value)} />
-                <Input placeholder="Company (optional)" value={company} onChange={e => setCompany(e.target.value)} />
-                <Input placeholder="City / Location (optional)" value={city} onChange={e => setCity(e.target.value)} />
-                <Input placeholder="Phone number" value={phone} onChange={e => setPhone(e.target.value)} />
-                <Input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(3)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
-                  <Button onClick={handleGenerateContent} className="flex-1" disabled={!name}>
-                    <Sparkles className="h-4 w-4 mr-1" /> Generate Card <ArrowRight className="h-4 w-4 ml-1" />
-                  </Button>
-                </div>
-              </motion.div>
-            )}
-
-            {/* Step 5: AI-Generated Content Review */}
-            {step === 5 && (
-              <motion.div key="s5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-                <div>
-                  <h2 className="text-lg font-semibold flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-primary" /> AI-Generated Content
-                  </h2>
-                  <p className="text-sm text-muted-foreground">Review and edit your card copy</p>
-                </div>
-
-                {isGenerating ? (
-                  <div className="flex flex-col items-center justify-center py-12 gap-3">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    <p className="text-sm text-muted-foreground">Writing your card content...</p>
-                  </div>
-                ) : aiContent ? (
-                  <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
-                    {([
-                      { key: "tagline", label: "Tagline" },
-                      { key: "bio", label: "Bio" },
-                      { key: "about", label: "About" },
-                      { key: "cta_text", label: "Call to Action" },
-                      { key: "instagram_bio", label: "Social Bio" },
-                    ] as const).map(({ key, label }) => (
-                      <div key={key} className="rounded-lg border border-border/50 p-3">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
-                          <button onClick={() => setEditingField(editingField === key ? null : key)}
-                            className="text-muted-foreground hover:text-foreground">
-                            <Pencil className="h-3 w-3" />
-                          </button>
-                        </div>
-                        {editingField === key ? (
-                          <Textarea
-                            value={aiContent[key]}
-                            onChange={e => setAiContent({ ...aiContent, [key]: e.target.value })}
-                            className="min-h-[40px] text-sm"
-                            autoFocus
-                          />
-                        ) : (
-                          <p className="text-sm">{aiContent[key]}</p>
-                        )}
-                      </div>
-                    ))}
-
-                    {/* Services */}
-                    <div className="rounded-lg border border-border/50 p-3">
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Services</span>
-                      <div className="flex flex-wrap gap-1.5 mt-1.5">
-                        {aiContent.services.map((s, i) => (
-                          <span key={i} className="px-2 py-1 rounded-md bg-primary/10 text-primary text-xs font-medium">{s}</span>
-                        ))}
-                      </div>
+                <div className="grid grid-cols-2 gap-3 max-h-80 overflow-y-auto pr-1">
+                  {sortedTemplates.map((t, i) => (
+                    <div key={t.id} className="relative">
+                      {i === 0 && (
+                        <span className="absolute -top-2 left-2 z-10 text-[9px] bg-primary text-primary-foreground px-2 py-0.5 rounded-full font-semibold flex items-center gap-1">
+                          <Star className="h-2.5 w-2.5" /> Recommended
+                        </span>
+                      )}
+                      <TemplateMiniCard
+                        template={t}
+                        selected={selectedTemplateId === t.id}
+                        onSelect={() => setSelectedTemplateId(t.id)}
+                      />
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <p className="text-sm text-muted-foreground mb-3">Content generation failed</p>
-                    <Button variant="outline" size="sm" onClick={handleGenerateContent}>
-                      <Sparkles className="h-4 w-4 mr-1" /> Try Again
-                    </Button>
-                  </div>
-                )}
-
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(4)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
-                  <Button onClick={() => setStep(6)} className="flex-1" disabled={isGenerating || !aiContent}>
-                    Looks Great <ArrowRight className="h-4 w-4 ml-1" />
-                  </Button>
-                </div>
-
-                {aiContent && (
-                  <Button variant="ghost" size="sm" className="w-full text-xs" onClick={handleGenerateContent} disabled={isGenerating}>
-                    <Sparkles className="h-3 w-3 mr-1" /> Regenerate
-                  </Button>
-                )}
-              </motion.div>
-            )}
-
-            {/* Step 6: CTA */}
-            {step === 6 && (
-              <motion.div key="s6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
-                <div>
-                  <h2 className="text-lg font-semibold">Primary action</h2>
-                  <p className="text-sm text-muted-foreground">What should visitors do first?</p>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  {ctaOptions.map(c => (
-                    <button key={c.id} onClick={() => setSelectedCTA(c.id)}
-                      className={`p-4 rounded-xl border text-center transition-all ${
-                        selectedCTA === c.id ? "border-primary bg-primary/5 shadow-glow" : "border-border hover:border-primary/30"
-                      }`}>
-                      <span className="text-2xl mb-1 block">{c.icon}</span>
-                      <p className="text-sm font-medium">{c.label}</p>
-                    </button>
                   ))}
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(5)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
-                  <Button onClick={handleLaunch} disabled={saving} className="flex-1 shadow-glow">
+                  <Button variant="outline" onClick={() => setStep(2)} className="flex-1">
+                    <ArrowLeft className="h-4 w-4 mr-1" /> Back
+                  </Button>
+                  <Button onClick={() => setStep(4)} className="flex-1">
+                    Continue <ArrowRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── Step 4: Services ── */}
+            {step === 4 && (
+              <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                <div>
+                  <h2 className="text-lg font-semibold">Your services</h2>
+                  <p className="text-sm text-muted-foreground">Add a few services you offer — you can edit later</p>
+                </div>
+
+                {/* Service chips */}
+                <div className="flex flex-wrap gap-2 min-h-[40px]">
+                  {services.map((s, i) => (
+                    <motion.span
+                      key={s}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium"
+                    >
+                      {s}
+                      <button onClick={() => removeService(i)} className="hover:text-destructive transition-colors">
+                        <X className="h-3 w-3" />
+                      </button>
+                    </motion.span>
+                  ))}
+                  {services.length === 0 && (
+                    <p className="text-sm text-muted-foreground italic">No services added yet</p>
+                  )}
+                </div>
+
+                {/* Add new */}
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Add a service..."
+                    value={newService}
+                    onChange={e => setNewService(e.target.value)}
+                    onKeyDown={e => e.key === "Enter" && addService()}
+                  />
+                  <Button variant="outline" size="icon" onClick={addService} disabled={!newService.trim()}>
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                {/* Suggested services from profession */}
+                {selectedProfession && (() => {
+                  const defaults = (selectedProfession.default_booking_services as any[]) || [];
+                  const suggestions = defaults.map((s: any) => s.name).filter((s: string) => !services.includes(s));
+                  if (suggestions.length === 0) return null;
+                  return (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground font-medium">Suggested for {selectedProfession.name}:</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {suggestions.slice(0, 6).map((s: string) => (
+                          <button key={s} onClick={() => setServices(prev => [...prev, s])}
+                            className="px-2.5 py-1 rounded-full border border-dashed border-primary/30 text-xs text-primary hover:bg-primary/5 transition-colors">
+                            + {s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setStep(3)} className="flex-1">
+                    <ArrowLeft className="h-4 w-4 mr-1" /> Back
+                  </Button>
+                  <Button onClick={handleLaunch} disabled={saving} className="flex-1">
                     {saving ? (
-                      <div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full" />
+                      <Loader2 className="h-4 w-4 animate-spin" />
                     ) : (
-                      <><Sparkles className="h-4 w-4 mr-1" /> Launch My Card</>
+                      <><Rocket className="h-4 w-4 mr-1" /> Launch My Card</>
                     )}
                   </Button>
                 </div>
+              </motion.div>
+            )}
+
+            {/* ── Step 5: Launch Celebration ── */}
+            {step === 5 && launched && (
+              <motion.div key="s5" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center space-y-6">
+                {/* Celebration */}
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 12, delay: 0.1 }}
+                  className="mx-auto h-20 w-20 rounded-full flex items-center justify-center text-4xl"
+                  style={{ background: "var(--gradient-primary)" }}
+                >
+                  🎉
+                </motion.div>
+
+                <div>
+                  <motion.h2
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="text-xl font-bold"
+                  >
+                    Your card is live!
+                  </motion.h2>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-sm text-muted-foreground mt-1"
+                  >
+                    You're ready to start capturing leads
+                  </motion.p>
+                </div>
+
+                {/* Action buttons */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6 }}
+                  className="grid grid-cols-2 gap-3"
+                >
+                  <Button onClick={() => navigate("/app/card")} className="gap-2">
+                    <Eye className="h-4 w-4" /> View Card
+                  </Button>
+                  <Button variant="outline" onClick={() => {
+                    navigator.clipboard.writeText(window.location.origin + "/c/" + (name || "").toLowerCase().replace(/[^a-z0-9]+/g, ""));
+                    toast({ title: "Link copied!" });
+                  }} className="gap-2">
+                    <Share2 className="h-4 w-4" /> Share Link
+                  </Button>
+                  <Button variant="outline" onClick={() => navigate("/app/card")} className="gap-2">
+                    <QrCode className="h-4 w-4" /> QR Code
+                  </Button>
+                  <Button variant="outline" onClick={() => navigate("/app")} className="gap-2">
+                    <LayoutDashboard className="h-4 w-4" /> Dashboard
+                  </Button>
+                </motion.div>
+
+                {/* Optional next steps */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.9 }}
+                  className="pt-4 border-t border-border"
+                >
+                  <p className="text-xs font-medium text-muted-foreground mb-3">Optional: Make it even better</p>
+                  <div className="flex flex-col gap-2">
+                    {[
+                      { icon: Camera, label: "Add photos to your card", path: "/app/card" },
+                      { icon: CalendarCheck, label: "Enable online booking", path: "/app/bookings" },
+                      { icon: FileText, label: "Create your first estimate", path: "/app/estimates" },
+                    ].map(({ icon: Icon, label, path }) => (
+                      <button
+                        key={label}
+                        onClick={() => navigate(path)}
+                        className="flex items-center gap-3 px-4 py-2.5 rounded-lg border border-border hover:bg-muted/50 transition-colors text-left"
+                      >
+                        <Icon className="h-4 w-4 text-primary shrink-0" />
+                        <span className="text-sm">{label}</span>
+                        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground ml-auto" />
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
