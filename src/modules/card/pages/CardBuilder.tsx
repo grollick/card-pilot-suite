@@ -564,6 +564,13 @@ export default function CardBuilder() {
         sectionTargets={s.sections.map((sec) => ({ id: sec.id, label: sec.label, enabled: sec.enabled }))}
         onCopyToSection={s.handleCopyToSection}
       />
+
+      <PhotoImportDialog
+        open={photoImportOpen}
+        onOpenChange={setPhotoImportOpen}
+        profession={s.professionName}
+        onImportComplete={handlePhotoImport}
+      />
     </div>
   );
 }
