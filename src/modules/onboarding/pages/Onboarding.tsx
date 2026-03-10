@@ -383,9 +383,34 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* Step 3: Essentials */}
+            {/* Step 3: Template Selection */}
             {step === 3 && (
               <motion.div key="s3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+                <div>
+                  <h2 className="text-lg font-semibold flex items-center gap-2">
+                    <LayoutTemplate className="h-5 w-5 text-primary" /> Choose a template
+                  </h2>
+                  <p className="text-sm text-muted-foreground">Pick a layout optimized for your profession</p>
+                </div>
+                <div className="max-h-80 overflow-y-auto pr-1">
+                  <TemplateSelector
+                    selectedTemplateId={selectedTemplateId}
+                    onSelect={setSelectedTemplateId}
+                    professionName={selectedProfession?.name}
+                    professionCategoryKey={categoryKey}
+                    compact
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setStep(2)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
+                  <Button onClick={() => setStep(4)} className="flex-1">Continue <ArrowRight className="h-4 w-4 ml-1" /></Button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Step 4: Essentials */}
+            {step === 4 && (
+              <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold">The essentials</h2>
                   <p className="text-sm text-muted-foreground">Add your basic info</p>
@@ -396,7 +421,7 @@ export default function Onboarding() {
                 <Input placeholder="Phone number" value={phone} onChange={e => setPhone(e.target.value)} />
                 <Input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(2)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
+                  <Button variant="outline" onClick={() => setStep(3)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
                   <Button onClick={handleGenerateContent} className="flex-1" disabled={!name}>
                     <Sparkles className="h-4 w-4 mr-1" /> Generate Card <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
@@ -404,9 +429,9 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* Step 4: AI-Generated Content Review */}
-            {step === 4 && (
-              <motion.div key="s4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+            {/* Step 5: AI-Generated Content Review */}
+            {step === 5 && (
+              <motion.div key="s5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-primary" /> AI-Generated Content
@@ -469,8 +494,8 @@ export default function Onboarding() {
                 )}
 
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(3)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
-                  <Button onClick={() => setStep(5)} className="flex-1" disabled={isGenerating || !aiContent}>
+                  <Button variant="outline" onClick={() => setStep(4)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
+                  <Button onClick={() => setStep(6)} className="flex-1" disabled={isGenerating || !aiContent}>
                     Looks Great <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
                 </div>
@@ -483,9 +508,9 @@ export default function Onboarding() {
               </motion.div>
             )}
 
-            {/* Step 5: CTA */}
-            {step === 5 && (
-              <motion.div key="s5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
+            {/* Step 6: CTA */}
+            {step === 6 && (
+              <motion.div key="s6" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                 <div>
                   <h2 className="text-lg font-semibold">Primary action</h2>
                   <p className="text-sm text-muted-foreground">What should visitors do first?</p>
@@ -502,7 +527,7 @@ export default function Onboarding() {
                   ))}
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setStep(4)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
+                  <Button variant="outline" onClick={() => setStep(5)} className="flex-1"><ArrowLeft className="h-4 w-4 mr-1" /> Back</Button>
                   <Button onClick={handleLaunch} disabled={saving} className="flex-1 shadow-glow">
                     {saving ? (
                       <div className="animate-spin h-4 w-4 border-2 border-primary-foreground border-t-transparent rounded-full" />
