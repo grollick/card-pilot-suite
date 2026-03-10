@@ -37,6 +37,7 @@ interface AISetup {
   bio: string;
   about: string;
   cta_text: string;
+  marketplace_summary: string;
   services: AIService[];
   suggested_template: string;
   setup_tips: string[];
