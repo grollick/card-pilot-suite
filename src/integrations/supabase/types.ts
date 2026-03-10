@@ -1939,6 +1939,8 @@ export type Database = {
           created_at: string
           id: string
           org_id: string | null
+          platform_avatar_url: string | null
+          platform_username: string | null
           provider: string
           user_id: string
         }
@@ -1948,6 +1950,8 @@ export type Database = {
           created_at?: string
           id?: string
           org_id?: string | null
+          platform_avatar_url?: string | null
+          platform_username?: string | null
           provider: string
           user_id: string
         }
@@ -1957,6 +1961,8 @@ export type Database = {
           created_at?: string
           id?: string
           org_id?: string | null
+          platform_avatar_url?: string | null
+          platform_username?: string | null
           provider?: string
           user_id?: string
         }
@@ -1970,47 +1976,113 @@ export type Database = {
           },
         ]
       }
+      social_campaigns: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          org_id: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          org_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          org_id?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_campaigns_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       social_posts: {
         Row: {
+          approval_status: string | null
+          campaign_id: string | null
           content: string
+          content_label: string | null
           created_at: string
           id: string
           lead_id: string | null
           media_urls: string[] | null
           org_id: string | null
+          platform_overrides: Json | null
           platforms_json: Json
+          queue_position: number | null
           scheduled_at: string | null
           status: Database["public"]["Enums"]["social_post_status"]
           updated_at: string
           user_id: string
         }
         Insert: {
+          approval_status?: string | null
+          campaign_id?: string | null
           content: string
+          content_label?: string | null
           created_at?: string
           id?: string
           lead_id?: string | null
           media_urls?: string[] | null
           org_id?: string | null
+          platform_overrides?: Json | null
           platforms_json?: Json
+          queue_position?: number | null
           scheduled_at?: string | null
           status?: Database["public"]["Enums"]["social_post_status"]
           updated_at?: string
           user_id: string
         }
         Update: {
+          approval_status?: string | null
+          campaign_id?: string | null
           content?: string
+          content_label?: string | null
           created_at?: string
           id?: string
           lead_id?: string | null
           media_urls?: string[] | null
           org_id?: string | null
+          platform_overrides?: Json | null
           platforms_json?: Json
+          queue_position?: number | null
           scheduled_at?: string | null
           status?: Database["public"]["Enums"]["social_post_status"]
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "social_posts_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "social_campaigns"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "social_posts_lead_id_fkey"
             columns: ["lead_id"]
@@ -2023,6 +2095,47 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_queue_slots: {
+        Row: {
+          account_id: string | null
+          created_at: string | null
+          day_of_week: number
+          enabled: boolean | null
+          id: string
+          platform: string
+          time_slot: string
+          user_id: string
+        }
+        Insert: {
+          account_id?: string | null
+          created_at?: string | null
+          day_of_week: number
+          enabled?: boolean | null
+          id?: string
+          platform: string
+          time_slot: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string | null
+          created_at?: string | null
+          day_of_week?: number
+          enabled?: boolean | null
+          id?: string
+          platform?: string
+          time_slot?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "social_queue_slots_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "social_accounts"
             referencedColumns: ["id"]
           },
         ]
