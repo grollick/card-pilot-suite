@@ -75,6 +75,7 @@ const ReviewsPage = lazy(() => import("@/modules/marketplace/pages/ReviewsPage")
 
 // AI Assistant
 const AssistantPage = lazy(() => import("@/modules/assistant/pages/AssistantPage"));
+const AgencyDashboard = lazy(() => import("@/modules/agency/pages/AgencyDashboard"));
 
 // Settings
 const SettingsPage = lazy(() => import("@/modules/settings/pages/SettingsPage"));
