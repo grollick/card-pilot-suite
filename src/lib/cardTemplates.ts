@@ -254,6 +254,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     style: "Modern",
     sections: [
       { id: "hero", enabled: true },
+      { id: "projects", enabled: true },
       { id: "gallery", enabled: true },
       { id: "services", enabled: true },
       { id: "quote_request", enabled: true },
