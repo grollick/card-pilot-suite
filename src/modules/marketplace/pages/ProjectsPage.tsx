@@ -224,11 +224,20 @@ export default function ProjectsPage() {
                   </div>
                 )}
                 <div className="flex items-center gap-1 pt-2 border-t border-border">
-                  <Button variant="ghost" size="sm" className="text-xs gap-1 flex-1" onClick={() => handleShare(project)}>
-                    <ExternalLink className="h-3 w-3" /> Share
+                  <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => handleShare(project)} title="Copy link">
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => shareToFacebook(project)} title="Share to Facebook">
+                    <Facebook className="h-3 w-3" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => shareToLinkedIn(project)} title="Share to LinkedIn">
+                    <Linkedin className="h-3 w-3" />
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => shareToTwitter(project)} title="Share to X">
+                    <Twitter className="h-3 w-3" />
                   </Button>
                   <Button variant="ghost" size="sm" className="text-xs gap-1 flex-1" onClick={() => generateSocialPost(project)}>
-                    <Share2 className="h-3 w-3" /> Social Post
+                    <Share2 className="h-3 w-3" /> Post
                   </Button>
                   <Button variant="ghost" size="sm" className="text-xs text-destructive hover:text-destructive" onClick={() => { deleteProject.mutate(project.id); toast.success("Project deleted"); }}>
                     <Trash2 className="h-3 w-3" />
