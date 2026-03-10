@@ -54,7 +54,8 @@ export default function DiscoverPage() {
   }, [listings]);
 
   const featuredListings = useMemo(() => listings?.filter((l) => l.featured) ?? [], [listings]);
-  const regularListings = useMemo(() => listings?.filter((l) => !l.featured) ?? [], [listings]);
+  const boostedListings = useMemo(() => listings?.filter((l) => !l.featured && boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
+  const regularListings = useMemo(() => listings?.filter((l) => !l.featured && !boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
 
   return (
     <div className="min-h-screen bg-background">
