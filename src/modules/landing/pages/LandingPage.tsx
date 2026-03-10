@@ -20,7 +20,7 @@ import InstantCardGenerator from "@/modules/landing/components/InstantCardGenera
 import LeadMagnetSection from "@/modules/landing/components/LeadMagnetSection";
 
 export default function Index() {
-  const visiblePlans = PLAN_TIERS.filter((p) => p.key !== "agency");
+  const visiblePlans = [...PLAN_TIERS];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
