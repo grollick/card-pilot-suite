@@ -68,6 +68,7 @@ const QRCampaignsPage = lazy(() => import("@/modules/marketing/pages/QRCampaigns
 const Analytics = lazy(() => import("@/modules/analytics/pages/Analytics"));
 const CardViewersPage = lazy(() => import("@/modules/analytics/pages/CardViewersPage"));
 const RevenueForecast = lazy(() => import("@/modules/analytics/pages/RevenueForecast"));
+const IndustryInsightsPage = lazy(() => import("@/modules/analytics/pages/IndustryInsightsPage"));
 
 // Marketplace
 const ProjectsPage = lazy(() => import("@/modules/marketplace/pages/ProjectsPage"));
