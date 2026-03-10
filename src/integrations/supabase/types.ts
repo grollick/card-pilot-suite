@@ -1431,12 +1431,14 @@ export type Database = {
           current_org_id: string | null
           daily_report_enabled: boolean
           email: string | null
+          featured: boolean
           followup_body: string | null
           followup_delay_minutes: number
           followup_enabled: boolean
           followup_subject: string | null
           handle: string | null
           id: string
+          marketplace_enabled: boolean
           name: string | null
           onboarding_completed: boolean
           phone: string | null
@@ -1445,6 +1447,7 @@ export type Database = {
           profession_id: string | null
           referral_code: string | null
           referred_by: string | null
+          service_area: string | null
           style_pack: string | null
           updated_at: string
         }
@@ -1457,12 +1460,14 @@ export type Database = {
           current_org_id?: string | null
           daily_report_enabled?: boolean
           email?: string | null
+          featured?: boolean
           followup_body?: string | null
           followup_delay_minutes?: number
           followup_enabled?: boolean
           followup_subject?: string | null
           handle?: string | null
           id: string
+          marketplace_enabled?: boolean
           name?: string | null
           onboarding_completed?: boolean
           phone?: string | null
@@ -1471,6 +1476,7 @@ export type Database = {
           profession_id?: string | null
           referral_code?: string | null
           referred_by?: string | null
+          service_area?: string | null
           style_pack?: string | null
           updated_at?: string
         }
@@ -1483,12 +1489,14 @@ export type Database = {
           current_org_id?: string | null
           daily_report_enabled?: boolean
           email?: string | null
+          featured?: boolean
           followup_body?: string | null
           followup_delay_minutes?: number
           followup_enabled?: boolean
           followup_subject?: string | null
           handle?: string | null
           id?: string
+          marketplace_enabled?: boolean
           name?: string | null
           onboarding_completed?: boolean
           phone?: string | null
@@ -1497,6 +1505,7 @@ export type Database = {
           profession_id?: string | null
           referral_code?: string | null
           referred_by?: string | null
+          service_area?: string | null
           style_pack?: string | null
           updated_at?: string
         }
