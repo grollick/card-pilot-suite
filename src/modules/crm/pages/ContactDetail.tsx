@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
   ArrowLeft, Phone, Mail, Calendar, FileText, MessageSquare,
-  Plus, Loader2, ChevronDown, Trash2, MoreHorizontal, Clock, Send, X, CheckCircle2, RotateCcw
+  Plus, Loader2, ChevronDown, Trash2, MoreHorizontal, Clock, Send, X, CheckCircle2, RotateCcw, ExternalLink
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import { useContact, useContactActivities, useContactTasks, useContactBookings, useContactFollowups, useContactFollowupHistory } from "@/hooks/useContactDetail";
 import { useLogActivity, useReactivateFollowups, useCancelFollowup } from "@/hooks/useContactActions";
 import { useCreateTask, useUpdateTask } from "@/hooks/useTasks";
+import { useCreatePortalToken } from "@/hooks/useClientPortal";
 import { toast } from "sonner";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle
