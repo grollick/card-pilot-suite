@@ -32,6 +32,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import MobileQuickActions from "@/modules/jobs/components/MobileQuickActions";
 import SignaturePad from "@/modules/jobs/components/SignaturePad";
 import JobSummaryDialog from "@/modules/jobs/components/JobSummaryDialog";
+import TechAssistantSheet from "@/modules/jobs/components/TechAssistantSheet";
 
 const STATUS_FLOW: Record<JobStatus, { next: JobStatus; label: string; icon: typeof Play; variant: "default" | "outline" | "destructive" }[]> = {
   draft: [{ next: "scheduled", label: "Schedule Job", icon: Play, variant: "default" }],
