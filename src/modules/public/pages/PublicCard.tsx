@@ -627,50 +627,145 @@ export default function PublicCard() {
         {/* Promotion Banner */}
         <PromoBanner userId={profile.id} palette={palette} fonts={fonts} />
         {/* ── Header ── */}
-        {enabledSections.has("hero") && (
-          <div style={{ position: "relative", zIndex: 2 }}>
-          <CardHeader
-            theme={theme}
-            name={profile.name || "Your Name"}
-            boldLastName={themeJson.bold_last_name === true}
-            uppercaseName={themeJson.uppercase_name === true}
-            nameLetterSpacing={typeof themeJson.name_letter_spacing === "number" ? themeJson.name_letter_spacing : 0}
-            nameFontWeight={typeof themeJson.name_font_weight === "number" ? themeJson.name_font_weight : 700}
-            firstNameFontWeight={typeof themeJson.first_name_font_weight === "number" ? themeJson.first_name_font_weight : null}
-            nameItalic={themeJson.name_italic === true}
-            nameFontSize={typeof themeJson.name_font_size === "number" ? themeJson.name_font_size : null}
-            subtitleFontSize={typeof themeJson.subtitle_font_size === "number" ? themeJson.subtitle_font_size : null}
-            profession={displayJobTitle}
-            company={profile.company ?? undefined}
-            avatarUrl={profile.avatar_url}
-            coverUrl={coverUrl}
-            avatarBgColor={themeJson.avatar_bg_color as string | undefined}
-            avatarRotation={themeJson.avatar_rotation as number | undefined}
-            avatarBorderWidth={(themeJson.tokens as any)?.header?.avatarBorderWidth ?? 3}
-            avatarSize={(themeJson.tokens as any)?.header?.avatarSize ?? 80}
-            avatarBannerText={(themeJson.tokens as any)?.header?.avatarBannerText ?? ""}
-            avatarBannerBg={(themeJson.tokens as any)?.header?.avatarBannerBg ?? ""}
-            avatarBannerPosition={(themeJson.tokens as any)?.header?.avatarBannerPosition ?? "bottom"}
-            avatarBannerAnimation={(themeJson.tokens as any)?.header?.avatarBannerAnimation ?? "none"}
-            coverOffsetY={themeJson.cover_offset_y as number | undefined}
-            logoUrl={themeJson.logo_url as string | undefined}
-            logoFrostedBg={themeJson.logo_frosted_bg !== false}
-            logoGlow={themeJson.logo_glow === true}
-            logoPosition={(themeJson.logo_position as any) ?? "top-right"}
-            logoSize={(themeJson.logo_size as any) ?? "medium"}
-            logoOpacity={typeof themeJson.logo_opacity === "number" ? (themeJson.logo_opacity as number) : 100}
-            logoPadding={typeof themeJson.logo_padding === "number" ? (themeJson.logo_padding as number) : 4}
-            logoNameGap={typeof themeJson.logo_name_gap === "number" ? (themeJson.logo_name_gap as number) : 8}
-            logoVerticalAlign={(themeJson.logo_vertical_align as any) ?? "center"}
-            metallicEffect={metallicEffect}
-            heroBackground={resolvedHeroBackground}
-          />
-          </div>
-        )}
+        {enabledSections.has("hero") && (() => {
+          const isHeroLayout = theme.header.layout === "hero";
+          
+          // Build inline CTA buttons for immersive hero layout
+          const heroCtaButtons = isHeroLayout && primaryCtaItem ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {ctaIconsOnly ? (
+                <div style={{ display: "flex", justifyContent: "center", gap: 12 }}>
+                  {enabledCtas.map((ctaItem) => (
+                    <motion.button
+                      key={ctaItem.id}
+                      onClick={() => handleCtaClick(ctaItem.id)}
+                      title={ctaItem.label}
+                      whileHover={{ scale: 1.1, boxShadow: "0 4px 16px -2px rgba(255,255,255,0.3)" }}
+                      whileTap={{ scale: 0.92 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        background: ctaItem.isPrimary ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.15)",
+                        color: ctaItem.isPrimary ? palette.primary : "#FFFFFF",
+                        border: ctaItem.isPrimary ? "none" : "1.5px solid rgba(255,255,255,0.3)",
+                        backdropFilter: "blur(8px)",
+                      }}
+                    >
+                      {CTA_ICONS[ctaItem.id]}
+                    </motion.button>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  <button
+                    onClick={() => handleCtaClick(primaryCta)}
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 8,
+                      padding: "12px 24px",
+                      borderRadius: theme.button.shape === "pill" ? 9999 : theme.radii.button,
+                      background: "rgba(255,255,255,0.95)",
+                      color: palette.primary,
+                      border: "none",
+                      fontWeight: 600,
+                      fontSize: 14,
+                      fontFamily: `'${fonts.secondary}', sans-serif`,
+                      cursor: "pointer",
+                      boxShadow: "0 2px 12px rgba(0,0,0,0.15)",
+                    }}
+                  >
+                    {CTA_ICONS[primaryCta]}
+                    <span>{primaryCtaItem.label}</span>
+                  </button>
+                  {secondaryCtaItems.length > 0 && (
+                    <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(secondaryCtaItems.length, 3)}, 1fr)`, gap: 8 }}>
+                      {secondaryCtaItems.map((ctaItem) => (
+                        <button
+                          key={ctaItem.id}
+                          onClick={() => handleCtaClick(ctaItem.id)}
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            gap: 4,
+                            padding: "10px 8px",
+                            borderRadius: radii.button,
+                            border: "1px solid rgba(255,255,255,0.25)",
+                            background: "rgba(255,255,255,0.12)",
+                            backdropFilter: "blur(8px)",
+                            color: "#FFFFFF",
+                            cursor: "pointer",
+                            fontSize: 11,
+                            fontWeight: 500,
+                            fontFamily: `'${fonts.secondary}', sans-serif`,
+                          }}
+                        >
+                          {CTA_ICONS[ctaItem.id]}
+                          {ctaItem.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          ) : undefined;
+
+          return (
+            <div style={{ position: "relative", zIndex: 2 }}>
+              <CardHeader
+                theme={theme}
+                name={profile.name || "Your Name"}
+                boldLastName={themeJson.bold_last_name === true}
+                uppercaseName={themeJson.uppercase_name === true}
+                nameLetterSpacing={typeof themeJson.name_letter_spacing === "number" ? themeJson.name_letter_spacing : 0}
+                nameFontWeight={typeof themeJson.name_font_weight === "number" ? themeJson.name_font_weight : 700}
+                firstNameFontWeight={typeof themeJson.first_name_font_weight === "number" ? themeJson.first_name_font_weight : null}
+                nameItalic={themeJson.name_italic === true}
+                nameFontSize={typeof themeJson.name_font_size === "number" ? themeJson.name_font_size : null}
+                subtitleFontSize={typeof themeJson.subtitle_font_size === "number" ? themeJson.subtitle_font_size : null}
+                profession={displayJobTitle}
+                company={profile.company ?? undefined}
+                avatarUrl={profile.avatar_url}
+                coverUrl={coverUrl}
+                avatarBgColor={themeJson.avatar_bg_color as string | undefined}
+                avatarRotation={themeJson.avatar_rotation as number | undefined}
+                avatarBorderWidth={(themeJson.tokens as any)?.header?.avatarBorderWidth ?? 3}
+                avatarSize={(themeJson.tokens as any)?.header?.avatarSize ?? 80}
+                avatarBannerText={(themeJson.tokens as any)?.header?.avatarBannerText ?? ""}
+                avatarBannerBg={(themeJson.tokens as any)?.header?.avatarBannerBg ?? ""}
+                avatarBannerPosition={(themeJson.tokens as any)?.header?.avatarBannerPosition ?? "bottom"}
+                avatarBannerAnimation={(themeJson.tokens as any)?.header?.avatarBannerAnimation ?? "none"}
+                coverOffsetY={themeJson.cover_offset_y as number | undefined}
+                logoUrl={themeJson.logo_url as string | undefined}
+                logoFrostedBg={themeJson.logo_frosted_bg !== false}
+                logoGlow={themeJson.logo_glow === true}
+                logoPosition={(themeJson.logo_position as any) ?? "top-right"}
+                logoSize={(themeJson.logo_size as any) ?? "medium"}
+                logoOpacity={typeof themeJson.logo_opacity === "number" ? (themeJson.logo_opacity as number) : 100}
+                logoPadding={typeof themeJson.logo_padding === "number" ? (themeJson.logo_padding as number) : 4}
+                logoNameGap={typeof themeJson.logo_name_gap === "number" ? (themeJson.logo_name_gap as number) : 8}
+                logoVerticalAlign={(themeJson.logo_vertical_align as any) ?? "center"}
+                metallicEffect={metallicEffect}
+                heroBackground={resolvedHeroBackground}
+                ctaChildren={heroCtaButtons}
+              />
+            </div>
+          );
+        })()}
 
         <div style={{ padding: `${spacing.section}px`, display: "flex", flexDirection: "column", gap: spacing.section, position: "relative", zIndex: 2 }}>
-          {/* ── CTA Buttons ── */}
-          {primaryCtaItem && (
+          {/* ── CTA Buttons (skip if already rendered inside immersive hero) ── */}
+          {primaryCtaItem && theme.header.layout !== "hero" && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
