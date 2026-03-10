@@ -1,4 +1,5 @@
-import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail, Clock, CheckCircle, AlertTriangle, Clock3, TrendingUp, Send, Plus, Trash2, GripVertical } from "lucide-react";
+import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail, Clock, CheckCircle, AlertTriangle, Clock3, TrendingUp, Send, Plus, Trash2, GripVertical, Store } from "lucide-react";
+import MarketplaceSettings from "@/modules/settings/components/MarketplaceSettings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
