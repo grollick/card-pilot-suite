@@ -56,6 +56,7 @@ const EstimatesPage = lazy(() => import("@/modules/estimates/pages/EstimatesPage
 // Jobs
 const JobsPage = lazy(() => import("@/modules/jobs/pages/JobsPage"));
 const JobDetailPage = lazy(() => import("@/modules/jobs/pages/JobDetailPage"));
+const JobPipelinePage = lazy(() => import("@/modules/jobs/pages/JobPipelinePage"));
 
 // Marketing
 const EmailMarketing = lazy(() => import("@/modules/marketing/pages/EmailMarketing"));
