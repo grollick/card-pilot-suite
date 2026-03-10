@@ -1106,6 +1106,9 @@ export type Database = {
           org_id: string | null
           scheduled_end: string | null
           scheduled_start: string | null
+          signature_name: string | null
+          signature_url: string | null
+          signed_at: string | null
           status: Database["public"]["Enums"]["job_status"]
           title: string
           updated_at: string
@@ -1127,6 +1130,9 @@ export type Database = {
           org_id?: string | null
           scheduled_end?: string | null
           scheduled_start?: string | null
+          signature_name?: string | null
+          signature_url?: string | null
+          signed_at?: string | null
           status?: Database["public"]["Enums"]["job_status"]
           title: string
           updated_at?: string
@@ -1148,6 +1154,9 @@ export type Database = {
           org_id?: string | null
           scheduled_end?: string | null
           scheduled_start?: string | null
+          signature_name?: string | null
+          signature_url?: string | null
+          signed_at?: string | null
           status?: Database["public"]["Enums"]["job_status"]
           title?: string
           updated_at?: string

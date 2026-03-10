@@ -17,6 +17,8 @@ import YesterdaySnapshot from "@/components/dashboard/YesterdaySnapshot";
 import MissedOpportunities from "@/components/dashboard/MissedOpportunities";
 import FirstLeadAssistant from "@/components/dashboard/FirstLeadAssistant";
 import JobMetrics from "@/components/dashboard/JobMetrics";
+import MobileJobDashboard from "@/components/dashboard/MobileJobDashboard";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const priorityColors: Record<string, string> = {
   high: "text-destructive",
@@ -46,6 +48,7 @@ const fadeUp = {
 
 export default function DashboardHome() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: feed = [], isLoading: feedLoading } = useRecentActivity();
   const { data: allTasks = [], isLoading: tasksLoading } = useTasks({ status: "open" });
@@ -66,6 +69,9 @@ export default function DashboardHome() {
           Track your leads, bookings, and revenue in real time.
         </p>
       </div>
+
+      {/* Mobile Job Dashboard */}
+      {isMobile && <MobileJobDashboard />}
 
       {/* Business Performance Panel */}
       <BusinessPerformancePanel />
