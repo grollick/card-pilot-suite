@@ -2,11 +2,12 @@ import { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useMarketplaceListings, useMarketplaceProfessions } from "@/hooks/useMarketplace";
+import { useBoostedUserIds } from "@/hooks/useBoosts";
 import ListingCard from "@/modules/marketplace/components/ListingCard";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, MapPin, Users, Loader2, Briefcase, Crown, Star, TrendingUp } from "lucide-react";
+import { Search, MapPin, Users, Loader2, Briefcase, Crown, Star, TrendingUp, Rocket } from "lucide-react";
 
 const POPULAR_PROFESSIONS = [
   "Barber", "Plumber", "Photographer", "Realtor", "Personal Trainer",
@@ -24,7 +25,9 @@ export default function DiscoverPage() {
   });
 
   const { data: profData } = useMarketplaceProfessions();
+  const { data: boostedUsers } = useBoostedUserIds();
 
+  const boostedIds = useMemo(() => new Set(boostedUsers?.map(b => b.user_id) ?? []), [boostedUsers]);
   const displayProfession = profession?.replace(/-/g, " ");
   const displayCity = city?.replace(/-/g, " ");
 
@@ -51,7 +54,8 @@ export default function DiscoverPage() {
   }, [listings]);
 
   const featuredListings = useMemo(() => listings?.filter((l) => l.featured) ?? [], [listings]);
-  const regularListings = useMemo(() => listings?.filter((l) => !l.featured) ?? [], [listings]);
+  const boostedListings = useMemo(() => listings?.filter((l) => !l.featured && boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
+  const regularListings = useMemo(() => listings?.filter((l) => !l.featured && !boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -176,6 +180,21 @@ export default function DiscoverPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {featuredListings.map((l) => (
                 <ListingCard key={l.id} listing={l} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Boosted section */}
+        {boostedListings.length > 0 && !search && (
+          <div className="mb-10">
+            <div className="flex items-center gap-2 mb-4">
+              <Rocket className="h-4 w-4 text-accent" />
+              <h2 className="text-lg font-semibold text-foreground">Boosted Businesses</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {boostedListings.map((l) => (
+                <ListingCard key={l.id} listing={l} boosted />
               ))}
             </div>
           </div>

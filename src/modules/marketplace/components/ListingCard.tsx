@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, ArrowRight, Star, Crown, MessageSquare } from "lucide-react";
+import { MapPin, Calendar, ArrowRight, Star, Crown, MessageSquare, Rocket } from "lucide-react";
 import type { MarketplaceListing } from "@/hooks/useMarketplace";
 
 function StarRating({ rating, count }: { rating: number; count: number }) {
@@ -22,7 +22,7 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
   );
 }
 
-export default function ListingCard({ listing }: { listing: MarketplaceListing }) {
+export default function ListingCard({ listing, boosted }: { listing: MarketplaceListing; boosted?: boolean }) {
   const initials = (listing.name ?? "?")
     .split(" ")
     .map((w) => w[0])
@@ -34,12 +34,20 @@ export default function ListingCard({ listing }: { listing: MarketplaceListing }
     <Card className={`group overflow-hidden border transition-all duration-300 ${
       listing.featured
         ? "border-primary/40 bg-primary/[0.02] shadow-md ring-1 ring-primary/10"
+        : boosted
+        ? "border-accent/40 bg-accent/[0.02] shadow-md ring-1 ring-accent/10"
         : "border-border/60 hover:border-primary/30 hover:shadow-lg"
     }`}>
       {listing.featured && (
         <div className="bg-primary/10 px-4 py-1.5 flex items-center gap-1.5 text-xs font-medium text-primary">
           <Crown className="h-3 w-3" />
           Featured Business
+        </div>
+      )}
+      {boosted && !listing.featured && (
+        <div className="bg-accent/10 px-4 py-1.5 flex items-center gap-1.5 text-xs font-medium text-accent">
+          <Rocket className="h-3 w-3" />
+          Boosted Business
         </div>
       )}
       <CardContent className="p-5 flex flex-col gap-3">

@@ -65,6 +65,7 @@ const ReferralsPage = lazy(() => import("@/modules/marketing/pages/ReferralsPage
 const AutomationPage = lazy(() => import("@/modules/marketing/pages/AutomationPage"));
 const AutopilotPage = lazy(() => import("@/modules/automation/pages/AutopilotPage"));
 const QRCampaignsPage = lazy(() => import("@/modules/marketing/pages/QRCampaignsPage"));
+const BoostPage = lazy(() => import("@/modules/marketing/pages/BoostPage"));
 
 // Analytics
 const Analytics = lazy(() => import("@/modules/analytics/pages/Analytics"));
@@ -151,6 +152,7 @@ const App = () => (
               <Route path="industry-insights" element={<Suspense fallback={<LazyFallback />}><IndustryInsightsPage /></Suspense>} />
               <Route path="promotions" element={<Suspense fallback={<LazyFallback />}><PromotionsPage /></Suspense>} />
               <Route path="referrals" element={<Suspense fallback={<LazyFallback />}><ReferralsPage /></Suspense>} />
+              <Route path="boost" element={<Suspense fallback={<LazyFallback />}><BoostPage /></Suspense>} />
               <Route path="projects" element={<Suspense fallback={<LazyFallback />}><ProjectsPage /></Suspense>} />
               <Route path="reviews" element={<Suspense fallback={<LazyFallback />}><ReviewsPage /></Suspense>} />
               <Route path="estimates" element={<Suspense fallback={<LazyFallback />}><EstimatesPage /></Suspense>} />
