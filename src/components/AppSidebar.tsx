@@ -162,6 +162,13 @@ export function AppSidebar() {
 
       {!collapsed && <Separator className="mx-4 w-auto opacity-50" />}
 
+      {/* Agency client switcher */}
+      {!collapsed && (
+        <div className="px-3 py-1">
+          <ClientSwitcher />
+        </div>
+      )}
+
       <SidebarContent className="px-2 pt-1">
         {/* Home */}
         <SidebarGroup>
