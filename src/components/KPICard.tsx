@@ -1,5 +1,6 @@
 import { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface KPICardProps {
   title: string;
@@ -8,6 +9,7 @@ interface KPICardProps {
   changeType?: "positive" | "negative" | "neutral";
   icon: LucideIcon;
   sparklineData?: number[];
+  isLoading?: boolean;
 }
 
 function Sparkline({ data }: { data: number[] }) {
@@ -30,25 +32,67 @@ function Sparkline({ data }: { data: number[] }) {
           <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <path d={areaPath} fill="url(#sparkFill)" />
-      <path d={linePath} fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <motion.path
+        d={areaPath}
+        fill="url(#sparkFill)"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3, duration: 0.5 }}
+      />
+      <motion.path
+        d={linePath}
+        fill="none"
+        stroke="hsl(var(--primary))"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: 1 }}
+        transition={{ delay: 0.2, duration: 0.8, ease: "easeOut" }}
+      />
     </svg>
   );
 }
 
-export default function KPICard({ title, value, change, changeType = "neutral", icon: Icon, sparklineData }: KPICardProps) {
+function KPICardSkeleton() {
+  return (
+    <div className="dash-card p-5">
+      <div className="flex items-start justify-between">
+        <div className="space-y-2.5">
+          <Skeleton className="h-3 w-20 skeleton-shimmer" />
+          <Skeleton className="h-7 w-16 skeleton-shimmer" />
+        </div>
+        <Skeleton className="h-9 w-9 rounded-lg skeleton-shimmer" />
+      </div>
+      <Skeleton className="h-3 w-24 mt-3 skeleton-shimmer" />
+    </div>
+  );
+}
+
+export default function KPICard({ title, value, change, changeType = "neutral", icon: Icon, sparklineData, isLoading }: KPICardProps) {
+  if (isLoading) return <KPICardSkeleton />;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="dash-card p-5"
+      transition={{ duration: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
+      whileHover={{ y: -2, transition: { duration: 0.2 } }}
+      className="dash-card p-5 group"
     >
       <div className="flex items-start justify-between">
         <div className="space-y-1.5">
-          <p className="text-xs text-muted-foreground font-medium">{title}</p>
-          <p className="text-2xl font-bold tracking-tight tabular-nums">{value}</p>
+          <p className="text-overline">{title}</p>
+          <motion.p
+            className="text-2xl font-bold tracking-tight tabular-nums"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.15 }}
+          >
+            {value}
+          </motion.p>
         </div>
-        <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
+        <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center transition-colors duration-200 group-hover:bg-primary/15">
           <Icon className="h-4 w-4 text-primary" />
         </div>
       </div>
@@ -58,13 +102,18 @@ export default function KPICard({ title, value, change, changeType = "neutral", 
         </div>
       )}
       {change && (
-        <p className={`text-xs mt-2 font-medium ${
-          changeType === "positive" ? "text-success" :
-          changeType === "negative" ? "text-destructive" :
-          "text-muted-foreground"
-        }`}>
+        <motion.p
+          initial={{ opacity: 0, x: -4 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.25 }}
+          className={`text-xs mt-2 font-medium ${
+            changeType === "positive" ? "text-success" :
+            changeType === "negative" ? "text-destructive" :
+            "text-muted-foreground"
+          }`}
+        >
           {change}
-        </p>
+        </motion.p>
       )}
     </motion.div>
   );

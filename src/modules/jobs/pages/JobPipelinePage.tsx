@@ -197,27 +197,31 @@ export default function JobPipelinePage() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
+        transition={{ delay: 0.1 }}
         className="flex gap-3 overflow-x-auto pb-4 min-h-[55vh]"
       >
-        {PIPELINE_STAGES.map((stage) => {
+        {PIPELINE_STAGES.map((stage, stageIndex) => {
           const items = stageItems[stage.id];
           const isDragOver = dragOverStageId === stage.id;
 
           return (
-            <div
+            <motion.div
               key={stage.id}
-              className={`min-w-[240px] w-[240px] shrink-0 rounded-xl border p-3 flex flex-col transition-colors ${
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: stageIndex * 0.05, duration: 0.3 }}
+              className={`min-w-[260px] w-[260px] shrink-0 rounded-xl border p-3 flex flex-col transition-all duration-200 ${
                 isDragOver
-                  ? "border-primary/50 bg-primary/5"
-                  : `border-border bg-muted/30`
+                  ? "drag-over border-primary/50 scale-[1.01]"
+                  : "border-border bg-muted/30"
               }`}
               onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; setDragOverStageId(stage.id); }}
               onDragLeave={() => setDragOverStageId(null)}
               onDrop={(e) => handleDrop(e, stage.id)}
             >
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{stage.label}</h3>
-                <Badge variant="secondary" className="text-[10px] px-1.5">{items.length}</Badge>
+                <h3 className="text-overline">{stage.label}</h3>
+                <Badge variant="secondary" className="text-[10px] px-1.5 tabular-nums">{items.length}</Badge>
               </div>
 
               <div className="space-y-2 flex-1">
@@ -234,14 +238,14 @@ export default function JobPipelinePage() {
                 ))}
 
                 {items.length === 0 && (
-                  <div className={`flex items-center justify-center h-20 text-xs border border-dashed rounded-lg transition-colors ${
-                    isDragOver ? "border-primary/50 text-primary" : "border-border text-muted-foreground"
+                  <div className={`flex items-center justify-center h-20 text-xs border border-dashed rounded-xl transition-all duration-200 ${
+                    isDragOver ? "border-primary/50 text-primary bg-primary/5" : "border-border text-muted-foreground"
                   }`}>
                     Drop here
                   </div>
                 )}
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </motion.div>
