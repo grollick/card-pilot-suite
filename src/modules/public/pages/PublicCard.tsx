@@ -49,6 +49,7 @@ import WalletPassDialog from "@/modules/card/components/WalletPassDialog";
 import QuoteRequestForm from "@/modules/card/components/QuoteRequestForm";
 import SmartEngagementPopup from "@/modules/card/components/SmartEngagementPopup";
 import StickyActionBar from "@/modules/card/components/StickyActionBar";
+import GalleryLightbox from "@/modules/card/components/GalleryLightbox";
 import { showsBranding } from "@/lib/plans";
 
 // ── Visitor meta for analytics ──
@@ -660,14 +661,22 @@ export default function PublicCard() {
         <div style={{ padding: `${spacing.section}px`, display: "flex", flexDirection: "column", gap: spacing.section, position: "relative", zIndex: 2 }}>
           {/* ── CTA Buttons ── */}
           {primaryCtaItem && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            style={{ display: "flex", flexDirection: "column", gap: 8 }}
+          >
             {ctaIconsOnly ? (
               <div style={{ display: "flex", justifyContent: "center", gap: 12 }}>
                 {enabledCtas.map((ctaItem) => (
-                  <button
+                  <motion.button
                     key={ctaItem.id}
                     onClick={() => handleCtaClick(ctaItem.id)}
                     title={ctaItem.label}
+                    whileHover={{ scale: 1.1, boxShadow: `0 4px 16px -2px ${palette.primary}50` }}
+                    whileTap={{ scale: 0.92 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
                     style={{
                       width: 44,
                       height: 44,
@@ -676,14 +685,13 @@ export default function PublicCard() {
                       alignItems: "center",
                       justifyContent: "center",
                       cursor: "pointer",
-                      transition: "all 0.2s",
                       background: ctaItem.isPrimary ? palette.primary : "transparent",
                       color: ctaItem.isPrimary ? palette.background : palette.primary,
                       border: ctaItem.isPrimary ? "none" : `1.5px solid ${palette.primary}40`,
                     }}
                   >
                     {CTA_ICONS[ctaItem.id]}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             ) : (
@@ -696,9 +704,12 @@ export default function PublicCard() {
                 {secondaryCtaItems.length > 0 && (
                 <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(secondaryCtaItems.length, 3)}, 1fr)`, gap: 8 }}>
                   {secondaryCtaItems.map((ctaItem) => (
-                    <button
+                    <motion.button
                       key={ctaItem.id}
                       onClick={() => handleCtaClick(ctaItem.id)}
+                      whileHover={{ scale: 1.04, background: `${palette.primary}12` }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
                       style={{
                         display: "flex",
                         flexDirection: "column",
@@ -713,18 +724,17 @@ export default function PublicCard() {
                         fontSize: 11,
                         fontWeight: 500,
                         fontFamily: `'${fonts.secondary}', sans-serif`,
-                        transition: "all 0.2s",
                       }}
                     >
                       {CTA_ICONS[ctaItem.id]}
                       {ctaItem.label}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
                 )}
               </>
             )}
-          </div>
+          </motion.div>
           )}
 
           {/* ── Sharing Tools ── */}
@@ -758,7 +768,12 @@ export default function PublicCard() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {hasCardServices
                     ? cardServices!.filter((s) => s.name).map((s, i) => (
-                        <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <motion.div
+                          key={i}
+                          style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", borderRadius: radii.button, cursor: "default" }}
+                          whileHover={{ backgroundColor: `${palette.primary}08`, x: 4 }}
+                          transition={{ duration: 0.15 }}
+                        >
                           <div>
                             <span style={{ fontSize: 14, fontWeight: 500, color: palette.primary }}>{s.name}</span>
                             {s.description && (
@@ -768,15 +783,20 @@ export default function PublicCard() {
                           {s.price && (
                             <span style={{ fontSize: 13, color: palette.secondary, fontWeight: 500 }}>{s.price}</span>
                           )}
-                        </div>
+                        </motion.div>
                       ))
                     : services.map((s) => (
-                        <div key={s.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <motion.div
+                          key={s.id}
+                          style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", borderRadius: radii.button, cursor: "default" }}
+                          whileHover={{ backgroundColor: `${palette.primary}08`, x: 4 }}
+                          transition={{ duration: 0.15 }}
+                        >
                           <span style={{ fontSize: 14, fontWeight: 500, color: palette.primary }}>{s.name}</span>
                           {s.price != null && (
                             <span style={{ fontSize: 13, color: palette.secondary }}>${Number(s.price).toFixed(0)}</span>
                           )}
-                        </div>
+                        </motion.div>
                       ))
                   }
                 </div>
@@ -1004,22 +1024,7 @@ export default function PublicCard() {
             return (
               <div>
                 <SectionTitle id="gallery" label="Gallery" />
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                  {images.map((img, i) => (
-                    <div key={i} style={{ borderRadius: radii.button, overflow: "hidden" }}>
-                      <img
-                        src={img.url}
-                        alt={img.caption || ""}
-                        style={{ width: "100%", height: 120, objectFit: "cover", display: "block" }}
-                      />
-                      {img.caption && (
-                        <p style={{ fontSize: 11, color: palette.secondary, padding: "4px 0", margin: 0, textAlign: "center" }}>
-                          {img.caption}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                <GalleryLightbox images={images} radii={radii.button} palette={palette} />
               </div>
             );
           })()}
@@ -1110,17 +1115,29 @@ export default function PublicCard() {
               )}
               {formSent ? (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
                   style={{
-                    padding: 20,
+                    padding: 24,
                     borderRadius: radii.card,
                     background: `${palette.primary}10`,
                     textAlign: "center",
                   }}
                 >
-                  <p style={{ fontSize: 14, fontWeight: 600, color: palette.primary, margin: 0 }}>
-                    ✓ Message sent! We'll be in touch.
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15, delay: 0.15 }}
+                    style={{ fontSize: 36, marginBottom: 8 }}
+                  >
+                    ✓
+                  </motion.div>
+                  <p style={{ fontSize: 15, fontWeight: 600, color: palette.primary, margin: 0 }}>
+                    Message sent!
+                  </p>
+                  <p style={{ fontSize: 13, color: palette.secondary, margin: "4px 0 0" }}>
+                    We'll be in touch shortly.
                   </p>
                 </motion.div>
               ) : (

@@ -121,6 +121,13 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     transition: { duration: 3, repeat: Infinity, ease: "easeInOut" as const },
   };
 
+  // Staggered entrance for hero elements
+  const heroEntrance = (delay: number) => ({
+    initial: { opacity: 0, y: 16 } as const,
+    animate: { opacity: 1, y: 0 } as const,
+    transition: { duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] as const },
+  });
+
   const bannerAnimationStyle: React.CSSProperties = (() => {
     switch (avatarBannerAnimation) {
       case "pulse":
@@ -331,13 +338,13 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
           {parallaxCover(160, true)}
           <div style={{ padding: "0 24px", marginTop: -40, display: "flex", flexDirection: "column", position: "relative", zIndex: 2 }}>
             {avatarEl}
-            <div style={{ display: "flex", alignItems: inlineAlignItems, gap: logoNameGap, marginTop: 12 }}>
+            <motion.div style={{ display: "flex", alignItems: inlineAlignItems, gap: logoNameGap, marginTop: 12 }} {...heroEntrance(0.15)}>
               {logoPosition === "beside-name" && inlineLogoEl}
               <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 24 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
               {logoPosition === "beside-name-right" && inlineLogoEl}
-            </div>
-            {profession && <p style={subtitleStyle}>{profession}</p>}
-            {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
+            </motion.div>
+            {profession && <motion.p style={subtitleStyle} {...heroEntrance(0.25)}>{profession}</motion.p>}
+            {company && <motion.p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }} {...heroEntrance(0.3)}>{company}</motion.p>}
           </div>
         </div>
       );
@@ -353,13 +360,13 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
           }}>
             {avatarEl}
             <div>
-              <div style={{ display: "flex", alignItems: inlineAlignItems, gap: logoNameGap }}>
+              <motion.div style={{ display: "flex", alignItems: inlineAlignItems, gap: logoNameGap }} {...heroEntrance(0.15)}>
                 {logoPosition === "beside-name" && inlineLogoEl}
                 <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 22 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
                 {logoPosition === "beside-name-right" && inlineLogoEl}
-              </div>
-              {profession && <p style={subtitleStyle}>{profession}</p>}
-              {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
+              </motion.div>
+              {profession && <motion.p style={subtitleStyle} {...heroEntrance(0.25)}>{profession}</motion.p>}
+              {company && <motion.p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }} {...heroEntrance(0.3)}>{company}</motion.p>}
             </div>
           </div>
         </div>
@@ -384,13 +391,13 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
                 },
               })}
             </div>
-            <div style={{ display: "flex", alignItems: inlineAlignItems, justifyContent: "center", gap: logoNameGap }}>
+            <motion.div style={{ display: "flex", alignItems: inlineAlignItems, justifyContent: "center", gap: logoNameGap }} {...heroEntrance(0.15)}>
               {logoPosition === "beside-name" && inlineLogoEl}
               <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 28 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
               {logoPosition === "beside-name-right" && inlineLogoEl}
-            </div>
-            {profession && <p style={{ ...subtitleStyle, fontSize: 16 }}>{profession}</p>}
-            {company && <p style={{ ...subtitleStyle, fontSize: 14, opacity: 0.7 }}>{company}</p>}
+            </motion.div>
+            {profession && <motion.p style={{ ...subtitleStyle, fontSize: 16 }} {...heroEntrance(0.25)}>{profession}</motion.p>}
+            {company && <motion.p style={{ ...subtitleStyle, fontSize: 14, opacity: 0.7 }} {...heroEntrance(0.3)}>{company}</motion.p>}
           </div>
         </div>
       );
@@ -409,13 +416,13 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
               {avatarEl}
             </div>
-            <div style={{ display: "flex", alignItems: inlineAlignItems, justifyContent: "center", gap: logoNameGap }}>
+            <motion.div style={{ display: "flex", alignItems: inlineAlignItems, justifyContent: "center", gap: logoNameGap }} {...heroEntrance(0.15)}>
               {logoPosition === "beside-name" && inlineLogoEl}
               <h1 style={{ ...titleStyle, fontSize: nameFontSize ?? 22 }}>{renderName(name, boldLastName, uppercaseName, firstNameFontWeight)}</h1>
               {logoPosition === "beside-name-right" && inlineLogoEl}
-            </div>
-            {profession && <p style={subtitleStyle}>{profession}</p>}
-            {company && <p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }}>{company}</p>}
+            </motion.div>
+            {profession && <motion.p style={subtitleStyle} {...heroEntrance(0.25)}>{profession}</motion.p>}
+            {company && <motion.p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7 }} {...heroEntrance(0.3)}>{company}</motion.p>}
           </div>
         </div>
       );
