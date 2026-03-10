@@ -113,6 +113,7 @@ export default function JobPipelineCard({ item, type, isDragging, onDragStart, o
           </DropdownMenu>
         </div>
       </div>
+      </div>
     </motion.div>
   );
 }
