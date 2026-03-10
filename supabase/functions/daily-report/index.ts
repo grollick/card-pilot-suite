@@ -16,7 +16,6 @@ serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
-    // Find users with daily reports enabled
     const { data: users } = await supabase
       .from("profiles")
       .select("id, name, email, handle")
@@ -45,6 +44,10 @@ serve(async (req) => {
           { count: newLeads },
           { count: newBookings },
           { data: services },
+          { count: estimatesSent },
+          { count: jobsCompleted },
+          { count: uncontactedLeads },
+          { count: pendingEstimates },
         ] = await Promise.all([
           supabase.from("analytics_events").select("event_type")
             .eq("user_id", user.id)
@@ -61,13 +64,31 @@ serve(async (req) => {
           supabase.from("booking_services").select("price")
             .eq("user_id", user.id)
             .eq("active", true),
+          supabase.from("estimates").select("*", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("status", "sent")
+            .gte("updated_at", yesterdayStart.toISOString())
+            .lte("updated_at", yesterdayEnd.toISOString()),
+          supabase.from("jobs").select("*", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("status", "completed")
+            .gte("updated_at", yesterdayStart.toISOString())
+            .lte("updated_at", yesterdayEnd.toISOString()),
+          supabase.from("leads").select("*", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("status", "open")
+            .is("last_activity_at", null),
+          supabase.from("estimates").select("*", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("status", "sent"),
         ]);
 
         const allEvents = events ?? [];
         const views = allEvents.filter(e => e.event_type === "card_view").length;
-        const clicks = allEvents.filter(e => e.event_type === "button_click").length;
         const leads = newLeads ?? 0;
         const bookings = newBookings ?? 0;
+        const estSent = estimatesSent ?? 0;
+        const jobsDone = jobsCompleted ?? 0;
 
         const avgPrice = (services ?? []).length > 0
           ? (services ?? []).reduce((s, sv) => s + (Number(sv.price) || 0), 0) / (services ?? []).length
@@ -76,38 +97,63 @@ serve(async (req) => {
 
         const dateStr = yesterdayStart.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
-        // Send via existing send-email function
+        // Build insights HTML
+        const insightItems: string[] = [];
+        if ((uncontactedLeads ?? 0) > 0) {
+          insightItems.push(`📞 You have <strong>${uncontactedLeads}</strong> lead${(uncontactedLeads ?? 0) > 1 ? "s" : ""} that haven't been contacted.`);
+        }
+        if ((pendingEstimates ?? 0) > 0) {
+          insightItems.push(`📋 <strong>${pendingEstimates}</strong> estimate${(pendingEstimates ?? 0) > 1 ? "s" : ""} sent but not yet approved.`);
+        }
+
+        const insightsHtml = insightItems.length > 0 ? `
+          <div style="margin:0 0 24px;padding:16px;background:#fef9e7;border-radius:12px;">
+            <div style="font-size:13px;font-weight:600;color:#92400e;margin:0 0 8px;">Action Items</div>
+            ${insightItems.map(item => `<div style="font-size:13px;color:#78350f;margin:4px 0;">${item}</div>`).join("")}
+          </div>
+        ` : "";
+
         await supabase.functions.invoke("send-email", {
           body: {
             to: user.email,
-            subject: `📊 Daily Report: ${views} views, ${leads} leads, $${estimatedRevenue} est. revenue`,
+            subject: `📊 Daily Scorecard: ${views} views, ${leads} leads, $${estimatedRevenue} revenue`,
             html: `
               <div style="font-family:'DM Sans',sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#ffffff;">
-                <h1 style="color:#1a1a2e;font-size:22px;margin:0 0 4px;">Daily Business Report</h1>
+                <h1 style="color:#1a1a2e;font-size:22px;margin:0 0 4px;">Daily Business Scorecard</h1>
                 <p style="color:#6b7280;font-size:14px;margin:0 0 24px;">${dateStr}</p>
                 
                 <table style="width:100%;border-collapse:collapse;margin:0 0 24px;">
                   <tr>
-                    <td style="padding:16px;text-align:center;background:#f8f9fc;border-radius:12px 0 0 0;">
-                      <div style="font-size:28px;font-weight:700;color:#1a1a2e;">${views}</div>
-                      <div style="font-size:12px;color:#6b7280;margin-top:4px;">Card Views</div>
+                    <td style="padding:14px;text-align:center;background:#f8f9fc;border-radius:12px 0 0 0;">
+                      <div style="font-size:26px;font-weight:700;color:#1a1a2e;">${views}</div>
+                      <div style="font-size:11px;color:#6b7280;margin-top:4px;">Card Views</div>
                     </td>
-                    <td style="padding:16px;text-align:center;background:#f8f9fc;">
-                      <div style="font-size:28px;font-weight:700;color:#1a1a2e;">${leads}</div>
-                      <div style="font-size:12px;color:#6b7280;margin-top:4px;">New Leads</div>
+                    <td style="padding:14px;text-align:center;background:#f8f9fc;">
+                      <div style="font-size:26px;font-weight:700;color:#1a1a2e;">${leads}</div>
+                      <div style="font-size:11px;color:#6b7280;margin-top:4px;">New Leads</div>
+                    </td>
+                    <td style="padding:14px;text-align:center;background:#f8f9fc;border-radius:0 12px 0 0;">
+                      <div style="font-size:26px;font-weight:700;color:#1a1a2e;">${bookings}</div>
+                      <div style="font-size:11px;color:#6b7280;margin-top:4px;">Bookings</div>
                     </td>
                   </tr>
                   <tr>
-                    <td style="padding:16px;text-align:center;background:#f8f9fc;border-radius:0 0 0 12px;">
-                      <div style="font-size:28px;font-weight:700;color:#1a1a2e;">${bookings}</div>
-                      <div style="font-size:12px;color:#6b7280;margin-top:4px;">Bookings</div>
+                    <td style="padding:14px;text-align:center;background:#f8f9fc;border-radius:0 0 0 12px;">
+                      <div style="font-size:26px;font-weight:700;color:#1a1a2e;">${estSent}</div>
+                      <div style="font-size:11px;color:#6b7280;margin-top:4px;">Estimates Sent</div>
                     </td>
-                    <td style="padding:16px;text-align:center;background:#f8f9fc;border-radius:0 0 12px 0;">
-                      <div style="font-size:28px;font-weight:700;color:#22c55e;">$${estimatedRevenue}</div>
-                      <div style="font-size:12px;color:#6b7280;margin-top:4px;">Est. Revenue</div>
+                    <td style="padding:14px;text-align:center;background:#f8f9fc;">
+                      <div style="font-size:26px;font-weight:700;color:#1a1a2e;">${jobsDone}</div>
+                      <div style="font-size:11px;color:#6b7280;margin-top:4px;">Jobs Done</div>
+                    </td>
+                    <td style="padding:14px;text-align:center;background:#f8f9fc;border-radius:0 0 12px 0;">
+                      <div style="font-size:26px;font-weight:700;color:#22c55e;">$${estimatedRevenue}</div>
+                      <div style="font-size:11px;color:#6b7280;margin-top:4px;">Est. Revenue</div>
                     </td>
                   </tr>
                 </table>
+
+                ${insightsHtml}
 
                 <a href="${Deno.env.get("SUPABASE_URL")?.replace(".supabase.co", ".lovable.app") || "#"}/app" 
                    style="display:block;text-align:center;padding:12px 24px;background:#4361ee;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">

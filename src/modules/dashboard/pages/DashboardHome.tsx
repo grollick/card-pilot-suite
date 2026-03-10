@@ -76,8 +76,8 @@ export default function DashboardHome() {
       {/* Business Performance Panel */}
       <BusinessPerformancePanel />
 
-      {/* Yesterday's Snapshot */}
-      <YesterdaySnapshot />
+      {/* Daily Business Scorecard */}
+      <DailyScorecard />
 
       {/* Main Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
