@@ -443,9 +443,9 @@ export default function QRBusinessCard() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
                 { label: "Total Scans", value: stats?.totalScans ?? 0, icon: ScanLine },
-                { label: "Unique Visitors", value: stats?.uniqueVisitors ?? 0, icon: Users },
+                { label: "Conversion Rate", value: `${stats?.conversionRate ?? 0}%`, icon: Users },
                 { label: "Leads Generated", value: stats?.leadsGenerated ?? 0, icon: TrendingUp },
-                { label: "Bookings", value: stats?.bookingsFromScans ?? 0, icon: Calendar },
+                { label: "Devices Tracked", value: stats?.devices?.length ?? 0, icon: Calendar },
               ].map((kpi) => (
                 <Card key={kpi.label} className="dash-card">
                   <CardContent className="pt-4 pb-3">
