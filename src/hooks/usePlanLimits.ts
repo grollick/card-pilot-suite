@@ -10,7 +10,7 @@ import { getPlanLimits, isLimitReached, type PlanLimits, type PlanKey } from "@/
  */
 export function usePlanLimits() {
   const { data: profile } = useProfile();
-  const planKey = (profile?.plan ?? "free") as PlanKey;
+  const planKey = (profile?.plan ?? "starter") as PlanKey;
   const limits: PlanLimits = useMemo(() => getPlanLimits(planKey), [planKey]);
 
   const checkLimit = (resource: keyof PlanLimits, currentCount: number): boolean => {
