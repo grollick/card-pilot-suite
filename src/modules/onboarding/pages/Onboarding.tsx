@@ -613,7 +613,7 @@ export default function Onboarding() {
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" onClick={() => {
                         setAiSetup(null);
-                        setStep(1);
+                        setStep(2);
                       }}>
                         <ArrowLeft className="h-4 w-4 mr-1" /> Back
                       </Button>
