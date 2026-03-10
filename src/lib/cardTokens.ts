@@ -124,7 +124,7 @@ export function getAvatarRadius(shape: "circle" | "rounded" | "square"): string 
 }
 
 // ─── Section ──────────────────────────────────────────────
-export type SectionCardStyle = "solid" | "frosted" | "elevated" | "soft" | "glow";
+export type SectionCardStyle = "solid" | "frosted" | "elevated" | "soft" | "glow" | "glass";
 export type SectionDivider = "none" | "hairline";
 
 export function getSectionTokens(tokens: Record<string, any>) {
