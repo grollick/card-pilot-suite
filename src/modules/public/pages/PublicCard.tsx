@@ -663,6 +663,7 @@ export default function PublicCard() {
             logoNameGap={typeof themeJson.logo_name_gap === "number" ? (themeJson.logo_name_gap as number) : 8}
             logoVerticalAlign={(themeJson.logo_vertical_align as any) ?? "center"}
             metallicEffect={metallicEffect}
+            heroBackground={resolvedHeroBackground}
           />
           </div>
         )}
