@@ -58,6 +58,7 @@ const customersItems = [
 ];
 
 const marketingItems = [
+  { title: "Growth", url: "/app/growth", icon: BarChart3 },
   { title: "Social", url: "/app/social", icon: Share2 },
   { title: "Email", url: "/app/email", icon: Mail },
   { title: "Content", url: "/app/content", icon: Megaphone },

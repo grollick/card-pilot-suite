@@ -184,6 +184,7 @@ const App = () => (
               <Route path="social" element={<LazyRoute><SocialScheduler /></LazyRoute>} />
               <Route path="content" element={<LazyRoute><ContentPage /></LazyRoute>} />
               <Route path="analytics" element={<LazyRoute><Analytics /></LazyRoute>} />
+              <Route path="growth" element={<LazyRoute><GrowthDashboard /></LazyRoute>} />
               <Route path="automation" element={<LazyRoute><AutomationPage /></LazyRoute>} />
               <Route path="autopilot" element={<LazyRoute><AutopilotPage /></LazyRoute>} />
               <Route path="qr-campaigns" element={<LazyRoute><QRCampaignsPage /></LazyRoute>} />

@@ -82,6 +82,9 @@ export default function DashboardHome() {
       {/* ★ "What should I do next?" — the #1 thing on the dashboard */}
       <NextActionsWidget />
 
+      {/* Share Your Card */}
+      <ShareCardWidget />
+
       {/* Quick Actions (desktop) */}
       {!isMobile && <QuickActionPanel />}
 
