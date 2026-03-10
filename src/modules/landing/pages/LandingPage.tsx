@@ -335,6 +335,9 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ─── INTERACTIVE BUILDER ─── */}
+      <InteractiveCardBuilder />
+
       {/* ─── SOCIAL PROOF ─── */}
       <section className="py-16 md:py-24">
         <div className="max-w-5xl mx-auto px-4">
