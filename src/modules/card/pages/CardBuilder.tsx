@@ -17,6 +17,31 @@ import { useCardBuilderState } from "@/hooks/useCardBuilderState";
 
 export default function CardBuilder() {
   const s = useCardBuilderState();
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+
+  const handleApplyTemplate = (templateId: string) => {
+    setSelectedTemplateId(templateId);
+    const template = getTemplate(templateId);
+    if (!template) return;
+    // Apply template sections to card builder
+    const newSections = template.sections.map(ts => {
+      const existing = s.sections.find(es => es.id === ts.id);
+      return {
+        id: ts.id,
+        label: existing?.label || ts.id.charAt(0).toUpperCase() + ts.id.slice(1).replace(/_/g, " "),
+        enabled: ts.enabled,
+        content: existing?.content,
+      };
+    });
+    // Add any existing sections not in the template
+    s.sections.forEach(es => {
+      if (!newSections.find(ns => ns.id === es.id)) {
+        newSections.push({ ...es, enabled: false });
+      }
+    });
+    s.setSections(newSections);
+    s.saveSections(newSections, true);
+  };
 
   const editingSec = s.sections.find((sec) => sec.id === s.editingSection);
 
