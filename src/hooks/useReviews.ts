@@ -12,6 +12,10 @@ export interface Review {
   review_text: string | null;
   is_public: boolean;
   project_id: string | null;
+  owner_response: string | null;
+  owner_response_at: string | null;
+  reported: boolean;
+  reported_reason: string | null;
   created_at: string;
 }
 
