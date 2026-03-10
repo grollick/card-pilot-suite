@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Phone, MessageSquare, User, FileText, Plus, Trash2,
   Loader2, Camera, CheckCircle2, Circle, Package, Play, Pause,
-  Clock, MapPin, Navigation, ChevronDown, PenTool
+  Clock, MapPin, Navigation, ChevronDown, PenTool, RefreshCw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -220,6 +220,17 @@ export default function JobDetailPage() {
             );
           })}
         </div>
+      )}
+
+      {/* Convert to Recurring - show for completed jobs */}
+      {status === "completed" && (
+        <Button
+          variant="outline"
+          className="gap-2"
+          onClick={() => navigate(`/app/recurring/new?job_id=${id}&lead_id=${job.lead_id || ""}&service=${encodeURIComponent(job.title)}&price=${job.estimates?.grand_total || 0}`)}
+        >
+          <RefreshCw className="h-4 w-4" /> Convert to Recurring Service
+        </Button>
       )}
 
       {/* Duration badge */}

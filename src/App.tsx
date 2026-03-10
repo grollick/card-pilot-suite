@@ -62,6 +62,10 @@ const JobPipelinePage = lazy(() => import("@/modules/jobs/pages/JobPipelinePage"
 const InvoicesPage = lazy(() => import("@/modules/invoices/pages/InvoicesPage"));
 const InvoiceDetailPage = lazy(() => import("@/modules/invoices/pages/InvoiceDetailPage"));
 
+// Recurring
+const RecurringPlansPage = lazy(() => import("@/modules/recurring/pages/RecurringPlansPage"));
+const RecurringPlanDetailPage = lazy(() => import("@/modules/recurring/pages/RecurringPlanDetailPage"));
+
 // Marketing
 const EmailMarketing = lazy(() => import("@/modules/marketing/pages/EmailMarketing"));
 const SocialScheduler = lazy(() => import("@/modules/marketing/pages/SocialScheduler"));
@@ -188,6 +192,8 @@ const App = () => (
               <Route path="job-pipeline" element={<LazyRoute><JobPipelinePage /></LazyRoute>} />
               <Route path="invoices" element={<LazyRoute><InvoicesPage /></LazyRoute>} />
               <Route path="invoices/:id" element={<LazyRoute><InvoiceDetailPage /></LazyRoute>} />
+              <Route path="recurring" element={<LazyRoute><RecurringPlansPage /></LazyRoute>} />
+              <Route path="recurring/:id" element={<LazyRoute><RecurringPlanDetailPage /></LazyRoute>} />
               <Route path="assistant" element={<LazyRoute><AssistantPage /></LazyRoute>} />
               <Route path="agency" element={<LazyRoute><AgencyDashboard /></LazyRoute>} />
               <Route path="marketplace" element={<LazyRoute><MarketplacePage /></LazyRoute>} />
