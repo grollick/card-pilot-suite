@@ -661,14 +661,22 @@ export default function PublicCard() {
         <div style={{ padding: `${spacing.section}px`, display: "flex", flexDirection: "column", gap: spacing.section, position: "relative", zIndex: 2 }}>
           {/* ── CTA Buttons ── */}
           {primaryCtaItem && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            style={{ display: "flex", flexDirection: "column", gap: 8 }}
+          >
             {ctaIconsOnly ? (
               <div style={{ display: "flex", justifyContent: "center", gap: 12 }}>
                 {enabledCtas.map((ctaItem) => (
-                  <button
+                  <motion.button
                     key={ctaItem.id}
                     onClick={() => handleCtaClick(ctaItem.id)}
                     title={ctaItem.label}
+                    whileHover={{ scale: 1.1, boxShadow: `0 4px 16px -2px ${palette.primary}50` }}
+                    whileTap={{ scale: 0.92 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 20 }}
                     style={{
                       width: 44,
                       height: 44,
@@ -677,14 +685,13 @@ export default function PublicCard() {
                       alignItems: "center",
                       justifyContent: "center",
                       cursor: "pointer",
-                      transition: "all 0.2s",
                       background: ctaItem.isPrimary ? palette.primary : "transparent",
                       color: ctaItem.isPrimary ? palette.background : palette.primary,
                       border: ctaItem.isPrimary ? "none" : `1.5px solid ${palette.primary}40`,
                     }}
                   >
                     {CTA_ICONS[ctaItem.id]}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             ) : (
@@ -697,9 +704,12 @@ export default function PublicCard() {
                 {secondaryCtaItems.length > 0 && (
                 <div style={{ display: "grid", gridTemplateColumns: `repeat(${Math.min(secondaryCtaItems.length, 3)}, 1fr)`, gap: 8 }}>
                   {secondaryCtaItems.map((ctaItem) => (
-                    <button
+                    <motion.button
                       key={ctaItem.id}
                       onClick={() => handleCtaClick(ctaItem.id)}
+                      whileHover={{ scale: 1.04, background: `${palette.primary}12` }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
                       style={{
                         display: "flex",
                         flexDirection: "column",
@@ -714,18 +724,17 @@ export default function PublicCard() {
                         fontSize: 11,
                         fontWeight: 500,
                         fontFamily: `'${fonts.secondary}', sans-serif`,
-                        transition: "all 0.2s",
                       }}
                     >
                       {CTA_ICONS[ctaItem.id]}
                       {ctaItem.label}
-                    </button>
+                    </motion.button>
                   ))}
                 </div>
                 )}
               </>
             )}
-          </div>
+          </motion.div>
           )}
 
           {/* ── Sharing Tools ── */}
