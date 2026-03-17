@@ -405,6 +405,18 @@ export default function ContactDetail() {
                 </div>
               </div>
             </TabsContent>
+
+            <TabsContent value="automations" className="mt-4">
+              <div className="rounded-xl border border-border bg-card p-5">
+                <ContactAutomationPanel
+                  contactId={contact.id}
+                  contactName={contact.name}
+                  contactEmail={contact.email}
+                  lastBookingDate={bookings[0]?.end_datetime ?? null}
+                  lastActivityDate={contact.last_activity_at}
+                />
+              </div>
+            </TabsContent>
           </Tabs>
         </motion.div>
       </div>
