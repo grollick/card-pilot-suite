@@ -73,6 +73,20 @@ const DEFAULT_RULES: Omit<AutomationRule, "id">[] = [
     action_config: { title: "Follow up with {name} (idle)", type: "follow_up", priority: "medium", due_offset_hours: 0 },
     enabled: true,
   },
+  {
+    trigger_type: "customer_ready_to_rebook",
+    trigger_config: { days_since_completed: 30 },
+    action_type: "send_email",
+    action_config: { title: "Time to rebook, {name}!", template_id: null },
+    enabled: true,
+  },
+  {
+    trigger_type: "contact_inactive",
+    trigger_config: { inactive_days: 60 },
+    action_type: "send_notification",
+    action_config: { title: "Win back {name}", message: "This customer has been inactive. Consider sending a promotion." },
+    enabled: true,
+  },
 ];
 
 // ── Queries & Mutations ──
