@@ -161,6 +161,12 @@ export default function BookingManager() {
 
   return (
     <div className="space-y-6 max-w-6xl">
+      <PageHelpBanner
+        storageKey="bookings"
+        tooltip="Customers who book appointments appear here. Set your availability and add services to start accepting bookings."
+        videoTitle="How customers schedule appointments"
+        videoDuration="2 min"
+      />
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Booking</h1>
