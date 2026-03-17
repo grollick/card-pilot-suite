@@ -27,6 +27,7 @@ import BusinessHealthScore from "@/modules/dashboard/components/BusinessHealthSc
 import TopCustomersWidget from "@/modules/dashboard/components/TopCustomersWidget";
 import ShareCardWidget from "@/modules/dashboard/components/ShareCardWidget";
 import RevenueOpportunities from "@/modules/dashboard/components/RevenueOpportunities";
+import ReviewsDashboardWidget from "@/modules/dashboard/components/ReviewsDashboardWidget";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const priorityColors: Record<string, string> = {
