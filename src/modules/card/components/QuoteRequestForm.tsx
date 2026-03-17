@@ -2,6 +2,19 @@ import { useState, useRef } from "react";
 import { FileText, Upload, X, Send, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { captureLead, getVisitorMeta } from "@/lib/captureLead";
+import { toast } from "sonner";
+import CardButton from "./CardButton";
+import CardSectionWrapper from "./CardSectionWrapper";
+import type { ResolvedCardTheme } from "@/lib/cardTokens";
+import type { MetallicEffect } from "./CardThemeEditor";
+
+interface QuoteRequestFormProps {
+  theme: ResolvedCardTheme;
+  profileId: string;
+  handle: string;
+  metallicEffect?: MetallicEffect;
+  sectionContent?: Record<string, any>;
+}
 
 export default function QuoteRequestForm({
   theme,
