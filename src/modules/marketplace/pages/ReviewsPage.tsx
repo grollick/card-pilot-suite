@@ -37,6 +37,7 @@ export default function ReviewsPage() {
   const deleteReview = useDeleteReview();
   const respondToReview = useRespondToReview();
   const reportReview = useReportReview();
+  const togglePublic = useToggleReviewPublic();
 
   // ── Dialogs ──
   const [respondTo, setRespondTo] = useState<Review | null>(null);
