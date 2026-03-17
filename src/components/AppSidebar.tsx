@@ -88,6 +88,7 @@ const moreItems = [
 ];
 
 const settingsItems = [
+  { title: "Help Center", url: "/app/help", icon: HelpCircle },
   { title: "Settings", url: "/app/settings", icon: Settings },
   { title: "Team", url: "/app/team", icon: Building2 },
   { title: "Admin", url: "/app/admin", icon: Shield },
