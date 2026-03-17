@@ -34,6 +34,7 @@ import NextActivityPanel from "@/modules/crm/components/NextActivityPanel";
 import ContactSummaryCard from "@/modules/crm/components/ContactSummaryCard";
 import ContactTasksList from "@/modules/crm/components/ContactTasksList";
 import PendingFollowups from "@/modules/crm/components/PendingFollowups";
+import ContactAutomationPanel from "@/modules/crm/components/ContactAutomationPanel";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function ContactDetail() {
