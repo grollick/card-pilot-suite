@@ -1,7 +1,7 @@
 import { format, formatDistanceToNow } from "date-fns";
 import {
   Eye, MousePointer, Users, Calendar, Mail, MessageSquare,
-  Phone, FileText, CheckCircle2, Circle, ArrowRight, Reply, MailCheck
+  Phone, FileText, CheckCircle2, Circle, ArrowRight, Reply, MailCheck, Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
