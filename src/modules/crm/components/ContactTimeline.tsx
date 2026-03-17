@@ -24,6 +24,7 @@ const activityIcons: Record<string, typeof Eye> = {
   task_completed: CheckCircle2,
   stage_changed: ArrowRight,
   file_shared: FileText,
+  review_submitted: Star,
 };
 
 const activityColors: Record<string, string> = {
