@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
   ArrowLeft, Phone, Mail, Calendar, FileText, MessageSquare,
-  Plus, Loader2, ChevronDown, Trash2, MoreHorizontal, Clock, Send, X, CheckCircle2, RotateCcw, ExternalLink
+  Plus, Loader2, ChevronDown, Trash2, MoreHorizontal, Clock, Send, X, CheckCircle2, RotateCcw, ExternalLink, Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
