@@ -25,6 +25,7 @@ const PublicProjectPage = lazy(() => import("@/modules/public/pages/PublicProjec
 
 // ── Auth & marketing — loaded eagerly (small) ──
 import LandingPage from "@/modules/landing/pages/LandingPage";
+import PricingPage from "@/modules/pricing/pages/PricingPage";
 import AuthPage from "@/modules/auth/pages/AuthPage";
 import ForgotPassword from "@/modules/auth/pages/ForgotPassword";
 import ResetPassword from "@/modules/auth/pages/ResetPassword";
