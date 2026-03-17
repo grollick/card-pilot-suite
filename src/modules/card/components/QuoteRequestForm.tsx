@@ -2,32 +2,6 @@ import { useState, useRef } from "react";
 import { FileText, Upload, X, Send, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { captureLead, getVisitorMeta } from "@/lib/captureLead";
-import { toast } from "sonner";
-import CardButton from "./CardButton";
-import CardSectionWrapper from "./CardSectionWrapper";
-import type { ResolvedCardTheme } from "@/lib/cardTokens";
-import type { MetallicEffect } from "./CardThemeEditor";
-
-interface QuoteRequestFormProps {
-  theme: ResolvedCardTheme;
-  profileId: string;
-  handle: string;
-  metallicEffect?: MetallicEffect;
-  sectionContent?: Record<string, any>;
-}
-
-function getVisitorMeta() {
-  return {
-    referrer: document.referrer || null,
-    utm_source: new URLSearchParams(window.location.search).get("utm_source"),
-    utm_medium: new URLSearchParams(window.location.search).get("utm_medium"),
-    utm_campaign: new URLSearchParams(window.location.search).get("utm_campaign"),
-    user_agent: navigator.userAgent,
-    language: navigator.language,
-    screen: `${screen.width}x${screen.height}`,
-    timestamp: new Date().toISOString(),
-  };
-}
 
 export default function QuoteRequestForm({
   theme,
