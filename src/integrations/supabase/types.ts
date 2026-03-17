@@ -147,6 +147,67 @@ export type Database = {
           },
         ]
       }
+      automation_runs: {
+        Row: {
+          automation_id: string
+          booking_id: string | null
+          contact_id: string | null
+          created_at: string
+          executed_at: string | null
+          id: string
+          meta_data: Json | null
+          scheduled_for: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          automation_id: string
+          booking_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          executed_at?: string | null
+          id?: string
+          meta_data?: Json | null
+          scheduled_for?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          automation_id?: string
+          booking_id?: string | null
+          contact_id?: string | null
+          created_at?: string
+          executed_at?: string | null
+          id?: string
+          meta_data?: Json | null
+          scheduled_for?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "automation_runs_automation_id_fkey"
+            columns: ["automation_id"]
+            isOneToOne: false
+            referencedRelation: "automation_rules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_runs_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "automation_runs_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       autopilot_log: {
         Row: {
           action_type: string
