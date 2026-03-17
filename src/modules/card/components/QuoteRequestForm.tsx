@@ -98,83 +98,32 @@ export default function QuoteRequestForm({
       const visitorMeta = getVisitorMeta();
       const photoUrls = await uploadPhotos();
 
-      // Get first pipeline stage
-      const { data: stages } = await supabase
-        .from("pipeline_stages")
-        .select("id")
-        .eq("user_id", profileId)
-        .order("sort_order", { ascending: true })
-        .limit(1);
-      const firstStageId = stages?.[0]?.id ?? null;
+      const quoteDescription = [
+        form.project_type && `Project: ${form.project_type}`,
+        form.budget && `Budget: ${form.budget}`,
+        form.location && `Location: ${form.location}`,
+        form.timeline && `Timeline: ${form.timeline}`,
+        form.description && `Details: ${form.description}`,
+        photoUrls.length > 0 && `${photoUrls.length} photo(s) attached`,
+      ].filter(Boolean).join("\n");
 
-      // Duplicate detection by email or phone
-      let existingLead: { id: string } | null = null;
-      if (form.email) {
-        const { data } = await supabase
-          .from("leads")
-          .select("id")
-          .eq("user_id", profileId)
-          .eq("email", form.email)
-          .limit(1)
-          .maybeSingle();
-        if (data) existingLead = data;
-      }
-      if (!existingLead && form.phone) {
-        const { data } = await supabase
-          .from("leads")
-          .select("id")
-          .eq("user_id", profileId)
-          .eq("phone", form.phone)
-          .limit(1)
-          .maybeSingle();
-        if (data) existingLead = data;
-      }
+      // Use centralized capture_lead function
+      const result = await captureLead({
+        ownerId: profileId,
+        name: form.name,
+        email: form.email || null,
+        phone: form.phone || null,
+        source: "card_form",
+        activityType: "quote_requested",
+        activityTitle: "Quote request submitted via digital card",
+        activityDescription: quoteDescription,
+        handle,
+        metaJson: visitorMeta,
+      });
 
-      let leadId: string;
+      const leadId = result?.lead_id;
 
-      if (existingLead) {
-        await supabase
-          .from("leads")
-          .update({
-            name: form.name,
-            ...(form.phone ? { phone: form.phone } : {}),
-            ...(form.email ? { email: form.email } : {}),
-            custom_fields_json: {
-              referrer: visitorMeta.referrer,
-              utm_source: visitorMeta.utm_source,
-              utm_medium: visitorMeta.utm_medium,
-              utm_campaign: visitorMeta.utm_campaign,
-              device: visitorMeta.user_agent,
-              capture_url: window.location.href,
-            },
-          })
-          .eq("id", existingLead.id);
-        leadId = existingLead.id;
-      } else {
-        const { data: lead } = await supabase
-          .from("leads")
-          .insert({
-            user_id: profileId,
-            name: form.name,
-            phone: form.phone || null,
-            email: form.email || null,
-            source: "card_form" as const,
-            stage_id: firstStageId,
-            custom_fields_json: {
-              referrer: visitorMeta.referrer,
-              utm_source: visitorMeta.utm_source,
-              utm_medium: visitorMeta.utm_medium,
-              utm_campaign: visitorMeta.utm_campaign,
-              device: visitorMeta.user_agent,
-              capture_url: window.location.href,
-            },
-          })
-          .select("id")
-          .maybeSingle();
-        leadId = lead?.id ?? "";
-      }
-
-      // Store quote request
+      // Store quote request details
       if (leadId) {
         await supabase.from("quote_requests" as any).insert({
           user_id: profileId,
@@ -189,35 +138,6 @@ export default function QuoteRequestForm({
             ...form,
             photo_count: photoUrls.length,
           },
-        });
-
-        // Log activity
-        await supabase.from("contact_activities").insert({
-          user_id: profileId,
-          lead_id: leadId,
-          activity_type: "quote_requested",
-          title: existingLead
-            ? "Returning contact submitted a quote request"
-            : "Quote request submitted via digital card",
-          description: [
-            form.project_type && `Project: ${form.project_type}`,
-            form.budget && `Budget: ${form.budget}`,
-            form.location && `Location: ${form.location}`,
-            form.timeline && `Timeline: ${form.timeline}`,
-            form.description && `Details: ${form.description}`,
-            photoUrls.length > 0 && `${photoUrls.length} photo(s) attached`,
-          ]
-            .filter(Boolean)
-            .join("\n"),
-          occurred_at: new Date().toISOString(),
-        });
-
-        // Analytics event
-        await supabase.from("analytics_events").insert({
-          user_id: profileId,
-          handle,
-          event_type: "form_submit" as const,
-          meta_json: { type: "quote_request", lead_id: leadId, duplicate: !!existingLead, ...visitorMeta },
         });
       }
 
