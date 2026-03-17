@@ -351,9 +351,7 @@ export default function PublicCard() {
         phone: formData.phone || null,
         source: "card_form",
         activityType: "form_submitted",
-        activityTitle: result === null
-          ? "Contact form submitted via digital card"
-          : "Contact form submitted via digital card",
+        activityTitle: "Contact form submitted via digital card",
         activityDescription: formData.message || null,
         handle: handle ?? null,
         metaJson: visitorMeta,
