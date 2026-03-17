@@ -20,6 +20,8 @@ export const TRIGGER_TYPES = [
   { value: "booking_completed", label: "Booking completed" },
   { value: "stage_changed", label: "Pipeline stage changed" },
   { value: "lead_idle", label: "Contact idle for X days" },
+  { value: "customer_ready_to_rebook", label: "Customer ready to rebook" },
+  { value: "contact_inactive", label: "Contact inactive (win-back)" },
 ] as const;
 
 export const ACTION_TYPES = [
@@ -28,6 +30,8 @@ export const ACTION_TYPES = [
   { value: "log_activity", label: "Log an activity" },
   { value: "move_stage", label: "Move pipeline stage" },
   { value: "send_notification", label: "Send notification" },
+  { value: "create_alert", label: "Create dashboard alert" },
+  { value: "apply_tag", label: "Apply tag to contact" },
 ] as const;
 
 export const TASK_TYPES = ["follow_up", "call", "email", "meeting", "reminder"] as const;
