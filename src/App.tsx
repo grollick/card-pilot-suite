@@ -215,6 +215,7 @@ const App = () => (
               <Route path="admin" element={<LazyRoute><AdminPage /></LazyRoute>} />
               <Route path="team-management" element={<LazyRoute><TeamManagementPage /></LazyRoute>} />
               <Route path="tech-dashboard" element={<LazyRoute><TechDashboardPage /></LazyRoute>} />
+              <Route path="help" element={<LazyRoute><HelpCenter /></LazyRoute>} />
             </Route>
 
             {/* Public card OR SEO landing — smart routing */}

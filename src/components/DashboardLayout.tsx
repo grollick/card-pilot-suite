@@ -2,6 +2,8 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Outlet } from "react-router-dom";
 import TopBar from "@/components/TopBar";
+import ProductTour from "@/components/ProductTour";
+import FloatingHelpButton from "@/components/FloatingHelpButton";
 
 export default function DashboardLayout() {
   return (
@@ -15,6 +17,8 @@ export default function DashboardLayout() {
           </main>
         </div>
       </div>
+      <ProductTour />
+      <FloatingHelpButton />
     </SidebarProvider>
   );
 }
