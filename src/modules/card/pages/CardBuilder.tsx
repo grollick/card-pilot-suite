@@ -1,3 +1,4 @@
+import PageHelpBanner from "@/components/PageHelpBanner";
 import { Palette, Pencil, Camera, LayoutList, LayoutTemplate, Globe } from "lucide-react";
 import ConversionTips from "@/modules/card/components/ConversionTips";
 import { Button } from "@/components/ui/button";
