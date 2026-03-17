@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { FileText, Upload, X, Send, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { captureLead, getVisitorMeta } from "@/lib/captureLead";
 import { toast } from "sonner";
 import CardButton from "./CardButton";
 import CardSectionWrapper from "./CardSectionWrapper";
