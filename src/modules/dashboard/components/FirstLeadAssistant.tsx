@@ -27,6 +27,7 @@ export default function FirstLeadAssistant() {
   const { data: profile } = useProfile();
   const prevCompletedRef = useRef<Set<string>>(new Set());
   const [celebratingKey, setCelebratingKey] = useState<string | null>(null);
+  const [expandedTip, setExpandedTip] = useState<string | null>(null);
 
   const { data: checklist = [] } = useQuery({
     queryKey: ["first-lead-checklist", user?.id],
