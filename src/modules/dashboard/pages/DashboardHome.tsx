@@ -100,6 +100,9 @@ export default function DashboardHome() {
 
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Revenue Opportunities */}
+          <RevenueOpportunities />
+
           {/* Leads Needing Attention */}
           <MissedOpportunities />
 
