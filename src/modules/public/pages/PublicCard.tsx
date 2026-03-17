@@ -33,6 +33,7 @@ import { usePublicReviews } from "@/hooks/useReviews";
 import { usePublicProjects } from "@/hooks/useProjects";
 import ReviewForm from "@/modules/public/components/ReviewForm";
 import { supabase } from "@/integrations/supabase/client";
+import { captureLead } from "@/lib/captureLead";
 import { toast } from "sonner";
 import { downloadVCard } from "@/lib/vcard";
 import {
@@ -343,106 +344,21 @@ export default function PublicCard() {
     try {
       const visitorMeta = getVisitorMeta();
 
-      const { data: stages } = await supabase
-        .from("pipeline_stages")
-        .select("id")
-        .eq("user_id", profile.id)
-        .order("sort_order", { ascending: true })
-        .limit(1);
-      const firstStageId = stages?.[0]?.id ?? null;
-
-      // ── Duplicate detection: match by email or phone ──
-      let existingLead: { id: string } | null = null;
-
-      if (formData.email) {
-        const { data } = await supabase
-          .from("leads")
-          .select("id")
-          .eq("user_id", profile.id)
-          .eq("email", formData.email)
-          .limit(1)
-          .maybeSingle();
-        if (data) existingLead = data;
-      }
-
-      if (!existingLead && formData.phone) {
-        const { data } = await supabase
-          .from("leads")
-          .select("id")
-          .eq("user_id", profile.id)
-          .eq("phone", formData.phone)
-          .limit(1)
-          .maybeSingle();
-        if (data) existingLead = data;
-      }
-
-      let leadId: string | undefined;
-
-      if (existingLead) {
-        // Update existing lead with latest info
-        await supabase
-          .from("leads")
-          .update({
-            name: formData.name,
-            ...(formData.phone ? { phone: formData.phone } : {}),
-            ...(formData.email ? { email: formData.email } : {}),
-            notes: formData.message || undefined,
-            custom_fields_json: {
-              referrer: visitorMeta.referrer,
-              utm_source: visitorMeta.utm_source,
-              utm_medium: visitorMeta.utm_medium,
-              utm_campaign: visitorMeta.utm_campaign,
-              device: visitorMeta.user_agent,
-              capture_url: window.location.href,
-            },
-          })
-          .eq("id", existingLead.id);
-        leadId = existingLead.id;
-      } else {
-        // Create new lead
-        const { data: lead } = await supabase
-          .from("leads")
-          .insert({
-            user_id: profile.id,
-            name: formData.name,
-            phone: formData.phone || null,
-            email: formData.email || null,
-            notes: formData.message || null,
-            source: "card_form" as const,
-            stage_id: firstStageId,
-            custom_fields_json: {
-              referrer: visitorMeta.referrer,
-              utm_source: visitorMeta.utm_source,
-              utm_medium: visitorMeta.utm_medium,
-              utm_campaign: visitorMeta.utm_campaign,
-              device: visitorMeta.user_agent,
-              capture_url: window.location.href,
-            },
-          })
-          .select("id")
-          .maybeSingle();
-        leadId = lead?.id;
-      }
-
-      if (leadId) {
-        await supabase.from("contact_activities").insert({
-          user_id: profile.id,
-          lead_id: leadId,
-          activity_type: "form_submitted",
-          title: existingLead
-            ? "Returning contact submitted card form"
-            : "Contact form submitted via digital card",
-          description: formData.message || null,
-          occurred_at: new Date().toISOString(),
-        });
-      }
-
-      await supabase.from("analytics_events").insert({
-        user_id: profile.id,
-        handle: handle!,
-        event_type: "form_submit" as const,
-        meta_json: { lead_id: leadId, duplicate: !!existingLead, ...visitorMeta },
+      const result = await captureLead({
+        ownerId: profile.id,
+        name: formData.name,
+        email: formData.email || null,
+        phone: formData.phone || null,
+        source: "card_form",
+        activityType: "form_submitted",
+        activityTitle: "Contact form submitted via digital card",
+        activityDescription: formData.message || null,
+        handle: handle ?? null,
+        metaJson: visitorMeta,
       });
+
+      const leadId = result?.lead_id;
+      const existingLead = result?.is_existing;
 
       // Notify card owner via email (fire-and-forget)
       if (profile.email) {

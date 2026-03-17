@@ -123,35 +123,14 @@ export default function PublicBooking() {
         timestamp: new Date().toISOString(),
       };
 
-      // Find first pipeline stage for auto-assignment
-      const { data: stages } = await supabase
-        .from("pipeline_stages")
-        .select("id")
-        .eq("user_id", data.profile.id)
-        .order("sort_order", { ascending: true })
-        .limit(1);
-      const firstStageId = stages?.[0]?.id ?? null;
-
-      // Create lead with pipeline stage + referral source
-      const { data: lead } = await supabase
-        .from("leads")
-        .insert({
-          user_id: data.profile.id,
-          name: formData.name,
-          email: formData.email || null,
-          phone: formData.phone || null,
-          source: "booking" as const,
-          stage_id: firstStageId,
-          custom_fields_json: visitorMeta,
-        })
-        .select("id")
-        .single();
-
-      // Create booking
+      // Create booking — the DB trigger (trg_booking_lead_capture) automatically:
+      // 1. Matches or creates a CRM contact
+      // 2. Links the booking to the contact
+      // 3. Logs an activity event
+      // 4. Updates daily_metrics (bookings + revenue)
       await supabase.from("bookings").insert({
         user_id: data.profile.id,
         service_id: selectedService.id,
-        lead_id: lead?.id ?? null,
         customer_name: formData.name,
         customer_email: formData.email || null,
         customer_phone: formData.phone || null,
@@ -161,25 +140,13 @@ export default function PublicBooking() {
         status: "requested" as const,
       });
 
-      // Track analytics
+      // Track analytics event
       await supabase.from("analytics_events").insert({
         user_id: data.profile.id,
         handle: handle!,
         event_type: "booking_created" as const,
-        meta_json: { lead_id: lead?.id, service: selectedService.name, ...visitorMeta },
+        meta_json: { service: selectedService.name, ...visitorMeta },
       });
-
-      // Log activity on lead
-      if (lead?.id) {
-        await supabase.from("contact_activities").insert({
-          user_id: data.profile.id,
-          lead_id: lead.id,
-          activity_type: "booking_created",
-          title: `Booking requested: ${selectedService.name}`,
-          description: `${format(startDt, "EEEE, MMMM d")} at ${selectedTime}`,
-          occurred_at: new Date().toISOString(),
-        });
-      }
 
       setBookingResult({ start: startDt, end: endDt });
       setStep(4);

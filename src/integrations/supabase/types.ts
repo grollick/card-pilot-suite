@@ -3026,6 +3026,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      capture_lead: {
+        Args: {
+          p_activity_description?: string
+          p_activity_title?: string
+          p_activity_type?: string
+          p_email?: string
+          p_handle?: string
+          p_meta_json?: Json
+          p_name: string
+          p_owner_id: string
+          p_phone?: string
+          p_source?: string
+        }
+        Returns: Json
+      }
       create_workspace_from_profession: {
         Args: {
           p_owner_user_id: string
