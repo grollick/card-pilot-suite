@@ -34,7 +34,7 @@ export async function captureLead(params: CaptureLeadParams): Promise<CaptureLea
     p_activity_type: params.activityType ?? "form_submitted",
     p_activity_title: params.activityTitle ?? "Contact form submitted",
     p_activity_description: params.activityDescription ?? null,
-    p_meta_json: params.metaJson ?? {},
+    p_meta_json: (params.metaJson ?? {}) as unknown as Record<string, string>,
     p_handle: params.handle ?? null,
   });
 
