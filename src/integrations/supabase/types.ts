@@ -1982,6 +1982,7 @@ export type Database = {
           referred_by: string | null
           service_area: string | null
           style_pack: string | null
+          tour_completed: boolean
           updated_at: string
         }
         Insert: {
@@ -2011,6 +2012,7 @@ export type Database = {
           referred_by?: string | null
           service_area?: string | null
           style_pack?: string | null
+          tour_completed?: boolean
           updated_at?: string
         }
         Update: {
@@ -2040,6 +2042,7 @@ export type Database = {
           referred_by?: string | null
           service_area?: string | null
           style_pack?: string | null
+          tour_completed?: boolean
           updated_at?: string
         }
         Relationships: [
