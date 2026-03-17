@@ -12,6 +12,7 @@ export interface Review {
   review_text: string | null;
   is_public: boolean;
   project_id: string | null;
+  source: string;
   owner_response: string | null;
   owner_response_at: string | null;
   reported: boolean;
@@ -60,7 +61,7 @@ export function useSubmitReview() {
     mutationFn: async (review: Partial<Review> & { user_id: string; reviewer_name: string }) => {
       const { data, error } = await supabase
         .from("reviews" as any)
-        .insert(review as any)
+        .insert({ ...review, is_public: false } as any)
         .select()
         .single();
       if (error) throw error;
@@ -69,6 +70,23 @@ export function useSubmitReview() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["reviews"] });
       queryClient.invalidateQueries({ queryKey: ["public-reviews", (data as any).user_id] });
+    },
+  });
+}
+
+export function useToggleReviewPublic() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, is_public }: { id: string; is_public: boolean }) => {
+      const { error } = await supabase
+        .from("reviews" as any)
+        .update({ is_public } as any)
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reviews"] });
+      queryClient.invalidateQueries({ queryKey: ["public-reviews"] });
     },
   });
 }
@@ -110,4 +128,19 @@ export function useReportReview() {
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["reviews"] }),
   });
+}
+
+/** Review stats for dashboard */
+export function useReviewStats() {
+  const { data: reviews = [] } = useReviews();
+  const total = reviews.length;
+  const avg = total > 0 ? reviews.reduce((s, r) => s + r.rating, 0) / total : 0;
+  const pending = reviews.filter(r => !r.is_public && !r.reported).length;
+  const thisMonth = reviews.filter(r => {
+    const d = new Date(r.created_at);
+    const now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+
+  return { total, avg, pending, thisMonth, reviews };
 }
