@@ -754,6 +754,65 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_metrics: {
+        Row: {
+          bookings_count: number
+          card_views: number
+          created_at: string
+          estimates_sent: number
+          id: string
+          jobs_completed: number
+          leads_count: number
+          metric_date: string
+          org_id: string | null
+          qr_scans: number
+          referrals_count: number
+          revenue: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bookings_count?: number
+          card_views?: number
+          created_at?: string
+          estimates_sent?: number
+          id?: string
+          jobs_completed?: number
+          leads_count?: number
+          metric_date?: string
+          org_id?: string | null
+          qr_scans?: number
+          referrals_count?: number
+          revenue?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bookings_count?: number
+          card_views?: number
+          created_at?: string
+          estimates_sent?: number
+          id?: string
+          jobs_completed?: number
+          leads_count?: number
+          metric_date?: string
+          org_id?: string | null
+          qr_scans?: number
+          referrals_count?: number
+          revenue?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_metrics_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_templates: {
         Row: {
           body: string
