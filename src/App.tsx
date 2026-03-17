@@ -108,6 +108,9 @@ const SettingsPage = lazy(() => import("@/modules/settings/pages/SettingsPage"))
 const AdminPage = lazy(() => import("@/modules/settings/pages/AdminPage"));
 const TeamPage = lazy(() => import("@/modules/settings/pages/TeamPage"));
 
+// Help
+const HelpCenter = lazy(() => import("@/modules/help/pages/HelpCenter"));
+
 const LazyFallback = () => (
   <div className="min-h-screen flex items-center justify-center">
     <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
