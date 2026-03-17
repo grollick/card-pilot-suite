@@ -153,6 +153,7 @@ const App = () => (
           <Routes>
             {/* Auth & marketing */}
             <Route path="/" element={<LandingPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
