@@ -146,7 +146,6 @@ export default function FirstLeadAssistant() {
   }
 
   const nextItem = checklist.find((c) => !c.done);
-  const [expandedTip, setExpandedTip] = useState<string | null>(null);
 
   // Progress ring dimensions
   const ringSize = 52;
