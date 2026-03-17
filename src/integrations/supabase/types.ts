@@ -2579,6 +2579,7 @@ export type Database = {
           review_text: string | null
           reviewer_email: string | null
           reviewer_name: string
+          source: string
           user_id: string
         }
         Insert: {
@@ -2595,6 +2596,7 @@ export type Database = {
           review_text?: string | null
           reviewer_email?: string | null
           reviewer_name: string
+          source?: string
           user_id: string
         }
         Update: {
@@ -2611,6 +2613,7 @@ export type Database = {
           review_text?: string | null
           reviewer_email?: string | null
           reviewer_name?: string
+          source?: string
           user_id?: string
         }
         Relationships: [
