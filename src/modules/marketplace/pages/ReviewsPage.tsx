@@ -237,7 +237,8 @@ export default function ReviewsPage() {
                         />
                       ))}
                     </div>
-                    {!review.is_public && <Badge variant="secondary" className="text-2xs">Hidden</Badge>}
+                    {!review.is_public && !review.reported && <Badge variant="outline" className="text-2xs text-warning border-warning/30">Pending</Badge>}
+                    {review.is_public && <Badge variant="secondary" className="text-2xs text-[hsl(var(--success))]">Published</Badge>}
                     {review.reported && <Badge variant="destructive" className="text-2xs">Reported</Badge>}
                   </div>
                   {review.review_text && (
