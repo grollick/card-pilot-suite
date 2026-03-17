@@ -13,7 +13,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  useReviews, useDeleteReview, useRespondToReview, useReportReview, type Review,
+  useReviews, useDeleteReview, useRespondToReview, useReportReview, useToggleReviewPublic, type Review,
 } from "@/hooks/useReviews";
 import { useProfile } from "@/hooks/useCard";
 import { toast } from "sonner";
