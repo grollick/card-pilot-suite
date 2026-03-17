@@ -1,7 +1,7 @@
 import { format, formatDistanceToNow } from "date-fns";
 import {
   Eye, MousePointer, Users, Calendar, Mail, MessageSquare,
-  Phone, FileText, CheckCircle2, Circle, ArrowRight, Reply, MailCheck
+  Phone, FileText, CheckCircle2, Circle, ArrowRight, Reply, MailCheck, Star
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -24,6 +24,7 @@ const activityIcons: Record<string, typeof Eye> = {
   task_completed: CheckCircle2,
   stage_changed: ArrowRight,
   file_shared: FileText,
+  review_submitted: Star,
 };
 
 const activityColors: Record<string, string> = {
@@ -45,6 +46,7 @@ const activityColors: Record<string, string> = {
   task_completed: "text-[hsl(var(--success))]",
   stage_changed: "text-primary",
   file_shared: "text-muted-foreground",
+  review_submitted: "text-warning",
 };
 
 type TimelineFilter = "all" | "notes" | "tasks" | "emails" | "bookings";

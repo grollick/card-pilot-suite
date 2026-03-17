@@ -13,7 +13,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  useReviews, useDeleteReview, useRespondToReview, useReportReview, type Review,
+  useReviews, useDeleteReview, useRespondToReview, useReportReview, useToggleReviewPublic, type Review,
 } from "@/hooks/useReviews";
 import { useProfile } from "@/hooks/useCard";
 import { toast } from "sonner";
@@ -37,6 +37,7 @@ export default function ReviewsPage() {
   const deleteReview = useDeleteReview();
   const respondToReview = useRespondToReview();
   const reportReview = useReportReview();
+  const togglePublic = useToggleReviewPublic();
 
   // ── Dialogs ──
   const [respondTo, setRespondTo] = useState<Review | null>(null);
@@ -236,7 +237,8 @@ export default function ReviewsPage() {
                         />
                       ))}
                     </div>
-                    {!review.is_public && <Badge variant="secondary" className="text-2xs">Hidden</Badge>}
+                    {!review.is_public && !review.reported && <Badge variant="outline" className="text-2xs text-warning border-warning/30">Pending</Badge>}
+                    {review.is_public && <Badge variant="secondary" className="text-2xs text-[hsl(var(--success))]">Published</Badge>}
                     {review.reported && <Badge variant="destructive" className="text-2xs">Reported</Badge>}
                   </div>
                   {review.review_text && (
@@ -258,6 +260,28 @@ export default function ReviewsPage() {
 
                 {/* Actions */}
                 <div className="flex gap-1 shrink-0 ml-2">
+                  {!review.is_public && !review.reported && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      title="Approve & publish"
+                      className="text-[hsl(var(--success))] hover:text-[hsl(var(--success))]"
+                      onClick={() => { togglePublic.mutate({ id: review.id, is_public: true }); toast.success("Review approved"); }}
+                    >
+                      <ThumbsUp className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                  {review.is_public && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      title="Unpublish"
+                      className="text-muted-foreground hover:text-warning"
+                      onClick={() => { togglePublic.mutate({ id: review.id, is_public: false }); toast.success("Review hidden"); }}
+                    >
+                      <Shield className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"
