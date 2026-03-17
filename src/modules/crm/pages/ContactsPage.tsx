@@ -1,3 +1,4 @@
+import PageHelpBanner from "@/components/PageHelpBanner";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Plus, ChevronRight, Loader2 } from "lucide-react";
@@ -153,6 +154,12 @@ export default function ContactsPage() {
 
   return (
     <div className="space-y-5 max-w-7xl">
+      <PageHelpBanner
+        storageKey="contacts"
+        tooltip="All lead form submissions appear here. Track conversations, set follow-ups, and never miss an opportunity."
+        videoTitle="How to manage leads"
+        videoDuration="3 min"
+      />
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Contacts</h1>

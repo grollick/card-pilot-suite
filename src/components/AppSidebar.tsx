@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Users, Briefcase, UserCheck, Megaphone, Settings,
-  ChevronLeft, LogOut, Globe, ChevronDown, Wrench, HardHat,
+  ChevronLeft, LogOut, Globe, ChevronDown, Wrench, HardHat, HelpCircle,
   // Leads sub-items
   Inbox, FileText, Calendar, Kanban,
   // Jobs sub-items
@@ -88,6 +88,7 @@ const moreItems = [
 ];
 
 const settingsItems = [
+  { title: "Help Center", url: "/app/help", icon: HelpCircle },
   { title: "Settings", url: "/app/settings", icon: Settings },
   { title: "Team", url: "/app/team", icon: Building2 },
   { title: "Admin", url: "/app/admin", icon: Shield },

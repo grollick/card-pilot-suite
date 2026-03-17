@@ -108,6 +108,9 @@ const SettingsPage = lazy(() => import("@/modules/settings/pages/SettingsPage"))
 const AdminPage = lazy(() => import("@/modules/settings/pages/AdminPage"));
 const TeamPage = lazy(() => import("@/modules/settings/pages/TeamPage"));
 
+// Help
+const HelpCenter = lazy(() => import("@/modules/help/pages/HelpCenter"));
+
 const LazyFallback = () => (
   <div className="min-h-screen flex items-center justify-center">
     <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
@@ -212,6 +215,7 @@ const App = () => (
               <Route path="admin" element={<LazyRoute><AdminPage /></LazyRoute>} />
               <Route path="team-management" element={<LazyRoute><TeamManagementPage /></LazyRoute>} />
               <Route path="tech-dashboard" element={<LazyRoute><TechDashboardPage /></LazyRoute>} />
+              <Route path="help" element={<LazyRoute><HelpCenter /></LazyRoute>} />
             </Route>
 
             {/* Public card OR SEO landing — smart routing */}
