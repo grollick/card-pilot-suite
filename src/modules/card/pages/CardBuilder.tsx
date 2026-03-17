@@ -84,6 +84,12 @@ export default function CardBuilder() {
 
   return (
     <div className="space-y-5 max-w-6xl">
+      <PageHelpBanner
+        storageKey="card_builder"
+        tooltip="Customize your card to capture more leads. Add a photo, compelling headline, and clear call-to-action."
+        videoTitle="How to create a high-converting card"
+        videoDuration="3 min"
+      />
       <CardBuilderHeader
         globalSaveState={s.globalSaveState}
         published={s.published}

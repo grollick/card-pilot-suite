@@ -154,6 +154,12 @@ export default function ContactsPage() {
 
   return (
     <div className="space-y-5 max-w-7xl">
+      <PageHelpBanner
+        storageKey="contacts"
+        tooltip="All lead form submissions appear here. Track conversations, set follow-ups, and never miss an opportunity."
+        videoTitle="How to manage leads"
+        videoDuration="3 min"
+      />
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Contacts</h1>
