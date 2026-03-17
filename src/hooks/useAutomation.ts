@@ -20,6 +20,8 @@ export const TRIGGER_TYPES = [
   { value: "booking_completed", label: "Booking completed" },
   { value: "stage_changed", label: "Pipeline stage changed" },
   { value: "lead_idle", label: "Contact idle for X days" },
+  { value: "customer_ready_to_rebook", label: "Customer ready to rebook" },
+  { value: "contact_inactive", label: "Contact inactive (win-back)" },
 ] as const;
 
 export const ACTION_TYPES = [
@@ -28,6 +30,8 @@ export const ACTION_TYPES = [
   { value: "log_activity", label: "Log an activity" },
   { value: "move_stage", label: "Move pipeline stage" },
   { value: "send_notification", label: "Send notification" },
+  { value: "create_alert", label: "Create dashboard alert" },
+  { value: "apply_tag", label: "Apply tag to contact" },
 ] as const;
 
 export const TASK_TYPES = ["follow_up", "call", "email", "meeting", "reminder"] as const;
@@ -67,6 +71,20 @@ const DEFAULT_RULES: Omit<AutomationRule, "id">[] = [
     trigger_config: { idle_days: 7 },
     action_type: "create_task",
     action_config: { title: "Follow up with {name} (idle)", type: "follow_up", priority: "medium", due_offset_hours: 0 },
+    enabled: true,
+  },
+  {
+    trigger_type: "customer_ready_to_rebook",
+    trigger_config: { days_since_completed: 30 },
+    action_type: "send_email",
+    action_config: { title: "Time to rebook, {name}!", template_id: null },
+    enabled: true,
+  },
+  {
+    trigger_type: "contact_inactive",
+    trigger_config: { inactive_days: 60 },
+    action_type: "send_notification",
+    action_config: { title: "Win back {name}", message: "This customer has been inactive. Consider sending a promotion." },
     enabled: true,
   },
 ];

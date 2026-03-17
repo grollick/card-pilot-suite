@@ -26,6 +26,7 @@ import MarketingSnapshot from "@/modules/dashboard/components/MarketingSnapshot"
 import BusinessHealthScore from "@/modules/dashboard/components/BusinessHealthScore";
 import TopCustomersWidget from "@/modules/dashboard/components/TopCustomersWidget";
 import ShareCardWidget from "@/modules/dashboard/components/ShareCardWidget";
+import RevenueOpportunities from "@/modules/dashboard/components/RevenueOpportunities";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const priorityColors: Record<string, string> = {
@@ -99,6 +100,9 @@ export default function DashboardHome() {
 
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-6">
+          {/* Revenue Opportunities */}
+          <RevenueOpportunities />
+
           {/* Leads Needing Attention */}
           <MissedOpportunities />
 

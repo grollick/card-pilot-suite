@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
   ArrowLeft, Phone, Mail, Calendar, FileText, MessageSquare,
-  Plus, Loader2, ChevronDown, Trash2, MoreHorizontal, Clock, Send, X, CheckCircle2, RotateCcw, ExternalLink
+  Plus, Loader2, ChevronDown, Trash2, MoreHorizontal, Clock, Send, X, CheckCircle2, RotateCcw, ExternalLink, Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -34,6 +34,7 @@ import NextActivityPanel from "@/modules/crm/components/NextActivityPanel";
 import ContactSummaryCard from "@/modules/crm/components/ContactSummaryCard";
 import ContactTasksList from "@/modules/crm/components/ContactTasksList";
 import PendingFollowups from "@/modules/crm/components/PendingFollowups";
+import ContactAutomationPanel from "@/modules/crm/components/ContactAutomationPanel";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function ContactDetail() {
@@ -215,6 +216,9 @@ export default function ContactDetail() {
                 Bookings {bookings.length > 0 && <Badge variant="secondary" className="ml-1.5 text-[10px] h-4">{bookings.length}</Badge>}
               </TabsTrigger>
               <TabsTrigger value="about" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-none px-4 pb-2">About</TabsTrigger>
+              <TabsTrigger value="automations" className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:shadow-none px-4 pb-2">
+                <Zap className="h-3.5 w-3.5 mr-1" />Automations
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="timeline" className="mt-4">
@@ -399,6 +403,18 @@ export default function ContactDetail() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="automations" className="mt-4">
+              <div className="rounded-xl border border-border bg-card p-5">
+                <ContactAutomationPanel
+                  contactId={contact.id}
+                  contactName={contact.name}
+                  contactEmail={contact.email}
+                  lastBookingDate={bookings[0]?.end_datetime ?? null}
+                  lastActivityDate={contact.last_activity_at}
+                />
               </div>
             </TabsContent>
           </Tabs>
