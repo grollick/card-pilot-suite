@@ -46,6 +46,7 @@ const activityColors: Record<string, string> = {
   task_completed: "text-[hsl(var(--success))]",
   stage_changed: "text-primary",
   file_shared: "text-muted-foreground",
+  review_submitted: "text-warning",
 };
 
 type TimelineFilter = "all" | "notes" | "tasks" | "emails" | "bookings";

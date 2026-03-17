@@ -260,6 +260,28 @@ export default function ReviewsPage() {
 
                 {/* Actions */}
                 <div className="flex gap-1 shrink-0 ml-2">
+                  {!review.is_public && !review.reported && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      title="Approve & publish"
+                      className="text-[hsl(var(--success))] hover:text-[hsl(var(--success))]"
+                      onClick={() => { togglePublic.mutate({ id: review.id, is_public: true }); toast.success("Review approved"); }}
+                    >
+                      <ThumbsUp className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                  {review.is_public && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      title="Unpublish"
+                      className="text-muted-foreground hover:text-warning"
+                      onClick={() => { togglePublic.mutate({ id: review.id, is_public: false }); toast.success("Review hidden"); }}
+                    >
+                      <Shield className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"

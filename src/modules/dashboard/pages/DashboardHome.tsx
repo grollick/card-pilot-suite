@@ -174,6 +174,9 @@ export default function DashboardHome() {
           {/* Business Health Score */}
           <BusinessHealthScore />
 
+          {/* Reviews */}
+          <ReviewsDashboardWidget />
+
           {/* Marketing Snapshot */}
           <MarketingSnapshot />
 
