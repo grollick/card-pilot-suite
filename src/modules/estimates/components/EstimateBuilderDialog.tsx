@@ -307,6 +307,27 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
           </>
         )}
       </DialogContent>
+      <EstimateAssistantSheet
+        open={assistantOpen}
+        onOpenChange={setAssistantOpen}
+        jobType={jobType}
+        scope={scope}
+        customerName={contacts.find((c: any) => c.id === leadId)?.name}
+        jobAddress={jobAddress}
+        existingItems={sections.flatMap(s => s.items)}
+        onApplyLineItems={(items) => {
+          setSections(prev => {
+            const lastSection = prev[prev.length - 1];
+            const hasEmptyOnly = lastSection.items.length === 1 && !lastSection.items[0].title;
+            if (hasEmptyOnly) {
+              return prev.map((s, i) => i === prev.length - 1 ? { ...s, items: items } : s);
+            }
+            return [...prev, { _tempId: crypto.randomUUID(), name: "AI Generated", notes: "", sort_order: prev.length, items }];
+          });
+        }}
+        onApplyScope={setScope}
+        onApplyTerms={setTermsConditions}
+      />
     </Dialog>
   );
 }
