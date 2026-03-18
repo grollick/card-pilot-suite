@@ -282,13 +282,30 @@ export function useCardBuilderState() {
   }, [profile, professionName, generate]);
 
   // ── Theme resolution ──
+  // Merge DB theme_json with any pending local fields for instant preview
+  const effectiveThemeJson = useMemo(() => {
+    const base = (card?.theme_json as any) ?? {};
+    return { ...base, ...pendingThemeFields };
+  }, [card?.theme_json, pendingThemeFields]);
+
+  // Clear pending fields once DB has caught up
+  useEffect(() => {
+    if (Object.keys(pendingThemeFields).length > 0 && card?.theme_json) {
+      const dbJson = card.theme_json as any;
+      const allSynced = Object.keys(pendingThemeFields).every(
+        key => JSON.stringify(dbJson[key]) === JSON.stringify(pendingThemeFields[key])
+      );
+      if (allSynced) setPendingThemeFields({});
+    }
+  }, [card?.theme_json, pendingThemeFields]);
+
   const savedThemeOverrides: CardThemeOverrides = {
-    palette: (card?.theme_json as any)?.palette ?? undefined,
-    fonts: (card?.theme_json as any)?.fonts ?? undefined,
-    tokens: (card?.theme_json as any)?.tokens ?? undefined,
-    gradientBg: (card?.theme_json as any)?.gradientBg ?? undefined,
-    bgPattern: (card?.theme_json as any)?.bgPattern ?? undefined,
-    metallicEffect: (card?.theme_json as any)?.metallicEffect ?? undefined,
+    palette: effectiveThemeJson.palette ?? undefined,
+    fonts: effectiveThemeJson.fonts ?? undefined,
+    tokens: effectiveThemeJson.tokens ?? undefined,
+    gradientBg: effectiveThemeJson.gradientBg ?? undefined,
+    bgPattern: effectiveThemeJson.bgPattern ?? undefined,
+    metallicEffect: effectiveThemeJson.metallicEffect ?? undefined,
   };
 
   // When theme editor is open, show live preview overrides; otherwise show saved
@@ -300,13 +317,12 @@ export function useCardBuilderState() {
     const tokens = (stylePack?.theme_tokens as Record<string, any>) ?? {};
     const palettes = (stylePack?.default_palettes as any[]) ?? [];
     const basePalette = palettes[0] ?? FALLBACK_PALETTE;
-    const themeJson = (card?.theme_json as any) ?? {};
 
-    // Use live preview overrides from theme editor when available
+    // Use live preview overrides from theme editor when available, then pending fields
     const liveOverrides = themePreviewOverrides ?? {};
-    const effectivePalette = (liveOverrides as any).palette ?? themeJson.palette;
-    const effectiveFonts = (liveOverrides as any).fonts ?? themeJson.fonts;
-    const effectiveTokens = (liveOverrides as any).tokens ?? themeJson.tokens;
+    const effectivePalette = (liveOverrides as any).palette ?? effectiveThemeJson.palette;
+    const effectiveFonts = (liveOverrides as any).fonts ?? effectiveThemeJson.fonts;
+    const effectiveTokens = (liveOverrides as any).tokens ?? effectiveThemeJson.tokens;
 
     const palette = effectivePalette ? { ...basePalette, ...effectivePalette } : basePalette;
     let merged = { ...tokens };
