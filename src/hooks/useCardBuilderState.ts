@@ -378,13 +378,12 @@ export function useCardBuilderState() {
     try {
       const existing = (card?.theme_json as any) ?? {};
       await upsertCard.mutateAsync({
-        sections_json: sections as any,
-        status: published ? "published" : "draft",
         theme_json: { ...existing, ...pendingThemeFieldsRef.current, cover_url: coverUrlRef.current, ...themeFields } as any,
       });
+      qc.invalidateQueries({ queryKey: ["public-card"] });
       toast.success("Theme updated!");
     } catch { toast.error("Failed to save theme"); }
-  }, [card, sections, published, upsertCard]);
+  }, [card, upsertCard, qc]);
 
   const handleThemeEditorOpenChange = useCallback((open: boolean) => {
     if (!open && themePreviewOverrides) {
