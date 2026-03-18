@@ -337,7 +337,7 @@ export function useCardBuilderState() {
       if (t.radius) merged = { ...merged, radius: { ...(merged.radius ?? {}), ...t.radius } };
     }
     return resolveCardTheme(merged, palette);
-  }, [stylePack, card?.theme_json, themePreviewOverrides]);
+  }, [stylePack, effectiveThemeJson, themePreviewOverrides]);
 
   const handleThemePreview = useCallback((overrides: CardThemeOverrides) => {
     setThemePreviewOverrides(overrides);
@@ -345,12 +345,22 @@ export function useCardBuilderState() {
 
   const handleThemeSave = useCallback(async (overrides: CardThemeOverrides) => {
     setThemePreviewOverrides(null);
+    // Apply locally immediately
+    const themeFields = {
+      palette: overrides.palette,
+      fonts: overrides.fonts,
+      tokens: overrides.tokens,
+      gradientBg: overrides.gradientBg,
+      bgPattern: overrides.bgPattern,
+      metallicEffect: overrides.metallicEffect,
+    };
+    setPendingThemeFields(prev => ({ ...prev, ...themeFields }));
     try {
       const existing = (card?.theme_json as any) ?? {};
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: published ? "published" : "draft",
-        theme_json: { ...existing, cover_url: coverUrl, palette: overrides.palette, fonts: overrides.fonts, tokens: overrides.tokens, gradientBg: overrides.gradientBg, bgPattern: overrides.bgPattern, metallicEffect: overrides.metallicEffect } as any,
+        theme_json: { ...existing, cover_url: coverUrl, ...themeFields } as any,
       });
       toast.success("Theme updated!");
     } catch { toast.error("Failed to save theme"); }
