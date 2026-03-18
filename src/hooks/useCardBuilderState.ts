@@ -443,7 +443,7 @@ export function useCardBuilderState() {
     identitySaveTimers, identitySaveState, setIdentitySaveState,
     // Photos / Logo
     avatarUrl, coverUrl, avatarBgColor, avatarRotation, coverOffsetY,
-    logoUrl, logoFrostedBg, logoGlow, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap, logoVerticalAlign,
+    logoUrl, logoFrostedBg, logoGlow, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap, logoVerticalAlign, logoCustomPosition,
     handleAvatarChange, handleCoverChange,
     handleAvatarBgColorChange, handleAvatarRotationChange, handleCoverOffsetYChange,
     handleLogoChange, handleLogoFrostedBgChange, handleLogoGlowChange,
