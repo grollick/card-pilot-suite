@@ -166,9 +166,8 @@ export function useCardBuilderState() {
           setGlobalSaveState("saving");
           await upsertCard.mutateAsync({
             sections_json: newSections as any,
-            status: published ? "published" : "draft",
-            theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFieldsRef.current, cover_url: coverUrlRef.current } as any,
           });
+          qc.invalidateQueries({ queryKey: ["public-card"] });
           setGlobalSaveState("saved");
           clearTimeout(globalSaveTimer.current);
           globalSaveTimer.current = setTimeout(() => setGlobalSaveState("idle"), 2500);
@@ -183,7 +182,7 @@ export function useCardBuilderState() {
       if (immediate) await doSave();
       else saveTimer.current = setTimeout(doSave, 800);
     },
-    [published, card, upsertCard],
+    [upsertCard, qc],
   );
 
   // ── Section handlers ──
