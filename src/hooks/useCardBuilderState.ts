@@ -132,14 +132,22 @@ export function useCardBuilderState() {
       pendingThemeFieldsRef.current = next;
       return next;
     });
+
     try {
       setGlobalSaveState("saving");
       const existing = (card?.theme_json as any) ?? {};
+      const mergedTheme = {
+        ...existing,
+        ...pendingThemeFieldsRef.current,
+        cover_url: coverUrlRef.current,
+        ...fields,
+      } as any;
+
       await upsertCard.mutateAsync({
-        sections_json: sections as any,
-        status: published ? "published" : "draft",
-        theme_json: { ...existing, ...pendingThemeFieldsRef.current, cover_url: coverUrlRef.current, ...fields } as any,
+        theme_json: mergedTheme,
       });
+
+      qc.invalidateQueries({ queryKey: ["public-card"] });
       setGlobalSaveState("saved");
       clearTimeout(globalSaveTimer.current);
       globalSaveTimer.current = setTimeout(() => setGlobalSaveState("idle"), 2500);
@@ -148,7 +156,7 @@ export function useCardBuilderState() {
       clearTimeout(globalSaveTimer.current);
       globalSaveTimer.current = setTimeout(() => setGlobalSaveState("idle"), 4000);
     }
-  }, [card, sections, published, upsertCard]);
+  }, [card, upsertCard, qc]);
 
   const saveSections = useCallback(
     async (newSections: CardSection[], immediate = false) => {
@@ -158,9 +166,8 @@ export function useCardBuilderState() {
           setGlobalSaveState("saving");
           await upsertCard.mutateAsync({
             sections_json: newSections as any,
-            status: published ? "published" : "draft",
-            theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFieldsRef.current, cover_url: coverUrlRef.current } as any,
           });
+          qc.invalidateQueries({ queryKey: ["public-card"] });
           setGlobalSaveState("saved");
           clearTimeout(globalSaveTimer.current);
           globalSaveTimer.current = setTimeout(() => setGlobalSaveState("idle"), 2500);
@@ -175,7 +182,7 @@ export function useCardBuilderState() {
       if (immediate) await doSave();
       else saveTimer.current = setTimeout(doSave, 800);
     },
-    [published, card, upsertCard],
+    [upsertCard, qc],
   );
 
   // ── Section handlers ──
@@ -234,13 +241,12 @@ export function useCardBuilderState() {
     clearTimeout(saveTimer.current);
     try {
       await upsertCard.mutateAsync({
-        sections_json: sections as any,
         status: val ? "published" : "draft",
-        theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFieldsRef.current, cover_url: coverUrl } as any,
       });
+      qc.invalidateQueries({ queryKey: ["public-card"] });
       toast.success(val ? "Card published!" : "Card unpublished");
     } catch { toast.error("Failed to update status"); }
-  }, [sections, card, coverUrl, upsertCard]);
+  }, [upsertCard, qc]);
 
   const handleAvatarChange = useCallback((url: string) => {
     setAvatarUrl(url);
@@ -251,13 +257,13 @@ export function useCardBuilderState() {
     setCoverUrl(url);
     coverUrlRef.current = url;
     try {
+      const existing = (card?.theme_json as any) ?? {};
       await upsertCard.mutateAsync({
-        sections_json: sections as any,
-        status: published ? "published" : "draft",
-        theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFieldsRef.current, cover_url: url } as any,
+        theme_json: { ...existing, ...pendingThemeFieldsRef.current, cover_url: url } as any,
       });
+      qc.invalidateQueries({ queryKey: ["public-card"] });
     } catch { toast.error("Failed to save backdrop"); }
-  }, [sections, published, card, upsertCard]);
+  }, [card, upsertCard, qc]);
 
   const makeThemeHandler = <T,>(field: string, setter: (v: T) => void) =>
     (val: T) => { setter(val); saveThemeField({ [field]: val }); };
@@ -372,13 +378,12 @@ export function useCardBuilderState() {
     try {
       const existing = (card?.theme_json as any) ?? {};
       await upsertCard.mutateAsync({
-        sections_json: sections as any,
-        status: published ? "published" : "draft",
         theme_json: { ...existing, ...pendingThemeFieldsRef.current, cover_url: coverUrlRef.current, ...themeFields } as any,
       });
+      qc.invalidateQueries({ queryKey: ["public-card"] });
       toast.success("Theme updated!");
     } catch { toast.error("Failed to save theme"); }
-  }, [card, sections, published, upsertCard]);
+  }, [card, upsertCard, qc]);
 
   const handleThemeEditorOpenChange = useCallback((open: boolean) => {
     if (!open && themePreviewOverrides) {
