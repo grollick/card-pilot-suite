@@ -163,7 +163,7 @@ export default function CardBuilderPreview({
     onIdentityPositionChange?.(null);
   }, [onIdentityPositionChange]);
 
-  // Logo drag handlers
+  // Logo drag handlers — store as percentage of cover container
   const handleLogoPointerDown = useCallback((e: React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -174,10 +174,17 @@ export default function CardBuilderPreview({
   }, [logoCustomPosition]);
 
   const handleLogoPointerMove = useCallback((e: React.PointerEvent) => {
-    if (!isLogoDragging.current) return;
+    if (!isLogoDragging.current || !coverRef.current) return;
+    const rect = coverRef.current.getBoundingClientRect();
     const dx = e.clientX - logoDragStart.current.x;
     const dy = e.clientY - logoDragStart.current.y;
-    onLogoCustomPositionChange?.({ x: logoDragStart.current.posX + dx, y: logoDragStart.current.posY + dy });
+    // Convert pixel delta to percentage of container
+    const dxPct = (dx / rect.width) * 100;
+    const dyPct = (dy / rect.height) * 100;
+    onLogoCustomPositionChange?.({
+      x: Math.max(-10, Math.min(90, logoDragStart.current.posX + dxPct)),
+      y: Math.max(-10, Math.min(90, logoDragStart.current.posY + dyPct)),
+    });
   }, [onLogoCustomPositionChange]);
 
   const handleLogoPointerUp = useCallback(() => {
