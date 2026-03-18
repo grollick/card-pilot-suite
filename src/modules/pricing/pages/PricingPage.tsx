@@ -175,8 +175,8 @@ export default function PricingPage() {
               Card<span className="text-primary">Pilot</span>
             </button>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>Sign in</Button>
-              <Button size="sm" onClick={() => navigate("/auth")}>Get Started Free</Button>
+              <Button variant="ghost" size="sm" onClick={() => handleAuthNav()}>{user ? "Dashboard" : "Sign in"}</Button>
+              {!user && <Button size="sm" onClick={() => handleAuthNav("signup")}>Get Started Free</Button>}
             </div>
           </div>
         </nav>
