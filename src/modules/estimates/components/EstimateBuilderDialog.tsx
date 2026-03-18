@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { Plus, Trash2, Loader2, Download, ChevronDown, ChevronRight, Calculator, Bookmark } from "lucide-react";
+import { Plus, Trash2, Loader2, Download, ChevronDown, ChevronRight, Calculator, Bookmark, Sparkles } from "lucide-react";
+import EstimateAssistantSheet from "./EstimateAssistantSheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
