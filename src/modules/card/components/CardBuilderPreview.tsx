@@ -120,6 +120,7 @@ export default function CardBuilderPreview({
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
   boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, nameLineHeight, onAvatarChange, setEditingSection,
   identityPosition, onIdentityPositionChange,
+  logoCustomPosition, onLogoCustomPositionChange,
   previewDevice: externalDevice, hideToolbar,
 }: Props) {
   const [internalDevice, setInternalDevice] = useState<"phone" | "tablet">("phone");
