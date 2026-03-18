@@ -1,4 +1,6 @@
-import { Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate, Sparkles, Loader2, MousePointerClick, Crown } from "lucide-react";
+import { Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate, Sparkles, Loader2, MousePointerClick, Crown, Plus } from "lucide-react";
+import BlockMarketplaceDialog from "@/modules/card/components/BlockMarketplaceDialog";
+import { canAccessBlock, type MarketplaceBlock } from "@/lib/blockMarketplace";
 import ConversionTips from "@/modules/card/components/ConversionTips";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -35,6 +37,30 @@ export default function CardBuilder() {
   const [photoImportOpen, setPhotoImportOpen] = useState(false);
   const [rightTab, setRightTab] = useState("identity");
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
+  const [blockMarketOpen, setBlockMarketOpen] = useState(false);
+
+  // Track installed marketplace blocks
+  const installedBlockIds = s.sections
+    .filter((sec) => !["hero","about","services","projects","quote_calculator","testimonials","gallery","contact","quote_request","booking","social"].includes(sec.id))
+    .map((sec) => sec.id);
+
+  const handleInstallBlock = (block: MarketplaceBlock) => {
+    if (s.sections.find((sec) => sec.id === block.id)) {
+      toast.info(`${block.name} is already on your card.`);
+      return;
+    }
+    const newSection = {
+      id: block.id,
+      label: block.name,
+      enabled: true,
+      content: block.defaultContent,
+    };
+    const next = [...s.sections, newSection];
+    s.setSections(next);
+    s.saveSections(next, true);
+    toast.success(`${block.name} added to your card!`);
+    setBlockMarketOpen(false);
+  };
 
   const handlePhotoImport = async (projects: ImportedProject[]) => {
     if (!user || projects.length === 0) return;
@@ -153,6 +179,17 @@ export default function CardBuilder() {
         setEditingSection={s.setEditingSection}
         saveSections={s.saveSections}
       />
+
+      {/* Block Marketplace trigger */}
+      <Button
+        variant="outline"
+        size="sm"
+        className="w-full gap-1.5 border-dashed border-primary/30 text-primary hover:bg-primary/5"
+        onClick={() => setBlockMarketOpen(true)}
+      >
+        <Plus className="h-3.5 w-3.5" />
+        Browse Block Marketplace
+      </Button>
 
       {/* AI Generate */}
       <div className="space-y-2">
@@ -605,6 +642,14 @@ export default function CardBuilder() {
         onOpenChange={setPhotoImportOpen}
         profession={s.professionName}
         onImportComplete={handlePhotoImport}
+      />
+
+      <BlockMarketplaceDialog
+        open={blockMarketOpen}
+        onOpenChange={setBlockMarketOpen}
+        installedBlockIds={installedBlockIds}
+        onInstallBlock={handleInstallBlock}
+        userPlan={planKey}
       />
     </div>
   );
