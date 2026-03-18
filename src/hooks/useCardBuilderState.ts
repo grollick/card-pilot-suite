@@ -241,13 +241,12 @@ export function useCardBuilderState() {
     clearTimeout(saveTimer.current);
     try {
       await upsertCard.mutateAsync({
-        sections_json: sections as any,
         status: val ? "published" : "draft",
-        theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFieldsRef.current, cover_url: coverUrl } as any,
       });
+      qc.invalidateQueries({ queryKey: ["public-card"] });
       toast.success(val ? "Card published!" : "Card unpublished");
     } catch { toast.error("Failed to update status"); }
-  }, [sections, card, coverUrl, upsertCard]);
+  }, [upsertCard, qc]);
 
   const handleAvatarChange = useCallback((url: string) => {
     setAvatarUrl(url);
