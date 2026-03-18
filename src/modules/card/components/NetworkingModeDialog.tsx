@@ -26,7 +26,7 @@ export default function NetworkingModeDialog({ open, onOpenChange }: NetworkingM
   const { data: profile } = useProfile();
   const { planKey } = usePlanLimits();
   const isPro = planKey !== "starter";
-  const isProPlus = planKey === "pro_plus" || planKey === "agency";
+  const isProPlus = planKey === "pro" || planKey === "agency";
   const [copied, setCopied] = useState(false);
   const svgRef = useRef<HTMLDivElement>(null);
   const nfcSupported = typeof window !== "undefined" && "NDEFReader" in window;
