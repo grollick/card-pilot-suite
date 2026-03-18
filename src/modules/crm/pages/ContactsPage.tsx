@@ -139,6 +139,11 @@ export default function ContactsPage() {
 
   const handleCreate = async () => {
     if (!newName.trim()) return;
+    if (checkLimit("contacts", contacts.length)) {
+      setNewOpen(false);
+      setUpgradeOpen(true);
+      return;
+    }
     const lead = await createContact.mutateAsync({
       name: newName,
       email: newEmail || undefined,
