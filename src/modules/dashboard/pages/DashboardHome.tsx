@@ -12,6 +12,7 @@ import MobileJobDashboard from "@/modules/dashboard/components/MobileJobDashboar
 import ActivationChecklist from "@/modules/dashboard/components/ActivationChecklist";
 import ShareMessageCard from "@/modules/dashboard/components/ShareMessageCard";
 import FirstLeadCelebration from "@/modules/dashboard/components/FirstLeadCelebration";
+import PostLeadSharePrompt from "@/modules/dashboard/components/PostLeadSharePrompt";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function DashboardHome() {
@@ -40,6 +41,9 @@ export default function DashboardHome() {
 
       {/* ── First Lead Celebration ── */}
       <FirstLeadCelebration />
+
+      {/* ── Post-Lead Share Prompt ── */}
+      <PostLeadSharePrompt />
 
       {/* ── SECTION 2: KPI Row ── */}
       <RevenueKPICards />
