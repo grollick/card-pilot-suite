@@ -123,7 +123,7 @@ export default function AIDesignAssistantDialog({
 
   return (
     <Dialog open={open} onOpenChange={(val) => { onOpenChange(val); if (!val) setTimeout(resetState, 300); }}>
-      <DialogContent className="max-w-lg max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden">
+      <DialogContent className="max-w-lg max-h-[85vh] p-0 gap-0 overflow-hidden">
 
         {/* Header */}
         <DialogHeader className="px-6 pt-6 pb-4 border-b border-border shrink-0">
@@ -150,8 +150,7 @@ export default function AIDesignAssistantDialog({
           </div>
         )}
 
-        <ScrollArea className="flex-1 min-h-0">
-          <div className="px-6 pb-6">
+        <div className="overflow-y-auto px-6 pb-6 max-h-[60vh]">
             <AnimatePresence mode="wait">
 
               {/* ── Step: Intro ── */}
