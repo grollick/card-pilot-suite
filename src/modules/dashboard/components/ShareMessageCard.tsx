@@ -27,10 +27,10 @@ export default function ShareMessageCard() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("handle, name, company, profession")
+        .select("handle, name, company")
         .eq("id", user!.id)
         .single();
-      return data;
+      return data as { handle: string | null; name: string | null; company: string | null } | null;
     },
   });
 
