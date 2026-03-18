@@ -92,6 +92,7 @@ const settingsItems = [
   { title: "Settings", url: "/app/settings", icon: Settings },
   { title: "Team", url: "/app/team", icon: Building2 },
   { title: "Admin", url: "/app/admin", icon: Shield },
+  { title: "Platform Admin", url: "/app/platform-admin", icon: Shield },
 ];
 
 type NavItem = { title: string; url: string; icon: any; end?: boolean };
