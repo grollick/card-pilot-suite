@@ -39,6 +39,49 @@ export default function CardBuilder() {
   const [rightTab, setRightTab] = useState("identity");
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
   const [blockMarketOpen, setBlockMarketOpen] = useState(false);
+  const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
+
+  const handleAICardGenerated = (result: AICardResult) => {
+    // Apply sections order
+    const newSections = result.sections_order.map((id) => {
+      const existing = s.sections.find((sec) => sec.id === id);
+      const label = existing?.label || id.charAt(0).toUpperCase() + id.slice(1).replace(/_/g, " ");
+      const content: Record<string, any> = existing?.content || {};
+
+      // Populate section content from AI result
+      if (id === "hero") content.tagline = result.hero.tagline;
+      if (id === "about") content.text = result.about;
+      if (id === "services") content.items = result.services;
+      if (id === "testimonials") content.items = result.testimonials;
+      if (id === "promo" || id === "offer_banner") {
+        content.headline = result.promo.headline;
+        content.body = result.promo.body;
+        content.cta_text = result.promo.cta_text;
+      }
+
+      return { id, label, enabled: true, content };
+    });
+    // Keep disabled sections not in the AI order
+    s.sections.forEach((sec) => {
+      if (!newSections.find((ns) => ns.id === sec.id)) {
+        newSections.push({ ...sec, enabled: false });
+      }
+    });
+    s.setSections(newSections);
+    s.saveSections(newSections, true);
+
+    // Apply theme
+    s.saveThemeField({
+      palette: {
+        primary: result.theme.primary_color,
+        secondary: result.theme.secondary_color,
+        accent: result.theme.accent_color,
+        background: result.theme.background_color,
+      },
+      ...(result.theme.font_primary && { fonts: { primary: result.theme.font_primary, secondary: result.theme.font_secondary || result.theme.font_primary } }),
+      ...(result.theme.border_radius && { border_radius: result.theme.border_radius }),
+    });
+  };
 
   // Track installed marketplace blocks
   const installedBlockIds = s.sections
