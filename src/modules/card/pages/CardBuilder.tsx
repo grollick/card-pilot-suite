@@ -64,7 +64,7 @@ export default function CardBuilder() {
     // Keep disabled sections not in the AI order
     s.sections.forEach((sec) => {
       if (!newSections.find((ns) => ns.id === sec.id)) {
-        newSections.push({ ...sec, enabled: false });
+        newSections.push({ ...sec, enabled: false, content: sec.content || {} });
       }
     });
     s.setSections(newSections);
