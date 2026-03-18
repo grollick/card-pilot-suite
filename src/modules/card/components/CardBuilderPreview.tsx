@@ -114,8 +114,11 @@ export default function CardBuilderPreview({
   logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap = 8, logoVerticalAlign = "center",
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
   boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, onAvatarChange, setEditingSection,
+  previewDevice: externalDevice, hideToolbar,
 }: Props) {
-  const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
+  const [internalDevice, setInternalDevice] = useState<"phone" | "tablet">("phone");
+  const previewDevice = externalDevice ?? internalDevice;
+  const setPreviewDevice = setInternalDevice;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const logoPx = logoSize === "small" ? 36 : logoSize === "large" ? 64 : 48;
