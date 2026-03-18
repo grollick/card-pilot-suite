@@ -65,6 +65,9 @@ export default function AdminPage() {
         <TabsContent value="emails" className="mt-4">
           <p className="text-sm text-muted-foreground">Manage default email templates per profession. Connect backend to enable editing.</p>
         </TabsContent>
+        <TabsContent value="system-events" className="mt-4">
+          <SystemEventsWidget />
+        </TabsContent>
       </Tabs>
     </div>
   );
