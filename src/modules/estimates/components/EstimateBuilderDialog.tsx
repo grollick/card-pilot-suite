@@ -83,7 +83,7 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
   const [termsConditions, setTermsConditions] = useState("");
   const [internalNotes, setInternalNotes] = useState("");
   const [showFinancials, setShowFinancials] = useState(false);
-
+  const [assistantOpen, setAssistantOpen] = useState(false);
   useEffect(() => {
     if (isEdit && existing) {
       setLeadId(existing.lead_id ?? "");
