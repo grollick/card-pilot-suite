@@ -23,10 +23,12 @@ import {
   Scissors,
   Home,
   Wrench,
+  TreePine,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FooterSection from "@/modules/landing/components/FooterSection";
 import HeroPhoneAnimation from "@/modules/landing/components/HeroPhoneAnimation";
+import { DEMO_CARDS } from "@/lib/demoCards";
 
 /* ── animations ── */
 const fade = {
