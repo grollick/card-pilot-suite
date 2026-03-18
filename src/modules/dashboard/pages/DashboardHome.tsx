@@ -42,6 +42,9 @@ export default function DashboardHome() {
       {/* ── First Lead Celebration ── */}
       <FirstLeadCelebration />
 
+      {/* ── Post-Lead Share Prompt ── */}
+      <PostLeadSharePrompt />
+
       {/* ── SECTION 2: KPI Row ── */}
       <RevenueKPICards />
 
