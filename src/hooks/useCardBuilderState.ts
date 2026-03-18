@@ -353,7 +353,6 @@ export function useCardBuilderState() {
 
   const handleThemeSave = useCallback(async (overrides: CardThemeOverrides) => {
     setThemePreviewOverrides(null);
-    // Apply locally immediately
     const themeFields = {
       palette: overrides.palette,
       fonts: overrides.fonts,
@@ -361,23 +360,33 @@ export function useCardBuilderState() {
       gradientBg: overrides.gradientBg,
       bgPattern: overrides.bgPattern,
       metallicEffect: overrides.metallicEffect,
+      heroBackgroundId: (overrides as any).heroBackgroundId,
     };
-    setPendingThemeFields(prev => ({ ...prev, ...themeFields }));
+
+    setPendingThemeFields(prev => {
+      const next = { ...prev, ...themeFields };
+      pendingThemeFieldsRef.current = next;
+      return next;
+    });
+
     try {
       const existing = (card?.theme_json as any) ?? {};
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: published ? "published" : "draft",
-        theme_json: { ...existing, cover_url: coverUrl, ...themeFields } as any,
+        theme_json: { ...existing, ...pendingThemeFieldsRef.current, cover_url: coverUrlRef.current, ...themeFields } as any,
       });
       toast.success("Theme updated!");
     } catch { toast.error("Failed to save theme"); }
-  }, [card, sections, published, coverUrl, upsertCard]);
+  }, [card, sections, published, upsertCard]);
 
   const handleThemeEditorOpenChange = useCallback((open: boolean) => {
+    if (!open && themePreviewOverrides) {
+      void handleThemeSave(themePreviewOverrides);
+    }
     setThemeEditorOpen(open);
     if (!open) setThemePreviewOverrides(null);
-  }, []);
+  }, [themePreviewOverrides, handleThemeSave]);
 
   const handleDragEnd = useCallback((active: string, over: string) => {
     setSections((prev) => {
