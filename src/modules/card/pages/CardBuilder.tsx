@@ -347,8 +347,9 @@ export default function CardBuilder() {
           firstNameFontWeight={s.firstNameFontWeight} setFirstNameFontWeight={s.setFirstNameFontWeight}
           nameItalic={s.nameItalic} setNameItalic={s.setNameItalic}
           nameFontSize={s.nameFontSize} setNameFontSize={s.setNameFontSize}
-          subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
-          saveThemeField={s.saveThemeField} qc={s.qc} hideWrapper
+           subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
+           nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
+           saveThemeField={s.saveThemeField} qc={s.qc} hideWrapper
         />
       </TabsContent>
 
@@ -543,6 +544,7 @@ export default function CardBuilder() {
                       nameItalic={s.nameItalic}
                       nameFontSize={s.nameFontSize}
                       subtitleFontSize={s.subtitleFontSize}
+                      nameLineHeight={s.nameLineHeight}
                       onAvatarChange={s.handleAvatarChange}
                       setEditingSection={s.setEditingSection}
                       identityPosition={s.identityPosition}
@@ -594,7 +596,8 @@ export default function CardBuilder() {
                 boldLastName={s.boldLastName} uppercaseName={s.uppercaseName}
                 nameLetterSpacing={s.nameLetterSpacing} nameFontWeight={s.nameFontWeight}
                 firstNameFontWeight={s.firstNameFontWeight} nameItalic={s.nameItalic}
-                nameFontSize={s.nameFontSize} subtitleFontSize={s.subtitleFontSize}
+                      nameFontSize={s.nameFontSize} subtitleFontSize={s.subtitleFontSize}
+                      nameLineHeight={s.nameLineHeight}
                 onAvatarChange={s.handleAvatarChange} setEditingSection={s.setEditingSection}
                 identityPosition={s.identityPosition}
                 onIdentityPositionChange={s.handleIdentityPositionChange}
@@ -656,6 +659,7 @@ export default function CardBuilder() {
                 nameItalic={s.nameItalic} setNameItalic={s.setNameItalic}
                 nameFontSize={s.nameFontSize} setNameFontSize={s.setNameFontSize}
                 subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
+                nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
                 saveThemeField={s.saveThemeField} qc={s.qc} hideWrapper
               />
               <div className="mt-4 space-y-3">

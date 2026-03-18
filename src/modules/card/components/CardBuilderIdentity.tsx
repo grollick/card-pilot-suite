@@ -30,6 +30,8 @@ interface Props {
   setNameFontSize: (v: number | null) => void;
   subtitleFontSize: number | null;
   setSubtitleFontSize: (v: number | null) => void;
+  nameLineHeight: number | null;
+  setNameLineHeight: (v: number | null) => void;
   professionName: string;
   identitySaveTimers: React.MutableRefObject<Record<string, ReturnType<typeof setTimeout>>>;
   identitySaveState: Record<string, "saving" | "saved" | null>;
@@ -55,6 +57,7 @@ export default function CardBuilderIdentity({
   nameItalic, setNameItalic,
   nameFontSize, setNameFontSize,
   subtitleFontSize, setSubtitleFontSize,
+  nameLineHeight, setNameLineHeight,
   professionName, identitySaveTimers, identitySaveState, setIdentitySaveState,
   saveThemeField, qc, hideWrapper,
 }: Props) {
@@ -213,6 +216,27 @@ export default function CardBuilderIdentity({
             <button
               type="button"
               onClick={() => { setSubtitleFontSize(null); saveThemeField({ subtitle_font_size: null }); }}
+              className="text-[10px] text-primary hover:underline mt-0.5"
+            >Reset to auto</button>
+          )}
+        </div>
+        <div className="mt-1.5">
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[11px] text-muted-foreground">Line spacing</label>
+            <span className="text-[10px] text-muted-foreground tabular-nums">{nameLineHeight != null ? `${nameLineHeight}` : "Auto"}</span>
+          </div>
+          <Slider
+            min={0.8}
+            max={3}
+            step={0.1}
+            value={[nameLineHeight ?? 1.4]}
+            onValueChange={([v]) => { setNameLineHeight(v); saveThemeField({ name_line_height: v }); }}
+            className="w-full"
+          />
+          {nameLineHeight !== null && (
+            <button
+              type="button"
+              onClick={() => { setNameLineHeight(null); saveThemeField({ name_line_height: null }); }}
               className="text-[10px] text-primary hover:underline mt-0.5"
             >Reset to auto</button>
           )}
