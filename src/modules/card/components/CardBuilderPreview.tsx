@@ -44,6 +44,8 @@ interface Props {
   setEditingSection: (id: string | null) => void;
   identityPosition?: { x: number; y: number } | null;
   onIdentityPositionChange?: (pos: { x: number; y: number } | null) => void;
+  logoCustomPosition?: { x: number; y: number } | null;
+  onLogoCustomPositionChange?: (pos: { x: number; y: number } | null) => void;
   /** When provided externally, hides the built-in device toggle toolbar */
   previewDevice?: "phone" | "tablet";
   hideToolbar?: boolean;
@@ -118,6 +120,7 @@ export default function CardBuilderPreview({
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
   boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, nameLineHeight, onAvatarChange, setEditingSection,
   identityPosition, onIdentityPositionChange,
+  logoCustomPosition, onLogoCustomPositionChange,
   previewDevice: externalDevice, hideToolbar,
 }: Props) {
   const [internalDevice, setInternalDevice] = useState<"phone" | "tablet">("phone");
@@ -127,6 +130,8 @@ export default function CardBuilderPreview({
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
+  const isLogoDragging = useRef(false);
+  const logoDragStart = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     e.preventDefault();
@@ -154,6 +159,32 @@ export default function CardBuilderPreview({
     e.stopPropagation();
     onIdentityPositionChange?.(null);
   }, [onIdentityPositionChange]);
+
+  // Logo drag handlers
+  const handleLogoPointerDown = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    isLogoDragging.current = true;
+    const pos = logoCustomPosition ?? { x: 0, y: 0 };
+    logoDragStart.current = { x: e.clientX, y: e.clientY, posX: pos.x, posY: pos.y };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }, [logoCustomPosition]);
+
+  const handleLogoPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isLogoDragging.current) return;
+    const dx = e.clientX - logoDragStart.current.x;
+    const dy = e.clientY - logoDragStart.current.y;
+    onLogoCustomPositionChange?.({ x: logoDragStart.current.posX + dx, y: logoDragStart.current.posY + dy });
+  }, [onLogoCustomPositionChange]);
+
+  const handleLogoPointerUp = useCallback(() => {
+    isLogoDragging.current = false;
+  }, []);
+
+  const handleResetLogoPosition = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onLogoCustomPositionChange?.(null);
+  }, [onLogoCustomPositionChange]);
 
   const logoPx = logoSize === "small" ? 36 : logoSize === "large" ? 64 : 48;
   const posMap: Record<string, string> = {
@@ -231,10 +262,44 @@ export default function CardBuilderPreview({
                     )}
                     {logoUrl && logoPosition !== "beside-name" && logoPosition !== "beside-name-right" && (
                       <div
-                        className={`absolute ${posMap[logoPosition]} rounded-lg flex items-center justify-center ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
-                        style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
+                        className={`absolute group/logo rounded-lg flex items-center justify-center ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
+                        style={{
+                          height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding,
+                          ...(logoCustomPosition
+                            ? { left: logoCustomPosition.x, top: logoCustomPosition.y }
+                            : (() => {
+                                const base: Record<string, React.CSSProperties> = {
+                                  "top-left": { top: 8, left: 8 },
+                                  "top-right": { top: 8, right: 8 },
+                                  "bottom-left": { bottom: 8, left: 8 },
+                                  "bottom-right": { bottom: 8, right: 8 },
+                                };
+                                return base[logoPosition] ?? { top: 8, right: 8 };
+                              })()),
+                          cursor: onLogoCustomPositionChange ? "grab" : undefined,
+                          userSelect: "none",
+                          touchAction: "none",
+                          zIndex: 5,
+                        }}
+                        onPointerDown={onLogoCustomPositionChange ? handleLogoPointerDown : undefined}
+                        onPointerMove={onLogoCustomPositionChange ? handleLogoPointerMove : undefined}
+                        onPointerUp={onLogoCustomPositionChange ? handleLogoPointerUp : undefined}
                       >
-                        <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
+                        <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain pointer-events-none" />
+                        {onLogoCustomPositionChange && (
+                          <div className="absolute -top-1 -right-1 z-10 opacity-0 group-hover/logo:opacity-100 transition-opacity flex gap-1">
+                            <div className="bg-primary/90 text-primary-foreground rounded-full p-1 shadow-md" title="Drag to reposition">
+                              <Move className="h-3 w-3" />
+                            </div>
+                            {logoCustomPosition && (
+                              <button
+                                onClick={handleResetLogoPosition}
+                                className="bg-destructive/90 text-destructive-foreground rounded-full p-1 shadow-md text-[9px] font-bold leading-none"
+                                title="Reset position"
+                              >✕</button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>

@@ -43,6 +43,7 @@ export function useCardBuilderState() {
   const [logoPadding, setLogoPadding] = useState(4);
   const [logoNameGap, setLogoNameGap] = useState(8);
   const [logoVerticalAlign, setLogoVerticalAlign] = useState<"top" | "center" | "bottom">("center");
+  const [logoCustomPosition, setLogoCustomPosition] = useState<{ x: number; y: number } | null>(null);
   const [ctaConfig, setCtaConfig] = useState<CtaItem[]>(DEFAULT_CTA_CONFIG);
   const [ctaIconsOnly, setCtaIconsOnly] = useState(false);
   const [socialIconsOnly, setSocialIconsOnly] = useState(true);
@@ -100,6 +101,7 @@ export function useCardBuilderState() {
       if (typeof t?.logo_padding === "number") setLogoPadding(t.logo_padding);
       if (typeof t?.logo_name_gap === "number") setLogoNameGap(t.logo_name_gap);
       if (t?.logo_vertical_align) setLogoVerticalAlign(t.logo_vertical_align);
+      if (t?.logo_custom_position) setLogoCustomPosition(t.logo_custom_position);
       if (t?.job_title) setJobTitle(t.job_title);
       if (typeof t?.bold_last_name === "boolean") setBoldLastName(t.bold_last_name);
       if (typeof t?.uppercase_name === "boolean") setUppercaseName(t.uppercase_name);
@@ -282,6 +284,10 @@ export function useCardBuilderState() {
   const handleLogoPaddingChange = makeThemeHandler("logo_padding", setLogoPadding);
   const handleLogoNameGapChange = makeThemeHandler("logo_name_gap", setLogoNameGap);
   const handleLogoVerticalAlignChange = makeThemeHandler("logo_vertical_align", setLogoVerticalAlign);
+  const handleLogoCustomPositionChange = useCallback((pos: { x: number; y: number } | null) => {
+    setLogoCustomPosition(pos);
+    saveThemeField({ logo_custom_position: pos });
+  }, [saveThemeField]);
   const handleLogoPositionChange = makeThemeHandler("logo_position", setLogoPosition);
   const handleLogoSizeChange = makeThemeHandler("logo_size", setLogoSize);
   const handleCtaConfigChange = useCallback((newConfig: CtaItem[]) => {
@@ -437,11 +443,11 @@ export function useCardBuilderState() {
     identitySaveTimers, identitySaveState, setIdentitySaveState,
     // Photos / Logo
     avatarUrl, coverUrl, avatarBgColor, avatarRotation, coverOffsetY,
-    logoUrl, logoFrostedBg, logoGlow, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap, logoVerticalAlign,
+    logoUrl, logoFrostedBg, logoGlow, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap, logoVerticalAlign, logoCustomPosition,
     handleAvatarChange, handleCoverChange,
     handleAvatarBgColorChange, handleAvatarRotationChange, handleCoverOffsetYChange,
     handleLogoChange, handleLogoFrostedBgChange, handleLogoGlowChange,
-    handleLogoOpacityChange, handleLogoPaddingChange, handleLogoPositionChange, handleLogoSizeChange, handleLogoNameGapChange, handleLogoVerticalAlignChange,
+    handleLogoOpacityChange, handleLogoPaddingChange, handleLogoPositionChange, handleLogoSizeChange, handleLogoNameGapChange, handleLogoVerticalAlignChange, handleLogoCustomPositionChange,
     // CTA & Social
     ctaConfig, ctaIconsOnly, setCtaIconsOnly,
     socialIconsOnly, setSocialIconsOnly, socialBtnColor, setSocialBtnColor,

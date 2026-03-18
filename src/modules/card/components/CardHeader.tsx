@@ -40,6 +40,7 @@ interface CardHeaderProps {
   logoPadding?: number;
   logoNameGap?: number;
   logoVerticalAlign?: "top" | "center" | "bottom";
+  logoCustomPosition?: { x: number; y: number } | null;
   metallicEffect?: MetallicEffect;
   /** Dynamic hero background (profession-based or user-selected) */
   heroBackground?: HeroBackground | null;
@@ -70,7 +71,7 @@ function renderName(name: string, bold?: boolean, uppercase?: boolean, firstName
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, nameFontSize, nameLineHeight, subtitleFontSize, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4, logoNameGap = 8, logoVerticalAlign = "center", metallicEffect, heroBackground, ctaChildren, glassHero = false }: CardHeaderProps) {
+export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, nameFontSize, nameLineHeight, subtitleFontSize, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4, logoNameGap = 8, logoVerticalAlign = "center", logoCustomPosition, metallicEffect, heroBackground, ctaChildren, glassHero = false }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -258,7 +259,9 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
       transition={logoGlow ? { duration: 2.5, repeat: Infinity, ease: "easeInOut" as const } : undefined}
       style={{
         position: "absolute",
-        ...logoPosStyle[logoPosition],
+        ...(logoCustomPosition
+          ? { left: logoCustomPosition.x, top: logoCustomPosition.y }
+          : logoPosStyle[logoPosition]),
         height: logoPx, width: logoPx, borderRadius: 8,
         background: logoFrostedBg ? "rgba(255,255,255,0.85)" : "transparent",
         backdropFilter: logoFrostedBg ? "blur(4px)" : undefined,

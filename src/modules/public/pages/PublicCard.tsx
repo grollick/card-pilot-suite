@@ -678,6 +678,7 @@ export default function PublicCard() {
                 logoPadding={typeof themeJson.logo_padding === "number" ? (themeJson.logo_padding as number) : 4}
                 logoNameGap={typeof themeJson.logo_name_gap === "number" ? (themeJson.logo_name_gap as number) : 8}
                 logoVerticalAlign={(themeJson.logo_vertical_align as any) ?? "center"}
+                logoCustomPosition={themeJson.logo_custom_position as { x: number; y: number } | undefined}
                 metallicEffect={metallicEffect}
                 heroBackground={resolvedHeroBackground}
                 ctaChildren={heroCtaButtons}
