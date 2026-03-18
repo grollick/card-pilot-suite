@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import { useContacts, usePipelineStages, useTags } from "@/hooks/useContacts";
 import { useCreateContact } from "@/hooks/useContactActions";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import UpgradePrompt from "@/components/UpgradePrompt";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 
