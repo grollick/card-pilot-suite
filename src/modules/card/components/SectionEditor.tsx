@@ -32,6 +32,10 @@ export interface SectionContent {
   description?: string;
   // Booking
   bookingHeading?: string;
+  // Projects
+  projectsHeading?: string;
+  projectsDescription?: string;
+  showBeforeAfter?: boolean;
 }
 
 interface SectionEditorProps {
