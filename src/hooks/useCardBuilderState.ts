@@ -52,6 +52,8 @@ export function useCardBuilderState() {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
   const [themePreviewOverrides, setThemePreviewOverrides] = useState<CardThemeOverrides | null>(null);
+  // Local pending theme fields — applied immediately to preview, synced to DB async
+  const [pendingThemeFields, setPendingThemeFields] = useState<Record<string, any>>({});
   const [editName, setEditName] = useState<string | null>(null);
   const [editCompany, setEditCompany] = useState<string | null>(null);
   const [editJobTitle, setEditJobTitle] = useState<string | null>(null);
