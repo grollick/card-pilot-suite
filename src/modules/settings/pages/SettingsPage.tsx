@@ -1,6 +1,7 @@
 import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail, Clock, CheckCircle, AlertTriangle, Clock3, TrendingUp, Send, Plus, Trash2, GripVertical, Store, Download } from "lucide-react";
 import MarketplaceSettings from "@/modules/settings/components/MarketplaceSettings";
 import DataExportSection from "@/modules/settings/components/DataExportSection";
+import DataImportSection from "@/modules/settings/components/DataImportSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -241,7 +242,8 @@ export default function SettingsPage() {
           </motion.div>
         </TabsContent>
 
-        <TabsContent value="data" className="mt-4">
+        <TabsContent value="data" className="mt-4 space-y-6">
+          <DataImportSection />
           <DataExportSection />
         </TabsContent>
       </Tabs>
