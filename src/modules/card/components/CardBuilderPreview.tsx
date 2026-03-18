@@ -130,6 +130,7 @@ export default function CardBuilderPreview({
   const setPreviewDevice = setInternalDevice;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const coverRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
   const isLogoDragging = useRef(false);
@@ -162,7 +163,7 @@ export default function CardBuilderPreview({
     onIdentityPositionChange?.(null);
   }, [onIdentityPositionChange]);
 
-  // Logo drag handlers
+  // Logo drag handlers — store as percentage of cover container
   const handleLogoPointerDown = useCallback((e: React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -173,10 +174,17 @@ export default function CardBuilderPreview({
   }, [logoCustomPosition]);
 
   const handleLogoPointerMove = useCallback((e: React.PointerEvent) => {
-    if (!isLogoDragging.current) return;
+    if (!isLogoDragging.current || !coverRef.current) return;
+    const rect = coverRef.current.getBoundingClientRect();
     const dx = e.clientX - logoDragStart.current.x;
     const dy = e.clientY - logoDragStart.current.y;
-    onLogoCustomPositionChange?.({ x: logoDragStart.current.posX + dx, y: logoDragStart.current.posY + dy });
+    // Convert pixel delta to percentage of container
+    const dxPct = (dx / rect.width) * 100;
+    const dyPct = (dy / rect.height) * 100;
+    onLogoCustomPositionChange?.({
+      x: Math.max(-10, Math.min(90, logoDragStart.current.posX + dxPct)),
+      y: Math.max(-10, Math.min(90, logoDragStart.current.posY + dyPct)),
+    });
   }, [onLogoCustomPositionChange]);
 
   const handleLogoPointerUp = useCallback(() => {
@@ -253,7 +261,7 @@ export default function CardBuilderPreview({
                   )}
 
                   {/* Cover */}
-                  <div className="h-36 relative overflow-hidden z-[2]" style={{
+                  <div ref={coverRef} className="h-36 relative overflow-hidden z-[2]" style={{
                     marginLeft: -8,
                     marginRight: -8,
                     marginTop: -8,
@@ -268,7 +276,7 @@ export default function CardBuilderPreview({
                         style={{
                           height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding,
                           ...(logoCustomPosition
-                            ? { left: logoCustomPosition.x, top: logoCustomPosition.y }
+                            ? { left: `${logoCustomPosition.x}%`, top: `${logoCustomPosition.y}%` }
                             : (() => {
                                 const base: Record<string, React.CSSProperties> = {
                                   "top-left": { top: 8, left: 8 },
