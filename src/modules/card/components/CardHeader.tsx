@@ -259,7 +259,9 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
       transition={logoGlow ? { duration: 2.5, repeat: Infinity, ease: "easeInOut" as const } : undefined}
       style={{
         position: "absolute",
-        ...logoPosStyle[logoPosition],
+        ...(logoCustomPosition
+          ? { left: logoCustomPosition.x, top: logoCustomPosition.y }
+          : logoPosStyle[logoPosition]),
         height: logoPx, width: logoPx, borderRadius: 8,
         background: logoFrostedBg ? "rgba(255,255,255,0.85)" : "transparent",
         backdropFilter: logoFrostedBg ? "blur(4px)" : undefined,
