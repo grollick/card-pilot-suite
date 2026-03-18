@@ -345,6 +345,7 @@ export default function ContactsPage() {
           </table>
         </motion.div>
       )}
+      <UpgradePrompt open={upgradeOpen} onOpenChange={setUpgradeOpen} feature="contacts" currentPlan={planKey} />
     </div>
   );
 }

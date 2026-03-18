@@ -21,13 +21,15 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { motion } from "framer-motion";
-import { format } from "date-fns";
+import { format, startOfMonth } from "date-fns";
 import { toast } from "sonner";
 import {
   useBookingServices, useCreateService, useUpdateService,
   useBookings, useUpdateBooking,
   useAvailability, useUpsertAvailability,
 } from "@/hooks/useBookings";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import UpgradePrompt from "@/components/UpgradePrompt";
 
 const statusColors: Record<string, string> = {
   requested: "bg-[hsl(var(--warning))]/10 text-[hsl(var(--warning))]",
