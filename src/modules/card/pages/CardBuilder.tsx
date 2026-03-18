@@ -1,10 +1,11 @@
-import { Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate, Sparkles, Loader2, MousePointerClick, Crown, Plus } from "lucide-react";
+import { Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate, Sparkles, Loader2, MousePointerClick, Crown, Plus, Eye, Smartphone } from "lucide-react";
 import BlockMarketplaceDialog from "@/modules/card/components/BlockMarketplaceDialog";
 import { canAccessBlock, type MarketplaceBlock } from "@/lib/blockMarketplace";
 import AIDesignAssistantDialog, { type AICardResult } from "@/modules/card/components/AIDesignAssistantDialog";
 import ConversionTips from "@/modules/card/components/ConversionTips";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -25,7 +26,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+
 import { motion } from "framer-motion";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
 
@@ -41,12 +42,14 @@ export default function CardBuilder() {
   const { user } = useAuth();
   const { planKey } = usePlanLimits();
   const isPro = planKey !== "starter";
+  const isMobile = useIsMobile();
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [photoImportOpen, setPhotoImportOpen] = useState(false);
   const [rightTab, setRightTab] = useState("identity");
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
   const [blockMarketOpen, setBlockMarketOpen] = useState(false);
   const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
+  const [mobileTab, setMobileTab] = useState<"preview" | "sections" | "identity" | "theme">("preview");
 
   const handleAICardGenerated = (result: AICardResult) => {
     // Apply sections order
@@ -457,6 +460,16 @@ export default function CardBuilder() {
     </Tabs>
   );
 
+  // Mobile tab config
+
+  // Mobile tab config
+  const mobileTabs = [
+    { id: "preview" as const, label: "Preview", icon: Smartphone },
+    { id: "sections" as const, label: "Sections", icon: Layers },
+    { id: "identity" as const, label: "Identity", icon: Pencil },
+    { id: "theme" as const, label: "Theme", icon: Palette },
+  ];
+
   return (
     <div className="flex flex-col -mx-4 md:-mx-6 lg:-mx-8 -mt-4 md:-mt-6 lg:-mt-8" style={{ height: "calc(100vh - 3.5rem)" }}>
       {/* ── Top Bar ── */}
@@ -490,7 +503,7 @@ export default function CardBuilder() {
 
           <ResizableHandle />
 
-          {/* Center Panel — Preview Canvas */}
+          {/* Center Panel — Preview Canvas (no duplicate toolbar) */}
           <ResizablePanel defaultSize={46} minSize={30}>
             <div className="h-full flex flex-col" style={{
               background: "radial-gradient(circle, hsl(var(--muted)) 1px, transparent 1px)",
@@ -532,6 +545,8 @@ export default function CardBuilder() {
                       subtitleFontSize={s.subtitleFontSize}
                       onAvatarChange={s.handleAvatarChange}
                       setEditingSection={s.setEditingSection}
+                      previewDevice={previewDevice}
+                      hideToolbar
                     />
                   </div>
                 </div>
@@ -558,27 +573,43 @@ export default function CardBuilder() {
         </ResizablePanelGroup>
       </div>
 
-      {/* ── Mobile: Stacked layout ── */}
-      <div className="lg:hidden flex-1 overflow-auto px-4 md:px-6 py-4 space-y-4">
-        <Accordion type="multiple" defaultValue={["sections"]} className="space-y-2">
-          <AccordionItem value="template" className="rounded-xl border border-border bg-card px-4 overflow-hidden">
-            <AccordionTrigger className="py-3 hover:no-underline">
-              <span className="flex items-center gap-2 text-sm font-semibold">
-                <LayoutTemplate className="h-4 w-4 text-primary" /> Templates
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="pb-3 pt-0">
-              <TemplateSelector selectedTemplateId={selectedTemplateId} onSelect={handleApplyTemplate} professionName={s.professionName} compact />
-            </AccordionContent>
-          </AccordionItem>
+      {/* ── Mobile: Tab-based layout with bottom nav ── */}
+      <div className="lg:hidden flex-1 flex flex-col min-h-0">
+        {/* Content area */}
+        <div className="flex-1 overflow-auto">
+          {mobileTab === "preview" && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4">
+              <CardBuilderPreview
+                profile={s.profile} previewTheme={s.previewTheme}
+                currentThemeOverrides={s.currentThemeOverrides} sections={s.sections}
+                coverUrl={s.coverUrl} coverOffsetY={s.coverOffsetY}
+                avatarUrl={s.avatarUrl} avatarBgColor={s.avatarBgColor} avatarRotation={s.avatarRotation}
+                logoUrl={s.logoUrl} logoFrostedBg={s.logoFrostedBg} logoPosition={s.logoPosition}
+                logoSize={s.logoSize} logoOpacity={s.logoOpacity} logoPadding={s.logoPadding}
+                logoNameGap={s.logoNameGap} logoVerticalAlign={s.logoVerticalAlign}
+                ctaConfig={s.ctaConfig} ctaIconsOnly={s.ctaIconsOnly}
+                editName={s.editName} editCompany={s.editCompany} displayJobTitle={s.displayJobTitle}
+                boldLastName={s.boldLastName} uppercaseName={s.uppercaseName}
+                nameLetterSpacing={s.nameLetterSpacing} nameFontWeight={s.nameFontWeight}
+                firstNameFontWeight={s.firstNameFontWeight} nameItalic={s.nameItalic}
+                nameFontSize={s.nameFontSize} subtitleFontSize={s.subtitleFontSize}
+                onAvatarChange={s.handleAvatarChange} setEditingSection={s.setEditingSection}
+              />
+            </motion.div>
+          )}
 
-          <AccordionItem value="sections" className="rounded-xl border border-border bg-card px-4 overflow-hidden">
-            <AccordionTrigger className="py-3 hover:no-underline">
-              <span className="flex items-center gap-2 text-sm font-semibold">
-                <Layers className="h-4 w-4 text-primary" /> Sections
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="pb-3 pt-0">
+          {mobileTab === "sections" && (
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="p-4 space-y-4">
+              {/* Templates */}
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 px-1">
+                  <LayoutTemplate className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Templates</span>
+                </div>
+                <TemplateSelector selectedTemplateId={selectedTemplateId} onSelect={handleApplyTemplate} professionName={s.professionName} compact />
+              </div>
+
+              {/* Section list */}
               <CardBuilderSections
                 sections={s.sections} setSections={s.setSections}
                 toggleSection={s.toggleSection} setEditingSection={s.setEditingSection}
@@ -592,16 +623,19 @@ export default function CardBuilder() {
                 socialBtnStyle={s.socialBtnStyle} setSocialBtnStyle={s.setSocialBtnStyle}
                 hideWrapper
               />
-            </AccordionContent>
-          </AccordionItem>
 
-          <AccordionItem value="identity" className="rounded-xl border border-border bg-card px-4 overflow-hidden">
-            <AccordionTrigger className="py-3 hover:no-underline">
-              <span className="flex items-center gap-2 text-sm font-semibold">
-                <Pencil className="h-4 w-4 text-primary" /> Identity
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="pb-3 pt-0">
+              <Button
+                variant="outline" size="sm"
+                className="w-full gap-1.5 border-dashed border-primary/30 text-primary"
+                onClick={() => setBlockMarketOpen(true)}
+              >
+                <Plus className="h-3.5 w-3.5" /> Browse Block Marketplace
+              </Button>
+            </motion.div>
+          )}
+
+          {mobileTab === "identity" && (
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="p-4">
               <CardBuilderIdentity
                 profile={s.profile} editName={s.editName} setEditName={s.setEditName}
                 editCompany={s.editCompany} setEditCompany={s.setEditCompany}
@@ -620,42 +654,102 @@ export default function CardBuilder() {
                 subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
                 saveThemeField={s.saveThemeField} qc={s.qc} hideWrapper
               />
-            </AccordionContent>
-          </AccordionItem>
+              <div className="mt-4 space-y-3">
+                <CardPhotoTools
+                  avatarUrl={s.avatarUrl} coverUrl={s.coverUrl} profession={s.professionName}
+                  onAvatarChange={s.handleAvatarChange} onCoverChange={s.handleCoverChange}
+                  avatarBgColor={s.avatarBgColor} avatarRotation={s.avatarRotation}
+                  onAvatarBgColorChange={s.handleAvatarBgColorChange}
+                  onAvatarRotationChange={s.handleAvatarRotationChange}
+                  coverOffsetY={s.coverOffsetY} onCoverOffsetYChange={s.handleCoverOffsetYChange}
+                  logoUrl={s.logoUrl} onLogoChange={s.handleLogoChange}
+                  logoFrostedBg={s.logoFrostedBg} onLogoFrostedBgChange={s.handleLogoFrostedBgChange}
+                  logoGlow={s.logoGlow} onLogoGlowChange={s.handleLogoGlowChange}
+                  logoPosition={s.logoPosition} onLogoPositionChange={s.handleLogoPositionChange}
+                  logoSize={s.logoSize} onLogoSizeChange={s.handleLogoSizeChange}
+                  logoOpacity={s.logoOpacity} onLogoOpacityChange={s.handleLogoOpacityChange}
+                  logoPadding={s.logoPadding} onLogoPaddingChange={s.handleLogoPaddingChange}
+                  logoNameGap={s.logoNameGap} onLogoNameGapChange={s.handleLogoNameGapChange}
+                  logoVerticalAlign={s.logoVerticalAlign} onLogoVerticalAlignChange={s.handleLogoVerticalAlignChange}
+                  {...avatarThemeProps}
+                />
+              </div>
+            </motion.div>
+          )}
 
-          <AccordionItem value="theme" className="rounded-xl border border-border bg-card px-4 overflow-hidden">
-            <AccordionTrigger className="py-3 hover:no-underline">
-              <span className="flex items-center gap-2 text-sm font-semibold">
-                <Palette className="h-4 w-4 text-primary" /> Theme
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="pb-3 pt-0">
-              <Button variant="outline" className="w-full" onClick={() => s.setThemeEditorOpen(true)}>
-                <Palette className="h-4 w-4 mr-2" /> Customize Theme
+          {mobileTab === "theme" && (
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="p-4 space-y-4">
+              <Button variant="default" className="w-full" onClick={() => s.setThemeEditorOpen(true)}>
+                <Sliders className="h-4 w-4 mr-2" /> Open Theme Editor
               </Button>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
 
-        {/* Mobile preview */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-          <CardBuilderPreview
-            profile={s.profile} previewTheme={s.previewTheme}
-            currentThemeOverrides={s.currentThemeOverrides} sections={s.sections}
-            coverUrl={s.coverUrl} coverOffsetY={s.coverOffsetY}
-            avatarUrl={s.avatarUrl} avatarBgColor={s.avatarBgColor} avatarRotation={s.avatarRotation}
-            logoUrl={s.logoUrl} logoFrostedBg={s.logoFrostedBg} logoPosition={s.logoPosition}
-            logoSize={s.logoSize} logoOpacity={s.logoOpacity} logoPadding={s.logoPadding}
-            logoNameGap={s.logoNameGap} logoVerticalAlign={s.logoVerticalAlign}
-            ctaConfig={s.ctaConfig} ctaIconsOnly={s.ctaIconsOnly}
-            editName={s.editName} editCompany={s.editCompany} displayJobTitle={s.displayJobTitle}
-            boldLastName={s.boldLastName} uppercaseName={s.uppercaseName}
-            nameLetterSpacing={s.nameLetterSpacing} nameFontWeight={s.nameFontWeight}
-            firstNameFontWeight={s.firstNameFontWeight} nameItalic={s.nameItalic}
-            nameFontSize={s.nameFontSize} subtitleFontSize={s.subtitleFontSize}
-            onAvatarChange={s.handleAvatarChange} setEditingSection={s.setEditingSection}
-          />
-        </motion.div>
+              {/* Quick palette */}
+              <div className="space-y-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Current Palette</span>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {[
+                    { label: "Primary", color: s.previewTheme.palette.primary },
+                    { label: "Secondary", color: s.previewTheme.palette.secondary },
+                    { label: "Accent", color: s.previewTheme.palette.accent },
+                    { label: "Bg", color: s.previewTheme.palette.background },
+                  ].map((c) => (
+                    <div key={c.label} className="text-center">
+                      <div className="h-10 rounded-lg border border-border shadow-sm" style={{ background: c.color }} />
+                      <span className="text-[10px] text-muted-foreground mt-1 block">{c.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quick settings */}
+              <div className="space-y-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Quick Settings</span>
+                <div className="space-y-3 rounded-xl border border-border bg-card p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Section icons</span>
+                    <Switch checked={s.showSectionIcons} onCheckedChange={(val) => { s.setShowSectionIcons(val); s.saveThemeField({ section_icons: val }); }} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Social icons only</span>
+                    <Switch checked={s.socialIconsOnly} onCheckedChange={(v) => { s.setSocialIconsOnly(v); s.saveThemeField({ social_icons_only: v }); }} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">CTA icons only</span>
+                    <Switch checked={s.ctaIconsOnly} onCheckedChange={(v) => { s.setCtaIconsOnly(v); s.saveThemeField({ cta_icons_only: v }); }} />
+                  </div>
+                </div>
+              </div>
+
+              {/* AI Tools */}
+              <div className="space-y-2">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">AI Tools</span>
+                <Button size="sm" className="w-full gap-1.5" onClick={() => setAiAssistantOpen(true)}>
+                  <Sparkles className="h-3.5 w-3.5" /> Generate My Card with AI
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </div>
+
+        {/* Bottom tab bar */}
+        <div className="shrink-0 border-t border-border bg-card/95 backdrop-blur-sm safe-area-bottom">
+          <div className="grid grid-cols-4 h-14">
+            {mobileTabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setMobileTab(tab.id)}
+                className={`flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors ${
+                  mobileTab === tab.id
+                    ? "text-primary"
+                    : "text-muted-foreground"
+                }`}
+              >
+                <tab.icon className={`h-5 w-5 transition-transform ${mobileTab === tab.id ? "scale-110" : ""}`} />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Section Editor Sheet */}

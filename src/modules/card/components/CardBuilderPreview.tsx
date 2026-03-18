@@ -41,6 +41,9 @@ interface Props {
   subtitleFontSize?: number | null;
   onAvatarChange: (url: string) => void;
   setEditingSection: (id: string | null) => void;
+  /** When provided externally, hides the built-in device toggle toolbar */
+  previewDevice?: "phone" | "tablet";
+  hideToolbar?: boolean;
 }
 
 function getSectionPreview(section: CardSection) {
@@ -111,8 +114,11 @@ export default function CardBuilderPreview({
   logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap = 8, logoVerticalAlign = "center",
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
   boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, onAvatarChange, setEditingSection,
+  previewDevice: externalDevice, hideToolbar,
 }: Props) {
-  const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
+  const [internalDevice, setInternalDevice] = useState<"phone" | "tablet">("phone");
+  const previewDevice = externalDevice ?? internalDevice;
+  const setPreviewDevice = setInternalDevice;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const logoPx = logoSize === "small" ? 36 : logoSize === "large" ? 64 : 48;
@@ -123,28 +129,30 @@ export default function CardBuilderPreview({
 
   return (
     <>
-      {/* Toolbar */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/50 p-0.5">
-          {(["phone", "tablet"] as const).map((d) => (
-            <button key={d} onClick={() => setPreviewDevice(d)}
-              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
-                previewDevice === d ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {d === "phone" ? <Smartphone className="h-3.5 w-3.5" /> : <Tablet className="h-3.5 w-3.5" />}
-              {d.charAt(0).toUpperCase() + d.slice(1)}
-            </button>
-          ))}
+      {/* Toolbar — hidden when parent controls device */}
+      {!hideToolbar && (
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1 rounded-lg border border-border bg-muted/50 p-0.5">
+            {(["phone", "tablet"] as const).map((d) => (
+              <button key={d} onClick={() => setPreviewDevice(d)}
+                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                  previewDevice === d ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {d === "phone" ? <Smartphone className="h-3.5 w-3.5" /> : <Tablet className="h-3.5 w-3.5" />}
+                {d.charAt(0).toUpperCase() + d.slice(1)}
+              </button>
+            ))}
+          </div>
+          {profile?.handle && (
+            <Button variant="outline" size="sm" asChild className="gap-2">
+              <a href={`/${profile.handle}`} target="_blank" rel="noreferrer">
+                <Eye className="h-4 w-4" /> Preview as Visitor
+              </a>
+            </Button>
+          )}
         </div>
-        {profile?.handle && (
-          <Button variant="outline" size="sm" asChild className="gap-2">
-            <a href={`/${profile.handle}`} target="_blank" rel="noreferrer">
-              <Eye className="h-4 w-4" /> Preview as Visitor
-            </a>
-          </Button>
-        )}
-      </div>
+      )}
 
       {/* Device Frame */}
       <div className="flex items-start justify-center py-4 transition-all duration-300">
