@@ -43,6 +43,7 @@ export function useCardBuilderState() {
   const [logoPadding, setLogoPadding] = useState(4);
   const [logoNameGap, setLogoNameGap] = useState(8);
   const [logoVerticalAlign, setLogoVerticalAlign] = useState<"top" | "center" | "bottom">("center");
+  const [logoCustomPosition, setLogoCustomPosition] = useState<{ x: number; y: number } | null>(null);
   const [ctaConfig, setCtaConfig] = useState<CtaItem[]>(DEFAULT_CTA_CONFIG);
   const [ctaIconsOnly, setCtaIconsOnly] = useState(false);
   const [socialIconsOnly, setSocialIconsOnly] = useState(true);
