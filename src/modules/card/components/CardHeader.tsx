@@ -486,7 +486,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
                   </motion.p>
                 )}
                 {company && (
-                  <motion.p style={{ ...subtitleStyle, fontSize: 13, color: "rgba(255,255,255,0.65)" }} {...heroEntrance(0.3)}>
+                  <motion.p style={{ ...subtitleStyle, fontSize: 13, color: "rgba(255,255,255,0.65)", marginTop: subtitleSpacing ?? 4 }} {...heroEntrance(0.3)}>
                     {company}
                   </motion.p>
                 )}
