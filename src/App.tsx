@@ -24,6 +24,11 @@ import DemoCardPreview from "@/modules/public/pages/DemoCardPreview";
 const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
 const PublicProjectPage = lazy(() => import("@/modules/public/pages/PublicProjectPage"));
 
+// Client Portal v2 — authenticated client dashboard
+const ClientAuthPage = lazy(() => import("@/modules/client/pages/ClientAuthPage"));
+const ClientDashboard = lazy(() => import("@/modules/client/pages/ClientDashboard"));
+const ClientProtectedRoute = lazy(() => import("@/modules/client/components/ClientProtectedRoute"));
+
 // ── Auth & marketing — loaded eagerly (small) ──
 import LandingPage from "@/modules/landing/pages/LandingPage";
 import PricingPage from "@/modules/pricing/pages/PricingPage";
@@ -177,7 +182,18 @@ const App = () => (
             <Route path="/project/:projectId" element={<LazyRoute><PublicProjectPage /></LazyRoute>} />
             <Route path="/portal/:token" element={<LazyRoute><ClientPortal /></LazyRoute>} />
 
-            {/* App dashboard — auth required, lazy loaded */}
+            {/* Client Portal v2 — authenticated */}
+            <Route path="/client/auth" element={<LazyRoute><ClientAuthPage /></LazyRoute>} />
+            <Route path="/client" element={
+              <LazyRoute>
+                <Suspense fallback={<LazyFallback />}>
+                  <ClientProtectedRoute>
+                    <ClientDashboard />
+                  </ClientProtectedRoute>
+                </Suspense>
+              </LazyRoute>
+            } />
+
             <Route path="/app" element={
               <ProtectedRoute><LazyRoute><DashboardLayout /></LazyRoute></ProtectedRoute>
             }>

@@ -47,3 +47,6 @@ verify_jwt = false
 
 [functions.admin-stats]
 verify_jwt = false
+
+[functions.client-auth]
+verify_jwt = false
