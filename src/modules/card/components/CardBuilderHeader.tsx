@@ -36,6 +36,7 @@ export default function CardBuilderHeader({
   previewDevice, onPreviewDeviceChange,
 }: Props) {
   const navigate = useNavigate();
+  const [networkingOpen, setNetworkingOpen] = useState(false);
 
   return (
     <TooltipProvider delayDuration={200}>
