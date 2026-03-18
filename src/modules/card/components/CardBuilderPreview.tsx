@@ -186,7 +186,7 @@ export default function CardBuilderPreview({
                   )}
 
                   {/* Cover */}
-                  <div className="h-28 relative overflow-hidden z-[2]" style={{
+                  <div className="h-36 relative overflow-hidden z-[2]" style={{
                     marginLeft: -8,
                     marginRight: -8,
                     marginTop: -8,
