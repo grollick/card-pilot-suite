@@ -1,6 +1,7 @@
 import { Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate, Sparkles, Loader2, MousePointerClick, Crown, Plus } from "lucide-react";
 import BlockMarketplaceDialog from "@/modules/card/components/BlockMarketplaceDialog";
 import { canAccessBlock, type MarketplaceBlock } from "@/lib/blockMarketplace";
+import AIDesignAssistantDialog, { type AICardResult } from "@/modules/card/components/AIDesignAssistantDialog";
 import ConversionTips from "@/modules/card/components/ConversionTips";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -38,6 +39,49 @@ export default function CardBuilder() {
   const [rightTab, setRightTab] = useState("identity");
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
   const [blockMarketOpen, setBlockMarketOpen] = useState(false);
+  const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
+
+  const handleAICardGenerated = (result: AICardResult) => {
+    // Apply sections order
+    const newSections = result.sections_order.map((id) => {
+      const existing = s.sections.find((sec) => sec.id === id);
+      const label = existing?.label || id.charAt(0).toUpperCase() + id.slice(1).replace(/_/g, " ");
+      const content: Record<string, any> = existing?.content || {};
+
+      // Populate section content from AI result
+      if (id === "hero") content.tagline = result.hero.tagline;
+      if (id === "about") content.text = result.about;
+      if (id === "services") content.items = result.services;
+      if (id === "testimonials") content.items = result.testimonials;
+      if (id === "promo" || id === "offer_banner") {
+        content.headline = result.promo.headline;
+        content.body = result.promo.body;
+        content.cta_text = result.promo.cta_text;
+      }
+
+      return { id, label, enabled: true, content };
+    });
+    // Keep disabled sections not in the AI order
+    s.sections.forEach((sec) => {
+      if (!newSections.find((ns) => ns.id === sec.id)) {
+        newSections.push({ ...sec, enabled: false, content: sec.content || {} });
+      }
+    });
+    s.setSections(newSections);
+    s.saveSections(newSections, true);
+
+    // Apply theme
+    s.saveThemeField({
+      palette: {
+        primary: result.theme.primary_color,
+        secondary: result.theme.secondary_color,
+        accent: result.theme.accent_color,
+        background: result.theme.background_color,
+      },
+      ...(result.theme.font_primary && { fonts: { primary: result.theme.font_primary, secondary: result.theme.font_secondary || result.theme.font_primary } }),
+      ...(result.theme.border_radius && { border_radius: result.theme.border_radius }),
+    });
+  };
 
   // Track installed marketplace blocks
   const installedBlockIds = s.sections
@@ -191,15 +235,23 @@ export default function CardBuilder() {
         Browse Block Marketplace
       </Button>
 
-      {/* AI Generate */}
+      {/* AI Tools */}
       <div className="space-y-2">
         <div className="flex items-center gap-2 px-1">
           <Sparkles className="h-3.5 w-3.5 text-primary" />
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">AI Tools</span>
         </div>
+        <Button
+          size="sm"
+          className="w-full gap-1.5"
+          onClick={() => setAiAssistantOpen(true)}
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+          Generate My Card with AI
+        </Button>
         <Button variant="outline" size="sm" className="w-full" onClick={s.handleAIGenerate} disabled={s.isGenerating}>
           {s.isGenerating ? <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 mr-2" />}
-          {s.isGenerating ? "Generating…" : "AI Write My Card"}
+          {s.isGenerating ? "Generating…" : "AI Write Copy Only"}
         </Button>
         {s.aiContent && (
           <div className="rounded-lg bg-primary/5 border border-primary/20 p-2.5">
@@ -650,6 +702,16 @@ export default function CardBuilder() {
         installedBlockIds={installedBlockIds}
         onInstallBlock={handleInstallBlock}
         userPlan={planKey}
+      />
+
+      <AIDesignAssistantDialog
+        open={aiAssistantOpen}
+        onOpenChange={setAiAssistantOpen}
+        onCardGenerated={handleAICardGenerated}
+        userName={s.profile?.name || undefined}
+        userCompany={s.profile?.company || undefined}
+        userProfession={s.professionName}
+        isPro={isPro}
       />
     </div>
   );
