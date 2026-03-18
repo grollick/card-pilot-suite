@@ -442,7 +442,7 @@ export default function PricingPage() {
             <p className="text-muted-foreground max-w-md mx-auto mb-6">
               Create your free card in 30 seconds. No credit card, no commitment.
             </p>
-            <Button size="lg" className="shadow-glow gap-2" onClick={() => navigate("/auth")}>
+            <Button size="lg" className="shadow-glow gap-2" onClick={() => handleAuthNav("signup")}>
               <Sparkles className="h-4 w-4" />
               Create Your Free Card
               <ArrowRight className="h-4 w-4" />
