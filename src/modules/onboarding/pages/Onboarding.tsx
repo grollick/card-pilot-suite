@@ -391,7 +391,7 @@ export default function Onboarding() {
         </div>
 
         {/* Progress */}
-        {step > 0 && step < 8 && (
+        {step > 0 && step < 7 && (
           <div className="flex gap-1.5 mb-6">
             {[...Array(totalSteps)].map((_, i) => (
               <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
@@ -401,7 +401,7 @@ export default function Onboarding() {
           </div>
         )}
 
-        <div className={`rounded-2xl border border-border bg-card shadow-lg ${step === 0 || step === 8 ? "p-8" : "p-6"}`}>
+        <div className={`rounded-2xl border border-border bg-card shadow-lg ${step === 0 || step === 7 ? "p-8" : "p-6"}`}>
           <AnimatePresence mode="wait">
             {/* ── Step 0: Welcome ── */}
             {step === 0 && (
