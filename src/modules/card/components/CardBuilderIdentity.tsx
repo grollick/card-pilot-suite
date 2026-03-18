@@ -34,6 +34,8 @@ interface Props {
   setSubtitleItalic: (v: boolean) => void;
   subtitleSpacing: number | null;
   setSubtitleSpacing: (v: number | null) => void;
+  showCompany: boolean;
+  setShowCompany: (v: boolean) => void;
   nameLineHeight: number | null;
   setNameLineHeight: (v: number | null) => void;
   nameTextStroke: boolean;
