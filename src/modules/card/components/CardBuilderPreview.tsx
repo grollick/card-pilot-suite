@@ -41,6 +41,8 @@ interface Props {
   subtitleFontSize?: number | null;
   onAvatarChange: (url: string) => void;
   setEditingSection: (id: string | null) => void;
+  identityPosition?: { x: number; y: number } | null;
+  onIdentityPositionChange?: (pos: { x: number; y: number } | null) => void;
   /** When provided externally, hides the built-in device toggle toolbar */
   previewDevice?: "phone" | "tablet";
   hideToolbar?: boolean;
