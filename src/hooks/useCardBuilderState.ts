@@ -122,6 +122,8 @@ export function useCardBuilderState() {
 
   // ── Save helpers ──
   const saveThemeField = useCallback(async (fields: Record<string, any>) => {
+    // Apply locally FIRST for instant preview update
+    setPendingThemeFields(prev => ({ ...prev, ...fields }));
     try {
       setGlobalSaveState("saving");
       const existing = (card?.theme_json as any) ?? {};
