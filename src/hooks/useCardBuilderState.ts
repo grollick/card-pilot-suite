@@ -106,7 +106,15 @@ export function useCardBuilderState() {
       if (typeof t?.logo_padding === "number") setLogoPadding(t.logo_padding);
       if (typeof t?.logo_name_gap === "number") setLogoNameGap(t.logo_name_gap);
       if (t?.logo_vertical_align) setLogoVerticalAlign(t.logo_vertical_align);
-      if (t?.logo_custom_position) setLogoCustomPosition(t.logo_custom_position);
+      if (t?.logo_custom_position) {
+        const lcp = t.logo_custom_position;
+        // Migrate old pixel-based positions (>100) to null — they're incompatible with percentage-based system
+        if (lcp.x > 100 || lcp.y > 100 || lcp.x < -10 || lcp.y < -10) {
+          setLogoCustomPosition(null);
+        } else {
+          setLogoCustomPosition(lcp);
+        }
+      }
       if (t?.job_title) setJobTitle(t.job_title);
       if (typeof t?.bold_last_name === "boolean") setBoldLastName(t.bold_last_name);
       if (typeof t?.uppercase_name === "boolean") setUppercaseName(t.uppercase_name);
