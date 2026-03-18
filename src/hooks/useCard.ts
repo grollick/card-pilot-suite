@@ -149,8 +149,10 @@ export function usePublicCard(handle: string | undefined) {
   return useQuery({
     queryKey: ["public-card", handle],
     enabled: !!handle,
-    staleTime: 10 * 60 * 1000,
-    gcTime: 30 * 60 * 1000,
+    staleTime: 0,
+    gcTime: 10 * 60 * 1000,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       // Step 1: Get profile (required for user_id)
       const { data: profile, error: pErr } = await supabase
