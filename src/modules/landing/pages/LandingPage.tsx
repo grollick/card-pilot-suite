@@ -403,41 +403,58 @@ export default function LandingPage() {
 
       {/* ─── 6. EXAMPLE CARDS ─── */}
       <section id="examples" className="py-16 md:py-24 bg-muted/40">
-        <div className="max-w-5xl mx-auto px-4">
+        <div className="max-w-6xl mx-auto px-4">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-14">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Example Cards</p>
             <h2 className="text-3xl md:text-4xl font-extrabold mb-3">
               Cards for every profession
             </h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">See how service professionals in different industries use CardPilot.</p>
+            <p className="text-muted-foreground max-w-lg mx-auto">Click any card to explore a full interactive demo.</p>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {exampleCards.map((card, i) => (
-              <motion.div key={card.profession} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i} className="rounded-2xl border border-border bg-card overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="bg-gradient-to-br from-primary/10 to-accent/5 p-6 text-center">
-                  <div className={`h-14 w-14 mx-auto rounded-2xl ${card.color} flex items-center justify-center mb-3`}>
-                    <card.icon className="h-6 w-6" />
-                  </div>
-                  <h3 className="font-bold text-foreground">{card.name}</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">{card.profession}</p>
-                </div>
-                <div className="p-5 space-y-2">
-                  {card.services.map((s) => (
-                    <div key={s} className="flex items-center gap-2 text-sm text-foreground">
-                      <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0" />
-                      <span>{s}</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
+            {DEMO_CARDS.map((card, i) => {
+              const Icon = PROFESSION_ICONS[card.profession] ?? Wrench;
+              const colorClass = PROFESSION_COLORS[card.profession] ?? "bg-primary/10 text-primary";
+              return (
+                <motion.div key={card.slug} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i} className="rounded-2xl border border-border bg-card overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                  <div className="p-6 text-center" style={{ background: `linear-gradient(135deg, ${card.accentColor}15, ${card.accentColor}08)` }}>
+                    <div className={`h-14 w-14 mx-auto rounded-2xl ${colorClass} flex items-center justify-center mb-3`}>
+                      <Icon className="h-6 w-6" />
                     </div>
-                  ))}
-                  <div className="pt-3">
-                    <Link to="/onboarding">
-                      <Button variant="outline" size="sm" className="w-full text-xs">
-                        Create a {card.profession} Card <ArrowRight className="h-3 w-3 ml-1" />
-                      </Button>
-                    </Link>
+                    <h3 className="font-bold text-foreground text-sm">{card.name}</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">{card.profession}</p>
+                    <p className="text-2xs text-muted-foreground mt-1">{card.city}</p>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                  <div className="p-4 space-y-1.5">
+                    {card.services.slice(0, 3).map((s) => (
+                      <div key={s.name} className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1.5 text-foreground">
+                          <CheckCircle2 className="h-3 w-3 text-[hsl(var(--success))] shrink-0" />
+                          <span className="truncate">{s.name}</span>
+                        </div>
+                        <span className="text-muted-foreground shrink-0 ml-2">{s.price}</span>
+                      </div>
+                    ))}
+                    {card.services.length > 3 && (
+                      <p className="text-2xs text-muted-foreground">+{card.services.length - 3} more services</p>
+                    )}
+                    <div className="flex gap-0.5 pt-1">
+                      {Array.from({ length: 5 }).map((_, j) => (
+                        <Star key={j} className="h-3 w-3 fill-[hsl(var(--warning))] text-[hsl(var(--warning))]" />
+                      ))}
+                      <span className="text-2xs text-muted-foreground ml-1">({card.testimonials.length})</span>
+                    </div>
+                    <div className="pt-2">
+                      <Link to={`/demo/${card.slug}`}>
+                        <Button variant="outline" size="sm" className="w-full text-xs">
+                          View Card <ExternalLink className="h-3 w-3 ml-1" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </section>
