@@ -30,6 +30,8 @@ interface Props {
   setNameFontSize: (v: number | null) => void;
   subtitleFontSize: number | null;
   setSubtitleFontSize: (v: number | null) => void;
+  subtitleItalic: boolean;
+  setSubtitleItalic: (v: boolean) => void;
   nameLineHeight: number | null;
   setNameLineHeight: (v: number | null) => void;
   nameTextStroke: boolean;
