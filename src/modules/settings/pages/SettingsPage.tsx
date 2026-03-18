@@ -240,6 +240,10 @@ export default function SettingsPage() {
             <p className="text-sm text-muted-foreground">Additional notification preferences coming soon.</p>
           </motion.div>
         </TabsContent>
+
+        <TabsContent value="data" className="mt-4">
+          <DataExportSection />
+        </TabsContent>
       </Tabs>
 
       {/* Confirmation dialog */}
