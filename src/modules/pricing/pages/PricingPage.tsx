@@ -294,7 +294,7 @@ export default function PricingPage() {
                     className={`mt-6 w-full ${isPro ? "shadow-glow" : ""}`}
                     variant={isPro ? "default" : "outline"}
                     size={isPro ? "lg" : "default"}
-                    onClick={() => navigate("/auth")}
+                   onClick={() => handleAuthNav("signup")}
                   >
                     {plan.cta}
                     <ArrowRight className="h-4 w-4" />
