@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import {
   Check, X, Zap, Users, BarChart3, CalendarCheck,
@@ -148,7 +149,16 @@ const benefits = [
 
 export default function PricingPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [annual, setAnnual] = useState(false);
+
+  const handleAuthNav = (mode?: string) => {
+    if (user) {
+      navigate("/app");
+    } else {
+      navigate(mode ? `/auth?mode=${mode}` : "/auth");
+    }
+  };
 
   return (
     <>
@@ -165,8 +175,8 @@ export default function PricingPage() {
               Card<span className="text-primary">Pilot</span>
             </button>
             <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" onClick={() => navigate("/auth")}>Sign in</Button>
-              <Button size="sm" onClick={() => navigate("/auth")}>Get Started Free</Button>
+              <Button variant="ghost" size="sm" onClick={() => handleAuthNav()}>{user ? "Dashboard" : "Sign in"}</Button>
+              {!user && <Button size="sm" onClick={() => handleAuthNav("signup")}>Get Started Free</Button>}
             </div>
           </div>
         </nav>
@@ -284,7 +294,7 @@ export default function PricingPage() {
                     className={`mt-6 w-full ${isPro ? "shadow-glow" : ""}`}
                     variant={isPro ? "default" : "outline"}
                     size={isPro ? "lg" : "default"}
-                    onClick={() => navigate("/auth")}
+                   onClick={() => handleAuthNav("signup")}
                   >
                     {plan.cta}
                     <ArrowRight className="h-4 w-4" />
@@ -432,7 +442,7 @@ export default function PricingPage() {
             <p className="text-muted-foreground max-w-md mx-auto mb-6">
               Create your free card in 30 seconds. No credit card, no commitment.
             </p>
-            <Button size="lg" className="shadow-glow gap-2" onClick={() => navigate("/auth")}>
+            <Button size="lg" className="shadow-glow gap-2" onClick={() => handleAuthNav("signup")}>
               <Sparkles className="h-4 w-4" />
               Create Your Free Card
               <ArrowRight className="h-4 w-4" />

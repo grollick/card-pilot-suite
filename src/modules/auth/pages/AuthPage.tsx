@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useNavigate, Link, useSearchParams, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
@@ -29,8 +29,7 @@ export default function Auth() {
   const { toast } = useToast();
 
   if (user) {
-    navigate("/app", { replace: true });
-    return null;
+    return <Navigate to="/app" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
