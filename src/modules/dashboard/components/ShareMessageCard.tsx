@@ -39,7 +39,7 @@ export default function ShareMessageCard() {
   const cardUrl = `${window.location.origin}/${profile.handle}`;
   const firstName = profile.name?.split(" ")[0] || "there";
   const business = profile.company || "my business";
-  const profession = profile.profession || "services";
+  const profession = "services";
 
   const messages: Record<Channel, string> = {
     text: `Hey! I just set up a digital business card for ${business}. Check it out and let me know if you or anyone you know needs ${profession} work done! 👇\n\n${cardUrl}`,
