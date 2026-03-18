@@ -391,7 +391,7 @@ export default function Onboarding() {
         </div>
 
         {/* Progress */}
-        {step < 7 && (
+        {step > 0 && step < 8 && (
           <div className="flex gap-1.5 mb-6">
             {[...Array(totalSteps)].map((_, i) => (
               <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
@@ -401,8 +401,55 @@ export default function Onboarding() {
           </div>
         )}
 
-        <div className={`rounded-2xl border border-border bg-card shadow-lg ${step === 7 ? "p-8" : "p-6"}`}>
+        <div className={`rounded-2xl border border-border bg-card shadow-lg ${step === 0 || step === 8 ? "p-8" : "p-6"}`}>
           <AnimatePresence mode="wait">
+            {/* ── Step 0: Welcome ── */}
+            {step === 0 && (
+              <motion.div key="s0" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, x: -20 }} className="text-center space-y-6">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.1 }}
+                  className="mx-auto h-20 w-20 rounded-2xl flex items-center justify-center"
+                  style={{ background: "var(--gradient-primary)" }}
+                >
+                  <Rocket className="h-10 w-10 text-primary-foreground" />
+                </motion.div>
+
+                <div className="space-y-2">
+                  <motion.h2 initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+                    className="text-2xl font-bold text-foreground">
+                    Let's get you your first lead
+                  </motion.h2>
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+                    className="text-sm text-muted-foreground max-w-xs mx-auto">
+                    In the next 2 minutes, we'll create your professional digital card and get you ready to capture leads & bookings.
+                  </motion.p>
+                </div>
+
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }}
+                  className="space-y-3">
+                  <div className="flex items-center gap-3 text-left px-4">
+                    {[
+                      { icon: Sparkles, text: "AI builds your card in seconds" },
+                      { icon: Share2, text: "Share it everywhere to get leads" },
+                      { icon: CalendarCheck, text: "Start booking customers today" },
+                    ].map(({ icon: Icon, text }, i) => (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-1.5 p-3 rounded-xl bg-muted/50">
+                        <Icon className="h-5 w-5 text-primary" />
+                        <span className="text-xs text-center text-muted-foreground font-medium">{text}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <Button onClick={() => setStep(1)} size="lg" className="w-full h-12 text-base font-semibold gap-2">
+                    Get Started <ArrowRight className="h-5 w-5" />
+                  </Button>
+                  <p className="text-[11px] text-muted-foreground">Takes less than 2 minutes · No credit card required</p>
+                </motion.div>
+              </motion.div>
+            )}
+
             {/* ── Step 1: Profession ── */}
             {step === 1 && (
               <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
