@@ -67,6 +67,7 @@ export function useCardBuilderState() {
   const [nameFontSize, setNameFontSize] = useState<number | null>(null);
   const [subtitleFontSize, setSubtitleFontSize] = useState<number | null>(null);
   const [identityPosition, setIdentityPosition] = useState<{ x: number; y: number } | null>(null);
+  const [nameLineHeight, setNameLineHeight] = useState<number | null>(null);
   const identitySaveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const [identitySaveState, setIdentitySaveState] = useState<Record<string, "saving" | "saved" | null>>({});
   const [globalSaveState, setGlobalSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
