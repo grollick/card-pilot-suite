@@ -32,6 +32,8 @@ interface Props {
   setSubtitleFontSize: (v: number | null) => void;
   subtitleItalic: boolean;
   setSubtitleItalic: (v: boolean) => void;
+  subtitleSpacing: number | null;
+  setSubtitleSpacing: (v: number | null) => void;
   nameLineHeight: number | null;
   setNameLineHeight: (v: number | null) => void;
   nameTextStroke: boolean;
@@ -64,6 +66,7 @@ export default function CardBuilderIdentity({
   nameFontSize, setNameFontSize,
   subtitleFontSize, setSubtitleFontSize,
   subtitleItalic, setSubtitleItalic,
+  subtitleSpacing, setSubtitleSpacing,
   nameLineHeight, setNameLineHeight,
   nameTextStroke, setNameTextStroke,
   nameTextStrokeWidth, setNameTextStrokeWidth,
@@ -236,6 +239,27 @@ export default function CardBuilderIdentity({
             onCheckedChange={(v) => { setSubtitleItalic(v); saveThemeField({ subtitle_italic: v }); }}
             className="scale-75 origin-right"
           />
+        </div>
+        <div className="mt-1.5">
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[11px] text-muted-foreground">Title–company spacing</label>
+            <span className="text-[10px] text-muted-foreground tabular-nums">{subtitleSpacing ?? "Auto"}</span>
+          </div>
+          <Slider
+            min={0}
+            max={24}
+            step={1}
+            value={[subtitleSpacing ?? 4]}
+            onValueChange={([v]) => { setSubtitleSpacing(v); saveThemeField({ subtitle_spacing: v }); }}
+            className="w-full"
+          />
+          {subtitleSpacing !== null && (
+            <button
+              type="button"
+              onClick={() => { setSubtitleSpacing(null); saveThemeField({ subtitle_spacing: null }); }}
+              className="text-[10px] text-primary hover:underline mt-0.5"
+            >Reset to auto</button>
+          )}
         </div>
         <div className="mt-1.5">
           <div className="flex items-center justify-between mb-1">
