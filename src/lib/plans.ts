@@ -138,6 +138,7 @@ export interface PlanLimits {
   estimates: number;
   social_posts: number;
   booking_services: number;
+  bookings_monthly: number;
   team_members: number;
   automations: number;
   email_templates: number;
