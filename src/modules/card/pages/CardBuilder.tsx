@@ -138,6 +138,7 @@ export default function CardBuilder() {
     setSelectedTemplateId(templateId);
     const template = getTemplate(templateId);
     if (!template) return;
+
     const newSections = template.sections.map(ts => {
       const existing = s.sections.find(es => es.id === ts.id);
       return {
@@ -147,13 +148,20 @@ export default function CardBuilder() {
         content: existing?.content,
       };
     });
+
     s.sections.forEach(es => {
       if (!newSections.find(ns => ns.id === es.id)) {
         newSections.push({ ...es, enabled: false } as any);
       }
     });
+
     s.setSections(newSections);
     s.saveSections(newSections, true);
+
+    const palette = TEMPLATE_STYLE_PALETTES[template.style];
+    if (palette) {
+      s.saveThemeField({ palette: { ...palette } });
+    }
   };
 
   const editingSec = s.sections.find((sec) => sec.id === s.editingSection);
