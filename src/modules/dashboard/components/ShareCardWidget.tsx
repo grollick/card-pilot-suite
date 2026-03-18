@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Check, QrCode, Share2, ArrowUpRight } from "lucide-react";
+import { Copy, Check, QrCode, Share2, ArrowUpRight, Wifi } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
