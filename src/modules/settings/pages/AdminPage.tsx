@@ -26,8 +26,9 @@ export default function AdminPage() {
           <TabsTrigger value="templates">Default Templates</TabsTrigger>
           <TabsTrigger value="pipeline">Default Pipeline</TabsTrigger>
           <TabsTrigger value="services">Default Services</TabsTrigger>
-          <TabsTrigger value="emails">Default Emails</TabsTrigger>
-        </TabsList>
+           <TabsTrigger value="emails">Default Emails</TabsTrigger>
+           <TabsTrigger value="system-events">System Events</TabsTrigger>
+         </TabsList>
 
         <TabsContent value="professions" className="mt-4 space-y-6">
           {professionCategories.map(cat => (
