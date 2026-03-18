@@ -79,7 +79,16 @@ export default function ShareCardWidget() {
         </div>
 
         {/* Action buttons */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
+          <Button
+            variant="default"
+            size="sm"
+            className="gap-1.5 text-xs shadow-glow"
+            onClick={() => setNetworkingOpen(true)}
+          >
+            <Wifi className="h-3.5 w-3.5" />
+            Network
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -87,10 +96,10 @@ export default function ShareCardWidget() {
             onClick={() => navigate("/app/card/qr")}
           >
             <QrCode className="h-3.5 w-3.5" />
-            Download QR
+            QR Code
           </Button>
           <Button
-            variant="default"
+            variant="outline"
             size="sm"
             className="gap-1.5 text-xs"
             onClick={() => navigate("/app/card")}
