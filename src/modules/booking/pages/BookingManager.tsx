@@ -52,6 +52,9 @@ export default function BookingManager() {
   const updateBooking = useUpdateBooking();
   const upsertAvailability = useUpsertAvailability();
   const sendEmail = useSendEmail();
+  const { planKey, checkLimit } = usePlanLimits();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upgradeFeature, setUpgradeFeature] = useState("");
 
   // New service dialog
   const [newOpen, setNewOpen] = useState(false);
