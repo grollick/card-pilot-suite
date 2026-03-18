@@ -29,6 +29,13 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 import { motion } from "framer-motion";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
 
+const TEMPLATE_STYLE_PALETTES: Record<string, { primary: string; secondary: string; accent: string; background: string }> = {
+  Modern: { primary: "#2563eb", secondary: "#0f172a", accent: "#14b8a6", background: "#f8fafc" },
+  Elegant: { primary: "#9f1239", secondary: "#3f1d2e", accent: "#d4a017", background: "#fffaf3" },
+  Bold: { primary: "#dc2626", secondary: "#111827", accent: "#f59e0b", background: "#fff7ed" },
+  Minimal: { primary: "#374151", secondary: "#111827", accent: "#6b7280", background: "#f9fafb" },
+};
+
 export default function CardBuilder() {
   const s = useCardBuilderState();
   const { user } = useAuth();
@@ -131,6 +138,7 @@ export default function CardBuilder() {
     setSelectedTemplateId(templateId);
     const template = getTemplate(templateId);
     if (!template) return;
+
     const newSections = template.sections.map(ts => {
       const existing = s.sections.find(es => es.id === ts.id);
       return {
@@ -140,13 +148,20 @@ export default function CardBuilder() {
         content: existing?.content,
       };
     });
+
     s.sections.forEach(es => {
       if (!newSections.find(ns => ns.id === es.id)) {
         newSections.push({ ...es, enabled: false } as any);
       }
     });
+
     s.setSections(newSections);
     s.saveSections(newSections, true);
+
+    const palette = TEMPLATE_STYLE_PALETTES[template.style];
+    if (palette) {
+      s.saveThemeField({ palette: { ...palette } });
+    }
   };
 
   const editingSec = s.sections.find((sec) => sec.id === s.editingSection);
