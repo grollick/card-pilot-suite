@@ -287,6 +287,11 @@ export function useCardBuilderState() {
     saveThemeField({ cta_config: newConfig });
   }, [saveThemeField]);
 
+  const handleIdentityPositionChange = useCallback((pos: { x: number; y: number } | null) => {
+    setIdentityPosition(pos);
+    saveThemeField({ identity_position: pos });
+  }, [saveThemeField]);
+
   const handleAIGenerate = useCallback(async () => {
     if (!profile) return;
     const result = await generate({
