@@ -37,6 +37,30 @@ export default function CardBuilder() {
   const [photoImportOpen, setPhotoImportOpen] = useState(false);
   const [rightTab, setRightTab] = useState("identity");
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
+  const [blockMarketOpen, setBlockMarketOpen] = useState(false);
+
+  // Track installed marketplace blocks
+  const installedBlockIds = s.sections
+    .filter((sec) => !["hero","about","services","projects","quote_calculator","testimonials","gallery","contact","quote_request","booking","social"].includes(sec.id))
+    .map((sec) => sec.id);
+
+  const handleInstallBlock = (block: MarketplaceBlock) => {
+    if (s.sections.find((sec) => sec.id === block.id)) {
+      toast.info(`${block.name} is already on your card.`);
+      return;
+    }
+    const newSection = {
+      id: block.id,
+      label: block.name,
+      enabled: true,
+      content: block.defaultContent,
+    };
+    const next = [...s.sections, newSection];
+    s.setSections(next);
+    s.saveSections(next, true);
+    toast.success(`${block.name} added to your card!`);
+    setBlockMarketOpen(false);
+  };
 
   const handlePhotoImport = async (projects: ImportedProject[]) => {
     if (!user || projects.length === 0) return;
