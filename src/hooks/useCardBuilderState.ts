@@ -121,16 +121,24 @@ export function useCardBuilderState() {
   }, [profile]);
 
   // ── Save helpers ──
+  const pendingThemeFieldsRef = useRef<Record<string, any>>({});
+  // Keep ref in sync
+  useEffect(() => { pendingThemeFieldsRef.current = pendingThemeFields; }, [pendingThemeFields]);
+
   const saveThemeField = useCallback(async (fields: Record<string, any>) => {
     // Apply locally FIRST for instant preview update
-    setPendingThemeFields(prev => ({ ...prev, ...fields }));
+    setPendingThemeFields(prev => {
+      const next = { ...prev, ...fields };
+      pendingThemeFieldsRef.current = next;
+      return next;
+    });
     try {
       setGlobalSaveState("saving");
       const existing = (card?.theme_json as any) ?? {};
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: published ? "published" : "draft",
-        theme_json: { ...existing, cover_url: coverUrlRef.current, ...fields } as any,
+        theme_json: { ...existing, ...pendingThemeFieldsRef.current, cover_url: coverUrlRef.current, ...fields } as any,
       });
       setGlobalSaveState("saved");
       clearTimeout(globalSaveTimer.current);
