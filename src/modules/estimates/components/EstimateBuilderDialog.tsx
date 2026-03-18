@@ -205,7 +205,10 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
         <DialogHeader className="px-6 pt-6 pb-3 border-b border-border">
           <div className="flex items-center justify-between">
             <DialogTitle>{isEdit ? `Edit ${estimateNumber}` : "New Estimate"}</DialogTitle>
-            <div className="flex gap-2">
+             <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setAssistantOpen(true)} className="gap-1.5">
+                <Sparkles className="h-3.5 w-3.5" /> AI Assistant
+              </Button>
               {(isEdit || sections.some(s => s.items.some(li => li.title))) && (
                 <Button variant="outline" size="sm" onClick={handleExportPDF} className="gap-1.5"><Download className="h-3.5 w-3.5" /> PDF</Button>
               )}
