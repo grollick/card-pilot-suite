@@ -52,6 +52,8 @@ export function useCardBuilderState() {
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [themeEditorOpen, setThemeEditorOpen] = useState(false);
   const [themePreviewOverrides, setThemePreviewOverrides] = useState<CardThemeOverrides | null>(null);
+  // Local pending theme fields — applied immediately to preview, synced to DB async
+  const [pendingThemeFields, setPendingThemeFields] = useState<Record<string, any>>({});
   const [editName, setEditName] = useState<string | null>(null);
   const [editCompany, setEditCompany] = useState<string | null>(null);
   const [editJobTitle, setEditJobTitle] = useState<string | null>(null);
@@ -120,6 +122,8 @@ export function useCardBuilderState() {
 
   // ── Save helpers ──
   const saveThemeField = useCallback(async (fields: Record<string, any>) => {
+    // Apply locally FIRST for instant preview update
+    setPendingThemeFields(prev => ({ ...prev, ...fields }));
     try {
       setGlobalSaveState("saving");
       const existing = (card?.theme_json as any) ?? {};
@@ -147,7 +151,7 @@ export function useCardBuilderState() {
           await upsertCard.mutateAsync({
             sections_json: newSections as any,
             status: published ? "published" : "draft",
-            theme_json: { ...(card?.theme_json as any ?? {}), cover_url: coverUrlRef.current } as any,
+            theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFields, cover_url: coverUrlRef.current } as any,
           });
           setGlobalSaveState("saved");
           clearTimeout(globalSaveTimer.current);
@@ -224,7 +228,7 @@ export function useCardBuilderState() {
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: val ? "published" : "draft",
-        theme_json: { ...(card?.theme_json as any ?? {}), cover_url: coverUrl } as any,
+        theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFields, cover_url: coverUrl } as any,
       });
       toast.success(val ? "Card published!" : "Card unpublished");
     } catch { toast.error("Failed to update status"); }
@@ -242,7 +246,7 @@ export function useCardBuilderState() {
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: published ? "published" : "draft",
-        theme_json: { ...(card?.theme_json as any ?? {}), cover_url: url } as any,
+        theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFields, cover_url: url } as any,
       });
     } catch { toast.error("Failed to save backdrop"); }
   }, [sections, published, card, upsertCard]);
@@ -278,13 +282,30 @@ export function useCardBuilderState() {
   }, [profile, professionName, generate]);
 
   // ── Theme resolution ──
+  // Merge DB theme_json with any pending local fields for instant preview
+  const effectiveThemeJson = useMemo(() => {
+    const base = (card?.theme_json as any) ?? {};
+    return { ...base, ...pendingThemeFields };
+  }, [card?.theme_json, pendingThemeFields]);
+
+  // Clear pending fields once DB has caught up
+  useEffect(() => {
+    if (Object.keys(pendingThemeFields).length > 0 && card?.theme_json) {
+      const dbJson = card.theme_json as any;
+      const allSynced = Object.keys(pendingThemeFields).every(
+        key => JSON.stringify(dbJson[key]) === JSON.stringify(pendingThemeFields[key])
+      );
+      if (allSynced) setPendingThemeFields({});
+    }
+  }, [card?.theme_json, pendingThemeFields]);
+
   const savedThemeOverrides: CardThemeOverrides = {
-    palette: (card?.theme_json as any)?.palette ?? undefined,
-    fonts: (card?.theme_json as any)?.fonts ?? undefined,
-    tokens: (card?.theme_json as any)?.tokens ?? undefined,
-    gradientBg: (card?.theme_json as any)?.gradientBg ?? undefined,
-    bgPattern: (card?.theme_json as any)?.bgPattern ?? undefined,
-    metallicEffect: (card?.theme_json as any)?.metallicEffect ?? undefined,
+    palette: effectiveThemeJson.palette ?? undefined,
+    fonts: effectiveThemeJson.fonts ?? undefined,
+    tokens: effectiveThemeJson.tokens ?? undefined,
+    gradientBg: effectiveThemeJson.gradientBg ?? undefined,
+    bgPattern: effectiveThemeJson.bgPattern ?? undefined,
+    metallicEffect: effectiveThemeJson.metallicEffect ?? undefined,
   };
 
   // When theme editor is open, show live preview overrides; otherwise show saved
@@ -296,13 +317,12 @@ export function useCardBuilderState() {
     const tokens = (stylePack?.theme_tokens as Record<string, any>) ?? {};
     const palettes = (stylePack?.default_palettes as any[]) ?? [];
     const basePalette = palettes[0] ?? FALLBACK_PALETTE;
-    const themeJson = (card?.theme_json as any) ?? {};
 
-    // Use live preview overrides from theme editor when available
+    // Use live preview overrides from theme editor when available, then pending fields
     const liveOverrides = themePreviewOverrides ?? {};
-    const effectivePalette = (liveOverrides as any).palette ?? themeJson.palette;
-    const effectiveFonts = (liveOverrides as any).fonts ?? themeJson.fonts;
-    const effectiveTokens = (liveOverrides as any).tokens ?? themeJson.tokens;
+    const effectivePalette = (liveOverrides as any).palette ?? effectiveThemeJson.palette;
+    const effectiveFonts = (liveOverrides as any).fonts ?? effectiveThemeJson.fonts;
+    const effectiveTokens = (liveOverrides as any).tokens ?? effectiveThemeJson.tokens;
 
     const palette = effectivePalette ? { ...basePalette, ...effectivePalette } : basePalette;
     let merged = { ...tokens };
@@ -317,7 +337,7 @@ export function useCardBuilderState() {
       if (t.radius) merged = { ...merged, radius: { ...(merged.radius ?? {}), ...t.radius } };
     }
     return resolveCardTheme(merged, palette);
-  }, [stylePack, card?.theme_json, themePreviewOverrides]);
+  }, [stylePack, effectiveThemeJson, themePreviewOverrides]);
 
   const handleThemePreview = useCallback((overrides: CardThemeOverrides) => {
     setThemePreviewOverrides(overrides);
@@ -325,12 +345,22 @@ export function useCardBuilderState() {
 
   const handleThemeSave = useCallback(async (overrides: CardThemeOverrides) => {
     setThemePreviewOverrides(null);
+    // Apply locally immediately
+    const themeFields = {
+      palette: overrides.palette,
+      fonts: overrides.fonts,
+      tokens: overrides.tokens,
+      gradientBg: overrides.gradientBg,
+      bgPattern: overrides.bgPattern,
+      metallicEffect: overrides.metallicEffect,
+    };
+    setPendingThemeFields(prev => ({ ...prev, ...themeFields }));
     try {
       const existing = (card?.theme_json as any) ?? {};
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: published ? "published" : "draft",
-        theme_json: { ...existing, cover_url: coverUrl, palette: overrides.palette, fonts: overrides.fonts, tokens: overrides.tokens, gradientBg: overrides.gradientBg, bgPattern: overrides.bgPattern, metallicEffect: overrides.metallicEffect } as any,
+        theme_json: { ...existing, cover_url: coverUrl, ...themeFields } as any,
       });
       toast.success("Theme updated!");
     } catch { toast.error("Failed to save theme"); }
