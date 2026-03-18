@@ -60,6 +60,8 @@ export default function ContactsPage() {
   const { data: stages = [] } = usePipelineStages();
   const { data: tags = [] } = useTags();
   const createContact = useCreateContact();
+  const { planKey, checkLimit } = usePlanLimits();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   const [search, setSearch] = useState("");
   const [stageFilter, setStageFilter] = useState("all");
