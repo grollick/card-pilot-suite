@@ -276,7 +276,7 @@ export default function CardBuilderPreview({
                         style={{
                           height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding,
                           ...(logoCustomPosition
-                            ? { left: logoCustomPosition.x, top: logoCustomPosition.y }
+                            ? { left: `${logoCustomPosition.x}%`, top: `${logoCustomPosition.y}%` }
                             : (() => {
                                 const base: Record<string, React.CSSProperties> = {
                                   "top-left": { top: 8, left: 8 },
