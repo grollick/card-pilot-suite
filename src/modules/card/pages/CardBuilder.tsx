@@ -180,6 +180,17 @@ export default function CardBuilder() {
         saveSections={s.saveSections}
       />
 
+      {/* Block Marketplace trigger */}
+      <Button
+        variant="outline"
+        size="sm"
+        className="w-full gap-1.5 border-dashed border-primary/30 text-primary hover:bg-primary/5"
+        onClick={() => setBlockMarketOpen(true)}
+      >
+        <Plus className="h-3.5 w-3.5" />
+        Browse Block Marketplace
+      </Button>
+
       {/* AI Generate */}
       <div className="space-y-2">
         <div className="flex items-center gap-2 px-1">
