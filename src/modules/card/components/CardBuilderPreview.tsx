@@ -116,7 +116,7 @@ export default function CardBuilderPreview({
   coverUrl, coverOffsetY, avatarUrl, avatarBgColor, avatarRotation,
   logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap = 8, logoVerticalAlign = "center",
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
-  boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, onAvatarChange, setEditingSection,
+  boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, nameLineHeight, onAvatarChange, setEditingSection,
   identityPosition, onIdentityPositionChange,
   previewDevice: externalDevice, hideToolbar,
 }: Props) {
