@@ -703,6 +703,16 @@ export default function CardBuilder() {
         onInstallBlock={handleInstallBlock}
         userPlan={planKey}
       />
+
+      <AIDesignAssistantDialog
+        open={aiAssistantOpen}
+        onOpenChange={setAiAssistantOpen}
+        onCardGenerated={handleAICardGenerated}
+        userName={s.profile?.name || undefined}
+        userCompany={s.profile?.company || undefined}
+        userProfession={s.professionName}
+        isPro={isPro}
+      />
     </div>
   );
 }
