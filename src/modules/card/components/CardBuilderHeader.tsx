@@ -127,8 +127,26 @@ export default function CardBuilderHeader({
               <QRShareDialog url={`${window.location.origin}/${handle}`} name={name || "Card"} />
               <NFCShareDialog url={`${window.location.origin}/${handle}`} name={name || "Card"} />
               <WalletPassDialog handle={handle} name={name || "Card"} />
+
+              <Separator orientation="vertical" className="h-5 mx-0.5" />
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="h-8 gap-1.5 text-xs shadow-glow"
+                    onClick={() => setNetworkingOpen(true)}
+                  >
+                    <Wifi className="h-3.5 w-3.5" /> Network
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Open Networking Mode</TooltipContent>
+              </Tooltip>
             </>
           )}
+
+          <NetworkingModeDialog open={networkingOpen} onOpenChange={setNetworkingOpen} />
 
           <Separator orientation="vertical" className="h-5 mx-1" />
 
