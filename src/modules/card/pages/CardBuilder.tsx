@@ -603,6 +603,8 @@ export default function CardBuilder() {
                 onAvatarChange={s.handleAvatarChange} setEditingSection={s.setEditingSection}
                 identityPosition={s.identityPosition}
                 onIdentityPositionChange={s.handleIdentityPositionChange}
+                logoCustomPosition={s.logoCustomPosition}
+                onLogoCustomPositionChange={s.handleLogoCustomPositionChange}
               />
             </motion.div>
           )}
