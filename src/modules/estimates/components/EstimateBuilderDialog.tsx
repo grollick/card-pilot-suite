@@ -1,5 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { Plus, Trash2, Loader2, Download, ChevronDown, ChevronRight, Calculator, Bookmark } from "lucide-react";
+import { Plus, Trash2, Loader2, Download, ChevronDown, ChevronRight, Calculator, Bookmark, Sparkles } from "lucide-react";
+import EstimateAssistantSheet from "./EstimateAssistantSheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,7 +83,7 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
   const [termsConditions, setTermsConditions] = useState("");
   const [internalNotes, setInternalNotes] = useState("");
   const [showFinancials, setShowFinancials] = useState(false);
-
+  const [assistantOpen, setAssistantOpen] = useState(false);
   useEffect(() => {
     if (isEdit && existing) {
       setLeadId(existing.lead_id ?? "");
@@ -204,7 +205,10 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
         <DialogHeader className="px-6 pt-6 pb-3 border-b border-border">
           <div className="flex items-center justify-between">
             <DialogTitle>{isEdit ? `Edit ${estimateNumber}` : "New Estimate"}</DialogTitle>
-            <div className="flex gap-2">
+             <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setAssistantOpen(true)} className="gap-1.5">
+                <Sparkles className="h-3.5 w-3.5" /> AI Assistant
+              </Button>
               {(isEdit || sections.some(s => s.items.some(li => li.title))) && (
                 <Button variant="outline" size="sm" onClick={handleExportPDF} className="gap-1.5"><Download className="h-3.5 w-3.5" /> PDF</Button>
               )}
@@ -303,6 +307,27 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
           </>
         )}
       </DialogContent>
+      <EstimateAssistantSheet
+        open={assistantOpen}
+        onOpenChange={setAssistantOpen}
+        jobType={jobType}
+        scope={scope}
+        customerName={contacts.find((c: any) => c.id === leadId)?.name}
+        jobAddress={jobAddress}
+        existingItems={sections.flatMap(s => s.items)}
+        onApplyLineItems={(items) => {
+          setSections(prev => {
+            const lastSection = prev[prev.length - 1];
+            const hasEmptyOnly = lastSection.items.length === 1 && !lastSection.items[0].title;
+            if (hasEmptyOnly) {
+              return prev.map((s, i) => i === prev.length - 1 ? { ...s, items: items } : s);
+            }
+            return [...prev, { _tempId: crypto.randomUUID(), name: "AI Generated", notes: "", sort_order: prev.length, items }];
+          });
+        }}
+        onApplyScope={setScope}
+        onApplyTerms={setTermsConditions}
+      />
     </Dialog>
   );
 }
