@@ -104,6 +104,7 @@ export default function SettingsPage() {
           <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
           <TabsTrigger value="brand">Brand Kit</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="data">Data</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="mt-4 space-y-4">
