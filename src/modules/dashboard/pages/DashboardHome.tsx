@@ -8,33 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
-import { useTasks, useUpdateTask } from "@/hooks/useTasks";
-import { useDashboardStats, useRecentActivity } from "@/hooks/useDashboardStats";
-import { formatDistanceToNow, format } from "date-fns";
-import BusinessPerformancePanel from "@/modules/dashboard/components/BusinessPerformancePanel";
-import DailyScorecard from "@/modules/dashboard/components/DailyScorecard";
+import { useRecentActivity } from "@/hooks/useDashboardStats";
+import { formatDistanceToNow } from "date-fns";
+import RevenueKPICards from "@/modules/dashboard/components/RevenueKPICards";
+import FunnelView from "@/modules/dashboard/components/FunnelView";
 import MissedOpportunities from "@/modules/dashboard/components/MissedOpportunities";
-import FirstLeadAssistant from "@/modules/dashboard/components/FirstLeadAssistant";
-import JobMetrics from "@/modules/dashboard/components/JobMetrics";
-import MobileJobDashboard from "@/modules/dashboard/components/MobileJobDashboard";
-import AIInsightsWidget from "@/modules/dashboard/components/AIInsightsWidget";
+import RevenueQuickActions from "@/modules/dashboard/components/RevenueQuickActions";
+import GrowthTrends from "@/modules/dashboard/components/GrowthTrends";
 import NextActionsWidget from "@/modules/dashboard/components/NextActionsWidget";
-import TodaysSchedule from "@/modules/dashboard/components/TodaysSchedule";
-import ActiveJobsWidget from "@/modules/dashboard/components/ActiveJobsWidget";
-import QuickActionPanel from "@/modules/dashboard/components/QuickActionPanel";
-import MarketingSnapshot from "@/modules/dashboard/components/MarketingSnapshot";
-import BusinessHealthScore from "@/modules/dashboard/components/BusinessHealthScore";
-import TopCustomersWidget from "@/modules/dashboard/components/TopCustomersWidget";
-import ShareCardWidget from "@/modules/dashboard/components/ShareCardWidget";
 import RevenueOpportunities from "@/modules/dashboard/components/RevenueOpportunities";
-import ReviewsDashboardWidget from "@/modules/dashboard/components/ReviewsDashboardWidget";
+import MobileJobDashboard from "@/modules/dashboard/components/MobileJobDashboard";
+import ShareCardWidget from "@/modules/dashboard/components/ShareCardWidget";
 import { useIsMobile } from "@/hooks/use-mobile";
-
-const priorityColors: Record<string, string> = {
-  high: "text-destructive",
-  medium: "text-warning",
-  low: "text-muted-foreground",
-};
 
 const feedIcons: Record<string, typeof Users> = {
   lead: UserPlus,
@@ -43,9 +28,9 @@ const feedIcons: Record<string, typeof Users> = {
 };
 
 const feedColors: Record<string, string> = {
-  lead: "bg-primary/10 text-primary",
-  booking: "bg-success/10 text-success",
-  qr_scan: "bg-accent/10 text-accent",
+  lead: "bg-success/10 text-success",
+  booking: "bg-warning/10 text-warning",
+  qr_scan: "bg-primary/10 text-primary",
 };
 
 const fadeUp = {
@@ -57,67 +42,47 @@ const fadeUp = {
 export default function DashboardHome() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: feed = [], isLoading: feedLoading } = useRecentActivity();
-  const { data: allTasks = [], isLoading: tasksLoading } = useTasks({ status: "open" });
-  const updateTask = useUpdateTask();
-
-  const today = new Date().toISOString().split("T")[0];
-  const todayTasks = allTasks.filter((t: any) => t.due_date && t.due_date <= today);
-  const upcomingTasks = allTasks.filter((t: any) => t.due_date && t.due_date > today).slice(0, 4);
-
-  const maxStageCount = Math.max(...(stats?.stageCounts ?? []).map(s => s.count), 1);
 
   return (
     <div className="space-y-6 max-w-6xl">
       {/* Header */}
       <div className="page-header">
-        <h1 className="page-title">Command Center</h1>
+        <h1 className="page-title">Revenue Dashboard</h1>
         <p className="page-description">
-          Get more leads, book more customers, and grow your business.
+          Track leads, bookings, and revenue — then take action to grow.
         </p>
       </div>
 
       {/* Mobile Job Dashboard */}
       {isMobile && <MobileJobDashboard />}
 
-      {/* ★ "What should I do next?" — the #1 thing on the dashboard */}
-      <NextActionsWidget />
+      {/* ── SECTION 1: KPI Cards ── */}
+      <RevenueKPICards />
 
-      {/* Share Your Card */}
+      {/* ── SECTION 5: Quick Actions ── */}
+      {!isMobile && <RevenueQuickActions />}
+
+      {/* Share Your Card CTA */}
       <ShareCardWidget />
 
-      {/* Quick Actions (desktop) */}
-      {!isMobile && <QuickActionPanel />}
+      {/* ── "What should I do next?" ── */}
+      <NextActionsWidget />
 
-      {/* Business Performance Panel */}
-      <BusinessPerformancePanel />
-
-      {/* Daily Business Scorecard */}
-      <DailyScorecard />
-
-      {/* Main Grid: 2-column layout */}
+      {/* ── Main Grid: 2-column layout ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-        {/* Left Column */}
+        {/* Left Column (2/3) */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Revenue Opportunities */}
+          {/* ── SECTION 3: Opportunities Panel ── */}
           <RevenueOpportunities />
-
-          {/* Leads Needing Attention */}
           <MissedOpportunities />
 
-          {/* Today's Schedule */}
-          <TodaysSchedule />
-
-          {/* Active Jobs */}
-          <ActiveJobsWidget />
-
-          {/* Activity Feed */}
+          {/* ── SECTION 4: Activity Feed ── */}
           <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.15 }}
             className="dash-card">
             <div className="dash-card-header">
-              <h2 className="font-semibold text-sm">Recent Activity</h2>
+              <h2 className="font-semibold text-sm">Live Activity</h2>
               <Badge variant="secondary" className="text-2xs font-medium">Last 7 days</Badge>
             </div>
             <div className="dash-card-body">
@@ -135,7 +100,10 @@ export default function DashboardHome() {
                   ))}
                 </div>
               ) : feed.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">No recent activity yet.</p>
+                <div className="text-center py-8">
+                  <p className="text-sm text-muted-foreground">No recent activity yet.</p>
+                  <p className="text-xs text-muted-foreground mt-1">Share your card to start getting leads and bookings.</p>
+                </div>
               ) : (
                 <div className="space-y-0.5">
                   {feed.map(item => {
@@ -169,137 +137,15 @@ export default function DashboardHome() {
           </motion.div>
         </div>
 
-        {/* Right Column */}
+        {/* Right Column (1/3) */}
         <div className="space-y-6">
-          {/* Business Health Score */}
-          <BusinessHealthScore />
+          {/* ── SECTION 2: Funnel View ── */}
+          <FunnelView />
 
-          {/* Reviews */}
-          <ReviewsDashboardWidget />
-
-          {/* Marketing Snapshot */}
-          <MarketingSnapshot />
-
-          {/* Revenue / Job Overview */}
-          <JobMetrics />
-
-          {/* Top Customers */}
-          <TopCustomersWidget />
-
-          {/* Pipeline Snapshot */}
-          <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.15 }}
-            className="dash-card">
-            <div className="dash-card-header">
-              <h2 className="font-semibold text-sm">Pipeline</h2>
-              <Button variant="ghost" size="sm" className="text-xs gap-1 h-7" onClick={() => navigate("/app/pipeline")}>
-                Open <ArrowUpRight className="h-3 w-3" />
-              </Button>
-            </div>
-            <div className="dash-card-body">
-              {statsLoading ? (
-                <div className="space-y-3">
-                  {Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="space-y-1.5">
-                      <Skeleton className="h-3 w-20" />
-                      <Skeleton className="h-2 w-full rounded-full" />
-                    </div>
-                  ))}
-                </div>
-              ) : (stats?.stageCounts ?? []).length === 0 ? (
-                <p className="text-xs text-muted-foreground text-center py-4">No pipeline stages configured.</p>
-              ) : (
-                <div className="space-y-3">
-                  {(stats?.stageCounts ?? []).map(stage => (
-                    <div key={stage.id}>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-medium truncate">{stage.name}</span>
-                        <span className="text-xs font-semibold text-muted-foreground tabular-nums">{stage.count}</span>
-                      </div>
-                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                        <motion.div
-                          className="h-full rounded-full bg-primary"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${(stage.count / maxStageCount) * 100}%` }}
-                          transition={{ duration: 0.6, ease: "easeOut" }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </motion.div>
-
-          {/* Today's Tasks */}
-          <motion.div {...fadeUp} transition={{ ...fadeUp.transition, delay: 0.2 }}
-            className="dash-card">
-            <div className="dash-card-header">
-              <h2 className="font-semibold text-sm">Today's Tasks <span className="text-muted-foreground font-normal">({todayTasks.length})</span></h2>
-              <Button variant="ghost" size="sm" className="text-xs gap-1 h-7" onClick={() => navigate("/app/tasks")}>
-                View all <ArrowUpRight className="h-3 w-3" />
-              </Button>
-            </div>
-            <div className="dash-card-body">
-              {tasksLoading ? (
-                <div className="space-y-2">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <div key={i} className="flex gap-2 items-center">
-                      <Skeleton className="h-5 w-5 rounded-full" />
-                      <Skeleton className="h-3.5 w-full" />
-                    </div>
-                  ))}
-                </div>
-              ) : todayTasks.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-4">No tasks due today ✓</p>
-              ) : (
-                <div className="space-y-0.5">
-                  {todayTasks.slice(0, 6).map((task: any) => (
-                    <div key={task.id} className="flex items-center gap-2.5 py-1.5 group">
-                      <button
-                        onClick={() => updateTask.mutate({ id: task.id, leadId: task.lead_id, status: "done", title: task.title })}
-                        className="hover:scale-110 transition-transform"
-                      >
-                        <Circle className={`h-4 w-4 shrink-0 ${priorityColors[task.priority]}`} />
-                      </button>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm truncate">{task.title}</p>
-                        {task.leads?.name && (
-                          <button onClick={() => navigate(`/app/contacts/${task.lead_id}`)} className="text-2xs text-primary hover:underline truncate block">
-                            {task.leads.name}
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {upcomingTasks.length > 0 && (
-                <div className="border-t border-border mt-3 pt-3">
-                  <p className="text-2xs text-muted-foreground uppercase tracking-wider mb-2 font-medium">Coming up</p>
-                  {upcomingTasks.map((task: any) => (
-                    <div key={task.id} className="flex items-center gap-2.5 py-1 opacity-50">
-                      <Circle className={`h-3.5 w-3.5 shrink-0 ${priorityColors[task.priority]}`} />
-                      <span className="text-xs flex-1 truncate">{task.title}</span>
-                      <span className="text-2xs text-muted-foreground tabular-nums">{task.due_date && format(new Date(task.due_date), "MMM d")}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              <Button variant="ghost" size="sm" className="mt-3 text-xs gap-1 w-full justify-center h-8" onClick={() => navigate("/app/tasks")}>
-                <Plus className="h-3 w-3" /> Add Task
-              </Button>
-            </div>
-          </motion.div>
-
-          {/* First Lead Checklist */}
-          <FirstLeadAssistant />
+          {/* ── SECTION 6: Growth Trends ── */}
+          <GrowthTrends />
         </div>
       </div>
-
-      {/* AI Insights */}
-      <AIInsightsWidget />
     </div>
   );
 }
