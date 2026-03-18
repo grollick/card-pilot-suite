@@ -32,6 +32,10 @@ export interface SectionContent {
   description?: string;
   // Booking
   bookingHeading?: string;
+  // Projects
+  projectsHeading?: string;
+  projectsDescription?: string;
+  showBeforeAfter?: boolean;
 }
 
 interface SectionEditorProps {
@@ -175,7 +179,7 @@ export default function SectionEditor({
           {sectionId === "social" && <SocialEditor draft={draft} setDraft={setDraft} />}
           {sectionId === "contact" && <ContactEditor draft={draft} setDraft={setDraft} />}
           {sectionId === "booking" && <BookingEditor draft={draft} setDraft={setDraft} />}
-
+          {sectionId === "projects" && <ProjectsEditor draft={draft} setDraft={setDraft} />}
           <div className="flex gap-2 pt-4 border-t border-border">
             <Button onClick={handleSave} className="flex-1">Save Changes</Button>
             <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
@@ -461,6 +465,43 @@ function BookingEditor({ draft, setDraft }: { draft: SectionContent; setDraft: (
       </div>
       <p className="text-xs text-muted-foreground">
         Booking services are managed in Settings → Bookings. The booking widget will automatically display your active services.
+      </p>
+    </div>
+  );
+}
+
+function ProjectsEditor({ draft, setDraft }: { draft: SectionContent; setDraft: (d: SectionContent) => void }) {
+  return (
+    <div className="space-y-3">
+      <div>
+        <Label className="text-xs">Section Heading</Label>
+        <Input
+          placeholder="e.g. Our Work"
+          value={draft.projectsHeading || ""}
+          onChange={(e) => setDraft({ ...draft, projectsHeading: e.target.value })}
+        />
+      </div>
+      <div>
+        <Label className="text-xs">Description</Label>
+        <Textarea
+          placeholder="e.g. Check out some of our recent projects and transformations."
+          value={draft.projectsDescription || ""}
+          onChange={(e) => setDraft({ ...draft, projectsDescription: e.target.value })}
+          rows={3}
+        />
+      </div>
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          id="showBeforeAfter"
+          checked={draft.showBeforeAfter !== false}
+          onChange={(e) => setDraft({ ...draft, showBeforeAfter: e.target.checked })}
+          className="rounded border-border"
+        />
+        <Label htmlFor="showBeforeAfter" className="text-xs cursor-pointer">Show before/after slider on project images</Label>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Projects are managed from the Projects page under Customers → Projects. Public projects will automatically appear on your card.
       </p>
     </div>
   );
