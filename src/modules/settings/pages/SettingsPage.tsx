@@ -2,6 +2,7 @@ import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail,
 import MarketplaceSettings from "@/modules/settings/components/MarketplaceSettings";
 import DataExportSection from "@/modules/settings/components/DataExportSection";
 import DataImportSection from "@/modules/settings/components/DataImportSection";
+import BrandKitSettings from "@/modules/settings/components/BrandKitSettings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -192,38 +193,7 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="brand" className="mt-4">
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="rounded-xl border border-border bg-card p-6 space-y-5">
-            <div className="flex items-center gap-2 mb-2">
-              <Palette className="h-4 w-4 text-primary" />
-              <h2 className="font-semibold">Brand Kit</h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Primary Color</Label>
-                <div className="flex items-center gap-2">
-                  <div className="h-10 w-10 rounded-lg bg-primary border border-border" />
-                  <Input defaultValue="#4361ee" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Secondary Color</Label>
-                <div className="flex items-center gap-2">
-                  <div className="h-10 w-10 rounded-lg bg-secondary border border-border" />
-                  <Input defaultValue="#f0f1f5" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Font Family</Label>
-                <Input defaultValue="DM Sans" />
-              </div>
-              <div className="space-y-2">
-                <Label>Logo</Label>
-                <Button variant="outline" size="sm">Upload Logo</Button>
-              </div>
-            </div>
-            <Button className="shadow-glow">Save Brand Kit</Button>
-          </motion.div>
+          <BrandKitSettings />
         </TabsContent>
 
         <TabsContent value="notifications" className="mt-4 space-y-4">
