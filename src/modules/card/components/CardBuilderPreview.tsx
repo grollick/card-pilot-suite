@@ -154,6 +154,12 @@ export default function CardBuilderPreview({
     onIdentityPositionChange?.(null);
   }, [onIdentityPositionChange]);
 
+  const logoPx = logoSize === "small" ? 36 : logoSize === "large" ? 64 : 48;
+  const posMap: Record<string, string> = {
+    "top-left": "top-2 left-2", "top-right": "top-2 right-2",
+    "bottom-left": "bottom-2 left-2", "bottom-right": "bottom-2 right-2",
+  };
+
   return (
     <>
       {/* Toolbar — hidden when parent controls device */}
