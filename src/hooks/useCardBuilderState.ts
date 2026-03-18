@@ -444,6 +444,8 @@ export function useCardBuilderState() {
     subtitleFontSize, setSubtitleFontSize,
     identityPosition, handleIdentityPositionChange,
     nameLineHeight, setNameLineHeight,
+    nameTextStroke, setNameTextStroke,
+    nameTextStrokeWidth, setNameTextStrokeWidth,
     identitySaveTimers, identitySaveState, setIdentitySaveState,
     // Photos / Logo
     avatarUrl, coverUrl, avatarBgColor, avatarRotation, coverOffsetY,
