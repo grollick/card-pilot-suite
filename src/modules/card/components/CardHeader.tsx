@@ -40,6 +40,7 @@ interface CardHeaderProps {
   logoPadding?: number;
   logoNameGap?: number;
   logoVerticalAlign?: "top" | "center" | "bottom";
+  logoCustomPosition?: { x: number; y: number } | null;
   metallicEffect?: MetallicEffect;
   /** Dynamic hero background (profession-based or user-selected) */
   heroBackground?: HeroBackground | null;
