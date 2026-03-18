@@ -132,14 +132,22 @@ export function useCardBuilderState() {
       pendingThemeFieldsRef.current = next;
       return next;
     });
+
     try {
       setGlobalSaveState("saving");
       const existing = (card?.theme_json as any) ?? {};
+      const mergedTheme = {
+        ...existing,
+        ...pendingThemeFieldsRef.current,
+        cover_url: coverUrlRef.current,
+        ...fields,
+      } as any;
+
       await upsertCard.mutateAsync({
-        sections_json: sections as any,
-        status: published ? "published" : "draft",
-        theme_json: { ...existing, ...pendingThemeFieldsRef.current, cover_url: coverUrlRef.current, ...fields } as any,
+        theme_json: mergedTheme,
       });
+
+      qc.invalidateQueries({ queryKey: ["public-card"] });
       setGlobalSaveState("saved");
       clearTimeout(globalSaveTimer.current);
       globalSaveTimer.current = setTimeout(() => setGlobalSaveState("idle"), 2500);
@@ -148,7 +156,7 @@ export function useCardBuilderState() {
       clearTimeout(globalSaveTimer.current);
       globalSaveTimer.current = setTimeout(() => setGlobalSaveState("idle"), 4000);
     }
-  }, [card, sections, published, upsertCard]);
+  }, [card, upsertCard, qc]);
 
   const saveSections = useCallback(
     async (newSections: CardSection[], immediate = false) => {
