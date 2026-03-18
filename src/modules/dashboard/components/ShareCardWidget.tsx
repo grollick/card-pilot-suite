@@ -125,6 +125,7 @@ export default function ShareCardWidget() {
           </div>
         </div>
       </div>
+      <NetworkingModeDialog open={networkingOpen} onOpenChange={setNetworkingOpen} />
     </motion.div>
   );
 }
