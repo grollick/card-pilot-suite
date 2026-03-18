@@ -162,6 +162,9 @@ const App = () => (
               <ProtectedRoute><LazyRoute><Onboarding /></LazyRoute></ProtectedRoute>
             } />
 
+            {/* Demo cards — no auth */}
+            <Route path="/demo/:slug" element={<DemoCardPreview />} />
+
             {/* Public routes — no auth required */}
             <Route path="/q/:campaign" element={<QRLanding />} />
             <Route path="/book/:handle" element={<PublicBooking />} />
