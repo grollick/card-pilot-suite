@@ -375,8 +375,10 @@ export default function Onboarding() {
     }
   };
 
-  const totalSteps = 7;
+  const totalSteps = 8;
 
+  const shareMessage = `Hey! I just set up my digital business card — check it out and let me know if you ever need ${selectedProfession?.name?.toLowerCase() || 'my'} services: ${window.location.origin}/c/${(name || "").toLowerCase().replace(/[^a-z0-9]+/g, "")}`;
+  const shareCheckedCount = Object.values(shareChecklist).filter(Boolean).length;
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-lg">
