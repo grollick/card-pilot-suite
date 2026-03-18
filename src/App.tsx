@@ -31,6 +31,7 @@ const ClientProtectedRoute = lazy(() => import("@/modules/client/components/Clie
 
 // ── Auth & marketing — loaded eagerly (small) ──
 import LandingPage from "@/modules/landing/pages/LandingPage";
+import IndustryLandingPage from "@/modules/landing/pages/IndustryLandingPage";
 import PricingPage from "@/modules/pricing/pages/PricingPage";
 import AuthPage from "@/modules/auth/pages/AuthPage";
 import ForgotPassword from "@/modules/auth/pages/ForgotPassword";
