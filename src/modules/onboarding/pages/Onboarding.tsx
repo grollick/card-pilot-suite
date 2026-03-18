@@ -238,7 +238,7 @@ export default function Onboarding() {
 
   // Trigger AI generation from step 2
   const handleDescriptionNext = () => {
-    setStep(3);
+    setStep(4);
     generateAISetup();
   };
 
