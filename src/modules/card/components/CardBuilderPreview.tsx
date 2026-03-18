@@ -40,6 +40,8 @@ interface Props {
   nameFontSize?: number | null;
   subtitleFontSize?: number | null;
   nameLineHeight?: number | null;
+  nameTextStroke?: boolean;
+  nameTextStrokeWidth?: number;
   onAvatarChange: (url: string) => void;
   setEditingSection: (id: string | null) => void;
   identityPosition?: { x: number; y: number } | null;
