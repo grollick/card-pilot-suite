@@ -44,6 +44,8 @@ interface Props {
   setEditingSection: (id: string | null) => void;
   identityPosition?: { x: number; y: number } | null;
   onIdentityPositionChange?: (pos: { x: number; y: number } | null) => void;
+  logoCustomPosition?: { x: number; y: number } | null;
+  onLogoCustomPositionChange?: (pos: { x: number; y: number } | null) => void;
   /** When provided externally, hides the built-in device toggle toolbar */
   previewDevice?: "phone" | "tablet";
   hideToolbar?: boolean;
