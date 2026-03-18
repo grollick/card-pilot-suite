@@ -220,6 +220,7 @@ const App = () => (
               <Route path="agency" element={<LazyRoute><AgencyDashboard /></LazyRoute>} />
               <Route path="marketplace" element={<LazyRoute><MarketplacePage /></LazyRoute>} />
               <Route path="admin" element={<LazyRoute><AdminPage /></LazyRoute>} />
+              <Route path="platform-admin" element={<LazyRoute><PlatformAdminDashboard /></LazyRoute>} />
               <Route path="team-management" element={<LazyRoute><TeamManagementPage /></LazyRoute>} />
               <Route path="tech-dashboard" element={<LazyRoute><TechDashboardPage /></LazyRoute>} />
               <Route path="help" element={<LazyRoute><HelpCenter /></LazyRoute>} />
