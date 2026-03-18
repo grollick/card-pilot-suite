@@ -447,7 +447,7 @@ export function useCardBuilderState() {
     handleAvatarChange, handleCoverChange,
     handleAvatarBgColorChange, handleAvatarRotationChange, handleCoverOffsetYChange,
     handleLogoChange, handleLogoFrostedBgChange, handleLogoGlowChange,
-    handleLogoOpacityChange, handleLogoPaddingChange, handleLogoPositionChange, handleLogoSizeChange, handleLogoNameGapChange, handleLogoVerticalAlignChange,
+    handleLogoOpacityChange, handleLogoPaddingChange, handleLogoPositionChange, handleLogoSizeChange, handleLogoNameGapChange, handleLogoVerticalAlignChange, handleLogoCustomPositionChange,
     // CTA & Social
     ctaConfig, ctaIconsOnly, setCtaIconsOnly,
     socialIconsOnly, setSocialIconsOnly, socialBtnColor, setSocialBtnColor,
