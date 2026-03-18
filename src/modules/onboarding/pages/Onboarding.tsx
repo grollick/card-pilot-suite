@@ -132,8 +132,9 @@ export default function Onboarding() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [search, setSearch] = useState("");
+  const [shareChecklist, setShareChecklist] = useState({ sent5: false, postLink: false, addBio: false });
   const [selectedProfessionId, setSelectedProfessionId] = useState("");
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [name, setName] = useState("");
