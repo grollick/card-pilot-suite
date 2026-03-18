@@ -313,9 +313,18 @@ export default function CardBuilderIdentity({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label className="text-xs text-muted-foreground">Company / Title</label>
-          <SaveIndicator state={identitySaveState.company ?? null} />
+          <div className="flex items-center gap-2">
+            <SaveIndicator state={identitySaveState.company ?? null} />
+            <Switch
+              checked={showCompany}
+              onCheckedChange={(v) => { setShowCompany(v); saveThemeField({ show_company: v }); }}
+              className="scale-75 origin-right"
+            />
+          </div>
         </div>
-        <Input value={editCompany ?? profile?.company ?? ""} onChange={makeHandler("company", "company", setEditCompany)} placeholder="Your Company" className="text-sm" />
+        {showCompany && (
+          <Input value={editCompany ?? profile?.company ?? ""} onChange={makeHandler("company", "company", setEditCompany)} placeholder="Your Company" className="text-sm" />
+        )}
       </div>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
