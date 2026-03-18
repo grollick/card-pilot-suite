@@ -111,7 +111,7 @@ export default function BlockMarketplaceDialog({
           </div>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 min-h-0">
+        <div className="flex-1 min-h-0 overflow-y-auto">
           <div className="p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
             {filtered.length === 0 && (
               <p className="col-span-2 text-center text-sm text-muted-foreground py-8">
@@ -132,7 +132,6 @@ export default function BlockMarketplaceDialog({
                       : "border-border bg-card hover:border-primary/20 hover:shadow-sm"
                   }`}
                 >
-                  {/* Premium badge */}
                   {block.isPremium && (
                     <Badge
                       variant="secondary"
@@ -199,7 +198,7 @@ export default function BlockMarketplaceDialog({
               );
             })}
           </div>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );
