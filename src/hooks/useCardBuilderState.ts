@@ -159,7 +159,7 @@ export function useCardBuilderState() {
           await upsertCard.mutateAsync({
             sections_json: newSections as any,
             status: published ? "published" : "draft",
-            theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFields, cover_url: coverUrlRef.current } as any,
+            theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFieldsRef.current, cover_url: coverUrlRef.current } as any,
           });
           setGlobalSaveState("saved");
           clearTimeout(globalSaveTimer.current);
