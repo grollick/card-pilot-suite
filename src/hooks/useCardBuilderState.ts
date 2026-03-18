@@ -121,16 +121,24 @@ export function useCardBuilderState() {
   }, [profile]);
 
   // ── Save helpers ──
+  const pendingThemeFieldsRef = useRef<Record<string, any>>({});
+  // Keep ref in sync
+  useEffect(() => { pendingThemeFieldsRef.current = pendingThemeFields; }, [pendingThemeFields]);
+
   const saveThemeField = useCallback(async (fields: Record<string, any>) => {
     // Apply locally FIRST for instant preview update
-    setPendingThemeFields(prev => ({ ...prev, ...fields }));
+    setPendingThemeFields(prev => {
+      const next = { ...prev, ...fields };
+      pendingThemeFieldsRef.current = next;
+      return next;
+    });
     try {
       setGlobalSaveState("saving");
       const existing = (card?.theme_json as any) ?? {};
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: published ? "published" : "draft",
-        theme_json: { ...existing, cover_url: coverUrlRef.current, ...fields } as any,
+        theme_json: { ...existing, ...pendingThemeFieldsRef.current, cover_url: coverUrlRef.current, ...fields } as any,
       });
       setGlobalSaveState("saved");
       clearTimeout(globalSaveTimer.current);
@@ -151,7 +159,7 @@ export function useCardBuilderState() {
           await upsertCard.mutateAsync({
             sections_json: newSections as any,
             status: published ? "published" : "draft",
-            theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFields, cover_url: coverUrlRef.current } as any,
+            theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFieldsRef.current, cover_url: coverUrlRef.current } as any,
           });
           setGlobalSaveState("saved");
           clearTimeout(globalSaveTimer.current);
@@ -228,7 +236,7 @@ export function useCardBuilderState() {
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: val ? "published" : "draft",
-        theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFields, cover_url: coverUrl } as any,
+        theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFieldsRef.current, cover_url: coverUrl } as any,
       });
       toast.success(val ? "Card published!" : "Card unpublished");
     } catch { toast.error("Failed to update status"); }
@@ -246,7 +254,7 @@ export function useCardBuilderState() {
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: published ? "published" : "draft",
-        theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFields, cover_url: url } as any,
+        theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFieldsRef.current, cover_url: url } as any,
       });
     } catch { toast.error("Failed to save backdrop"); }
   }, [sections, published, card, upsertCard]);
