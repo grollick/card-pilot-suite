@@ -643,6 +643,14 @@ export default function CardBuilder() {
         profession={s.professionName}
         onImportComplete={handlePhotoImport}
       />
+
+      <BlockMarketplaceDialog
+        open={blockMarketOpen}
+        onOpenChange={setBlockMarketOpen}
+        installedBlockIds={installedBlockIds}
+        onInstallBlock={handleInstallBlock}
+        userPlan={planKey}
+      />
     </div>
   );
 }
