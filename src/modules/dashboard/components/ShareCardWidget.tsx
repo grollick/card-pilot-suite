@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Check, QrCode, Share2, ArrowUpRight } from "lucide-react";
+import { Copy, Check, QrCode, Share2, ArrowUpRight, Wifi } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-
+import NetworkingModeDialog from "@/modules/card/components/NetworkingModeDialog";
 const socials = [
   { name: "Facebook", color: "bg-[hsl(220,46%,48%)]", share: (url: string) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
   { name: "LinkedIn", color: "bg-[hsl(210,80%,38%)]", share: (url: string) => `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}` },
@@ -18,6 +18,7 @@ export default function ShareCardWidget() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
+  const [networkingOpen, setNetworkingOpen] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["profile-handle-share"],
@@ -78,7 +79,16 @@ export default function ShareCardWidget() {
         </div>
 
         {/* Action buttons */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
+          <Button
+            variant="default"
+            size="sm"
+            className="gap-1.5 text-xs shadow-glow"
+            onClick={() => setNetworkingOpen(true)}
+          >
+            <Wifi className="h-3.5 w-3.5" />
+            Network
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -86,10 +96,10 @@ export default function ShareCardWidget() {
             onClick={() => navigate("/app/card/qr")}
           >
             <QrCode className="h-3.5 w-3.5" />
-            Download QR
+            QR Code
           </Button>
           <Button
-            variant="default"
+            variant="outline"
             size="sm"
             className="gap-1.5 text-xs"
             onClick={() => navigate("/app/card")}
@@ -115,6 +125,7 @@ export default function ShareCardWidget() {
           </div>
         </div>
       </div>
+      <NetworkingModeDialog open={networkingOpen} onOpenChange={setNetworkingOpen} />
     </motion.div>
   );
 }

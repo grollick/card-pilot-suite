@@ -1,6 +1,6 @@
 import {
   Globe, Loader2, Cloud, CloudOff, Link2, Undo2, Redo2,
-  Eye, Smartphone, Tablet, Monitor, Send, ChevronLeft,
+  Eye, Smartphone, Tablet, Monitor, Send, ChevronLeft, Wifi,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -8,9 +8,11 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import QRShareDialog from "./QRShareDialog";
 import NFCShareDialog from "./NFCShareDialog";
 import WalletPassDialog from "./WalletPassDialog";
+import NetworkingModeDialog from "./NetworkingModeDialog";
 import {
   Tooltip,
   TooltipContent,
@@ -34,6 +36,7 @@ export default function CardBuilderHeader({
   previewDevice, onPreviewDeviceChange,
 }: Props) {
   const navigate = useNavigate();
+  const [networkingOpen, setNetworkingOpen] = useState(false);
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -124,8 +127,26 @@ export default function CardBuilderHeader({
               <QRShareDialog url={`${window.location.origin}/${handle}`} name={name || "Card"} />
               <NFCShareDialog url={`${window.location.origin}/${handle}`} name={name || "Card"} />
               <WalletPassDialog handle={handle} name={name || "Card"} />
+
+              <Separator orientation="vertical" className="h-5 mx-0.5" />
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="h-8 gap-1.5 text-xs shadow-glow"
+                    onClick={() => setNetworkingOpen(true)}
+                  >
+                    <Wifi className="h-3.5 w-3.5" /> Network
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Open Networking Mode</TooltipContent>
+              </Tooltip>
             </>
           )}
+
+          <NetworkingModeDialog open={networkingOpen} onOpenChange={setNetworkingOpen} />
 
           <Separator orientation="vertical" className="h-5 mx-1" />
 
