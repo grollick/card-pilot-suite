@@ -512,3 +512,44 @@ function ProjectsEditor({ draft, setDraft }: { draft: SectionContent; setDraft: 
     </div>
   );
 }
+
+function QuoteCalculatorEditor({ draft, setDraft }: { draft: SectionContent; setDraft: (d: SectionContent) => void }) {
+  return (
+    <div className="space-y-3">
+      <div>
+        <Label className="text-xs">Section Heading</Label>
+        <Input
+          placeholder="e.g. Get an Instant Quote"
+          value={draft.calcHeading || ""}
+          onChange={(e) => setDraft({ ...draft, calcHeading: e.target.value })}
+        />
+      </div>
+      <div>
+        <Label className="text-xs">Calculator Preset</Label>
+        <select
+          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+          value={draft.calcPresetId || ""}
+          onChange={(e) => setDraft({ ...draft, calcPresetId: e.target.value })}
+        >
+          <option value="">Auto (match profession)</option>
+          {CALCULATOR_PRESETS.map((p) => (
+            <option key={p.id} value={p.id}>{p.name}</option>
+          ))}
+        </select>
+        <p className="text-[10px] text-muted-foreground mt-1">Choose a preset or let it auto-detect from your profession.</p>
+      </div>
+      <div>
+        <Label className="text-xs">Disclaimer Text</Label>
+        <Textarea
+          placeholder="e.g. Final pricing depends on site assessment."
+          value={draft.calcDisclaimer || ""}
+          onChange={(e) => setDraft({ ...draft, calcDisclaimer: e.target.value })}
+          rows={2}
+        />
+      </div>
+      <p className="text-xs text-muted-foreground">
+        The calculator lets visitors estimate costs and submit their info as a lead automatically.
+      </p>
+    </div>
+  );
+}
