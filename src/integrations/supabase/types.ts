@@ -701,6 +701,39 @@ export type Database = {
           },
         ]
       }
+      client_profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string
+          id: string
+          name: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          name?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       contact_activities: {
         Row: {
           activity_type: string
@@ -3192,7 +3225,7 @@ export type Database = {
         | "communication"
         | "productivity"
       app_pricing_type: "free" | "paid_once" | "subscription"
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "client"
       booking_status:
         | "pending"
         | "confirmed"
@@ -3387,7 +3420,7 @@ export const Constants = {
         "productivity",
       ],
       app_pricing_type: ["free", "paid_once", "subscription"],
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "client"],
       booking_status: [
         "pending",
         "confirmed",
