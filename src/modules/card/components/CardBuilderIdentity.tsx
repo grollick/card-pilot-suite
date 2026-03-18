@@ -220,6 +220,27 @@ export default function CardBuilderIdentity({
             >Reset to auto</button>
           )}
         </div>
+        <div className="mt-1.5">
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[11px] text-muted-foreground">Line spacing</label>
+            <span className="text-[10px] text-muted-foreground tabular-nums">{nameLineHeight != null ? `${nameLineHeight}` : "Auto"}</span>
+          </div>
+          <Slider
+            min={0.8}
+            max={3}
+            step={0.1}
+            value={[nameLineHeight ?? 1.4]}
+            onValueChange={([v]) => { setNameLineHeight(v); saveThemeField({ name_line_height: v }); }}
+            className="w-full"
+          />
+          {nameLineHeight !== null && (
+            <button
+              type="button"
+              onClick={() => { setNameLineHeight(null); saveThemeField({ name_line_height: null }); }}
+              className="text-[10px] text-primary hover:underline mt-0.5"
+            >Reset to auto</button>
+          )}
+        </div>
       </div>
       <div className="space-y-2">
         <div className="flex items-center justify-between">
