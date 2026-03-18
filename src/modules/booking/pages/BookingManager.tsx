@@ -89,6 +89,12 @@ export default function BookingManager() {
 
   const handleCreateService = async () => {
     if (!sName.trim()) return;
+    if (checkLimit("booking_services", services.length)) {
+      setNewOpen(false);
+      setUpgradeFeature("services");
+      setUpgradeOpen(true);
+      return;
+    }
     await createService.mutateAsync({
       name: sName,
       duration_min: parseInt(sDuration) || 30,
