@@ -1,52 +1,63 @@
 import { useNavigate } from "react-router-dom";
-import { Phone, MessageSquare, CalendarPlus, UserPlus, FileText, Share2 } from "lucide-react";
+import { UserPlus, CalendarPlus, Share2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const actions = [
-  { icon: Phone, label: "Call Lead", route: "/app/contacts", color: "text-success", desc: "Follow up by phone" },
-  { icon: MessageSquare, label: "Send Message", route: "/app/contacts", color: "text-primary", desc: "Email or text" },
-  { icon: CalendarPlus, label: "Book Appointment", route: "/app/bookings", color: "text-warning", desc: "Schedule a job" },
-  { icon: UserPlus, label: "Add Contact", route: "/app/contacts", color: "text-accent", desc: "New lead" },
-  { icon: FileText, label: "Create Estimate", route: "/app/estimates", color: "text-destructive", desc: "Send a quote" },
-  { icon: Share2, label: "Share Card", route: "/app/card/qr", color: "text-primary", desc: "Get more leads" },
+  { icon: UserPlus, label: "Add Lead", route: "/app/contacts?new=1", variant: "default" as const },
+  { icon: CalendarPlus, label: "Book Appointment", route: "/app/bookings?new=1", variant: "outline" as const },
+  { icon: Share2, label: "Share Card", route: "/app/card/qr", variant: "outline" as const },
 ];
 
 export default function RevenueQuickActions() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile-handle-quick"],
+    enabled: !!user,
+    staleTime: 10 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("handle").eq("id", user!.id).single();
+      return data;
+    },
+  });
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.15, duration: 0.4 }}
-      className="dash-card"
+      transition={{ delay: 0.12, duration: 0.35 }}
+      className="flex flex-wrap gap-2"
     >
-      <div className="dash-card-header">
-        <h2 className="font-semibold text-sm">Quick Actions</h2>
-        <span className="text-2xs text-muted-foreground">Generate revenue now</span>
-      </div>
-      <div className="dash-card-body">
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-          {actions.map((a, idx) => (
-            <motion.div
-              key={a.label}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: idx * 0.03 }}
-            >
-              <Button
-                variant="outline"
-                className="flex-col h-[76px] w-full gap-1 text-xs font-medium hover:bg-muted/50 hover:border-primary/20 transition-all group"
-                onClick={() => navigate(a.route)}
-              >
-                <a.icon className={`h-5 w-5 ${a.color} transition-transform group-hover:scale-110`} />
-                <span className="leading-tight text-center">{a.label}</span>
-              </Button>
-            </motion.div>
-          ))}
-        </div>
-      </div>
+      {actions.map((a, idx) => (
+        <Button
+          key={a.label}
+          variant={a.variant}
+          size="sm"
+          className="gap-2 rounded-xl h-9 text-[13px] font-medium"
+          onClick={() => navigate(a.route)}
+        >
+          <a.icon className="h-4 w-4" />
+          {a.label}
+        </Button>
+      ))}
+      {profile?.handle && (
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2 rounded-xl h-9 text-[13px] font-medium"
+          asChild
+        >
+          <a href={`/${profile.handle}`} target="_blank" rel="noreferrer">
+            <ExternalLink className="h-3.5 w-3.5" />
+            View Card
+          </a>
+        </Button>
+      )}
     </motion.div>
   );
 }
