@@ -233,7 +233,7 @@ export default function Onboarding() {
   // When profession selected, move to description input step
   const handleProfessionNext = () => {
     if (!selectedProfession) return;
-    setStep(2);
+    setStep(3);
   };
 
   // Trigger AI generation from step 2
