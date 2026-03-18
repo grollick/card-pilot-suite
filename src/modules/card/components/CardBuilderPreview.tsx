@@ -1,6 +1,6 @@
-import { CreditCard, Eye, Pencil, Smartphone, Tablet } from "lucide-react";
+import { CreditCard, Eye, Pencil, Smartphone, Tablet, Move } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { getPatternSvg, type CardThemeOverrides, METALLIC_GRADIENTS, type MetallicType } from "./CardThemeEditor";
 import { CTA_ICON_MAP } from "./CtaEditor";
