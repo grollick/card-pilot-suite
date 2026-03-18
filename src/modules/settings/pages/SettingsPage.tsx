@@ -1,5 +1,6 @@
-import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail, Clock, CheckCircle, AlertTriangle, Clock3, TrendingUp, Send, Plus, Trash2, GripVertical, Store } from "lucide-react";
+import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail, Clock, CheckCircle, AlertTriangle, Clock3, TrendingUp, Send, Plus, Trash2, GripVertical, Store, Download } from "lucide-react";
 import MarketplaceSettings from "@/modules/settings/components/MarketplaceSettings";
+import DataExportSection from "@/modules/settings/components/DataExportSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -103,6 +104,7 @@ export default function SettingsPage() {
           <TabsTrigger value="marketplace">Marketplace</TabsTrigger>
           <TabsTrigger value="brand">Brand Kit</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="data">Data</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profile" className="mt-4 space-y-4">
@@ -237,6 +239,10 @@ export default function SettingsPage() {
             </div>
             <p className="text-sm text-muted-foreground">Additional notification preferences coming soon.</p>
           </motion.div>
+        </TabsContent>
+
+        <TabsContent value="data" className="mt-4">
+          <DataExportSection />
         </TabsContent>
       </Tabs>
 
