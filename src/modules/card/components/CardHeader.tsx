@@ -263,7 +263,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
       style={{
         position: "absolute",
         ...(logoCustomPosition
-          ? { left: logoCustomPosition.x, top: logoCustomPosition.y }
+          ? { left: `${logoCustomPosition.x}%`, top: `${logoCustomPosition.y}%` }
           : logoPosStyle[logoPosition]),
         height: logoPx, width: logoPx, borderRadius: 8,
         background: logoFrostedBg ? "rgba(255,255,255,0.85)" : "transparent",
