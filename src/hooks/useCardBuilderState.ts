@@ -228,7 +228,7 @@ export function useCardBuilderState() {
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: val ? "published" : "draft",
-        theme_json: { ...(card?.theme_json as any ?? {}), cover_url: coverUrl } as any,
+        theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFields, cover_url: coverUrl } as any,
       });
       toast.success(val ? "Card published!" : "Card unpublished");
     } catch { toast.error("Failed to update status"); }
