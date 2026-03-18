@@ -398,6 +398,7 @@ export default function BookingManager() {
           </motion.div>
         </TabsContent>
       </Tabs>
+      <UpgradePrompt open={upgradeOpen} onOpenChange={setUpgradeOpen} feature={upgradeFeature} currentPlan={planKey} />
     </div>
   );
 }
