@@ -347,8 +347,9 @@ export default function CardBuilder() {
           firstNameFontWeight={s.firstNameFontWeight} setFirstNameFontWeight={s.setFirstNameFontWeight}
           nameItalic={s.nameItalic} setNameItalic={s.setNameItalic}
           nameFontSize={s.nameFontSize} setNameFontSize={s.setNameFontSize}
-          subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
-          saveThemeField={s.saveThemeField} qc={s.qc} hideWrapper
+           subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
+           nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
+           saveThemeField={s.saveThemeField} qc={s.qc} hideWrapper
         />
       </TabsContent>
 
