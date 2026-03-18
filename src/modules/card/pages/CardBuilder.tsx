@@ -42,12 +42,14 @@ export default function CardBuilder() {
   const { user } = useAuth();
   const { planKey } = usePlanLimits();
   const isPro = planKey !== "starter";
+  const isMobile = useIsMobile();
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [photoImportOpen, setPhotoImportOpen] = useState(false);
   const [rightTab, setRightTab] = useState("identity");
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
   const [blockMarketOpen, setBlockMarketOpen] = useState(false);
   const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
+  const [mobileTab, setMobileTab] = useState<"preview" | "sections" | "identity" | "theme">("preview");
 
   const handleAICardGenerated = (result: AICardResult) => {
     // Apply sections order
