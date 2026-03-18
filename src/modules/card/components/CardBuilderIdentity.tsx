@@ -30,6 +30,8 @@ interface Props {
   setNameFontSize: (v: number | null) => void;
   subtitleFontSize: number | null;
   setSubtitleFontSize: (v: number | null) => void;
+  subtitleItalic: boolean;
+  setSubtitleItalic: (v: boolean) => void;
   nameLineHeight: number | null;
   setNameLineHeight: (v: number | null) => void;
   nameTextStroke: boolean;
@@ -61,6 +63,7 @@ export default function CardBuilderIdentity({
   nameItalic, setNameItalic,
   nameFontSize, setNameFontSize,
   subtitleFontSize, setSubtitleFontSize,
+  subtitleItalic, setSubtitleItalic,
   nameLineHeight, setNameLineHeight,
   nameTextStroke, setNameTextStroke,
   nameTextStrokeWidth, setNameTextStrokeWidth,
@@ -225,6 +228,14 @@ export default function CardBuilderIdentity({
               className="text-[10px] text-primary hover:underline mt-0.5"
             >Reset to auto</button>
           )}
+        </div>
+        <div className="flex items-center justify-between mt-1">
+          <label className="text-[11px] text-muted-foreground">Italic job title</label>
+          <Switch
+            checked={subtitleItalic}
+            onCheckedChange={(v) => { setSubtitleItalic(v); saveThemeField({ subtitle_italic: v }); }}
+            className="scale-75 origin-right"
+          />
         </div>
         <div className="mt-1.5">
           <div className="flex items-center justify-between mb-1">

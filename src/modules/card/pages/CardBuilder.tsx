@@ -348,6 +348,7 @@ export default function CardBuilder() {
           nameItalic={s.nameItalic} setNameItalic={s.setNameItalic}
           nameFontSize={s.nameFontSize} setNameFontSize={s.setNameFontSize}
            subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
+           subtitleItalic={s.subtitleItalic} setSubtitleItalic={s.setSubtitleItalic}
            nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
            nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
            nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}
@@ -546,6 +547,7 @@ export default function CardBuilder() {
                       nameItalic={s.nameItalic}
                       nameFontSize={s.nameFontSize}
                       subtitleFontSize={s.subtitleFontSize}
+                      subtitleItalic={s.subtitleItalic}
                       nameLineHeight={s.nameLineHeight}
                       nameTextStroke={s.nameTextStroke}
                       nameTextStrokeWidth={s.nameTextStrokeWidth}
@@ -603,6 +605,7 @@ export default function CardBuilder() {
                 nameLetterSpacing={s.nameLetterSpacing} nameFontWeight={s.nameFontWeight}
                 firstNameFontWeight={s.firstNameFontWeight} nameItalic={s.nameItalic}
                       nameFontSize={s.nameFontSize} subtitleFontSize={s.subtitleFontSize}
+                      subtitleItalic={s.subtitleItalic}
                       nameLineHeight={s.nameLineHeight}
                       nameTextStroke={s.nameTextStroke}
                       nameTextStrokeWidth={s.nameTextStrokeWidth}
@@ -669,6 +672,7 @@ export default function CardBuilder() {
                 nameItalic={s.nameItalic} setNameItalic={s.setNameItalic}
                 nameFontSize={s.nameFontSize} setNameFontSize={s.setNameFontSize}
                 subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
+                subtitleItalic={s.subtitleItalic} setSubtitleItalic={s.setSubtitleItalic}
                 nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
                 nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
                 nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}

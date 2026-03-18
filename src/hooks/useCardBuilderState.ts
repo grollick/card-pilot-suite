@@ -67,6 +67,7 @@ export function useCardBuilderState() {
   const [nameItalic, setNameItalic] = useState(false);
   const [nameFontSize, setNameFontSize] = useState<number | null>(null);
   const [subtitleFontSize, setSubtitleFontSize] = useState<number | null>(null);
+  const [subtitleItalic, setSubtitleItalic] = useState(false);
   const [identityPosition, setIdentityPosition] = useState<{ x: number; y: number } | null>(null);
   const [nameLineHeight, setNameLineHeight] = useState<number | null>(null);
   const [nameTextStroke, setNameTextStroke] = useState(false);
@@ -113,6 +114,7 @@ export function useCardBuilderState() {
       if (typeof t?.name_italic === "boolean") setNameItalic(t.name_italic);
       if (typeof t?.name_font_size === "number") setNameFontSize(t.name_font_size);
       if (typeof t?.subtitle_font_size === "number") setSubtitleFontSize(t.subtitle_font_size);
+      if (typeof t?.subtitle_italic === "boolean") setSubtitleItalic(t.subtitle_italic);
       if (t?.identity_position) setIdentityPosition(t.identity_position);
       if (typeof t?.name_line_height === "number") setNameLineHeight(t.name_line_height);
       if (typeof t?.name_text_stroke === "boolean") setNameTextStroke(t.name_text_stroke);
@@ -442,6 +444,7 @@ export function useCardBuilderState() {
     nameItalic, setNameItalic,
     nameFontSize, setNameFontSize,
     subtitleFontSize, setSubtitleFontSize,
+    subtitleItalic, setSubtitleItalic,
     identityPosition, handleIdentityPositionChange,
     nameLineHeight, setNameLineHeight,
     nameTextStroke, setNameTextStroke,
