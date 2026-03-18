@@ -415,8 +415,7 @@ export default function AIDesignAssistantDialog({
               )}
 
             </AnimatePresence>
-          </div>
-        </ScrollArea>
+        </div>
       </DialogContent>
     </Dialog>
   );
