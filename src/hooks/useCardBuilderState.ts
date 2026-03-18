@@ -66,6 +66,7 @@ export function useCardBuilderState() {
   const [nameItalic, setNameItalic] = useState(false);
   const [nameFontSize, setNameFontSize] = useState<number | null>(null);
   const [subtitleFontSize, setSubtitleFontSize] = useState<number | null>(null);
+  const [identityPosition, setIdentityPosition] = useState<{ x: number; y: number } | null>(null);
   const identitySaveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const [identitySaveState, setIdentitySaveState] = useState<Record<string, "saving" | "saved" | null>>({});
   const [globalSaveState, setGlobalSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -107,6 +108,7 @@ export function useCardBuilderState() {
       if (typeof t?.name_italic === "boolean") setNameItalic(t.name_italic);
       if (typeof t?.name_font_size === "number") setNameFontSize(t.name_font_size);
       if (typeof t?.subtitle_font_size === "number") setSubtitleFontSize(t.subtitle_font_size);
+      if (t?.identity_position) setIdentityPosition(t.identity_position);
       if (typeof t?.section_icons === "boolean") setShowSectionIcons(t.section_icons);
       if (typeof t?.cta_icons_only === "boolean") setCtaIconsOnly(t.cta_icons_only);
       if (typeof t?.social_icons_only === "boolean") setSocialIconsOnly(t.social_icons_only);
@@ -285,6 +287,11 @@ export function useCardBuilderState() {
     saveThemeField({ cta_config: newConfig });
   }, [saveThemeField]);
 
+  const handleIdentityPositionChange = useCallback((pos: { x: number; y: number } | null) => {
+    setIdentityPosition(pos);
+    saveThemeField({ identity_position: pos });
+  }, [saveThemeField]);
+
   const handleAIGenerate = useCallback(async () => {
     if (!profile) return;
     const result = await generate({
@@ -423,6 +430,7 @@ export function useCardBuilderState() {
     nameItalic, setNameItalic,
     nameFontSize, setNameFontSize,
     subtitleFontSize, setSubtitleFontSize,
+    identityPosition, handleIdentityPositionChange,
     identitySaveTimers, identitySaveState, setIdentitySaveState,
     // Photos / Logo
     avatarUrl, coverUrl, avatarBgColor, avatarRotation, coverOffsetY,

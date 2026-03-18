@@ -1,6 +1,6 @@
-import { CreditCard, Eye, Pencil, Smartphone, Tablet } from "lucide-react";
+import { CreditCard, Eye, Pencil, Smartphone, Tablet, Move } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { getPatternSvg, type CardThemeOverrides, METALLIC_GRADIENTS, type MetallicType } from "./CardThemeEditor";
 import { CTA_ICON_MAP } from "./CtaEditor";
@@ -41,6 +41,8 @@ interface Props {
   subtitleFontSize?: number | null;
   onAvatarChange: (url: string) => void;
   setEditingSection: (id: string | null) => void;
+  identityPosition?: { x: number; y: number } | null;
+  onIdentityPositionChange?: (pos: { x: number; y: number } | null) => void;
   /** When provided externally, hides the built-in device toggle toolbar */
   previewDevice?: "phone" | "tablet";
   hideToolbar?: boolean;
@@ -114,12 +116,43 @@ export default function CardBuilderPreview({
   logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap = 8, logoVerticalAlign = "center",
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
   boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, onAvatarChange, setEditingSection,
+  identityPosition, onIdentityPositionChange,
   previewDevice: externalDevice, hideToolbar,
 }: Props) {
   const [internalDevice, setInternalDevice] = useState<"phone" | "tablet">("phone");
   const previewDevice = externalDevice ?? internalDevice;
   const setPreviewDevice = setInternalDevice;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+  const dragStart = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
+
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    isDragging.current = true;
+    const pos = identityPosition ?? { x: 0, y: 0 };
+    dragStart.current = { x: e.clientX, y: e.clientY, posX: pos.x, posY: pos.y };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }, [identityPosition]);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isDragging.current) return;
+    const dx = e.clientX - dragStart.current.x;
+    const dy = e.clientY - dragStart.current.y;
+    const newX = dragStart.current.posX + dx;
+    const newY = dragStart.current.posY + dy;
+    onIdentityPositionChange?.({ x: newX, y: newY });
+  }, [onIdentityPositionChange]);
+
+  const handlePointerUp = useCallback(() => {
+    isDragging.current = false;
+  }, []);
+
+  const handleResetPosition = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onIdentityPositionChange?.(null);
+  }, [onIdentityPositionChange]);
 
   const logoPx = logoSize === "small" ? 36 : logoSize === "large" ? 64 : 48;
   const posMap: Record<string, string> = {
@@ -205,83 +238,113 @@ export default function CardBuilderPreview({
                     )}
                   </div>
 
-                  <div className="px-5 pb-5 relative z-[2]">
-                    {/* Avatar */}
+                  <div className="px-5 pb-5 relative z-[2]" ref={containerRef}>
+                    {/* Draggable Identity Block */}
                     <div
-                      className="h-20 w-20 rounded-2xl border-4 flex items-center justify-center mb-3 cursor-pointer relative group overflow-hidden"
-                      onClick={() => fileInputRef.current?.click()}
+                      className="relative group/drag"
                       style={{
-                        borderColor: previewTheme.palette.background,
-                        backgroundColor: avatarBgColor === "transparent" ? `${previewTheme.palette.secondary}15` : avatarBgColor,
+                        transform: identityPosition ? `translate(${identityPosition.x}px, ${identityPosition.y}px)` : undefined,
+                        cursor: onIdentityPositionChange ? "grab" : undefined,
+                        userSelect: "none",
+                        touchAction: "none",
                       }}
+                      onPointerDown={onIdentityPositionChange ? handlePointerDown : undefined}
+                      onPointerMove={onIdentityPositionChange ? handlePointerMove : undefined}
+                      onPointerUp={onIdentityPositionChange ? handlePointerUp : undefined}
                     >
-                      {avatarUrl ? (
-                        <img src={avatarUrl} alt="avatar" className={`h-full w-full rounded-2xl ${avatarBgColor !== "transparent" ? "object-contain" : "object-cover"}`} style={{ transform: `rotate(${avatarRotation}deg)` }} />
-                      ) : (
-                        <CreditCard className="h-8 w-8 text-muted-foreground" />
+                      {/* Drag handle indicator */}
+                      {onIdentityPositionChange && (
+                        <div className="absolute -top-1 -right-1 z-10 opacity-0 group-hover/drag:opacity-100 transition-opacity flex gap-1">
+                          <div className="bg-primary/90 text-primary-foreground rounded-full p-1 shadow-md" title="Drag to reposition">
+                            <Move className="h-3 w-3" />
+                          </div>
+                          {identityPosition && (
+                            <button
+                              onClick={handleResetPosition}
+                              className="bg-destructive/90 text-destructive-foreground rounded-full p-1 shadow-md text-[9px] font-bold leading-none"
+                              title="Reset position"
+                            >✕</button>
+                          )}
+                        </div>
                       )}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-2xl">
-                        <CreditCard className="h-5 w-5 text-white" />
-                      </div>
-                    </div>
-                    <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file || !profile) return;
-                        try {
-                          const { supabase } = await import("@/integrations/supabase/client");
-                          const ext = file.name.split(".").pop() || "jpg";
-                          const path = `${profile.id}/avatar.${ext}`;
-                          const { error } = await supabase.storage.from("card-assets").upload(path, file, { upsert: true });
-                          if (error) throw error;
-                          const { data } = supabase.storage.from("card-assets").getPublicUrl(path);
-                          const url = `${data.publicUrl}?t=${Date.now()}`;
-                          await supabase.from("profiles").update({ avatar_url: url }).eq("id", profile.id);
-                          onAvatarChange(url);
-                          toast.success("Photo uploaded!");
-                        } catch (err: any) { toast.error(err.message || "Upload failed"); }
-                      }}
-                    />
 
-                    <div style={{ display: "flex", alignItems: logoVerticalAlign === "top" ? "flex-start" : logoVerticalAlign === "bottom" ? "flex-end" : "center", gap: logoNameGap }}>
-                      {logoUrl && logoPosition === "beside-name" && (
-                        <div
-                          className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
-                          style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
-                        >
-                          <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
+                      {/* Avatar */}
+                      <div
+                        className="h-20 w-20 rounded-2xl border-4 flex items-center justify-center mb-3 cursor-pointer relative group overflow-hidden"
+                        onClick={(e) => { if (!isDragging.current) fileInputRef.current?.click(); }}
+                        style={{
+                          borderColor: previewTheme.palette.background,
+                          backgroundColor: avatarBgColor === "transparent" ? `${previewTheme.palette.secondary}15` : avatarBgColor,
+                        }}
+                      >
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt="avatar" className={`h-full w-full rounded-2xl ${avatarBgColor !== "transparent" ? "object-contain" : "object-cover"}`} style={{ transform: `rotate(${avatarRotation}deg)` }} />
+                        ) : (
+                          <CreditCard className="h-8 w-8 text-muted-foreground" />
+                        )}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-2xl">
+                          <CreditCard className="h-5 w-5 text-white" />
                         </div>
-                      )}
-                      <h3 style={{ color: (() => { const me = currentThemeOverrides.metallicEffect; return me?.type && me.type !== "none" && me.applyToName ? "transparent" : previewTheme.palette.secondary; })(), fontFamily: `'${previewTheme.fonts.primary}', sans-serif`, fontWeight: nameFontWeight ?? 700, fontStyle: nameItalic ? "italic" : undefined, fontSize: nameFontSize ?? 18, ...(uppercaseName ? { textTransform: 'uppercase' as const } : {}), ...(nameLetterSpacing ? { letterSpacing: `${nameLetterSpacing}px` } : {}), ...(() => { const me = currentThemeOverrides.metallicEffect; if (me?.type && me.type !== "none" && me.applyToName) { return { background: METALLIC_GRADIENTS[me.type as Exclude<MetallicType, "none">], WebkitBackgroundClip: "text" as const, WebkitTextFillColor: "transparent", backgroundClip: "text" as const }; } return {}; })() }}>
-                        {(() => {
-                          const full = (editName ?? profile?.name) || "Your Name";
-                          const display = uppercaseName ? full.toUpperCase() : full;
-                          const parts = display.trim().split(/\s+/);
-                          if (parts.length <= 1) {
-                            if (firstNameFontWeight != null) return <span style={{ fontWeight: firstNameFontWeight }}>{display}</span>;
-                            if (boldLastName) return <span style={{ fontWeight: 800 }}>{display}</span>;
-                            return display;
-                          }
-                          const last = parts.pop()!;
-                          const firstName = parts.join(" ");
-                          const firstStyle = firstNameFontWeight != null ? { fontWeight: firstNameFontWeight } : undefined;
-                          const lastStyle = boldLastName ? { fontWeight: 800 } : undefined;
-                          return <>{firstStyle ? <span style={firstStyle}>{firstName}</span> : firstName} {lastStyle ? <span style={lastStyle}>{last}</span> : last}</>;
-                        })()}
-                      </h3>
-                      {logoUrl && logoPosition === "beside-name-right" && (
-                        <div
-                          className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
-                          style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
-                        >
-                          <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
-                        </div>
+                      </div>
+                      <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file || !profile) return;
+                          try {
+                            const { supabase } = await import("@/integrations/supabase/client");
+                            const ext = file.name.split(".").pop() || "jpg";
+                            const path = `${profile.id}/avatar.${ext}`;
+                            const { error } = await supabase.storage.from("card-assets").upload(path, file, { upsert: true });
+                            if (error) throw error;
+                            const { data } = supabase.storage.from("card-assets").getPublicUrl(path);
+                            const url = `${data.publicUrl}?t=${Date.now()}`;
+                            await supabase.from("profiles").update({ avatar_url: url }).eq("id", profile.id);
+                            onAvatarChange(url);
+                            toast.success("Photo uploaded!");
+                          } catch (err: any) { toast.error(err.message || "Upload failed"); }
+                        }}
+                      />
+
+                      <div style={{ display: "flex", alignItems: logoVerticalAlign === "top" ? "flex-start" : logoVerticalAlign === "bottom" ? "flex-end" : "center", gap: logoNameGap }}>
+                        {logoUrl && logoPosition === "beside-name" && (
+                          <div
+                            className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
+                            style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
+                          >
+                            <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
+                          </div>
+                        )}
+                        <h3 style={{ color: (() => { const me = currentThemeOverrides.metallicEffect; return me?.type && me.type !== "none" && me.applyToName ? "transparent" : previewTheme.palette.secondary; })(), fontFamily: `'${previewTheme.fonts.primary}', sans-serif`, fontWeight: nameFontWeight ?? 700, fontStyle: nameItalic ? "italic" : undefined, fontSize: nameFontSize ?? 18, ...(uppercaseName ? { textTransform: 'uppercase' as const } : {}), ...(nameLetterSpacing ? { letterSpacing: `${nameLetterSpacing}px` } : {}), ...(() => { const me = currentThemeOverrides.metallicEffect; if (me?.type && me.type !== "none" && me.applyToName) { return { background: METALLIC_GRADIENTS[me.type as Exclude<MetallicType, "none">], WebkitBackgroundClip: "text" as const, WebkitTextFillColor: "transparent", backgroundClip: "text" as const }; } return {}; })() }}>
+                          {(() => {
+                            const full = (editName ?? profile?.name) || "Your Name";
+                            const display = uppercaseName ? full.toUpperCase() : full;
+                            const parts = display.trim().split(/\s+/);
+                            if (parts.length <= 1) {
+                              if (firstNameFontWeight != null) return <span style={{ fontWeight: firstNameFontWeight }}>{display}</span>;
+                              if (boldLastName) return <span style={{ fontWeight: 800 }}>{display}</span>;
+                              return display;
+                            }
+                            const last = parts.pop()!;
+                            const firstName = parts.join(" ");
+                            const firstStyle = firstNameFontWeight != null ? { fontWeight: firstNameFontWeight } : undefined;
+                            const lastStyle = boldLastName ? { fontWeight: 800 } : undefined;
+                            return <>{firstStyle ? <span style={firstStyle}>{firstName}</span> : firstName} {lastStyle ? <span style={lastStyle}>{last}</span> : last}</>;
+                          })()}
+                        </h3>
+                        {logoUrl && logoPosition === "beside-name-right" && (
+                          <div
+                            className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
+                            style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
+                          >
+                            <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
+                          </div>
+                        )}
+                      </div>
+                      <p style={{ color: `${previewTheme.palette.secondary}99`, fontSize: subtitleFontSize ?? 14 }}>{displayJobTitle}</p>
+                      {(editCompany ?? profile?.company) && (
+                        <p className="text-xs mt-0.5" style={{ color: `${previewTheme.palette.secondary}70` }}>{editCompany ?? profile?.company}</p>
                       )}
                     </div>
-                    <p style={{ color: `${previewTheme.palette.secondary}99`, fontSize: subtitleFontSize ?? 14 }}>{displayJobTitle}</p>
-                    {(editCompany ?? profile?.company) && (
-                      <p className="text-xs mt-0.5" style={{ color: `${previewTheme.palette.secondary}70` }}>{editCompany ?? profile?.company}</p>
-                    )}
 
                     {/* CTA Buttons */}
                     {(() => {
