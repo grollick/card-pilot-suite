@@ -97,7 +97,7 @@ export function useCardBuilderState() {
       if (t?.avatar_bg_color) setAvatarBgColor(t.avatar_bg_color);
       if (typeof t?.avatar_rotation === "number") setAvatarRotation(t.avatar_rotation);
       if (typeof t?.cover_offset_y === "number") setCoverOffsetY(t.cover_offset_y);
-      if (t?.logo_url) setLogoUrl(t.logo_url);
+      if (typeof t?.logo_url === "string") setLogoUrl(t.logo_url || null);
       if (typeof t?.logo_frosted_bg === "boolean") setLogoFrostedBg(t.logo_frosted_bg);
       if (typeof t?.logo_glow === "boolean") setLogoGlow(t.logo_glow);
       if (t?.logo_position) setLogoPosition(t.logo_position);
@@ -106,7 +106,15 @@ export function useCardBuilderState() {
       if (typeof t?.logo_padding === "number") setLogoPadding(t.logo_padding);
       if (typeof t?.logo_name_gap === "number") setLogoNameGap(t.logo_name_gap);
       if (t?.logo_vertical_align) setLogoVerticalAlign(t.logo_vertical_align);
-      if (t?.logo_custom_position) setLogoCustomPosition(t.logo_custom_position);
+      if (t?.logo_custom_position) {
+        const lcp = t.logo_custom_position;
+        // Migrate old pixel-based positions (>100) to null — they're incompatible with percentage-based system
+        if (lcp.x > 100 || lcp.y > 100 || lcp.x < -10 || lcp.y < -10) {
+          setLogoCustomPosition(null);
+        } else {
+          setLogoCustomPosition(lcp);
+        }
+      }
       if (t?.job_title) setJobTitle(t.job_title);
       if (typeof t?.bold_last_name === "boolean") setBoldLastName(t.bold_last_name);
       if (typeof t?.uppercase_name === "boolean") setUppercaseName(t.uppercase_name);
