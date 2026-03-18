@@ -93,7 +93,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     fontWeight: nameFontWeight ?? header.titleWeight,
     color: hasMetallicName ? "transparent" : palette.primary,
     margin: 0,
-    lineHeight: 1.2,
+    lineHeight: nameLineHeight ?? 1.2,
     letterSpacing: nameLetterSpacing ? `${nameLetterSpacing}px` : undefined,
     fontStyle: nameItalic ? "italic" : undefined,
     ...(hasMetallicName ? {
