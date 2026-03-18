@@ -21,7 +21,7 @@ export function useRecentSystemEvents(limit = 25) {
         .order("created_at", { ascending: false })
         .limit(limit);
       if (error) throw error;
-      return (data ?? []) as SystemEvent[];
+      return (data ?? []) as unknown as SystemEvent[];
     },
     refetchInterval: 30_000,
   });
