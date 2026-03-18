@@ -242,7 +242,8 @@ export default function SettingsPage() {
           </motion.div>
         </TabsContent>
 
-        <TabsContent value="data" className="mt-4">
+        <TabsContent value="data" className="mt-4 space-y-6">
+          <DataImportSection />
           <DataExportSection />
         </TabsContent>
       </Tabs>
