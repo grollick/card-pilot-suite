@@ -205,7 +205,7 @@ export default function CardBuilderPreview({
                     )}
                   </div>
 
-                  <div className="px-5 pb-5 -mt-10 relative z-[2]">
+                  <div className="px-5 pb-5 -mt-5 relative z-[2]">
                     {/* Avatar */}
                     <div
                       className="h-20 w-20 rounded-2xl border-4 flex items-center justify-center mb-3 cursor-pointer relative group overflow-hidden"
