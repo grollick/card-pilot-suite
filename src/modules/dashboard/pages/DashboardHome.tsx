@@ -11,6 +11,7 @@ import ShareCardWidget from "@/modules/dashboard/components/ShareCardWidget";
 import MobileJobDashboard from "@/modules/dashboard/components/MobileJobDashboard";
 import ActivationChecklist from "@/modules/dashboard/components/ActivationChecklist";
 import ShareMessageCard from "@/modules/dashboard/components/ShareMessageCard";
+import FirstLeadCelebration from "@/modules/dashboard/components/FirstLeadCelebration";
 import PostLeadSharePrompt from "@/modules/dashboard/components/PostLeadSharePrompt";
 import { useIsMobile } from "@/hooks/use-mobile";
 
