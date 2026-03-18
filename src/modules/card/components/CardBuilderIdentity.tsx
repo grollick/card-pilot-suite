@@ -30,6 +30,8 @@ interface Props {
   setNameFontSize: (v: number | null) => void;
   subtitleFontSize: number | null;
   setSubtitleFontSize: (v: number | null) => void;
+  nameLineHeight: number | null;
+  setNameLineHeight: (v: number | null) => void;
   professionName: string;
   identitySaveTimers: React.MutableRefObject<Record<string, ReturnType<typeof setTimeout>>>;
   identitySaveState: Record<string, "saving" | "saved" | null>;
