@@ -207,9 +207,9 @@ export default function DataImportSection() {
         <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-1">
           <div className="flex items-center gap-2 text-sm">
             {lastResult.failed === 0 ? (
-              <CheckCircle className="h-4 w-4 text-green-500" />
+              <CheckCircle className="h-4 w-4 text-primary" />
             ) : (
-              <AlertTriangle className="h-4 w-4 text-yellow-500" />
+              <AlertTriangle className="h-4 w-4 text-destructive" />
             )}
             <span className="font-medium">
               {lastResult.success} imported, {lastResult.failed} failed
