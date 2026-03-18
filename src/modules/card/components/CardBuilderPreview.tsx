@@ -262,10 +262,44 @@ export default function CardBuilderPreview({
                     )}
                     {logoUrl && logoPosition !== "beside-name" && logoPosition !== "beside-name-right" && (
                       <div
-                        className={`absolute ${posMap[logoPosition]} rounded-lg flex items-center justify-center ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
-                        style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
+                        className={`absolute group/logo rounded-lg flex items-center justify-center ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
+                        style={{
+                          height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding,
+                          ...(logoCustomPosition
+                            ? { left: logoCustomPosition.x, top: logoCustomPosition.y }
+                            : (() => {
+                                const base: Record<string, React.CSSProperties> = {
+                                  "top-left": { top: 8, left: 8 },
+                                  "top-right": { top: 8, right: 8 },
+                                  "bottom-left": { bottom: 8, left: 8 },
+                                  "bottom-right": { bottom: 8, right: 8 },
+                                };
+                                return base[logoPosition] ?? { top: 8, right: 8 };
+                              })()),
+                          cursor: onLogoCustomPositionChange ? "grab" : undefined,
+                          userSelect: "none",
+                          touchAction: "none",
+                          zIndex: 5,
+                        }}
+                        onPointerDown={onLogoCustomPositionChange ? handleLogoPointerDown : undefined}
+                        onPointerMove={onLogoCustomPositionChange ? handleLogoPointerMove : undefined}
+                        onPointerUp={onLogoCustomPositionChange ? handleLogoPointerUp : undefined}
                       >
-                        <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
+                        <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain pointer-events-none" />
+                        {onLogoCustomPositionChange && (
+                          <div className="absolute -top-1 -right-1 z-10 opacity-0 group-hover/logo:opacity-100 transition-opacity flex gap-1">
+                            <div className="bg-primary/90 text-primary-foreground rounded-full p-1 shadow-md" title="Drag to reposition">
+                              <Move className="h-3 w-3" />
+                            </div>
+                            {logoCustomPosition && (
+                              <button
+                                onClick={handleResetLogoPosition}
+                                className="bg-destructive/90 text-destructive-foreground rounded-full p-1 shadow-md text-[9px] font-bold leading-none"
+                                title="Reset position"
+                              >✕</button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
