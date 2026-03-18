@@ -348,6 +348,7 @@ export default function CardBuilder() {
           nameItalic={s.nameItalic} setNameItalic={s.setNameItalic}
           nameFontSize={s.nameFontSize} setNameFontSize={s.setNameFontSize}
            subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
+           subtitleItalic={s.subtitleItalic} setSubtitleItalic={s.setSubtitleItalic}
            nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
            nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
            nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}
