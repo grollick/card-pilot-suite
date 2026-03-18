@@ -296,6 +296,12 @@ export function useSendCampaign() {
     },
     onError: (err: Error) => {
       toast.error(err.message);
+      logSystemEvent({
+        eventType: "campaign_send_failure",
+        severity: "error",
+        message: err.message,
+        meta: { hook: "useSendCampaign" },
+      });
     },
   });
 }
