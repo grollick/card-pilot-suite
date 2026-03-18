@@ -1,4 +1,6 @@
-import { Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate, Sparkles, Loader2, MousePointerClick, Crown } from "lucide-react";
+import { Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate, Sparkles, Loader2, MousePointerClick, Crown, Plus } from "lucide-react";
+import BlockMarketplaceDialog from "@/modules/card/components/BlockMarketplaceDialog";
+import { canAccessBlock, type MarketplaceBlock } from "@/lib/blockMarketplace";
 import ConversionTips from "@/modules/card/components/ConversionTips";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
