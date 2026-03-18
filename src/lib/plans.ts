@@ -56,6 +56,7 @@ export const PLAN_TIERS = [
       estimates: -1,
       social_posts: -1,
       booking_services: -1,
+      bookings_monthly: -1,
       team_members: 1,
       automations: 5,
       email_templates: -1,
