@@ -350,6 +350,7 @@ export default function CardBuilder() {
            subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
            subtitleItalic={s.subtitleItalic} setSubtitleItalic={s.setSubtitleItalic}
            subtitleSpacing={s.subtitleSpacing} setSubtitleSpacing={s.setSubtitleSpacing}
+           showCompany={s.showCompany} setShowCompany={s.setShowCompany}
            nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
            nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
            nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}
@@ -550,6 +551,7 @@ export default function CardBuilder() {
                       subtitleFontSize={s.subtitleFontSize}
                       subtitleItalic={s.subtitleItalic}
                       subtitleSpacing={s.subtitleSpacing}
+                      showCompany={s.showCompany}
                       nameLineHeight={s.nameLineHeight}
                       nameTextStroke={s.nameTextStroke}
                       nameTextStrokeWidth={s.nameTextStrokeWidth}
@@ -609,6 +611,7 @@ export default function CardBuilder() {
                       nameFontSize={s.nameFontSize} subtitleFontSize={s.subtitleFontSize}
                       subtitleItalic={s.subtitleItalic}
                       subtitleSpacing={s.subtitleSpacing}
+                      showCompany={s.showCompany}
                       nameLineHeight={s.nameLineHeight}
                       nameTextStroke={s.nameTextStroke}
                       nameTextStrokeWidth={s.nameTextStrokeWidth}
@@ -677,6 +680,7 @@ export default function CardBuilder() {
                 subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
                 subtitleItalic={s.subtitleItalic} setSubtitleItalic={s.setSubtitleItalic}
                 subtitleSpacing={s.subtitleSpacing} setSubtitleSpacing={s.setSubtitleSpacing}
+                showCompany={s.showCompany} setShowCompany={s.setShowCompany}
                 nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
                 nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
                 nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}

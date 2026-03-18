@@ -69,6 +69,7 @@ export function useCardBuilderState() {
   const [subtitleFontSize, setSubtitleFontSize] = useState<number | null>(null);
   const [subtitleItalic, setSubtitleItalic] = useState(false);
   const [subtitleSpacing, setSubtitleSpacing] = useState<number | null>(null);
+  const [showCompany, setShowCompany] = useState(true);
   const [identityPosition, setIdentityPosition] = useState<{ x: number; y: number } | null>(null);
   const [nameLineHeight, setNameLineHeight] = useState<number | null>(null);
   const [nameTextStroke, setNameTextStroke] = useState(false);
@@ -117,6 +118,7 @@ export function useCardBuilderState() {
       if (typeof t?.subtitle_font_size === "number") setSubtitleFontSize(t.subtitle_font_size);
       if (typeof t?.subtitle_italic === "boolean") setSubtitleItalic(t.subtitle_italic);
       if (typeof t?.subtitle_spacing === "number") setSubtitleSpacing(t.subtitle_spacing);
+      if (typeof t?.show_company === "boolean") setShowCompany(t.show_company);
       if (t?.identity_position) setIdentityPosition(t.identity_position);
       if (typeof t?.name_line_height === "number") setNameLineHeight(t.name_line_height);
       if (typeof t?.name_text_stroke === "boolean") setNameTextStroke(t.name_text_stroke);
@@ -448,6 +450,7 @@ export function useCardBuilderState() {
     subtitleFontSize, setSubtitleFontSize,
     subtitleItalic, setSubtitleItalic,
     subtitleSpacing, setSubtitleSpacing,
+    showCompany, setShowCompany,
     identityPosition, handleIdentityPositionChange,
     nameLineHeight, setNameLineHeight,
     nameTextStroke, setNameTextStroke,
