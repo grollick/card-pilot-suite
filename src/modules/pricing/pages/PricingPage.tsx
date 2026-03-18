@@ -149,7 +149,16 @@ const benefits = [
 
 export default function PricingPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [annual, setAnnual] = useState(false);
+
+  const handleAuthNav = (mode?: string) => {
+    if (user) {
+      navigate("/app");
+    } else {
+      navigate(mode ? `/auth?mode=${mode}` : "/auth");
+    }
+  };
 
   return (
     <>
