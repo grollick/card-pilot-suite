@@ -544,6 +544,7 @@ export default function CardBuilder() {
                       nameItalic={s.nameItalic}
                       nameFontSize={s.nameFontSize}
                       subtitleFontSize={s.subtitleFontSize}
+                      nameLineHeight={s.nameLineHeight}
                       onAvatarChange={s.handleAvatarChange}
                       setEditingSection={s.setEditingSection}
                       identityPosition={s.identityPosition}
