@@ -148,6 +148,18 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (err) {
+    console.error("run-automations error:", err);
+
+    try {
+      const svc = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+      await svc.from("system_events").insert({
+        event_type: "automation_failure",
+        severity: "error",
+        message: err.message ?? "Automation execution failed",
+        meta_data: { function: "run-automations" },
+      });
+    } catch (_) { /* best effort */ }
+
     return new Response(JSON.stringify({ error: err.message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

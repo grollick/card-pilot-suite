@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { professions, professionCategories, getProfessionsByCategory } from "@/data/professions";
 import { motion } from "framer-motion";
+import SystemEventsWidget from "@/modules/settings/components/SystemEventsWidget";
 
 export default function AdminPage() {
   const byCategory = getProfessionsByCategory();
@@ -25,8 +26,9 @@ export default function AdminPage() {
           <TabsTrigger value="templates">Default Templates</TabsTrigger>
           <TabsTrigger value="pipeline">Default Pipeline</TabsTrigger>
           <TabsTrigger value="services">Default Services</TabsTrigger>
-          <TabsTrigger value="emails">Default Emails</TabsTrigger>
-        </TabsList>
+           <TabsTrigger value="emails">Default Emails</TabsTrigger>
+           <TabsTrigger value="system-events">System Events</TabsTrigger>
+         </TabsList>
 
         <TabsContent value="professions" className="mt-4 space-y-6">
           {professionCategories.map(cat => (
@@ -62,6 +64,9 @@ export default function AdminPage() {
         </TabsContent>
         <TabsContent value="emails" className="mt-4">
           <p className="text-sm text-muted-foreground">Manage default email templates per profession. Connect backend to enable editing.</p>
+        </TabsContent>
+        <TabsContent value="system-events" className="mt-4">
+          <SystemEventsWidget />
         </TabsContent>
       </Tabs>
     </div>

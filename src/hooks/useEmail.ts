@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import type { Database } from "@/integrations/supabase/types";
 import { toast } from "sonner";
+import { logSystemEvent } from "@/lib/systemLogger";
 
 type CampaignStatus = Database["public"]["Enums"]["campaign_status"];
 
@@ -295,6 +296,12 @@ export function useSendCampaign() {
     },
     onError: (err: Error) => {
       toast.error(err.message);
+      logSystemEvent({
+        eventType: "campaign_send_failure",
+        severity: "error",
+        message: err.message,
+        meta: { hook: "useSendCampaign" },
+      });
     },
   });
 }
