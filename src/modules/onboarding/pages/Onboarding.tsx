@@ -375,7 +375,7 @@ export default function Onboarding() {
     }
   };
 
-  const totalSteps = 8;
+  const totalSteps = 7;
 
   const shareMessage = `Hey! I just set up my digital business card — check it out and let me know if you ever need ${selectedProfession?.name?.toLowerCase() || 'my'} services: ${window.location.origin}/c/${(name || "").toLowerCase().replace(/[^a-z0-9]+/g, "")}`;
   const shareCheckedCount = Object.values(shareChecklist).filter(Boolean).length;
