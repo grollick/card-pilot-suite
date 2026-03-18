@@ -169,6 +169,9 @@ const App = () => (
               <ProtectedRoute><LazyRoute><Onboarding /></LazyRoute></ProtectedRoute>
             } />
 
+            {/* Industry landing pages */}
+            <Route path="/for/:industry" element={<IndustryLandingPage />} />
+
             {/* Demo cards — no auth */}
             <Route path="/demo/:slug" element={<DemoCardPreview />} />
 
