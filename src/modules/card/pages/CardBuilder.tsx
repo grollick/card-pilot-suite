@@ -460,8 +460,7 @@ export default function CardBuilder() {
     </Tabs>
   );
 
-  const isMobile = useIsMobile();
-  const [mobileTab, setMobileTab] = useState<"preview" | "sections" | "identity" | "theme">("preview");
+  // Mobile tab config
 
   // Mobile tab config
   const mobileTabs = [
