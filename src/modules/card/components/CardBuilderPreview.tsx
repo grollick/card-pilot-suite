@@ -160,6 +160,32 @@ export default function CardBuilderPreview({
     onIdentityPositionChange?.(null);
   }, [onIdentityPositionChange]);
 
+  // Logo drag handlers
+  const handleLogoPointerDown = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    isLogoDragging.current = true;
+    const pos = logoCustomPosition ?? { x: 0, y: 0 };
+    logoDragStart.current = { x: e.clientX, y: e.clientY, posX: pos.x, posY: pos.y };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }, [logoCustomPosition]);
+
+  const handleLogoPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isLogoDragging.current) return;
+    const dx = e.clientX - logoDragStart.current.x;
+    const dy = e.clientY - logoDragStart.current.y;
+    onLogoCustomPositionChange?.({ x: logoDragStart.current.posX + dx, y: logoDragStart.current.posY + dy });
+  }, [onLogoCustomPositionChange]);
+
+  const handleLogoPointerUp = useCallback(() => {
+    isLogoDragging.current = false;
+  }, []);
+
+  const handleResetLogoPosition = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onLogoCustomPositionChange?.(null);
+  }, [onLogoCustomPositionChange]);
+
   const logoPx = logoSize === "small" ? 36 : logoSize === "large" ? 64 : 48;
   const posMap: Record<string, string> = {
     "top-left": "top-2 left-2", "top-right": "top-2 right-2",
