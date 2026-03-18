@@ -67,6 +67,7 @@ export function useCardBuilderState() {
   const [nameItalic, setNameItalic] = useState(false);
   const [nameFontSize, setNameFontSize] = useState<number | null>(null);
   const [subtitleFontSize, setSubtitleFontSize] = useState<number | null>(null);
+  const [subtitleItalic, setSubtitleItalic] = useState(false);
   const [identityPosition, setIdentityPosition] = useState<{ x: number; y: number } | null>(null);
   const [nameLineHeight, setNameLineHeight] = useState<number | null>(null);
   const [nameTextStroke, setNameTextStroke] = useState(false);
