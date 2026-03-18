@@ -13,6 +13,7 @@ const anim = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 } };
 
 const PLAN_LABELS: Record<string, { label: string; color: string }> = {
   starter: { label: "Free", color: "bg-muted text-muted-foreground" },
+  free: { label: "Free", color: "bg-muted text-muted-foreground" },
   pro: { label: "Pro", color: "bg-primary/15 text-primary" },
   business: { label: "Pro Plus", color: "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" },
   agency: { label: "Agency", color: "bg-[hsl(var(--warning))]/15 text-[hsl(var(--warning))]" },
