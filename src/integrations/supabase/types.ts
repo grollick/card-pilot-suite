@@ -2950,6 +2950,36 @@ export type Database = {
         }
         Relationships: []
       }
+      system_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          message: string
+          meta_data: Json | null
+          severity: Database["public"]["Enums"]["system_event_severity"]
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          message: string
+          meta_data?: Json | null
+          severity?: Database["public"]["Enums"]["system_event_severity"]
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          message?: string
+          meta_data?: Json | null
+          severity?: Database["public"]["Enums"]["system_event_severity"]
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       tags: {
         Row: {
           color: string | null
@@ -3211,6 +3241,7 @@ export type Database = {
         | "custom"
       recurring_plan_status: "active" | "paused" | "cancelled" | "completed"
       social_post_status: "draft" | "scheduled" | "published" | "failed"
+      system_event_severity: "info" | "warning" | "error" | "critical"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -3411,6 +3442,7 @@ export const Constants = {
       ],
       recurring_plan_status: ["active", "paused", "cancelled", "completed"],
       social_post_status: ["draft", "scheduled", "published", "failed"],
+      system_event_severity: ["info", "warning", "error", "critical"],
     },
   },
 } as const
