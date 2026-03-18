@@ -349,6 +349,8 @@ export default function CardBuilder() {
           nameFontSize={s.nameFontSize} setNameFontSize={s.setNameFontSize}
            subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
            nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
+           nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
+           nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}
            saveThemeField={s.saveThemeField} qc={s.qc} hideWrapper
         />
       </TabsContent>
@@ -545,6 +547,8 @@ export default function CardBuilder() {
                       nameFontSize={s.nameFontSize}
                       subtitleFontSize={s.subtitleFontSize}
                       nameLineHeight={s.nameLineHeight}
+                      nameTextStroke={s.nameTextStroke}
+                      nameTextStrokeWidth={s.nameTextStrokeWidth}
                       onAvatarChange={s.handleAvatarChange}
                       setEditingSection={s.setEditingSection}
                       identityPosition={s.identityPosition}
@@ -600,6 +604,8 @@ export default function CardBuilder() {
                 firstNameFontWeight={s.firstNameFontWeight} nameItalic={s.nameItalic}
                       nameFontSize={s.nameFontSize} subtitleFontSize={s.subtitleFontSize}
                       nameLineHeight={s.nameLineHeight}
+                      nameTextStroke={s.nameTextStroke}
+                      nameTextStrokeWidth={s.nameTextStrokeWidth}
                 onAvatarChange={s.handleAvatarChange} setEditingSection={s.setEditingSection}
                 identityPosition={s.identityPosition}
                 onIdentityPositionChange={s.handleIdentityPositionChange}
@@ -664,6 +670,8 @@ export default function CardBuilder() {
                 nameFontSize={s.nameFontSize} setNameFontSize={s.setNameFontSize}
                 subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
                 nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
+                nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
+                nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}
                 saveThemeField={s.saveThemeField} qc={s.qc} hideWrapper
               />
               <div className="mt-4 space-y-3">

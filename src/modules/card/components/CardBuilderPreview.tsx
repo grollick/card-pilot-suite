@@ -40,6 +40,8 @@ interface Props {
   nameFontSize?: number | null;
   subtitleFontSize?: number | null;
   nameLineHeight?: number | null;
+  nameTextStroke?: boolean;
+  nameTextStrokeWidth?: number;
   onAvatarChange: (url: string) => void;
   setEditingSection: (id: string | null) => void;
   identityPosition?: { x: number; y: number } | null;
@@ -118,7 +120,7 @@ export default function CardBuilderPreview({
   coverUrl, coverOffsetY, avatarUrl, avatarBgColor, avatarRotation,
   logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap = 8, logoVerticalAlign = "center",
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
-  boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, nameLineHeight, onAvatarChange, setEditingSection,
+  boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, nameLineHeight, nameTextStroke, nameTextStrokeWidth, onAvatarChange, setEditingSection,
   identityPosition, onIdentityPositionChange,
   logoCustomPosition, onLogoCustomPositionChange,
   previewDevice: externalDevice, hideToolbar,
@@ -380,7 +382,7 @@ export default function CardBuilderPreview({
                             <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
                           </div>
                         )}
-                        <h3 style={{ color: (() => { const me = currentThemeOverrides.metallicEffect; return me?.type && me.type !== "none" && me.applyToName ? "transparent" : previewTheme.palette.secondary; })(), fontFamily: `'${previewTheme.fonts.primary}', sans-serif`, fontWeight: nameFontWeight ?? 700, fontStyle: nameItalic ? "italic" : undefined, fontSize: nameFontSize ?? 18, lineHeight: nameLineHeight ?? undefined, ...(uppercaseName ? { textTransform: 'uppercase' as const } : {}), ...(nameLetterSpacing ? { letterSpacing: `${nameLetterSpacing}px` } : {}), ...(() => { const me = currentThemeOverrides.metallicEffect; if (me?.type && me.type !== "none" && me.applyToName) { return { background: METALLIC_GRADIENTS[me.type as Exclude<MetallicType, "none">], WebkitBackgroundClip: "text" as const, WebkitTextFillColor: "transparent", backgroundClip: "text" as const }; } return {}; })() }}>
+                        <h3 style={{ color: (() => { const me = currentThemeOverrides.metallicEffect; return me?.type && me.type !== "none" && me.applyToName ? "transparent" : previewTheme.palette.secondary; })(), fontFamily: `'${previewTheme.fonts.primary}', sans-serif`, fontWeight: nameFontWeight ?? 700, fontStyle: nameItalic ? "italic" : undefined, fontSize: nameFontSize ?? 18, lineHeight: nameLineHeight ?? undefined, ...(uppercaseName ? { textTransform: 'uppercase' as const } : {}), ...(nameLetterSpacing ? { letterSpacing: `${nameLetterSpacing}px` } : {}), ...(nameTextStroke ? { WebkitTextStroke: `${nameTextStrokeWidth ?? 1}px white`, paintOrder: 'stroke fill' as const } : {}), ...(() => { const me = currentThemeOverrides.metallicEffect; if (me?.type && me.type !== "none" && me.applyToName) { return { background: METALLIC_GRADIENTS[me.type as Exclude<MetallicType, "none">], WebkitBackgroundClip: "text" as const, WebkitTextFillColor: "transparent", backgroundClip: "text" as const }; } return {}; })() }}>
                           {(() => {
                             const full = (editName ?? profile?.name) || "Your Name";
                             const display = uppercaseName ? full.toUpperCase() : full;

@@ -32,6 +32,10 @@ interface Props {
   setSubtitleFontSize: (v: number | null) => void;
   nameLineHeight: number | null;
   setNameLineHeight: (v: number | null) => void;
+  nameTextStroke: boolean;
+  setNameTextStroke: (v: boolean) => void;
+  nameTextStrokeWidth: number;
+  setNameTextStrokeWidth: (v: number) => void;
   professionName: string;
   identitySaveTimers: React.MutableRefObject<Record<string, ReturnType<typeof setTimeout>>>;
   identitySaveState: Record<string, "saving" | "saved" | null>;
@@ -58,6 +62,8 @@ export default function CardBuilderIdentity({
   nameFontSize, setNameFontSize,
   subtitleFontSize, setSubtitleFontSize,
   nameLineHeight, setNameLineHeight,
+  nameTextStroke, setNameTextStroke,
+  nameTextStrokeWidth, setNameTextStrokeWidth,
   professionName, identitySaveTimers, identitySaveState, setIdentitySaveState,
   saveThemeField, qc, hideWrapper,
 }: Props) {
@@ -241,6 +247,30 @@ export default function CardBuilderIdentity({
             >Reset to auto</button>
           )}
         </div>
+        <div className="flex items-center justify-between mt-1">
+          <label className="text-[11px] text-muted-foreground">White text border</label>
+          <Switch
+            checked={nameTextStroke}
+            onCheckedChange={(v) => { setNameTextStroke(v); saveThemeField({ name_text_stroke: v }); }}
+            className="scale-75 origin-right"
+          />
+        </div>
+        {nameTextStroke && (
+          <div className="mt-1.5">
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px] text-muted-foreground">Border weight</label>
+              <span className="text-[10px] text-muted-foreground tabular-nums">{nameTextStrokeWidth}px</span>
+            </div>
+            <Slider
+              min={0.5}
+              max={4}
+              step={0.5}
+              value={[nameTextStrokeWidth]}
+              onValueChange={([v]) => { setNameTextStrokeWidth(v); saveThemeField({ name_text_stroke_width: v }); }}
+              className="w-full"
+            />
+          </div>
+        )}
       </div>
       <div className="space-y-2">
         <div className="flex items-center justify-between">

@@ -69,6 +69,8 @@ export function useCardBuilderState() {
   const [subtitleFontSize, setSubtitleFontSize] = useState<number | null>(null);
   const [identityPosition, setIdentityPosition] = useState<{ x: number; y: number } | null>(null);
   const [nameLineHeight, setNameLineHeight] = useState<number | null>(null);
+  const [nameTextStroke, setNameTextStroke] = useState(false);
+  const [nameTextStrokeWidth, setNameTextStrokeWidth] = useState(1);
   const identitySaveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const [identitySaveState, setIdentitySaveState] = useState<Record<string, "saving" | "saved" | null>>({});
   const [globalSaveState, setGlobalSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
@@ -113,6 +115,8 @@ export function useCardBuilderState() {
       if (typeof t?.subtitle_font_size === "number") setSubtitleFontSize(t.subtitle_font_size);
       if (t?.identity_position) setIdentityPosition(t.identity_position);
       if (typeof t?.name_line_height === "number") setNameLineHeight(t.name_line_height);
+      if (typeof t?.name_text_stroke === "boolean") setNameTextStroke(t.name_text_stroke);
+      if (typeof t?.name_text_stroke_width === "number") setNameTextStrokeWidth(t.name_text_stroke_width);
       if (typeof t?.section_icons === "boolean") setShowSectionIcons(t.section_icons);
       if (typeof t?.cta_icons_only === "boolean") setCtaIconsOnly(t.cta_icons_only);
       if (typeof t?.social_icons_only === "boolean") setSocialIconsOnly(t.social_icons_only);
@@ -440,6 +444,8 @@ export function useCardBuilderState() {
     subtitleFontSize, setSubtitleFontSize,
     identityPosition, handleIdentityPositionChange,
     nameLineHeight, setNameLineHeight,
+    nameTextStroke, setNameTextStroke,
+    nameTextStrokeWidth, setNameTextStrokeWidth,
     identitySaveTimers, identitySaveState, setIdentitySaveState,
     // Photos / Logo
     avatarUrl, coverUrl, avatarBgColor, avatarRotation, coverOffsetY,
