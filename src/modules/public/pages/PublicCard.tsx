@@ -656,6 +656,8 @@ export default function PublicCard() {
                 nameFontSize={typeof themeJson.name_font_size === "number" ? themeJson.name_font_size : null}
                 subtitleFontSize={typeof themeJson.subtitle_font_size === "number" ? themeJson.subtitle_font_size : null}
                 nameLineHeight={typeof themeJson.name_line_height === "number" ? themeJson.name_line_height : null}
+                nameTextStroke={themeJson.name_text_stroke === true}
+                nameTextStrokeWidth={typeof themeJson.name_text_stroke_width === "number" ? (themeJson.name_text_stroke_width as number) : 1}
                 profession={displayJobTitle}
                 company={profile.company ?? undefined}
                 avatarUrl={profile.avatar_url}
