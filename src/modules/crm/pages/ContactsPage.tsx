@@ -14,6 +14,8 @@ import {
 } from "@/components/ui/dialog";
 import { useContacts, usePipelineStages, useTags } from "@/hooks/useContacts";
 import { useCreateContact } from "@/hooks/useContactActions";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import UpgradePrompt from "@/components/UpgradePrompt";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 
@@ -58,6 +60,8 @@ export default function ContactsPage() {
   const { data: stages = [] } = usePipelineStages();
   const { data: tags = [] } = useTags();
   const createContact = useCreateContact();
+  const { planKey, checkLimit } = usePlanLimits();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   const [search, setSearch] = useState("");
   const [stageFilter, setStageFilter] = useState("all");
@@ -135,6 +139,11 @@ export default function ContactsPage() {
 
   const handleCreate = async () => {
     if (!newName.trim()) return;
+    if (checkLimit("contacts", contacts.length)) {
+      setNewOpen(false);
+      setUpgradeOpen(true);
+      return;
+    }
     const lead = await createContact.mutateAsync({
       name: newName,
       email: newEmail || undefined,
@@ -336,6 +345,7 @@ export default function ContactsPage() {
           </table>
         </motion.div>
       )}
+      <UpgradePrompt open={upgradeOpen} onOpenChange={setUpgradeOpen} feature="contacts" currentPlan={planKey} />
     </div>
   );
 }

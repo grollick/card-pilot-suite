@@ -11,19 +11,20 @@ export const PLAN_TIERS = [
     popular: false,
     features: [
       "1 digital business card",
-      "20 contacts",
-      "3 estimates / month",
-      "5 social posts / month",
+      "100 contacts",
+      "3 services",
+      "200 bookings / month",
       "Basic lead capture",
       "QR code sharing",
       "CardPilot branding on card",
     ],
     limits: {
-      contacts: 20,
+      contacts: 100,
       cards: 1,
       estimates: 3,
       social_posts: 5,
       booking_services: 3,
+      bookings_monthly: 200,
       team_members: 1,
       automations: 0,
       email_templates: 0,
@@ -55,6 +56,7 @@ export const PLAN_TIERS = [
       estimates: -1,
       social_posts: -1,
       booking_services: -1,
+      bookings_monthly: -1,
       team_members: 1,
       automations: 5,
       email_templates: -1,
@@ -85,6 +87,7 @@ export const PLAN_TIERS = [
       estimates: -1,
       social_posts: -1,
       booking_services: -1,
+      bookings_monthly: -1,
       team_members: 3,
       automations: -1,
       email_templates: -1,
@@ -116,6 +119,7 @@ export const PLAN_TIERS = [
       estimates: -1,
       social_posts: -1,
       booking_services: -1,
+      bookings_monthly: -1,
       team_members: -1,
       automations: -1,
       email_templates: -1,
@@ -134,6 +138,7 @@ export interface PlanLimits {
   estimates: number;
   social_posts: number;
   booking_services: number;
+  bookings_monthly: number;
   team_members: number;
   automations: number;
   email_templates: number;

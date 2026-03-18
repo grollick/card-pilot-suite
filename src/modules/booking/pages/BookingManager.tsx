@@ -21,13 +21,15 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { motion } from "framer-motion";
-import { format } from "date-fns";
+import { format, startOfMonth } from "date-fns";
 import { toast } from "sonner";
 import {
   useBookingServices, useCreateService, useUpdateService,
   useBookings, useUpdateBooking,
   useAvailability, useUpsertAvailability,
 } from "@/hooks/useBookings";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import UpgradePrompt from "@/components/UpgradePrompt";
 
 const statusColors: Record<string, string> = {
   requested: "bg-[hsl(var(--warning))]/10 text-[hsl(var(--warning))]",
@@ -50,6 +52,9 @@ export default function BookingManager() {
   const updateBooking = useUpdateBooking();
   const upsertAvailability = useUpsertAvailability();
   const sendEmail = useSendEmail();
+  const { planKey, checkLimit } = usePlanLimits();
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upgradeFeature, setUpgradeFeature] = useState("");
 
   // New service dialog
   const [newOpen, setNewOpen] = useState(false);
@@ -84,6 +89,12 @@ export default function BookingManager() {
 
   const handleCreateService = async () => {
     if (!sName.trim()) return;
+    if (checkLimit("booking_services", services.length)) {
+      setNewOpen(false);
+      setUpgradeFeature("services");
+      setUpgradeOpen(true);
+      return;
+    }
     await createService.mutateAsync({
       name: sName,
       duration_min: parseInt(sDuration) || 30,
@@ -387,6 +398,7 @@ export default function BookingManager() {
           </motion.div>
         </TabsContent>
       </Tabs>
+      <UpgradePrompt open={upgradeOpen} onOpenChange={setUpgradeOpen} feature={upgradeFeature} currentPlan={planKey} />
     </div>
   );
 }
