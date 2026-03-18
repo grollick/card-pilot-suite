@@ -24,6 +24,11 @@ import DemoCardPreview from "@/modules/public/pages/DemoCardPreview";
 const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
 const PublicProjectPage = lazy(() => import("@/modules/public/pages/PublicProjectPage"));
 
+// Client Portal v2 — authenticated client dashboard
+const ClientAuthPage = lazy(() => import("@/modules/client/pages/ClientAuthPage"));
+const ClientDashboard = lazy(() => import("@/modules/client/pages/ClientDashboard"));
+const ClientProtectedRoute = lazy(() => import("@/modules/client/components/ClientProtectedRoute"));
+
 // ── Auth & marketing — loaded eagerly (small) ──
 import LandingPage from "@/modules/landing/pages/LandingPage";
 import PricingPage from "@/modules/pricing/pages/PricingPage";
