@@ -29,8 +29,7 @@ export default function Auth() {
   const { toast } = useToast();
 
   if (user) {
-    navigate("/app", { replace: true });
-    return null;
+    return <Navigate to="/app" replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
