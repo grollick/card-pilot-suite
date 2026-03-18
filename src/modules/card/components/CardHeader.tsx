@@ -99,6 +99,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     lineHeight: nameLineHeight ?? 1.2,
     letterSpacing: nameLetterSpacing ? `${nameLetterSpacing}px` : undefined,
     fontStyle: nameItalic ? "italic" : undefined,
+    ...(nameTextStroke ? { WebkitTextStroke: `${nameTextStrokeWidth}px white`, paintOrder: 'stroke fill' as const } : {}),
     ...(hasMetallicName ? {
       background: metallicGrad,
       WebkitBackgroundClip: "text",
