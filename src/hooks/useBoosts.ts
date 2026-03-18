@@ -125,3 +125,18 @@ export function useCancelBoost() {
     },
   });
 }
+
+/** Track boost views for a set of boosted user IDs (called once per page load) */
+export function useTrackBoostViews(boostedUserIds: string[]) {
+  const tracked = useRef(false);
+
+  useEffect(() => {
+    if (tracked.current || boostedUserIds.length === 0) return;
+    tracked.current = true;
+
+    // Fire-and-forget RPCs for each boosted user visible
+    boostedUserIds.forEach((userId) => {
+      supabase.rpc("increment_boost_views", { p_user_id: userId } as any).then();
+    });
+  }, [boostedUserIds]);
+}
