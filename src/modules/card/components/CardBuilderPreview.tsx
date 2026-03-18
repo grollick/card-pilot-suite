@@ -39,6 +39,7 @@ interface Props {
   nameItalic?: boolean;
   nameFontSize?: number | null;
   subtitleFontSize?: number | null;
+  nameLineHeight?: number | null;
   onAvatarChange: (url: string) => void;
   setEditingSection: (id: string | null) => void;
   identityPosition?: { x: number; y: number } | null;
