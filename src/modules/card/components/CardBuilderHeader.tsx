@@ -1,6 +1,6 @@
 import {
   Globe, Loader2, Cloud, CloudOff, Link2, Undo2, Redo2,
-  Eye, Smartphone, Tablet, Monitor, Send, ChevronLeft,
+  Eye, Smartphone, Tablet, Monitor, Send, ChevronLeft, Wifi,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -8,9 +8,11 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import QRShareDialog from "./QRShareDialog";
 import NFCShareDialog from "./NFCShareDialog";
 import WalletPassDialog from "./WalletPassDialog";
+import NetworkingModeDialog from "./NetworkingModeDialog";
 import {
   Tooltip,
   TooltipContent,
