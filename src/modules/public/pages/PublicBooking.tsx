@@ -374,6 +374,20 @@ export default function PublicBooking() {
                   <Button variant="outline" className="w-full" onClick={handleDownloadICS}>
                     <Download className="h-4 w-4 mr-2" /> Add to Calendar (.ics)
                   </Button>
+
+                  {/* Viral Growth: Post-booking CTA */}
+                  <div className="mt-4 p-4 rounded-xl border border-primary/20 bg-primary/5 space-y-2">
+                    <p className="text-sm font-semibold text-foreground">Want your own smart business card?</p>
+                    <p className="text-xs text-muted-foreground">
+                      Get a card like this one — capture leads, take bookings, and grow your business. Free to start.
+                    </p>
+                    <Link to={`/auth?ref=booking&from=${handle}`}>
+                      <Button size="sm" className="w-full gap-1.5 mt-1">
+                        Create Your Free Card →
+                      </Button>
+                    </Link>
+                  </div>
+
                   <Link to={`/${handle}`}>
                     <Button variant="ghost" className="w-full mt-1">Back to Card</Button>
                   </Link>
