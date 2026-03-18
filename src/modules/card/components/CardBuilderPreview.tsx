@@ -116,18 +116,43 @@ export default function CardBuilderPreview({
   logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap = 8, logoVerticalAlign = "center",
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
   boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, onAvatarChange, setEditingSection,
+  identityPosition, onIdentityPositionChange,
   previewDevice: externalDevice, hideToolbar,
 }: Props) {
   const [internalDevice, setInternalDevice] = useState<"phone" | "tablet">("phone");
   const previewDevice = externalDevice ?? internalDevice;
   const setPreviewDevice = setInternalDevice;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isDragging = useRef(false);
+  const dragStart = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
 
-  const logoPx = logoSize === "small" ? 36 : logoSize === "large" ? 64 : 48;
-  const posMap: Record<string, string> = {
-    "top-left": "top-2 left-2", "top-right": "top-2 right-2",
-    "bottom-left": "bottom-2 left-2", "bottom-right": "bottom-2 right-2",
-  };
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    isDragging.current = true;
+    const pos = identityPosition ?? { x: 0, y: 0 };
+    dragStart.current = { x: e.clientX, y: e.clientY, posX: pos.x, posY: pos.y };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }, [identityPosition]);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isDragging.current) return;
+    const dx = e.clientX - dragStart.current.x;
+    const dy = e.clientY - dragStart.current.y;
+    const newX = dragStart.current.posX + dx;
+    const newY = dragStart.current.posY + dy;
+    onIdentityPositionChange?.({ x: newX, y: newY });
+  }, [onIdentityPositionChange]);
+
+  const handlePointerUp = useCallback(() => {
+    isDragging.current = false;
+  }, []);
+
+  const handleResetPosition = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    onIdentityPositionChange?.(null);
+  }, [onIdentityPositionChange]);
 
   return (
     <>
