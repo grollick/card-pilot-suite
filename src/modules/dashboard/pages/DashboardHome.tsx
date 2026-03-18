@@ -9,6 +9,9 @@ import RevenueOpportunities from "@/modules/dashboard/components/RevenueOpportun
 import DashboardActivityFeed from "@/modules/dashboard/components/DashboardActivityFeed";
 import ShareCardWidget from "@/modules/dashboard/components/ShareCardWidget";
 import MobileJobDashboard from "@/modules/dashboard/components/MobileJobDashboard";
+import ActivationChecklist from "@/modules/dashboard/components/ActivationChecklist";
+import ShareMessageCard from "@/modules/dashboard/components/ShareMessageCard";
+import FirstLeadCelebration from "@/modules/dashboard/components/FirstLeadCelebration";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function DashboardHome() {
