@@ -444,6 +444,7 @@ export function useCardBuilderState() {
     nameItalic, setNameItalic,
     nameFontSize, setNameFontSize,
     subtitleFontSize, setSubtitleFontSize,
+    subtitleItalic, setSubtitleItalic,
     identityPosition, handleIdentityPositionChange,
     nameLineHeight, setNameLineHeight,
     nameTextStroke, setNameTextStroke,
