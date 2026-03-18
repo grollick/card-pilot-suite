@@ -39,6 +39,7 @@ interface Props {
   nameItalic?: boolean;
   nameFontSize?: number | null;
   subtitleFontSize?: number | null;
+  subtitleItalic?: boolean;
   nameLineHeight?: number | null;
   nameTextStroke?: boolean;
   nameTextStrokeWidth?: number;
