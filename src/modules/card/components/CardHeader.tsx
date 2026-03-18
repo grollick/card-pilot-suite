@@ -16,6 +16,8 @@ interface CardHeaderProps {
   nameItalic?: boolean;
   nameFontSize?: number | null;
   nameLineHeight?: number | null;
+  nameTextStroke?: boolean;
+  nameTextStrokeWidth?: number;
   subtitleFontSize?: number | null;
   profession?: string;
   company?: string;
