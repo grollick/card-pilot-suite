@@ -7,14 +7,33 @@ export interface IndustryPageData {
   heroHeadline: string;
   heroSubheadline: string;
   ctaText: string;
+  secondaryCtaText?: string;
   ctaSubtext: string;
   problemHeadline: string;
   problems: { icon: string; title: string; description: string }[];
+  problemClosing?: string;
   solutionHeadline: string;
+  solutionDescription?: string;
+  solutionBullets?: string[];
   solutionPoints: { title: string; description: string }[];
   howItWorks: { step: string; title: string; description: string }[];
+  productPreview?: {
+    headline: string;
+    highlights: string[];
+    caption: string;
+  };
   features: { title: string; description: string; icon: string }[];
+  featuresHeadline?: string;
+  socialProof?: { quote: string; attribution: string };
   testimonialIntro: string;
+  demoSection?: { headline: string; buttonText: string };
+  pricingPreview?: {
+    headline: string;
+    plans: { name: string; description: string }[];
+  };
+  finalCtaHeadline?: string;
+  finalCtaSubheadline?: string;
+  footerNote?: string;
   focusAreas: string[];
 }
 
@@ -23,36 +42,75 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
     slug: "contractors",
     profession: "Contractor",
     demoSlug: "demo-contractor",
-    heroHeadline: "The Digital Business Card Built for Contractors",
-    heroSubheadline: "Stop losing leads to voicemail. Get a professional digital card that captures quote requests, showcases your projects, and books jobs — 24/7.",
+    heroHeadline: "Get More Renovation Leads and Book Jobs from One Link",
+    heroSubheadline: "Show your projects, capture quote requests, and let customers book consultations — all from a single smart business card.",
     ctaText: "Create Your Free Contractor Card",
-    ctaSubtext: "No credit card required · Takes 30 seconds",
-    problemHeadline: "Sound Familiar?",
+    secondaryCtaText: "View Example Contractor Card",
+    ctaSubtext: "No credit card required",
+    problemHeadline: "Most contractors lose jobs before they even get a chance to quote.",
     problems: [
-      { icon: "📞", title: "Missed calls = missed jobs", description: "You're on a job site and can't pick up. That lead just called your competitor instead." },
-      { icon: "📋", title: "No easy way to share your work", description: "You've got amazing projects, but sharing them means digging through your phone for photos." },
-      { icon: "💸", title: "Quotes disappear into email chains", description: "Potential clients request estimates but never follow up because the process is clunky." },
+      { icon: "📞", title: "Customers don't know how to reach you quickly", description: "You're on a job site and can't pick up. That lead just called your competitor." },
+      { icon: "📋", title: "Your work isn't showcased properly", description: "You've done amazing renovations, but nobody sees them when it matters." },
+      { icon: "💬", title: "Leads get lost in texts and calls", description: "Messages pile up across different channels and things slip through the cracks." },
+      { icon: "🔄", title: "Follow-ups don't happen consistently", description: "You mean to follow up on quotes, but busy days turn into busy weeks." },
     ],
-    solutionHeadline: "One Card. More Leads. Less Hassle.",
+    problemClosing: "Every missed message is a missed job.",
+    solutionHeadline: "Turn your work into a lead-generating machine.",
+    solutionDescription: "CardPilot gives you one simple link that shows your work, captures leads, and lets customers book with you instantly.",
+    solutionBullets: [
+      "Show your before-and-after projects",
+      "Let customers request quotes",
+      "Allow instant booking for consultations",
+      "Keep all leads organized in one place",
+    ],
     solutionPoints: [
-      { title: "Instant Quote Requests", description: "Clients tap your card, fill out a quick form, and you get the lead instantly — even while you're swinging a hammer." },
-      { title: "Project Showcase", description: "Display your best before-and-after photos, completed builds, and client testimonials right on your card." },
-      { title: "Automated Follow-ups", description: "Never forget to follow up on a quote. CardPilot sends reminders automatically so leads don't go cold." },
+      { title: "Show your before-and-after projects", description: "Display your best work front and center so prospects trust your craftsmanship." },
+      { title: "Let customers request quotes", description: "Clients fill out a quick form and you get the lead instantly." },
+      { title: "Allow instant booking for consultations", description: "Customers pick a time that works — no phone tag required." },
+      { title: "Keep all leads organized in one place", description: "Every inquiry, quote request, and booking in a single dashboard." },
     ],
     howItWorks: [
-      { step: "1", title: "Create Your Card", description: "Enter your trade, services, and upload project photos. AI fills in the rest." },
-      { step: "2", title: "Share Everywhere", description: "Hand out your QR code on job sites, add it to invoices, or text it to potential clients." },
-      { step: "3", title: "Capture & Close", description: "Leads come in automatically. Follow up, send estimates, and book more jobs." },
+      { step: "1", title: "Create your card", description: "Add your services, photos, and contact info." },
+      { step: "2", title: "Share your link", description: "Send it to customers or post it online." },
+      { step: "3", title: "Get leads and bookings", description: "Customers contact you and request quotes instantly." },
     ],
+    productPreview: {
+      headline: "Everything you need to win more jobs",
+      highlights: [
+        "Project showcase (before & after)",
+        "Quote request form",
+        "Booking calendar",
+        "Lead tracking dashboard",
+      ],
+      caption: "See exactly how many leads and bookings you're getting.",
+    },
+    featuresHeadline: "Built for contractors who want more jobs",
     features: [
-      { title: "Lead Capture Forms", icon: "📥", description: "Built-in forms that capture name, phone, project details, and budget." },
-      { title: "Project Gallery", icon: "🖼️", description: "Showcase completed work with before/after photos and descriptions." },
-      { title: "Service Menu & Pricing", icon: "💲", description: "List your services with estimated pricing so clients know what to expect." },
-      { title: "Instant Estimates", icon: "📄", description: "Generate professional PDF estimates and send them from your phone." },
-      { title: "Review Collection", icon: "⭐", description: "Automatically ask happy clients for Google reviews after job completion." },
-      { title: "QR Code & NFC", icon: "📱", description: "Share your card via QR stickers on your truck, hard hat, or business cards." },
+      { title: "Get More Leads", icon: "📥", description: "Capture quote requests from your card." },
+      { title: "Show Your Work", icon: "🖼️", description: "Display before-and-after projects to build trust." },
+      { title: "Book Consultations", icon: "📅", description: "Let customers schedule time with you." },
+      { title: "Stay Organized", icon: "📊", description: "Manage all your leads and jobs in one dashboard." },
     ],
+    socialProof: {
+      quote: "I shared my card and got 3 renovation leads in the first week.",
+      attribution: "Local Contractor",
+    },
     testimonialIntro: "Contractors across the country trust CardPilot",
+    demoSection: {
+      headline: "See a real contractor card",
+      buttonText: "View Example Card",
+    },
+    pricingPreview: {
+      headline: "Start free. Upgrade when you're ready.",
+      plans: [
+        { name: "Free", description: "Basic card, lead capture, booking" },
+        { name: "Pro", description: "Automation, unlimited services, advanced features" },
+        { name: "Pro Plus", description: "Full business tools and customization" },
+      ],
+    },
+    finalCtaHeadline: "Start getting more leads today.",
+    finalCtaSubheadline: "Set up your contractor card in minutes and start booking more jobs.",
+    footerNote: "Built for contractors, renovators, and construction professionals.",
     focusAreas: ["Lead Generation", "Quote Requests", "Project Showcases"],
   },
   barbers: {

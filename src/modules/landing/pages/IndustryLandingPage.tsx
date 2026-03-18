@@ -1,10 +1,9 @@
-import { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, CheckCircle2, Star } from "lucide-react";
+import { ArrowRight, CheckCircle2, Star, ChevronRight } from "lucide-react";
 import { getIndustryPage, getIndustryDemoCard } from "@/modules/landing/data/industryPages";
 import NotFound from "@/modules/shared/pages/NotFound";
 
@@ -78,7 +77,9 @@ export default function IndustryLandingPage() {
                 </Button>
                 {demo && (
                   <Button asChild variant="outline" size="lg" className="text-base">
-                    <Link to={`/demo/${demo.slug}`}>See Demo Card</Link>
+                    <Link to={`/demo/${demo.slug}`}>
+                      {page.secondaryCtaText || "See Demo Card"}
+                    </Link>
                   </Button>
                 )}
               </div>
@@ -96,7 +97,7 @@ export default function IndustryLandingPage() {
             >
               {page.problemHeadline}
             </motion.h2>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className={`grid gap-6 ${page.problems.length === 4 ? 'sm:grid-cols-2' : 'md:grid-cols-3'}`}>
               {page.problems.map((p, i) => (
                 <motion.div
                   key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i}
@@ -108,6 +109,14 @@ export default function IndustryLandingPage() {
                 </motion.div>
               ))}
             </div>
+            {page.problemClosing && (
+              <motion.p
+                initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={page.problems.length}
+                className="text-center text-lg font-semibold text-foreground mt-10"
+              >
+                {page.problemClosing}
+              </motion.p>
+            )}
           </div>
         </section>
 
@@ -115,25 +124,47 @@ export default function IndustryLandingPage() {
         <section className="max-w-5xl mx-auto px-4 py-16 md:py-20">
           <motion.h2
             initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}
-            className="text-2xl md:text-3xl font-bold text-center mb-12"
+            className="text-2xl md:text-3xl font-bold text-center mb-4"
           >
             {page.solutionHeadline}
           </motion.h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {page.solutionPoints.map((s, i) => (
-              <motion.div
-                key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i}
-              >
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
-                  <div>
-                    <h3 className="font-semibold text-foreground mb-1">{s.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{s.description}</p>
+          {page.solutionDescription && (
+            <motion.p
+              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}
+              className="text-center text-muted-foreground max-w-2xl mx-auto mb-10"
+            >
+              {page.solutionDescription}
+            </motion.p>
+          )}
+          {page.solutionBullets ? (
+            <div className="max-w-xl mx-auto space-y-4">
+              {page.solutionBullets.map((b, i) => (
+                <motion.div
+                  key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i}
+                  className="flex items-center gap-3"
+                >
+                  <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
+                  <span className="text-foreground">{b}</span>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className={`grid gap-8 ${page.solutionPoints.length === 4 ? 'sm:grid-cols-2' : 'md:grid-cols-3'}`}>
+              {page.solutionPoints.map((s, i) => (
+                <motion.div
+                  key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i}
+                >
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-primary mt-0.5 shrink-0" />
+                    <div>
+                      <h3 className="font-semibold text-foreground mb-1">{s.title}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{s.description}</p>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* ── How It Works ── */}
@@ -162,8 +193,147 @@ export default function IndustryLandingPage() {
           </div>
         </section>
 
-        {/* ── Demo Card Preview ── */}
-        {demo && (
+        {/* ── Product Preview ── */}
+        {page.productPreview && (
+          <section className="max-w-5xl mx-auto px-4 py-16 md:py-20">
+            <motion.h2
+              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}
+              className="text-2xl md:text-3xl font-bold text-center mb-10"
+            >
+              {page.productPreview.headline}
+            </motion.h2>
+            <div className="max-w-2xl mx-auto">
+              <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                {page.productPreview.highlights.map((h, i) => (
+                  <motion.div
+                    key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i}
+                    className="flex items-center gap-3 bg-card rounded-lg border border-border/60 p-4"
+                  >
+                    <CheckCircle2 className="h-5 w-5 text-primary shrink-0" />
+                    <span className="text-sm font-medium text-foreground">{h}</span>
+                  </motion.div>
+                ))}
+              </div>
+              <motion.p
+                initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={4}
+                className="text-center text-sm text-muted-foreground"
+              >
+                {page.productPreview.caption}
+              </motion.p>
+            </div>
+          </section>
+        )}
+
+        {/* ── Features ── */}
+        <section className="bg-muted/30 border-y border-border/30">
+          <div className="max-w-5xl mx-auto px-4 py-16 md:py-20">
+            <motion.h2
+              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}
+              className="text-2xl md:text-3xl font-bold text-center mb-12"
+            >
+              {page.featuresHeadline || `Everything a ${page.profession} Needs`}
+            </motion.h2>
+            <div className={`grid gap-6 ${page.features.length <= 4 ? 'sm:grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-3'}`}>
+              {page.features.map((f, i) => (
+                <motion.div
+                  key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i}
+                  className="bg-card rounded-xl border border-border/60 p-5"
+                >
+                  <span className="text-2xl mb-2 block">{f.icon}</span>
+                  <h3 className="font-semibold text-foreground mb-1">{f.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">{f.description}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Social Proof (single quote) ── */}
+        {page.socialProof && (
+          <section className="max-w-4xl mx-auto px-4 py-16 md:py-20">
+            <motion.blockquote
+              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}
+              className="text-center"
+            >
+              <p className="text-xl md:text-2xl font-medium text-foreground italic leading-relaxed mb-4">
+                "{page.socialProof.quote}"
+              </p>
+              <footer className="text-sm text-muted-foreground">— {page.socialProof.attribution}</footer>
+            </motion.blockquote>
+          </section>
+        )}
+
+        {/* ── Testimonials (from demo card) ── */}
+        {!page.socialProof && demo && demo.testimonials.length > 0 && (
+          <section className="max-w-5xl mx-auto px-4 py-16 md:py-20">
+            <motion.h2
+              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}
+              className="text-2xl md:text-3xl font-bold text-center mb-3"
+            >
+              {page.testimonialIntro}
+            </motion.h2>
+            <p className="text-center text-muted-foreground mb-10">Real reviews from real clients.</p>
+            <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+              {demo.testimonials.map((t, i) => (
+                <motion.div
+                  key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i}
+                  className="bg-card rounded-xl border border-border/60 p-6"
+                >
+                  <div className="flex gap-0.5 mb-3">
+                    {Array.from({ length: t.rating }).map((_, j) => (
+                      <Star key={j} className="h-4 w-4 fill-primary text-primary" />
+                    ))}
+                  </div>
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-3">"{t.text}"</p>
+                  <p className="text-sm font-medium text-foreground">— {t.name}</p>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Demo Section ── */}
+        {demo && page.demoSection && (
+          <section className="border-y border-border/30 bg-muted/20">
+            <div className="max-w-5xl mx-auto px-4 py-16 md:py-20">
+              <motion.div
+                initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}
+                className="text-center"
+              >
+                <h2 className="text-2xl md:text-3xl font-bold mb-3">{page.demoSection.headline}</h2>
+                <p className="text-muted-foreground mb-4 max-w-xl mx-auto">
+                  See a sample {page.profession.toLowerCase()} card built with CardPilot.
+                </p>
+
+                {/* Mini card preview */}
+                <div className="max-w-sm mx-auto bg-card rounded-2xl border border-border/60 shadow-lg overflow-hidden mb-6">
+                  <div className="p-5" style={{ borderTop: `4px solid ${demo.accentColor}` }}>
+                    <h3 className="text-lg font-bold text-foreground">{demo.name}</h3>
+                    <p className="text-xs text-muted-foreground">{demo.company} · {demo.city}</p>
+                    <p className="text-xs text-muted-foreground italic mt-1">"{demo.tagline}"</p>
+                    <div className="mt-3 space-y-1.5">
+                      {demo.services.slice(0, 3).map((s) => (
+                        <div key={s.name} className="flex justify-between text-xs">
+                          <span className="text-foreground">{s.name}</span>
+                          <span className="text-muted-foreground font-medium">{s.price}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <Button asChild size="lg">
+                  <Link to={`/demo/${demo.slug}`}>
+                    {page.demoSection.buttonText} <ChevronRight className="ml-1 h-4 w-4" />
+                  </Link>
+                </Button>
+              </motion.div>
+            </div>
+          </section>
+        )}
+
+        {/* ── Demo Card Preview (fallback for pages without demoSection) ── */}
+        {demo && !page.demoSection && (
           <section className="max-w-5xl mx-auto px-4 py-16 md:py-20">
             <motion.h2
               initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}
@@ -209,56 +379,34 @@ export default function IndustryLandingPage() {
           </section>
         )}
 
-        {/* ── Features ── */}
-        <section className="bg-muted/30 border-y border-border/30">
-          <div className="max-w-5xl mx-auto px-4 py-16 md:py-20">
-            <motion.h2
-              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}
-              className="text-2xl md:text-3xl font-bold text-center mb-12"
-            >
-              Everything a {page.profession} Needs
-            </motion.h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {page.features.map((f, i) => (
-                <motion.div
-                  key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i}
-                  className="bg-card rounded-xl border border-border/60 p-5"
-                >
-                  <span className="text-2xl mb-2 block">{f.icon}</span>
-                  <h3 className="font-semibold text-foreground mb-1">{f.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{f.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Testimonials ── */}
-        {demo && demo.testimonials.length > 0 && (
+        {/* ── Pricing Preview ── */}
+        {page.pricingPreview && (
           <section className="max-w-5xl mx-auto px-4 py-16 md:py-20">
             <motion.h2
               initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}
-              className="text-2xl md:text-3xl font-bold text-center mb-3"
+              className="text-2xl md:text-3xl font-bold text-center mb-10"
             >
-              {page.testimonialIntro}
+              {page.pricingPreview.headline}
             </motion.h2>
-            <p className="text-center text-muted-foreground mb-10">Real reviews from real clients.</p>
-            <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-              {demo.testimonials.map((t, i) => (
+            <div className="grid sm:grid-cols-3 gap-5 max-w-3xl mx-auto">
+              {page.pricingPreview.plans.map((plan, i) => (
                 <motion.div
                   key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i}
-                  className="bg-card rounded-xl border border-border/60 p-6"
+                  className={`bg-card rounded-xl border p-6 text-center ${i === 1 ? 'border-primary shadow-md ring-1 ring-primary/20' : 'border-border/60'}`}
                 >
-                  <div className="flex gap-0.5 mb-3">
-                    {Array.from({ length: t.rating }).map((_, j) => (
-                      <Star key={j} className="h-4 w-4 fill-primary text-primary" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-3">"{t.text}"</p>
-                  <p className="text-sm font-medium text-foreground">— {t.name}</p>
+                  <h3 className="font-bold text-foreground text-lg mb-2">{plan.name}</h3>
+                  <p className="text-sm text-muted-foreground">{plan.description}</p>
                 </motion.div>
               ))}
             </div>
+            <motion.div
+              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={3}
+              className="text-center mt-6"
+            >
+              <Button asChild variant="outline">
+                <Link to="/pricing">View Full Pricing <ChevronRight className="ml-1 h-4 w-4" /></Link>
+              </Button>
+            </motion.div>
           </section>
         )}
 
@@ -267,10 +415,10 @@ export default function IndustryLandingPage() {
           <div className="max-w-3xl mx-auto px-4 py-16 md:py-24 text-center">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}>
               <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
-                Ready to Grow Your {page.profession} Business?
+                {page.finalCtaHeadline || `Ready to Grow Your ${page.profession} Business?`}
               </h2>
               <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-                Join thousands of {page.profession.toLowerCase()}s who use CardPilot to capture more leads, book more jobs, and build a stronger reputation.
+                {page.finalCtaSubheadline || `Join thousands of ${page.profession.toLowerCase()}s who use CardPilot to capture more leads, book more jobs, and build a stronger reputation.`}
               </p>
               <Button asChild size="lg" className="text-base px-10">
                 <Link to="/auth">
@@ -285,6 +433,7 @@ export default function IndustryLandingPage() {
         {/* ── Footer ── */}
         <footer className="border-t border-border/40 py-8 text-center">
           <p className="text-xs text-muted-foreground">
+            {page.footerNote && <span className="block mb-1">{page.footerNote}</span>}
             © {new Date().getFullYear()} <Link to="/" className="text-primary hover:underline">CardPilot</Link> — The smart business card platform for local professionals.
           </p>
         </footer>
