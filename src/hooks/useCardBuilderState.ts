@@ -97,7 +97,7 @@ export function useCardBuilderState() {
       if (t?.avatar_bg_color) setAvatarBgColor(t.avatar_bg_color);
       if (typeof t?.avatar_rotation === "number") setAvatarRotation(t.avatar_rotation);
       if (typeof t?.cover_offset_y === "number") setCoverOffsetY(t.cover_offset_y);
-      if (t?.logo_url) setLogoUrl(t.logo_url);
+      if (typeof t?.logo_url === "string") setLogoUrl(t.logo_url || null);
       if (typeof t?.logo_frosted_bg === "boolean") setLogoFrostedBg(t.logo_frosted_bg);
       if (typeof t?.logo_glow === "boolean") setLogoGlow(t.logo_glow);
       if (t?.logo_position) setLogoPosition(t.logo_position);
