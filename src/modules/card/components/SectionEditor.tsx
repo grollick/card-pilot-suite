@@ -36,6 +36,10 @@ export interface SectionContent {
   projectsHeading?: string;
   projectsDescription?: string;
   showBeforeAfter?: boolean;
+  // Quote Calculator
+  calcHeading?: string;
+  calcPresetId?: string;
+  calcDisclaimer?: string;
 }
 
 interface SectionEditorProps {
