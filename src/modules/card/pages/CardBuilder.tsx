@@ -235,15 +235,23 @@ export default function CardBuilder() {
         Browse Block Marketplace
       </Button>
 
-      {/* AI Generate */}
+      {/* AI Tools */}
       <div className="space-y-2">
         <div className="flex items-center gap-2 px-1">
           <Sparkles className="h-3.5 w-3.5 text-primary" />
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">AI Tools</span>
         </div>
+        <Button
+          size="sm"
+          className="w-full gap-1.5"
+          onClick={() => setAiAssistantOpen(true)}
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+          Generate My Card with AI
+        </Button>
         <Button variant="outline" size="sm" className="w-full" onClick={s.handleAIGenerate} disabled={s.isGenerating}>
           {s.isGenerating ? <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 mr-2" />}
-          {s.isGenerating ? "Generating…" : "AI Write My Card"}
+          {s.isGenerating ? "Generating…" : "AI Write Copy Only"}
         </Button>
         {s.aiContent && (
           <div className="rounded-lg bg-primary/5 border border-primary/20 p-2.5">
