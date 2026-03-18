@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { useEffect, useRef } from "react";
 
 export interface NeighborhoodBoost {
   id: string;
@@ -123,4 +124,19 @@ export function useCancelBoost() {
       toast.success("Boost cancelled");
     },
   });
+}
+
+/** Track boost views for a set of boosted user IDs (called once per page load) */
+export function useTrackBoostViews(boostedUserIds: string[]) {
+  const tracked = useRef(false);
+
+  useEffect(() => {
+    if (tracked.current || boostedUserIds.length === 0) return;
+    tracked.current = true;
+
+    // Fire-and-forget RPCs for each boosted user visible
+    boostedUserIds.forEach((userId) => {
+      supabase.rpc("increment_boost_views", { p_user_id: userId } as any).then();
+    });
+  }, [boostedUserIds]);
 }

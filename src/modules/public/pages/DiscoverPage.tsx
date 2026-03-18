@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useMarketplaceListings, useMarketplaceProfessions } from "@/hooks/useMarketplace";
-import { useBoostedUserIds } from "@/hooks/useBoosts";
+import { useBoostedUserIds, useTrackBoostViews } from "@/hooks/useBoosts";
 import ListingCard from "@/modules/marketplace/components/ListingCard";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -56,6 +56,10 @@ export default function DiscoverPage() {
   const featuredListings = useMemo(() => listings?.filter((l) => l.featured) ?? [], [listings]);
   const boostedListings = useMemo(() => listings?.filter((l) => !l.featured && boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
   const regularListings = useMemo(() => listings?.filter((l) => !l.featured && !boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
+
+  // Track boost views when boosted listings are displayed
+  const boostedUserIdsArray = useMemo(() => boostedListings.map(l => l.id), [boostedListings]);
+  useTrackBoostViews(boostedUserIdsArray);
 
   return (
     <div className="min-h-screen bg-background">
