@@ -110,6 +110,7 @@ export function useCardBuilderState() {
       if (typeof t?.name_font_size === "number") setNameFontSize(t.name_font_size);
       if (typeof t?.subtitle_font_size === "number") setSubtitleFontSize(t.subtitle_font_size);
       if (t?.identity_position) setIdentityPosition(t.identity_position);
+      if (typeof t?.name_line_height === "number") setNameLineHeight(t.name_line_height);
       if (typeof t?.section_icons === "boolean") setShowSectionIcons(t.section_icons);
       if (typeof t?.cta_icons_only === "boolean") setCtaIconsOnly(t.cta_icons_only);
       if (typeof t?.social_icons_only === "boolean") setSocialIconsOnly(t.social_icons_only);
