@@ -41,6 +41,9 @@ interface Props {
   subtitleFontSize?: number | null;
   onAvatarChange: (url: string) => void;
   setEditingSection: (id: string | null) => void;
+  /** When provided externally, hides the built-in device toggle toolbar */
+  previewDevice?: "phone" | "tablet";
+  hideToolbar?: boolean;
 }
 
 function getSectionPreview(section: CardSection) {
