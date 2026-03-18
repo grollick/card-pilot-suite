@@ -113,6 +113,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     fontFamily: `'${fonts.secondary}', sans-serif`,
     color: palette.secondary,
     fontSize: subtitleFontSize ?? 14,
+    fontStyle: subtitleItalic ? "italic" : undefined,
     margin: 0,
     marginTop: 4,
   };
