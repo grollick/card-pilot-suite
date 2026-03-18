@@ -61,12 +61,21 @@ const benefits = [
   { icon: BarChart3, title: "Track Your Growth", desc: "See card views, leads captured, bookings, and revenue — all in real-time." },
 ];
 
-const exampleCards = [
-  { name: "Mike's Contracting", profession: "Contractor", icon: Wrench, color: "bg-primary/10 text-primary", services: ["Kitchen Remodels", "Deck Building", "Additions"] },
-  { name: "Fresh Cuts Studio", profession: "Barber", icon: Scissors, color: "bg-accent/10 text-accent", services: ["Haircuts", "Beard Trims", "Hot Shaves"] },
-  { name: "Sarah Chen Realty", profession: "Realtor", icon: Home, color: "bg-success/10 text-success", services: ["Listings", "Buyer Agent", "Market Analysis"] },
-  { name: "Lens & Light Photo", profession: "Photographer", icon: Camera, color: "bg-warning/10 text-warning", services: ["Weddings", "Portraits", "Events"] },
-];
+const PROFESSION_ICONS: Record<string, typeof Wrench> = {
+  Contractor: Wrench,
+  Barber: Scissors,
+  Realtor: Home,
+  Photographer: Camera,
+  Landscaper: TreePine,
+};
+
+const PROFESSION_COLORS: Record<string, string> = {
+  Contractor: "bg-primary/10 text-primary",
+  Barber: "bg-accent/10 text-accent",
+  Realtor: "bg-[hsl(var(--success))]/10 text-[hsl(var(--success))]",
+  Photographer: "bg-[hsl(var(--warning))]/10 text-[hsl(var(--warning))]",
+  Landscaper: "bg-primary/10 text-primary",
+};
 
 const testimonials = [
   { name: "Jake M.", role: "Landscaper", text: "I went from losing half my leads to booking 90% of them. CardPilot paid for itself in a week.", rating: 5 },
