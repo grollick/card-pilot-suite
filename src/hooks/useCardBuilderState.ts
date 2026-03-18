@@ -116,6 +116,7 @@ export function useCardBuilderState() {
       if (typeof t?.name_font_size === "number") setNameFontSize(t.name_font_size);
       if (typeof t?.subtitle_font_size === "number") setSubtitleFontSize(t.subtitle_font_size);
       if (typeof t?.subtitle_italic === "boolean") setSubtitleItalic(t.subtitle_italic);
+      if (typeof t?.subtitle_spacing === "number") setSubtitleSpacing(t.subtitle_spacing);
       if (t?.identity_position) setIdentityPosition(t.identity_position);
       if (typeof t?.name_line_height === "number") setNameLineHeight(t.name_line_height);
       if (typeof t?.name_text_stroke === "boolean") setNameTextStroke(t.name_text_stroke);
