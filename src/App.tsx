@@ -18,6 +18,7 @@ import ProductsPage from "@/modules/public/pages/ProductsPage";
 import DiscoverPage from "@/modules/public/pages/DiscoverPage";
 import HandleOrSeoRoute from "@/modules/public/pages/HandleOrSeoRoute";
 import PublicSite from "@/modules/public/pages/PublicSite";
+import DemoCardPreview from "@/modules/public/pages/DemoCardPreview";
 
 // Client Portal — loaded eagerly (public, token-based)
 const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
@@ -160,6 +161,9 @@ const App = () => (
             <Route path="/onboarding" element={
               <ProtectedRoute><LazyRoute><Onboarding /></LazyRoute></ProtectedRoute>
             } />
+
+            {/* Demo cards — no auth */}
+            <Route path="/demo/:slug" element={<DemoCardPreview />} />
 
             {/* Public routes — no auth required */}
             <Route path="/q/:campaign" element={<QRLanding />} />
