@@ -666,6 +666,8 @@ export default function CardBuilder() {
                 nameFontSize={s.nameFontSize} setNameFontSize={s.setNameFontSize}
                 subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
                 nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
+                nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
+                nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}
                 saveThemeField={s.saveThemeField} qc={s.qc} hideWrapper
               />
               <div className="mt-4 space-y-3">
