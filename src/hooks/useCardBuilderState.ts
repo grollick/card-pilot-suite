@@ -284,6 +284,10 @@ export function useCardBuilderState() {
   const handleLogoPaddingChange = makeThemeHandler("logo_padding", setLogoPadding);
   const handleLogoNameGapChange = makeThemeHandler("logo_name_gap", setLogoNameGap);
   const handleLogoVerticalAlignChange = makeThemeHandler("logo_vertical_align", setLogoVerticalAlign);
+  const handleLogoCustomPositionChange = useCallback((pos: { x: number; y: number } | null) => {
+    setLogoCustomPosition(pos);
+    saveThemeField({ logo_custom_position: pos });
+  }, [saveThemeField]);
   const handleLogoPositionChange = makeThemeHandler("logo_position", setLogoPosition);
   const handleLogoSizeChange = makeThemeHandler("logo_size", setLogoSize);
   const handleCtaConfigChange = useCallback((newConfig: CtaItem[]) => {
