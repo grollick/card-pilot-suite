@@ -130,6 +130,8 @@ export default function CardBuilderPreview({
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const dragStart = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
+  const isLogoDragging = useRef(false);
+  const logoDragStart = useRef({ x: 0, y: 0, posX: 0, posY: 0 });
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     e.preventDefault();
