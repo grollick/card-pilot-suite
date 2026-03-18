@@ -2,6 +2,7 @@ import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail,
 import MarketplaceSettings from "@/modules/settings/components/MarketplaceSettings";
 import DataExportSection from "@/modules/settings/components/DataExportSection";
 import DataImportSection from "@/modules/settings/components/DataImportSection";
+import BrandKitSettings from "@/modules/settings/components/BrandKitSettings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
