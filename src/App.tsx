@@ -182,7 +182,18 @@ const App = () => (
             <Route path="/project/:projectId" element={<LazyRoute><PublicProjectPage /></LazyRoute>} />
             <Route path="/portal/:token" element={<LazyRoute><ClientPortal /></LazyRoute>} />
 
-            {/* App dashboard — auth required, lazy loaded */}
+            {/* Client Portal v2 — authenticated */}
+            <Route path="/client/auth" element={<LazyRoute><ClientAuthPage /></LazyRoute>} />
+            <Route path="/client" element={
+              <LazyRoute>
+                <Suspense fallback={<LazyFallback />}>
+                  <ClientProtectedRoute>
+                    <ClientDashboard />
+                  </ClientProtectedRoute>
+                </Suspense>
+              </LazyRoute>
+            } />
+
             <Route path="/app" element={
               <ProtectedRoute><LazyRoute><DashboardLayout /></LazyRoute></ProtectedRoute>
             }>
