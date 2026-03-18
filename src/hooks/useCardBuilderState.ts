@@ -246,7 +246,7 @@ export function useCardBuilderState() {
       await upsertCard.mutateAsync({
         sections_json: sections as any,
         status: published ? "published" : "draft",
-        theme_json: { ...(card?.theme_json as any ?? {}), cover_url: url } as any,
+        theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFields, cover_url: url } as any,
       });
     } catch { toast.error("Failed to save backdrop"); }
   }, [sections, published, card, upsertCard]);
