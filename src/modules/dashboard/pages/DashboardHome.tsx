@@ -38,11 +38,20 @@ export default function DashboardHome() {
       {/* Mobile Job Dashboard */}
       {isMobile && <MobileJobDashboard />}
 
+      {/* ── First Lead Celebration ── */}
+      <FirstLeadCelebration />
+
       {/* ── SECTION 2: KPI Row ── */}
       <RevenueKPICards />
 
-      {/* ── Share Card CTA ── */}
-      <ShareCardWidget />
+      {/* ── Activation System ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ActivationChecklist />
+        <div className="space-y-6">
+          <ShareMessageCard />
+          <ShareCardWidget />
+        </div>
+      </div>
 
       {/* ── Next Actions ── */}
       <NextActionsWidget />
