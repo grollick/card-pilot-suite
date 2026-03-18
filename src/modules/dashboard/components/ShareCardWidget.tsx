@@ -18,6 +18,7 @@ export default function ShareCardWidget() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [copied, setCopied] = useState(false);
+  const [networkingOpen, setNetworkingOpen] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ["profile-handle-share"],
