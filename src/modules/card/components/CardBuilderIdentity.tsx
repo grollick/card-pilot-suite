@@ -57,6 +57,7 @@ export default function CardBuilderIdentity({
   nameItalic, setNameItalic,
   nameFontSize, setNameFontSize,
   subtitleFontSize, setSubtitleFontSize,
+  nameLineHeight, setNameLineHeight,
   professionName, identitySaveTimers, identitySaveState, setIdentitySaveState,
   saveThemeField, qc, hideWrapper,
 }: Props) {
