@@ -545,6 +545,8 @@ export default function CardBuilder() {
                       subtitleFontSize={s.subtitleFontSize}
                       onAvatarChange={s.handleAvatarChange}
                       setEditingSection={s.setEditingSection}
+                      identityPosition={s.identityPosition}
+                      onIdentityPositionChange={s.handleIdentityPositionChange}
                       previewDevice={previewDevice}
                       hideToolbar
                     />
