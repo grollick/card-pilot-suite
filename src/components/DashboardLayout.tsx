@@ -4,6 +4,7 @@ import { Outlet } from "react-router-dom";
 import TopBar from "@/components/TopBar";
 import ProductTour from "@/components/ProductTour";
 import FloatingHelpButton from "@/components/FloatingHelpButton";
+import UpgradeTriggers from "@/components/UpgradeTriggers";
 
 export default function DashboardLayout() {
   return (
@@ -19,6 +20,7 @@ export default function DashboardLayout() {
       </div>
       <ProductTour />
       <FloatingHelpButton />
+      <UpgradeTriggers />
     </SidebarProvider>
   );
 }
