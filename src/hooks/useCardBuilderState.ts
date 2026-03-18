@@ -257,13 +257,13 @@ export function useCardBuilderState() {
     setCoverUrl(url);
     coverUrlRef.current = url;
     try {
+      const existing = (card?.theme_json as any) ?? {};
       await upsertCard.mutateAsync({
-        sections_json: sections as any,
-        status: published ? "published" : "draft",
-        theme_json: { ...(card?.theme_json as any ?? {}), ...pendingThemeFieldsRef.current, cover_url: url } as any,
+        theme_json: { ...existing, ...pendingThemeFieldsRef.current, cover_url: url } as any,
       });
+      qc.invalidateQueries({ queryKey: ["public-card"] });
     } catch { toast.error("Failed to save backdrop"); }
-  }, [sections, published, card, upsertCard]);
+  }, [card, upsertCard, qc]);
 
   const makeThemeHandler = <T,>(field: string, setter: (v: T) => void) =>
     (val: T) => { setter(val); saveThemeField({ [field]: val }); };
