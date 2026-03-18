@@ -46,6 +46,7 @@ function TrendBadge({ value }: { value: number }) {
 }
 
 export default function RevenueKPICards() {
+  const navigate = useNavigate();
   const { data, isLoading } = useBusinessPerformance();
 
   const kpis = [
@@ -57,6 +58,7 @@ export default function RevenueKPICards() {
       iconBg: "bg-success/10",
       iconColor: "text-success",
       borderAccent: "hover:border-success/30",
+      route: "/app/contacts",
     },
     {
       label: "Bookings",
@@ -66,6 +68,7 @@ export default function RevenueKPICards() {
       iconBg: "bg-warning/10",
       iconColor: "text-warning",
       borderAccent: "hover:border-warning/30",
+      route: "/app/bookings",
     },
     {
       label: "Est. Revenue",
@@ -76,6 +79,7 @@ export default function RevenueKPICards() {
       iconColor: "text-primary",
       borderAccent: "hover:border-primary/30",
       prefix: "$",
+      route: "/app/invoices",
     },
     {
       label: "Conversion",
@@ -86,6 +90,7 @@ export default function RevenueKPICards() {
       iconColor: "text-accent",
       borderAccent: "hover:border-accent/30",
       suffix: "%",
+      route: "/app/analytics",
     },
   ];
 
@@ -97,7 +102,8 @@ export default function RevenueKPICards() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: idx * 0.05, duration: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className={`group relative rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:shadow-md ${kpi.borderAccent}`}
+          onClick={() => navigate(kpi.route)}
+          className={`group relative rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:shadow-md cursor-pointer ${kpi.borderAccent}`}
         >
           {/* Subtle gradient overlay on hover */}
           <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-br from-transparent to-muted/20 pointer-events-none" />
