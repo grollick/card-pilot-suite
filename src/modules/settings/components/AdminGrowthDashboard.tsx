@@ -318,10 +318,10 @@ function GrowthLevers({ navigate }: { navigate: (path: string) => void }) {
   const levers = [
     {
       title: "Referral Program",
-      description: "Users who refer 3 friends get 30 days Pro free. Promote this in-app.",
+      description: "Users invite friends → both get 14 days Pro free on activation. Drive viral growth.",
       icon: Star,
       action: "View referrals",
-      path: "/app/analytics",
+      path: "/app/referrals",
     },
     {
       title: "SEO & Public Cards",

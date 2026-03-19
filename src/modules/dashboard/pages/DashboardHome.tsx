@@ -89,6 +89,9 @@ export default function DashboardHome() {
       {/* ── Business Performance ── */}
       <BusinessPerformancePanel />
 
+      {/* ── Referral Widget ── */}
+      <ReferralWidget />
+
       {/* ── Activation System ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ActivationChecklist />

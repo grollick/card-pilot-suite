@@ -232,7 +232,7 @@ export default function ReferralsPage() {
           {[
             { step: 1, title: "Share your link", desc: "Send your unique link to colleagues and fellow pros" },
             { step: 2, title: "They sign up & activate", desc: "They create a card and get their first lead or estimate" },
-            { step: 3, title: "You both earn rewards", desc: "Unlock free Pro time as you hit referral milestones" },
+            { step: 3, title: "You both get 14 days Pro", desc: "Both you and your friend earn 14 days of Pro access instantly" },
           ].map((s) => (
             <div key={s.step} className="text-center space-y-2">
               <div className="h-10 w-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center mx-auto">
