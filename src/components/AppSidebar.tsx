@@ -92,15 +92,18 @@ const moreItems = [
   { title: "Agency", url: "/app/agency", icon: Building2 },
 ];
 
-const settingsItems = [
+const settingsItemsBase = [
   { title: "Help Center", url: "/app/help", icon: HelpCircle },
   { title: "Settings", url: "/app/settings", icon: Settings },
   { title: "Team", url: "/app/team", icon: Building2 },
+  { title: "Landing Pages", url: "/app/landing-pages", icon: Globe },
+  { title: "Sales Pipeline", url: "/app/sales-crm", icon: Kanban },
+];
+
+const adminOnlyItems = [
   { title: "Admin", url: "/app/admin", icon: Shield },
   { title: "Platform Admin", url: "/app/platform-admin", icon: Shield },
   { title: "Admin Marketing", url: "/app/admin-marketing", icon: Megaphone },
-  { title: "Landing Pages", url: "/app/landing-pages", icon: Globe },
-  { title: "Sales Pipeline", url: "/app/sales-crm", icon: Kanban },
 ];
 
 type NavItem = { title: string; url: string; icon: any; end?: boolean };
