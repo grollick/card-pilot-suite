@@ -143,15 +143,18 @@ export default function InvoicesPage() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                     {inv.status === "draft" && (
-                      <DropdownMenuItem onClick={() => updateStatus.mutate({ id: inv.id, status: "sent" })}>
+                      <DropdownMenuItem onClick={() => updateStatus.mutate({ id: inv.id, status: "sent", lead_id: inv.lead_id, invoice_number: inv.invoice_number })}>
                         <Send className="h-4 w-4 mr-2" /> Mark as Sent
                       </DropdownMenuItem>
                     )}
                     {["sent", "viewed", "overdue"].includes(inv.status) && (
-                      <DropdownMenuItem onClick={() => updateStatus.mutate({ id: inv.id, status: "paid" })}>
+                      <DropdownMenuItem onClick={() => updateStatus.mutate({ id: inv.id, status: "paid", lead_id: inv.lead_id, invoice_number: inv.invoice_number })}>
                         <CheckCircle className="h-4 w-4 mr-2" /> Mark as Paid
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuItem onClick={() => handleExportPDF(inv)}>
+                      <Download className="h-4 w-4 mr-2" /> Export PDF
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-destructive"
                       onClick={() => deleteInvoice.mutate(inv.id)}
