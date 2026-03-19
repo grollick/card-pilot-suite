@@ -83,6 +83,9 @@ export default function AIDesignAssistantDialog({
   const handleGenerate = async () => {
     setStep("generating");
     try {
+      const templateId = getBestTemplateForProfession(businessType);
+      const template = getTemplate(templateId);
+
       const { data, error } = await supabase.functions.invoke("ai-design-assistant", {
         body: {
           business_type: businessType,
@@ -92,6 +95,16 @@ export default function AIDesignAssistantDialog({
           primary_cta: primaryCta,
           name: userName,
           company: userCompany,
+          template: template ? {
+            id: template.id,
+            name: template.name,
+            category: template.category,
+            style: template.style,
+            sections: template.sections,
+            ctaPriority: template.ctaPriority,
+            emphasis: template.emphasis,
+            preview: template.preview,
+          } : undefined,
         },
       });
       if (error) throw error;
