@@ -1,13 +1,16 @@
 import { useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { useMarketplaceListings, useMarketplaceProfessions } from "@/hooks/useMarketplace";
+import { useMarketplaceListings, useMarketplaceProfessions, useMarketplaceServices } from "@/hooks/useMarketplace";
 import { useBoostedUserIds, useTrackBoostViews } from "@/hooks/useBoosts";
 import ListingCard from "@/modules/marketplace/components/ListingCard";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, MapPin, Users, Loader2, Briefcase, Crown, Star, TrendingUp, Rocket } from "lucide-react";
+import {
+  Search, MapPin, Users, Loader2, Briefcase, Crown, Star,
+  TrendingUp, Rocket, Wrench, SlidersHorizontal, X,
+} from "lucide-react";
 
 const POPULAR_PROFESSIONS = [
   "Barber", "Plumber", "Photographer", "Realtor", "Personal Trainer",
@@ -17,14 +20,18 @@ const POPULAR_PROFESSIONS = [
 export default function DiscoverPage() {
   const { profession, city } = useParams<{ profession?: string; city?: string }>();
   const [search, setSearch] = useState("");
+  const [serviceFilter, setServiceFilter] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
 
   const { data: listings, isLoading } = useMarketplaceListings({
     profession,
     city,
     search: search.length > 1 ? search : undefined,
+    service: serviceFilter || undefined,
   });
 
   const { data: profData } = useMarketplaceProfessions();
+  const { data: topServices } = useMarketplaceServices();
   const { data: boostedUsers } = useBoostedUserIds();
 
   const boostedIds = useMemo(() => new Set(boostedUsers?.map(b => b.user_id) ?? []), [boostedUsers]);
@@ -36,7 +43,7 @@ export default function DiscoverPage() {
       return `${capitalize(displayProfession)}s in ${capitalize(displayCity)}`;
     if (displayProfession) return `${capitalize(displayProfession)}s`;
     if (displayCity) return `Businesses in ${capitalize(displayCity)}`;
-    return "Discover Local Businesses";
+    return "Find & Book Local Professionals";
   }, [displayProfession, displayCity]);
 
   const metaDescription = useMemo(() => {
@@ -57,9 +64,10 @@ export default function DiscoverPage() {
   const boostedListings = useMemo(() => listings?.filter((l) => !l.featured && boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
   const regularListings = useMemo(() => listings?.filter((l) => !l.featured && !boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
 
-  // Track boost views when boosted listings are displayed
   const boostedUserIdsArray = useMemo(() => boostedListings.map(l => l.id), [boostedListings]);
   useTrackBoostViews(boostedUserIdsArray);
+
+  const hasActiveFilters = !!serviceFilter || !!search;
 
   return (
     <div className="min-h-screen bg-background">
@@ -95,19 +103,75 @@ export default function DiscoverPage() {
             {title}
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mb-8">
-            Find and book trusted local professionals. View ratings, request quotes, and connect directly.
+            Search by profession, location, or service. View ratings, request quotes, and book instantly.
           </p>
 
-          {/* Search */}
-          <div className="relative max-w-lg">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by name, profession, or city…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-10 h-12 text-base bg-card border-border/60"
-            />
+          {/* Search bar */}
+          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name, profession, service, or city…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 h-12 text-base bg-card border-border/60"
+              />
+            </div>
+            <Button
+              variant={showFilters ? "secondary" : "outline"}
+              size="lg"
+              className="gap-2 h-12 shrink-0"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              Filters
+              {hasActiveFilters && (
+                <span className="h-5 w-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-bold">
+                  {(serviceFilter ? 1 : 0) + (search ? 1 : 0)}
+                </span>
+              )}
+            </Button>
           </div>
+
+          {/* Expanded filters */}
+          {showFilters && (
+            <div className="mt-4 p-4 rounded-xl border border-border/60 bg-card/80 backdrop-blur-sm max-w-2xl space-y-4">
+              {/* Service filter */}
+              {topServices && topServices.length > 0 && (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Wrench className="h-3.5 w-3.5 text-muted-foreground" />
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Filter by Service</span>
+                    {serviceFilter && (
+                      <button onClick={() => setServiceFilter("")} className="ml-auto text-xs text-primary hover:underline flex items-center gap-0.5">
+                        <X className="h-3 w-3" /> Clear
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {topServices.map((s) => (
+                      <Badge
+                        key={s.name}
+                        variant={serviceFilter === s.name ? "default" : "outline"}
+                        className="cursor-pointer hover:bg-primary/10 hover:border-primary/30 transition-colors text-xs"
+                        onClick={() => setServiceFilter(serviceFilter === s.name ? "" : s.name)}
+                      >
+                        {s.name}
+                        <span className="ml-1 opacity-60">({s.count})</span>
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Clear all */}
+              {hasActiveFilters && (
+                <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={() => { setSearch(""); setServiceFilter(""); }}>
+                  <X className="h-3 w-3" /> Clear all filters
+                </Button>
+              )}
+            </div>
+          )}
 
           {/* Stats bar */}
           {!isLoading && listings && (
@@ -130,7 +194,7 @@ export default function DiscoverPage() {
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Profession pills */}
-        {!profession && !city && (
+        {!profession && !city && !search && !serviceFilter && (
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-3">
               <Briefcase className="h-4 w-4 text-muted-foreground" />
@@ -175,7 +239,7 @@ export default function DiscoverPage() {
         )}
 
         {/* Featured section */}
-        {featuredListings.length > 0 && !search && (
+        {featuredListings.length > 0 && !search && !serviceFilter && (
           <div className="mb-10">
             <div className="flex items-center gap-2 mb-4">
               <Crown className="h-4 w-4 text-primary" />
@@ -190,7 +254,7 @@ export default function DiscoverPage() {
         )}
 
         {/* Boosted section */}
-        {boostedListings.length > 0 && !search && (
+        {boostedListings.length > 0 && !search && !serviceFilter && (
           <div className="mb-10">
             <div className="flex items-center gap-2 mb-4">
               <Rocket className="h-4 w-4 text-accent" />
@@ -212,6 +276,18 @@ export default function DiscoverPage() {
               {isLoading ? "Loading…" : `${regularListings.length} businesses`}
             </span>
           </div>
+          {hasActiveFilters && (
+            <div className="flex items-center gap-2">
+              {serviceFilter && (
+                <Badge variant="secondary" className="gap-1 text-xs">
+                  <Wrench className="h-3 w-3" /> {serviceFilter}
+                  <button onClick={() => setServiceFilter("")}>
+                    <X className="h-3 w-3 ml-0.5" />
+                  </button>
+                </Badge>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Grid */}
@@ -225,16 +301,23 @@ export default function DiscoverPage() {
               <ListingCard key={l.id} listing={l} />
             ))}
           </div>
-        ) : featuredListings.length === 0 ? (
+        ) : featuredListings.length === 0 && boostedListings.length === 0 ? (
           <div className="text-center py-20">
             <Users className="h-10 w-10 mx-auto text-muted-foreground/40 mb-4" />
             <h3 className="text-lg font-semibold text-foreground mb-1">No businesses found</h3>
             <p className="text-muted-foreground mb-6">
-              {search ? "Try a different search term." : "No listings match this filter yet."}
+              {search || serviceFilter ? "Try different search terms or filters." : "No listings match this filter yet."}
             </p>
-            <Button asChild variant="outline">
-              <Link to="/discover">Browse all</Link>
-            </Button>
+            <div className="flex gap-2 justify-center">
+              {hasActiveFilters && (
+                <Button variant="outline" onClick={() => { setSearch(""); setServiceFilter(""); }}>
+                  Clear filters
+                </Button>
+              )}
+              <Button asChild variant="outline">
+                <Link to="/discover">Browse all</Link>
+              </Button>
+            </div>
           </div>
         ) : null}
 
