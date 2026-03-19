@@ -17,6 +17,7 @@ import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useIsAdmin } from "@/hooks/useAdminStats";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import {
@@ -91,15 +92,18 @@ const moreItems = [
   { title: "Agency", url: "/app/agency", icon: Building2 },
 ];
 
-const settingsItems = [
+const settingsItemsBase = [
   { title: "Help Center", url: "/app/help", icon: HelpCircle },
   { title: "Settings", url: "/app/settings", icon: Settings },
   { title: "Team", url: "/app/team", icon: Building2 },
+  { title: "Landing Pages", url: "/app/landing-pages", icon: Globe },
+  { title: "Sales Pipeline", url: "/app/sales-crm", icon: Kanban },
+];
+
+const adminOnlyItems = [
   { title: "Admin", url: "/app/admin", icon: Shield },
   { title: "Platform Admin", url: "/app/platform-admin", icon: Shield },
   { title: "Admin Marketing", url: "/app/admin-marketing", icon: Megaphone },
-  { title: "Landing Pages", url: "/app/landing-pages", icon: Globe },
-  { title: "Sales Pipeline", url: "/app/sales-crm", icon: Kanban },
 ];
 
 type NavItem = { title: string; url: string; icon: any; end?: boolean };
@@ -110,6 +114,7 @@ export function AppSidebar() {
   const location = useLocation();
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
+  const { data: isAdmin } = useIsAdmin();
 
   const { data: profile } = useQuery({
     queryKey: ["profile-handle"],
@@ -281,7 +286,7 @@ export function AppSidebar() {
       <SidebarFooter className="px-2 pb-3">
         {!collapsed && <Separator className="mx-2 mb-2 w-auto opacity-50" />}
         <SidebarMenu>
-          {settingsItems.map(renderItem)}
+          {[...settingsItemsBase, ...(isAdmin ? adminOnlyItems : [])].map(renderItem)}
         </SidebarMenu>
 
         {/* User section */}

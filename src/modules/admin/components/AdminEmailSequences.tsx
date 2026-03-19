@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { Play, Pause, Plus, Trash2, ChevronRight, Mail, Clock, Zap, UserPlus, Eye, Settings2, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -91,7 +91,7 @@ const PRESET_SEQUENCES = [
   },
 ];
 
-export default function AdminEmailSequences() {
+const AdminEmailSequences = forwardRef<HTMLDivElement>(function AdminEmailSequences(_props, ref) {
   const { data: sequences = [], isLoading } = useEmailSequences();
   const createSeq = useCreateSequence();
   const updateSeq = useUpdateSequence();
@@ -227,7 +227,9 @@ export default function AdminEmailSequences() {
       ) : null}
     </div>
   );
-}
+});
+
+export default AdminEmailSequences;
 
 // ── Sequence Detail View ──
 function SequenceDetail({ sequenceId, onBack, preset }: { sequenceId: string; onBack: () => void; preset?: typeof PRESET_SEQUENCES[number] }) {
