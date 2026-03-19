@@ -436,6 +436,10 @@ export default function CardBuilder() {
               <span className="text-xs text-muted-foreground">Social icons only</span>
               <Switch checked={s.socialIconsOnly} onCheckedChange={(v) => { s.setSocialIconsOnly(v); s.saveThemeField({ social_icons_only: v }); }} className="scale-75" />
             </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">Scan to Save</span>
+              <Switch checked={(s.card?.theme_json as any)?.scan_to_save === true} onCheckedChange={(v) => { s.saveThemeField({ scan_to_save: v }); }} className="scale-75" />
+            </div>
           </div>
         </div>
 
