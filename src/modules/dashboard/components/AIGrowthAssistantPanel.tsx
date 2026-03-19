@@ -214,11 +214,7 @@ export default function AIGrowthAssistantPanel() {
             <div className="space-y-2">
               <AnimatePresence initial={false}>
                 {visibleInsights.map((insight, i) => {
-                  const insightType: InsightType =
-                    insight.type === "warning" ? "problem" :
-                    insight.type === "tip" ? "opportunity" :
-                    insight.type === "info" ? "positive" :
-                    (insight.type as InsightType) || "opportunity";
+                  const insightType = insight.type || "opportunity";
 
                   const config = typeConfig[insightType] ?? typeConfig.opportunity;
                   const Icon = config.icon;
