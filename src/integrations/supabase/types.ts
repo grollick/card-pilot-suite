@@ -2280,6 +2280,45 @@ export type Database = {
           },
         ]
       }
+      landing_page_content: {
+        Row: {
+          created_at: string
+          id: string
+          is_published: boolean
+          page_description: string | null
+          page_key: string
+          page_title: string
+          sections_json: Json
+          settings_json: Json
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          page_description?: string | null
+          page_key: string
+          page_title?: string
+          sections_json?: Json
+          settings_json?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_published?: boolean
+          page_description?: string | null
+          page_key?: string
+          page_title?: string
+          sections_json?: Json
+          settings_json?: Json
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       lead_routing_log: {
         Row: {
           converted_at: string | null
