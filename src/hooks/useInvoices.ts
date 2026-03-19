@@ -93,11 +93,12 @@ export function useCreateInvoice() {
       line_items?: Array<{ title: string; description?: string; quantity: number; unit_price: number; line_total: number }>;
     }) => {
       const { line_items, ...invoiceData } = invoice;
+      const invNumber = invoiceData.invoice_number || generateInvoiceNumber();
       const { data, error } = await supabase
         .from("invoices")
         .insert({
           ...invoiceData,
-          invoice_number: invoiceData.invoice_number || generateInvoiceNumber(),
+          invoice_number: invNumber,
           user_id: user!.id,
           status: "draft" as any,
         })
@@ -120,10 +121,22 @@ export function useCreateInvoice() {
         if (liError) throw liError;
       }
 
+      // Log CRM activity
+      if (invoice.lead_id) {
+        await supabase.from("contact_activities").insert({
+          lead_id: invoice.lead_id,
+          user_id: user!.id,
+          activity_type: "invoice_created",
+          title: `Invoice ${invNumber} created`,
+          related_id: (data as any).id,
+        });
+      }
+
       return data;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["invoices"] });
+      qc.invalidateQueries({ queryKey: ["contact-activities"] });
       toast.success("Invoice created");
     },
     onError: (e: any) => toast.error(e.message),
