@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import { useNavigate } from "react-router-dom";
 import {
   Plus, Loader2, FileText, Send, Eye, CheckCircle, AlertTriangle,
@@ -84,6 +85,7 @@ export default function InvoicesPage() {
 
   return (
     <div className="space-y-5">
+      <DesktopGuidanceNotice toolKey="invoice-builder" />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}

@@ -1,4 +1,5 @@
 import { Eye, MousePointer, Users, TrendingUp, Mail, BarChart3, Calendar, Globe, Smartphone, Monitor, Tablet, Download, Clock, RefreshCw, ArrowDown } from "lucide-react";
+import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import KPICard from "@/components/KPICard";
 import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -35,6 +36,7 @@ export default function Analytics() {
 
   return (
     <div className="space-y-8 max-w-6xl">
+      <DesktopGuidanceNotice toolKey="analytics" />
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Analytics</h1>

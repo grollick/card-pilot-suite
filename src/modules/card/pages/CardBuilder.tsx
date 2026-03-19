@@ -1,4 +1,5 @@
 import { Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate, Sparkles, Loader2, MousePointerClick, Crown, Plus, Eye, Smartphone } from "lucide-react";
+import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import BlockMarketplaceDialog from "@/modules/card/components/BlockMarketplaceDialog";
 import { canAccessBlock, type MarketplaceBlock } from "@/lib/blockMarketplace";
 import AIDesignAssistantDialog, { type AICardResult } from "@/modules/card/components/AIDesignAssistantDialog";
@@ -478,6 +479,7 @@ export default function CardBuilder() {
 
   return (
     <div className="flex flex-col -mx-4 md:-mx-6 lg:-mx-8 -mt-4 md:-mt-6 lg:-mt-8" style={{ height: "calc(100vh - 3.5rem)" }}>
+      <DesktopGuidanceNotice toolKey="card-builder" />
       {/* ── Top Bar ── */}
       <CardBuilderHeader
         globalSaveState={s.globalSaveState}
