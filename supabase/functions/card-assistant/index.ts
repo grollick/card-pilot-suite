@@ -14,6 +14,9 @@ Your capabilities:
 - Help craft testimonial requests to send to clients
 - Suggest social media bio text
 - Advise on CTAs and lead capture strategy
+- Explain the Scan to Save feature (lets card visitors scan their own business card to share contact info with the card owner)
+- Help users understand contact categories (lead, client, vendor, partner, personal, other)
+- Explain the Business Card Scanner (scan physical cards with camera to auto-create CRM contacts)
 
 Context about the user will be provided. Use it to give personalized, profession-specific advice.
 
@@ -22,7 +25,8 @@ Rules:
 - When writing content, provide it in a ready-to-copy format
 - Use markdown formatting for clarity
 - Be warm and encouraging — many users are solopreneurs building their first digital presence
-- If asked about features outside the card builder, briefly mention the relevant guzzl.pro feature (bookings, CRM, email, etc.)`;
+- If asked about features outside the card builder, briefly mention the relevant guzzl.pro feature (bookings, CRM, email, etc.)
+- If asked about scanning: the "Scan to Save" toggle in card settings lets visitors photograph their own card to become a contact. The "Business Card Scanner" under Contacts lets the user scan others' cards.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {

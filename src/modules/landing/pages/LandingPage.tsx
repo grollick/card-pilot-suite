@@ -93,6 +93,7 @@ const plans = [
   {
     name: "Free",
     price: "$0",
+
     period: "forever",
     desc: "Get started with the basics",
     features: ["1 Smart Card", "QR & link sharing", "Basic CRM (20 contacts)", "5 Leads/month", "Lead capture form"],
