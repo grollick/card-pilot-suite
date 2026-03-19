@@ -120,6 +120,9 @@ export default function MarketplacePerformancePage() {
         <KPI icon={DollarSign} label="Revenue" value={`$${d.totalRevenue.toLocaleString()}`} />
       </div>
 
+      {/* Lead Routing Stats */}
+      <LeadRoutingStatsSection />
+
       {/* Chart */}
       <Card>
         <CardHeader>
