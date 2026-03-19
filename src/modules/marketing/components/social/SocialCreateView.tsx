@@ -81,6 +81,15 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
     } else { resetForm(); }
   }, [editPost, resetForm]);
 
+  useEffect(() => {
+    if (pendingContent) {
+      setContent(pendingContent.content);
+      if (pendingContent.hashtags.length > 0) setHashtags(pendingContent.hashtags.join(", "));
+      if (pendingContent.imageUrl) setImageUrl(pendingContent.imageUrl);
+      onPendingConsumed?.();
+    }
+  }, [pendingContent, onPendingConsumed]);
+
   const togglePlatform = (p: string) => setSelectedPlatforms(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
 
   const getContentForPlatform = (platform: string) => platformOverrides[platform]?.content || content;

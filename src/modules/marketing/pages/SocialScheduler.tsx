@@ -66,6 +66,8 @@ export default function SocialScheduler() {
           <SocialCreateView
             editPost={editPost}
             onDone={() => setEditPost(null)}
+            pendingContent={pendingContent}
+            onPendingConsumed={() => setPendingContent(null)}
           />
         )}
         {activeTab === "calendar" && (
