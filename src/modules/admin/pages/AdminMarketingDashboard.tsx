@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Megaphone, Mail, FileText, BookOpen, BarChart3, Users, UserCheck, Target, Send, Workflow } from "lucide-react";
+import { Megaphone, Mail, FileText, BookOpen, BarChart3, Users, UserCheck, Target, Send, Workflow, ShieldAlert, Loader2 } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useAdminStats } from "@/hooks/useAdminStats";
+import { useAdminStats, useIsAdmin } from "@/hooks/useAdminStats";
 import AdminCampaignBuilder from "@/modules/admin/components/AdminCampaignBuilder";
 import AdminEmailTemplates from "@/modules/admin/components/AdminEmailTemplates";
 import AdminSuccessPlaybooks from "@/modules/admin/components/AdminSuccessPlaybooks";
@@ -11,8 +11,27 @@ import AdminMarketingAnalytics from "@/modules/admin/components/AdminMarketingAn
 import AdminEmailSequences from "@/modules/admin/components/AdminEmailSequences";
 
 export default function AdminMarketingDashboard() {
+  const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
   const { data: stats, isLoading } = useAdminStats();
   const [activeTab, setActiveTab] = useState("overview");
+
+  if (adminLoading) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-[400px] flex flex-col items-center justify-center gap-3">
+        <ShieldAlert className="h-10 w-10 text-destructive" />
+        <h2 className="text-lg font-semibold">Access Denied</h2>
+        <p className="text-sm text-muted-foreground">You don't have permission to view this page.</p>
+      </div>
+    );
+  }
 
   const activeUsers = stats ? Math.round((stats.signups30d / Math.max(stats.totalUsers, 1)) * stats.totalUsers * 0.4) : 0;
 
