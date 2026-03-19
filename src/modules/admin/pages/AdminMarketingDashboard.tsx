@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Megaphone, Mail, FileText, BookOpen, BarChart3, Users, UserCheck, Target, Send } from "lucide-react";
+import { Megaphone, Mail, FileText, BookOpen, BarChart3, Users, UserCheck, Target, Send, Workflow } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import AdminCampaignBuilder from "@/modules/admin/components/AdminCampaignBuilde
 import AdminEmailTemplates from "@/modules/admin/components/AdminEmailTemplates";
 import AdminSuccessPlaybooks from "@/modules/admin/components/AdminSuccessPlaybooks";
 import AdminMarketingAnalytics from "@/modules/admin/components/AdminMarketingAnalytics";
+import AdminEmailSequences from "@/modules/admin/components/AdminEmailSequences";
 
 export default function AdminMarketingDashboard() {
   const { data: stats, isLoading } = useAdminStats();
@@ -31,8 +32,10 @@ export default function AdminMarketingDashboard() {
         <TabsList className="flex-wrap h-auto gap-1">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
+          <TabsTrigger value="sequences">Sequences</TabsTrigger>
           <TabsTrigger value="templates">Templates</TabsTrigger>
           <TabsTrigger value="playbooks">Playbooks</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
@@ -65,7 +68,7 @@ export default function AdminMarketingDashboard() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="cursor-pointer hover:shadow-card transition-shadow" onClick={() => setActiveTab("campaigns")}>
               <CardHeader className="pb-2">
                 <Send className="h-8 w-8 text-primary mb-2" />
@@ -87,11 +90,22 @@ export default function AdminMarketingDashboard() {
                 <CardDescription>Profession-specific success guides</CardDescription>
               </CardHeader>
             </Card>
+            <Card className="cursor-pointer hover:shadow-card transition-shadow" onClick={() => setActiveTab("sequences")}>
+              <CardHeader className="pb-2">
+                <Workflow className="h-8 w-8 text-primary mb-2" />
+                <CardTitle className="text-base">Email Sequences</CardTitle>
+                <CardDescription>Automated onboarding & engagement flows</CardDescription>
+              </CardHeader>
+            </Card>
           </div>
         </TabsContent>
 
         <TabsContent value="campaigns" className="mt-4">
           <AdminCampaignBuilder stats={stats} />
+        </TabsContent>
+
+        <TabsContent value="sequences" className="mt-4">
+          <AdminEmailSequences />
         </TabsContent>
 
         <TabsContent value="templates" className="mt-4">

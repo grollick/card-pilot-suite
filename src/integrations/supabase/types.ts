@@ -1173,6 +1173,184 @@ export type Database = {
           },
         ]
       }
+      email_sequence_enrollments: {
+        Row: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          completed_at: string | null
+          created_at: string
+          current_step: number
+          enrolled_at: string
+          id: string
+          last_email_at: string | null
+          sequence_id: string
+          status: Database["public"]["Enums"]["enrollment_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          current_step?: number
+          enrolled_at?: string
+          id?: string
+          last_email_at?: string | null
+          sequence_id: string
+          status?: Database["public"]["Enums"]["enrollment_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string
+          current_step?: number
+          enrolled_at?: string
+          id?: string
+          last_email_at?: string | null
+          sequence_id?: string
+          status?: Database["public"]["Enums"]["enrollment_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_sequence_enrollments_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "email_sequences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_sequence_events: {
+        Row: {
+          created_at: string
+          enrollment_id: string
+          event_type: string
+          id: string
+          meta_data: Json | null
+          step_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          enrollment_id: string
+          event_type: string
+          id?: string
+          meta_data?: Json | null
+          step_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          enrollment_id?: string
+          event_type?: string
+          id?: string
+          meta_data?: Json | null
+          step_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_sequence_events_enrollment_id_fkey"
+            columns: ["enrollment_id"]
+            isOneToOne: false
+            referencedRelation: "email_sequence_enrollments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_sequence_events_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "email_sequence_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_sequence_steps: {
+        Row: {
+          body: string
+          created_at: string
+          delay_hours: number
+          enabled: boolean
+          id: string
+          sequence_id: string
+          step_number: number
+          stop_conditions: Json
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          delay_hours?: number
+          enabled?: boolean
+          id?: string
+          sequence_id: string
+          step_number?: number
+          stop_conditions?: Json
+          subject: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          delay_hours?: number
+          enabled?: boolean
+          id?: string
+          sequence_id?: string
+          step_number?: number
+          stop_conditions?: Json
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_sequence_steps_sequence_id_fkey"
+            columns: ["sequence_id"]
+            isOneToOne: false
+            referencedRelation: "email_sequences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_sequences: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          max_emails_per_day: number
+          name: string
+          status: Database["public"]["Enums"]["sequence_status"]
+          trigger_config: Json
+          trigger_type: Database["public"]["Enums"]["sequence_trigger"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          max_emails_per_day?: number
+          name: string
+          status?: Database["public"]["Enums"]["sequence_status"]
+          trigger_config?: Json
+          trigger_type?: Database["public"]["Enums"]["sequence_trigger"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          max_emails_per_day?: number
+          name?: string
+          status?: Database["public"]["Enums"]["sequence_status"]
+          trigger_config?: Json
+          trigger_type?: Database["public"]["Enums"]["sequence_trigger"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_templates: {
         Row: {
           body: string
@@ -4124,6 +4302,7 @@ export type Database = {
         | "partner"
         | "personal"
         | "other"
+      enrollment_status: "active" | "completed" | "cancelled" | "paused"
       estimate_status:
         | "draft"
         | "sent"
@@ -4174,6 +4353,14 @@ export type Database = {
         | "got_first_lead"
         | "paid"
         | "upsell"
+      sequence_status: "active" | "paused" | "draft"
+      sequence_trigger:
+        | "signup"
+        | "incomplete_profile"
+        | "inactivity"
+        | "lead_activity"
+        | "beta_expiry"
+        | "manual"
       social_post_status: "draft" | "scheduled" | "published" | "failed"
       system_event_severity: "info" | "warning" | "error" | "critical"
     }
@@ -4341,6 +4528,7 @@ export const Constants = {
         "personal",
         "other",
       ],
+      enrollment_status: ["active", "completed", "cancelled", "paused"],
       estimate_status: [
         "draft",
         "sent",
@@ -4396,6 +4584,15 @@ export const Constants = {
         "got_first_lead",
         "paid",
         "upsell",
+      ],
+      sequence_status: ["active", "paused", "draft"],
+      sequence_trigger: [
+        "signup",
+        "incomplete_profile",
+        "inactivity",
+        "lead_activity",
+        "beta_expiry",
+        "manual",
       ],
       social_post_status: ["draft", "scheduled", "published", "failed"],
       system_event_severity: ["info", "warning", "error", "critical"],
