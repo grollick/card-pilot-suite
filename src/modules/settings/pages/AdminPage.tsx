@@ -89,6 +89,9 @@ export default function AdminPage() {
         <TabsContent value="roadmap" className="mt-4">
           <RoadmapBoard />
         </TabsContent>
+        <TabsContent value="growth" className="mt-4">
+          <AdminGrowthDashboard />
+        </TabsContent>
       </Tabs>
     </div>
   );
