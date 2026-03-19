@@ -68,7 +68,7 @@ export default function AdminMarketingDashboard() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card className="cursor-pointer hover:shadow-card transition-shadow" onClick={() => setActiveTab("campaigns")}>
               <CardHeader className="pb-2">
                 <Send className="h-8 w-8 text-primary mb-2" />
