@@ -11,6 +11,9 @@ import {
   INVOICE_STATUS_LABELS, INVOICE_STATUS_COLORS, type InvoiceStatus,
 } from "@/hooks/useInvoices";
 import { format } from "date-fns";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import { exportInvoicePDF } from "@/lib/invoicePdf";
+import { supabase } from "@/integrations/supabase/client";
 
 const STATUS_TABS: Array<{ value: string; label: string; icon: any }> = [
   { value: "all", label: "All", icon: FileText },
