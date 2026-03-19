@@ -17,6 +17,10 @@ export interface MarketplaceListing {
   review_count: number;
   services: { name: string; price: number | null }[];
   updated_at: string;
+  available_for_work: boolean;
+  avg_response_minutes: number | null;
+  profile_completeness: number;
+  conversion_score: number;
 }
 
 interface MarketplaceFilters {
@@ -24,6 +28,19 @@ interface MarketplaceFilters {
   city?: string;
   search?: string;
   service?: string;
+  intent?: "quote" | "book" | "available_now";
+}
+
+function calcProfileCompleteness(p: any): number {
+  let score = 0;
+  if (p.name) score += 15;
+  if (p.avatar_url) score += 20;
+  if (p.bio) score += 15;
+  if (p.company) score += 10;
+  if (p.city) score += 10;
+  if (p.service_area) score += 10;
+  if (p.professions?.name) score += 10;
+  return Math.min(score, 100);
 }
 
 export function useMarketplaceListings(filters: MarketplaceFilters) {
@@ -33,7 +50,7 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
     queryFn: async (): Promise<MarketplaceListing[]> => {
       const query = supabase
         .from("profiles")
-        .select("id, name, handle, avatar_url, company, city, bio, service_area, featured, featured_until, marketplace_enabled, updated_at, professions(name, category)" as any)
+        .select("id, name, handle, avatar_url, company, city, bio, service_area, featured, featured_until, marketplace_enabled, updated_at, available_for_work, avg_response_minutes, professions(name, category)" as any)
         .not("handle", "is", null)
         .not("name", "is", null)
         .order("name");
@@ -45,8 +62,8 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
       const userIds = enabledProfiles.map((p: any) => p.id);
       if (userIds.length === 0) return [];
 
-      // Fetch ratings & services in parallel
-      const [ratingsResult, servicesResult] = await Promise.all([
+      // Fetch ratings, services & lead counts in parallel
+      const [ratingsResult, servicesResult, leadsResult] = await Promise.all([
         supabase
           .from("reviews")
           .select("user_id, rating")
@@ -56,6 +73,10 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
           .from("booking_services")
           .select("user_id, name, price")
           .eq("active", true)
+          .in("user_id", userIds),
+        supabase
+          .from("marketplace_lead_credits")
+          .select("user_id")
           .in("user_id", userIds),
       ]);
 
@@ -82,10 +103,29 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         });
       }
 
+      // Build lead counts for conversion scoring
+      const leadCounts: Record<string, number> = {};
+      if (leadsResult.data) {
+        leadsResult.data.forEach((l: any) => {
+          leadCounts[l.user_id] = (leadCounts[l.user_id] ?? 0) + 1;
+        });
+      }
+
       const now = new Date();
       let listings: MarketplaceListing[] = enabledProfiles.map((p: any) => {
         const featuredUntil = p.featured_until ? new Date(p.featured_until) : null;
         const isFeatured = p.featured || (featuredUntil && featuredUntil > now);
+        const reviewData = ratingsMap[p.id];
+        const services = servicesMap[p.id] ?? [];
+        const completeness = calcProfileCompleteness(p);
+        const leads = leadCounts[p.id] ?? 0;
+        // Conversion score: higher if they have reviews + respond fast + have leads
+        const conversionScore =
+          (reviewData ? reviewData.avg * reviewData.count : 0) * 2 +
+          (p.avg_response_minutes && p.avg_response_minutes < 60 ? 30 : p.avg_response_minutes && p.avg_response_minutes < 240 ? 15 : 0) +
+          Math.min(leads * 5, 50) +
+          completeness * 0.3;
+
         return {
           id: p.id,
           name: p.name,
@@ -98,12 +138,24 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
           profession_category: p.professions?.category ?? null,
           service_area: p.service_area ?? null,
           featured: isFeatured ?? false,
-          avg_rating: ratingsMap[p.id]?.avg ?? null,
-          review_count: ratingsMap[p.id]?.count ?? 0,
-          services: servicesMap[p.id] ?? [],
+          avg_rating: reviewData?.avg ?? null,
+          review_count: reviewData?.count ?? 0,
+          services,
           updated_at: p.updated_at,
+          available_for_work: p.available_for_work ?? true,
+          avg_response_minutes: p.avg_response_minutes ?? null,
+          profile_completeness: completeness,
+          conversion_score: conversionScore,
         };
       });
+
+      // Intent filters
+      if (filters.intent === "available_now") {
+        listings = listings.filter((l) => l.available_for_work);
+      }
+      if (filters.intent === "book") {
+        listings = listings.filter((l) => l.services.length > 0);
+      }
 
       // Filter by profession
       if (filters.profession) {
@@ -133,7 +185,7 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         );
       }
 
-      // Full-text search (includes services)
+      // Full-text search
       if (filters.search) {
         const s = filters.search.toLowerCase();
         listings = listings.filter(
@@ -147,10 +199,14 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         );
       }
 
-      // Ranking: featured → high-rated → active → name
+      // Smart ranking: featured → conversion_score → rating → activity → name
       const nowMs = Date.now();
       listings.sort((a, b) => {
         if (a.featured !== b.featured) return a.featured ? -1 : 1;
+        // Available for work gets a slight boost
+        if (a.available_for_work !== b.available_for_work) return a.available_for_work ? -1 : 1;
+        // Conversion score (composite)
+        if (b.conversion_score !== a.conversion_score) return b.conversion_score - a.conversion_score;
         const ratingA = a.avg_rating ?? 0;
         const ratingB = b.avg_rating ?? 0;
         if (ratingB !== ratingA) return ratingB - ratingA;
@@ -177,7 +233,6 @@ export function useMarketplaceServices() {
         .eq("active", true);
       if (error) throw error;
 
-      // Deduplicate service names and count providers
       const serviceMap = new Map<string, number>();
       (data ?? []).forEach((s: any) => {
         const key = s.name.trim();

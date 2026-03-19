@@ -2210,7 +2210,9 @@ export type Database = {
       }
       profiles: {
         Row: {
+          available_for_work: boolean
           avatar_url: string | null
+          avg_response_minutes: number | null
           bio: string | null
           city: string | null
           company: string | null
@@ -2241,7 +2243,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          available_for_work?: boolean
           avatar_url?: string | null
+          avg_response_minutes?: number | null
           bio?: string | null
           city?: string | null
           company?: string | null
@@ -2272,7 +2276,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          available_for_work?: boolean
           avatar_url?: string | null
+          avg_response_minutes?: number | null
           bio?: string | null
           city?: string | null
           company?: string | null
