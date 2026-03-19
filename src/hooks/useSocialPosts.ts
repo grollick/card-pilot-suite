@@ -9,8 +9,8 @@ export interface SocialPost {
   content: string;
   platforms_json: string[];
   scheduled_at: string | null;
-  status: string;               // "draft" | "scheduled" | "published" | "failed"
-  approval_status: string;      // unified status: idea | draft | pending_approval | approved | queued | scheduled | publishing | published | failed | archived
+  status: string;
+  approval_status: string;
   media_urls: string[] | null;
   created_at: string;
   updated_at: string;
@@ -20,6 +20,14 @@ export interface SocialPost {
   content_label: string | null;
   platform_overrides: Record<string, { content?: string; hashtags?: string[]; media_urls?: string[] }>;
   queue_position: number | null;
+  // Performance tracking
+  clicks: number;
+  link_clicks: number;
+  leads_generated: number;
+  bookings_generated: number;
+  engagement_score: number;
+  content_type: string | null;
+  performance_notes: string | null;
 }
 
 const POST_KEY = ["social-posts"] as const;
