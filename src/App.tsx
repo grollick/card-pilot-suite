@@ -196,6 +196,8 @@ const App = () => (
             <Route path="/discover" element={<DiscoverPage />} />
             <Route path="/discover/:profession" element={<DiscoverPage />} />
             <Route path="/discover/:profession/:city" element={<DiscoverPage />} />
+            <Route path="/request-service" element={<RequestServicePage />} />
+            <Route path="/request-status/:token" element={<LazyRoute><RequestStatusPage /></LazyRoute>} />
             <Route path="/project/:projectId" element={<LazyRoute><PublicProjectPage /></LazyRoute>} />
             <Route path="/portal/:token" element={<LazyRoute><ClientPortal /></LazyRoute>} />
             <Route path="/pay/:token" element={<LazyRoute><PublicInvoicePage /></LazyRoute>} />
