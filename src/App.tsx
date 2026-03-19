@@ -214,6 +214,7 @@ const App = () => (
             <Route path="/project/:projectId" element={<LazyRoute><PublicProjectPage /></LazyRoute>} />
             <Route path="/portal/:token" element={<LazyRoute><ClientPortal /></LazyRoute>} />
             <Route path="/pay/:token" element={<LazyRoute><PublicInvoicePage /></LazyRoute>} />
+            <Route path="/ref/:code" element={<ReferralRedirect />} />
 
             {/* Client Portal v2 — authenticated */}
             <Route path="/client/auth" element={<LazyRoute><ClientAuthPage /></LazyRoute>} />
