@@ -8,6 +8,7 @@ import BetaManagementTab from "@/modules/settings/components/BetaManagementTab";
 import AdminFeedbackTab from "@/modules/settings/components/AdminFeedbackTab";
 import BugPriorityDashboard from "@/modules/settings/components/BugPriorityDashboard";
 import RoadmapBoard from "@/modules/settings/components/RoadmapBoard";
+import AdminGrowthDashboard from "@/modules/settings/components/AdminGrowthDashboard";
 export default function AdminPage() {
   const byCategory = getProfessionsByCategory();
 
