@@ -40,7 +40,7 @@ export default function MarketplaceAwarenessWidget() {
     },
   });
 
-  const isListed = profile?.marketplace_visible === true;
+  const isListed = profile?.marketplace_enabled === true;
   const isOnDuty = duty?.is_on_duty === true;
   const leadsReceived = duty?.leads_received || 0;
 

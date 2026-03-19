@@ -62,7 +62,7 @@ export default function ProjectProgressWidget({ leadIds }: Props) {
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium truncate">{job.title || "Job"}</p>
                 <span className="text-2xs text-muted-foreground">
-                  {job.scheduled_date ? format(new Date(job.scheduled_date), "MMM d") : ""}
+                  {job.scheduled_start ? format(new Date(job.scheduled_start), "MMM d") : ""}
                 </span>
               </div>
 
