@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Save, Send, CheckCircle, Loader2, Plus, Trash2,
-  Download, Copy, GripVertical, FileText,
+  Download, Copy, GripVertical, FileText, Link2, DollarSign, CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,12 +16,15 @@ import {
   useInvoice, useInvoiceLineItems, useUpdateInvoice, useUpdateInvoiceStatus,
   useSaveInvoiceLineItems, useCreateInvoice, type InvoiceStatus,
 } from "@/hooks/useInvoices";
+import { useInvoicePayments, useRecordPayment, useInvoicePaymentLink } from "@/hooks/useInvoicePayments";
 import { useContacts } from "@/hooks/useContacts";
 import { useJobs } from "@/hooks/useJobs";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
 import { exportInvoicePDF } from "@/lib/invoicePdf";
 import DocumentStatusBadge from "@/components/DocumentStatusBadge";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import { format } from "date-fns";
 
 interface LineItem {
   title: string;
