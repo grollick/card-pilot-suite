@@ -3,7 +3,9 @@ import {
   Users, UserCheck, Zap, Briefcase, BarChart3, TrendingUp,
   Plus, Send, Eye, Activity, Target, CheckCircle2,
   MessageSquare, Trash2, ChevronRight, Lightbulb, Rocket,
-  Mail, Globe, UserPlus, Settings, BarChart, Megaphone
+  Mail, Globe, UserPlus, Settings, BarChart, Megaphone,
+  AlertTriangle, DollarSign, Calendar, Star, ArrowUpRight,
+  Clock, Trophy, Flame, Heart, RefreshCw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { useAdminGrowthStats, useOutreachContacts } from "@/hooks/useAdminGrowthStats";
 import { useNavigate } from "react-router-dom";
@@ -62,8 +65,7 @@ function FunnelView({ funnel, isLoading }: { funnel: any; isLoading: boolean }) 
     prev === 0 ? "—" : `${Math.round((curr / prev) * 100)}%`;
 
   return (
-    <div
-      className="rounded-xl border border-border bg-card p-5">
+    <div className="rounded-xl border border-border bg-card p-5">
       <h3 className="font-semibold mb-4 flex items-center gap-2">
         <TrendingUp className="h-4 w-4 text-primary" /> Conversion Funnel (30d)
       </h3>
@@ -94,6 +96,295 @@ function FunnelView({ funnel, isLoading }: { funnel: any; isLoading: boolean }) 
   );
 }
 
+// ─── Weekly Growth Goals ───
+function WeeklyGoals({ kpis, contacts }: { kpis: any; contacts: any[] }) {
+  const goals = [
+    {
+      label: "New signups",
+      current: kpis?.newUsers7d ?? 0,
+      target: 10,
+      icon: Users,
+    },
+    {
+      label: "Outreach contacts made",
+      current: (contacts || []).filter(c => c.status !== "not_contacted").length,
+      target: 20,
+      icon: Send,
+    },
+    {
+      label: "Activation rate",
+      current: kpis?.totalUsers > 0 ? Math.round(((kpis?.activatedUsers ?? 0) / (kpis?.totalUsers || 1)) * 100) : 0,
+      target: 40,
+      icon: Flame,
+      suffix: "%",
+    },
+    {
+      label: "Job requests",
+      current: kpis?.jobRequests30d ?? 0,
+      target: 15,
+      icon: Briefcase,
+    },
+  ];
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <h3 className="font-semibold mb-4 flex items-center gap-2">
+        <Trophy className="h-4 w-4 text-warning" /> Weekly Growth Goals
+      </h3>
+      <div className="space-y-4">
+        {goals.map(g => {
+          const pct = Math.min(Math.round((g.current / g.target) * 100), 100);
+          const hit = pct >= 100;
+          return (
+            <div key={g.label} className="space-y-1.5">
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2">
+                  <g.icon className="h-3.5 w-3.5 text-muted-foreground" />
+                  {g.label}
+                </span>
+                <span className={`text-xs font-bold tabular-nums ${hit ? "text-success" : ""}`}>
+                  {g.current}{g.suffix || ""} / {g.target}{g.suffix || ""}
+                </span>
+              </div>
+              <Progress value={pct} className="h-2" />
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Churn Risk Alerts ───
+function ChurnRiskAlerts({ kpis, funnel }: { kpis: any; funnel: any }) {
+  const alerts: { level: "critical" | "warning" | "info"; message: string; action: string }[] = [];
+
+  const activationRate = kpis?.totalUsers > 0
+    ? ((kpis?.activatedUsers ?? 0) / (kpis?.totalUsers || 1)) * 100
+    : 0;
+
+  if (activationRate < 20) {
+    alerts.push({
+      level: "critical",
+      message: `Only ${Math.round(activationRate)}% of users have activated. Most signups are going cold.`,
+      action: "Send activation reminder emails",
+    });
+  } else if (activationRate < 40) {
+    alerts.push({
+      level: "warning",
+      message: `Activation rate is ${Math.round(activationRate)}%. Room for improvement.`,
+      action: "Review onboarding flow for friction",
+    });
+  }
+
+  if ((kpis?.responseRate ?? 0) < 30) {
+    alerts.push({
+      level: "critical",
+      message: "Response rate is critically low. Users aren't engaging with leads.",
+      action: "Add push notifications or SMS reminders",
+    });
+  }
+
+  if ((kpis?.newUsers7d ?? 0) === 0) {
+    alerts.push({
+      level: "warning",
+      message: "Zero new signups this week. Growth has stalled.",
+      action: "Launch an outreach or social media campaign",
+    });
+  }
+
+  if ((funnel?.leads ?? 0) > 0 && (funnel?.wins ?? 0) === 0) {
+    alerts.push({
+      level: "warning",
+      message: "Leads are coming in but nobody is closing. Pros may need help.",
+      action: "Create response templates and coaching content",
+    });
+  }
+
+  if (alerts.length === 0) {
+    alerts.push({
+      level: "info",
+      message: "No critical churn risks detected. Keep up the momentum!",
+      action: "Focus on scaling what's working",
+    });
+  }
+
+  const levelStyles = {
+    critical: "border-destructive/30 bg-destructive/5",
+    warning: "border-warning/30 bg-warning/5",
+    info: "border-border bg-muted/30",
+  };
+  const levelIcons = {
+    critical: AlertTriangle,
+    warning: Clock,
+    info: CheckCircle2,
+  };
+  const levelBadge = {
+    critical: "destructive" as const,
+    warning: "secondary" as const,
+    info: "outline" as const,
+  };
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <h3 className="font-semibold mb-4 flex items-center gap-2">
+        <AlertTriangle className="h-4 w-4 text-destructive" /> Churn Risk Alerts
+      </h3>
+      <div className="space-y-2">
+        {alerts.map((a, i) => {
+          const Icon = levelIcons[a.level];
+          return (
+            <div key={i} className={`rounded-lg border p-3 ${levelStyles[a.level]}`}>
+              <div className="flex items-start gap-2">
+                <Icon className="h-4 w-4 mt-0.5 shrink-0 text-muted-foreground" />
+                <div className="flex-1 space-y-1">
+                  <p className="text-sm">{a.message}</p>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={levelBadge[a.level]} className="text-2xs">{a.level}</Badge>
+                    <span className="text-2xs text-muted-foreground">→ {a.action}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Retention Summary ───
+function RetentionSummary({ kpis }: { kpis: any }) {
+  const totalUsers = kpis?.totalUsers ?? 0;
+  const activated = kpis?.activatedUsers ?? 0;
+  const withLeads = kpis?.totalLeads ?? 0;
+  const withJobs = kpis?.totalJobRequests ?? 0;
+
+  const segments = [
+    {
+      label: "Signed up only",
+      count: Math.max(totalUsers - activated, 0),
+      color: "bg-muted-foreground/20",
+      description: "Haven't completed setup",
+    },
+    {
+      label: "Activated",
+      count: activated,
+      color: "bg-primary/30",
+      description: "Completed onboarding",
+    },
+    {
+      label: "Getting leads",
+      count: withLeads > 0 ? Math.min(withLeads, activated) : 0,
+      color: "bg-success/30",
+      description: "Receiving inbound leads",
+    },
+    {
+      label: "Winning jobs",
+      count: withJobs > 0 ? Math.min(withJobs, activated) : 0,
+      color: "bg-warning/30",
+      description: "Converting leads to jobs",
+    },
+  ];
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <h3 className="font-semibold mb-4 flex items-center gap-2">
+        <Heart className="h-4 w-4 text-destructive" /> User Retention Stages
+      </h3>
+      <div className="space-y-3">
+        {segments.map(s => {
+          const pct = totalUsers > 0 ? Math.round((s.count / totalUsers) * 100) : 0;
+          return (
+            <div key={s.label} className="space-y-1">
+              <div className="flex items-center justify-between text-sm">
+                <span>{s.label}</span>
+                <span className="text-xs tabular-nums font-medium">{s.count} ({pct}%)</span>
+              </div>
+              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                <div className={`h-full rounded-full ${s.color} transition-all`} style={{ width: `${pct}%` }} />
+              </div>
+              <p className="text-2xs text-muted-foreground">{s.description}</p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Growth Levers ───
+function GrowthLevers({ navigate }: { navigate: (path: string) => void }) {
+  const levers = [
+    {
+      title: "Referral Program",
+      description: "Users who refer 3 friends get 30 days Pro free. Promote this in-app.",
+      icon: Star,
+      action: "View referrals",
+      path: "/app/analytics",
+    },
+    {
+      title: "SEO & Public Cards",
+      description: "Every published card is a landing page. More cards = more organic traffic.",
+      icon: Globe,
+      action: "View marketplace",
+      path: "/app/marketplace",
+    },
+    {
+      title: "Email Sequences",
+      description: "Automate welcome, activation, and re-engagement emails to reduce churn.",
+      icon: Mail,
+      action: "Manage sequences",
+      path: "/app/admin-marketing",
+    },
+    {
+      title: "Social Proof",
+      description: "Highlight success stories and reviews on the landing page to boost conversions.",
+      icon: Trophy,
+      action: "View feedback",
+      path: "/app/admin",
+    },
+    {
+      title: "Marketplace Supply",
+      description: "More on-duty pros = better customer experience = more repeat requests.",
+      icon: RefreshCw,
+      action: "View marketplace",
+      path: "/app/marketplace",
+    },
+    {
+      title: "Feature Adoption",
+      description: "Track which features drive retention. Push underused high-value features.",
+      icon: BarChart,
+      action: "View analytics",
+      path: "/app/analytics",
+    },
+  ];
+
+  return (
+    <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-card to-primary/[0.03] p-5">
+      <h3 className="font-semibold mb-4 flex items-center gap-2">
+        <Rocket className="h-4 w-4 text-primary" /> Growth Levers
+      </h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {levers.map(l => (
+          <div key={l.title} className="rounded-lg border border-border bg-card p-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <div className="h-7 w-7 rounded-md bg-primary/10 flex items-center justify-center">
+                <l.icon className="h-3.5 w-3.5 text-primary" />
+              </div>
+              <h4 className="text-sm font-medium">{l.title}</h4>
+            </div>
+            <p className="text-2xs text-muted-foreground leading-relaxed">{l.description}</p>
+            <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 px-2" onClick={() => navigate(l.path)}>
+              {l.action} <ArrowUpRight className="h-3 w-3" />
+            </Button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Outreach Tracker ───
 const OUTREACH_STATUSES = [
   { value: "not_contacted", label: "Not Contacted", color: "bg-muted text-muted-foreground" },
@@ -119,8 +410,7 @@ function OutreachTracker() {
   };
 
   return (
-    <div
-      className="rounded-xl border border-border bg-card p-5">
+    <div className="rounded-xl border border-border bg-card p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold flex items-center gap-2">
           <Target className="h-4 w-4 text-primary" /> Outreach Tracker
@@ -208,8 +498,7 @@ function DailyActions({ kpis, contacts }: { kpis: any; contacts: any[] }) {
   ];
 
   return (
-    <div
-      className="rounded-xl border border-border bg-card p-5">
+    <div className="rounded-xl border border-border bg-card p-5">
       <h3 className="font-semibold mb-3 flex items-center gap-2">
         <CheckCircle2 className="h-4 w-4 text-success" /> Daily Actions
       </h3>
@@ -240,8 +529,7 @@ function ActivityFeed({ feed, isLoading }: { feed: any[]; isLoading: boolean }) 
   };
 
   return (
-    <div
-      className="rounded-xl border border-border bg-card p-5">
+    <div className="rounded-xl border border-border bg-card p-5">
       <h3 className="font-semibold mb-3 flex items-center gap-2">
         <Activity className="h-4 w-4 text-primary" /> Activity Feed
       </h3>
@@ -279,8 +567,7 @@ function MarketplaceHealth({ marketplace, isLoading }: { marketplace: any; isLoa
   ];
 
   return (
-    <div
-      className="rounded-xl border border-border bg-card p-5">
+    <div className="rounded-xl border border-border bg-card p-5">
       <h3 className="font-semibold mb-3 flex items-center gap-2">
         <Rocket className="h-4 w-4 text-primary" /> Marketplace Health
       </h3>
@@ -298,7 +585,7 @@ function MarketplaceHealth({ marketplace, isLoading }: { marketplace: any; isLoa
   );
 }
 
-// ─── Insights ───
+// ─── Growth Insights ───
 function GrowthInsights({ kpis, funnel, marketplace }: { kpis: any; funnel: any; marketplace: any }) {
   const insights: string[] = [];
 
@@ -310,8 +597,7 @@ function GrowthInsights({ kpis, funnel, marketplace }: { kpis: any; funnel: any;
   if (insights.length === 0) insights.push("Growth looks healthy! Keep up the outreach momentum.");
 
   return (
-    <div
-      className="rounded-xl border border-primary/20 bg-gradient-to-br from-card to-primary/[0.03] p-5">
+    <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-card to-primary/[0.03] p-5">
       <h3 className="font-semibold mb-3 flex items-center gap-2">
         <Lightbulb className="h-4 w-4 text-warning" /> Growth Insights
       </h3>
@@ -373,20 +659,34 @@ export default function AdminGrowthDashboard() {
       {/* KPIs */}
       <KPICards kpis={data?.kpis} isLoading={isLoading} />
 
+      {/* Churn Risk + Weekly Goals */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <ChurnRiskAlerts kpis={data?.kpis} funnel={data?.funnel} />
+        <WeeklyGoals kpis={data?.kpis} contacts={contacts || []} />
+      </div>
+
       {/* Funnel + Marketplace side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <FunnelView funnel={data?.funnel} isLoading={isLoading} />
         <MarketplaceHealth marketplace={data?.marketplace} isLoading={isLoading} />
       </div>
 
-      {/* Outreach Tracker */}
-      <OutreachTracker />
+      {/* Retention + Outreach */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <RetentionSummary kpis={data?.kpis} />
+        <div className="lg:col-span-2">
+          <OutreachTracker />
+        </div>
+      </div>
 
       {/* Daily Actions + Activity Feed side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <DailyActions kpis={data?.kpis} contacts={contacts || []} />
         <ActivityFeed feed={data?.activityFeed || []} isLoading={isLoading} />
       </div>
+
+      {/* Growth Levers */}
+      <GrowthLevers navigate={navigate} />
 
       {/* Insights */}
       <GrowthInsights kpis={data?.kpis} funnel={data?.funnel} marketplace={data?.marketplace} />
