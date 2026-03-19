@@ -759,10 +759,28 @@ export default function DiscoverPage() {
             </span>
           </div>
           {hasActiveFilters && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              {professionFilter && (
+                <Badge variant="secondary" className="gap-1 text-xs">
+                  <Briefcase className="h-3 w-3" /> {professionFilter}
+                  <button onClick={() => setProfessionFilter("")}><X className="h-3 w-3 ml-0.5" /></button>
+                </Badge>
+              )}
+              {locationFilter && (
+                <Badge variant="secondary" className="gap-1 text-xs">
+                  <MapPin className="h-3 w-3" /> {locationFilter}
+                  <button onClick={() => setLocationFilter("")}><X className="h-3 w-3 ml-0.5" /></button>
+                </Badge>
+              )}
+              {ratingFilter && (
+                <Badge variant="secondary" className="gap-1 text-xs">
+                  <Star className="h-3 w-3" /> {ratingFilter}+ stars
+                  <button onClick={() => setRatingFilter("")}><X className="h-3 w-3 ml-0.5" /></button>
+                </Badge>
+              )}
               {intentFilter && (
                 <Badge variant="secondary" className="gap-1 text-xs">
-                  {intentFilter === "quote" ? "Quotes" : intentFilter === "book" ? "Bookable" : "Available"}
+                  {intentFilter === "quote" ? "Quotes" : intentFilter === "book" ? "Bookable" : intentFilter === "on_duty" ? "On Duty" : "Available"}
                   <button onClick={() => setIntentFilter("")}><X className="h-3 w-3 ml-0.5" /></button>
                 </Badge>
               )}
