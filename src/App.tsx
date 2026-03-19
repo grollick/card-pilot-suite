@@ -156,6 +156,7 @@ const queryClient = new QueryClient({
 });
 
 const App = () => (
+  <ThemeProvider attribute="class" defaultTheme="light" storageKey="cardpilot-theme">
   <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
