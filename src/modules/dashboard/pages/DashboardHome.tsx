@@ -91,6 +91,9 @@ export default function DashboardHome() {
           {/* ── Lead Quality ── */}
           <LeadQualityWidget />
 
+          {/* ── Lead Velocity ── */}
+          <LeadVelocityWidget />
+
           {/* ── SECTION 7: Growth & Insights ── */}
           <GrowthTrends />
         </div>
