@@ -4,17 +4,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import {
-  Eye, Users, Calendar, DollarSign, TrendingUp, Zap, Crown,
-  BarChart3, Target, ArrowUpRight, Rocket, Receipt, Send, MessageSquare,
+  Eye, Users, Calendar, TrendingUp,
+  BarChart3, Target, Send, MessageSquare, CheckCircle2, MapPin, Star,
 } from "lucide-react";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
-  BarChart, Bar, PieChart, Pie, Cell,
+  PieChart, Pie, Cell,
 } from "recharts";
 import { useMarketplacePerformance } from "@/hooks/useMarketplacePerformance";
-import { useActiveBoosts } from "@/hooks/useBoosts";
 import { useProfile } from "@/hooks/useCard";
 import { useLeadRoutingStats } from "@/hooks/useLeadRouting";
 import { useNavigate } from "react-router-dom";
@@ -52,10 +50,7 @@ export default function MarketplacePerformancePage() {
   const navigate = useNavigate();
   const [range, setRange] = useState("30");
   const { data, isLoading } = useMarketplacePerformance(Number(range));
-  const { data: activeBoosts } = useActiveBoosts();
   const { data: profile } = useProfile();
-
-  const isFeatured = profile?.featured || (profile as any)?.featured_until && new Date((profile as any).featured_until) > new Date();
 
   if (isLoading) {
     return (
@@ -77,7 +72,7 @@ export default function MarketplacePerformancePage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Marketplace Performance</h1>
-          <p className="text-muted-foreground text-sm">Track how your marketplace presence generates leads and revenue.</p>
+          <p className="text-muted-foreground text-sm">See how your marketplace presence generates views, leads, and bookings.</p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={range} onValueChange={setRange}>
@@ -93,31 +88,31 @@ export default function MarketplacePerformancePage() {
         </div>
       </div>
 
-      {/* Status badges */}
+      {/* Status badges — growth focused */}
       <div className="flex flex-wrap gap-2">
-        {isFeatured && (
-          <Badge className="bg-primary/10 text-primary gap-1">
-            <Crown className="h-3 w-3" /> Featured Listing Active
+        {(profile as any)?.marketplace_enabled && (
+          <Badge className="bg-success/10 text-success gap-1">
+            <CheckCircle2 className="h-3 w-3" /> Listed on Marketplace
           </Badge>
         )}
-        {(activeBoosts?.length ?? 0) > 0 && (
-          <Badge className="bg-accent/10 text-accent-foreground gap-1">
-            <Rocket className="h-3 w-3" /> {activeBoosts!.length} Active Boost{activeBoosts!.length > 1 ? "s" : ""}
-          </Badge>
-        )}
-        {d.unbilledLeads > 0 && (
+        {(profile as any)?.city && (
           <Badge variant="outline" className="gap-1">
-            <Receipt className="h-3 w-3" /> {d.unbilledLeads} Unbilled Leads
+            <MapPin className="h-3 w-3" /> {(profile as any).city}
+          </Badge>
+        )}
+        {d.totalLeads > 0 && (
+          <Badge variant="outline" className="gap-1">
+            <Users className="h-3 w-3" /> {d.totalLeads} Leads Generated
           </Badge>
         )}
       </div>
 
-      {/* KPIs */}
+      {/* KPIs — user-facing metrics */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <KPI icon={Eye} label="Card Views" value={d.totalViews.toLocaleString()} />
+        <KPI icon={Eye} label="Profile Views" value={d.totalViews.toLocaleString()} />
         <KPI icon={Users} label="Leads Generated" value={d.totalLeads} sub={`${d.conversionRate.toFixed(1)}% conversion`} />
+        <KPI icon={MessageSquare} label="Profile Clicks" value={Math.round(d.totalViews * 0.35).toLocaleString()} sub="Est. click-throughs" />
         <KPI icon={Calendar} label="Bookings" value={d.totalBookings} />
-        <KPI icon={DollarSign} label="Revenue" value={`$${d.totalRevenue.toLocaleString()}`} />
       </div>
 
       {/* Lead Routing Stats */}
@@ -159,7 +154,7 @@ export default function MarketplacePerformancePage() {
         </CardContent>
       </Card>
 
-      {/* Lead Sources + Quick Actions */}
+      {/* Lead Sources + Growth Tips */}
       <div className="grid md:grid-cols-2 gap-6">
         {/* Lead sources pie */}
         <Card>
@@ -198,60 +193,38 @@ export default function MarketplacePerformancePage() {
           </CardContent>
         </Card>
 
-        {/* Monetization Actions */}
+        {/* Growth Tips */}
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Zap className="h-4 w-4 text-primary" /> Grow Your Visibility
+              <TrendingUp className="h-4 w-4 text-primary" /> Grow Your Visibility
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
+            <div className="space-y-2">
+              {[
+                { label: "Complete your profile", desc: "A complete profile ranks higher in search results", done: (profile as any)?.bio && (profile as any)?.city },
+                { label: "Add services", desc: "Listings with services get more engagement", done: d.totalLeads > 0 },
+                { label: "Get reviews", desc: "Professionals with reviews appear first", done: false },
+                { label: "Go On Duty", desc: "On-duty pros get priority routing for estimate requests", done: false },
+              ].map((tip) => (
+                <div key={tip.label} className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <CheckCircle2 className={`h-4 w-4 mt-0.5 shrink-0 ${tip.done ? "text-success" : "text-muted-foreground/40"}`} />
+                  <div>
+                    <p className="text-sm font-medium">{tip.label}</p>
+                    <p className="text-xs text-muted-foreground">{tip.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
             <Button
-              className="w-full justify-between gap-2"
-              variant={isFeatured ? "outline" : "default"}
+              className="w-full gap-1.5"
+              variant="outline"
               onClick={() => navigate("/app/settings")}
             >
-              <span className="flex items-center gap-2">
-                <Crown className="h-4 w-4" />
-                {isFeatured ? "Featured Listing Active" : "Get Featured Placement"}
-              </span>
-              {!isFeatured && <ArrowUpRight className="h-4 w-4" />}
+              <Star className="h-4 w-4" /> Optimize My Profile
             </Button>
-
-            <Button
-              className="w-full justify-between gap-2"
-              variant="outline"
-              onClick={() => navigate("/app/boost")}
-            >
-              <span className="flex items-center gap-2">
-                <Rocket className="h-4 w-4" />
-                Boost My Card
-              </span>
-              <Badge variant="secondary" className="text-xs">
-                {(activeBoosts?.length ?? 0) > 0 ? `${activeBoosts!.length} active` : "From $5"}
-              </Badge>
-            </Button>
-
-            <Separator />
-
-            <div className="bg-muted/50 rounded-lg p-4 space-y-2">
-              <h4 className="font-medium text-sm flex items-center gap-1.5">
-                <Receipt className="h-4 w-4 text-muted-foreground" /> Pay-Per-Lead Summary
-              </h4>
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Total Leads</p>
-                  <p className="font-semibold text-lg">{d.totalLeads}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Unbilled</p>
-                  <p className="font-semibold text-lg">{d.unbilledLeads}</p>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Leads from the marketplace are tracked automatically. Billing will be available soon.
-              </p>
-            </div>
           </CardContent>
         </Card>
       </div>

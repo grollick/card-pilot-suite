@@ -146,7 +146,7 @@ export default function Onboarding() {
       const handle = generateHandle(name || user.email || "user");
       const packKey = pickStylePackKey("Modern", categoryKey);
 
-      // 1. Profile
+      // 1. Profile — auto-enable marketplace listing
       const { error: profileErr } = await supabase.from("profiles").update({
         name, company: company || null, phone: phone || null,
         email: user.email, city: city || null, handle,
@@ -154,7 +154,8 @@ export default function Onboarding() {
         style_pack: packKey, primary_cta: "call",
         bio: aiSetup?.bio || null,
         onboarding_completed: true,
-      }).eq("id", user.id);
+        marketplace_enabled: true,
+      } as any).eq("id", user.id);
       if (profileErr) throw profileErr;
 
       // 2. Card

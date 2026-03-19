@@ -267,9 +267,9 @@ export default function DiscoverPage() {
   const title = useMemo(() => {
     if (displayProfession && displayCity)
       return `${capitalize(displayProfession)}s in ${capitalize(displayCity)}`;
-    if (displayProfession) return `${capitalize(displayProfession)}s`;
-    if (displayCity) return `Businesses in ${capitalize(displayCity)}`;
-    return "Find & Book Local Professionals";
+    if (displayProfession) return `${capitalize(displayProfession)}s Near You`;
+    if (displayCity) return `Professionals in ${capitalize(displayCity)}`;
+    return "Get Discovered by Local Customers";
   }, [displayProfession, displayCity]);
 
   const metaDescription = useMemo(() => {
@@ -343,7 +343,7 @@ export default function DiscoverPage() {
           >
             <h1 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight mb-3">{title}</h1>
             <p className="text-muted-foreground text-lg max-w-2xl mb-10">
-              Discover top-rated professionals. Compare reviews, response times, and book instantly.
+              Find professionals near you. Compare reviews, response times, and connect instantly — all free.
             </p>
           </motion.div>
 
@@ -468,18 +468,16 @@ export default function DiscoverPage() {
               className="flex items-center gap-6 mt-6 text-sm text-muted-foreground"
             >
               <span className="flex items-center gap-1.5">
-                <Users className="h-4 w-4" /> {listings.length} businesses
+                <Users className="h-4 w-4" /> {listings.length} professionals
               </span>
-              {featuredListings.length > 0 && (
-                <span className="flex items-center gap-1.5">
-                  <Crown className="h-4 w-4 text-primary" /> {featuredListings.length} featured
-                </span>
-              )}
               <span className="flex items-center gap-1.5">
                 <Star className="h-4 w-4" /> {listings.filter(l => l.review_count > 0).length} reviewed
               </span>
               <span className="flex items-center gap-1.5 hidden sm:flex">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" /> {listings.filter(l => l.available_for_work).length} available
+              </span>
+              <span className="flex items-center gap-1.5 hidden sm:flex">
+                <MapPin className="h-4 w-4" /> {cities.length} cities
               </span>
             </motion.div>
           )}
@@ -603,31 +601,16 @@ export default function DiscoverPage() {
           </motion.div>
         )}
 
-        {/* Featured section */}
+        {/* Active businesses section (replaces old Featured/Boosted paid sections) */}
         {featuredListings.length > 0 && !search && !serviceFilter && !intentFilter && (
           <div className="mb-10">
             <div className="flex items-center gap-2 mb-4">
-              <Crown className="h-4 w-4 text-primary" />
-              <h2 className="text-lg font-semibold text-foreground">Featured Businesses</h2>
+              <Star className="h-4 w-4 text-primary" />
+              <h2 className="text-lg font-semibold text-foreground">Active Professionals</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {featuredListings.map((l) => (
                 <ListingCard key={l.id} listing={l} />
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Boosted section */}
-        {boostedListings.length > 0 && !search && !serviceFilter && !intentFilter && (
-          <div className="mb-10">
-            <div className="flex items-center gap-2 mb-4">
-              <Rocket className="h-4 w-4 text-accent" />
-              <h2 className="text-lg font-semibold text-foreground">Boosted Businesses</h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {boostedListings.map((l) => (
-                <ListingCard key={l.id} listing={l} boosted />
               ))}
             </div>
           </div>
@@ -670,21 +653,32 @@ export default function DiscoverPage() {
               <ListingCard key={l.id} listing={l} />
             ))}
           </div>
-        ) : featuredListings.length === 0 && boostedListings.length === 0 && (topMatches === null || topMatches.length === 0) ? (
+        ) : featuredListings.length === 0 && (topMatches === null || topMatches.length === 0) ? (
           <div className="text-center py-20">
-            <Users className="h-10 w-10 mx-auto text-muted-foreground/40 mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-1">No businesses found</h3>
-            <p className="text-muted-foreground mb-6">
-              {hasActiveFilters ? "Try different search terms or filters." : "No listings match this filter yet."}
-            </p>
-            <div className="flex gap-2 justify-center">
-              {hasActiveFilters && (
-                <Button variant="outline" onClick={clearAll}>Clear filters</Button>
-              )}
-              <Button asChild variant="outline">
-                <Link to="/discover">Browse all</Link>
-              </Button>
-            </div>
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+              <MapPin className="h-12 w-12 mx-auto text-primary/30 mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-1">
+                {hasActiveFilters ? "No professionals found" : "Be the first in your area"}
+              </h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                {hasActiveFilters
+                  ? "Try different search terms or filters."
+                  : "No professionals are listed in this area yet. Join the marketplace and start getting discovered by local customers — it's free."}
+              </p>
+              <div className="flex gap-2 justify-center">
+                {hasActiveFilters && (
+                  <Button variant="outline" onClick={clearAll}>Clear filters</Button>
+                )}
+                <Button asChild variant="outline">
+                  <Link to="/discover">Browse all</Link>
+                </Button>
+                {!hasActiveFilters && (
+                  <Button asChild>
+                    <Link to="/auth">Get Listed Free <ArrowRight className="h-3.5 w-3.5 ml-1" /></Link>
+                  </Button>
+                )}
+              </div>
+            </motion.div>
           </div>
         ) : null}
 
