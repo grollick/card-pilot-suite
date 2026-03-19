@@ -13,9 +13,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
+import { useLeadPerformance } from "@/hooks/useLeadPerformance";
 import {
   Briefcase, Loader2, Send, MapPin, DollarSign, Clock,
-  CheckCircle2, MessageSquare, TrendingUp, ArrowRight, Inbox,
+  CheckCircle2, MessageSquare, TrendingUp, ArrowRight, Inbox, Zap, AlertTriangle,
 } from "lucide-react";
 
 export default function JobRequestsPage() {
