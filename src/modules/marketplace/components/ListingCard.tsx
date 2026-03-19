@@ -5,9 +5,10 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   MapPin, Calendar, ArrowRight, Star, Crown, MessageSquare,
-  Rocket, Phone, DollarSign, Clock, ShieldCheck, CheckCircle2,
+  Rocket, Phone, DollarSign, Clock, ShieldCheck, CheckCircle2, Zap,
 } from "lucide-react";
 import type { MarketplaceListing } from "@/hooks/useMarketplace";
+import { motion } from "framer-motion";
 
 function StarRating({ rating, count }: { rating: number; count: number }) {
   return (
@@ -15,7 +16,7 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
       {[1, 2, 3, 4, 5].map((s) => (
         <Star
           key={s}
-          className={`h-3 w-3 ${s <= Math.round(rating) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`}
+          className={`h-3 w-3 ${s <= Math.round(rating) ? "fill-amber-400 text-amber-400" : "text-muted-foreground/30"}`}
         />
       ))}
       <span className="text-xs text-muted-foreground ml-0.5">
@@ -40,12 +41,12 @@ function PriceRange({ services }: { services: { name: string; price: number | nu
 
 function ResponseBadge({ minutes }: { minutes: number }) {
   if (minutes < 30) return (
-    <Badge variant="secondary" className="text-[10px] gap-0.5 bg-green-500/10 text-green-700 border-green-500/20">
-      <Clock className="h-2.5 w-2.5" /> &lt;30 min
+    <Badge variant="secondary" className="text-[10px] gap-0.5 bg-emerald-500/10 text-emerald-700 border-emerald-500/20">
+      <Zap className="h-2.5 w-2.5" /> &lt;30 min
     </Badge>
   );
   if (minutes < 60) return (
-    <Badge variant="secondary" className="text-[10px] gap-0.5 bg-emerald-500/10 text-emerald-700 border-emerald-500/20">
+    <Badge variant="secondary" className="text-[10px] gap-0.5 bg-emerald-500/10 text-emerald-600 border-emerald-500/15">
       <Clock className="h-2.5 w-2.5" /> &lt;1 hr
     </Badge>
   );
@@ -57,7 +58,14 @@ function ResponseBadge({ minutes }: { minutes: number }) {
   return null;
 }
 
-export default function ListingCard({ listing, boosted }: { listing: MarketplaceListing; boosted?: boolean }) {
+interface ListingCardProps {
+  listing: MarketplaceListing;
+  boosted?: boolean;
+  /** Renders an expanded hero variant for top recommended cards */
+  variant?: "default" | "hero";
+}
+
+export default function ListingCard({ listing, boosted, variant = "default" }: ListingCardProps) {
   const initials = (listing.name ?? "?")
     .split(" ")
     .map((w) => w[0])
@@ -66,142 +74,181 @@ export default function ListingCard({ listing, boosted }: { listing: Marketplace
     .toUpperCase();
 
   const isVerified = listing.profile_completeness >= 70 && listing.review_count >= 1;
+  const isHero = variant === "hero";
 
   return (
-    <Card className={`group overflow-hidden border transition-all duration-300 ${
-      listing.featured
-        ? "border-primary/40 bg-primary/[0.02] shadow-md ring-1 ring-primary/10"
-        : boosted
-        ? "border-accent/40 bg-accent/[0.02] shadow-md ring-1 ring-accent/10"
-        : "border-border/60 hover:border-primary/30 hover:shadow-lg"
-    }`}>
-      {listing.featured && (
-        <div className="bg-primary/10 px-4 py-1.5 flex items-center gap-1.5 text-xs font-medium text-primary">
-          <Crown className="h-3 w-3" />
-          Featured Business
-        </div>
-      )}
-      {boosted && !listing.featured && (
-        <div className="bg-accent/10 px-4 py-1.5 flex items-center gap-1.5 text-xs font-medium text-accent">
-          <Rocket className="h-3 w-3" />
-          Boosted Business
-        </div>
-      )}
-      <CardContent className="p-5 flex flex-col gap-3">
-        {/* Header */}
-        <div className="flex items-start gap-3">
-          <div className="relative">
-            <Avatar className="h-14 w-14 rounded-xl border-2 border-border shrink-0">
-              <AvatarImage src={listing.avatar_url ?? undefined} alt={listing.name ?? ""} />
-              <AvatarFallback className="rounded-xl bg-primary/10 text-primary font-semibold text-sm">
-                {initials}
-              </AvatarFallback>
-            </Avatar>
-            {listing.available_for_work && (
-              <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-green-500 border-2 border-card" title="Available for work" />
-            )}
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+    >
+      <Card className={`group overflow-hidden border transition-all duration-300 ${
+        isHero
+          ? "border-primary/30 bg-gradient-to-br from-primary/[0.04] to-background shadow-lg ring-1 ring-primary/10 hover:shadow-xl"
+          : listing.featured
+          ? "border-primary/40 bg-primary/[0.02] shadow-md ring-1 ring-primary/10"
+          : boosted
+          ? "border-accent/40 bg-accent/[0.02] shadow-md ring-1 ring-accent/10"
+          : "border-border/60 hover:border-primary/30 hover:shadow-lg"
+      }`}>
+        {listing.featured && !isHero && (
+          <div className="bg-primary/10 px-4 py-1.5 flex items-center gap-1.5 text-xs font-medium text-primary">
+            <Crown className="h-3 w-3" />
+            Featured Business
           </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5">
-              <h3 className="font-semibold text-foreground truncate">{listing.name}</h3>
-              {isVerified && (
-                <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
-              )}
-            </div>
-            {listing.company && (
-              <p className="text-sm text-muted-foreground truncate">{listing.company}</p>
-            )}
-            <div className="flex flex-wrap items-center gap-1.5 mt-1">
-              {listing.profession_name && (
-                <Badge variant="secondary" className="text-xs font-normal">
-                  {listing.profession_name}
-                </Badge>
-              )}
+        )}
+        {boosted && !listing.featured && !isHero && (
+          <div className="bg-accent/10 px-4 py-1.5 flex items-center gap-1.5 text-xs font-medium text-accent">
+            <Rocket className="h-3 w-3" />
+            Boosted Business
+          </div>
+        )}
+        {isHero && (
+          <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent px-4 py-2 flex items-center gap-1.5 text-xs font-semibold text-primary">
+            <Star className="h-3 w-3 fill-primary" />
+            Top Recommended
+          </div>
+        )}
+        <CardContent className={`flex flex-col gap-3 ${isHero ? "p-6" : "p-5"}`}>
+          {/* Header */}
+          <div className="flex items-start gap-3">
+            <div className="relative">
+              <Avatar className={`rounded-xl border-2 border-border shrink-0 ${isHero ? "h-16 w-16" : "h-14 w-14"}`}>
+                <AvatarImage src={listing.avatar_url ?? undefined} alt={listing.name ?? ""} />
+                <AvatarFallback className="rounded-xl bg-primary/10 text-primary font-semibold text-sm">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
               {listing.available_for_work && (
-                <Badge variant="outline" className="text-[10px] font-normal gap-0.5 bg-green-500/5 text-green-700 border-green-500/20">
-                  <CheckCircle2 className="h-2.5 w-2.5" /> Available
+                <span className="absolute -bottom-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-emerald-500 border-2 border-card" title="Available for work" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5">
+                <h3 className={`font-semibold text-foreground truncate ${isHero ? "text-lg" : ""}`}>{listing.name}</h3>
+                {isVerified && (
+                  <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
+                )}
+              </div>
+              {listing.company && (
+                <p className="text-sm text-muted-foreground truncate">{listing.company}</p>
+              )}
+              <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                {listing.profession_name && (
+                  <Badge variant="secondary" className="text-xs font-normal">
+                    {listing.profession_name}
+                  </Badge>
+                )}
+                {listing.available_for_work && (
+                  <Badge variant="outline" className="text-[10px] font-normal gap-0.5 bg-emerald-500/5 text-emerald-700 border-emerald-500/20">
+                    <CheckCircle2 className="h-2.5 w-2.5" /> Available
+                  </Badge>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Trust signals row */}
+          <div className="flex flex-wrap items-center gap-2">
+            {listing.avg_rating !== null && listing.review_count > 0 && (
+              <StarRating rating={listing.avg_rating} count={listing.review_count} />
+            )}
+            {listing.avg_response_minutes !== null && (
+              <ResponseBadge minutes={listing.avg_response_minutes} />
+            )}
+            {listing.city && (
+              <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
+                <MapPin className="h-3 w-3" />
+                {listing.city}
+              </span>
+            )}
+            <PriceRange services={listing.services} />
+          </div>
+
+          {/* Bio */}
+          {listing.bio && (
+            <p className={`text-muted-foreground leading-relaxed ${isHero ? "text-sm line-clamp-3" : "text-sm line-clamp-2"}`}>
+              {listing.bio}
+            </p>
+          )}
+
+          {/* Services */}
+          {listing.services.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {listing.services.slice(0, isHero ? 5 : 4).map((s) => (
+                <Badge key={s.name} variant="outline" className="text-[10px] font-normal text-muted-foreground">
+                  {s.name}
+                  {s.price !== null && s.price > 0 && (
+                    <span className="ml-1 text-foreground font-medium">${s.price}</span>
+                  )}
+                </Badge>
+              ))}
+              {listing.services.length > (isHero ? 5 : 4) && (
+                <Badge variant="outline" className="text-[10px] font-normal text-muted-foreground">
+                  +{listing.services.length - (isHero ? 5 : 4)} more
                 </Badge>
               )}
             </div>
-          </div>
-        </div>
-
-        {/* Trust signals row */}
-        <div className="flex flex-wrap items-center gap-2">
-          {listing.avg_rating !== null && listing.review_count > 0 && (
-            <StarRating rating={listing.avg_rating} count={listing.review_count} />
           )}
-          {listing.avg_response_minutes !== null && (
-            <ResponseBadge minutes={listing.avg_response_minutes} />
-          )}
-          {listing.city && (
-            <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
-              <MapPin className="h-3 w-3" />
-              {listing.city}
-            </span>
-          )}
-          <PriceRange services={listing.services} />
-        </div>
 
-        {/* Bio */}
-        {listing.bio && (
-          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-            {listing.bio}
-          </p>
-        )}
+          {/* Service Area */}
+          {listing.service_area && (
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <MapPin className="h-3 w-3" /> Serves: {listing.service_area}
+            </p>
+          )}
 
-        {/* Services */}
-        {listing.services.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {listing.services.slice(0, 4).map((s) => (
-              <Badge key={s.name} variant="outline" className="text-[10px] font-normal text-muted-foreground">
-                {s.name}
-                {s.price !== null && s.price > 0 && (
-                  <span className="ml-1 text-foreground font-medium">${s.price}</span>
-                )}
-              </Badge>
-            ))}
-            {listing.services.length > 4 && (
-              <Badge variant="outline" className="text-[10px] font-normal text-muted-foreground">
-                +{listing.services.length - 4} more
-              </Badge>
+          {/* Primary CTA */}
+          <div className="mt-auto pt-2 space-y-2">
+            {isHero ? (
+              <div className="flex gap-2">
+                <Button asChild size="sm" className="flex-1 gap-1.5 shadow-sm">
+                  <Link to={`/${listing.handle}?quote=1`}>
+                    <MessageSquare className="h-3.5 w-3.5" /> Get a Quote
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="sm" className="flex-1 gap-1.5">
+                  <Link to={`/book/${listing.handle}`}>
+                    <Calendar className="h-3.5 w-3.5" /> Book Now
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button asChild size="sm" className="w-full gap-1.5">
+                  <Link to={`/${listing.handle}`}>
+                    View Card <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                </Button>
+                <div className="flex gap-2">
+                  <Button asChild variant="outline" size="sm" className="flex-1 gap-1.5 text-xs">
+                    <Link to={`/book/${listing.handle}`}>
+                      <Calendar className="h-3.5 w-3.5" /> Book
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" size="sm" className="flex-1 gap-1.5 text-xs">
+                    <Link to={`/${listing.handle}?quote=1`}>
+                      <MessageSquare className="h-3.5 w-3.5" /> Quote
+                    </Link>
+                  </Button>
+                  <Button asChild variant="ghost" size="sm" className="text-xs px-2">
+                    <Link to={`/${listing.handle}?contact=1`}>
+                      <Phone className="h-3.5 w-3.5" />
+                    </Link>
+                  </Button>
+                </div>
+              </>
+            )}
+            {isHero && (
+              <Button asChild variant="ghost" size="sm" className="w-full text-xs gap-1 text-muted-foreground hover:text-foreground">
+                <Link to={`/${listing.handle}`}>
+                  View full profile <ArrowRight className="h-3 w-3" />
+                </Link>
+              </Button>
             )}
           </div>
-        )}
-
-        {/* Service Area */}
-        {listing.service_area && (
-          <p className="text-xs text-muted-foreground flex items-center gap-1">
-            <MapPin className="h-3 w-3" /> Serves: {listing.service_area}
-          </p>
-        )}
-
-        {/* Primary CTA */}
-        <div className="mt-auto pt-2 space-y-2">
-          <Button asChild size="sm" className="w-full gap-1.5">
-            <Link to={`/${listing.handle}`}>
-              View Card <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </Button>
-          <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm" className="flex-1 gap-1.5 text-xs">
-              <Link to={`/book/${listing.handle}`}>
-                <Calendar className="h-3.5 w-3.5" /> Book
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="sm" className="flex-1 gap-1.5 text-xs">
-              <Link to={`/${listing.handle}?quote=1`}>
-                <MessageSquare className="h-3.5 w-3.5" /> Quote
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm" className="text-xs px-2">
-              <Link to={`/${listing.handle}?contact=1`}>
-                <Phone className="h-3.5 w-3.5" />
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
