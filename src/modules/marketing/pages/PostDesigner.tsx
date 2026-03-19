@@ -1,12 +1,13 @@
-import { useState, useCallback } from "react";
-import { ArrowLeft, Download, Send, Sparkles, Wand2 } from "lucide-react";
+import { useState, useCallback, useRef } from "react";
+import { ArrowLeft, Download, Send, Sparkles, Wand2, PanelRightOpen, PanelRightClose } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import TemplatePicker from "../components/postdesigner/TemplatePicker";
 import CanvasRenderer from "../components/postdesigner/CanvasRenderer";
 import StyleControls from "../components/postdesigner/StyleControls";
+import AiSuggestionsPanel from "../components/postdesigner/AiSuggestionsPanel";
 import type { CanvasElement, PostFormat, PostTemplate } from "../data/postTemplates";
 import { POST_TEMPLATES } from "../data/postTemplates";
 
@@ -18,6 +19,8 @@ export default function PostDesigner() {
   const [bgColor, setBgColor] = useState(POST_TEMPLATES[0].bgColor);
   const [format, setFormat] = useState<PostFormat>(POST_TEMPLATES[0].format);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [currentTemplate, setCurrentTemplate] = useState<PostTemplate | null>(POST_TEMPLATES[0]);
+  const [showAi, setShowAi] = useState(true);
 
   const selectedElement = elements.find((e) => e.id === selectedId) ?? null;
 
@@ -26,6 +29,7 @@ export default function PostDesigner() {
     setBgColor(t.bgColor);
     setFormat(t.format);
     setSelectedId(null);
+    setCurrentTemplate(t);
     toast.success(`Loaded "${t.name}" template`);
   }, []);
 
@@ -81,6 +85,63 @@ export default function PostDesigner() {
     setElements((prev) => prev.map((el) => (el.id === id ? { ...el, zIndex: Math.max(0, el.zIndex - 1) } : el)));
   }, []);
 
+  // AI application handlers
+  const applyHeadline = useCallback((text: string) => {
+    setElements((prev) => {
+      const headline = prev.find((e) => e.type === "text" && (e.fontWeight === "800" || e.fontWeight === "700") && (e.fontSize ?? 16) >= 28);
+      if (headline) {
+        toast.success("Headline updated!");
+        return prev.map((el) => (el.id === headline.id ? { ...el, text } : el));
+      }
+      toast.info("No headline element found — add a text element first");
+      return prev;
+    });
+  }, []);
+
+  const applySubheadline = useCallback((text: string) => {
+    setElements((prev) => {
+      const sub = prev.find((e) => e.type === "text" && (e.fontWeight === "400" || e.fontWeight === "500") && (e.fontSize ?? 16) < 28);
+      if (sub) {
+        toast.success("Subheadline updated!");
+        return prev.map((el) => (el.id === sub.id ? { ...el, text } : el));
+      }
+      toast.info("No subheadline element found");
+      return prev;
+    });
+  }, []);
+
+  const applyCta = useCallback((text: string) => {
+    setElements((prev) => {
+      const badge = prev.find((e) => e.type === "badge");
+      if (badge) {
+        toast.success("CTA updated!");
+        return prev.map((el) => (el.id === badge.id ? { ...el, badgeText: text } : el));
+      }
+      toast.info("No CTA badge element found");
+      return prev;
+    });
+  }, []);
+
+  const applyImage = useCallback((url: string, elementId?: string) => {
+    setElements((prev) => {
+      const target = elementId
+        ? prev.find((e) => e.id === elementId)
+        : prev.find((e) => e.type === "image");
+      if (target) {
+        toast.success("Image applied!");
+        return prev.map((el) => (el.id === target.id ? { ...el, imageUrl: url } : el));
+      }
+      // Add a new image element
+      const maxZ = Math.max(0, ...prev.map((e) => e.zIndex));
+      const newEl: CanvasElement = {
+        id: uid(), type: "image", x: 5, y: 30, width: 90, height: 40, rotation: 0, zIndex: maxZ + 1,
+        fill: "#00000022", borderRadius: 12, imageUrl: url,
+      };
+      toast.success("Image added to canvas!");
+      return [...prev, newEl];
+    });
+  }, []);
+
   return (
     <div className="h-[calc(100vh-56px)] flex flex-col">
       {/* Top toolbar */}
@@ -92,8 +153,13 @@ export default function PostDesigner() {
           <h1 className="font-semibold text-sm">Post Designer</h1>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5">
-            <Sparkles className="h-3 w-3" /> AI Caption
+          <Button
+            variant={showAi ? "default" : "outline"}
+            size="sm"
+            className="h-8 text-xs gap-1.5"
+            onClick={() => setShowAi(!showAi)}
+          >
+            <Sparkles className="h-3 w-3" /> AI Assist
           </Button>
           <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5">
             <Download className="h-3 w-3" /> Export
@@ -104,7 +170,7 @@ export default function PostDesigner() {
         </div>
       </div>
 
-      {/* Three-panel layout */}
+      {/* Four-panel layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Template picker */}
         <motion.div
@@ -148,6 +214,28 @@ export default function PostDesigner() {
             onSendBackward={sendBackward}
           />
         </motion.div>
+
+        {/* Far right: AI panel */}
+        <AnimatePresence>
+          {showAi && (
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 280, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="border-l border-border bg-card shrink-0 overflow-hidden"
+            >
+              <AiSuggestionsPanel
+                currentTemplate={currentTemplate}
+                elements={elements}
+                onApplyHeadline={applyHeadline}
+                onApplySubheadline={applySubheadline}
+                onApplyCta={applyCta}
+                onApplyImage={applyImage}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
