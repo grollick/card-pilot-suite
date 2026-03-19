@@ -18,7 +18,7 @@ export default function MarketplaceAwarenessWidget() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("marketplace_visible, marketplace_bio, profession")
+        .select("marketplace_enabled, bio, profession_id")
         .eq("id", user!.id)
         .single();
       return data;
