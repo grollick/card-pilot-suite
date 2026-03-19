@@ -10,13 +10,15 @@ export interface CachedProfile {
   tour_completed: boolean;
   onboarding_completed: boolean;
   current_org_id: string | null;
+  company: string | null;
 }
 
 /**
- * Single consolidated profile query — replaces 5+ separate profile fetches
+ * Single consolidated profile query — replaces 8+ separate profile fetches
  * that were each hitting the DB independently on every page load.
  *
- * Consumers: AppSidebar, TopBar, ProtectedRoute, OrgContext, ProductTour, UpgradeTriggers, etc.
+ * Consumers: AppSidebar, TopBar, ProtectedRoute, OrgContext, ProductTour,
+ * UpgradeTriggers, ShareCardWidget, ShareMessageCard, RevenueQuickActions, etc.
  */
 export function useProfileCache() {
   const { user } = useAuth();
@@ -28,7 +30,7 @@ export function useProfileCache() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("handle, name, avatar_url, plan, tour_completed, onboarding_completed, current_org_id")
+        .select("handle, name, avatar_url, plan, tour_completed, onboarding_completed, current_org_id, company")
         .eq("id", user!.id)
         .maybeSingle();
       if (error) throw error;
