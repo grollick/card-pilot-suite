@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Plus, LayoutDashboard, FileText, CalendarDays, Columns3, ListOrdered, BarChart3, Users, LayoutPanelLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Plus, LayoutDashboard, FileText, CalendarDays, Columns3, ListOrdered, BarChart3, Users, LayoutPanelLeft, Paintbrush } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SocialOverview from "../components/social/SocialOverview";
