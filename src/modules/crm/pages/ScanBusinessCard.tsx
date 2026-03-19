@@ -5,8 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+const CONTACT_TYPES = [
+  { value: "lead", label: "Lead", description: "Potential customer" },
+  { value: "client", label: "Client", description: "Existing customer" },
+  { value: "vendor", label: "Vendor", description: "Supplier or service provider" },
+  { value: "partner", label: "Partner", description: "Business partner" },
+  { value: "personal", label: "Personal", description: "Personal contact" },
+  { value: "other", label: "Other", description: "Other contact" },
+] as const;
 
 interface ExtractedContact {
   name: string;
@@ -29,6 +39,7 @@ export default function ScanBusinessCard() {
   const [step, setStep] = useState<Step>("capture");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [contact, setContact] = useState<ExtractedContact>({ name: "" });
+  const [contactType, setContactType] = useState<string>("lead");
   const [saving, setSaving] = useState(false);
 
   const processImage = useCallback(async (base64: string) => {
@@ -82,6 +93,7 @@ export default function ScanBusinessCard() {
         phone: contact.phone?.trim() || null,
         company: contact.company?.trim() || null,
         source: "business_card" as any,
+        contact_type: contactType as any,
         notes: [
           contact.job_title && `Title: ${contact.job_title}`,
           contact.website && `Website: ${contact.website}`,
@@ -104,6 +116,7 @@ export default function ScanBusinessCard() {
     setStep("capture");
     setImagePreview(null);
     setContact({ name: "" });
+    setContactType("lead");
   };
 
   return (
@@ -187,6 +200,22 @@ export default function ScanBusinessCard() {
           )}
 
           <div className="space-y-3">
+            <div>
+              <Label>Contact Type</Label>
+              <Select value={contactType} onValueChange={setContactType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CONTACT_TYPES.map((t) => (
+                    <SelectItem key={t.value} value={t.value}>
+                      <span>{t.label}</span>
+                      <span className="text-muted-foreground ml-1 text-xs">— {t.description}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div>
               <Label>Name *</Label>
               <Input value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />

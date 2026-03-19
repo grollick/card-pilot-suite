@@ -2348,6 +2348,7 @@ export type Database = {
           address: string | null
           assigned_to_user_id: string | null
           company: string | null
+          contact_type: Database["public"]["Enums"]["contact_type"]
           created_at: string
           custom_fields_json: Json
           email: string | null
@@ -2374,6 +2375,7 @@ export type Database = {
           address?: string | null
           assigned_to_user_id?: string | null
           company?: string | null
+          contact_type?: Database["public"]["Enums"]["contact_type"]
           created_at?: string
           custom_fields_json?: Json
           email?: string | null
@@ -2400,6 +2402,7 @@ export type Database = {
           address?: string | null
           assigned_to_user_id?: string | null
           company?: string | null
+          contact_type?: Database["public"]["Enums"]["contact_type"]
           created_at?: string
           custom_fields_json?: Json
           email?: string | null
@@ -4028,6 +4031,13 @@ export type Database = {
       campaign_email_status: "pending" | "sent" | "failed" | "bounced"
       campaign_status: "draft" | "sending" | "sent" | "paused"
       card_status: "draft" | "published" | "unpublished"
+      contact_type:
+        | "lead"
+        | "client"
+        | "vendor"
+        | "partner"
+        | "personal"
+        | "other"
       estimate_status:
         | "draft"
         | "sent"
@@ -4058,6 +4068,7 @@ export type Database = {
         | "import"
         | "referral"
         | "other"
+        | "business_card"
       org_role: "owner" | "admin" | "member"
       priority_level: "critical" | "high" | "medium" | "low"
       recurring_billing_cycle: "per_visit" | "monthly" | "custom"
@@ -4236,6 +4247,14 @@ export const Constants = {
       campaign_email_status: ["pending", "sent", "failed", "bounced"],
       campaign_status: ["draft", "sending", "sent", "paused"],
       card_status: ["draft", "published", "unpublished"],
+      contact_type: [
+        "lead",
+        "client",
+        "vendor",
+        "partner",
+        "personal",
+        "other",
+      ],
       estimate_status: [
         "draft",
         "sent",
@@ -4269,6 +4288,7 @@ export const Constants = {
         "import",
         "referral",
         "other",
+        "business_card",
       ],
       org_role: ["owner", "admin", "member"],
       priority_level: ["critical", "high", "medium", "low"],
