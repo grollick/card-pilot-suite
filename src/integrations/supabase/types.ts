@@ -3003,6 +3003,42 @@ export type Database = {
         }
         Relationships: []
       }
+      outreach_contacts: {
+        Row: {
+          business: string | null
+          created_at: string
+          created_by: string
+          id: string
+          last_contact_at: string | null
+          name: string
+          notes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          last_contact_at?: string | null
+          name: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          last_contact_at?: string | null
+          name?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       pipeline_stages: {
         Row: {
           created_at: string

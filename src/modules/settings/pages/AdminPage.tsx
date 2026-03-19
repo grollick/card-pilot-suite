@@ -8,6 +8,7 @@ import BetaManagementTab from "@/modules/settings/components/BetaManagementTab";
 import AdminFeedbackTab from "@/modules/settings/components/AdminFeedbackTab";
 import BugPriorityDashboard from "@/modules/settings/components/BugPriorityDashboard";
 import RoadmapBoard from "@/modules/settings/components/RoadmapBoard";
+import AdminGrowthDashboard from "@/modules/settings/components/AdminGrowthDashboard";
 export default function AdminPage() {
   const byCategory = getProfessionsByCategory();
 
@@ -35,6 +36,7 @@ export default function AdminPage() {
            <TabsTrigger value="feedback">Feedback</TabsTrigger>
            <TabsTrigger value="bugs">Bug Priority</TabsTrigger>
            <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
+           <TabsTrigger value="growth">Growth</TabsTrigger>
          </TabsList>
 
         <TabsContent value="professions" className="mt-4 space-y-6">
@@ -86,6 +88,9 @@ export default function AdminPage() {
         </TabsContent>
         <TabsContent value="roadmap" className="mt-4">
           <RoadmapBoard />
+        </TabsContent>
+        <TabsContent value="growth" className="mt-4">
+          <AdminGrowthDashboard />
         </TabsContent>
       </Tabs>
     </div>
