@@ -103,6 +103,9 @@ export default function DashboardHome() {
         <SmartRevenueWidget />
       </div>
 
+      {/* ── Lead Performance ── */}
+      <LeadPerformanceWidget />
+
       {/* ── Next Actions ── */}
       <NextActionsWidget />
 

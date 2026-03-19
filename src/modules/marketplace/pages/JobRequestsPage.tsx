@@ -132,6 +132,13 @@ export default function JobRequestsPage() {
                   >
                     <Card className={`border-border transition-all ${!responded ? "hover:border-primary/30 hover:shadow-md" : ""}`}>
                       <CardContent className="p-5">
+                        {/* Competition nudge for unresponded */}
+                        {!responded && request.match_status === "pending" && (
+                          <div className="flex items-center gap-2 text-xs text-amber-600 bg-amber-500/10 rounded-lg px-3 py-1.5 mb-3">
+                            <Zap className="h-3 w-3 shrink-0" />
+                            <span>Respond quickly to improve your chances — fast replies win more leads.</span>
+                          </div>
+                        )}
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0 space-y-2">
                             <div className="flex items-center gap-2 flex-wrap">

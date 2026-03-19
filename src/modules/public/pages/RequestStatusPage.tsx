@@ -114,7 +114,7 @@ export default function RequestStatusPage() {
                   transition={{ delay: i * 0.1 }}
                 >
                   <Card className="border-border hover:shadow-md transition-shadow">
-                    <CardContent className="p-5">
+                     <CardContent className="p-5">
                       <div className="flex items-start gap-4">
                         <Avatar className="h-12 w-12">
                           <AvatarImage src={response.profile?.avatar_url || ""} />
@@ -126,6 +126,14 @@ export default function RequestStatusPage() {
                             {response.profile?.city && (
                               <Badge variant="outline" className="text-2xs gap-1">
                                 <MapPin className="h-2.5 w-2.5" /> {response.profile.city}
+                              </Badge>
+                            )}
+                          </div>
+                          {/* Trust signals */}
+                          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                            {i === 0 && (
+                              <Badge variant="outline" className="text-2xs gap-1 border-primary/30 bg-primary/5 text-primary">
+                                <Clock className="h-2.5 w-2.5" /> First to respond
                               </Badge>
                             )}
                           </div>
