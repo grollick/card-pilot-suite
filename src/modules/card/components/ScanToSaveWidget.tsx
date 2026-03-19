@@ -9,7 +9,7 @@ interface Props {
   handle: string;
   palette: { primary: string; secondary: string; accent?: string; background: string };
   fonts: { primary: string; secondary: string };
-  radii: { card: number; button: number };
+  radii: { card: number | string; button: number | string };
   onSuccess?: () => void;
 }
 
