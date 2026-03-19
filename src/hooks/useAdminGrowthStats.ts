@@ -34,10 +34,18 @@ export interface ActivityItem {
   meta: Record<string, string>;
 }
 
+export interface ReferralMetrics {
+  total: number;
+  activated: number;
+  rewardsIssued: number;
+  totalRewardDays: number;
+}
+
 export interface AdminGrowthData {
   kpis: GrowthKPIs;
   funnel: GrowthFunnel;
   marketplace: MarketplaceHealth;
+  referrals: ReferralMetrics;
   signupsByDate: Record<string, number>;
   planCounts: Record<string, number>;
   activityFeed: ActivityItem[];
