@@ -20,6 +20,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function DashboardHome() {
   const isMobile = useIsMobile();
+  const { data: guaranteeData } = useLeadGuarantee();
 
   return (
     <div className="space-y-6 max-w-[1280px]">
