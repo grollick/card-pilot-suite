@@ -57,7 +57,7 @@ const steps = [
 const benefits = [
   { icon: UserPlus, title: "Capture Leads", desc: "Turn every card view into a contact. Auto-capture visitor info without lifting a finger." },
   { icon: Calendar, title: "Book Appointments", desc: "Let customers self-book from your card. No more back-and-forth scheduling." },
-  { icon: Camera, title: "Show Your Work", desc: "Showcase your best projects with before/after photos and galleries." },
+  { icon: Camera, title: "Scan Business Cards", desc: "Scan physical business cards with your camera — AI extracts contact info instantly. Or let visitors scan theirs to you." },
   { icon: BarChart3, title: "Track Your Growth", desc: "See card views, leads captured, bookings, and revenue — all in real-time." },
 ];
 
@@ -93,9 +93,10 @@ const plans = [
   {
     name: "Free",
     price: "$0",
+
     period: "forever",
     desc: "Get started with the basics",
-    features: ["1 Smart Card", "QR & link sharing", "Basic CRM (20 contacts)", "5 Leads/month", "Lead capture form"],
+    features: ["1 Smart Card", "QR & link sharing", "Basic CRM (20 contacts)", "5 Leads/month", "Lead capture form", "Business card scanner"],
     highlighted: false,
   },
   {
@@ -103,7 +104,7 @@ const plans = [
     price: "$29",
     period: "/month",
     desc: "Everything you need to grow",
-    features: ["Unlimited cards & contacts", "Booking & estimates", "Full CRM & pipeline", "Autopilot follow-ups", "Project showcase", "Remove branding"],
+    features: ["Unlimited cards & contacts", "Booking & estimates", "Full CRM & pipeline", "Autopilot follow-ups", "Scan to Save on your card", "Contact categories", "Remove branding"],
     highlighted: true,
   },
   {

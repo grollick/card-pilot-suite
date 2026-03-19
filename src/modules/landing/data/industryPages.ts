@@ -80,6 +80,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
         "Project showcase (before & after)",
         "Quote request form",
         "Booking calendar",
+        "Business card scanner",
         "Lead tracking dashboard",
       ],
       caption: "See exactly how many leads and bookings you're getting.",
@@ -89,6 +90,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       { title: "Get More Leads", icon: "📥", description: "Capture quote requests from your card." },
       { title: "Show Your Work", icon: "🖼️", description: "Display before-and-after projects to build trust." },
       { title: "Book Consultations", icon: "📅", description: "Let customers schedule time with you." },
+      { title: "Scan Business Cards", icon: "📸", description: "Scan physical cards at job sites to add contacts instantly." },
       { title: "Stay Organized", icon: "📊", description: "Manage all your leads and jobs in one dashboard." },
     ],
     socialProof: {
@@ -111,7 +113,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
     finalCtaHeadline: "Start getting more leads today.",
     finalCtaSubheadline: "Set up your contractor card in minutes and start booking more jobs.",
     footerNote: "Built for contractors, renovators, and construction professionals.",
-    focusAreas: ["Lead Generation", "Quote Requests", "Project Showcases"],
+    focusAreas: ["Lead Generation", "Quote Requests", "Card Scanning", "Project Showcases"],
   },
   barbers: {
     slug: "barbers",
@@ -163,6 +165,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
     features: [
       { title: "Get More Bookings", icon: "📅", description: "Clients can book instantly from your link." },
       { title: "Show Your Work", icon: "✂️", description: "Display your best fades, cuts, and styles." },
+      { title: "Scan to Save", icon: "📸", description: "Let walk-ins scan their card to become a contact — no typing needed." },
       { title: "Stay Organized", icon: "📊", description: "Track appointments and clients easily." },
       { title: "Bring Clients Back", icon: "🔔", description: "Encourage repeat bookings and loyalty." },
     ],
@@ -239,6 +242,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       { title: "Capture Leads", icon: "📥", description: "Get buyer and seller inquiries instantly." },
       { title: "Show Listings", icon: "🏡", description: "Display featured properties in one place." },
       { title: "Book Consultations", icon: "📅", description: "Let clients schedule time with you." },
+      { title: "Scan Business Cards", icon: "📸", description: "Scan cards at open houses to instantly add contacts to your CRM." },
       { title: "Stay Organized", icon: "📊", description: "Track all leads and conversations." },
     ],
     socialProof: {
@@ -292,6 +296,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       { title: "Portfolio Gallery", icon: "🖼️", description: "A beautiful, fast-loading gallery that showcases your best work." },
       { title: "Session Booking", icon: "📅", description: "Clients choose a package and book a date — no emails needed." },
       { title: "Inquiry Forms", icon: "📝", description: "Smart forms capture event type, date, location, and budget." },
+      { title: "Business Card Scanner", icon: "📸", description: "Scan client cards at events and networking mixers to grow your contact list." },
       { title: "Package Display", icon: "💎", description: "Show your pricing packages with what's included in each tier." },
       { title: "Client Testimonials", icon: "⭐", description: "Display glowing reviews from past clients to build trust." },
       { title: "Social Links", icon: "📱", description: "Connect your Instagram, TikTok, and portfolio site in one place." },
@@ -327,6 +332,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
     features: [
       { title: "Before & After Slider", icon: "🔄", description: "Interactive sliders that show dramatic yard transformations." },
       { title: "Quote Request Forms", icon: "📋", description: "Capture property size, service type, and photos from potential clients." },
+      { title: "Scan Business Cards", icon: "📸", description: "Scan cards at home shows and networking events to grow your client base." },
       { title: "Seasonal Promos", icon: "🍂", description: "Promote seasonal services with eye-catching banners on your card." },
       { title: "Service Area Map", icon: "📍", description: "Show exactly which neighborhoods and zip codes you serve." },
       { title: "Maintenance Plans", icon: "📆", description: "Display recurring plan options to lock in steady monthly revenue." },
