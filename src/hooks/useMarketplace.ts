@@ -33,7 +33,7 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
     queryFn: async (): Promise<MarketplaceListing[]> => {
       const query = supabase
         .from("profiles")
-        .select("id, name, handle, avatar_url, company, city, bio, service_area, featured, marketplace_enabled, updated_at, professions(name, category)" as any)
+        .select("id, name, handle, avatar_url, company, city, bio, service_area, featured, featured_until, marketplace_enabled, updated_at, professions(name, category)" as any)
         .not("handle", "is", null)
         .not("name", "is", null)
         .order("name");
@@ -82,23 +82,28 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         });
       }
 
-      let listings: MarketplaceListing[] = enabledProfiles.map((p: any) => ({
-        id: p.id,
-        name: p.name,
-        handle: p.handle,
-        avatar_url: p.avatar_url,
-        company: p.company,
-        city: p.city,
-        bio: p.bio,
-        profession_name: p.professions?.name ?? null,
-        profession_category: p.professions?.category ?? null,
-        service_area: p.service_area ?? null,
-        featured: p.featured ?? false,
-        avg_rating: ratingsMap[p.id]?.avg ?? null,
-        review_count: ratingsMap[p.id]?.count ?? 0,
-        services: servicesMap[p.id] ?? [],
-        updated_at: p.updated_at,
-      }));
+      const now = new Date();
+      let listings: MarketplaceListing[] = enabledProfiles.map((p: any) => {
+        const featuredUntil = p.featured_until ? new Date(p.featured_until) : null;
+        const isFeatured = p.featured || (featuredUntil && featuredUntil > now);
+        return {
+          id: p.id,
+          name: p.name,
+          handle: p.handle,
+          avatar_url: p.avatar_url,
+          company: p.company,
+          city: p.city,
+          bio: p.bio,
+          profession_name: p.professions?.name ?? null,
+          profession_category: p.professions?.category ?? null,
+          service_area: p.service_area ?? null,
+          featured: isFeatured ?? false,
+          avg_rating: ratingsMap[p.id]?.avg ?? null,
+          review_count: ratingsMap[p.id]?.count ?? 0,
+          services: servicesMap[p.id] ?? [],
+          updated_at: p.updated_at,
+        };
+      });
 
       // Filter by profession
       if (filters.profession) {
@@ -143,16 +148,14 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
       }
 
       // Ranking: featured → high-rated → active → name
-      const now = Date.now();
+      const nowMs = Date.now();
       listings.sort((a, b) => {
         if (a.featured !== b.featured) return a.featured ? -1 : 1;
-        // Rating score (0-5)
         const ratingA = a.avg_rating ?? 0;
         const ratingB = b.avg_rating ?? 0;
         if (ratingB !== ratingA) return ratingB - ratingA;
-        // Activity recency (more recently updated = higher)
-        const activeA = now - new Date(a.updated_at).getTime();
-        const activeB = now - new Date(b.updated_at).getTime();
+        const activeA = nowMs - new Date(a.updated_at).getTime();
+        const activeB = nowMs - new Date(b.updated_at).getTime();
         if (activeA !== activeB) return activeA - activeB;
         return (a.name ?? "").localeCompare(b.name ?? "");
       });

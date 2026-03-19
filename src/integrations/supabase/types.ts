@@ -1954,6 +1954,44 @@ export type Database = {
         }
         Relationships: []
       }
+      marketplace_lead_credits: {
+        Row: {
+          amount: number
+          billed: boolean
+          created_at: string
+          id: string
+          lead_id: string | null
+          source: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          billed?: boolean
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          source?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          billed?: boolean
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          source?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_lead_credits_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       neighborhood_boosts: {
         Row: {
           bookings_count: number
@@ -2181,6 +2219,7 @@ export type Database = {
           daily_report_enabled: boolean
           email: string | null
           featured: boolean
+          featured_until: string | null
           followup_body: string | null
           followup_delay_minutes: number
           followup_enabled: boolean
@@ -2211,6 +2250,7 @@ export type Database = {
           daily_report_enabled?: boolean
           email?: string | null
           featured?: boolean
+          featured_until?: string | null
           followup_body?: string | null
           followup_delay_minutes?: number
           followup_enabled?: boolean
@@ -2241,6 +2281,7 @@ export type Database = {
           daily_report_enabled?: boolean
           email?: string | null
           featured?: boolean
+          featured_until?: string | null
           followup_body?: string | null
           followup_delay_minutes?: number
           followup_enabled?: boolean

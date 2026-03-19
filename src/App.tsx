@@ -99,6 +99,7 @@ const IndustryInsightsPage = lazy(() => import("@/modules/analytics/pages/Indust
 // Marketplace
 const ProjectsPage = lazy(() => import("@/modules/marketplace/pages/ProjectsPage"));
 const ReviewsPage = lazy(() => import("@/modules/marketplace/pages/ReviewsPage"));
+const MarketplacePerformancePage = lazy(() => import("@/modules/marketplace/pages/MarketplacePerformancePage"));
 
 // AI Assistant
 const AssistantPage = lazy(() => import("@/modules/assistant/pages/AssistantPage"));
@@ -228,6 +229,7 @@ const App = () => (
               <Route path="boost" element={<LazyRoute><BoostPage /></LazyRoute>} />
               <Route path="projects" element={<LazyRoute><ProjectsPage /></LazyRoute>} />
               <Route path="reviews" element={<LazyRoute><ReviewsPage /></LazyRoute>} />
+              <Route path="marketplace-performance" element={<LazyRoute><MarketplacePerformancePage /></LazyRoute>} />
               <Route path="estimates" element={<LazyRoute><EstimatesPage /></LazyRoute>} />
               <Route path="jobs" element={<LazyRoute><JobsPage /></LazyRoute>} />
               <Route path="jobs/:id" element={<LazyRoute><JobDetailPage /></LazyRoute>} />

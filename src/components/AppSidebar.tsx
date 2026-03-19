@@ -64,6 +64,7 @@ const marketingItems = [
   { title: "Content", url: "/app/content", icon: Megaphone },
   { title: "Referrals", url: "/app/referrals", icon: Gift },
   { title: "Boost", url: "/app/boost", icon: Zap },
+  { title: "Marketplace ROI", url: "/app/marketplace-performance", icon: BarChart3 },
   { title: "Promotions", url: "/app/promotions", icon: Tag },
   { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
 ];
