@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Loader2, FileText, Send, Eye, CheckCircle, AlertTriangle, X, MoreHorizontal, Trash2 } from "lucide-react";
+import { Plus, Loader2, FileText, Send, Eye, CheckCircle, AlertTriangle, X, MoreHorizontal, Trash2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +11,9 @@ import {
   INVOICE_STATUS_LABELS, INVOICE_STATUS_COLORS, type InvoiceStatus,
 } from "@/hooks/useInvoices";
 import { format } from "date-fns";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import { exportInvoicePDF } from "@/lib/invoicePdf";
+import { supabase } from "@/integrations/supabase/client";
 
 const STATUS_TABS: Array<{ value: string; label: string; icon: any }> = [
   { value: "all", label: "All", icon: FileText },
@@ -27,6 +30,21 @@ export default function InvoicesPage() {
   const { data: invoices = [], isLoading } = useInvoices(statusFilter);
   const updateStatus = useUpdateInvoiceStatus();
   const deleteInvoice = useDeleteInvoice();
+  const { planKey, profile } = usePlanLimits();
+
+  const handleExportPDF = async (inv: any) => {
+    const { data: lineItems } = await supabase
+      .from("invoice_line_items")
+      .select("*")
+      .eq("invoice_id", inv.id)
+      .order("sort_order");
+    exportInvoicePDF({
+      invoice: { ...inv, leads: inv.leads, jobs: inv.jobs },
+      lineItems: (lineItems ?? []) as any[],
+      profile: profile as any,
+      planKey,
+    });
+  };
 
   const totalRevenue = invoices.filter((i: any) => i.status === "paid").reduce((sum: number, i: any) => sum + Number(i.grand_total), 0);
   const totalOutstanding = invoices.filter((i: any) => ["sent", "viewed", "overdue"].includes(i.status)).reduce((sum: number, i: any) => sum + Number(i.grand_total), 0);
@@ -125,15 +143,18 @@ export default function InvoicesPage() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                     {inv.status === "draft" && (
-                      <DropdownMenuItem onClick={() => updateStatus.mutate({ id: inv.id, status: "sent" })}>
+                      <DropdownMenuItem onClick={() => updateStatus.mutate({ id: inv.id, status: "sent", lead_id: inv.lead_id, invoice_number: inv.invoice_number })}>
                         <Send className="h-4 w-4 mr-2" /> Mark as Sent
                       </DropdownMenuItem>
                     )}
                     {["sent", "viewed", "overdue"].includes(inv.status) && (
-                      <DropdownMenuItem onClick={() => updateStatus.mutate({ id: inv.id, status: "paid" })}>
+                      <DropdownMenuItem onClick={() => updateStatus.mutate({ id: inv.id, status: "paid", lead_id: inv.lead_id, invoice_number: inv.invoice_number })}>
                         <CheckCircle className="h-4 w-4 mr-2" /> Mark as Paid
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuItem onClick={() => handleExportPDF(inv)}>
+                      <Download className="h-4 w-4 mr-2" /> Export PDF
+                    </DropdownMenuItem>
                     <DropdownMenuItem
                       className="text-destructive"
                       onClick={() => deleteInvoice.mutate(inv.id)}

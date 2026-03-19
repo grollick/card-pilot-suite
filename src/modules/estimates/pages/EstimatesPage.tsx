@@ -27,7 +27,7 @@ import {
 import { format, addHours } from "date-fns";
 import {
   useEstimates, useDeleteEstimate, useUpdateEstimateStatus, useDuplicateEstimate,
-  useConvertEstimateToJob,
+  useConvertEstimateToJob, useConvertEstimateToInvoice,
   type EstimateStatus, type EstimateSection, calculateEstimateTotals,
 } from "@/hooks/useEstimates";
 import { usePipelineStages } from "@/hooks/useContacts";
@@ -61,6 +61,7 @@ export default function EstimatesPage() {
   const updateStatus = useUpdateEstimateStatus();
   const duplicateEstimate = useDuplicateEstimate();
   const convertToJob = useConvertEstimateToJob();
+  const convertToInvoice = useConvertEstimateToInvoice();
   const { data: stages = [] } = usePipelineStages();
   const { planKey, profile } = usePlanLimits();
 
@@ -196,7 +197,7 @@ export default function EstimatesPage() {
                           {nextStatuses.includes("approved") && <DropdownMenuItem onClick={() => handleStatusChange(est, "approved")}><CheckCircle2 className="h-3.5 w-3.5 mr-2 text-emerald-600" /> Approve</DropdownMenuItem>}
                           {nextStatuses.includes("declined") && <DropdownMenuItem onClick={() => handleStatusChange(est, "declined")}><XCircle className="h-3.5 w-3.5 mr-2 text-destructive" /> Decline</DropdownMenuItem>}
                           {nextStatuses.includes("draft") && <DropdownMenuItem onClick={() => handleStatusChange(est, "draft")}><FileText className="h-3.5 w-3.5 mr-2" /> Revert to Draft</DropdownMenuItem>}
-                          {isApproved && !isConverted && <><DropdownMenuSeparator /><DropdownMenuItem onClick={() => { setConvertDialog(est); setConvertDate(new Date().toISOString().split("T")[0]); }}><CalendarCheck className="h-3.5 w-3.5 mr-2" /> Convert to Job</DropdownMenuItem></>}
+                          {isApproved && !isConverted && <><DropdownMenuSeparator /><DropdownMenuItem onClick={() => { setConvertDialog(est); setConvertDate(new Date().toISOString().split("T")[0]); }}><CalendarCheck className="h-3.5 w-3.5 mr-2" /> Convert to Job</DropdownMenuItem><DropdownMenuItem onClick={() => convertToInvoice.mutate({ estimateId: est.id })}><FileText className="h-3.5 w-3.5 mr-2" /> Convert to Invoice</DropdownMenuItem></>}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => handleExportPDF(est)}><Download className="h-3.5 w-3.5 mr-2" /> Export PDF</DropdownMenuItem>
                           <DropdownMenuItem onClick={() => duplicateEstimate.mutate(est)}><Copy className="h-3.5 w-3.5 mr-2" /> Duplicate</DropdownMenuItem>

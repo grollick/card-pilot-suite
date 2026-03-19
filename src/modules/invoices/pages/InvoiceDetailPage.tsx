@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Save, Send, CheckCircle, Loader2, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, Send, CheckCircle, Loader2, Plus, Trash2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +16,8 @@ import {
 } from "@/hooks/useInvoices";
 import { useContacts } from "@/hooks/useContacts";
 import { useJobs } from "@/hooks/useJobs";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
+import { exportInvoicePDF } from "@/lib/invoicePdf";
 import { format } from "date-fns";
 
 interface LineItem {
@@ -36,6 +38,7 @@ export default function InvoiceDetailPage() {
   const updateStatus = useUpdateInvoiceStatus();
   const saveLineItems = useSaveInvoiceLineItems();
   const createInvoice = useCreateInvoice();
+  const { planKey, profile } = usePlanLimits();
 
   const [leadId, setLeadId] = useState<string>("");
   const [jobId, setJobId] = useState<string>("");
@@ -132,13 +135,23 @@ export default function InvoiceDetailPage() {
         </div>
         <div className="flex gap-2">
           {!isNew && invoice?.status === "draft" && (
-            <Button variant="outline" onClick={() => updateStatus.mutate({ id: id!, status: "sent" })}>
+            <Button variant="outline" onClick={() => updateStatus.mutate({ id: id!, status: "sent", lead_id: invoice?.lead_id, invoice_number: invoice?.invoice_number })}>
               <Send className="h-4 w-4 mr-2" /> Mark Sent
             </Button>
           )}
           {!isNew && ["sent", "viewed", "overdue"].includes(invoice?.status) && (
-            <Button variant="outline" onClick={() => updateStatus.mutate({ id: id!, status: "paid" })}>
+            <Button variant="outline" onClick={() => updateStatus.mutate({ id: id!, status: "paid", lead_id: invoice?.lead_id, invoice_number: invoice?.invoice_number })}>
               <CheckCircle className="h-4 w-4 mr-2" /> Mark Paid
+            </Button>
+          )}
+          {!isNew && invoice && (
+            <Button variant="outline" onClick={() => exportInvoicePDF({
+              invoice: { ...invoice, leads: invoice.leads, jobs: invoice.jobs },
+              lineItems: items.filter(li => li.title),
+              profile: profile as any,
+              planKey,
+            })}>
+              <Download className="h-4 w-4 mr-2" /> PDF
             </Button>
           )}
           <Button onClick={handleSave} disabled={createInvoice.isPending || updateInvoice.isPending}>

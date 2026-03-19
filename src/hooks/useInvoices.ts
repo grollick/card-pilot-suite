@@ -93,11 +93,12 @@ export function useCreateInvoice() {
       line_items?: Array<{ title: string; description?: string; quantity: number; unit_price: number; line_total: number }>;
     }) => {
       const { line_items, ...invoiceData } = invoice;
+      const invNumber = invoiceData.invoice_number || generateInvoiceNumber();
       const { data, error } = await supabase
         .from("invoices")
         .insert({
           ...invoiceData,
-          invoice_number: invoiceData.invoice_number || generateInvoiceNumber(),
+          invoice_number: invNumber,
           user_id: user!.id,
           status: "draft" as any,
         })
@@ -120,10 +121,22 @@ export function useCreateInvoice() {
         if (liError) throw liError;
       }
 
+      // Log CRM activity
+      if (invoice.lead_id) {
+        await supabase.from("contact_activities").insert({
+          lead_id: invoice.lead_id,
+          user_id: user!.id,
+          activity_type: "invoice_created",
+          title: `Invoice ${invNumber} created`,
+          related_id: (data as any).id,
+        });
+      }
+
       return data;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["invoices"] });
+      qc.invalidateQueries({ queryKey: ["contact-activities"] });
       toast.success("Invoice created");
     },
     onError: (e: any) => toast.error(e.message),
@@ -151,9 +164,12 @@ export function useUpdateInvoice() {
 }
 
 export function useUpdateInvoiceStatus() {
+  const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: InvoiceStatus }) => {
+    mutationFn: async ({ id, status, lead_id, invoice_number }: {
+      id: string; status: InvoiceStatus; lead_id?: string | null; invoice_number?: string;
+    }) => {
       const updates: any = { status };
       if (status === "sent") updates.sent_at = new Date().toISOString();
       if (status === "paid") {
@@ -161,11 +177,25 @@ export function useUpdateInvoiceStatus() {
       }
       const { error } = await supabase.from("invoices").update(updates).eq("id", id);
       if (error) throw error;
+
+      // Log CRM activity for status changes
+      if (lead_id && user) {
+        const activityType = `invoice_${status}`;
+        await supabase.from("contact_activities").insert({
+          lead_id,
+          user_id: user.id,
+          activity_type: activityType,
+          title: `Invoice ${invoice_number ?? ""} marked ${status}`,
+          related_id: id,
+        });
+      }
+
       return { id, status };
     },
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["invoices"] });
       qc.invalidateQueries({ queryKey: ["invoice", vars.id] });
+      qc.invalidateQueries({ queryKey: ["contact-activities"] });
       toast.success(`Invoice marked as ${INVOICE_STATUS_LABELS[vars.status]}`);
     },
     onError: (e: any) => toast.error(e.message),
