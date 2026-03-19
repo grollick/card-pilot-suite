@@ -65,6 +65,7 @@ export default function BlockMarketplaceDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[85vh] flex flex-col p-0 gap-0">
+        <DesktopGuidanceNotice toolKey="block-marketplace" />
         <DialogHeader className="px-5 pt-5 pb-3 border-b border-border space-y-3 shrink-0">
           <DialogTitle className="text-lg font-bold flex items-center gap-2">
             <Plus className="h-5 w-5 text-primary" />
