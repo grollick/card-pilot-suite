@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { format, isPast, isFuture, formatDistanceToNow } from "date-fns";
+import { format, isPast, isFuture } from "date-fns";
 import {
-  Calendar, Clock, Building2, Star, Tag, RotateCw,
-  ChevronRight, Loader2, LogOut, X, AlertTriangle, Sparkles
+  Calendar, Clock, Building2, Star, RotateCw,
+  ChevronRight, Loader2, LogOut, X, AlertTriangle, Sparkles, Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,8 +17,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import {
   useClientProfile, useClientBusinesses, useClientBookings,
-  useCancelBooking, type ClientBooking
+  type ClientBooking
 } from "@/hooks/useClientPortalData";
+import { useClientCancelBooking } from "@/hooks/useClientPortalActions";
+import PortalReviewDialog from "@/modules/client/components/PortalReviewDialog";
 import { toast } from "sonner";
 
 const anim = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } };
@@ -37,8 +39,9 @@ export default function ClientDashboard() {
   const { data: profile, isLoading: profileLoading } = useClientProfile();
   const { data: businesses = [], isLoading: bizLoading } = useClientBusinesses();
   const { data: bookings = [], isLoading: bookingsLoading } = useClientBookings();
-  const cancelBooking = useCancelBooking();
-  const [cancelTarget, setCancelTarget] = useState<string | null>(null);
+  const cancelBooking = useClientCancelBooking();
+  const [cancelTarget, setCancelTarget] = useState<{ id: string; userId: string; leadId: string; serviceName?: string } | null>(null);
+  const [reviewTarget, setReviewTarget] = useState<{ businessUserId: string; businessName: string | null; leadId: string } | null>(null);
 
   const isLoading = profileLoading || bizLoading || bookingsLoading;
 
@@ -52,17 +55,20 @@ export default function ClientDashboard() {
   const handleCancel = async () => {
     if (!cancelTarget) return;
     try {
-      await cancelBooking.mutateAsync(cancelTarget);
-      toast.success("Booking cancelled successfully");
+      await cancelBooking.mutateAsync({
+        bookingId: cancelTarget.id,
+        businessUserId: cancelTarget.userId,
+        leadId: cancelTarget.leadId,
+        serviceName: cancelTarget.serviceName,
+      });
     } catch {
-      toast.error("Failed to cancel booking");
+      // error handled in hook
     }
     setCancelTarget(null);
   };
 
   const handleBookAgain = (booking: ClientBooking) => {
     if (booking.user_id) {
-      // Find the business handle
       const biz = businesses.find(b => b.businessUserId === booking.user_id);
       if (biz?.businessHandle) {
         navigate(`/book/${biz.businessHandle}`);
@@ -75,6 +81,12 @@ export default function ClientDashboard() {
   const handleSignOut = async () => {
     await signOut();
     navigate("/client/auth");
+  };
+
+  // Find the lead_id for a booking's business
+  const getLeadIdForBooking = (booking: ClientBooking): string | null => {
+    const biz = businesses.find(b => b.businessUserId === booking.user_id);
+    return biz?.leadId || booking.lead_id || null;
   };
 
   return (
@@ -171,7 +183,17 @@ export default function ClientDashboard() {
                   <BookingCard
                     key={booking.id}
                     booking={booking}
-                    onCancel={() => setCancelTarget(booking.id)}
+                    onCancel={() => {
+                      const leadId = getLeadIdForBooking(booking);
+                      if (leadId) {
+                        setCancelTarget({
+                          id: booking.id,
+                          userId: booking.user_id,
+                          leadId,
+                          serviceName: booking.serviceName,
+                        });
+                      }
+                    }}
                     onReschedule={() => handleBookAgain(booking)}
                     variant="upcoming"
                   />
@@ -190,14 +212,25 @@ export default function ClientDashboard() {
                   <p className="text-sm text-muted-foreground">No past services yet</p>
                 </div>
               ) : (
-                pastBookings.map((booking) => (
-                  <BookingCard
-                    key={booking.id}
-                    booking={booking}
-                    onBookAgain={() => handleBookAgain(booking)}
-                    variant="past"
-                  />
-                ))
+                pastBookings.map((booking) => {
+                  const leadId = getLeadIdForBooking(booking);
+                  return (
+                    <BookingCard
+                      key={booking.id}
+                      booking={booking}
+                      onBookAgain={() => handleBookAgain(booking)}
+                      onReview={leadId ? () => {
+                        const biz = businesses.find(b => b.businessUserId === booking.user_id);
+                        setReviewTarget({
+                          businessUserId: booking.user_id,
+                          businessName: biz?.businessName || booking.businessName || null,
+                          leadId,
+                        });
+                      } : undefined}
+                      variant="past"
+                    />
+                  );
+                })
               )}
             </TabsContent>
           </Tabs>
@@ -227,45 +260,30 @@ export default function ClientDashboard() {
                       <p className="text-xs text-muted-foreground">@{biz.businessHandle}</p>
                     )}
                   </div>
-                  {biz.businessHandle && (
+                  <div className="flex gap-1.5">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate(`/book/${biz.businessHandle}`)}
+                      onClick={() => setReviewTarget({
+                        businessUserId: biz.businessUserId,
+                        businessName: biz.businessName,
+                        leadId: biz.leadId,
+                      })}
                     >
-                      Book <ChevronRight className="h-3 w-3 ml-1" />
+                      <Star className="h-3 w-3 mr-1" /> Review
                     </Button>
-                  )}
+                    {biz.businessHandle && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => navigate(`/book/${biz.businessHandle}`)}
+                      >
+                        Book <ChevronRight className="h-3 w-3 ml-1" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* Reviews CTA */}
-        {!isLoading && pastBookings.length > 0 && (
-          <motion.div {...anim} transition={{ delay: 0.2 }}
-            className="rounded-xl border border-border bg-card p-5"
-          >
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-[hsl(var(--warning))]/10 flex items-center justify-center shrink-0">
-                <Star className="h-5 w-5 text-[hsl(var(--warning))]" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-sm">Share Your Experience</h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Help others by leaving a review for your service providers.
-                </p>
-              </div>
-              {businesses.length > 0 && businesses[0].businessHandle && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate(`/${businesses[0].businessHandle}?review=true`)}
-                >
-                  Leave Review
-                </Button>
-              )}
             </div>
           </motion.div>
         )}
@@ -300,6 +318,19 @@ export default function ClientDashboard() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Review Dialog */}
+      {reviewTarget && (
+        <PortalReviewDialog
+          open={!!reviewTarget}
+          onOpenChange={(open) => { if (!open) setReviewTarget(null); }}
+          businessUserId={reviewTarget.businessUserId}
+          businessName={reviewTarget.businessName}
+          leadId={reviewTarget.leadId}
+          clientName={profile?.name || "Client"}
+          clientEmail={profile?.email}
+        />
+      )}
+
       {/* Footer */}
       <footer className="border-t border-border mt-12 py-4 text-center">
         <p className="text-xs text-muted-foreground">
@@ -315,12 +346,14 @@ function BookingCard({
   onCancel,
   onReschedule,
   onBookAgain,
+  onReview,
   variant,
 }: {
   booking: ClientBooking;
   onCancel?: () => void;
   onReschedule?: () => void;
   onBookAgain?: () => void;
+  onReview?: () => void;
   variant: "upcoming" | "past";
 }) {
   const statusColor = statusColors[booking.status] || statusColors.pending;
@@ -357,6 +390,9 @@ function BookingCard({
               </span>
             )}
           </div>
+          {variant === "past" && booking.notes && (
+            <p className="text-xs text-muted-foreground mt-1.5 italic">"{booking.notes}"</p>
+          )}
         </div>
 
         <div className="flex gap-1.5 shrink-0">
@@ -371,9 +407,16 @@ function BookingCard({
             </>
           )}
           {variant === "past" && booking.status === "completed" && (
-            <Button variant="outline" size="sm" onClick={onBookAgain}>
-              <RotateCw className="h-3 w-3 mr-1" /> Book Again
-            </Button>
+            <div className="flex gap-1.5">
+              {onReview && (
+                <Button variant="outline" size="sm" onClick={onReview}>
+                  <Star className="h-3 w-3 mr-1" /> Review
+                </Button>
+              )}
+              <Button variant="outline" size="sm" onClick={onBookAgain}>
+                <RotateCw className="h-3 w-3 mr-1" /> Rebook
+              </Button>
+            </div>
           )}
         </div>
       </div>
