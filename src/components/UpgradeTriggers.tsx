@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useProfileCache } from "@/hooks/useProfileCache";
 import MilestoneUpgradePrompt from "@/components/MilestoneUpgradePrompt";
 
 /**
@@ -12,19 +13,8 @@ export default function UpgradeTriggers() {
   const { user } = useAuth();
   const [milestone, setMilestone] = useState<"first_lead" | "first_booking" | null>(null);
 
-  // Fetch user plan
-  const { data: profile } = useQuery({
-    queryKey: ["profile-plan", user?.id],
-    enabled: !!user,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("plan")
-        .eq("id", user!.id)
-        .single();
-      return data;
-    },
-  });
+  // Use shared profile cache instead of a separate query
+  const { data: profile } = useProfileCache();
 
   // Fetch lead and booking counts
   const { data: counts } = useQuery({

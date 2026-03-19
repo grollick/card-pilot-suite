@@ -4,7 +4,8 @@ import { X, ChevronRight, ChevronLeft, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useProfileCache } from "@/hooks/useProfileCache";
 
 interface TourStep {
   title: string;
