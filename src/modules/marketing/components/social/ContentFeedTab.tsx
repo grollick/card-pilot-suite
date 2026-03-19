@@ -20,7 +20,7 @@ interface FeedItem {
 }
 
 interface Props {
-  onUsePost: (data: { content: string; hashtags: string[] }) => void;
+  onUsePost: (data: { content: string; hashtags: string[]; imageUrl?: string }) => void;
 }
 
 const CATEGORY_CONFIG: Record<string, { label: string; icon: typeof Flame; color: string }> = {
@@ -60,7 +60,7 @@ export default function ContentFeedTab({ onUsePost }: Props) {
   const handleUse = (item: FeedItem) => {
     const hashtagStr = item.hashtags.map(h => `#${h}`).join(" ");
     const fullContent = `${item.caption}\n\n${item.cta}\n\n${hashtagStr}`;
-    onUsePost({ content: fullContent, hashtags: item.hashtags });
+    onUsePost({ content: fullContent, hashtags: item.hashtags, imageUrl: item.image_url });
     toast.success("Post added to Create view!");
   };
 

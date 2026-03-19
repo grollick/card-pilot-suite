@@ -35,14 +35,17 @@ const TRADE_TEMPLATES = [
 interface Props {
   editPost?: SocialPost | null;
   onDone?: () => void;
+  pendingContent?: { content: string; hashtags: string[]; imageUrl?: string } | null;
+  onPendingConsumed?: () => void;
 }
 
-export default function SocialCreateView({ editPost, onDone }: Props) {
+export default function SocialCreateView({ editPost, onDone, pendingContent, onPendingConsumed }: Props) {
   const createPost = useCreatePost();
   const updatePost = useUpdatePost();
   const { data: campaigns = [] } = useSocialCampaigns();
 
   const [content, setContent] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["Instagram", "Facebook"]);
   const [platformOverrides, setPlatformOverrides] = useState<Record<string, { content?: string; hashtags?: string[] }>>({});
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
@@ -57,7 +60,7 @@ export default function SocialCreateView({ editPost, onDone }: Props) {
   const [linkToCard, setLinkToCard] = useState(true);
 
   const resetForm = useCallback(() => {
-    setContent(""); setSelectedPlatforms(["Instagram", "Facebook"]); setPlatformOverrides({});
+    setContent(""); setImageUrl(""); setSelectedPlatforms(["Instagram", "Facebook"]); setPlatformOverrides({});
     setScheduledDate(undefined); setScheduledTime("10:00");
     setCampaignId(""); setContentLabel(""); setHashtags(""); setCta("");
     setShowAiGenerator(false); setShowSpinner(false); setTone("professional");
@@ -77,6 +80,15 @@ export default function SocialCreateView({ editPost, onDone }: Props) {
       }
     } else { resetForm(); }
   }, [editPost, resetForm]);
+
+  useEffect(() => {
+    if (pendingContent) {
+      setContent(pendingContent.content);
+      if (pendingContent.hashtags.length > 0) setHashtags(pendingContent.hashtags.join(", "));
+      if (pendingContent.imageUrl) setImageUrl(pendingContent.imageUrl);
+      onPendingConsumed?.();
+    }
+  }, [pendingContent, onPendingConsumed]);
 
   const togglePlatform = (p: string) => setSelectedPlatforms(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
 
@@ -213,11 +225,12 @@ export default function SocialCreateView({ editPost, onDone }: Props) {
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">AI Post Generator</h3>
                 <AIPostGenerator
                   platforms={selectedPlatforms.length > 0 ? selectedPlatforms : ["Instagram"]}
-                  onSelectPost={({ content: newContent, hashtags: newHashtags }) => {
+                  onSelectPost={({ content: newContent, hashtags: newHashtags, imageUrl: newImageUrl }) => {
                     setContent(newContent);
                     if (newHashtags.length > 0) {
                       setHashtags(newHashtags.join(", "));
                     }
+                    if (newImageUrl) setImageUrl(newImageUrl);
                     setShowAiGenerator(false);
                   }}
                 />
@@ -276,6 +289,7 @@ export default function SocialCreateView({ editPost, onDone }: Props) {
                   platform={platform}
                   content={getContentForPlatform(platform)}
                   hashtags={hashtags.split(",").map(s => s.trim()).filter(Boolean)}
+                  imageUrl={imageUrl}
                 />
               ))}
             </div>

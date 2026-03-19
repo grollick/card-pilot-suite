@@ -21,14 +21,14 @@ export default function SocialScheduler() {
   const [activeTab, setActiveTab] = useState("create");
   const [detailPost, setDetailPost] = useState<SocialPost | null>(null);
   const [editPost, setEditPost] = useState<SocialPost | null>(null);
-  const [pendingContent, setPendingContent] = useState<{ content: string; hashtags: string[] } | null>(null);
+  const [pendingContent, setPendingContent] = useState<{ content: string; hashtags: string[]; imageUrl?: string } | null>(null);
 
   const openCreate = (post?: SocialPost) => {
     setEditPost(post ?? null);
     setActiveTab("create");
   };
 
-  const handleUseFeedPost = (data: { content: string; hashtags: string[] }) => {
+  const handleUseFeedPost = (data: { content: string; hashtags: string[]; imageUrl?: string }) => {
     setPendingContent(data);
     setActiveTab("create");
   };
@@ -66,6 +66,8 @@ export default function SocialScheduler() {
           <SocialCreateView
             editPost={editPost}
             onDone={() => setEditPost(null)}
+            pendingContent={pendingContent}
+            onPendingConsumed={() => setPendingContent(null)}
           />
         )}
         {activeTab === "calendar" && (
