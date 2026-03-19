@@ -80,15 +80,21 @@ export default function HeroSection() {
             </a>
           </motion.div>
 
-          <motion.p
+          <motion.div
             initial="hidden"
             animate="visible"
             variants={fadeUp}
             custom={4}
-            className="text-xs text-muted-foreground mt-5"
+            className="mt-5 flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground"
           >
-            Free forever plan • Setup in 2 minutes • No credit card required
-          </motion.p>
+            <span>Free forever plan</span>
+            <span>•</span>
+            <span>Setup in 2 minutes</span>
+            <span>•</span>
+            <span className="font-medium text-primary flex items-center gap-1">
+              <Shield className="h-3 w-3" /> 3 leads in 30 days — guaranteed
+            </span>
+          </motion.div>
         </div>
 
         {/* Product preview cards */}
