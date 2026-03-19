@@ -69,7 +69,7 @@ export function OrgProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  const currentOrg = orgs.find((o) => o.id === profile?.current_org_id) || orgs[0] || null;
+  const currentOrg = orgs.find((o) => o.id === profileCache?.current_org_id) || orgs[0] || null;
 
   // Fetch members of current org
   const { data: members = [], isLoading: membersLoading } = useQuery({
