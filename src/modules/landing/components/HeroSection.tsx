@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight, Play, Users, Calendar, FileText, BarChart3, Smartphone, MessageSquare } from "lucide-react";
+import { ArrowRight, Play, Users, Calendar, FileText, BarChart3, Smartphone, MessageSquare, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const fadeUp = {

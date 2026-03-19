@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
+import LeadGuaranteeBanner from "@/components/LeadGuaranteeBanner";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import {

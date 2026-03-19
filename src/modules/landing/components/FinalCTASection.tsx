@@ -81,6 +81,11 @@ export default function FinalCTASection() {
         >
           No credit card required • Setup in 2 minutes • Free forever plan
         </motion.p>
+
+        {/* Lead Guarantee */}
+        <div className="mt-10 max-w-2xl mx-auto">
+          <LeadGuaranteeBanner variant="landing" />
+        </div>
       </div>
     </section>
   );
