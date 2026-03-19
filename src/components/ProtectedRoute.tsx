@@ -7,18 +7,20 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  const { data: profile, isLoading: profileLoading } = useQuery({
+  const { data: profile, isLoading: profileLoading, error: profileError } = useQuery({
     queryKey: ["profile-onboarding", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
         .select("onboarding_completed")
         .eq("id", user!.id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
     enabled: !!user,
+    retry: 2,
+    staleTime: 5 * 60 * 1000,
   });
 
   if (loading || (user && profileLoading)) {
@@ -30,6 +32,12 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   }
 
   if (!user) return <Navigate to="/auth" replace />;
+
+  // If profile fetch failed, still allow access (don't block the app)
+  if (profileError) {
+    console.error("[ProtectedRoute] Profile fetch failed:", profileError);
+    return <>{children}</>;
+  }
 
   if (profile && !profile.onboarding_completed && location.pathname !== "/onboarding") {
     return <Navigate to="/onboarding" replace />;
