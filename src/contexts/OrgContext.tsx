@@ -115,7 +115,7 @@ export function OrgProvider({ children }: { children: ReactNode }) {
     await supabase.from("profiles").update({ current_org_id: data.id }).eq("id", user.id);
 
     queryClient.invalidateQueries({ queryKey: ["orgs"] });
-    queryClient.invalidateQueries({ queryKey: ["profile-org"] });
+    queryClient.invalidateQueries({ queryKey: ["profile-cache"] });
     return data as Organization;
   }, [user, queryClient]);
 
