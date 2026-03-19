@@ -49,6 +49,7 @@ export default function EstimateAssistantSheet({
   const [result, setResult] = useState("");
   const [parsedItems, setParsedItems] = useState<EstimateLineItem[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showTopup, setShowTopup] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
