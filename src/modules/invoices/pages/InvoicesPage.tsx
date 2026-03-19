@@ -34,10 +34,19 @@ export default function InvoicesPage() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const { data: invoices = [], isLoading } = useInvoices(statusFilter);
   const updateStatus = useUpdateInvoiceStatus();
   const deleteInvoice = useDeleteInvoice();
-  const { planKey, profile } = usePlanLimits();
+  const { planKey, profile, checkLimit, hasFeature } = usePlanLimits();
+
+  const isFree = planKey === "starter";
+  const thisMonthInvoices = invoices.filter((i: any) => {
+    const d = new Date(i.created_at);
+    const now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+  const invoiceLimitReached = isFree && thisMonthInvoices.length >= 3;
 
   const handleExportPDF = async (inv: any) => {
     const { data: lineItems } = await supabase

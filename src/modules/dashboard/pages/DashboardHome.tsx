@@ -120,6 +120,9 @@ export default function DashboardHome() {
           <GrowthTrends />
         </div>
       </div>
+
+      {/* Mobile floating quick-create buttons */}
+      {isMobile && <MobileQuickCreate />}
     </div>
   );
 }
