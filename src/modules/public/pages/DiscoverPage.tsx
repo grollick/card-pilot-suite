@@ -243,14 +243,61 @@ export default function DiscoverPage() {
   const [search, setSearch] = useState("");
   const [serviceFilter, setServiceFilter] = useState("");
   const [intentFilter, setIntentFilter] = useState<"" | "quote" | "book" | "available_now" | "on_duty">("");
+  const [professionFilter, setProfessionFilter] = useState("");
+  const [locationFilter, setLocationFilter] = useState("");
+  const [ratingFilter, setRatingFilter] = useState<"" | "3" | "4" | "5">("");
   const [showFilters, setShowFilters] = useState(false);
   const [showMatcher, setShowMatcher] = useState(false);
   const [topMatches, setTopMatches] = useState<MarketplaceListing[] | null>(null);
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
+  const [detectedCity, setDetectedCity] = useState<string | null>(null);
+  const [detectingLocation, setDetectingLocation] = useState(false);
+
+  // Auto-detect user location on mount
+  useEffect(() => {
+    if (!city && !locationFilter && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&zoom=10`);
+            const data = await res.json();
+            const cityName = data.address?.city || data.address?.town || data.address?.village || data.address?.county;
+            if (cityName) setDetectedCity(cityName);
+          } catch { /* silent fail */ }
+        },
+        () => { /* permission denied or error — silent */ },
+        { timeout: 5000 }
+      );
+    }
+  }, []);
+
+  const handleDetectLocation = useCallback(() => {
+    if (!navigator.geolocation) return;
+    setDetectingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&zoom=10`);
+          const data = await res.json();
+          const cityName = data.address?.city || data.address?.town || data.address?.village || data.address?.county;
+          if (cityName) {
+            setDetectedCity(cityName);
+            setLocationFilter(cityName);
+          }
+        } catch { /* silent */ }
+        setDetectingLocation(false);
+      },
+      () => setDetectingLocation(false),
+      { timeout: 8000 }
+    );
+  }, []);
+
+  // Use location filter or detected city as effective city
+  const effectiveCity = city || (locationFilter ? locationFilter.toLowerCase().replace(/\s+/g, "-") : undefined);
 
   const { data: listings, isLoading } = useMarketplaceListings({
-    profession,
-    city,
+    profession: professionFilter ? professionFilter.toLowerCase().replace(/\s+/g, "-") : profession,
+    city: effectiveCity,
     search: search.length > 1 ? search : undefined,
     service: serviceFilter || undefined,
     intent: (intentFilter || undefined) as any,
@@ -261,45 +308,52 @@ export default function DiscoverPage() {
   const { data: boostedUsers } = useBoostedUserIds();
 
   const boostedIds = useMemo(() => new Set(boostedUsers?.map(b => b.user_id) ?? []), [boostedUsers]);
-  const displayProfession = profession?.replace(/-/g, " ");
-  const displayCity = city?.replace(/-/g, " ");
+  const displayProfession = professionFilter || profession?.replace(/-/g, " ");
+  const displayCity = locationFilter || city?.replace(/-/g, " ");
+
+  // Apply rating filter client-side
+  const filteredListings = useMemo(() => {
+    if (!listings) return [];
+    if (!ratingFilter) return listings;
+    const minRating = parseInt(ratingFilter);
+    return listings.filter((l) => l.avg_rating !== null && l.avg_rating >= minRating);
+  }, [listings, ratingFilter]);
 
   const title = useMemo(() => {
     if (displayProfession && displayCity)
       return `${capitalize(displayProfession)}s in ${capitalize(displayCity)}`;
     if (displayProfession) return `${capitalize(displayProfession)}s Near You`;
     if (displayCity) return `Professionals in ${capitalize(displayCity)}`;
-    return "Get Discovered by Local Customers";
+    return "Find Professionals Near You";
   }, [displayProfession, displayCity]);
 
   const metaDescription = useMemo(() => {
     if (displayProfession && displayCity)
       return `Find trusted ${displayProfession}s in ${capitalize(displayCity)}. Book appointments, request quotes, and connect with local professionals.`;
     if (displayProfession) return `Browse top ${displayProfession}s on guzzl.pro. View profiles, read reviews, and book services instantly.`;
-    return "Discover and book trusted local businesses on guzzl.pro. Search by profession, location, and services.";
+    return "Discover and book trusted local professionals. Search by service, location, and ratings — completely free.";
   }, [displayProfession, displayCity]);
 
   const cities = useMemo(() => {
-    if (!listings) return [];
+    if (!filteredListings) return [];
     const set = new Set<string>();
-    listings.forEach((l) => l.city && set.add(l.city));
+    filteredListings.forEach((l) => l.city && set.add(l.city));
     return Array.from(set).sort().slice(0, 12);
-  }, [listings]);
+  }, [filteredListings]);
 
-  const featuredListings = useMemo(() => listings?.filter((l) => l.featured) ?? [], [listings]);
-  const boostedListings = useMemo(() => listings?.filter((l) => !l.featured && boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
-  const onDutyListings = useMemo(() => listings?.filter((l) => l.is_on_duty && !l.featured && !boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
-  // Regular = everything after the top 3 recommended
-  const allNonFeatured = useMemo(() => listings?.filter((l) => !l.featured && !boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
+  const featuredListings = useMemo(() => filteredListings?.filter((l) => l.featured) ?? [], [filteredListings]);
+  const boostedListings = useMemo(() => filteredListings?.filter((l) => !l.featured && boostedIds.has(l.id)) ?? [], [filteredListings, boostedIds]);
+  const onDutyListings = useMemo(() => filteredListings?.filter((l) => l.is_on_duty && !l.featured && !boostedIds.has(l.id)) ?? [], [filteredListings, boostedIds]);
+  const allNonFeatured = useMemo(() => filteredListings?.filter((l) => !l.featured && !boostedIds.has(l.id)) ?? [], [filteredListings, boostedIds]);
   const regularListings = useMemo(() => allNonFeatured.slice(3), [allNonFeatured]);
 
   const boostedUserIdsArray = useMemo(() => boostedListings.map(l => l.id), [boostedListings]);
   useTrackBoostViews(boostedUserIdsArray);
 
-  const hasActiveFilters = !!serviceFilter || !!search || !!intentFilter;
+  const hasActiveFilters = !!serviceFilter || !!search || !!intentFilter || !!professionFilter || !!locationFilter || !!ratingFilter;
   const professionNames = useMemo(() => profData?.professions.map(p => p.name) ?? POPULAR_PROFESSIONS, [profData]);
 
-  const clearAll = () => { setSearch(""); setServiceFilter(""); setIntentFilter(""); };
+  const clearAll = () => { setSearch(""); setServiceFilter(""); setIntentFilter(""); setProfessionFilter(""); setLocationFilter(""); setRatingFilter(""); };
 
   // Show sticky CTA only when listings are loaded
   const showSticky = !isLoading && (listings?.length ?? 0) > 0;
