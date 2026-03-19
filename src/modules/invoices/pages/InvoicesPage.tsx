@@ -1,19 +1,25 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Loader2, FileText, Send, Eye, CheckCircle, AlertTriangle, X, MoreHorizontal, Trash2, Download } from "lucide-react";
+import {
+  Plus, Loader2, FileText, Send, Eye, CheckCircle, AlertTriangle,
+  MoreHorizontal, Trash2, Download, Search, DollarSign,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import {
-  useInvoices, useUpdateInvoiceStatus, useDeleteInvoice,
-  INVOICE_STATUS_LABELS, INVOICE_STATUS_COLORS, type InvoiceStatus,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  useInvoices, useUpdateInvoiceStatus, useDeleteInvoice, type InvoiceStatus,
 } from "@/hooks/useInvoices";
 import { format } from "date-fns";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
 import { exportInvoicePDF } from "@/lib/invoicePdf";
 import { supabase } from "@/integrations/supabase/client";
+import { motion } from "framer-motion";
+import DocumentStatusBadge from "@/components/DocumentStatusBadge";
 
 const STATUS_TABS: Array<{ value: string; label: string; icon: any }> = [
   { value: "all", label: "All", icon: FileText },
@@ -27,6 +33,7 @@ const STATUS_TABS: Array<{ value: string; label: string; icon: any }> = [
 export default function InvoicesPage() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("all");
+  const [search, setSearch] = useState("");
   const { data: invoices = [], isLoading } = useInvoices(statusFilter);
   const updateStatus = useUpdateInvoiceStatus();
   const deleteInvoice = useDeleteInvoice();
@@ -46,109 +53,207 @@ export default function InvoicesPage() {
     });
   };
 
-  const totalRevenue = invoices.filter((i: any) => i.status === "paid").reduce((sum: number, i: any) => sum + Number(i.grand_total), 0);
-  const totalOutstanding = invoices.filter((i: any) => ["sent", "viewed", "overdue"].includes(i.status)).reduce((sum: number, i: any) => sum + Number(i.grand_total), 0);
+  const filtered = invoices.filter((inv: any) => {
+    if (!search) return true;
+    const s = search.toLowerCase();
+    return (
+      (inv.leads?.name?.toLowerCase() ?? "").includes(s) ||
+      (inv.invoice_number?.toLowerCase() ?? "").includes(s)
+    );
+  });
+
+  const totalRevenue = invoices
+    .filter((i: any) => i.status === "paid")
+    .reduce((sum: number, i: any) => sum + Number(i.grand_total), 0);
+  const totalOutstanding = invoices
+    .filter((i: any) => ["sent", "viewed", "overdue"].includes(i.status))
+    .reduce((sum: number, i: any) => sum + Number(i.grand_total), 0);
+  const overdueCount = invoices.filter((i: any) => i.status === "overdue").length;
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between flex-wrap gap-3"
+      >
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Invoices</h1>
-          <p className="text-muted-foreground text-sm mt-1">Manage billing and track payments</p>
+          <p className="text-muted-foreground text-sm mt-1">
+            Manage billing and track payments
+          </p>
         </div>
-        <Button className="shadow-glow" onClick={() => navigate("/app/invoices/new")}>
+        <Button
+          className="shadow-glow"
+          onClick={() => navigate("/app/invoices/new")}
+        >
           <Plus className="h-4 w-4 mr-2" /> New Invoice
         </Button>
-      </div>
+      </motion.div>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card><CardContent className="p-4">
-          <p className="text-xs text-muted-foreground">Total Invoices</p>
-          <p className="text-2xl font-bold">{invoices.length}</p>
-        </CardContent></Card>
-        <Card><CardContent className="p-4">
-          <p className="text-xs text-muted-foreground">Paid</p>
-          <p className="text-2xl font-bold text-success">${totalRevenue.toLocaleString()}</p>
-        </CardContent></Card>
-        <Card><CardContent className="p-4">
-          <p className="text-xs text-muted-foreground">Outstanding</p>
-          <p className="text-2xl font-bold text-warning">${totalOutstanding.toLocaleString()}</p>
-        </CardContent></Card>
-        <Card><CardContent className="p-4">
-          <p className="text-xs text-muted-foreground">Overdue</p>
-          <p className="text-2xl font-bold text-destructive">
-            {invoices.filter((i: any) => i.status === "overdue").length}
+      {/* KPI Cards */}
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="grid grid-cols-2 md:grid-cols-4 gap-3"
+      >
+        <div className="dash-card p-4">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+            Total
           </p>
-        </CardContent></Card>
+          <p className="text-2xl font-bold tabular-nums mt-1">
+            {invoices.length}
+          </p>
+        </div>
+        <div className="dash-card p-4">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+            Paid
+          </p>
+          <p className="text-2xl font-bold tabular-nums text-success mt-1">
+            ${totalRevenue.toLocaleString()}
+          </p>
+        </div>
+        <div className="dash-card p-4">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+            Outstanding
+          </p>
+          <p className="text-2xl font-bold tabular-nums text-warning mt-1">
+            ${totalOutstanding.toLocaleString()}
+          </p>
+        </div>
+        <div className="dash-card p-4">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+            Overdue
+          </p>
+          <p className="text-2xl font-bold tabular-nums text-destructive mt-1">
+            {overdueCount}
+          </p>
+        </div>
+      </motion.div>
+
+      {/* Filters */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <Tabs value={statusFilter} onValueChange={setStatusFilter}>
+          <TabsList className="flex-wrap">
+            {STATUS_TABS.map((tab) => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className="text-xs gap-1"
+              >
+                <tab.icon className="h-3 w-3" /> {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+        <div className="relative flex-1 max-w-xs ml-auto">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
+          <Input
+            placeholder="Search invoices..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9 h-9"
+          />
+        </div>
       </div>
 
-      {/* Status filter tabs */}
-      <Tabs value={statusFilter} onValueChange={setStatusFilter}>
-        <TabsList className="flex-wrap">
-          {STATUS_TABS.map((tab) => (
-            <TabsTrigger key={tab.value} value={tab.value} className="text-xs gap-1">
-              <tab.icon className="h-3 w-3" /> {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </Tabs>
-
+      {/* List */}
       {isLoading ? (
         <div className="flex justify-center py-12">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
-      ) : invoices.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <FileText className="h-10 w-10 text-muted-foreground mb-3" />
-            <h3 className="font-semibold">No invoices yet</h3>
-            <p className="text-sm text-muted-foreground mt-1">Create your first invoice or complete a job to auto-generate one.</p>
-            <Button className="mt-4" onClick={() => navigate("/app/invoices/new")}>
-              <Plus className="h-4 w-4 mr-2" /> Create Invoice
-            </Button>
-          </CardContent>
-        </Card>
+      ) : filtered.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="dash-card p-12 text-center"
+        >
+          <FileText className="h-10 w-10 text-muted-foreground/40 mx-auto mb-3" />
+          <h3 className="font-semibold mb-1">No invoices yet</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            Create your first invoice to start billing customers.
+          </p>
+          <Button onClick={() => navigate("/app/invoices/new")}>
+            <Plus className="h-4 w-4 mr-2" /> Create Invoice
+          </Button>
+        </motion.div>
       ) : (
         <div className="space-y-2">
-          {invoices.map((inv: any) => (
-            <Card
+          {filtered.map((inv: any, idx: number) => (
+            <motion.div
               key={inv.id}
-              className="cursor-pointer hover:shadow-md transition-shadow"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.03 }}
+              className="dash-card p-4 flex items-center justify-between gap-4 cursor-pointer hover:shadow-md transition-all group"
               onClick={() => navigate(`/app/invoices/${inv.id}`)}
             >
-              <CardContent className="p-4 flex items-center justify-between gap-4">
-                <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="h-10 w-10 rounded-xl bg-primary/5 flex items-center justify-center shrink-0">
+                  <DollarSign className="h-4.5 w-4.5 text-primary/60" />
+                </div>
+                <div className="min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-mono text-sm font-semibold">{inv.invoice_number}</span>
-                    <Badge className={`text-[10px] ${INVOICE_STATUS_COLORS[inv.status as InvoiceStatus]}`}>
-                      {INVOICE_STATUS_LABELS[inv.status as InvoiceStatus]}
-                    </Badge>
+                    <span className="font-mono text-sm font-semibold">
+                      {inv.invoice_number}
+                    </span>
+                    <DocumentStatusBadge status={inv.status} size="sm" />
                   </div>
                   <p className="text-sm text-muted-foreground truncate mt-0.5">
-                    {inv.leads?.name || "No customer"} {inv.jobs?.title ? `• ${inv.jobs.title}` : ""}
+                    {inv.leads?.name || "No customer"}
+                    {inv.jobs?.title ? ` • ${inv.jobs.title}` : ""}
                   </p>
                 </div>
-                <div className="text-right shrink-0">
-                  <p className="font-semibold">${Number(inv.grand_total).toLocaleString()}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {inv.due_date ? `Due ${format(new Date(inv.due_date), "MMM d")}` : "No due date"}
-                  </p>
-                </div>
+              </div>
+              <div className="text-right shrink-0">
+                <p className="font-semibold tabular-nums">
+                  ${Number(inv.grand_total).toLocaleString()}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {inv.due_date
+                    ? `Due ${format(new Date(inv.due_date + "T00:00:00"), "MMM d")}`
+                    : "No due date"}
+                </p>
+              </div>
+              <div onClick={(e) => e.stopPropagation()}>
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
                       <MoreHorizontal className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                  <DropdownMenuContent align="end">
                     {inv.status === "draft" && (
-                      <DropdownMenuItem onClick={() => updateStatus.mutate({ id: inv.id, status: "sent", lead_id: inv.lead_id, invoice_number: inv.invoice_number })}>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          updateStatus.mutate({
+                            id: inv.id,
+                            status: "sent",
+                            lead_id: inv.lead_id,
+                            invoice_number: inv.invoice_number,
+                          })
+                        }
+                      >
                         <Send className="h-4 w-4 mr-2" /> Mark as Sent
                       </DropdownMenuItem>
                     )}
                     {["sent", "viewed", "overdue"].includes(inv.status) && (
-                      <DropdownMenuItem onClick={() => updateStatus.mutate({ id: inv.id, status: "paid", lead_id: inv.lead_id, invoice_number: inv.invoice_number })}>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          updateStatus.mutate({
+                            id: inv.id,
+                            status: "paid",
+                            lead_id: inv.lead_id,
+                            invoice_number: inv.invoice_number,
+                          })
+                        }
+                      >
                         <CheckCircle className="h-4 w-4 mr-2" /> Mark as Paid
                       </DropdownMenuItem>
                     )}
@@ -163,8 +268,8 @@ export default function InvoicesPage() {
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-              </CardContent>
-            </Card>
+              </div>
+            </motion.div>
           ))}
         </div>
       )}
