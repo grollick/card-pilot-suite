@@ -28,7 +28,7 @@ export default function SocialScheduler() {
     setActiveTab("create");
   };
 
-  const handleUseFeedPost = (data: { content: string; hashtags: string[] }) => {
+  const handleUseFeedPost = (data: { content: string; hashtags: string[]; imageUrl?: string }) => {
     setPendingContent(data);
     setActiveTab("create");
   };

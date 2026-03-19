@@ -278,6 +278,7 @@ export default function SocialCreateView({ editPost, onDone }: Props) {
                   platform={platform}
                   content={getContentForPlatform(platform)}
                   hashtags={hashtags.split(",").map(s => s.trim()).filter(Boolean)}
+                  imageUrl={imageUrl}
                 />
               ))}
             </div>
