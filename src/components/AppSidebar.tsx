@@ -95,6 +95,7 @@ const settingsItems = [
   { title: "Team", url: "/app/team", icon: Building2 },
   { title: "Admin", url: "/app/admin", icon: Shield },
   { title: "Platform Admin", url: "/app/platform-admin", icon: Shield },
+  { title: "Landing Pages", url: "/app/landing-pages", icon: Globe },
   { title: "Sales Pipeline", url: "/app/sales-crm", icon: Kanban },
 ];
 
