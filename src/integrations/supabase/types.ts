@@ -163,6 +163,68 @@ export type Database = {
           },
         ]
       }
+      auto_campaigns: {
+        Row: {
+          campaign_type: string
+          content_types: string[]
+          created_at: string
+          frequency: string
+          id: string
+          name: string
+          next_post_at: string | null
+          org_id: string | null
+          posts_generated: number
+          posts_per_week: number
+          profession: string | null
+          settings_json: Json
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          campaign_type?: string
+          content_types?: string[]
+          created_at?: string
+          frequency?: string
+          id?: string
+          name: string
+          next_post_at?: string | null
+          org_id?: string | null
+          posts_generated?: number
+          posts_per_week?: number
+          profession?: string | null
+          settings_json?: Json
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          campaign_type?: string
+          content_types?: string[]
+          created_at?: string
+          frequency?: string
+          id?: string
+          name?: string
+          next_post_at?: string | null
+          org_id?: string | null
+          posts_generated?: number
+          posts_per_week?: number
+          profession?: string | null
+          settings_json?: Json
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auto_campaigns_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       automation_rules: {
         Row: {
           action_config: Json

@@ -87,6 +87,7 @@ const ContentPage = lazy(() => import("@/modules/marketing/pages/ContentPage"));
 const PromotionsPage = lazy(() => import("@/modules/marketing/pages/PromotionsPage"));
 const ReferralsPage = lazy(() => import("@/modules/marketing/pages/ReferralsPage"));
 const AutomationPage = lazy(() => import("@/modules/marketing/pages/AutomationPage"));
+const AutoCampaignsPage = lazy(() => import("@/modules/marketing/pages/AutoCampaignsPage"));
 const AutopilotPage = lazy(() => import("@/modules/automation/pages/AutopilotPage"));
 const QRCampaignsPage = lazy(() => import("@/modules/marketing/pages/QRCampaignsPage"));
 const BoostPage = lazy(() => import("@/modules/marketing/pages/BoostPage"));
@@ -222,6 +223,7 @@ const App = () => (
               <Route path="analytics" element={<LazyRoute><Analytics /></LazyRoute>} />
               <Route path="growth" element={<LazyRoute><GrowthDashboard /></LazyRoute>} />
               <Route path="automation" element={<LazyRoute><AutomationPage /></LazyRoute>} />
+              <Route path="auto-campaigns" element={<LazyRoute><AutoCampaignsPage /></LazyRoute>} />
               <Route path="autopilot" element={<LazyRoute><AutopilotPage /></LazyRoute>} />
               <Route path="qr-campaigns" element={<LazyRoute><QRCampaignsPage /></LazyRoute>} />
               <Route path="settings" element={<LazyRoute><SettingsPage /></LazyRoute>} />
