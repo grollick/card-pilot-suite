@@ -396,9 +396,29 @@ export default function DiscoverPage() {
             transition={{ duration: 0.5 }}
           >
             <h1 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight mb-3">{title}</h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mb-10">
-              Find professionals near you. Compare reviews, response times, and connect instantly — all free.
+            <p className="text-muted-foreground text-lg max-w-2xl mb-4">
+              Search by service, profession, or location. Compare reviews, response times, and connect instantly — completely free.
             </p>
+            {detectedCity && !locationFilter && !city && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-2 mb-6"
+              >
+                <Badge variant="outline" className="gap-1.5 text-sm py-1 px-3 bg-card/50 backdrop-blur-sm">
+                  <Navigation className="h-3 w-3 text-primary" />
+                  Near {detectedCity}
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs gap-1"
+                  onClick={() => setLocationFilter(detectedCity)}
+                >
+                  Use this location
+                </Button>
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Glassmorphism search panel */}
