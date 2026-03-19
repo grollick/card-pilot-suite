@@ -5,7 +5,7 @@ export default function FooterSection() {
     <footer className="border-t border-border py-10">
       <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-lg font-extrabold tracking-tight gradient-text">guzzl.pro</span>
+          <span className="text-lg font-extrabold tracking-tight gradient-text"><span className="font-bold text-primary">guzzl</span>.pro</span>
           <span className="text-sm text-muted-foreground">© 2026</span>
         </div>
         <div className="flex items-center gap-6 text-sm text-muted-foreground">
