@@ -82,6 +82,11 @@ export default function DashboardHome() {
           {/* ── SECTION 3: Funnel ── */}
           <FunnelView />
 
+          {/* ── Lead Guarantee Tracker ── */}
+          {guaranteeData && !guaranteeData.targetMet && (
+            <LeadGuaranteeBanner variant="dashboard" guaranteeData={guaranteeData} />
+          )}
+
           {/* ── Lead Quality ── */}
           <LeadQualityWidget />
 
