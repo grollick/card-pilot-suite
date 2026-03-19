@@ -14,6 +14,8 @@ import ActivationChecklist from "@/modules/dashboard/components/ActivationCheckl
 import ShareMessageCard from "@/modules/dashboard/components/ShareMessageCard";
 import FirstLeadCelebration from "@/modules/dashboard/components/FirstLeadCelebration";
 import PostLeadSharePrompt from "@/modules/dashboard/components/PostLeadSharePrompt";
+import LeadGuaranteeBanner from "@/components/LeadGuaranteeBanner";
+import { useLeadGuarantee } from "@/hooks/useLeadGuarantee";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 export default function DashboardHome() {
