@@ -123,7 +123,7 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
           <DialogTitle>{editPost ? "Edit Post" : "New Post"}</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 pr-2">
+        <div className="flex-1 overflow-y-auto pr-2">
           <div className="grid md:grid-cols-[1fr,280px] gap-4">
             <div className="space-y-4">
               {/* Platform Selection */}
