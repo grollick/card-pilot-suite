@@ -21,6 +21,7 @@ import AIGrowthAssistantPanel from "@/modules/dashboard/components/AIGrowthAssis
 import EstimateDutyPanel from "@/modules/dashboard/components/EstimateDutyPanel";
 import RevenuePipelineWidget from "@/modules/dashboard/components/RevenuePipelineWidget";
 import LeadGuaranteeBanner from "@/components/LeadGuaranteeBanner";
+import MobileQuickCreate from "@/modules/invoices/components/MobileQuickCreate";
 import { useLeadGuarantee } from "@/hooks/useLeadGuarantee";
 import { useIsMobile } from "@/hooks/use-mobile";
 
