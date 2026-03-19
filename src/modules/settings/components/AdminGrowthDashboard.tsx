@@ -1,8 +1,9 @@
 import { useState } from "react";
 import {
   Users, UserCheck, Zap, Briefcase, BarChart3, TrendingUp,
-  Plus, Send, Eye, Activity, ArrowRight, Target, CheckCircle2,
-  Clock, MessageSquare, Trash2, ChevronRight, Lightbulb, Rocket
+  Plus, Send, Eye, Activity, Target, CheckCircle2,
+  MessageSquare, Trash2, ChevronRight, Lightbulb, Rocket,
+  Mail, Globe, UserPlus, Settings, BarChart, Megaphone
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
