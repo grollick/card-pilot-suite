@@ -5,7 +5,7 @@ import { professions, professionCategories, getProfessionsByCategory } from "@/d
 import { motion } from "framer-motion";
 import SystemEventsWidget from "@/modules/settings/components/SystemEventsWidget";
 import BetaManagementTab from "@/modules/settings/components/BetaManagementTab";
-
+import AdminFeedbackTab from "@/modules/settings/components/AdminFeedbackTab";
 export default function AdminPage() {
   const byCategory = getProfessionsByCategory();
 
@@ -30,6 +30,7 @@ export default function AdminPage() {
            <TabsTrigger value="emails">Default Emails</TabsTrigger>
            <TabsTrigger value="system-events">System Events</TabsTrigger>
            <TabsTrigger value="beta">Beta Access</TabsTrigger>
+           <TabsTrigger value="feedback">Feedback</TabsTrigger>
          </TabsList>
 
         <TabsContent value="professions" className="mt-4 space-y-6">
@@ -72,6 +73,9 @@ export default function AdminPage() {
         </TabsContent>
         <TabsContent value="beta" className="mt-4">
           <BetaManagementTab />
+        </TabsContent>
+        <TabsContent value="feedback" className="mt-4">
+          <AdminFeedbackTab />
         </TabsContent>
       </Tabs>
     </div>
