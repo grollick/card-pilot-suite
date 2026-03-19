@@ -63,6 +63,7 @@ Deno.serve(async (req) => {
       { data: recentProfiles },
       { data: recentRequests },
       { data: recentMatches },
+      { data: allReferrals },
     ] = await Promise.all([
       sc.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", d7),
       sc.from("profiles").select("id", { count: "exact", head: true }),
@@ -78,6 +79,7 @@ Deno.serve(async (req) => {
       sc.from("profiles").select("id, name, email, plan, created_at, handle").order("created_at", { ascending: false }).limit(15),
       sc.from("estimate_requests").select("id, requester_name, service_needed, status, created_at").order("created_at", { ascending: false }).limit(10),
       sc.from("estimate_matches").select("id, status, created_at, match_score").order("created_at", { ascending: false }).limit(10),
+      sc.from("referrals").select("id, status, rewarded, reward_days, created_at"),
     ]);
 
     // Activated = onboarding_completed OR has published card
@@ -95,6 +97,13 @@ Deno.serve(async (req) => {
       new Date(p.created_at) >= new Date(d30) && p.onboarding_completed === true
     ).length;
     const wins = matches.filter((m: any) => m.status === "accepted").length;
+
+    // Referral stats
+    const refs = allReferrals || [];
+    const totalReferrals = refs.length;
+    const activatedReferrals = refs.filter((r: any) => r.status === "completed").length;
+    const rewardsIssued = refs.filter((r: any) => r.rewarded).length;
+    const totalRewardDays = refs.reduce((sum: number, r: any) => sum + (r.reward_days || 0), 0);
 
     // Signup trend (daily, last 30d)
     const signupsByDate: Record<string, number> = {};
@@ -146,7 +155,7 @@ Deno.serve(async (req) => {
         responseRate,
       },
       funnel: {
-        outreach: 0, // manual tracking via outreach_contacts
+        outreach: 0,
         signups: signups30d,
         activated: activated30d,
         leads: leads30d || 0,
@@ -157,6 +166,12 @@ Deno.serve(async (req) => {
         onDutyUsers: onDutyCount || 0,
         totalRequests: totalJobRequests || 0,
         avgResponses: matches.length > 0 ? Math.round(matches.length / Math.max(totalJobRequests || 1, 1)) : 0,
+      },
+      referrals: {
+        total: totalReferrals,
+        activated: activatedReferrals,
+        rewardsIssued,
+        totalRewardDays,
       },
       signupsByDate,
       planCounts,

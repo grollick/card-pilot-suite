@@ -28,6 +28,7 @@ import AhaPromptBanner from "@/modules/dashboard/components/AhaPromptBanner";
 import ChurnRecoveryBanner from "@/modules/dashboard/components/ChurnRecoveryBanner";
 import MilestoneCelebrationListener from "@/modules/dashboard/components/MilestoneCelebrationListener";
 import ReferralActivationChecker from "@/modules/dashboard/components/ReferralActivationChecker";
+import ReferralWidget from "@/modules/dashboard/components/ReferralWidget";
 import MarketplaceAwarenessWidget from "@/modules/dashboard/components/MarketplaceAwarenessWidget";
 import { useLeadGuarantee } from "@/hooks/useLeadGuarantee";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -87,6 +88,9 @@ export default function DashboardHome() {
 
       {/* ── Business Performance ── */}
       <BusinessPerformancePanel />
+
+      {/* ── Referral Widget ── */}
+      <ReferralWidget />
 
       {/* ── Activation System ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

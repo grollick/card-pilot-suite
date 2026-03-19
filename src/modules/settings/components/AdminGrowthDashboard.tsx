@@ -5,7 +5,7 @@ import {
   MessageSquare, Trash2, ChevronRight, Lightbulb, Rocket,
   Mail, Globe, UserPlus, Settings, BarChart, Megaphone,
   AlertTriangle, DollarSign, Calendar, Star, ArrowUpRight,
-  Clock, Trophy, Flame, Heart, RefreshCw
+  Clock, Trophy, Flame, Heart, RefreshCw, Gift
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -313,15 +313,44 @@ function RetentionSummary({ kpis }: { kpis: any }) {
   );
 }
 
+// ─── Referral Metrics Card ───
+function ReferralMetricsCard({ referrals, isLoading }: { referrals: any; isLoading: boolean }) {
+  const items = [
+    { label: "Total Referrals", value: referrals?.total ?? 0, icon: Users, color: "text-primary" },
+    { label: "Activated", value: referrals?.activated ?? 0, icon: UserCheck, color: "text-success" },
+    { label: "Rewards Issued", value: referrals?.rewardsIssued ?? 0, icon: Trophy, color: "text-warning" },
+    { label: "Days Rewarded", value: referrals?.totalRewardDays ?? 0, icon: Calendar, color: "text-accent" },
+  ];
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="flex items-center gap-2 mb-3">
+        <Gift className="h-4 w-4 text-primary" />
+        <h3 className="text-sm font-semibold">Referral Program</h3>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {items.map(c => (
+          <div key={c.label} className="text-center">
+            {isLoading ? <Skeleton className="h-7 w-12 mx-auto" /> : (
+              <p className="text-xl font-bold tabular-nums">{c.value}</p>
+            )}
+            <p className="text-xs text-muted-foreground mt-0.5">{c.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Growth Levers ───
 function GrowthLevers({ navigate }: { navigate: (path: string) => void }) {
   const levers = [
     {
       title: "Referral Program",
-      description: "Users who refer 3 friends get 30 days Pro free. Promote this in-app.",
+      description: "Users invite friends → both get 14 days Pro free on activation. Drive viral growth.",
       icon: Star,
       action: "View referrals",
-      path: "/app/analytics",
+      path: "/app/referrals",
     },
     {
       title: "SEO & Public Cards",
@@ -658,6 +687,9 @@ export default function AdminGrowthDashboard() {
 
       {/* KPIs */}
       <KPICards kpis={data?.kpis} isLoading={isLoading} />
+
+      {/* Referral Metrics */}
+      <ReferralMetricsCard referrals={data?.referrals} isLoading={isLoading} />
 
       {/* Churn Risk + Weekly Goals */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

@@ -25,6 +25,7 @@ const OnDutyMapPage = lazy(() => import("@/modules/public/pages/OnDutyMapPage"))
 const RequestServicePage = lazy(() => import("@/modules/public/pages/RequestServicePage"));
 const PublicSite = lazy(() => import("@/modules/public/pages/PublicSite"));
 const DemoCardPreview = lazy(() => import("@/modules/public/pages/DemoCardPreview"));
+const ReferralRedirect = lazy(() => import("@/modules/public/pages/ReferralRedirect"));
 
 // Client Portal — loaded eagerly (public, token-based)
 const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
@@ -214,6 +215,7 @@ const App = () => (
             <Route path="/project/:projectId" element={<LazyRoute><PublicProjectPage /></LazyRoute>} />
             <Route path="/portal/:token" element={<LazyRoute><ClientPortal /></LazyRoute>} />
             <Route path="/pay/:token" element={<LazyRoute><PublicInvoicePage /></LazyRoute>} />
+            <Route path="/ref/:code" element={<ReferralRedirect />} />
 
             {/* Client Portal v2 — authenticated */}
             <Route path="/client/auth" element={<LazyRoute><ClientAuthPage /></LazyRoute>} />

@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 
 const REWARD_TIERS = [
-  { count: 1, reward: "7 days Pro free", days: 7, icon: "🎁" },
+  { count: 1, reward: "14 days Pro free (both!)", days: 14, icon: "🎁" },
   { count: 3, reward: "1 month Pro free", days: 30, icon: "🚀" },
   { count: 5, reward: "2 months Pro free", days: 60, icon: "⭐" },
   { count: 10, reward: "6 months Pro free", days: 180, icon: "👑" },
@@ -92,7 +92,7 @@ export default function ReferralsPage() {
   });
 
   const referralLink = referralCode
-    ? `${window.location.origin}/auth?ref=${referralCode}&mode=signup`
+    ? `${window.location.origin}/ref/${referralCode}`
     : "";
 
   const copyLink = () => {
@@ -232,7 +232,7 @@ export default function ReferralsPage() {
           {[
             { step: 1, title: "Share your link", desc: "Send your unique link to colleagues and fellow pros" },
             { step: 2, title: "They sign up & activate", desc: "They create a card and get their first lead or estimate" },
-            { step: 3, title: "You both earn rewards", desc: "Unlock free Pro time as you hit referral milestones" },
+            { step: 3, title: "You both get 14 days Pro", desc: "Both you and your friend earn 14 days of Pro access instantly" },
           ].map((s) => (
             <div key={s.step} className="text-center space-y-2">
               <div className="h-10 w-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center mx-auto">
