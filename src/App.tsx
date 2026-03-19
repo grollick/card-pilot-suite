@@ -152,9 +152,13 @@ function LazyRoute({ children }: { children: React.ReactNode }) {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 2 * 60 * 1000, // 2 min — avoid refetch storms on navigation
-      gcTime: 10 * 60 * 1000,   // 10 min garbage collection
-      retry: 1,                  // single retry on failure
+      staleTime: 2 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      retry: (failureCount, error: any) => {
+        // Don't retry on 4xx errors (auth, not found, validation)
+        if (error?.status >= 400 && error?.status < 500) return false;
+        return failureCount < 2;
+      },
       refetchOnWindowFocus: false,
     },
     mutations: {
