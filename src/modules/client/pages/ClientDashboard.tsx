@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { format, isPast, isFuture } from "date-fns";
 import {
@@ -21,6 +21,10 @@ import {
 } from "@/hooks/useClientPortalData";
 import { useClientCancelBooking } from "@/hooks/useClientPortalActions";
 import PortalReviewDialog from "@/modules/client/components/PortalReviewDialog";
+import UpcomingAppointmentWidget from "@/modules/client/components/UpcomingAppointmentWidget";
+import PaymentSummaryWidget from "@/modules/client/components/PaymentSummaryWidget";
+import ProjectProgressWidget from "@/modules/client/components/ProjectProgressWidget";
+import DocumentVaultWidget from "@/modules/client/components/DocumentVaultWidget";
 import { toast } from "sonner";
 
 const anim = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } };
