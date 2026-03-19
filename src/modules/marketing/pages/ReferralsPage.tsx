@@ -15,7 +15,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 
 const REWARD_TIERS = [
-  { count: 1, reward: "7 days Pro free", days: 7, icon: "🎁" },
+  { count: 1, reward: "14 days Pro free (both!)", days: 14, icon: "🎁" },
   { count: 3, reward: "1 month Pro free", days: 30, icon: "🚀" },
   { count: 5, reward: "2 months Pro free", days: 60, icon: "⭐" },
   { count: 10, reward: "6 months Pro free", days: 180, icon: "👑" },
