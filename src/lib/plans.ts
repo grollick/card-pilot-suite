@@ -144,6 +144,7 @@ export interface PlanLimits {
   contacts: number;
   cards: number;
   estimates: number;
+  invoices: number;
   social_posts: number;
   booking_services: number;
   bookings_monthly: number;
@@ -154,6 +155,12 @@ export interface PlanLimits {
   gallery_images: number;
   testimonials: number;
   ai_requests_monthly: number;
+  pdf_export: boolean;
+  estimate_approvals: boolean;
+  payments: boolean;
+  deposits: boolean;
+  recurring_invoices: boolean;
+  advanced_reporting: boolean;
 }
 
 export function getPlanByKey(key: string): (typeof PLAN_TIERS)[number] | undefined {
