@@ -242,6 +242,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       { title: "Capture Leads", icon: "📥", description: "Get buyer and seller inquiries instantly." },
       { title: "Show Listings", icon: "🏡", description: "Display featured properties in one place." },
       { title: "Book Consultations", icon: "📅", description: "Let clients schedule time with you." },
+      { title: "Scan Business Cards", icon: "📸", description: "Scan cards at open houses to instantly add contacts to your CRM." },
       { title: "Stay Organized", icon: "📊", description: "Track all leads and conversations." },
     ],
     socialProof: {
