@@ -214,11 +214,12 @@ export default function SocialCreateView({ editPost, onDone }: Props) {
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">AI Post Generator</h3>
                 <AIPostGenerator
                   platforms={selectedPlatforms.length > 0 ? selectedPlatforms : ["Instagram"]}
-                  onSelectPost={({ content: newContent, hashtags: newHashtags }) => {
+                  onSelectPost={({ content: newContent, hashtags: newHashtags, imageUrl: newImageUrl }) => {
                     setContent(newContent);
                     if (newHashtags.length > 0) {
                       setHashtags(newHashtags.join(", "));
                     }
+                    if (newImageUrl) setImageUrl(newImageUrl);
                     setShowAiGenerator(false);
                   }}
                 />
