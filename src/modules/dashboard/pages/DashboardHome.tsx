@@ -22,6 +22,9 @@ import EstimateDutyPanel from "@/modules/dashboard/components/EstimateDutyPanel"
 import RevenuePipelineWidget from "@/modules/dashboard/components/RevenuePipelineWidget";
 import LeadGuaranteeBanner from "@/components/LeadGuaranteeBanner";
 import MobileQuickCreate from "@/modules/invoices/components/MobileQuickCreate";
+import AhaPromptBanner from "@/modules/dashboard/components/AhaPromptBanner";
+import ChurnRecoveryBanner from "@/modules/dashboard/components/ChurnRecoveryBanner";
+import MilestoneCelebrationListener from "@/modules/dashboard/components/MilestoneCelebrationListener";
 import { useLeadGuarantee } from "@/hooks/useLeadGuarantee";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -52,6 +55,15 @@ export default function DashboardHome() {
 
       {/* ── First Lead Celebration ── */}
       <FirstLeadCelebration />
+
+      {/* ── Milestone Celebration Listener (no UI) ── */}
+      <MilestoneCelebrationListener />
+
+      {/* ── Churn Recovery Banner ── */}
+      <ChurnRecoveryBanner />
+
+      {/* ── Aha Moment Prompt ── */}
+      <AhaPromptBanner />
 
       {/* ── Post-Lead Share Prompt ── */}
       <PostLeadSharePrompt />
