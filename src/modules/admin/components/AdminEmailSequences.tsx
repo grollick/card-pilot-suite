@@ -431,7 +431,7 @@ function StepEditor({
           <Button size="sm" variant="ghost" onClick={onEdit}>
             <Eye className="h-3 w-3" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={onDelete}>
+          <Button size="sm" variant="ghost" onClick={() => { if (confirm("Delete this step?")) onDelete(); }}>
             <Trash2 className="h-3 w-3 text-destructive" />
           </Button>
         </div>

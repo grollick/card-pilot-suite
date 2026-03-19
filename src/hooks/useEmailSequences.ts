@@ -166,6 +166,7 @@ export function useDeleteStep() {
       qc.invalidateQueries({ queryKey: ["sequence-steps", vars.sequence_id] });
       toast.success("Step removed");
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to remove step"),
   });
 }
 
