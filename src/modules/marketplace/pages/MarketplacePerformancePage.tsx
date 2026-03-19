@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import {
   Eye, Users, Calendar, DollarSign, TrendingUp, Zap, Crown,
-  BarChart3, Target, ArrowUpRight, Rocket, Receipt,
+  BarChart3, Target, ArrowUpRight, Rocket, Receipt, Send, MessageSquare,
 } from "lucide-react";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -16,6 +16,7 @@ import {
 import { useMarketplacePerformance } from "@/hooks/useMarketplacePerformance";
 import { useActiveBoosts } from "@/hooks/useBoosts";
 import { useProfile } from "@/hooks/useCard";
+import { useLeadRoutingStats } from "@/hooks/useLeadRouting";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 
