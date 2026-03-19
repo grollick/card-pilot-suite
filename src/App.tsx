@@ -17,6 +17,7 @@ import PublicBooking from "@/modules/public/pages/PublicBooking";
 import QRLanding from "@/modules/public/pages/QRLanding";
 import ProductsPage from "@/modules/public/pages/ProductsPage";
 import DiscoverPage from "@/modules/public/pages/DiscoverPage";
+import OnDutyMapPage from "@/modules/public/pages/OnDutyMapPage";
 import LegalPage from "@/modules/public/pages/LegalPage";
 import RequestServicePage from "@/modules/public/pages/RequestServicePage";
 import HandleOrSeoRoute from "@/modules/public/pages/HandleOrSeoRoute";
