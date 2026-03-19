@@ -1,0 +1,200 @@
+import { useState } from "react";
+import { Sparkles, Loader2, Check, Image, RefreshCw, Wand2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+interface PostIdea {
+  title: string;
+  caption: string;
+  hashtags: string[];
+  cta: string;
+  image_query: string;
+  image_description: string;
+  image_url: string;
+  style: "showcase" | "educational" | "promotional" | "personal";
+}
+
+interface Props {
+  platforms: string[];
+  onSelectPost: (data: { content: string; hashtags: string[]; imageUrl: string }) => void;
+}
+
+const STYLE_CONFIG: Record<string, { label: string; color: string; icon: string }> = {
+  showcase: { label: "Showcase", color: "bg-amber-500/10 text-amber-600 border-amber-500/20", icon: "📸" },
+  educational: { label: "Tips & How-to", color: "bg-blue-500/10 text-blue-600 border-blue-500/20", icon: "💡" },
+  promotional: { label: "Promo", color: "bg-green-500/10 text-green-600 border-green-500/20", icon: "🎯" },
+  personal: { label: "Behind the Scenes", color: "bg-purple-500/10 text-purple-600 border-purple-500/20", icon: "🎬" },
+};
+
+export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
+  const [topic, setTopic] = useState("");
+  const [ideas, setIdeas] = useState<PostIdea[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+
+  const generate = async () => {
+    setLoading(true);
+    setIdeas([]);
+    setSelectedIdx(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-post-ideas", {
+        body: { platforms, topic: topic.trim() || undefined },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setIdeas(data.posts ?? []);
+      if (!data.posts?.length) toast.info("No ideas generated. Try a different topic.");
+    } catch (err: any) {
+      console.error("AI generation error:", err);
+      toast.error(err.message || "Failed to generate post ideas");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUsePost = (idx: number) => {
+    const idea = ideas[idx];
+    const hashtagStr = idea.hashtags.map(h => `#${h}`).join(" ");
+    const fullContent = `${idea.caption}\n\n${idea.cta}\n\n${hashtagStr}`;
+    onSelectPost({
+      content: fullContent,
+      hashtags: idea.hashtags,
+      imageUrl: idea.image_url,
+    });
+    toast.success("Post added! You can edit it before saving.");
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex gap-2">
+        <div className="flex-1">
+          <Input
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+            placeholder="Topic (optional) e.g. 'spring specials', 'new project'"
+            className="h-8 text-xs"
+            onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
+          />
+        </div>
+        <Button
+          size="sm"
+          className="h-8 text-xs gap-1.5 shadow-glow"
+          onClick={generate}
+          disabled={loading}
+        >
+          {loading ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : ideas.length > 0 ? (
+            <RefreshCw className="h-3.5 w-3.5" />
+          ) : (
+            <Wand2 className="h-3.5 w-3.5" />
+          )}
+          {loading ? "Generating..." : ideas.length > 0 ? "Regenerate" : "Generate Ideas"}
+        </Button>
+      </div>
+
+      {loading && (
+        <div className="flex items-center justify-center py-8 text-muted-foreground">
+          <Loader2 className="h-5 w-5 animate-spin mr-2" />
+          <span className="text-sm">AI is crafting trade-specific posts for you…</span>
+        </div>
+      )}
+
+      {ideas.length > 0 && (
+        <ScrollArea className="max-h-[420px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pr-2">
+            {ideas.map((idea, idx) => {
+              const style = STYLE_CONFIG[idea.style] ?? STYLE_CONFIG.showcase;
+              const isSelected = selectedIdx === idx;
+              return (
+                <Card
+                  key={idx}
+                  className={cn(
+                    "cursor-pointer transition-all hover:shadow-md border-2",
+                    isSelected
+                      ? "border-primary ring-2 ring-primary/20"
+                      : "border-transparent hover:border-primary/30"
+                  )}
+                  onClick={() => setSelectedIdx(idx)}
+                >
+                  <CardContent className="p-3 space-y-2">
+                    {/* Image preview */}
+                    <div className="relative rounded-md overflow-hidden bg-muted aspect-video">
+                      <img
+                        src={idea.image_url}
+                        alt={idea.image_description}
+                        className="w-full h-full object-cover"
+                        loading="lazy"
+                      />
+                      <Badge className={cn("absolute top-1.5 left-1.5 text-[10px] border", style.color)}>
+                        {style.icon} {style.label}
+                      </Badge>
+                    </div>
+
+                    {/* Content */}
+                    <div>
+                      <p className="font-semibold text-xs leading-tight">{idea.title}</p>
+                      <p className="text-[11px] text-muted-foreground mt-1 line-clamp-3 leading-relaxed">
+                        {idea.caption}
+                      </p>
+                    </div>
+
+                    {/* Hashtags preview */}
+                    <div className="flex flex-wrap gap-1">
+                      {idea.hashtags.slice(0, 4).map((h) => (
+                        <span key={h} className="text-[9px] text-primary/80">
+                          #{h}
+                        </span>
+                      ))}
+                      {idea.hashtags.length > 4 && (
+                        <span className="text-[9px] text-muted-foreground">
+                          +{idea.hashtags.length - 4} more
+                        </span>
+                      )}
+                    </div>
+
+                    {/* CTA preview */}
+                    <p className="text-[10px] text-muted-foreground italic">CTA: {idea.cta}</p>
+
+                    {/* Use button */}
+                    <Button
+                      size="sm"
+                      className="w-full h-7 text-xs gap-1"
+                      variant={isSelected ? "default" : "outline"}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleUsePost(idx);
+                      }}
+                    >
+                      {isSelected ? <Check className="h-3 w-3" /> : <Sparkles className="h-3 w-3" />}
+                      Use This Post
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </ScrollArea>
+      )}
+
+      {!loading && ideas.length === 0 && (
+        <div className="text-center py-6 text-muted-foreground">
+          <Wand2 className="h-8 w-8 mx-auto mb-2 opacity-30" />
+          <p className="text-xs">
+            Hit <strong>Generate Ideas</strong> to get AI-crafted posts tailored to your trade
+          </p>
+          <p className="text-[10px] mt-1 opacity-70">
+            Add an optional topic for more targeted results
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
