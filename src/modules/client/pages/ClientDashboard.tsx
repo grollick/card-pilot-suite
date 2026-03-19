@@ -48,7 +48,7 @@ export default function ClientDashboard() {
   const [reviewTarget, setReviewTarget] = useState<{ businessUserId: string; businessName: string | null; leadId: string } | null>(null);
 
   const isLoading = profileLoading || bizLoading || bookingsLoading;
-
+  const leadIds = useMemo(() => businesses.map(b => b.leadId), [businesses]);
   const upcomingBookings = bookings.filter(
     b => isFuture(new Date(b.start_datetime)) && b.status !== "cancelled"
   );
