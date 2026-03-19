@@ -115,8 +115,8 @@ export function useAdminFeedbackList() {
   return useQuery<BetaFeedback[]>({
     queryKey: ["admin-feedback-list"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("beta_feedback")
+      const { data, error } = await (supabase.from as any)
+        ("beta_feedback")
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
