@@ -137,6 +137,7 @@ export function useCreateStep() {
       qc.invalidateQueries({ queryKey: ["sequence-steps", vars.sequence_id] });
       toast.success("Step added");
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to add step"),
   });
 }
 
