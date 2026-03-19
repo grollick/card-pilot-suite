@@ -207,7 +207,7 @@ export function AppSidebar() {
                 <span className="text-xs font-bold text-primary-foreground">CP</span>
               </div>
               <div>
-                <span className="text-sm font-bold tracking-tight">guzzl.pro</span>
+                <span className="text-sm font-bold tracking-tight"><span className="font-bold text-primary">guzzl</span>.pro</span>
                 <p className="text-2xs text-muted-foreground leading-tight">Business Growth Platform</p>
               </div>
             </div>
