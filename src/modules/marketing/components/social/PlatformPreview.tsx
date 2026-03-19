@@ -8,7 +8,7 @@ interface Props {
   imageUrl?: string;
 }
 
-function InstagramPreview({ content, hashtags }: { content: string; hashtags?: string[] }) {
+function InstagramPreview({ content, hashtags, imageUrl }: { content: string; hashtags?: string[]; imageUrl?: string }) {
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden">
       <div className="flex items-center gap-2 p-2.5">
@@ -17,8 +17,12 @@ function InstagramPreview({ content, hashtags }: { content: string; hashtags?: s
         </div>
         <span className="text-[10px] font-semibold">your_business</span>
       </div>
-      <div className="h-32 bg-muted flex items-center justify-center">
-        <span className="text-xs text-muted-foreground">Image preview</span>
+      <div className="h-32 bg-muted flex items-center justify-center overflow-hidden">
+        {imageUrl ? (
+          <img src={imageUrl} alt="Post" className="w-full h-full object-cover" />
+        ) : (
+          <span className="text-xs text-muted-foreground">Image preview</span>
+        )}
       </div>
       <div className="p-2.5 space-y-1.5">
         <div className="flex items-center gap-3">
