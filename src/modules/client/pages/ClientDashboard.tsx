@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { format, isPast, isFuture } from "date-fns";
 import {
   Calendar, Clock, Building2, Star, RotateCw,
-  ChevronRight, Loader2, LogOut, X, AlertTriangle, Sparkles, Lock
+  ChevronRight, Loader2, LogOut, X, AlertTriangle, Sparkles, Lock, Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
