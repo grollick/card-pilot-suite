@@ -1,4 +1,5 @@
 import { Paintbrush, Sparkles, Loader2, MousePointerClick, Globe } from "lucide-react";
+import BuilderAISuggestions from "./BuilderAISuggestions";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
