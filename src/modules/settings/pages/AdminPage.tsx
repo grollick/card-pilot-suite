@@ -81,6 +81,12 @@ export default function AdminPage() {
         <TabsContent value="feedback" className="mt-4">
           <AdminFeedbackTab />
         </TabsContent>
+        <TabsContent value="bugs" className="mt-4">
+          <BugPriorityDashboard />
+        </TabsContent>
+        <TabsContent value="roadmap" className="mt-4">
+          <RoadmapBoard />
+        </TabsContent>
       </Tabs>
     </div>
   );
