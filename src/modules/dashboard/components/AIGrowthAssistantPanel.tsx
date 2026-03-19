@@ -15,12 +15,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useBusinessHealthScore } from "@/hooks/useBusinessHealthScore";
 import { useDashboardStats } from "@/hooks/useDashboardStats";
 
-type InsightType = "problem" | "opportunity" | "positive";
+type InsightType = "problem" | "opportunity" | "positive" | "warning" | "tip" | "info";
 
 interface Insight {
   title: string;
   description: string;
-  type: InsightType;
+  type: string;
   action?: string;
   route?: string;
 }
