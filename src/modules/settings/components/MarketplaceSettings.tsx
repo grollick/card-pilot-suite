@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Store, MapPin, Eye, Crown, Loader2 } from "lucide-react";
+import { Store, MapPin, Eye, Loader2, Users, Sparkles, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,16 +59,23 @@ export default function MarketplaceSettings({ profile }: MarketplaceSettingsProp
           <Store className="h-4 w-4 text-primary" />
           <h2 className="font-semibold">Marketplace Presence</h2>
         </div>
-        {profile?.featured && (
-          <Badge className="bg-primary/10 text-primary border-primary/20">
-            <Crown className="h-3 w-3 mr-1" /> Featured
+        {enabled && (
+          <Badge className="bg-success/10 text-success border-success/20 gap-1">
+            <CheckCircle2 className="h-3 w-3" /> Listed
           </Badge>
         )}
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        Control how your business appears on the guzzl.pro Discover marketplace. When enabled, potential customers can find and contact you.
-      </p>
+      <div className="rounded-lg bg-primary/5 border border-primary/10 p-4 space-y-2">
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-4 w-4 text-primary" />
+          <p className="text-sm font-medium">Get discovered by local customers — free</p>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          When enabled, your business appears in the marketplace where customers search for professionals in your area. 
+          The more complete your profile, the higher you rank.
+        </p>
+      </div>
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -77,7 +84,7 @@ export default function MarketplaceSettings({ profile }: MarketplaceSettingsProp
               <Eye className="h-3.5 w-3.5" /> Show on Marketplace
             </Label>
             <p className="text-xs text-muted-foreground">
-              Allow people to discover your business on /discover
+              Let people discover your business on /discover
             </p>
           </div>
           <Switch checked={enabled} onCheckedChange={setEnabled} />
@@ -94,10 +101,24 @@ export default function MarketplaceSettings({ profile }: MarketplaceSettingsProp
             placeholder="e.g. Toronto, GTA, Southern Ontario"
           />
           <p className="text-xs text-muted-foreground">
-            Describe the area you serve. This helps customers find you by location.
+            Describe the area you serve. This helps nearby customers find you.
           </p>
         </div>
       </div>
+
+      {enabled && (
+        <div className="rounded-lg bg-muted/50 p-3 space-y-1.5">
+          <p className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+            <Users className="h-3 w-3" /> How to rank higher (all free)
+          </p>
+          <ul className="text-xs text-muted-foreground space-y-1 pl-5 list-disc">
+            <li>Complete your profile (bio, city, services)</li>
+            <li>Get customer reviews</li>
+            <li>Respond to leads quickly</li>
+            <li>Go On Duty to receive estimate requests</li>
+          </ul>
+        </div>
+      )}
 
       <Button onClick={handleSave} disabled={saving} className="shadow-glow">
         {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}

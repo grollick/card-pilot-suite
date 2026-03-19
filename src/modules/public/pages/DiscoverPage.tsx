@@ -653,21 +653,32 @@ export default function DiscoverPage() {
               <ListingCard key={l.id} listing={l} />
             ))}
           </div>
-        ) : featuredListings.length === 0 && boostedListings.length === 0 && (topMatches === null || topMatches.length === 0) ? (
+        ) : featuredListings.length === 0 && (topMatches === null || topMatches.length === 0) ? (
           <div className="text-center py-20">
-            <Users className="h-10 w-10 mx-auto text-muted-foreground/40 mb-4" />
-            <h3 className="text-lg font-semibold text-foreground mb-1">No businesses found</h3>
-            <p className="text-muted-foreground mb-6">
-              {hasActiveFilters ? "Try different search terms or filters." : "No listings match this filter yet."}
-            </p>
-            <div className="flex gap-2 justify-center">
-              {hasActiveFilters && (
-                <Button variant="outline" onClick={clearAll}>Clear filters</Button>
-              )}
-              <Button asChild variant="outline">
-                <Link to="/discover">Browse all</Link>
-              </Button>
-            </div>
+            <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+              <MapPin className="h-12 w-12 mx-auto text-primary/30 mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-1">
+                {hasActiveFilters ? "No professionals found" : "Be the first in your area"}
+              </h3>
+              <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                {hasActiveFilters
+                  ? "Try different search terms or filters."
+                  : "No professionals are listed in this area yet. Join the marketplace and start getting discovered by local customers — it's free."}
+              </p>
+              <div className="flex gap-2 justify-center">
+                {hasActiveFilters && (
+                  <Button variant="outline" onClick={clearAll}>Clear filters</Button>
+                )}
+                <Button asChild variant="outline">
+                  <Link to="/discover">Browse all</Link>
+                </Button>
+                {!hasActiveFilters && (
+                  <Button asChild>
+                    <Link to="/auth">Get Listed Free <ArrowRight className="h-3.5 w-3.5 ml-1" /></Link>
+                  </Button>
+                )}
+              </div>
+            </motion.div>
           </div>
         ) : null}
 

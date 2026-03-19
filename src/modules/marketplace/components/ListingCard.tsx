@@ -85,24 +85,8 @@ export default function ListingCard({ listing, boosted, variant = "default" }: L
       <Card className={`group overflow-hidden border transition-all duration-300 ${
         isHero
           ? "border-primary/30 bg-gradient-to-br from-primary/[0.04] to-background shadow-lg ring-1 ring-primary/10 hover:shadow-xl"
-          : listing.featured
-          ? "border-primary/40 bg-primary/[0.02] shadow-md ring-1 ring-primary/10"
-          : boosted
-          ? "border-accent/40 bg-accent/[0.02] shadow-md ring-1 ring-accent/10"
           : "border-border/60 hover:border-primary/30 hover:shadow-lg"
       }`}>
-        {listing.featured && !isHero && (
-          <div className="bg-primary/10 px-4 py-1.5 flex items-center gap-1.5 text-xs font-medium text-primary">
-            <Crown className="h-3 w-3" />
-            Featured Business
-          </div>
-        )}
-        {boosted && !listing.featured && !isHero && (
-          <div className="bg-accent/10 px-4 py-1.5 flex items-center gap-1.5 text-xs font-medium text-accent">
-            <Rocket className="h-3 w-3" />
-            Boosted Business
-          </div>
-        )}
         {isHero && (
           <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent px-4 py-2 flex items-center gap-1.5 text-xs font-semibold text-primary">
             <Star className="h-3 w-3 fill-primary" />
