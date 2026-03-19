@@ -1,106 +1,88 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Plus, LayoutDashboard, FileText, CalendarDays, Columns3, ListOrdered, BarChart3, Users, LayoutPanelLeft, Paintbrush } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import SocialOverview from "../components/social/SocialOverview";
-import SocialPostsList from "../components/social/SocialPostsList";
+import { PenLine, CalendarDays, Megaphone, Newspaper, BarChart3 } from "lucide-react";
+import SocialCreateView from "../components/social/SocialCreateView";
 import SocialCalendar from "../components/social/SocialCalendar";
-import SocialPlanner from "../components/social/SocialPlanner";
-import SocialStreams from "../components/social/SocialStreams";
-import SocialQueue from "../components/social/SocialQueue";
+import SocialCampaignsTab from "../components/social/SocialCampaignsTab";
+import ContentFeedTab from "../components/social/ContentFeedTab";
 import SocialAnalyticsTab from "../components/social/SocialAnalyticsTab";
-import SocialAccountsPanel from "../components/social/SocialAccountsPanel";
-import SocialComposerDialog from "../components/social/SocialComposerDialog";
 import PostDetailDrawer from "../components/social/PostDetailDrawer";
 import type { SocialPost } from "@/hooks/useSocialPosts";
+import { cn } from "@/lib/utils";
 
 const TABS = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard },
-  { id: "posts", label: "Posts", icon: FileText },
+  { id: "create", label: "Create", icon: PenLine },
   { id: "calendar", label: "Calendar", icon: CalendarDays },
-  { id: "planner", label: "Planner", icon: LayoutPanelLeft },
-  { id: "streams", label: "Streams", icon: Columns3 },
-  { id: "queue", label: "Queue", icon: ListOrdered },
+  { id: "campaigns", label: "Campaigns", icon: Megaphone },
+  { id: "feed", label: "Content Feed", icon: Newspaper },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
-  { id: "accounts", label: "Accounts", icon: Users },
 ];
 
 export default function SocialScheduler() {
-  const navigate = useNavigate();
-  const [composerOpen, setComposerOpen] = useState(false);
-  const [editPost, setEditPost] = useState<SocialPost | null>(null);
+  const [activeTab, setActiveTab] = useState("create");
   const [detailPost, setDetailPost] = useState<SocialPost | null>(null);
+  const [editPost, setEditPost] = useState<SocialPost | null>(null);
+  const [pendingContent, setPendingContent] = useState<{ content: string; hashtags: string[] } | null>(null);
 
-  const openComposer = (post?: SocialPost) => {
+  const openCreate = (post?: SocialPost) => {
     setEditPost(post ?? null);
-    setComposerOpen(true);
+    setActiveTab("create");
+  };
+
+  const handleUseFeedPost = (data: { content: string; hashtags: string[] }) => {
+    setPendingContent(data);
+    setActiveTab("create");
   };
 
   return (
     <div className="space-y-4 max-w-7xl">
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Social</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">Plan, schedule, and monitor your social media</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => navigate("/app/post-designer")} className="gap-1.5">
-            <Paintbrush className="h-4 w-4" /> Design Post
-          </Button>
-          <Button className="shadow-glow" onClick={() => openComposer()}>
-            <Plus className="h-4 w-4 mr-2" /> New Post
-          </Button>
-        </div>
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight">Social</h1>
+        <p className="text-muted-foreground text-sm mt-0.5">Create, schedule, and grow with AI-powered social content</p>
       </div>
 
-      <Tabs defaultValue="overview">
-        <TabsList className="w-full justify-start flex-wrap h-auto gap-0.5 bg-muted/50 p-1">
-          {TABS.map(tab => (
-            <TabsTrigger key={tab.id} value={tab.id} className="gap-1.5 text-xs data-[state=active]:shadow-sm">
-              <tab.icon className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">{tab.label}</span>
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      {/* Top Navigation */}
+      <div className="flex items-center gap-1 border-b border-border">
+        {TABS.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              "flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px",
+              activeTab === tab.id
+                ? "border-primary text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+            )}
+          >
+            <tab.icon className="h-4 w-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-        <TabsContent value="overview" className="mt-4">
-          <SocialOverview onNewPost={() => openComposer()} onViewPost={setDetailPost} />
-        </TabsContent>
-        <TabsContent value="posts" className="mt-4">
-          <SocialPostsList onEdit={openComposer} onViewDetail={setDetailPost} />
-        </TabsContent>
-        <TabsContent value="calendar" className="mt-4">
-          <SocialCalendar onNewPost={() => openComposer()} onViewPost={setDetailPost} />
-        </TabsContent>
-        <TabsContent value="planner" className="mt-4">
-          <SocialPlanner onEdit={openComposer} onViewDetail={setDetailPost} />
-        </TabsContent>
-        <TabsContent value="streams" className="mt-4">
-          <SocialStreams onViewPost={setDetailPost} />
-        </TabsContent>
-        <TabsContent value="queue" className="mt-4">
-          <SocialQueue />
-        </TabsContent>
-        <TabsContent value="analytics" className="mt-4">
-          <SocialAnalyticsTab />
-        </TabsContent>
-        <TabsContent value="accounts" className="mt-4">
-          <SocialAccountsPanel />
-        </TabsContent>
-      </Tabs>
-
-      <SocialComposerDialog
-        open={composerOpen}
-        onOpenChange={setComposerOpen}
-        editPost={editPost}
-        onClose={() => { setComposerOpen(false); setEditPost(null); }}
-      />
+      {/* Content */}
+      <div className="mt-2">
+        {activeTab === "create" && (
+          <SocialCreateView
+            editPost={editPost}
+            onDone={() => setEditPost(null)}
+          />
+        )}
+        {activeTab === "calendar" && (
+          <SocialCalendar
+            onNewPost={() => openCreate()}
+            onViewPost={setDetailPost}
+          />
+        )}
+        {activeTab === "campaigns" && <SocialCampaignsTab />}
+        {activeTab === "feed" && <ContentFeedTab onUsePost={handleUseFeedPost} />}
+        {activeTab === "analytics" && <SocialAnalyticsTab />}
+      </div>
 
       <PostDetailDrawer
         post={detailPost}
         onClose={() => setDetailPost(null)}
-        onEdit={openComposer}
+        onEdit={openCreate}
       />
     </div>
   );
