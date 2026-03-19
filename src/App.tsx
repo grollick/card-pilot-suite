@@ -116,6 +116,7 @@ const TechDashboardPage = lazy(() => import("@/modules/team/pages/TechDashboardP
 const SettingsPage = lazy(() => import("@/modules/settings/pages/SettingsPage"));
 const AdminPage = lazy(() => import("@/modules/settings/pages/AdminPage"));
 const PlatformAdminDashboard = lazy(() => import("@/modules/admin/pages/PlatformAdminDashboard"));
+const SalesCrmPage = lazy(() => import("@/modules/admin/pages/SalesCrmPage"));
 const TeamPage = lazy(() => import("@/modules/settings/pages/TeamPage"));
 
 // Help
