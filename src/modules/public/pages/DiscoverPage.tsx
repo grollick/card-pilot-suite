@@ -15,7 +15,7 @@ import {
   Search, MapPin, Users, Loader2, Briefcase, Crown, Star,
   TrendingUp, Rocket, Wrench, SlidersHorizontal, X,
   CalendarCheck, MessageSquareText, CheckCircle2, Sparkles, ChevronRight,
-  ArrowRight, Navigation, StarIcon,
+  ArrowRight, Navigation, StarIcon, Send,
 } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
