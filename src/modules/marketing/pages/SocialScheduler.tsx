@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Plus, LayoutDashboard, FileText, CalendarDays, Columns3, ListOrdered, BarChart3, Users, LayoutPanelLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Plus, LayoutDashboard, FileText, CalendarDays, Columns3, ListOrdered, BarChart3, Users, LayoutPanelLeft, Paintbrush } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SocialOverview from "../components/social/SocialOverview";
@@ -26,6 +27,7 @@ const TABS = [
 ];
 
 export default function SocialScheduler() {
+  const navigate = useNavigate();
   const [composerOpen, setComposerOpen] = useState(false);
   const [editPost, setEditPost] = useState<SocialPost | null>(null);
   const [detailPost, setDetailPost] = useState<SocialPost | null>(null);
@@ -42,9 +44,14 @@ export default function SocialScheduler() {
           <h1 className="text-2xl font-bold tracking-tight">Social</h1>
           <p className="text-muted-foreground text-sm mt-0.5">Plan, schedule, and monitor your social media</p>
         </div>
-        <Button className="shadow-glow" onClick={() => openComposer()}>
-          <Plus className="h-4 w-4 mr-2" /> New Post
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => navigate("/app/post-designer")} className="gap-1.5">
+            <Paintbrush className="h-4 w-4" /> Design Post
+          </Button>
+          <Button className="shadow-glow" onClick={() => openComposer()}>
+            <Plus className="h-4 w-4 mr-2" /> New Post
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="overview">

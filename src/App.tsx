@@ -82,6 +82,7 @@ const RecurringPlanDetailPage = lazy(() => import("@/modules/recurring/pages/Rec
 // Marketing
 const EmailMarketing = lazy(() => import("@/modules/marketing/pages/EmailMarketing"));
 const SocialScheduler = lazy(() => import("@/modules/marketing/pages/SocialScheduler"));
+const PostDesigner = lazy(() => import("@/modules/marketing/pages/PostDesigner"));
 const ContentPage = lazy(() => import("@/modules/marketing/pages/ContentPage"));
 const PromotionsPage = lazy(() => import("@/modules/marketing/pages/PromotionsPage"));
 const ReferralsPage = lazy(() => import("@/modules/marketing/pages/ReferralsPage"));
@@ -216,6 +217,7 @@ const App = () => (
               <Route path="bookings" element={<LazyRoute><BookingManager /></LazyRoute>} />
               <Route path="email" element={<LazyRoute><EmailMarketing /></LazyRoute>} />
               <Route path="social" element={<LazyRoute><SocialScheduler /></LazyRoute>} />
+              <Route path="post-designer" element={<LazyRoute><PostDesigner /></LazyRoute>} />
               <Route path="content" element={<LazyRoute><ContentPage /></LazyRoute>} />
               <Route path="analytics" element={<LazyRoute><Analytics /></LazyRoute>} />
               <Route path="growth" element={<LazyRoute><GrowthDashboard /></LazyRoute>} />
