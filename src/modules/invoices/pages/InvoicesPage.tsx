@@ -291,6 +291,39 @@ export default function InvoicesPage() {
           ))}
         </div>
       )}
+      {/* Limit banner for free users */}
+      {isFree && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <Alert className={invoiceLimitReached ? "border-destructive/30 bg-destructive/5" : "border-primary/20 bg-primary/5"}>
+            <Sparkles className="h-4 w-4" />
+            <AlertDescription className="text-sm">
+              {invoiceLimitReached
+                ? `You've used all 3 invoices this month. Upgrade to Pro for unlimited invoices, PDF export, and more.`
+                : `${thisMonthInvoices.length}/3 invoices used this month on Free plan.`}
+              {invoiceLimitReached && (
+                <Button
+                  variant="link"
+                  className="h-auto p-0 ml-1"
+                  onClick={() => setShowUpgrade(true)}
+                >
+                  Upgrade now →
+                </Button>
+              )}
+            </AlertDescription>
+          </Alert>
+        </motion.div>
+      )}
+
+      <UpgradePrompt
+        open={showUpgrade}
+        onOpenChange={setShowUpgrade}
+        feature="invoice"
+        currentPlan={planKey}
+      />
     </div>
   );
 }
