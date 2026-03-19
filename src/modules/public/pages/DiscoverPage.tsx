@@ -288,6 +288,7 @@ export default function DiscoverPage() {
 
   const featuredListings = useMemo(() => listings?.filter((l) => l.featured) ?? [], [listings]);
   const boostedListings = useMemo(() => listings?.filter((l) => !l.featured && boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
+  const onDutyListings = useMemo(() => listings?.filter((l) => l.is_on_duty && !l.featured && !boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
   // Regular = everything after the top 3 recommended
   const allNonFeatured = useMemo(() => listings?.filter((l) => !l.featured && !boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
   const regularListings = useMemo(() => allNonFeatured.slice(3), [allNonFeatured]);
