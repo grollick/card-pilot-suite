@@ -16,8 +16,8 @@ import ClientSwitcher from "@/modules/agency/components/ClientSwitcher";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { useIsAdmin } from "@/hooks/useAdminStats";
+import { useProfileCache } from "@/hooks/useProfileCache";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import {
