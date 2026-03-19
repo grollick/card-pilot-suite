@@ -123,6 +123,7 @@ const AdminPage = lazy(() => import("@/modules/settings/pages/AdminPage"));
 const PlatformAdminDashboard = lazy(() => import("@/modules/admin/pages/PlatformAdminDashboard"));
 const LandingPageManager = lazy(() => import("@/modules/admin/pages/LandingPageManager"));
 const SalesCrmPage = lazy(() => import("@/modules/admin/pages/SalesCrmPage"));
+const UserPageBuilder = lazy(() => import("@/modules/website/pages/UserPageBuilder"));
 const TeamPage = lazy(() => import("@/modules/settings/pages/TeamPage"));
 
 // Help
