@@ -187,6 +187,9 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
       if (filters.intent === "book") {
         listings = listings.filter((l) => l.services.length > 0);
       }
+      if (filters.intent === "on_duty") {
+        listings = listings.filter((l) => l.is_on_duty);
+      }
 
       // Filter by profession
       if (filters.profession) {
