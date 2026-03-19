@@ -60,7 +60,7 @@ export default function EstimateDutyPanel() {
     >
       {/* Accent bar */}
       {isOnDuty && (
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-success via-emerald-400 to-success rounded-t-xl" />
+        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-success to-success/60 rounded-t-xl" />
       )}
 
       <div className="dash-card-header pt-3">
