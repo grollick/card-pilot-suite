@@ -143,9 +143,8 @@ export default function HelpCenter() {
           const Icon = section.icon;
 
           return (
-            <motion.div
+            <div
               key={section.id}
-              layout
               className="rounded-xl border border-border bg-card overflow-hidden"
             >
               {/* Section Header */}
@@ -169,9 +168,7 @@ export default function HelpCenter() {
 
               {/* Expanded Content */}
               {isExpanded && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
+                <div
                   className="border-t border-border"
                 >
                   <div className="p-4 space-y-5">
@@ -222,9 +219,9 @@ export default function HelpCenter() {
                       </div>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               )}
-            </motion.div>
+            </div>
           );
         })}
       </div>
