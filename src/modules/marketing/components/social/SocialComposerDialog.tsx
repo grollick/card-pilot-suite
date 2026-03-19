@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -124,7 +123,7 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
           <DialogTitle>{editPost ? "Edit Post" : "New Post"}</DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="flex-1 pr-2">
+        <div className="flex-1 overflow-y-auto pr-2">
           <div className="grid md:grid-cols-[1fr,280px] gap-4">
             <div className="space-y-4">
               {/* Platform Selection */}
@@ -284,7 +283,7 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
               </div>
             </div>
           </div>
-        </ScrollArea>
+        </div>
 
         <DialogFooter className="pt-2 border-t border-border gap-1">
           <Button variant="outline" onClick={onClose}>Cancel</Button>
