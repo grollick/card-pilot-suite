@@ -399,6 +399,16 @@ function StepEditor({
   const [body, setBody] = useState(step.body);
   const [delayHours, setDelayHours] = useState(step.delay_hours);
 
+  // Sync local state when step changes or editing starts
+  const stepId = step.id;
+  const [prevStepId, setPrevStepId] = useState(stepId);
+  if (stepId !== prevStepId) {
+    setPrevStepId(stepId);
+    setSubject(step.subject);
+    setBody(step.body);
+    setDelayHours(step.delay_hours);
+  }
+
   return (
     <div className={`border rounded-lg p-4 ${!step.enabled ? "opacity-50" : ""}`}>
       <div className="flex items-center justify-between gap-3">
@@ -421,7 +431,7 @@ function StepEditor({
           <Button size="sm" variant="ghost" onClick={onEdit}>
             <Eye className="h-3 w-3" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={onDelete}>
+          <Button size="sm" variant="ghost" onClick={() => { if (confirm("Delete this step?")) onDelete(); }}>
             <Trash2 className="h-3 w-3 text-destructive" />
           </Button>
         </div>

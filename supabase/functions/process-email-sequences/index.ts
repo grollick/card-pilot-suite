@@ -18,6 +18,27 @@ serve(async (req) => {
   );
 
   try {
+    // ── Auth check: require admin role ──
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) return jsonRes({ error: "Unauthorized" }, 401);
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authErr } = await createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY") || Deno.env.get("SUPABASE_PUBLISHABLE_KEY") || ""
+    ).auth.getUser(token);
+
+    if (authErr || !user) return jsonRes({ error: "Unauthorized" }, 401);
+
+    const { data: roleRow } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (!roleRow) return jsonRes({ error: "Admin access required" }, 403);
+
     const action = (await req.json().catch(() => ({})))?.action ?? "process";
 
     // ── Action: enroll_new_signups ──

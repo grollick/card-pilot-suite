@@ -71,6 +71,7 @@ export function useCreateSequence() {
       qc.invalidateQueries({ queryKey: ["email-sequences"] });
       toast.success("Sequence created");
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to create sequence"),
   });
 }
 
@@ -84,6 +85,7 @@ export function useUpdateSequence() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["email-sequences"] });
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to update sequence"),
   });
 }
 
@@ -98,6 +100,7 @@ export function useDeleteSequence() {
       qc.invalidateQueries({ queryKey: ["email-sequences"] });
       toast.success("Sequence deleted");
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to delete sequence"),
   });
 }
 
@@ -134,6 +137,7 @@ export function useCreateStep() {
       qc.invalidateQueries({ queryKey: ["sequence-steps", vars.sequence_id] });
       toast.success("Step added");
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to add step"),
   });
 }
 
@@ -147,6 +151,7 @@ export function useUpdateStep() {
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["sequence-steps", vars.sequence_id] });
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to update step"),
   });
 }
 
@@ -161,6 +166,7 @@ export function useDeleteStep() {
       qc.invalidateQueries({ queryKey: ["sequence-steps", vars.sequence_id] });
       toast.success("Step removed");
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to remove step"),
   });
 }
 
@@ -185,8 +191,11 @@ export function useSequenceEnrollments(sequenceId: string | null) {
 export function useRunSequenceProcessor() {
   return useMutation({
     mutationFn: async (action: "process" | "enroll_new_signups" | "check_stop_conditions") => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error("Not authenticated");
       const { data, error } = await supabase.functions.invoke("process-email-sequences", {
         body: { action },
+        headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (error) throw error;
       return data;
