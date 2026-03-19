@@ -10,6 +10,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { pickStylePackKey } from "@/lib/stylePackSelection";
 import { getBestTemplateForProfession, getTemplate, CARD_TEMPLATES } from "@/lib/cardTemplates";
 import { generateEstimateNumber, calculateLineTotals } from "@/hooks/useEstimates";
+import { getChecklistTemplate } from "@/lib/checklistTemplates";
 
 import StepProfession from "../components/StepProfession";
 import StepBusinessInfo from "../components/StepBusinessInfo";
@@ -333,13 +334,28 @@ export default function Onboarding() {
   const cardUrl = `${window.location.origin}/${handle}`;
   const shareMessage = `Hey! I just set up my digital business card — check it out and let me know if you ever need ${selectedProfession?.name?.toLowerCase() || "my"} services: ${cardUrl}`;
 
-  const checklistItems = [
-    { label: "Card created & published", done: launched },
-    { label: "Services added", done: services.length > 0 },
-    { label: "First estimate sent", done: estimateCreated },
-    { label: "First lead received", done: false },
-    { label: "First booking completed", done: false },
-  ];
+  // Use profession-aware checklist template
+  const checklistTemplate = getChecklistTemplate(
+    selectedProfession?.name,
+    selectedProfession?.category,
+  );
+
+  const onboardingSignals: Record<string, boolean> = {
+    card_published: launched,
+    has_services: services.length > 0,
+    has_image: launched,
+    estimate_sent: estimateCreated,
+    has_views: false,
+    has_lead: false,
+    has_booking: false,
+    has_review: false,
+  };
+
+  const checklistItems = checklistTemplate.steps.map((step) => ({
+    label: step.label,
+    done: onboardingSignals[step.signal] ?? false,
+    route: step.route,
+  }));
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -485,6 +501,7 @@ export default function Onboarding() {
             {step === 7 && (
               <StepActivationChecklist
                 items={checklistItems}
+                headline={checklistTemplate.headline}
                 onGoToDashboard={() => navigate("/app")}
               />
             )}

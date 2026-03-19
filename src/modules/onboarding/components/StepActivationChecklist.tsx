@@ -1,4 +1,5 @@
-import { CheckCircle2, Circle, LayoutDashboard, PartyPopper, Rocket } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { CheckCircle2, Circle, LayoutDashboard, PartyPopper, Rocket, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import OnboardingStepWrapper from "./OnboardingStepWrapper";
@@ -6,14 +7,17 @@ import OnboardingStepWrapper from "./OnboardingStepWrapper";
 interface CheckItem {
   label: string;
   done: boolean;
+  route?: string;
 }
 
 interface Props {
   items: CheckItem[];
+  headline?: string;
   onGoToDashboard: () => void;
 }
 
-export default function StepActivationChecklist({ items, onGoToDashboard }: Props) {
+export default function StepActivationChecklist({ items, headline, onGoToDashboard }: Props) {
+  const navigate = useNavigate();
   const doneCount = items.filter(i => i.done).length;
   const progress = items.length > 0 ? (doneCount / items.length) * 100 : 0;
 
@@ -35,7 +39,7 @@ export default function StepActivationChecklist({ items, onGoToDashboard }: Prop
         </motion.div>
 
         <div>
-          <h2 className="text-xl font-bold">You're on your way! 🚀</h2>
+          <h2 className="text-xl font-bold">{headline || "You're on your way!"} 🚀</h2>
           <p className="text-sm text-muted-foreground mt-1">
             {doneCount}/{items.length} steps completed — keep going to start earning
           </p>
@@ -52,17 +56,21 @@ export default function StepActivationChecklist({ items, onGoToDashboard }: Prop
         />
       </div>
 
-      {/* Checklist items */}
+      {/* Checklist items — clickable to navigate */}
       <div className="space-y-1.5">
         {items.map((item, i) => (
-          <motion.div
+          <motion.button
             key={item.label}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.1 }}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-all ${
+            onClick={() => item.route && !item.done && navigate(item.route)}
+            disabled={item.done || !item.route}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-all w-full text-left ${
               item.done
                 ? "border-success/20 bg-success/5"
+                : item.route
+                ? "border-border hover:border-primary/30 hover:bg-primary/5 cursor-pointer"
                 : "border-border"
             }`}
           >
@@ -71,10 +79,13 @@ export default function StepActivationChecklist({ items, onGoToDashboard }: Prop
             ) : (
               <Circle className="h-5 w-5 text-muted-foreground/30 shrink-0" />
             )}
-            <span className={`text-sm ${item.done ? "text-success font-medium line-through" : "text-foreground"}`}>
+            <span className={`text-sm flex-1 ${item.done ? "text-success font-medium line-through" : "text-foreground"}`}>
               {item.label}
             </span>
-          </motion.div>
+            {!item.done && item.route && (
+              <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/40" />
+            )}
+          </motion.button>
         ))}
       </div>
 
