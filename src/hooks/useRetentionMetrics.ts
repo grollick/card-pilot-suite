@@ -44,7 +44,7 @@ export function useRetentionMetrics() {
         // Reviews this month
         supabase
           .from("reviews")
-          .select("id, rating, status")
+          .select("id, rating, is_public")
           .gte("created_at", monthStart),
 
         // Completed bookings 30+ days ago (rebooking candidates)
