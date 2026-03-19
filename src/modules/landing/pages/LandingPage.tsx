@@ -104,7 +104,7 @@ const plans = [
     price: "$29",
     period: "/month",
     desc: "Everything you need to grow",
-    features: ["Unlimited cards & contacts", "Booking & estimates", "Full CRM & pipeline", "Autopilot follow-ups", "Project showcase", "Remove branding"],
+    features: ["Unlimited cards & contacts", "Booking & estimates", "Full CRM & pipeline", "Autopilot follow-ups", "Scan to Save on your card", "Contact categories", "Remove branding"],
     highlighted: true,
   },
   {
