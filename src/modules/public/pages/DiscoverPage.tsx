@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useMarketplaceListings, useMarketplaceProfessions, useMarketplaceServices, type MarketplaceListing } from "@/hooks/useMarketplace";
@@ -15,7 +15,7 @@ import {
   Search, MapPin, Users, Loader2, Briefcase, Crown, Star,
   TrendingUp, Rocket, Wrench, SlidersHorizontal, X,
   CalendarCheck, MessageSquareText, CheckCircle2, Sparkles, ChevronRight,
-  ArrowRight,
+  ArrowRight, Navigation, StarIcon,
 } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -243,14 +243,61 @@ export default function DiscoverPage() {
   const [search, setSearch] = useState("");
   const [serviceFilter, setServiceFilter] = useState("");
   const [intentFilter, setIntentFilter] = useState<"" | "quote" | "book" | "available_now" | "on_duty">("");
+  const [professionFilter, setProfessionFilter] = useState("");
+  const [locationFilter, setLocationFilter] = useState("");
+  const [ratingFilter, setRatingFilter] = useState<"" | "3" | "4" | "5">("");
   const [showFilters, setShowFilters] = useState(false);
   const [showMatcher, setShowMatcher] = useState(false);
   const [topMatches, setTopMatches] = useState<MarketplaceListing[] | null>(null);
   const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
+  const [detectedCity, setDetectedCity] = useState<string | null>(null);
+  const [detectingLocation, setDetectingLocation] = useState(false);
+
+  // Auto-detect user location on mount
+  useEffect(() => {
+    if (!city && !locationFilter && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&zoom=10`);
+            const data = await res.json();
+            const cityName = data.address?.city || data.address?.town || data.address?.village || data.address?.county;
+            if (cityName) setDetectedCity(cityName);
+          } catch { /* silent fail */ }
+        },
+        () => { /* permission denied or error — silent */ },
+        { timeout: 5000 }
+      );
+    }
+  }, []);
+
+  const handleDetectLocation = useCallback(() => {
+    if (!navigator.geolocation) return;
+    setDetectingLocation(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json&zoom=10`);
+          const data = await res.json();
+          const cityName = data.address?.city || data.address?.town || data.address?.village || data.address?.county;
+          if (cityName) {
+            setDetectedCity(cityName);
+            setLocationFilter(cityName);
+          }
+        } catch { /* silent */ }
+        setDetectingLocation(false);
+      },
+      () => setDetectingLocation(false),
+      { timeout: 8000 }
+    );
+  }, []);
+
+  // Use location filter or detected city as effective city
+  const effectiveCity = city || (locationFilter ? locationFilter.toLowerCase().replace(/\s+/g, "-") : undefined);
 
   const { data: listings, isLoading } = useMarketplaceListings({
-    profession,
-    city,
+    profession: professionFilter ? professionFilter.toLowerCase().replace(/\s+/g, "-") : profession,
+    city: effectiveCity,
     search: search.length > 1 ? search : undefined,
     service: serviceFilter || undefined,
     intent: (intentFilter || undefined) as any,
@@ -261,45 +308,52 @@ export default function DiscoverPage() {
   const { data: boostedUsers } = useBoostedUserIds();
 
   const boostedIds = useMemo(() => new Set(boostedUsers?.map(b => b.user_id) ?? []), [boostedUsers]);
-  const displayProfession = profession?.replace(/-/g, " ");
-  const displayCity = city?.replace(/-/g, " ");
+  const displayProfession = professionFilter || profession?.replace(/-/g, " ");
+  const displayCity = locationFilter || city?.replace(/-/g, " ");
+
+  // Apply rating filter client-side
+  const filteredListings = useMemo(() => {
+    if (!listings) return [];
+    if (!ratingFilter) return listings;
+    const minRating = parseInt(ratingFilter);
+    return listings.filter((l) => l.avg_rating !== null && l.avg_rating >= minRating);
+  }, [listings, ratingFilter]);
 
   const title = useMemo(() => {
     if (displayProfession && displayCity)
       return `${capitalize(displayProfession)}s in ${capitalize(displayCity)}`;
     if (displayProfession) return `${capitalize(displayProfession)}s Near You`;
     if (displayCity) return `Professionals in ${capitalize(displayCity)}`;
-    return "Get Discovered by Local Customers";
+    return "Find Professionals Near You";
   }, [displayProfession, displayCity]);
 
   const metaDescription = useMemo(() => {
     if (displayProfession && displayCity)
       return `Find trusted ${displayProfession}s in ${capitalize(displayCity)}. Book appointments, request quotes, and connect with local professionals.`;
     if (displayProfession) return `Browse top ${displayProfession}s on guzzl.pro. View profiles, read reviews, and book services instantly.`;
-    return "Discover and book trusted local businesses on guzzl.pro. Search by profession, location, and services.";
+    return "Discover and book trusted local professionals. Search by service, location, and ratings — completely free.";
   }, [displayProfession, displayCity]);
 
   const cities = useMemo(() => {
-    if (!listings) return [];
+    if (!filteredListings) return [];
     const set = new Set<string>();
-    listings.forEach((l) => l.city && set.add(l.city));
+    filteredListings.forEach((l) => l.city && set.add(l.city));
     return Array.from(set).sort().slice(0, 12);
-  }, [listings]);
+  }, [filteredListings]);
 
-  const featuredListings = useMemo(() => listings?.filter((l) => l.featured) ?? [], [listings]);
-  const boostedListings = useMemo(() => listings?.filter((l) => !l.featured && boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
-  const onDutyListings = useMemo(() => listings?.filter((l) => l.is_on_duty && !l.featured && !boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
-  // Regular = everything after the top 3 recommended
-  const allNonFeatured = useMemo(() => listings?.filter((l) => !l.featured && !boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
+  const featuredListings = useMemo(() => filteredListings?.filter((l) => l.featured) ?? [], [filteredListings]);
+  const boostedListings = useMemo(() => filteredListings?.filter((l) => !l.featured && boostedIds.has(l.id)) ?? [], [filteredListings, boostedIds]);
+  const onDutyListings = useMemo(() => filteredListings?.filter((l) => l.is_on_duty && !l.featured && !boostedIds.has(l.id)) ?? [], [filteredListings, boostedIds]);
+  const allNonFeatured = useMemo(() => filteredListings?.filter((l) => !l.featured && !boostedIds.has(l.id)) ?? [], [filteredListings, boostedIds]);
   const regularListings = useMemo(() => allNonFeatured.slice(3), [allNonFeatured]);
 
   const boostedUserIdsArray = useMemo(() => boostedListings.map(l => l.id), [boostedListings]);
   useTrackBoostViews(boostedUserIdsArray);
 
-  const hasActiveFilters = !!serviceFilter || !!search || !!intentFilter;
+  const hasActiveFilters = !!serviceFilter || !!search || !!intentFilter || !!professionFilter || !!locationFilter || !!ratingFilter;
   const professionNames = useMemo(() => profData?.professions.map(p => p.name) ?? POPULAR_PROFESSIONS, [profData]);
 
-  const clearAll = () => { setSearch(""); setServiceFilter(""); setIntentFilter(""); };
+  const clearAll = () => { setSearch(""); setServiceFilter(""); setIntentFilter(""); setProfessionFilter(""); setLocationFilter(""); setRatingFilter(""); };
 
   // Show sticky CTA only when listings are loaded
   const showSticky = !isLoading && (listings?.length ?? 0) > 0;
@@ -342,9 +396,29 @@ export default function DiscoverPage() {
             transition={{ duration: 0.5 }}
           >
             <h1 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight mb-3">{title}</h1>
-            <p className="text-muted-foreground text-lg max-w-2xl mb-10">
-              Find professionals near you. Compare reviews, response times, and connect instantly — all free.
+            <p className="text-muted-foreground text-lg max-w-2xl mb-4">
+              Search by service, profession, or location. Compare reviews, response times, and connect instantly — completely free.
             </p>
+            {detectedCity && !locationFilter && !city && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-2 mb-6"
+              >
+                <Badge variant="outline" className="gap-1.5 text-sm py-1 px-3 bg-card/50 backdrop-blur-sm">
+                  <Navigation className="h-3 w-3 text-primary" />
+                  Near {detectedCity}
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-xs gap-1"
+                  onClick={() => setLocationFilter(detectedCity)}
+                >
+                  Use this location
+                </Button>
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Glassmorphism search panel */}
@@ -359,8 +433,8 @@ export default function DiscoverPage() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by name, profession, service, or city…"
+                   <Input
+                    placeholder="What service do you need?"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="pl-10 h-12 text-base bg-background/50 border-border/40 rounded-xl"
@@ -421,6 +495,66 @@ export default function DiscoverPage() {
                   className="overflow-hidden"
                 >
                   <div className="mt-3 p-4 rounded-xl border border-border/40 bg-card/70 backdrop-blur-sm space-y-4">
+                    {/* Profession, Location, Rating filters */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block flex items-center gap-1">
+                          <Briefcase className="h-3 w-3" /> Profession
+                        </label>
+                        <Select value={professionFilter} onValueChange={(v) => setProfessionFilter(v === "all" ? "" : v)}>
+                          <SelectTrigger className="h-9 text-xs">
+                            <SelectValue placeholder="All professions" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All professions</SelectItem>
+                            {professionNames.map((p) => (
+                              <SelectItem key={p} value={p}>{p}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block flex items-center gap-1">
+                          <MapPin className="h-3 w-3" /> Location
+                        </label>
+                        <div className="flex gap-1.5">
+                          <Input
+                            placeholder={detectedCity || "City or area…"}
+                            value={locationFilter}
+                            onChange={(e) => setLocationFilter(e.target.value)}
+                            className="h-9 text-xs flex-1"
+                          />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-9 w-9 shrink-0"
+                            onClick={handleDetectLocation}
+                            disabled={detectingLocation}
+                            title="Detect my location"
+                          >
+                            {detectingLocation ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Navigation className="h-3.5 w-3.5" />}
+                          </Button>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block flex items-center gap-1">
+                          <Star className="h-3 w-3" /> Minimum Rating
+                        </label>
+                        <Select value={ratingFilter} onValueChange={(v) => setRatingFilter(v === "any" ? "" : v as any)}>
+                          <SelectTrigger className="h-9 text-xs">
+                            <SelectValue placeholder="Any rating" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="any">Any rating</SelectItem>
+                            <SelectItem value="3">3+ stars</SelectItem>
+                            <SelectItem value="4">4+ stars</SelectItem>
+                            <SelectItem value="5">5 stars only</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Service tags */}
                     {topServices && topServices.length > 0 && (
                       <div>
                         <div className="flex items-center gap-2 mb-2">
@@ -468,13 +602,13 @@ export default function DiscoverPage() {
               className="flex items-center gap-6 mt-6 text-sm text-muted-foreground"
             >
               <span className="flex items-center gap-1.5">
-                <Users className="h-4 w-4" /> {listings.length} professionals
+                <Users className="h-4 w-4" /> {filteredListings.length} professionals
               </span>
               <span className="flex items-center gap-1.5">
-                <Star className="h-4 w-4" /> {listings.filter(l => l.review_count > 0).length} reviewed
+                <Star className="h-4 w-4" /> {filteredListings.filter(l => l.review_count > 0).length} reviewed
               </span>
               <span className="flex items-center gap-1.5 hidden sm:flex">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600" /> {listings.filter(l => l.available_for_work).length} available
+                <CheckCircle2 className="h-4 w-4 text-emerald-600" /> {filteredListings.filter(l => l.available_for_work).length} available
               </span>
               <span className="flex items-center gap-1.5 hidden sm:flex">
                 <MapPin className="h-4 w-4" /> {cities.length} cities
@@ -625,10 +759,28 @@ export default function DiscoverPage() {
             </span>
           </div>
           {hasActiveFilters && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              {professionFilter && (
+                <Badge variant="secondary" className="gap-1 text-xs">
+                  <Briefcase className="h-3 w-3" /> {professionFilter}
+                  <button onClick={() => setProfessionFilter("")}><X className="h-3 w-3 ml-0.5" /></button>
+                </Badge>
+              )}
+              {locationFilter && (
+                <Badge variant="secondary" className="gap-1 text-xs">
+                  <MapPin className="h-3 w-3" /> {locationFilter}
+                  <button onClick={() => setLocationFilter("")}><X className="h-3 w-3 ml-0.5" /></button>
+                </Badge>
+              )}
+              {ratingFilter && (
+                <Badge variant="secondary" className="gap-1 text-xs">
+                  <Star className="h-3 w-3" /> {ratingFilter}+ stars
+                  <button onClick={() => setRatingFilter("")}><X className="h-3 w-3 ml-0.5" /></button>
+                </Badge>
+              )}
               {intentFilter && (
                 <Badge variant="secondary" className="gap-1 text-xs">
-                  {intentFilter === "quote" ? "Quotes" : intentFilter === "book" ? "Bookable" : "Available"}
+                  {intentFilter === "quote" ? "Quotes" : intentFilter === "book" ? "Bookable" : intentFilter === "on_duty" ? "On Duty" : "Available"}
                   <button onClick={() => setIntentFilter("")}><X className="h-3 w-3 ml-0.5" /></button>
                 </Badge>
               )}
