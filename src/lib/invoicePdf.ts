@@ -157,7 +157,7 @@ export function exportInvoicePDF({
   ${invoice.notes ? `<div class="notes"><h3>Notes</h3><p>${invoice.notes}</p></div>` : ""}
   ${invoice.terms ? `<div class="terms"><h3>Terms & Conditions</h3><p>${invoice.terms}</p></div>` : ""}
 
-  ${hasBranding ? `<div class="watermark">Powered by CardPilot</div>` : ""}
+  ${hasBranding ? `<div class="watermark">Powered by guzzl.pro</div>` : ""}
 </body>
 </html>`;
 

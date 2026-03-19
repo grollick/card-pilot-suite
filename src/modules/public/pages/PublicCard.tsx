@@ -379,7 +379,7 @@ export default function PublicCard() {
                   ${formData.message ? `<tr><td style="padding:8px 0;color:#6b7280;">Message</td><td style="padding:8px 0;color:#111827;">${formData.message}</td></tr>` : ""}
                 </table>
                 <a href="${window.location.origin}/app/contacts" style="display:inline-block;padding:10px 20px;background:#4361ee;color:#fff;border-radius:6px;text-decoration:none;font-weight:600;margin-top:8px;">View in CRM</a>
-                <p style="color:#9ca3af;font-size:12px;margin:24px 0 0;">CardPilot — Your digital business card platform</p>
+                <p style="color:#9ca3af;font-size:12px;margin:24px 0 0;">guzzl.pro — Your digital business card platform</p>
               </div>
             `,
             email_type: "custom",
@@ -1447,7 +1447,7 @@ export default function PublicCard() {
                 style={{ fontSize: 11, color: `${palette.secondary}90`, textDecoration: "none", display: "inline-block" }}
               >
                 Powered by{" "}
-                <span style={{ fontWeight: 700, color: palette.primary }}>CardPilot</span>
+                <span style={{ fontWeight: 700, color: palette.primary }}>guzzl.pro</span>
               </a>
               <p style={{ fontSize: 10, color: `${palette.secondary}60`, margin: "4px 0 0" }}>
                 <a

@@ -20,7 +20,7 @@ export default function ProductsPage() {
       <nav className="border-b border-border/50 bg-card/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link to="/" className="text-lg font-extrabold tracking-tight">
-            <span className="gradient-text">CardPilot</span>
+            <span className="gradient-text">guzzl.pro</span>
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/">
@@ -46,7 +46,7 @@ export default function ProductsPage() {
             <span className="gradient-text">generate leads for you</span>
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mt-4">
-            Premium laser-engraved plates, NFC business cards, and outdoor signs — each one linked to your CardPilot digital card. Every scan is a potential customer.
+            Premium laser-engraved plates, NFC business cards, and outdoor signs — each one linked to your guzzl.pro digital card. Every scan is a potential customer.
           </p>
         </motion.div>
       </section>
@@ -102,7 +102,7 @@ export default function ProductsPage() {
                   Order Now — ${product.price}
                 </Button>
                 <p className="text-xs text-center text-muted-foreground">
-                  Requires a CardPilot account • Ships in 3-5 business days
+                  Requires a guzzl.pro account • Ships in 3-5 business days
                 </p>
               </div>
             </motion.div>
@@ -133,7 +133,7 @@ export default function ProductsPage() {
       {/* Footer */}
       <footer className="border-t border-border py-8">
         <div className="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">© 2026 CardPilot. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground">© 2026 guzzl.pro. All rights reserved.</p>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <Link to="/" className="hover:text-foreground transition-colors">Home</Link>
             <Link to="/auth" className="hover:text-foreground transition-colors">Log in</Link>

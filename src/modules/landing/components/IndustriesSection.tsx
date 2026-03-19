@@ -43,7 +43,7 @@ export default function IndustriesSection() {
             Built for service businesses
           </h2>
           <p className="text-muted-foreground mt-4 max-w-lg mx-auto text-lg">
-            From contractors to consultants, CardPilot adapts to your industry.
+            From contractors to consultants, guzzl.pro adapts to your industry.
           </p>
         </motion.div>
 

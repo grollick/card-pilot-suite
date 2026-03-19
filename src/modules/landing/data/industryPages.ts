@@ -56,7 +56,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
     ],
     problemClosing: "Every missed message is a missed job.",
     solutionHeadline: "Turn your work into a lead-generating machine.",
-    solutionDescription: "CardPilot gives you one simple link that shows your work, captures leads, and lets customers book with you instantly.",
+    solutionDescription: "guzzl.pro gives you one simple link that shows your work, captures leads, and lets customers book with you instantly.",
     solutionBullets: [
       "Show your before-and-after projects",
       "Let customers request quotes",
@@ -95,7 +95,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       quote: "I shared my card and got 3 renovation leads in the first week.",
       attribution: "Local Contractor",
     },
-    testimonialIntro: "Contractors across the country trust CardPilot",
+    testimonialIntro: "Contractors across the country trust guzzl.pro",
     demoSection: {
       headline: "See a real contractor card",
       buttonText: "View Example Card",
@@ -131,7 +131,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
     ],
     problemClosing: "If your chair isn't full, you're losing money.",
     solutionHeadline: "Turn your profile into a booking machine.",
-    solutionDescription: "CardPilot gives you one link that shows your work and lets clients book instantly.",
+    solutionDescription: "guzzl.pro gives you one link that shows your work and lets clients book instantly.",
     solutionBullets: [
       "Show your best cuts and styles",
       "Let clients book appointments in seconds",
@@ -170,7 +170,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       quote: "I added my link to Instagram and filled my week in 3 days.",
       attribution: "Local Barber",
     },
-    testimonialIntro: "Barbers are growing their clientele with CardPilot",
+    testimonialIntro: "Barbers are growing their clientele with guzzl.pro",
     demoSection: {
       headline: "See a real barber card",
       buttonText: "View Example Barber Card",
@@ -206,7 +206,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
     ],
     problemClosing: "Every missed lead could be a missed commission.",
     solutionHeadline: "Turn every visitor into a potential client.",
-    solutionDescription: "CardPilot gives you one simple link that captures leads and showcases your listings professionally.",
+    solutionDescription: "guzzl.pro gives you one simple link that captures leads and showcases your listings professionally.",
     solutionBullets: [
       "Capture buyer and seller inquiries",
       "Showcase featured listings",
@@ -245,7 +245,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       quote: "I started getting more serious buyer inquiries within days.",
       attribution: "Local Realtor",
     },
-    testimonialIntro: "Top-producing agents choose CardPilot",
+    testimonialIntro: "Top-producing agents choose guzzl.pro",
     demoSection: {
       headline: "See a real realtor card",
       buttonText: "View Example Realtor Card",
@@ -296,7 +296,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       { title: "Client Testimonials", icon: "⭐", description: "Display glowing reviews from past clients to build trust." },
       { title: "Social Links", icon: "📱", description: "Connect your Instagram, TikTok, and portfolio site in one place." },
     ],
-    testimonialIntro: "Photographers are booking more sessions with CardPilot",
+    testimonialIntro: "Photographers are booking more sessions with guzzl.pro",
     focusAreas: ["Portfolio", "Bookings", "Client Inquiries"],
   },
   landscapers: {
@@ -332,7 +332,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       { title: "Maintenance Plans", icon: "📆", description: "Display recurring plan options to lock in steady monthly revenue." },
       { title: "Review Collection", icon: "⭐", description: "Automatically request reviews after completing a landscaping project." },
     ],
-    testimonialIntro: "Landscapers are growing faster with CardPilot",
+    testimonialIntro: "Landscapers are growing faster with guzzl.pro",
     focusAreas: ["Before/After Projects", "Quote Requests", "Seasonal Promotions"],
   },
 };

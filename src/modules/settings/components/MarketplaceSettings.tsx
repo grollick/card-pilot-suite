@@ -67,7 +67,7 @@ export default function MarketplaceSettings({ profile }: MarketplaceSettingsProp
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Control how your business appears on the CardPilot Discover marketplace. When enabled, potential customers can find and contact you.
+        Control how your business appears on the guzzl.pro Discover marketplace. When enabled, potential customers can find and contact you.
       </p>
 
       <div className="space-y-4">

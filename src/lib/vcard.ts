@@ -35,7 +35,7 @@ export function generateVCard(data: VCardData): string {
     lines.push(`URL:${cardUrl}`);
   }
 
-  lines.push(`PRODID:-//CardPilot//EN`);
+  lines.push(`PRODID:-//guzzl.pro//EN`);
   lines.push("END:VCARD");
 
   return lines.join("\r\n");

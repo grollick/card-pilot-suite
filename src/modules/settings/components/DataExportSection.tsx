@@ -27,7 +27,7 @@ const DATA_SETS: DataSet[] = [
     description: "All CRM contacts, lead scores, and lifecycle data",
     table: "leads",
     select: "id, name, email, phone, company, address, source, status, lifecycle_stage, lead_score, notes, created_at, last_activity_at",
-    filenamePrefix: "cardpilot-contacts",
+    filenamePrefix: "guzzl-pro-contacts",
   },
   {
     key: "bookings",
@@ -36,7 +36,7 @@ const DATA_SETS: DataSet[] = [
     description: "All appointments with customer details and status",
     table: "bookings",
     select: "id, customer_name, customer_email, customer_phone, start_datetime, end_datetime, status, notes, created_at",
-    filenamePrefix: "cardpilot-bookings",
+    filenamePrefix: "guzzl-pro-bookings",
   },
   {
     key: "services",
@@ -45,7 +45,7 @@ const DATA_SETS: DataSet[] = [
     description: "Booking services with pricing and duration",
     table: "booking_services",
     select: "id, name, description, duration_min, price, active, created_at",
-    filenamePrefix: "cardpilot-services",
+    filenamePrefix: "guzzl-pro-services",
   },
   {
     key: "projects",
@@ -54,7 +54,7 @@ const DATA_SETS: DataSet[] = [
     description: "Before/after project showcase entries",
     table: "projects",
     select: "id, title, description, before_image_url, after_image_url, services_used, is_public, created_at",
-    filenamePrefix: "cardpilot-projects",
+    filenamePrefix: "guzzl-pro-projects",
   },
   {
     key: "reviews",
@@ -63,7 +63,7 @@ const DATA_SETS: DataSet[] = [
     description: "Customer reviews, ratings, and responses",
     table: "reviews",
     select: "id, reviewer_name, reviewer_email, rating, review_text, is_public, owner_response, source, created_at",
-    filenamePrefix: "cardpilot-reviews",
+    filenamePrefix: "guzzl-pro-reviews",
   },
 ];
 

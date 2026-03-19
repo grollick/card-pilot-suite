@@ -1,4 +1,4 @@
-// ── CardPilot Physical QR Products ──
+// ── guzzl.pro Physical QR Products ──
 
 export interface QRProduct {
   id: string;
@@ -19,7 +19,7 @@ export const QR_PRODUCTS: QRProduct[] = [
     features: [
       "Brushed aluminum finish",
       "Laser-engraved QR code",
-      "Links to your CardPilot card",
+      "Links to your guzzl.pro card",
       "Weather-resistant",
       "Mounting hardware included",
     ],

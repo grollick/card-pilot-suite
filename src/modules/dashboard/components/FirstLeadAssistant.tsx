@@ -99,7 +99,7 @@ export default function FirstLeadAssistant() {
     card: { title: "🎉 Your card is live!", description: "Customers can now find and contact you." },
     services: { title: "✅ Services added!", description: "Customers can see what you offer." },
     lead: { title: "🎉 Congratulations!", description: "Your first lead has arrived." },
-    booking: { title: "🎊 First booking!", description: "Your first customer booked through CardPilot." },
+    booking: { title: "🎊 First booking!", description: "Your first customer booked through guzzl.pro." },
   };
 
   useEffect(() => {

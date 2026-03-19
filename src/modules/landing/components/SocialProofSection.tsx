@@ -54,7 +54,7 @@ export default function SocialProofSection() {
             Built for the businesses that keep our communities running
           </h2>
           <p className="text-muted-foreground mt-3 max-w-lg mx-auto">
-            Thousands of professionals trust CardPilot to grow their business.
+            Thousands of professionals trust guzzl.pro to grow their business.
           </p>
         </motion.div>
 

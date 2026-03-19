@@ -464,7 +464,7 @@ export default function ProductTourSection() {
             Take a Quick Product Tour
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            See how CardPilot helps you capture leads, book customers, and manage your business — all in one platform.
+            See how guzzl.pro helps you capture leads, book customers, and manage your business — all in one platform.
           </p>
         </motion.div>
 

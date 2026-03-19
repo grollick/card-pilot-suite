@@ -275,8 +275,8 @@ export default function DiscoverPage() {
   const metaDescription = useMemo(() => {
     if (displayProfession && displayCity)
       return `Find trusted ${displayProfession}s in ${capitalize(displayCity)}. Book appointments, request quotes, and connect with local professionals.`;
-    if (displayProfession) return `Browse top ${displayProfession}s on CardPilot. View profiles, read reviews, and book services instantly.`;
-    return "Discover and book trusted local businesses on CardPilot. Search by profession, location, and services.";
+    if (displayProfession) return `Browse top ${displayProfession}s on guzzl.pro. View profiles, read reviews, and book services instantly.`;
+    return "Discover and book trusted local businesses on guzzl.pro. Search by profession, location, and services.";
   }, [displayProfession, displayCity]);
 
   const cities = useMemo(() => {
@@ -307,7 +307,7 @@ export default function DiscoverPage() {
   return (
     <div className="min-h-screen bg-background pb-24">
       <Helmet>
-        <title>{title} | CardPilot</title>
+        <title>{title} | guzzl.pro</title>
         <meta name="description" content={metaDescription} />
       </Helmet>
 
@@ -319,7 +319,7 @@ export default function DiscoverPage() {
         <div className="relative max-w-6xl mx-auto px-4 py-14 md:py-20">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 mb-6">
-            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">CardPilot</Link>
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">guzzl.pro</Link>
             <span className="text-muted-foreground/40">/</span>
             <span className="text-sm text-foreground font-medium">Discover</span>
             {displayProfession && (
@@ -691,7 +691,7 @@ export default function DiscoverPage() {
         {/* SEO footer */}
         <div className="mt-16 pt-8 border-t border-border/40">
           <p className="text-xs text-muted-foreground text-center">
-            Powered by <Link to="/" className="text-primary hover:underline">CardPilot</Link> — the smart business card platform that helps local businesses get more customers.
+            Powered by <Link to="/" className="text-primary hover:underline">guzzl.pro</Link> — the smart business card platform that helps local businesses get more customers.
           </p>
         </div>
       </div>

@@ -77,14 +77,14 @@ export default function WhiteLabelSettings() {
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Customize branding for <strong>{currentOrg.name}</strong>. Replace CardPilot branding with your own.
+        Customize branding for <strong>{currentOrg.name}</strong>. Replace guzzl.pro branding with your own.
       </p>
 
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label className="text-sm font-medium">Enable White Label</Label>
-            <p className="text-xs text-muted-foreground">Remove all CardPilot branding from this workspace</p>
+            <p className="text-xs text-muted-foreground">Remove all guzzl.pro branding from this workspace</p>
           </div>
           <Switch checked={enabled} onCheckedChange={setEnabled} />
         </div>

@@ -102,7 +102,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "CardPilot <onboarding@resend.dev>",
+        from: "guzzl.pro <onboarding@resend.dev>",
         to: [booking.customer_email],
         subject: `How was your ${serviceName}? We'd love your feedback!`,
         html,

@@ -71,7 +71,7 @@ export default function WalletPassDialog({ handle, name = "Card" }: WalletPassDi
             Google Wallet
           </Button>
           <p className="text-[10px] text-muted-foreground text-center mt-1">
-            When someone taps your card, they'll see your full CardPilot profile.
+            When someone taps your card, they'll see your full guzzl.pro profile.
           </p>
         </div>
       </DialogContent>

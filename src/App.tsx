@@ -156,7 +156,7 @@ const queryClient = new QueryClient({
 });
 
 const App = () => (
-  <ThemeProvider attribute="class" defaultTheme="light" storageKey="cardpilot-theme">
+  <ThemeProvider attribute="class" defaultTheme="light" storageKey="guzzl-pro-theme">
   <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>

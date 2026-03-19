@@ -29,7 +29,7 @@ Deno.test("send-email - sends test email via Resend", async () => {
     },
     body: JSON.stringify({
       to: "delivered@resend.dev",
-      subject: "CardPilot Test Email",
+      subject: "guzzl.pro Test Email",
       html: "<h1>It works!</h1><p>Your Resend integration is live.</p>",
       email_type: "custom",
     }),

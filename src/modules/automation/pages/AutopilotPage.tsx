@@ -78,7 +78,7 @@ export default function AutopilotPage() {
   return (
     <>
       <Helmet>
-        <title>AI Autopilot – CardPilot</title>
+        <title>AI Autopilot – guzzl.pro</title>
       </Helmet>
 
       <div className="space-y-6 max-w-4xl">

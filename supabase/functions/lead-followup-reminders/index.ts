@@ -57,7 +57,7 @@ serve(async (req) => {
                   <h2 style="color: #1a1a1a;">Don't miss this lead!</h2>
                   <p>${quoteReq?.customer_name || "A potential customer"} requested a quote${quoteReq?.service_needed ? ` for <strong>${quoteReq.service_needed}</strong>` : ""} 1 hour ago and hasn't heard back yet.</p>
                   <p style="color: #666;">Businesses that respond within 1 hour are <strong>7x more likely</strong> to win the job.</p>
-                  <p><a href="https://card-pilot-suite.lovable.app/app/contacts" style="background: #f59e0b; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">Respond Now</a></p>
+                  <p><a href="https://guzzl.pro/app/contacts" style="background: #f59e0b; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">Respond Now</a></p>
                 </div>
               `,
             },
@@ -119,7 +119,7 @@ serve(async (req) => {
                   <h2 style="color: #dc2626;">You're about to lose this lead</h2>
                   <p>${quoteReq?.customer_name || "A potential customer"} has been waiting <strong>24 hours</strong> for a response${quoteReq?.service_needed ? ` about <strong>${quoteReq.service_needed}</strong>` : ""}.</p>
                   <p style="color: #666;">This is your last reminder. After this, the lead may choose another provider.</p>
-                  <p><a href="https://card-pilot-suite.lovable.app/app/contacts" style="background: #dc2626; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">Respond Now Before It's Too Late</a></p>
+                  <p><a href="https://guzzl.pro/app/contacts" style="background: #dc2626; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">Respond Now Before It's Too Late</a></p>
                 </div>
               `,
             },

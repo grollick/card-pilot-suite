@@ -28,7 +28,7 @@ export default function QRProductsSection() {
         </div>
         <h2 className="text-3xl md:text-4xl font-bold">Smart QR products that drive leads</h2>
         <p className="text-muted-foreground mt-3 max-w-lg mx-auto">
-          Premium laser-engraved plates, NFC cards, and signs — each one linked to your CardPilot card.
+          Premium laser-engraved plates, NFC cards, and signs — each one linked to your guzzl.pro card.
         </p>
       </motion.div>
 

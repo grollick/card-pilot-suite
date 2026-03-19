@@ -61,7 +61,7 @@ export default function IndustryInsightsPage() {
   return (
     <>
       <Helmet>
-        <title>Industry Insights – CardPilot</title>
+        <title>Industry Insights – guzzl.pro</title>
       </Helmet>
 
       <div className="space-y-6">

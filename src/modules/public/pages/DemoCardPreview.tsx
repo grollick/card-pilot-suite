@@ -170,7 +170,7 @@ export default function DemoCardPreview() {
         <motion.section initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} className="mx-4 mt-8">
           <div className="rounded-2xl bg-gradient-to-r from-primary to-primary/80 p-6 text-center text-primary-foreground">
             <h3 className="text-lg font-bold mb-2">Want a card like this?</h3>
-            <p className="text-sm text-primary-foreground/80 mb-4">Create your own CardPilot card in under 2 minutes — completely free.</p>
+            <p className="text-sm text-primary-foreground/80 mb-4">Create your own guzzl.pro card in under 2 minutes — completely free.</p>
             <Link to="/onboarding">
               <Button variant="secondary" size="lg" className="shadow-lg">
                 Create Your Free Card <ChevronRight className="h-4 w-4 ml-1" />
@@ -182,7 +182,7 @@ export default function DemoCardPreview() {
         {/* Powered by */}
         <div className="text-center mt-8">
           <Link to="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-            Powered by <span className="font-semibold">CardPilot</span>
+            Powered by <span className="font-semibold">guzzl.pro</span>
           </Link>
         </div>
       </div>

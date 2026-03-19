@@ -95,10 +95,10 @@ export default function Auth() {
           className="relative z-10 max-w-md"
         >
           <Link to="/">
-            <h2 className="text-3xl font-bold text-primary-foreground mb-2">CardPilot</h2>
+            <h2 className="text-3xl font-bold text-primary-foreground mb-2">guzzl.pro</h2>
           </Link>
           <p className="text-primary-foreground/80 text-lg mb-10 leading-relaxed">
-            Join thousands of service professionals using CardPilot to grow their business.
+            Join thousands of service professionals using guzzl.pro to grow their business.
           </p>
 
           <div className="space-y-5">
@@ -118,7 +118,7 @@ export default function Auth() {
 
           <div className="mt-12 pt-8 border-t border-primary-foreground/15">
             <p className="text-primary-foreground/60 text-xs">
-              "CardPilot helped me double my bookings in the first month."
+              "guzzl.pro helped me double my bookings in the first month."
             </p>
             <p className="text-primary-foreground/40 text-xs mt-2">— Mike R., HVAC Contractor</p>
           </div>
@@ -136,14 +136,14 @@ export default function Auth() {
           {/* Mobile logo */}
           <div className="lg:hidden text-center mb-6">
             <Link to="/">
-              <h1 className="text-2xl font-bold text-primary">CardPilot</h1>
+              <h1 className="text-2xl font-bold text-primary">guzzl.pro</h1>
             </Link>
           </div>
 
           {/* Headline */}
           <div className="mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
-              {isSignup ? "Create your CardPilot account." : "Welcome back."}
+              {isSignup ? "Create your guzzl.pro account." : "Welcome back."}
             </h1>
             {isSignup && (
               <p className="text-muted-foreground mt-2 text-sm">

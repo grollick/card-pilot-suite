@@ -247,7 +247,7 @@ serve(async (req) => {
               subject: `${qualityLabel} ${quoteReq.customer_name} needs ${quoteReq.service_needed || "your services"}`,
               html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                  <h2 style="color: #1a1a1a;">New Lead from CardPilot Marketplace</h2>
+                  <h2 style="color: #1a1a1a;">New Lead from guzzl.pro Marketplace</h2>
                   <div style="display: inline-block; background: ${qualityBadgeColor}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-bottom: 12px;">
                     Quality Score: ${leadQualityScore}/100 — ${qualityTier.toUpperCase()}
                   </div>
@@ -261,7 +261,7 @@ serve(async (req) => {
                     ${quoteReq.notes ? `<p><strong>Details:</strong> ${quoteReq.notes}</p>` : ""}
                   </div>
                   <p style="color: #666;">${urgencyNote}</p>
-                  <p><a href="https://card-pilot-suite.lovable.app/app/contacts" style="background: #6366f1; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">View in Dashboard</a></p>
+                  <p><a href="https://guzzl.pro/app/contacts" style="background: #6366f1; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">View in Dashboard</a></p>
                 </div>
               `,
             },

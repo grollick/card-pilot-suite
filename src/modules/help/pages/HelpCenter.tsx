@@ -89,7 +89,7 @@ const helpSections: HelpSection[] = [
       { title: "Email marketing", description: "Send targeted campaigns to your contacts." },
       { title: "Social media scheduling", description: "Plan and schedule posts to stay visible." },
     ],
-    video: { title: "Growth Strategies", description: "Scale your business with CardPilot tools.", duration: "5 min" },
+    video: { title: "Growth Strategies", description: "Scale your business with guzzl.pro tools.", duration: "5 min" },
     faqs: [
       { q: "What analytics are available?", a: "Card views, lead sources, conversion rates, and revenue tracking." },
       { q: "Is there an autopilot mode?", a: "Yes! Autopilot automates follow-ups, review requests, and social posts." },
@@ -120,7 +120,7 @@ export default function HelpCenter() {
           </div>
           <div>
             <h1 className="page-title">Help Center</h1>
-            <p className="page-description">Learn how to generate leads and grow your business with CardPilot.</p>
+            <p className="page-description">Learn how to generate leads and grow your business with guzzl.pro.</p>
           </div>
         </div>
       </div>

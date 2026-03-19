@@ -30,40 +30,40 @@ const EMAIL_SEQUENCE = [
         <li><strong>Estimate Templates</strong> — Send professional quotes in minutes</li>
         <li><strong>Local Marketing Tips</strong> — Grow your reputation in your community</li>
       </ul>
-      <p>CardPilot was built to help service professionals like you manage everything in one place — from your digital business card to CRM, booking, estimates, and marketing.</p>
-      <p><a href="https://cardpilot.app/onboarding" style="background:#4f46e5;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">Create Your Free Card →</a></p>
-      <p>Best,<br/>The CardPilot Team</p>
+      <p>guzzl.pro was built to help service professionals like you manage everything in one place — from your digital business card to CRM, booking, estimates, and marketing.</p>
+      <p><a href="https://guzzl-pro.app/onboarding" style="background:#4f46e5;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">Create Your Free Card →</a></p>
+      <p>Best,<br/>The guzzl.pro Team</p>
     `,
   },
   {
     delayMinutes: 2880, // Day 2
-    subject: "How CardPilot captures leads automatically",
+    subject: "How guzzl.pro captures leads automatically",
     body: (name: string) => `
       <h2>Hi ${name},</h2>
       <p>Did you know that most service businesses lose leads because they don't have a fast way to capture contact information?</p>
-      <p>With CardPilot, every visitor who views your smart business card can:</p>
+      <p>With guzzl.pro, every visitor who views your smart business card can:</p>
       <ul>
         <li>Call or text you with one tap</li>
         <li>Book an appointment online</li>
         <li>Submit a contact form — automatically saved to your CRM</li>
       </ul>
       <p>No more lost sticky notes or missed calls. Every lead is tracked and ready for follow-up.</p>
-      <p><a href="https://cardpilot.app/onboarding" style="background:#4f46e5;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">Try It Free →</a></p>
+      <p><a href="https://guzzl-pro.app/onboarding" style="background:#4f46e5;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">Try It Free →</a></p>
     `,
   },
   {
     delayMinutes: 5760, // Day 4
-    subject: "Real businesses growing with CardPilot",
+    subject: "Real businesses growing with guzzl.pro",
     body: (name: string) => `
       <h2>Hi ${name},</h2>
-      <p>Here's how service professionals are using CardPilot every day:</p>
+      <p>Here's how service professionals are using guzzl.pro every day:</p>
       <ul>
         <li><strong>Landscapers</strong> share their card at job sites — customers book seasonal cleanups online</li>
         <li><strong>Electricians</strong> attach QR codes to invoices — customers leave reviews and rebook</li>
         <li><strong>Personal trainers</strong> send their card link on social media — new clients book sessions instantly</li>
       </ul>
       <p>The best part? Everything connects: your card, CRM, bookings, estimates, and marketing — all in one place.</p>
-      <p><a href="https://cardpilot.app/onboarding" style="background:#4f46e5;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">Start Growing Your Business →</a></p>
+      <p><a href="https://guzzl-pro.app/onboarding" style="background:#4f46e5;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">Start Growing Your Business →</a></p>
     `,
   },
   {
@@ -72,7 +72,7 @@ const EMAIL_SEQUENCE = [
     body: (name: string) => `
       <h2>Hi ${name},</h2>
       <p>It's been a week since you downloaded the toolkit. Have you had a chance to try any of the strategies?</p>
-      <p>Creating your CardPilot smart business card takes less than 2 minutes — and it's completely free to start.</p>
+      <p>Creating your guzzl.pro smart business card takes less than 2 minutes — and it's completely free to start.</p>
       <p>Here's what you'll get:</p>
       <ul>
         <li>A stunning digital business card</li>
@@ -81,9 +81,9 @@ const EMAIL_SEQUENCE = [
         <li>Professional estimate builder</li>
         <li>Social media scheduling</li>
       </ul>
-      <p><a href="https://cardpilot.app/onboarding" style="background:#4f46e5;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">Create Your Card — It's Free →</a></p>
+      <p><a href="https://guzzl-pro.app/onboarding" style="background:#4f46e5;color:#fff;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">Create Your Card — It's Free →</a></p>
       <p>We're here if you need anything!</p>
-      <p>— The CardPilot Team</p>
+      <p>— The guzzl.pro Team</p>
     `,
   },
 ];
@@ -144,7 +144,7 @@ Deno.serve(async (req) => {
           Authorization: `Bearer ${RESEND_API_KEY}`,
         },
         body: JSON.stringify({
-          from: "CardPilot <hello@updates.cardpilot.app>",
+          from: "guzzl.pro <hello@updates.guzzl-pro.app>",
           to: [email],
           subject: firstEmail.subject,
           html: firstEmail.body(name),
@@ -164,7 +164,7 @@ Deno.serve(async (req) => {
             Authorization: `Bearer ${RESEND_API_KEY}`,
           },
           body: JSON.stringify({
-            from: "CardPilot <hello@updates.cardpilot.app>",
+            from: "guzzl.pro <hello@updates.guzzl-pro.app>",
             to: [email],
             subject: step.subject,
             html: step.body(name),

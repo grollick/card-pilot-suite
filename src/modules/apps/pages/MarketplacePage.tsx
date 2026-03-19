@@ -45,7 +45,7 @@ export default function MarketplacePage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Apps & Integrations</h1>
-        <p className="text-sm text-muted-foreground mt-1">Discover and install apps to extend your CardPilot workspace.</p>
+        <p className="text-sm text-muted-foreground mt-1">Discover and install apps to extend your guzzl.pro workspace.</p>
       </div>
 
       <Tabs value={tab} onValueChange={setTab}>

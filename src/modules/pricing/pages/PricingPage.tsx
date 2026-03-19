@@ -57,7 +57,7 @@ const plans = [
       "Full CRM pipeline",
       "Social media scheduler",
       "Promotion banners on your card",
-      "Remove CardPilot watermark",
+      "Remove guzzl.pro watermark",
     ],
   },
   {
@@ -134,8 +134,8 @@ const faqs = [
     a: "Yes — save 20% when you choose annual billing on any paid plan. That's like getting over 2 months free.",
   },
   {
-    q: "Is CardPilot worth $29/month?",
-    a: "One new job from an automated follow-up can easily cover months of CardPilot. Most Pro users report earning back their investment within the first week.",
+    q: "Is guzzl.pro worth $29/month?",
+    a: "One new job from an automated follow-up can easily cover months of guzzl.pro. Most Pro users report earning back their investment within the first week.",
   },
 ];
 
@@ -164,8 +164,8 @@ export default function PricingPage() {
   return (
     <>
       <Helmet>
-        <title>Pricing — CardPilot | Grow Your Business Starting Free</title>
-        <meta name="description" content="Start free, upgrade when the leads start rolling in. CardPilot pricing designed so one new job pays for your entire month." />
+        <title>Pricing — guzzl.pro | Grow Your Business Starting Free</title>
+        <meta name="description" content="Start free, upgrade when the leads start rolling in. guzzl.pro pricing designed so one new job pays for your entire month." />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -337,7 +337,7 @@ export default function PricingPage() {
                 The math is simple
               </h2>
               <p className="text-muted-foreground max-w-lg mx-auto mb-8">
-                CardPilot costs less than a single business card order — and generates leads every single day.
+                guzzl.pro costs less than a single business card order — and generates leads every single day.
               </p>
             </div>
             <div className="grid sm:grid-cols-3 gap-6 text-center">
@@ -403,7 +403,7 @@ export default function PricingPage() {
               Stop chasing customers. Let them come to you.
             </h2>
             <p className="text-muted-foreground max-w-lg mx-auto mb-10">
-              CardPilot turns every interaction into a potential booking.
+              guzzl.pro turns every interaction into a potential booking.
             </p>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {benefits.map((b) => (
@@ -456,14 +456,14 @@ export default function PricingPage() {
               <ArrowRight className="h-4 w-4" />
             </Button>
             <p className="text-xs text-muted-foreground mt-3">
-              Join thousands of local professionals already growing with CardPilot.
+              Join thousands of local professionals already growing with guzzl.pro.
             </p>
           </div>
         </section>
 
         {/* Footer */}
         <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} CardPilot. All rights reserved.
+          © {new Date().getFullYear()} guzzl.pro. All rights reserved.
         </footer>
       </div>
     </>

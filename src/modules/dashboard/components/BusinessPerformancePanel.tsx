@@ -90,7 +90,7 @@ export default function BusinessPerformancePanel() {
       <div className="dash-card-header">
         <div>
           <h2 className="font-semibold text-sm">This Month's Performance</h2>
-          <p className="text-xs text-muted-foreground mt-0.5">Revenue generated through CardPilot</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Revenue generated through guzzl.pro</p>
         </div>
         <div className="flex items-center gap-2">
           {!isLoading && data && (

@@ -242,7 +242,7 @@ export default function InteractiveCardBuilder() {
 
   const handlePersistAndSignup = () => {
     try {
-      localStorage.setItem("cardpilot_demo", JSON.stringify(data));
+      localStorage.setItem("guzzl-pro_demo", JSON.stringify(data));
     } catch {}
     window.location.href = "/onboarding";
   };
@@ -262,7 +262,7 @@ export default function InteractiveCardBuilder() {
               <Check className="h-4 w-4" /> Your card is ready!
             </div>
             <h2 className="text-3xl md:text-4xl font-extrabold text-foreground mb-3">
-              Here's your CardPilot preview
+              Here's your guzzl.pro preview
             </h2>
             <p className="text-muted-foreground max-w-md mx-auto">
               Create your free account to publish it and start getting leads.

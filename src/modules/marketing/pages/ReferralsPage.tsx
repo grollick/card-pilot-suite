@@ -106,7 +106,7 @@ export default function ReferralsPage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "Join CardPilot",
+          title: "Join guzzl.pro",
           text: "Create your digital business card and start getting more leads. Use my referral link:",
           url: referralLink,
         });
@@ -130,7 +130,7 @@ export default function ReferralsPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Referral Program</h1>
         <p className="text-muted-foreground text-sm mt-1">
-          Invite professionals to CardPilot — you both earn rewards
+          Invite professionals to guzzl.pro — you both earn rewards
         </p>
       </div>
 
@@ -193,9 +193,9 @@ export default function ReferralsPage() {
                 size="sm"
                 className="gap-1.5"
                 onClick={() => {
-                  const subject = encodeURIComponent("Join CardPilot — digital business cards for pros");
+                  const subject = encodeURIComponent("Join guzzl.pro — digital business cards for pros");
                   const body = encodeURIComponent(
-                    `Hey!\n\nI've been using CardPilot to get more leads with a digital business card. Check it out:\n\n${referralLink}\n\nYou'll get a free Pro trial when you sign up!`
+                    `Hey!\n\nI've been using guzzl.pro to get more leads with a digital business card. Check it out:\n\n${referralLink}\n\nYou'll get a free Pro trial when you sign up!`
                   );
                   window.open(`mailto:?subject=${subject}&body=${body}`);
                 }}
@@ -208,7 +208,7 @@ export default function ReferralsPage() {
                 className="gap-1.5"
                 onClick={() => {
                   const text = encodeURIComponent(
-                    `Check out CardPilot — the smart business card that gets you more leads: ${referralLink}`
+                    `Check out guzzl.pro — the smart business card that gets you more leads: ${referralLink}`
                   );
                   window.open(`sms:?body=${text}`);
                 }}

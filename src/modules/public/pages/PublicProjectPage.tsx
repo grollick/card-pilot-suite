@@ -252,7 +252,7 @@ export default function PublicProjectPage() {
             href="/?ref=project"
             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            Powered by <span className="font-bold text-primary">CardPilot</span>
+            Powered by <span className="font-bold text-primary">guzzl.pro</span>
           </a>
           <p>
             <a

@@ -216,7 +216,7 @@ serve(async (req) => {
                 </a>
 
                 <p style="color:#9ca3af;font-size:11px;text-align:center;margin:24px 0 0;">
-                  CardPilot — Your digital business card platform<br/>
+                  guzzl.pro — Your digital business card platform<br/>
                   <a href="${appUrl}/app/settings" style="color:#9ca3af;">Manage notification preferences</a>
                 </p>
               </div>
