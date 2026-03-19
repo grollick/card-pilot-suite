@@ -59,7 +59,8 @@ export default function ActivationChecklist() {
       const hasLead = (leadRes.data?.length ?? 0) > 0;
       const hasBooking = (bookingRes.data?.length ?? 0) > 0;
       const hasViews = (analyticsRes.data?.length ?? 0) >= 5;
-
+      const hasEstimate = (estimateRes.data?.length ?? 0) > 0;
+      const hasEstimateSent = estimateRes.data?.some((e: any) => e.status === "sent" || e.status === "approved") ?? false;
       // Check if card has gallery images
       const sections = cardRes.data?.sections_json as any[];
       const hasImage = sections?.some(
