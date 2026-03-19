@@ -235,7 +235,7 @@ export default function BetaManagementTab() {
                     </TableCell>
                     <TableCell>
                       {isActive ? (
-                        <Badge className="bg-green-500/15 text-green-700 border-green-200">
+                        <Badge className="bg-primary/15 text-primary border-primary/20">
                           <CheckCircle2 className="h-3 w-3 mr-1" /> Active
                         </Badge>
                       ) : (

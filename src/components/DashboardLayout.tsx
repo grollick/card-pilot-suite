@@ -5,6 +5,7 @@ import TopBar from "@/components/TopBar";
 import ProductTour from "@/components/ProductTour";
 import FloatingHelpButton from "@/components/FloatingHelpButton";
 import UpgradeTriggers from "@/components/UpgradeTriggers";
+import BetaStatusBanner from "@/components/BetaStatusBanner";
 
 export default function DashboardLayout() {
   return (
@@ -14,6 +15,7 @@ export default function DashboardLayout() {
         <div className="flex-1 flex flex-col min-w-0">
           <TopBar />
           <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
+            <BetaStatusBanner />
             <Outlet />
           </main>
         </div>
