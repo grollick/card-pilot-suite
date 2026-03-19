@@ -501,6 +501,7 @@ export default function Onboarding() {
             {step === 7 && (
               <StepActivationChecklist
                 items={checklistItems}
+                headline={checklistTemplate.headline}
                 onGoToDashboard={() => navigate("/app")}
               />
             )}
