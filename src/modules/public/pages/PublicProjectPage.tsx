@@ -252,7 +252,7 @@ export default function PublicProjectPage() {
             href="/?ref=project"
             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            Powered by <span className="font-bold text-primary"><span className="font-bold text-primary">guzzl</span>.pro</span>
+            Powered by <span className="font-bold text-primary"><span className="font-extrabold text-primary">guzzl</span>.pro</span>
           </a>
           <p>
             <a

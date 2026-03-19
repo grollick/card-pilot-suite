@@ -179,7 +179,7 @@ export default function SeoLandingPage() {
           <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
             {/* Breadcrumb */}
             <nav className="flex items-center gap-2 mb-5 text-sm" aria-label="Breadcrumb">
-              <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors"><span className="font-bold text-primary">guzzl</span>.pro</Link>
+              <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors"><span className="font-extrabold text-primary">guzzl</span>.pro</Link>
               <span className="text-muted-foreground/50">/</span>
               <Link to="/discover" className="text-muted-foreground hover:text-foreground transition-colors">Discover</Link>
               <span className="text-muted-foreground/50">/</span>
@@ -364,7 +364,7 @@ export default function SeoLandingPage() {
           {/* Footer */}
           <footer className="mt-12 pt-8 border-t border-border/40 text-center">
             <p className="text-xs text-muted-foreground">
-              Powered by <Link to="/" className="text-primary hover:underline"><span className="font-bold text-primary">guzzl</span>.pro</Link> — the smart business card platform that helps local businesses get more customers.
+              Powered by <Link to="/" className="text-primary hover:underline"><span className="font-extrabold text-primary">guzzl</span>.pro</Link> — the smart business card platform that helps local businesses get more customers.
             </p>
           </footer>
         </main>
