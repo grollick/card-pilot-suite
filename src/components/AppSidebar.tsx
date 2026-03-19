@@ -16,8 +16,8 @@ import ClientSwitcher from "@/modules/agency/components/ClientSwitcher";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 import { useIsAdmin } from "@/hooks/useAdminStats";
+import { useProfileCache } from "@/hooks/useProfileCache";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
 import {
@@ -115,20 +115,7 @@ export function AppSidebar() {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
   const { data: isAdmin } = useIsAdmin();
-
-  const { data: profile } = useQuery({
-    queryKey: ["profile-handle"],
-    enabled: !!user,
-    staleTime: 10 * 60 * 1000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("handle, name, avatar_url")
-        .eq("id", user!.id)
-        .single();
-      return data;
-    },
-  });
+  const { data: profile } = useProfileCache();
 
   const isActive = (path: string, end?: boolean) => {
     if (end) return location.pathname === path;

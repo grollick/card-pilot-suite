@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useProfileCache } from "@/hooks/useProfileCache";
 
 const CHANNELS = [
   { key: "text", label: "Text", icon: Smartphone },
@@ -20,19 +19,7 @@ export default function ShareMessageCard() {
   const [copied, setCopied] = useState(false);
   const [channel, setChannel] = useState<Channel>("text");
 
-  const { data: profile } = useQuery({
-    queryKey: ["profile-share-msg"],
-    enabled: !!user,
-    staleTime: 10 * 60 * 1000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("handle, name, company")
-        .eq("id", user!.id)
-        .single();
-      return data as { handle: string | null; name: string | null; company: string | null } | null;
-    },
-  });
+  const { data: profile } = useProfileCache();
 
   if (!profile?.handle) return null;
 

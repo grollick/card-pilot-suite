@@ -4,7 +4,8 @@ import { X, ChevronRight, ChevronLeft, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useProfileCache } from "@/hooks/useProfileCache";
 
 interface TourStep {
   title: string;
@@ -57,19 +58,8 @@ export default function ProductTour() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 
-  const { data: tourCompleted } = useQuery({
-    queryKey: ["tour-completed", user?.id],
-    enabled: !!user,
-    staleTime: Infinity,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("tour_completed")
-        .eq("id", user!.id)
-        .single();
-      return data?.tour_completed ?? false;
-    },
-  });
+  const { data: profileCache } = useProfileCache();
+  const tourCompleted = profileCache?.tour_completed ?? false;
 
   const completeTour = useMutation({
     mutationFn: async () => {

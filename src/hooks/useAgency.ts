@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useOrg } from "@/contexts/OrgContext";
+import { useProfileCache } from "@/hooks/useProfileCache";
 
 export interface ClientWorkspace {
   id: string;
@@ -20,17 +21,13 @@ export interface ClientWorkspace {
 
 export function useIsAgency() {
   const { user } = useAuth();
+  const { data: profile } = useProfileCache();
   return useQuery({
-    queryKey: ["is-agency", user?.id],
-    enabled: !!user,
+    queryKey: ["is-agency", user?.id, profile?.plan],
+    enabled: !!user && !!profile,
     staleTime: 10 * 60 * 1000,
     queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("plan")
-        .eq("id", user!.id)
-        .single();
-      return data?.plan === "agency";
+      return profile?.plan === "agency";
     },
   });
 }

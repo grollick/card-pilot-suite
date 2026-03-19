@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useMemo, ReactNode, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -50,24 +50,26 @@ export function OrgProvider({ children }: { children: ReactNode }) {
       return data as Organization[];
     },
     enabled: !!user,
+    staleTime: 5 * 60 * 1000,
   });
 
-  // Fetch current org from profile
-  const { data: profile } = useQuery({
-    queryKey: ["profile-org", user?.id],
+  // Use profile cache for current_org_id instead of a separate query
+  const { data: profileCache } = useQuery({
+    queryKey: ["profile-cache", user?.id],
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("current_org_id")
+        .select("handle, name, avatar_url, plan, tour_completed, onboarding_completed, current_org_id, company")
         .eq("id", user!.id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
-    enabled: !!user,
   });
 
-  const currentOrg = orgs.find((o) => o.id === profile?.current_org_id) || orgs[0] || null;
+  const currentOrg = orgs.find((o) => o.id === profileCache?.current_org_id) || orgs[0] || null;
 
   // Fetch members of current org
   const { data: members = [], isLoading: membersLoading } = useQuery({
@@ -90,7 +92,7 @@ export function OrgProvider({ children }: { children: ReactNode }) {
   const switchOrg = useCallback(async (orgId: string) => {
     if (!user) return;
     await supabase.from("profiles").update({ current_org_id: orgId }).eq("id", user.id);
-    queryClient.invalidateQueries({ queryKey: ["profile-org"] });
+    queryClient.invalidateQueries({ queryKey: ["profile-cache"] });
   }, [user, queryClient]);
 
   const createOrg = useCallback(async (name: string, slug: string): Promise<Organization | null> => {
@@ -113,7 +115,7 @@ export function OrgProvider({ children }: { children: ReactNode }) {
     await supabase.from("profiles").update({ current_org_id: data.id }).eq("id", user.id);
 
     queryClient.invalidateQueries({ queryKey: ["orgs"] });
-    queryClient.invalidateQueries({ queryKey: ["profile-org"] });
+    queryClient.invalidateQueries({ queryKey: ["profile-cache"] });
     return data as Organization;
   }, [user, queryClient]);
 
@@ -148,20 +150,22 @@ export function OrgProvider({ children }: { children: ReactNode }) {
     queryClient.invalidateQueries({ queryKey: ["org-members"] });
   }, [queryClient]);
 
+  const value = useMemo(() => ({
+    currentOrg,
+    orgs,
+    members,
+    myRole,
+    isOrgAdmin,
+    loading: orgsLoading || membersLoading,
+    switchOrg,
+    createOrg,
+    inviteMember,
+    removeMember,
+    updateMemberRole,
+  }), [currentOrg, orgs, members, myRole, isOrgAdmin, orgsLoading, membersLoading, switchOrg, createOrg, inviteMember, removeMember, updateMemberRole]);
+
   return (
-    <OrgContext.Provider value={{
-      currentOrg,
-      orgs,
-      members,
-      myRole,
-      isOrgAdmin,
-      loading: orgsLoading || membersLoading,
-      switchOrg,
-      createOrg,
-      inviteMember,
-      removeMember,
-      updateMemberRole,
-    }}>
+    <OrgContext.Provider value={value}>
       {children}
     </OrgContext.Provider>
   );
