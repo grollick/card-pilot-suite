@@ -98,6 +98,13 @@ Deno.serve(async (req) => {
     ).length;
     const wins = matches.filter((m: any) => m.status === "accepted").length;
 
+    // Referral stats
+    const refs = allReferrals || [];
+    const totalReferrals = refs.length;
+    const activatedReferrals = refs.filter((r: any) => r.status === "completed").length;
+    const rewardsIssued = refs.filter((r: any) => r.rewarded).length;
+    const totalRewardDays = refs.reduce((sum: number, r: any) => sum + (r.reward_days || 0), 0);
+
     // Signup trend (daily, last 30d)
     const signupsByDate: Record<string, number> = {};
     for (const p of profiles) {
