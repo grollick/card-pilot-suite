@@ -168,6 +168,7 @@ const queryClient = new QueryClient({
 });
 
 const App = () => (
+  <ErrorBoundary fullPage>
   <ThemeProvider attribute="class" defaultTheme="light" storageKey="guzzl-pro-theme">
   <HelmetProvider>
   <QueryClientProvider client={queryClient}>
