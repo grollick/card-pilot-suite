@@ -79,6 +79,9 @@ export default function DashboardHome() {
           {/* ── SECTION 3: Funnel ── */}
           <FunnelView />
 
+          {/* ── Lead Quality ── */}
+          <LeadQualityWidget />
+
           {/* ── SECTION 7: Growth & Insights ── */}
           <GrowthTrends />
         </div>
