@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { useMarketplaceListings, useMarketplaceProfessions, useMarketplaceServices, type MarketplaceListing } from "@/hooks/useMarketplace";
 import { useBoostedUserIds, useTrackBoostViews } from "@/hooks/useBoosts";
 import ListingCard from "@/modules/marketplace/components/ListingCard";
+import MarketplaceQuoteDialog from "@/modules/marketplace/components/MarketplaceQuoteDialog";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -219,7 +220,7 @@ function RecommendedSection({ listings }: { listings: MarketplaceListing[] }) {
 }
 
 // ── Sticky CTA ──
-function StickyCTA() {
+function StickyCTA({ onQuoteClick }: { onQuoteClick: () => void }) {
   return (
     <motion.div
       initial={{ y: 100, opacity: 0 }}
@@ -229,7 +230,7 @@ function StickyCTA() {
     >
       <div className="bg-card/95 backdrop-blur-md border border-border/60 rounded-full shadow-xl px-2 py-2 flex items-center gap-2">
         <span className="text-sm font-medium text-foreground pl-4 hidden sm:inline">Need help finding the right pro?</span>
-        <Button size="sm" className="rounded-full gap-1.5 shadow-sm px-5">
+        <Button size="sm" className="rounded-full gap-1.5 shadow-sm px-5" onClick={onQuoteClick}>
           <MessageSquareText className="h-4 w-4" /> Request a Quote <ArrowRight className="h-3.5 w-3.5" />
         </Button>
       </div>
@@ -245,6 +246,7 @@ export default function DiscoverPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [showMatcher, setShowMatcher] = useState(false);
   const [topMatches, setTopMatches] = useState<MarketplaceListing[] | null>(null);
+  const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
 
   const { data: listings, isLoading } = useMarketplaceListings({
     profession,
@@ -649,7 +651,15 @@ export default function DiscoverPage() {
       </div>
 
       {/* Sticky CTA */}
-      {showSticky && <StickyCTA />}
+      {showSticky && <StickyCTA onQuoteClick={() => setQuoteDialogOpen(true)} />}
+
+      {/* Quote Dialog */}
+      <MarketplaceQuoteDialog
+        open={quoteDialogOpen}
+        onOpenChange={setQuoteDialogOpen}
+        profession={displayProfession}
+        location={displayCity}
+      />
     </div>
   );
 }

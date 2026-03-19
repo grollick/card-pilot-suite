@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import {
   Eye, Users, Calendar, DollarSign, TrendingUp, Zap, Crown,
-  BarChart3, Target, ArrowUpRight, Rocket, Receipt,
+  BarChart3, Target, ArrowUpRight, Rocket, Receipt, Send, MessageSquare,
 } from "lucide-react";
 import {
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -16,6 +16,7 @@ import {
 import { useMarketplacePerformance } from "@/hooks/useMarketplacePerformance";
 import { useActiveBoosts } from "@/hooks/useBoosts";
 import { useProfile } from "@/hooks/useCard";
+import { useLeadRoutingStats } from "@/hooks/useLeadRouting";
 import { useNavigate } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -118,6 +119,9 @@ export default function MarketplacePerformancePage() {
         <KPI icon={Calendar} label="Bookings" value={d.totalBookings} />
         <KPI icon={DollarSign} label="Revenue" value={`$${d.totalRevenue.toLocaleString()}`} />
       </div>
+
+      {/* Lead Routing Stats */}
+      <LeadRoutingStatsSection />
 
       {/* Chart */}
       <Card>
@@ -252,5 +256,42 @@ export default function MarketplacePerformancePage() {
         </Card>
       </div>
     </div>
+  );
+}
+
+function LeadRoutingStatsSection() {
+  const stats = useLeadRoutingStats();
+
+  if (stats.totalDelivered === 0) return null;
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Send className="h-4 w-4 text-primary" />
+          Lead Routing Performance
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center">
+            <p className="text-2xl font-bold">{stats.totalDelivered}</p>
+            <p className="text-xs text-muted-foreground">Leads Delivered</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold">{stats.responded}</p>
+            <p className="text-xs text-muted-foreground">Responded</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold">{stats.responseRate}%</p>
+            <p className="text-xs text-muted-foreground">Response Rate</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold">{stats.conversionRate}%</p>
+            <p className="text-xs text-muted-foreground">Conversion Rate</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
