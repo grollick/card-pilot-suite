@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import SystemEventsWidget from "@/modules/settings/components/SystemEventsWidget";
 import BetaManagementTab from "@/modules/settings/components/BetaManagementTab";
 import AdminFeedbackTab from "@/modules/settings/components/AdminFeedbackTab";
+import BugPriorityDashboard from "@/modules/settings/components/BugPriorityDashboard";
+import RoadmapBoard from "@/modules/settings/components/RoadmapBoard";
 export default function AdminPage() {
   const byCategory = getProfessionsByCategory();
 
@@ -31,6 +33,8 @@ export default function AdminPage() {
            <TabsTrigger value="system-events">System Events</TabsTrigger>
            <TabsTrigger value="beta">Beta Access</TabsTrigger>
            <TabsTrigger value="feedback">Feedback</TabsTrigger>
+           <TabsTrigger value="bugs">Bug Priority</TabsTrigger>
+           <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
          </TabsList>
 
         <TabsContent value="professions" className="mt-4 space-y-6">
@@ -76,6 +80,12 @@ export default function AdminPage() {
         </TabsContent>
         <TabsContent value="feedback" className="mt-4">
           <AdminFeedbackTab />
+        </TabsContent>
+        <TabsContent value="bugs" className="mt-4">
+          <BugPriorityDashboard />
+        </TabsContent>
+        <TabsContent value="roadmap" className="mt-4">
+          <RoadmapBoard />
         </TabsContent>
       </Tabs>
     </div>

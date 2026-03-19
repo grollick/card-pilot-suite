@@ -703,6 +703,60 @@ export type Database = {
           },
         ]
       }
+      bug_issues: {
+        Row: {
+          created_at: string
+          description: string | null
+          feature_tag: string | null
+          feedback_ids: string[] | null
+          frequency_score: number
+          id: string
+          impact_score: number
+          priority_level: Database["public"]["Enums"]["priority_level"]
+          priority_score: number | null
+          report_count: number
+          resolved_at: string | null
+          revenue_risk_score: number
+          roadmap_status: Database["public"]["Enums"]["roadmap_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          feature_tag?: string | null
+          feedback_ids?: string[] | null
+          frequency_score?: number
+          id?: string
+          impact_score?: number
+          priority_level?: Database["public"]["Enums"]["priority_level"]
+          priority_score?: number | null
+          report_count?: number
+          resolved_at?: string | null
+          revenue_risk_score?: number
+          roadmap_status?: Database["public"]["Enums"]["roadmap_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          feature_tag?: string | null
+          feedback_ids?: string[] | null
+          frequency_score?: number
+          id?: string
+          impact_score?: number
+          priority_level?: Database["public"]["Enums"]["priority_level"]
+          priority_score?: number | null
+          report_count?: number
+          resolved_at?: string | null
+          revenue_risk_score?: number
+          roadmap_status?: Database["public"]["Enums"]["roadmap_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       campaign_emails: {
         Row: {
           campaign_id: string
@@ -4005,6 +4059,7 @@ export type Database = {
         | "referral"
         | "other"
       org_role: "owner" | "admin" | "member"
+      priority_level: "critical" | "high" | "medium" | "low"
       recurring_billing_cycle: "per_visit" | "monthly" | "custom"
       recurring_frequency:
         | "weekly"
@@ -4013,6 +4068,7 @@ export type Database = {
         | "quarterly"
         | "custom"
       recurring_plan_status: "active" | "paused" | "cancelled" | "completed"
+      roadmap_status: "backlog" | "next_up" | "in_progress" | "done"
       sales_crm_stage:
         | "new_lead"
         | "contacted"
@@ -4215,6 +4271,7 @@ export const Constants = {
         "other",
       ],
       org_role: ["owner", "admin", "member"],
+      priority_level: ["critical", "high", "medium", "low"],
       recurring_billing_cycle: ["per_visit", "monthly", "custom"],
       recurring_frequency: [
         "weekly",
@@ -4224,6 +4281,7 @@ export const Constants = {
         "custom",
       ],
       recurring_plan_status: ["active", "paused", "cancelled", "completed"],
+      roadmap_status: ["backlog", "next_up", "in_progress", "done"],
       sales_crm_stage: [
         "new_lead",
         "contacted",
