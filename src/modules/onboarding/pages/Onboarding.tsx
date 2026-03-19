@@ -10,6 +10,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { pickStylePackKey } from "@/lib/stylePackSelection";
 import { getBestTemplateForProfession, getTemplate, CARD_TEMPLATES } from "@/lib/cardTemplates";
 import { generateEstimateNumber, calculateLineTotals } from "@/hooks/useEstimates";
+import { getChecklistTemplate } from "@/lib/checklistTemplates";
 
 import StepProfession from "../components/StepProfession";
 import StepBusinessInfo from "../components/StepBusinessInfo";
