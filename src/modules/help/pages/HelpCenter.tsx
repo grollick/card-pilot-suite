@@ -143,9 +143,8 @@ export default function HelpCenter() {
           const Icon = section.icon;
 
           return (
-            <motion.div
+            <div
               key={section.id}
-              layout
               className="rounded-xl border border-border bg-card overflow-hidden"
             >
               {/* Section Header */}
