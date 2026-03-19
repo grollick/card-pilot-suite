@@ -61,7 +61,7 @@ export function useCreateSequence() {
     mutationFn: async (s: { name: string; description?: string; trigger_type: string; trigger_config?: Record<string, any> }) => {
       const { data, error } = await supabase
         .from("email_sequences")
-        .insert(s)
+        .insert([s as any])
         .select()
         .single();
       if (error) throw error;
