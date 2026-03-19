@@ -14,8 +14,15 @@ export function usePlanLimits() {
   const limits: PlanLimits = useMemo(() => getPlanLimits(planKey), [planKey]);
 
   const checkLimit = (resource: keyof PlanLimits, currentCount: number): boolean => {
-    return isLimitReached(limits[resource], currentCount);
+    const val = limits[resource];
+    if (typeof val === "boolean") return false;
+    return isLimitReached(val, currentCount);
   };
 
-  return { planKey, limits, checkLimit, profile };
+  const hasFeature = (feature: keyof PlanLimits): boolean => {
+    const val = limits[feature];
+    return typeof val === "boolean" ? val : true;
+  };
+
+  return { planKey, limits, checkLimit, hasFeature, profile };
 }

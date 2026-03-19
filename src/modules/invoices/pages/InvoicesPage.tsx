@@ -20,6 +20,9 @@ import { exportInvoicePDF } from "@/lib/invoicePdf";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import DocumentStatusBadge from "@/components/DocumentStatusBadge";
+import UpgradePrompt from "@/components/UpgradePrompt";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Sparkles } from "lucide-react";
 
 const STATUS_TABS: Array<{ value: string; label: string; icon: any }> = [
   { value: "all", label: "All", icon: FileText },
@@ -34,10 +37,19 @@ export default function InvoicesPage() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const [showUpgrade, setShowUpgrade] = useState(false);
   const { data: invoices = [], isLoading } = useInvoices(statusFilter);
   const updateStatus = useUpdateInvoiceStatus();
   const deleteInvoice = useDeleteInvoice();
-  const { planKey, profile } = usePlanLimits();
+  const { planKey, profile, checkLimit, hasFeature } = usePlanLimits();
+
+  const isFree = planKey === "starter";
+  const thisMonthInvoices = invoices.filter((i: any) => {
+    const d = new Date(i.created_at);
+    const now = new Date();
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  });
+  const invoiceLimitReached = isFree && thisMonthInvoices.length >= 3;
 
   const handleExportPDF = async (inv: any) => {
     const { data: lineItems } = await supabase
@@ -86,7 +98,13 @@ export default function InvoicesPage() {
         </div>
         <Button
           className="shadow-glow"
-          onClick={() => navigate("/app/invoices/new")}
+          onClick={() => {
+            if (invoiceLimitReached) {
+              setShowUpgrade(true);
+            } else {
+              navigate("/app/invoices/new");
+            }
+          }}
         >
           <Plus className="h-4 w-4 mr-2" /> New Invoice
         </Button>
@@ -273,6 +291,39 @@ export default function InvoicesPage() {
           ))}
         </div>
       )}
+      {/* Limit banner for free users */}
+      {isFree && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <Alert className={invoiceLimitReached ? "border-destructive/30 bg-destructive/5" : "border-primary/20 bg-primary/5"}>
+            <Sparkles className="h-4 w-4" />
+            <AlertDescription className="text-sm">
+              {invoiceLimitReached
+                ? `You've used all 3 invoices this month. Upgrade to Pro for unlimited invoices, PDF export, and more.`
+                : `${thisMonthInvoices.length}/3 invoices used this month on Free plan.`}
+              {invoiceLimitReached && (
+                <Button
+                  variant="link"
+                  className="h-auto p-0 ml-1"
+                  onClick={() => setShowUpgrade(true)}
+                >
+                  Upgrade now →
+                </Button>
+              )}
+            </AlertDescription>
+          </Alert>
+        </motion.div>
+      )}
+
+      <UpgradePrompt
+        open={showUpgrade}
+        onOpenChange={setShowUpgrade}
+        feature="invoice"
+        currentPlan={planKey}
+      />
     </div>
   );
 }

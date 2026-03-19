@@ -22,6 +22,7 @@ export const PLAN_TIERS = [
       contacts: 100,
       cards: 1,
       estimates: 3,
+      invoices: 3,
       social_posts: 5,
       booking_services: 3,
       bookings_monthly: 200,
@@ -32,6 +33,12 @@ export const PLAN_TIERS = [
       gallery_images: 3,
       testimonials: 2,
       ai_requests_monthly: 5,
+      pdf_export: false,
+      estimate_approvals: false,
+      payments: false,
+      deposits: false,
+      recurring_invoices: false,
+      advanced_reporting: false,
     },
   },
   {
@@ -56,6 +63,7 @@ export const PLAN_TIERS = [
       contacts: -1,
       cards: 2,
       estimates: -1,
+      invoices: -1,
       social_posts: -1,
       booking_services: -1,
       bookings_monthly: -1,
@@ -66,6 +74,12 @@ export const PLAN_TIERS = [
       gallery_images: -1,
       testimonials: -1,
       ai_requests_monthly: 50,
+      pdf_export: true,
+      estimate_approvals: true,
+      payments: false,
+      deposits: false,
+      recurring_invoices: false,
+      advanced_reporting: false,
     },
   },
   {
@@ -90,6 +104,7 @@ export const PLAN_TIERS = [
       contacts: -1,
       cards: -1,
       estimates: -1,
+      invoices: -1,
       social_posts: -1,
       booking_services: -1,
       bookings_monthly: -1,
@@ -100,6 +115,12 @@ export const PLAN_TIERS = [
       gallery_images: -1,
       testimonials: -1,
       ai_requests_monthly: 500,
+      pdf_export: true,
+      estimate_approvals: true,
+      payments: true,
+      deposits: true,
+      recurring_invoices: true,
+      advanced_reporting: true,
     },
   },
   {
@@ -124,6 +145,7 @@ export const PLAN_TIERS = [
       contacts: -1,
       cards: -1,
       estimates: -1,
+      invoices: -1,
       social_posts: -1,
       booking_services: -1,
       bookings_monthly: -1,
@@ -134,6 +156,12 @@ export const PLAN_TIERS = [
       gallery_images: -1,
       testimonials: -1,
       ai_requests_monthly: -1,
+      pdf_export: true,
+      estimate_approvals: true,
+      payments: true,
+      deposits: true,
+      recurring_invoices: true,
+      advanced_reporting: true,
     },
   },
 ] as const;
@@ -144,6 +172,7 @@ export interface PlanLimits {
   contacts: number;
   cards: number;
   estimates: number;
+  invoices: number;
   social_posts: number;
   booking_services: number;
   bookings_monthly: number;
@@ -154,6 +183,12 @@ export interface PlanLimits {
   gallery_images: number;
   testimonials: number;
   ai_requests_monthly: number;
+  pdf_export: boolean;
+  estimate_approvals: boolean;
+  payments: boolean;
+  deposits: boolean;
+  recurring_invoices: boolean;
+  advanced_reporting: boolean;
 }
 
 export function getPlanByKey(key: string): (typeof PLAN_TIERS)[number] | undefined {
