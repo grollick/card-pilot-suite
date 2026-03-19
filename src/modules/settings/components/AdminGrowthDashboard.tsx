@@ -11,13 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useAdminGrowthStats, useOutreachContacts } from "@/hooks/useAdminGrowthStats";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 
-const fadeUp = { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 } };
 
 // ─── KPI Cards ───
 function KPICards({ kpis, isLoading }: { kpis: any; isLoading: boolean }) {
@@ -32,7 +30,7 @@ function KPICards({ kpis, isLoading }: { kpis: any; isLoading: boolean }) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
       {cards.map((c, i) => (
-        <motion.div key={c.label} {...fadeUp} transition={{ delay: i * 0.03 }}
+        <div key={c.label}
           className="rounded-xl border border-border bg-card p-4">
           <div className="flex items-center gap-2 mb-2">
             <div className="h-8 w-8 rounded-lg bg-muted/60 flex items-center justify-center">
@@ -43,7 +41,7 @@ function KPICards({ kpis, isLoading }: { kpis: any; isLoading: boolean }) {
             <p className="text-2xl font-bold tabular-nums">{typeof c.value === "number" ? c.value.toLocaleString() : c.value}</p>
           )}
           <p className="text-xs text-muted-foreground mt-1">{c.label}</p>
-        </motion.div>
+        </div>
       ))}
     </div>
   );
@@ -63,7 +61,7 @@ function FunnelView({ funnel, isLoading }: { funnel: any; isLoading: boolean }) 
     prev === 0 ? "—" : `${Math.round((curr / prev) * 100)}%`;
 
   return (
-    <motion.div {...fadeUp} transition={{ delay: 0.1 }}
+    <div
       className="rounded-xl border border-border bg-card p-5">
       <h3 className="font-semibold mb-4 flex items-center gap-2">
         <TrendingUp className="h-4 w-4 text-primary" /> Conversion Funnel (30d)
@@ -91,7 +89,7 @@ function FunnelView({ funnel, isLoading }: { funnel: any; isLoading: boolean }) 
           );
         })}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -120,7 +118,7 @@ function OutreachTracker() {
   };
 
   return (
-    <motion.div {...fadeUp} transition={{ delay: 0.15 }}
+    <div
       className="rounded-xl border border-border bg-card p-5">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold flex items-center gap-2">
@@ -192,7 +190,7 @@ function OutreachTracker() {
           })}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }
 
@@ -209,7 +207,7 @@ function DailyActions({ kpis, contacts }: { kpis: any; contacts: any[] }) {
   ];
 
   return (
-    <motion.div {...fadeUp} transition={{ delay: 0.2 }}
+    <div
       className="rounded-xl border border-border bg-card p-5">
       <h3 className="font-semibold mb-3 flex items-center gap-2">
         <CheckCircle2 className="h-4 w-4 text-success" /> Daily Actions
@@ -223,7 +221,7 @@ function DailyActions({ kpis, contacts }: { kpis: any; contacts: any[] }) {
           </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -241,7 +239,7 @@ function ActivityFeed({ feed, isLoading }: { feed: any[]; isLoading: boolean }) 
   };
 
   return (
-    <motion.div {...fadeUp} transition={{ delay: 0.25 }}
+    <div
       className="rounded-xl border border-border bg-card p-5">
       <h3 className="font-semibold mb-3 flex items-center gap-2">
         <Activity className="h-4 w-4 text-primary" /> Activity Feed
@@ -266,7 +264,7 @@ function ActivityFeed({ feed, isLoading }: { feed: any[]; isLoading: boolean }) 
           })}
         </div>
       )}
-    </motion.div>
+    </div>
   );
 }
 
@@ -280,7 +278,7 @@ function MarketplaceHealth({ marketplace, isLoading }: { marketplace: any; isLoa
   ];
 
   return (
-    <motion.div {...fadeUp} transition={{ delay: 0.3 }}
+    <div
       className="rounded-xl border border-border bg-card p-5">
       <h3 className="font-semibold mb-3 flex items-center gap-2">
         <Rocket className="h-4 w-4 text-primary" /> Marketplace Health
@@ -295,7 +293,7 @@ function MarketplaceHealth({ marketplace, isLoading }: { marketplace: any; isLoa
           </div>
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -311,7 +309,7 @@ function GrowthInsights({ kpis, funnel, marketplace }: { kpis: any; funnel: any;
   if (insights.length === 0) insights.push("Growth looks healthy! Keep up the outreach momentum.");
 
   return (
-    <motion.div {...fadeUp} transition={{ delay: 0.35 }}
+    <div
       className="rounded-xl border border-primary/20 bg-gradient-to-br from-card to-primary/[0.03] p-5">
       <h3 className="font-semibold mb-3 flex items-center gap-2">
         <Lightbulb className="h-4 w-4 text-warning" /> Growth Insights
@@ -324,7 +322,7 @@ function GrowthInsights({ kpis, funnel, marketplace }: { kpis: any; funnel: any;
           </li>
         ))}
       </ul>
-    </motion.div>
+    </div>
   );
 }
 
@@ -360,7 +358,7 @@ export default function AdminGrowthDashboard() {
       </div>
 
       {/* Quick Actions */}
-      <motion.div {...fadeUp} transition={{ delay: 0.3 }}
+      <div
         className="flex flex-wrap gap-2">
         <Button variant="outline" size="sm" className="gap-1.5"
           onClick={() => { /* open add contact dialog via state would require lifting — using outreach tracker instead */ toast.info("Use the Outreach Tracker above to add contacts"); }}>
@@ -374,7 +372,7 @@ export default function AdminGrowthDashboard() {
           onClick={() => navigate("/app/platform-admin")}>
           <Eye className="h-3.5 w-3.5" /> View Users
         </Button>
-      </motion.div>
+      </div>
 
       {/* Insights */}
       <GrowthInsights kpis={data?.kpis} funnel={data?.funnel} marketplace={data?.marketplace} />
