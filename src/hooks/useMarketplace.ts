@@ -148,16 +148,14 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
       }
 
       // Ranking: featured → high-rated → active → name
-      const now = Date.now();
+      const nowMs = Date.now();
       listings.sort((a, b) => {
         if (a.featured !== b.featured) return a.featured ? -1 : 1;
-        // Rating score (0-5)
         const ratingA = a.avg_rating ?? 0;
         const ratingB = b.avg_rating ?? 0;
         if (ratingB !== ratingA) return ratingB - ratingA;
-        // Activity recency (more recently updated = higher)
-        const activeA = now - new Date(a.updated_at).getTime();
-        const activeB = now - new Date(b.updated_at).getTime();
+        const activeA = nowMs - new Date(a.updated_at).getTime();
+        const activeB = nowMs - new Date(b.updated_at).getTime();
         if (activeA !== activeB) return activeA - activeB;
         return (a.name ?? "").localeCompare(b.name ?? "");
       });
