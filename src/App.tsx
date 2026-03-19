@@ -23,6 +23,7 @@ import DemoCardPreview from "@/modules/public/pages/DemoCardPreview";
 // Client Portal — loaded eagerly (public, token-based)
 const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
 const PublicProjectPage = lazy(() => import("@/modules/public/pages/PublicProjectPage"));
+const PublicInvoicePage = lazy(() => import("@/modules/public/pages/PublicInvoicePage"));
 
 // Client Portal v2 — authenticated client dashboard
 const ClientAuthPage = lazy(() => import("@/modules/client/pages/ClientAuthPage"));
@@ -187,6 +188,7 @@ const App = () => (
             <Route path="/discover/:profession/:city" element={<DiscoverPage />} />
             <Route path="/project/:projectId" element={<LazyRoute><PublicProjectPage /></LazyRoute>} />
             <Route path="/portal/:token" element={<LazyRoute><ClientPortal /></LazyRoute>} />
+            <Route path="/pay/:token" element={<LazyRoute><PublicInvoicePage /></LazyRoute>} />
 
             {/* Client Portal v2 — authenticated */}
             <Route path="/client/auth" element={<LazyRoute><ClientAuthPage /></LazyRoute>} />
