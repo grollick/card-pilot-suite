@@ -242,7 +242,7 @@ export default function DiscoverPage() {
   const { profession, city } = useParams<{ profession?: string; city?: string }>();
   const [search, setSearch] = useState("");
   const [serviceFilter, setServiceFilter] = useState("");
-  const [intentFilter, setIntentFilter] = useState<"" | "quote" | "book" | "available_now">("");
+  const [intentFilter, setIntentFilter] = useState<"" | "quote" | "book" | "available_now" | "on_duty">("");
   const [showFilters, setShowFilters] = useState(false);
   const [showMatcher, setShowMatcher] = useState(false);
   const [topMatches, setTopMatches] = useState<MarketplaceListing[] | null>(null);
