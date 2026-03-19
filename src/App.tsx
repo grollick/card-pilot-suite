@@ -218,6 +218,7 @@ const App = () => (
               <Route path="contacts/:id" element={<LazyRoute><ContactDetail /></LazyRoute>} />
               <Route path="pipeline" element={<LazyRoute><PipelinePage /></LazyRoute>} />
               <Route path="tasks" element={<LazyRoute><TasksPage /></LazyRoute>} />
+              <Route path="scan-card" element={<LazyRoute><ScanBusinessCard /></LazyRoute>} />
               <Route path="bookings" element={<LazyRoute><BookingManager /></LazyRoute>} />
               <Route path="email" element={<LazyRoute><EmailMarketing /></LazyRoute>} />
               <Route path="social" element={<LazyRoute><SocialScheduler /></LazyRoute>} />
