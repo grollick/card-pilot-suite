@@ -564,35 +564,21 @@ export default function InvoiceDetailPage() {
               </div>
             </div>
 
-            {/* Status card */}
+            {/* Status & Payment card */}
             {!isNew && invoice && (
-              <div className="dash-card p-5 space-y-3">
-                <h2 className="text-sm font-semibold text-foreground">Status</h2>
-                <DocumentStatusBadge status={invoice.status} />
-                {invoice.sent_at && (
-                  <p className="text-xs text-muted-foreground">
-                    Sent{" "}
-                    {new Date(invoice.sent_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </p>
-                )}
-                {invoice.paid_at && (
-                  <p className="text-xs text-success">
-                    Paid{" "}
-                    {new Date(invoice.paid_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </p>
-                )}
-              </div>
+              <InvoicePaymentPanel
+                invoice={invoice}
+                invoiceId={id!}
+                grandTotal={grandTotal}
+              />
             )}
 
             {/* Quick actions */}
             <div className="dash-card p-5 space-y-2">
               <h2 className="text-sm font-semibold text-foreground">Actions</h2>
+              {!isNew && invoice && (
+                <CopyPayLinkButton invoiceId={id!} />
+              )}
               {!isNew && invoice?.status === "draft" && (
                 <Button
                   variant="outline"
