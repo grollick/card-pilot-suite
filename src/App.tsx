@@ -99,6 +99,7 @@ const IndustryInsightsPage = lazy(() => import("@/modules/analytics/pages/Indust
 // Marketplace
 const ProjectsPage = lazy(() => import("@/modules/marketplace/pages/ProjectsPage"));
 const ReviewsPage = lazy(() => import("@/modules/marketplace/pages/ReviewsPage"));
+const MarketplacePerformancePage = lazy(() => import("@/modules/marketplace/pages/MarketplacePerformancePage"));
 
 // AI Assistant
 const AssistantPage = lazy(() => import("@/modules/assistant/pages/AssistantPage"));
