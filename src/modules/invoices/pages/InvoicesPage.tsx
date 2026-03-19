@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Loader2, FileText, Send, Eye, CheckCircle, AlertTriangle, X, MoreHorizontal, Trash2 } from "lucide-react";
+import { Plus, Loader2, FileText, Send, Eye, CheckCircle, AlertTriangle, X, MoreHorizontal, Trash2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
