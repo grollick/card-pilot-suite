@@ -1011,6 +1011,84 @@ export type Database = {
           },
         ]
       }
+      estimate_duty_log: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          lead_id: string | null
+          response_time_minutes: number | null
+          user_id: string
+          was_on_duty: boolean
+        }
+        Insert: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          lead_id?: string | null
+          response_time_minutes?: number | null
+          user_id: string
+          was_on_duty?: boolean
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          lead_id?: string | null
+          response_time_minutes?: number | null
+          user_id?: string
+          was_on_duty?: boolean
+        }
+        Relationships: []
+      }
+      estimate_duty_status: {
+        Row: {
+          auto_off_after_hours: number | null
+          auto_off_outside_hours: boolean
+          available_until: string | null
+          created_at: string
+          id: string
+          is_on_duty: boolean
+          leads_received: number
+          max_leads: number | null
+          service_radius_km: number | null
+          service_types: string[] | null
+          updated_at: string
+          user_id: string
+          went_on_duty_at: string | null
+        }
+        Insert: {
+          auto_off_after_hours?: number | null
+          auto_off_outside_hours?: boolean
+          available_until?: string | null
+          created_at?: string
+          id?: string
+          is_on_duty?: boolean
+          leads_received?: number
+          max_leads?: number | null
+          service_radius_km?: number | null
+          service_types?: string[] | null
+          updated_at?: string
+          user_id: string
+          went_on_duty_at?: string | null
+        }
+        Update: {
+          auto_off_after_hours?: number | null
+          auto_off_outside_hours?: boolean
+          available_until?: string | null
+          created_at?: string
+          id?: string
+          is_on_duty?: boolean
+          leads_received?: number
+          max_leads?: number | null
+          service_radius_km?: number | null
+          service_types?: string[] | null
+          updated_at?: string
+          user_id?: string
+          went_on_duty_at?: string | null
+        }
+        Relationships: []
+      }
       estimate_line_items: {
         Row: {
           calc_depth: number

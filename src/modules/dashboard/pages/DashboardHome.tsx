@@ -18,6 +18,7 @@ import PostLeadSharePrompt from "@/modules/dashboard/components/PostLeadSharePro
 import BusinessPerformancePanel from "@/modules/dashboard/components/BusinessPerformancePanel";
 import RetentionInsightsWidget from "@/modules/dashboard/components/RetentionInsightsWidget";
 import AIGrowthAssistantPanel from "@/modules/dashboard/components/AIGrowthAssistantPanel";
+import EstimateDutyPanel from "@/modules/dashboard/components/EstimateDutyPanel";
 import LeadGuaranteeBanner from "@/components/LeadGuaranteeBanner";
 import { useLeadGuarantee } from "@/hooks/useLeadGuarantee";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -91,6 +92,9 @@ export default function DashboardHome() {
         <div className="lg:col-span-2 space-y-6">
           {/* ── SECTION 3: Funnel ── */}
           <FunnelView />
+
+          {/* ── On Duty for Estimates ── */}
+          <EstimateDutyPanel />
 
           {/* ── Lead Guarantee Tracker ── */}
           {guaranteeData && !guaranteeData.targetMet && (

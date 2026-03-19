@@ -242,7 +242,7 @@ export default function DiscoverPage() {
   const { profession, city } = useParams<{ profession?: string; city?: string }>();
   const [search, setSearch] = useState("");
   const [serviceFilter, setServiceFilter] = useState("");
-  const [intentFilter, setIntentFilter] = useState<"" | "quote" | "book" | "available_now">("");
+  const [intentFilter, setIntentFilter] = useState<"" | "quote" | "book" | "available_now" | "on_duty">("");
   const [showFilters, setShowFilters] = useState(false);
   const [showMatcher, setShowMatcher] = useState(false);
   const [topMatches, setTopMatches] = useState<MarketplaceListing[] | null>(null);
@@ -387,6 +387,7 @@ export default function DiscoverPage() {
                   { key: "quote" as const, label: "Get a quote", icon: MessageSquareText },
                   { key: "book" as const, label: "Book today", icon: CalendarCheck },
                   { key: "available_now" as const, label: "Available this week", icon: CheckCircle2 },
+                  { key: "on_duty" as const, label: "On Duty Now", icon: Sparkles },
                 ]).map(({ key, label, icon: Icon }) => (
                   <Button
                     key={key}

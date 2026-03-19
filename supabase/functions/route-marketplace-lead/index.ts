@@ -97,6 +97,19 @@ serve(async (req) => {
       .eq("id", quoteRequestId);
 
     // 3. Find matching businesses — priority routing for high-quality leads
+    // First check for on-duty users
+    const { data: onDutyUsers } = await supabase
+      .from("estimate_duty_status")
+      .select("user_id, service_types, service_radius_km, max_leads, leads_received")
+      .eq("is_on_duty", true);
+
+    const onDutySet = new Map<string, any>();
+    (onDutyUsers ?? []).forEach((d: any) => {
+      // Skip users who hit their lead cap
+      if (d.max_leads && d.leads_received >= d.max_leads) return;
+      onDutySet.set(d.user_id, d);
+    });
+
     let query = supabase
       .from("profiles")
       .select("id, name, handle, email, city, available_for_work, avg_response_minutes, plan, professions(name)")
@@ -117,6 +130,20 @@ serve(async (req) => {
     // Score and filter candidates
     const scored = (candidates ?? []).map((c: any) => {
       let score = 0;
+
+      // ON DUTY PRIORITY BOOST
+      const dutyInfo = onDutySet.get(c.id);
+      if (dutyInfo) {
+        score += 60; // Major boost for on-duty users
+
+        // Service type match for on-duty
+        if (dutyInfo.service_types?.length > 0 && quoteReq.service_needed) {
+          const svcMatch = dutyInfo.service_types.some((st: string) =>
+            quoteReq.service_needed.toLowerCase().includes(st.toLowerCase())
+          );
+          if (svcMatch) score += 20;
+        }
+      }
 
       // Profession match
       if (quoteReq.profession && c.professions?.name) {
@@ -146,7 +173,7 @@ serve(async (req) => {
         if (c.avg_response_minutes && c.avg_response_minutes < 30) score += 10;
       }
 
-      return { ...c, score };
+      return { ...c, score, isOnDuty: !!dutyInfo };
     });
 
     scored.sort((a: any, b: any) => b.score - a.score);
@@ -253,6 +280,23 @@ serve(async (req) => {
           title: `${qualityLabel}: ${quoteReq.customer_name}`,
           description: `Score: ${leadQualityScore}/100 | Service: ${quoteReq.service_needed || "General"} | Budget: ${quoteReq.budget || "Not specified"} | ${urgencyNote}`,
           occurred_at: new Date().toISOString(),
+        });
+      }
+
+      // Track on-duty analytics
+      if (business.isOnDuty && leadId) {
+        await supabase.from("estimate_duty_log").insert({
+          user_id: business.id,
+          lead_id: leadId,
+          event_type: "lead_received",
+          was_on_duty: true,
+        });
+        // Increment leads_received counter
+        await supabase.rpc("increment_duty_leads", { p_user_id: business.id }).catch(() => {
+          // Fallback: direct update
+          supabase.from("estimate_duty_status")
+            .update({ leads_received: (onDutySet.get(business.id)?.leads_received ?? 0) + 1 })
+            .eq("user_id", business.id);
         });
       }
 
