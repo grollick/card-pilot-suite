@@ -70,8 +70,8 @@ function WeeklyReportSummary() {
 
         <div className="grid grid-cols-3 gap-3">
           {[
-            { label: "Leads", value: stats?.leadsThisMonth ?? 0, icon: Target },
-            { label: "Bookings", value: stats?.bookingsThisMonth ?? 0, icon: Calendar },
+            { label: "Leads", value: stats?.leadsToday ?? 0, icon: Target },
+            { label: "Bookings", value: stats?.bookingsWeek ?? 0, icon: Calendar },
             { label: "Health", value: `${healthPct}%`, icon: Sparkles },
           ].map((m) => (
             <div key={m.label} className="text-center p-2.5 rounded-lg bg-muted/40">
