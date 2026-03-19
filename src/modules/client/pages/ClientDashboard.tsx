@@ -147,6 +147,19 @@ export default function ClientDashboard() {
           ))}
         </div>
 
+        {/* ── New Portal Widgets ── */}
+        <UpcomingAppointmentWidget
+          bookings={bookings}
+          onReschedule={(booking) => handleBookAgain(booking)}
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ProjectProgressWidget leadIds={leadIds} />
+          <PaymentSummaryWidget leadIds={leadIds} />
+        </div>
+
+        <DocumentVaultWidget leadIds={leadIds} />
+
         {/* Bookings */}
         <motion.div {...anim} transition={{ delay: 0.1 }}>
           <Tabs defaultValue="upcoming" className="space-y-4">
