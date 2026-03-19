@@ -113,7 +113,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
     finalCtaHeadline: "Start getting more leads today.",
     finalCtaSubheadline: "Set up your contractor card in minutes and start booking more jobs.",
     footerNote: "Built for contractors, renovators, and construction professionals.",
-    focusAreas: ["Lead Generation", "Quote Requests", "Project Showcases"],
+    focusAreas: ["Lead Generation", "Quote Requests", "Card Scanning", "Project Showcases"],
   },
   barbers: {
     slug: "barbers",
