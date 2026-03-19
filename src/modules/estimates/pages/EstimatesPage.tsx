@@ -27,7 +27,7 @@ import {
 import { format, addHours } from "date-fns";
 import {
   useEstimates, useDeleteEstimate, useUpdateEstimateStatus, useDuplicateEstimate,
-  useConvertEstimateToJob,
+  useConvertEstimateToJob, useConvertEstimateToInvoice,
   type EstimateStatus, type EstimateSection, calculateEstimateTotals,
 } from "@/hooks/useEstimates";
 import { usePipelineStages } from "@/hooks/useContacts";
