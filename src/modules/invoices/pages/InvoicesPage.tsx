@@ -30,6 +30,21 @@ export default function InvoicesPage() {
   const { data: invoices = [], isLoading } = useInvoices(statusFilter);
   const updateStatus = useUpdateInvoiceStatus();
   const deleteInvoice = useDeleteInvoice();
+  const { planKey, profile } = usePlanLimits();
+
+  const handleExportPDF = async (inv: any) => {
+    const { data: lineItems } = await supabase
+      .from("invoice_line_items")
+      .select("*")
+      .eq("invoice_id", inv.id)
+      .order("sort_order");
+    exportInvoicePDF({
+      invoice: { ...inv, leads: inv.leads, jobs: inv.jobs },
+      lineItems: (lineItems ?? []) as any[],
+      profile: profile as any,
+      planKey,
+    });
+  };
 
   const totalRevenue = invoices.filter((i: any) => i.status === "paid").reduce((sum: number, i: any) => sum + Number(i.grand_total), 0);
   const totalOutstanding = invoices.filter((i: any) => ["sent", "viewed", "overdue"].includes(i.status)).reduce((sum: number, i: any) => sum + Number(i.grand_total), 0);
