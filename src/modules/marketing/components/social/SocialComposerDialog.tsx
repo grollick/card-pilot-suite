@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Sparkles, Hash, RefreshCw } from "lucide-react";
+import { Sparkles, Hash, RefreshCw, Wand2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,7 +20,7 @@ import type { SocialPost } from "@/hooks/useSocialPosts";
 import { PLATFORMS, CONTENT_LABELS, getPlatformConfig, deriveDbStatus } from "./constants";
 import type { PostStatus } from "./constants";
 import PlatformPreview from "./PlatformPreview";
-
+import AIPostGenerator from "./AIPostGenerator";
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
@@ -41,11 +41,13 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
   const [campaignId, setCampaignId] = useState<string>("");
   const [contentLabel, setContentLabel] = useState<string>("");
   const [activePlatformTab, setActivePlatformTab] = useState("base");
+  const [showAiGenerator, setShowAiGenerator] = useState(false);
 
   const resetForm = useCallback(() => {
     setContent(""); setSelectedPlatforms([]); setPlatformOverrides({});
     setScheduledDate(undefined); setScheduledTime("10:00");
     setCampaignId(""); setContentLabel(""); setActivePlatformTab("base");
+    setShowAiGenerator(false);
   }, []);
 
   useEffect(() => {
@@ -238,12 +240,38 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
                 </div>
               </div>
 
-              {/* AI Actions */}
-              <div className="flex gap-2 flex-wrap">
-                <Button variant="outline" size="sm" className="text-xs h-7 gap-1"><Sparkles className="h-3 w-3" /> Generate Post</Button>
-                <Button variant="outline" size="sm" className="text-xs h-7 gap-1"><RefreshCw className="h-3 w-3" /> Caption Variations</Button>
-                <Button variant="outline" size="sm" className="text-xs h-7 gap-1"><Hash className="h-3 w-3" /> Generate Hashtags</Button>
+              {/* AI Generator Toggle */}
+              <div>
+                <Button
+                  variant={showAiGenerator ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs h-8 gap-1.5 w-full"
+                  onClick={() => setShowAiGenerator(!showAiGenerator)}
+                >
+                  <Wand2 className="h-3.5 w-3.5" />
+                  {showAiGenerator ? "Hide AI Post Generator" : "✨ AI: Generate Trade-Specific Posts"}
+                </Button>
               </div>
+
+              {showAiGenerator && (
+                <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                  <AIPostGenerator
+                    platforms={selectedPlatforms.length > 0 ? selectedPlatforms : ["Instagram"]}
+                    onSelectPost={({ content: newContent, hashtags }) => {
+                      setContent(newContent);
+                      // Apply hashtags to all selected platforms
+                      if (hashtags.length > 0 && selectedPlatforms.length > 0) {
+                        const newOverrides = { ...platformOverrides };
+                        selectedPlatforms.forEach(p => {
+                          newOverrides[p] = { ...newOverrides[p], hashtags };
+                        });
+                        setPlatformOverrides(newOverrides);
+                      }
+                      setShowAiGenerator(false);
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Preview */}
