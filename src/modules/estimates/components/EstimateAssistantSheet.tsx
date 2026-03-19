@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import AiCreditTopupDialog from "@/components/AiCreditTopupDialog";
 import {
   Sparkles, FileText, DollarSign, ListChecks, TrendingUp, ShieldCheck,
   Loader2, Copy, RotateCcw, CheckCircle2, ArrowRight

@@ -308,6 +308,7 @@ export default function AssistantPage() {
           </Button>
         </div>
       </div>
+      <AiCreditTopupDialog open={showTopup} onOpenChange={setShowTopup} />
     </div>
   );
 }
