@@ -124,6 +124,7 @@ export default function ActivationChecklist() {
   const milestoneMessages: Record<string, { title: string; description: string }> = {
     card: { title: "🎉 Your card is live!", description: "Customers can now find and contact you." },
     services: { title: "✅ Services added!", description: "Customers can see what you offer." },
+    estimate: { title: "📨 First estimate sent!", description: "You're on your way to closing your first job." },
     lead: { title: "🎉 First lead captured!", description: "Your marketing is working. Keep sharing!" },
     booking: { title: "🎊 First booking!", description: "Your first customer booked through CardPilot." },
   };
