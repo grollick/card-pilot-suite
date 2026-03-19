@@ -332,6 +332,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
     features: [
       { title: "Before & After Slider", icon: "🔄", description: "Interactive sliders that show dramatic yard transformations." },
       { title: "Quote Request Forms", icon: "📋", description: "Capture property size, service type, and photos from potential clients." },
+      { title: "Scan Business Cards", icon: "📸", description: "Scan cards at home shows and networking events to grow your client base." },
       { title: "Seasonal Promos", icon: "🍂", description: "Promote seasonal services with eye-catching banners on your card." },
       { title: "Service Area Map", icon: "📍", description: "Show exactly which neighborhoods and zip codes you serve." },
       { title: "Maintenance Plans", icon: "📆", description: "Display recurring plan options to lock in steady monthly revenue." },
