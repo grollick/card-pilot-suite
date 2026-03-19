@@ -16,6 +16,7 @@ export const PLAN_TIERS = [
       "See who's viewing your card",
       "Share via QR code or link",
       "Up to 3 services listed",
+      "5 AI requests per month",
     ],
     limits: {
       contacts: 100,
@@ -30,6 +31,7 @@ export const PLAN_TIERS = [
       qr_campaigns: 0,
       gallery_images: 3,
       testimonials: 2,
+      ai_requests_monthly: 5,
     },
   },
   {
@@ -48,6 +50,7 @@ export const PLAN_TIERS = [
       "Social media scheduler",
       "Promotion banners on your card",
       "Remove CardPilot watermark",
+      "50 AI requests per month",
     ],
     limits: {
       contacts: -1,
@@ -62,6 +65,7 @@ export const PLAN_TIERS = [
       qr_campaigns: 3,
       gallery_images: -1,
       testimonials: -1,
+      ai_requests_monthly: 50,
     },
   },
   {
@@ -80,6 +84,7 @@ export const PLAN_TIERS = [
       "Custom domain support",
       "White-label branding option",
       "Priority support",
+      "500 AI requests per month",
     ],
     limits: {
       contacts: -1,
@@ -94,6 +99,7 @@ export const PLAN_TIERS = [
       qr_campaigns: -1,
       gallery_images: -1,
       testimonials: -1,
+      ai_requests_monthly: 500,
     },
   },
   {
@@ -112,6 +118,7 @@ export const PLAN_TIERS = [
       "Per-client analytics",
       "Custom domain support",
       "Dedicated support",
+      "Unlimited AI requests",
     ],
     limits: {
       contacts: -1,
@@ -126,6 +133,7 @@ export const PLAN_TIERS = [
       qr_campaigns: -1,
       gallery_images: -1,
       testimonials: -1,
+      ai_requests_monthly: -1,
     },
   },
 ] as const;
@@ -145,6 +153,7 @@ export interface PlanLimits {
   qr_campaigns: number;
   gallery_images: number;
   testimonials: number;
+  ai_requests_monthly: number;
 }
 
 export function getPlanByKey(key: string): (typeof PLAN_TIERS)[number] | undefined {
@@ -154,7 +163,6 @@ export function getPlanByKey(key: string): (typeof PLAN_TIERS)[number] | undefin
 export function getPlanLimits(key: string): PlanLimits {
   const plan = getPlanByKey(key);
   if (!plan) {
-    // Default to starter (free) limits for unknown plans
     return { ...PLAN_TIERS[0].limits };
   }
   return { ...plan.limits };
@@ -165,6 +173,15 @@ export function isLimitReached(limit: number, current: number): boolean {
   if (limit === -1) return false;
   return current >= limit;
 }
+
+/** AI request limits by plan key (used server-side in edge functions) */
+export const AI_LIMITS: Record<string, number> = {
+  starter: 5,
+  free: 5,
+  growth: 50,
+  pro: 500,
+  agency: -1,
+};
 
 /** Whether this plan shows "Powered by CardPilot" branding */
 export function showsBranding(planKey: string): boolean {

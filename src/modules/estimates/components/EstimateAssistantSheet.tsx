@@ -100,7 +100,9 @@ export default function EstimateAssistantSheet({
 
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({ error: "Request failed" }));
-        if (resp.status === 429) toast.error("Rate limit exceeded. Try again shortly.");
+        if (resp.status === 403 && err.code === "AI_LIMIT_REACHED") {
+          toast.error("AI limit reached — upgrade your plan for more requests.");
+        } else if (resp.status === 429) toast.error("Rate limit exceeded. Try again shortly.");
         else if (resp.status === 402) toast.error("AI credits exhausted.");
         throw new Error(err.error || "Request failed");
       }

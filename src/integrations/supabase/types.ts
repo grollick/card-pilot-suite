@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_usage: {
+        Row: {
+          created_at: string
+          id: string
+          month_key: string
+          request_count: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          month_key: string
+          request_count?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          month_key?: string
+          request_count?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       analytics_events: {
         Row: {
           created_at: string
@@ -3166,6 +3193,10 @@ export type Database = {
           p_phone?: string
           p_source?: string
         }
+        Returns: Json
+      }
+      check_and_increment_ai_usage: {
+        Args: { p_limit: number; p_user_id: string }
         Returns: Json
       }
       create_workspace_from_profession: {

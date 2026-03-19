@@ -36,10 +36,34 @@ serve(async (req) => {
     }
 
     // Gather business context
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const adminClient = createClient(supabaseUrl, serviceRoleKey);
+
     const [{ data: profile }, { data: services }] = await Promise.all([
-      supabase.from("profiles").select("name, company, bio, city").eq("id", user.id).single(),
+      supabase.from("profiles").select("name, company, bio, city, plan").eq("id", user.id).single(),
       supabase.from("booking_services").select("name, price, duration_min").eq("user_id", user.id).eq("active", true).limit(20),
     ]);
+
+    // Check AI usage limits
+    const planKey = profile?.plan || "starter";
+    const aiLimits: Record<string, number> = { starter: 5, free: 5, growth: 50, pro: 500, agency: -1 };
+    const limit = aiLimits[planKey] ?? 5;
+
+    const { data: usageCheck, error: usageError } = await adminClient.rpc("check_and_increment_ai_usage", {
+      p_user_id: user.id,
+      p_limit: limit,
+    });
+
+    if (usageError || !usageCheck?.allowed) {
+      const current = usageCheck?.current ?? 0;
+      return new Response(JSON.stringify({
+        error: `AI limit reached (${current}/${limit} requests this month). Upgrade your plan for more AI requests.`,
+        code: "AI_LIMIT_REACHED",
+      }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const contextParts: string[] = [];
     if (profile) contextParts.push(`Business: ${profile.company || profile.name || "Service Pro"}, ${profile.city || ""}`);
