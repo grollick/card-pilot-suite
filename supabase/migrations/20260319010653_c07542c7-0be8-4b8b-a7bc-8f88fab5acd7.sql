@@ -1,0 +1,2 @@
+ALTER TABLE public.lead_routing_log ADD COLUMN IF NOT EXISTS lead_quality_score integer NOT NULL DEFAULT 0;
+ALTER TABLE public.marketplace_quote_requests ADD COLUMN IF NOT EXISTS lead_quality_score integer NOT NULL DEFAULT 0;
