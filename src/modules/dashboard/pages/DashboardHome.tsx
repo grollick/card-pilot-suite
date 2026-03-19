@@ -75,6 +75,9 @@ export default function DashboardHome() {
       {/* ── On Duty for Estimates ── */}
       <EstimateDutyPanel />
 
+      {/* ── Marketplace Awareness ── */}
+      <MarketplaceAwarenessWidget />
+
       {/* ── SECTION 2: KPI Row ── */}
       <RevenueKPICards />
 
