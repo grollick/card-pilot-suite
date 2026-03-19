@@ -248,7 +248,7 @@ export default function Onboarding() {
             name: data.clientName,
             email: data.clientEmail || null,
             phone: data.clientPhone || null,
-            source: "onboarding",
+            source: "manual" as const,
           }])
           .select("id")
           .single();
