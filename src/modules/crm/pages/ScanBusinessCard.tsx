@@ -200,6 +200,22 @@ export default function ScanBusinessCard() {
 
           <div className="space-y-3">
             <div>
+              <Label>Contact Type</Label>
+              <Select value={contactType} onValueChange={setContactType}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CONTACT_TYPES.map((t) => (
+                    <SelectItem key={t.value} value={t.value}>
+                      <span>{t.label}</span>
+                      <span className="text-muted-foreground ml-1 text-xs">— {t.description}</span>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
               <Label>Name *</Label>
               <Input value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />
             </div>
