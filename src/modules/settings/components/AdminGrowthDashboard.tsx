@@ -313,6 +313,35 @@ function RetentionSummary({ kpis }: { kpis: any }) {
   );
 }
 
+// ─── Referral Metrics Card ───
+function ReferralMetricsCard({ referrals, isLoading }: { referrals: any; isLoading: boolean }) {
+  const items = [
+    { label: "Total Referrals", value: referrals?.total ?? 0, icon: Users, color: "text-primary" },
+    { label: "Activated", value: referrals?.activated ?? 0, icon: UserCheck, color: "text-success" },
+    { label: "Rewards Issued", value: referrals?.rewardsIssued ?? 0, icon: Trophy, color: "text-warning" },
+    { label: "Days Rewarded", value: referrals?.totalRewardDays ?? 0, icon: Calendar, color: "text-accent" },
+  ];
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="flex items-center gap-2 mb-3">
+        <Gift className="h-4 w-4 text-primary" />
+        <h3 className="text-sm font-semibold">Referral Program</h3>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {items.map(c => (
+          <div key={c.label} className="text-center">
+            {isLoading ? <Skeleton className="h-7 w-12 mx-auto" /> : (
+              <p className="text-xl font-bold tabular-nums">{c.value}</p>
+            )}
+            <p className="text-xs text-muted-foreground mt-0.5">{c.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ─── Growth Levers ───
 function GrowthLevers({ navigate }: { navigate: (path: string) => void }) {
   const levers = [
