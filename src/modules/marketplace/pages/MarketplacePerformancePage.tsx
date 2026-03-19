@@ -258,3 +258,40 @@ export default function MarketplacePerformancePage() {
     </div>
   );
 }
+
+function LeadRoutingStatsSection() {
+  const stats = useLeadRoutingStats();
+
+  if (stats.totalDelivered === 0) return null;
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Send className="h-4 w-4 text-primary" />
+          Lead Routing Performance
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center">
+            <p className="text-2xl font-bold">{stats.totalDelivered}</p>
+            <p className="text-xs text-muted-foreground">Leads Delivered</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold">{stats.responded}</p>
+            <p className="text-xs text-muted-foreground">Responded</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold">{stats.responseRate}%</p>
+            <p className="text-xs text-muted-foreground">Response Rate</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold">{stats.conversionRate}%</p>
+            <p className="text-xs text-muted-foreground">Conversion Rate</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
