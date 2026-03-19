@@ -267,9 +267,9 @@ export default function DiscoverPage() {
   const title = useMemo(() => {
     if (displayProfession && displayCity)
       return `${capitalize(displayProfession)}s in ${capitalize(displayCity)}`;
-    if (displayProfession) return `${capitalize(displayProfession)}s`;
-    if (displayCity) return `Businesses in ${capitalize(displayCity)}`;
-    return "Find & Book Local Professionals";
+    if (displayProfession) return `${capitalize(displayProfession)}s Near You`;
+    if (displayCity) return `Professionals in ${capitalize(displayCity)}`;
+    return "Get Discovered by Local Customers";
   }, [displayProfession, displayCity]);
 
   const metaDescription = useMemo(() => {
