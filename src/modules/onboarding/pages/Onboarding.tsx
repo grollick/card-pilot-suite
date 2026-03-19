@@ -243,13 +243,13 @@ export default function Onboarding() {
       if (data.clientName) {
         const { data: lead, error: leadErr } = await supabase
           .from("leads")
-          .insert({
+          .insert([{
             user_id: user.id,
             name: data.clientName,
             email: data.clientEmail || null,
             phone: data.clientPhone || null,
             source: "onboarding",
-          })
+          }])
           .select("id")
           .single();
         if (leadErr) throw leadErr;
