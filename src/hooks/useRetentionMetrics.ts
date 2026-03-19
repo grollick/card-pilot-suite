@@ -98,7 +98,7 @@ export function useRetentionMetrics() {
       const avgRating = reviews.length > 0
         ? Math.round((reviews.reduce((s, r) => s + (r.rating ?? 0), 0) / reviews.length) * 10) / 10
         : 0;
-      const pendingReviews = reviews.filter((r) => r.status === "pending").length;
+      const pendingReviews = reviews.filter((r) => !r.is_public).length;
 
       // Revenue
       const monthlyRevenue = (revenueRes.data ?? []).reduce((s, r) => s + Number(r.revenue ?? 0), 0);
