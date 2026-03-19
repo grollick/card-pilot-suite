@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { Sparkles, Loader2, Check, Image, RefreshCw, Wand2 } from "lucide-react";
+import { Sparkles, Loader2, Check, RefreshCw, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -108,80 +106,76 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
       )}
 
       {ideas.length > 0 && (
-        <ScrollArea className="max-h-[420px]">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pr-2">
-            {ideas.map((idea, idx) => {
-              const style = STYLE_CONFIG[idea.style] ?? STYLE_CONFIG.showcase;
-              const isSelected = selectedIdx === idx;
-              return (
-                <Card
-                  key={idx}
-                  className={cn(
-                    "cursor-pointer transition-all hover:shadow-md border-2",
-                    isSelected
-                      ? "border-primary ring-2 ring-primary/20"
-                      : "border-transparent hover:border-primary/30"
-                  )}
-                  onClick={() => setSelectedIdx(idx)}
-                >
-                  <CardContent className="p-3 space-y-2">
-                    {/* Image preview */}
-                    <div className="relative rounded-md overflow-hidden bg-muted aspect-video">
-                      <img
-                        src={idea.image_url}
-                        alt={idea.image_description}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                      <Badge className={cn("absolute top-1.5 left-1.5 text-[10px] border", style.color)}>
-                        {style.icon} {style.label}
-                      </Badge>
-                    </div>
-
-                    {/* Content */}
-                    <div>
-                      <p className="font-semibold text-xs leading-tight">{idea.title}</p>
-                      <p className="text-[11px] text-muted-foreground mt-1 line-clamp-3 leading-relaxed">
-                        {idea.caption}
-                      </p>
-                    </div>
-
-                    {/* Hashtags preview */}
-                    <div className="flex flex-wrap gap-1">
-                      {idea.hashtags.slice(0, 4).map((h) => (
-                        <span key={h} className="text-[9px] text-primary/80">
-                          #{h}
-                        </span>
-                      ))}
-                      {idea.hashtags.length > 4 && (
-                        <span className="text-[9px] text-muted-foreground">
-                          +{idea.hashtags.length - 4} more
-                        </span>
-                      )}
-                    </div>
-
-                    {/* CTA preview */}
-                    <p className="text-[10px] text-muted-foreground italic">CTA: {idea.cta}</p>
-
-                    {/* Use button */}
-                    <Button
-                      size="sm"
-                      className="w-full h-7 text-xs gap-1"
-                      variant={isSelected ? "default" : "outline"}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleUsePost(idx);
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {ideas.map((idea, idx) => {
+            const style = STYLE_CONFIG[idea.style] ?? STYLE_CONFIG.showcase;
+            const isSelected = selectedIdx === idx;
+            return (
+              <Card
+                key={idx}
+                className={cn(
+                  "cursor-pointer transition-all hover:shadow-md border-2",
+                  isSelected
+                    ? "border-primary ring-2 ring-primary/20"
+                    : "border-transparent hover:border-primary/30"
+                )}
+                onClick={() => setSelectedIdx(idx)}
+              >
+                <CardContent className="p-3 space-y-2">
+                  {/* Image preview */}
+                  <div className="relative rounded-md overflow-hidden bg-muted aspect-video">
+                    <img
+                      src={idea.image_url}
+                      alt={idea.image_description}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${encodeURIComponent(idea.image_query)}/800/600`;
                       }}
-                    >
-                      {isSelected ? <Check className="h-3 w-3" /> : <Sparkles className="h-3 w-3" />}
-                      Use This Post
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </ScrollArea>
+                    />
+                    <Badge className={cn("absolute top-1.5 left-1.5 text-[10px] border", style.color)}>
+                      {style.icon} {style.label}
+                    </Badge>
+                  </div>
+
+                  {/* Content */}
+                  <div>
+                    <p className="font-semibold text-xs leading-tight">{idea.title}</p>
+                    <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                      {idea.caption}
+                    </p>
+                  </div>
+
+                  {/* Hashtags */}
+                  <div className="flex flex-wrap gap-1">
+                    {idea.hashtags.map((h) => (
+                      <span key={h} className="text-[9px] text-primary/80">
+                        #{h}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* CTA */}
+                  <p className="text-[10px] text-muted-foreground italic">CTA: {idea.cta}</p>
+
+                  {/* Use button */}
+                  <Button
+                    size="sm"
+                    className="w-full h-7 text-xs gap-1"
+                    variant={isSelected ? "default" : "outline"}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleUsePost(idx);
+                    }}
+                  >
+                    {isSelected ? <Check className="h-3 w-3" /> : <Sparkles className="h-3 w-3" />}
+                    Use This Post
+                  </Button>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       )}
 
       {!loading && ideas.length === 0 && (
