@@ -26,6 +26,7 @@ import MobileQuickCreate from "@/modules/invoices/components/MobileQuickCreate";
 import AhaPromptBanner from "@/modules/dashboard/components/AhaPromptBanner";
 import ChurnRecoveryBanner from "@/modules/dashboard/components/ChurnRecoveryBanner";
 import MilestoneCelebrationListener from "@/modules/dashboard/components/MilestoneCelebrationListener";
+import ReferralActivationChecker from "@/modules/dashboard/components/ReferralActivationChecker";
 import { useLeadGuarantee } from "@/hooks/useLeadGuarantee";
 import { useIsMobile } from "@/hooks/use-mobile";
 
