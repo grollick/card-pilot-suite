@@ -129,10 +129,11 @@ For each post, also suggest a specific stock photo search query that would pair 
 
     const result = JSON.parse(toolCall.function.arguments);
 
-    // Attach Unsplash image URLs to each post
+    // Attach image URLs to each post using loremflickr (free, no API key)
     if (result.posts) {
-      for (const post of result.posts) {
-        post.image_url = `https://source.unsplash.com/800x600/?${encodeURIComponent(post.image_query)}`;
+      for (let i = 0; i < result.posts.length; i++) {
+        const post = result.posts[i];
+        post.image_url = `https://loremflickr.com/800/600/${encodeURIComponent(post.image_query)}?random=${i}`;
       }
     }
 

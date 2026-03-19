@@ -144,7 +144,7 @@ Generate social media content suggestions for this post template.`;
         result.queries.map(async (q: { query: string; description: string }) => {
           try {
             // Use Unsplash source for free images (no API key needed)
-            const unsplashUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(q.query)}`;
+            const unsplashUrl = `https://loremflickr.com/800/600/${encodeURIComponent(q.query)}`;
             return {
               url: unsplashUrl,
               query: q.query,
