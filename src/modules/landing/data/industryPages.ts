@@ -80,6 +80,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
         "Project showcase (before & after)",
         "Quote request form",
         "Booking calendar",
+        "Business card scanner",
         "Lead tracking dashboard",
       ],
       caption: "See exactly how many leads and bookings you're getting.",
