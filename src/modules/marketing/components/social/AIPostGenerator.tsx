@@ -132,7 +132,7 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
               >
                 <CardContent className="p-3 space-y-2">
                   {/* Image preview */}
-                  <div className="relative rounded-md overflow-hidden bg-muted aspect-video">
+                  <div className="relative rounded-md overflow-hidden bg-muted aspect-video group/img">
                     <img
                       src={idea.image_url}
                       alt={idea.image_description}
@@ -145,6 +145,14 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
                     <Badge className={cn("absolute top-1.5 left-1.5 text-[10px] border", style.color)}>
                       {style.icon} {style.label}
                     </Badge>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); shuffleImage(idx); }}
+                      className="absolute bottom-1.5 right-1.5 flex items-center gap-1 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm text-[10px] font-medium text-foreground opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-background"
+                      title="Get a different image"
+                    >
+                      <ImageOff className="h-3 w-3" />
+                      New image
+                    </button>
                   </div>
 
                   {/* Content */}
