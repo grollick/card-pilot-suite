@@ -30,7 +30,7 @@ function KPICards({ kpis, isLoading }: { kpis: any; isLoading: boolean }) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
       {cards.map((c, i) => (
-        <div key={c.label} transition={{ delay: i * 0.03 }}
+        <div key={c.label}
           className="rounded-xl border border-border bg-card p-4">
           <div className="flex items-center gap-2 mb-2">
             <div className="h-8 w-8 rounded-lg bg-muted/60 flex items-center justify-center">
