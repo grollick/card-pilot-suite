@@ -237,6 +237,8 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
       const nowMs = Date.now();
       listings.sort((a, b) => {
         if (a.featured !== b.featured) return a.featured ? -1 : 1;
+        // On Duty gets priority
+        if (a.is_on_duty !== b.is_on_duty) return a.is_on_duty ? -1 : 1;
         // Available for work gets a slight boost
         if (a.available_for_work !== b.available_for_work) return a.available_for_work ? -1 : 1;
         // Conversion score (composite)
