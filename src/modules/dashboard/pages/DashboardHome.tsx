@@ -55,6 +55,9 @@ export default function DashboardHome() {
       {/* ── SECTION 2: KPI Row ── */}
       <RevenueKPICards />
 
+      {/* ── Business Performance ── */}
+      <BusinessPerformancePanel />
+
       {/* ── Activation System ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ActivationChecklist />
