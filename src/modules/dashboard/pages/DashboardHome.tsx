@@ -5,6 +5,7 @@ import MissedOpportunities from "@/modules/dashboard/components/MissedOpportunit
 import RevenueQuickActions from "@/modules/dashboard/components/RevenueQuickActions";
 import GrowthTrends from "@/modules/dashboard/components/GrowthTrends";
 import NextActionsWidget from "@/modules/dashboard/components/NextActionsWidget";
+import LeadQualityWidget from "@/modules/dashboard/components/LeadQualityWidget";
 import RevenueOpportunities from "@/modules/dashboard/components/RevenueOpportunities";
 import DashboardActivityFeed from "@/modules/dashboard/components/DashboardActivityFeed";
 import ShareCardWidget from "@/modules/dashboard/components/ShareCardWidget";
