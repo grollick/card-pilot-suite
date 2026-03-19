@@ -82,6 +82,7 @@ const RecurringPlanDetailPage = lazy(() => import("@/modules/recurring/pages/Rec
 // Marketing
 const EmailMarketing = lazy(() => import("@/modules/marketing/pages/EmailMarketing"));
 const SocialScheduler = lazy(() => import("@/modules/marketing/pages/SocialScheduler"));
+const PostDesigner = lazy(() => import("@/modules/marketing/pages/PostDesigner"));
 const ContentPage = lazy(() => import("@/modules/marketing/pages/ContentPage"));
 const PromotionsPage = lazy(() => import("@/modules/marketing/pages/PromotionsPage"));
 const ReferralsPage = lazy(() => import("@/modules/marketing/pages/ReferralsPage"));
