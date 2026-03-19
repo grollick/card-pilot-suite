@@ -116,6 +116,12 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         });
       }
 
+      // Build on-duty set
+      const onDutySet = new Set<string>();
+      if (dutyResult.data) {
+        dutyResult.data.forEach((d: any) => onDutySet.add(d.user_id));
+      }
+
       const now = new Date();
       const threeDaysAgoMs = now.getTime() - 3 * 24 * 60 * 60 * 1000;
       const sevenDaysAgoMs = now.getTime() - 7 * 24 * 60 * 60 * 1000;
@@ -127,23 +133,21 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         const services = servicesMap[p.id] ?? [];
         const completeness = calcProfileCompleteness(p);
         const leads = leadCounts[p.id] ?? 0;
+        const isOnDuty = onDutySet.has(p.id);
 
-        // ── Velocity multipliers (mirrored from useLeadVelocity) ──
+        // ── Velocity multipliers ──
         let velocityBoost = 1.0;
-
-        // Fast responder boost
         const respMin = p.avg_response_minutes ?? 999;
         if (respMin < 60) velocityBoost *= 1.3;
         else if (respMin < 240) velocityBoost *= 1.1;
 
-        // Profile freshness boost (updated in last 3 days)
         const profileUpdatedAt = p.updated_at ? new Date(p.updated_at).getTime() : 0;
         if (profileUpdatedAt > threeDaysAgoMs) velocityBoost *= 1.2;
-
-        // Activity recency boost
         if (profileUpdatedAt > sevenDaysAgoMs) velocityBoost *= 1.1;
 
-        // Conversion score with velocity boost applied
+        // On Duty boost
+        if (isOnDuty) velocityBoost *= 1.4;
+
         const baseConversion =
           (reviewData ? reviewData.avg * reviewData.count : 0) * 2 +
           (respMin < 60 ? 30 : respMin < 240 ? 15 : 0) +
@@ -172,6 +176,7 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
           avg_response_minutes: p.avg_response_minutes ?? null,
           profile_completeness: completeness,
           conversion_score: conversionScore,
+          is_on_duty: isOnDuty,
         };
       });
 
