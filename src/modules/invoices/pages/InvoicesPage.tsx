@@ -20,6 +20,9 @@ import { exportInvoicePDF } from "@/lib/invoicePdf";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import DocumentStatusBadge from "@/components/DocumentStatusBadge";
+import UpgradePrompt from "@/components/UpgradePrompt";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Sparkles } from "lucide-react";
 
 const STATUS_TABS: Array<{ value: string; label: string; icon: any }> = [
   { value: "all", label: "All", icon: FileText },
