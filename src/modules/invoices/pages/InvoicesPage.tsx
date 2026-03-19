@@ -95,7 +95,13 @@ export default function InvoicesPage() {
         </div>
         <Button
           className="shadow-glow"
-          onClick={() => navigate("/app/invoices/new")}
+          onClick={() => {
+            if (invoiceLimitReached) {
+              setShowUpgrade(true);
+            } else {
+              navigate("/app/invoices/new");
+            }
+          }}
         >
           <Plus className="h-4 w-4 mr-2" /> New Invoice
         </Button>
