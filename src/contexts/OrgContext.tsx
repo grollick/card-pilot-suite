@@ -61,7 +61,7 @@ export function OrgProvider({ children }: { children: ReactNode }) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("handle, name, avatar_url, plan, tour_completed, onboarding_completed, current_org_id")
+        .select("handle, name, avatar_url, plan, tour_completed, onboarding_completed, current_org_id, company")
         .eq("id", user!.id)
         .maybeSingle();
       if (error) throw error;
