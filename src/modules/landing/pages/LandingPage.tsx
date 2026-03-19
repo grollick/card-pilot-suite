@@ -252,7 +252,7 @@ export default function LandingPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-primary/20 bg-primary/5">
               <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-sm font-semibold text-foreground">CardPilot solves all of this — in one platform.</span>
+              <span className="text-sm font-semibold text-foreground">guzzl.pro solves all of this — in one platform.</span>
             </div>
           </motion.div>
 
