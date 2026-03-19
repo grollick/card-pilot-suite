@@ -21,6 +21,7 @@ import AIGrowthAssistantPanel from "@/modules/dashboard/components/AIGrowthAssis
 import EstimateDutyPanel from "@/modules/dashboard/components/EstimateDutyPanel";
 import RevenuePipelineWidget from "@/modules/dashboard/components/RevenuePipelineWidget";
 import SmartRevenueWidget from "@/modules/dashboard/components/SmartRevenueWidget";
+import LeadPerformanceWidget from "@/modules/dashboard/components/LeadPerformanceWidget";
 import LeadGuaranteeBanner from "@/components/LeadGuaranteeBanner";
 import MobileQuickCreate from "@/modules/invoices/components/MobileQuickCreate";
 import AhaPromptBanner from "@/modules/dashboard/components/AhaPromptBanner";
