@@ -488,6 +488,54 @@ export type Database = {
         }
         Relationships: []
       }
+      beta_feedback: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          device_type: string | null
+          feature_tag: string | null
+          feedback_type: Database["public"]["Enums"]["feedback_type"]
+          id: string
+          message: string
+          meta_json: Json | null
+          page_url: string | null
+          screenshot_url: string | null
+          status: Database["public"]["Enums"]["feedback_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          device_type?: string | null
+          feature_tag?: string | null
+          feedback_type?: Database["public"]["Enums"]["feedback_type"]
+          id?: string
+          message: string
+          meta_json?: Json | null
+          page_url?: string | null
+          screenshot_url?: string | null
+          status?: Database["public"]["Enums"]["feedback_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          device_type?: string | null
+          feature_tag?: string | null
+          feedback_type?: Database["public"]["Enums"]["feedback_type"]
+          id?: string
+          message?: string
+          meta_json?: Json | null
+          page_url?: string | null
+          screenshot_url?: string | null
+          status?: Database["public"]["Enums"]["feedback_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       booking_services: {
         Row: {
           active: boolean
@@ -3933,6 +3981,8 @@ export type Database = {
         | "approved"
         | "declined"
         | "expired"
+      feedback_status: "new" | "in_review" | "planned" | "fixed"
+      feedback_type: "bug" | "suggestion" | "confusing" | "positive"
       invoice_status:
         | "draft"
         | "sent"
@@ -4138,6 +4188,8 @@ export const Constants = {
         "declined",
         "expired",
       ],
+      feedback_status: ["new", "in_review", "planned", "fixed"],
+      feedback_type: ["bug", "suggestion", "confusing", "positive"],
       invoice_status: [
         "draft",
         "sent",
