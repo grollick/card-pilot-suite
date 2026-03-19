@@ -336,7 +336,7 @@ export default function LandingPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Example Cards</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">Cards for every profession</h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">See how professionals in different industries use CardPilot to grow their business.</p>
+            <p className="text-muted-foreground max-w-lg mx-auto">See how professionals in different industries use guzzl.pro to grow their business.</p>
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
             {DEMO_CARDS.map((card, i) => {
