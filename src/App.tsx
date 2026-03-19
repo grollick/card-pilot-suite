@@ -116,6 +116,7 @@ const TechDashboardPage = lazy(() => import("@/modules/team/pages/TechDashboardP
 const SettingsPage = lazy(() => import("@/modules/settings/pages/SettingsPage"));
 const AdminPage = lazy(() => import("@/modules/settings/pages/AdminPage"));
 const PlatformAdminDashboard = lazy(() => import("@/modules/admin/pages/PlatformAdminDashboard"));
+const SalesCrmPage = lazy(() => import("@/modules/admin/pages/SalesCrmPage"));
 const TeamPage = lazy(() => import("@/modules/settings/pages/TeamPage"));
 
 // Help
@@ -243,6 +244,7 @@ const App = () => (
               <Route path="marketplace" element={<LazyRoute><MarketplacePage /></LazyRoute>} />
               <Route path="admin" element={<LazyRoute><AdminPage /></LazyRoute>} />
               <Route path="platform-admin" element={<LazyRoute><PlatformAdminDashboard /></LazyRoute>} />
+              <Route path="sales-crm" element={<LazyRoute><SalesCrmPage /></LazyRoute>} />
               <Route path="team-management" element={<LazyRoute><TeamManagementPage /></LazyRoute>} />
               <Route path="tech-dashboard" element={<LazyRoute><TechDashboardPage /></LazyRoute>} />
               <Route path="help" element={<LazyRoute><HelpCenter /></LazyRoute>} />

@@ -2770,6 +2770,45 @@ export type Database = {
           },
         ]
       }
+      sales_crm_contacts: {
+        Row: {
+          business_name: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          notes: string | null
+          phone: string | null
+          stage: Database["public"]["Enums"]["sales_crm_stage"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          stage?: Database["public"]["Enums"]["sales_crm_stage"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          stage?: Database["public"]["Enums"]["sales_crm_stage"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       scheduled_followups: {
         Row: {
           created_at: string
@@ -3382,6 +3421,14 @@ export type Database = {
         | "quarterly"
         | "custom"
       recurring_plan_status: "active" | "paused" | "cancelled" | "completed"
+      sales_crm_stage:
+        | "new_lead"
+        | "contacted"
+        | "interested"
+        | "card_built"
+        | "got_first_lead"
+        | "paid"
+        | "upsell"
       social_post_status: "draft" | "scheduled" | "published" | "failed"
       system_event_severity: "info" | "warning" | "error" | "critical"
     }
@@ -3583,6 +3630,15 @@ export const Constants = {
         "custom",
       ],
       recurring_plan_status: ["active", "paused", "cancelled", "completed"],
+      sales_crm_stage: [
+        "new_lead",
+        "contacted",
+        "interested",
+        "card_built",
+        "got_first_lead",
+        "paid",
+        "upsell",
+      ],
       social_post_status: ["draft", "scheduled", "published", "failed"],
       system_event_severity: ["info", "warning", "error", "critical"],
     },
