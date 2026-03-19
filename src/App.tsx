@@ -12,17 +12,19 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Loader2 } from "lucide-react";
 
-// ── Public routes — loaded eagerly for fast <500ms render ──
-import PublicBooking from "@/modules/public/pages/PublicBooking";
-import QRLanding from "@/modules/public/pages/QRLanding";
-import ProductsPage from "@/modules/public/pages/ProductsPage";
-import DiscoverPage from "@/modules/public/pages/DiscoverPage";
-import OnDutyMapPage from "@/modules/public/pages/OnDutyMapPage";
+// ── Public routes — most eagerly loaded for fast render ──
 import LegalPage from "@/modules/public/pages/LegalPage";
-import RequestServicePage from "@/modules/public/pages/RequestServicePage";
 import HandleOrSeoRoute from "@/modules/public/pages/HandleOrSeoRoute";
-import PublicSite from "@/modules/public/pages/PublicSite";
-import DemoCardPreview from "@/modules/public/pages/DemoCardPreview";
+
+// ── Public routes — lazy loaded (heavier) ──
+const PublicBooking = lazy(() => import("@/modules/public/pages/PublicBooking"));
+const QRLanding = lazy(() => import("@/modules/public/pages/QRLanding"));
+const ProductsPage = lazy(() => import("@/modules/public/pages/ProductsPage"));
+const DiscoverPage = lazy(() => import("@/modules/public/pages/DiscoverPage"));
+const OnDutyMapPage = lazy(() => import("@/modules/public/pages/OnDutyMapPage"));
+const RequestServicePage = lazy(() => import("@/modules/public/pages/RequestServicePage"));
+const PublicSite = lazy(() => import("@/modules/public/pages/PublicSite"));
+const DemoCardPreview = lazy(() => import("@/modules/public/pages/DemoCardPreview"));
 
 // Client Portal — loaded eagerly (public, token-based)
 const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
@@ -152,9 +154,13 @@ function LazyRoute({ children }: { children: React.ReactNode }) {
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 2 * 60 * 1000, // 2 min — avoid refetch storms on navigation
-      gcTime: 10 * 60 * 1000,   // 10 min garbage collection
-      retry: 1,                  // single retry on failure
+      staleTime: 2 * 60 * 1000,
+      gcTime: 10 * 60 * 1000,
+      retry: (failureCount, error: any) => {
+        // Don't retry on 4xx errors (auth, not found, validation)
+        if (error?.status >= 400 && error?.status < 500) return false;
+        return failureCount < 2;
+      },
       refetchOnWindowFocus: false,
     },
     mutations: {
@@ -164,6 +170,7 @@ const queryClient = new QueryClient({
 });
 
 const App = () => (
+  <ErrorBoundary fullPage>
   <ThemeProvider attribute="class" defaultTheme="light" storageKey="guzzl-pro-theme">
   <HelmetProvider>
   <QueryClientProvider client={queryClient}>
@@ -188,20 +195,20 @@ const App = () => (
             <Route path="/for/:industry" element={<IndustryLandingPage />} />
 
             {/* Demo cards — no auth */}
-            <Route path="/demo/:slug" element={<DemoCardPreview />} />
+            <Route path="/demo/:slug" element={<LazyRoute><DemoCardPreview /></LazyRoute>} />
 
             {/* Public routes — no auth required */}
-            <Route path="/q/:campaign" element={<QRLanding />} />
-            <Route path="/book/:handle" element={<PublicBooking />} />
-            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/q/:campaign" element={<LazyRoute><QRLanding /></LazyRoute>} />
+            <Route path="/book/:handle" element={<LazyRoute><PublicBooking /></LazyRoute>} />
+            <Route path="/products" element={<LazyRoute><ProductsPage /></LazyRoute>} />
             <Route path="/privacy" element={<LegalPage pageKey="privacy" />} />
             <Route path="/terms" element={<LegalPage pageKey="terms" />} />
-            <Route path="/site/:handle" element={<PublicSite />} />
-            <Route path="/discover" element={<DiscoverPage />} />
-            <Route path="/discover/map" element={<OnDutyMapPage />} />
-            <Route path="/discover/:profession" element={<DiscoverPage />} />
-            <Route path="/discover/:profession/:city" element={<DiscoverPage />} />
-            <Route path="/request-service" element={<RequestServicePage />} />
+            <Route path="/site/:handle" element={<LazyRoute><PublicSite /></LazyRoute>} />
+            <Route path="/discover" element={<LazyRoute><DiscoverPage /></LazyRoute>} />
+            <Route path="/discover/map" element={<LazyRoute><OnDutyMapPage /></LazyRoute>} />
+            <Route path="/discover/:profession" element={<LazyRoute><DiscoverPage /></LazyRoute>} />
+            <Route path="/discover/:profession/:city" element={<LazyRoute><DiscoverPage /></LazyRoute>} />
+            <Route path="/request-service" element={<LazyRoute><RequestServicePage /></LazyRoute>} />
             <Route path="/request-status/:token" element={<LazyRoute><RequestStatusPage /></LazyRoute>} />
             <Route path="/project/:projectId" element={<LazyRoute><PublicProjectPage /></LazyRoute>} />
             <Route path="/portal/:token" element={<LazyRoute><ClientPortal /></LazyRoute>} />
@@ -287,6 +294,7 @@ const App = () => (
   </QueryClientProvider>
   </HelmetProvider>
   </ThemeProvider>
+  </ErrorBoundary>
 );
 
 export default App;
