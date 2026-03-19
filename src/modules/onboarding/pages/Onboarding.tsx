@@ -223,6 +223,15 @@ export default function Onboarding() {
 
       await queryClient.invalidateQueries({ queryKey: ["profile-onboarding"] });
       setLaunched(true);
+
+      // Record referral signup if user was referred
+      try {
+        await supabase.functions.invoke("referral-system", {
+          body: { action: "record_signup" },
+        });
+      } catch {
+        // Non-critical, don't block onboarding
+      }
     } catch (err: any) {
       console.error("Onboarding error:", err);
       toast({ title: "Something went wrong", description: err.message, variant: "destructive" });
