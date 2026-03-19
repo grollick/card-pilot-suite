@@ -1332,7 +1332,22 @@ export default function PublicCard() {
             </div>
           )}
 
-          {/* ── Quote Request ── */}
+          {/* ── Scan to Save ── */}
+          {themeJson.scan_to_save === true && (
+            <div>
+              <SectionTitle id="scan_to_save" label="Scan Your Card" />
+              <CardSectionWrapper theme={theme} index={5} metallicEffect={metallicEffect}>
+                <ScanToSaveWidget
+                  ownerId={profile.id}
+                  handle={handle!}
+                  palette={palette}
+                  fonts={fonts}
+                  radii={radii}
+                />
+              </CardSectionWrapper>
+            </div>
+          )}
+
           {enabledSections.has("quote_request") && (
             <div id="quote-request-section">
               <SectionTitle id="quote_request" label={sectionContent("quote_request")?.heading || "Request a Quote"} />
