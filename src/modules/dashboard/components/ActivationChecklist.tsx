@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2, Rocket, ArrowRight, Lightbulb,
   Globe, Wrench, Share2, UserPlus, CalendarCheck, PartyPopper, Sparkles,
-  Image, Send, LinkIcon, AtSign,
+  Image, Send, LinkIcon, AtSign, FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useCard";
@@ -44,12 +44,13 @@ export default function ActivationChecklist() {
     queryFn: async (): Promise<ChecklistItem[]> => {
       const uid = user!.id;
 
-      const [cardRes, serviceRes, leadRes, bookingRes, analyticsRes] = await Promise.all([
+      const [cardRes, serviceRes, leadRes, bookingRes, analyticsRes, estimateRes] = await Promise.all([
         supabase.from("cards").select("id, status, sections_json").eq("user_id", uid).limit(1).maybeSingle(),
         supabase.from("booking_services").select("id").eq("user_id", uid).eq("active", true).limit(1),
         supabase.from("leads").select("id").eq("user_id", uid).limit(1),
         supabase.from("bookings").select("id").eq("user_id", uid).limit(1),
         supabase.from("analytics_events").select("id").eq("user_id", uid).eq("event_type", "card_view").limit(5),
+        supabase.from("estimates").select("id, status").eq("user_id", uid).limit(1),
       ]);
 
       const hasPublishedCard = cardRes.data?.status === "published";
@@ -58,7 +59,8 @@ export default function ActivationChecklist() {
       const hasLead = (leadRes.data?.length ?? 0) > 0;
       const hasBooking = (bookingRes.data?.length ?? 0) > 0;
       const hasViews = (analyticsRes.data?.length ?? 0) >= 5;
-
+      const hasEstimate = (estimateRes.data?.length ?? 0) > 0;
+      const hasEstimateSent = estimateRes.data?.some((e: any) => e.status === "sent" || e.status === "approved") ?? false;
       // Check if card has gallery images
       const sections = cardRes.data?.sections_json as any[];
       const hasImage = sections?.some(
@@ -81,6 +83,11 @@ export default function ActivationChecklist() {
           key: "image", label: "Upload a photo or logo", group: "setup",
           tip: "Cards with images get 3× more engagement. Add a profile photo or work sample.",
           route: "/app/card", done: hasImage || hasPublishedCard, icon: Image,
+        },
+        {
+          key: "estimate", label: "Send your first estimate", group: "setup",
+          tip: "Create and send an estimate to start your revenue workflow. Most contractors close their first job within a week.",
+          route: "/app/estimates", done: hasEstimateSent, icon: FileText,
         },
         // Share group
         {
@@ -117,6 +124,7 @@ export default function ActivationChecklist() {
   const milestoneMessages: Record<string, { title: string; description: string }> = {
     card: { title: "🎉 Your card is live!", description: "Customers can now find and contact you." },
     services: { title: "✅ Services added!", description: "Customers can see what you offer." },
+    estimate: { title: "📨 First estimate sent!", description: "You're on your way to closing your first job." },
     lead: { title: "🎉 First lead captured!", description: "Your marketing is working. Keep sharing!" },
     booking: { title: "🎊 First booking!", description: "Your first customer booked through CardPilot." },
   };
