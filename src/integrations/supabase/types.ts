@@ -1704,6 +1704,50 @@ export type Database = {
           },
         ]
       }
+      invoice_payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          invoice_id: string
+          notes: string | null
+          paid_at: string
+          payment_method: string
+          payment_reference: string | null
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          invoice_id: string
+          notes?: string | null
+          paid_at?: string
+          payment_method?: string
+          payment_reference?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          invoice_id?: string
+          notes?: string | null
+          paid_at?: string
+          payment_method?: string
+          payment_reference?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_payments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoices: {
         Row: {
           amount_paid: number
@@ -1721,6 +1765,8 @@ export type Database = {
           org_id: string | null
           paid_at: string | null
           payment_method: string | null
+          payment_reference: string | null
+          payment_token: string | null
           reminder_count: number
           sent_at: string | null
           status: Database["public"]["Enums"]["invoice_status"]
@@ -1748,6 +1794,8 @@ export type Database = {
           org_id?: string | null
           paid_at?: string | null
           payment_method?: string | null
+          payment_reference?: string | null
+          payment_token?: string | null
           reminder_count?: number
           sent_at?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
@@ -1775,6 +1823,8 @@ export type Database = {
           org_id?: string | null
           paid_at?: string | null
           payment_method?: string | null
+          payment_reference?: string | null
+          payment_token?: string | null
           reminder_count?: number
           sent_at?: string | null
           status?: Database["public"]["Enums"]["invoice_status"]
