@@ -103,6 +103,9 @@ export default function DashboardHome() {
           {/* ── Retention Insights ── */}
           <RetentionInsightsWidget />
 
+          {/* ── AI Growth Coach ── */}
+          <GrowthCoachWidget />
+
           {/* ── SECTION 7: Growth & Insights ── */}
           <GrowthTrends />
         </div>
