@@ -3,8 +3,7 @@ import { UserPlus, CalendarPlus, Share2, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useProfileCache } from "@/hooks/useProfileCache";
 
 const actions = [
   { icon: UserPlus, label: "Add Lead", route: "/app/contacts?new=1", variant: "default" as const },
@@ -16,15 +15,7 @@ export default function RevenueQuickActions() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const { data: profile } = useQuery({
-    queryKey: ["profile-handle-quick"],
-    enabled: !!user,
-    staleTime: 10 * 60 * 1000,
-    queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("handle").eq("id", user!.id).single();
-      return data;
-    },
-  });
+  const { data: profile } = useProfileCache();
 
   return (
     <motion.div

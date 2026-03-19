@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useProfileCache } from "@/hooks/useProfileCache";
 import NetworkingModeDialog from "@/modules/card/components/NetworkingModeDialog";
 const socials = [
   { name: "Facebook", color: "bg-[hsl(220,46%,48%)]", share: (url: string) => `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}` },
@@ -20,19 +19,7 @@ export default function ShareCardWidget() {
   const [copied, setCopied] = useState(false);
   const [networkingOpen, setNetworkingOpen] = useState(false);
 
-  const { data: profile } = useQuery({
-    queryKey: ["profile-handle-share"],
-    enabled: !!user,
-    staleTime: 10 * 60 * 1000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("handle, name, company")
-        .eq("id", user!.id)
-        .single();
-      return data;
-    },
-  });
+  const { data: profile } = useProfileCache();
 
   const cardUrl = profile?.handle ? `${window.location.origin}/${profile.handle}` : "";
   const shareText = `Check out my digital business card${profile?.company ? ` for ${profile.company}` : ""}!`;
