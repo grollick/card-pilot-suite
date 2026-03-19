@@ -343,7 +343,7 @@ export default function DiscoverPage() {
           >
             <h1 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight mb-3">{title}</h1>
             <p className="text-muted-foreground text-lg max-w-2xl mb-10">
-              Discover top-rated professionals. Compare reviews, response times, and book instantly.
+              Find professionals near you. Compare reviews, response times, and connect instantly — all free.
             </p>
           </motion.div>
 
