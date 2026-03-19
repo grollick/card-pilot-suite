@@ -6,6 +6,7 @@ import ProductTour from "@/components/ProductTour";
 import FloatingHelpButton from "@/components/FloatingHelpButton";
 import UpgradeTriggers from "@/components/UpgradeTriggers";
 import BetaStatusBanner from "@/components/BetaStatusBanner";
+import BetaFeedbackWidget from "@/components/BetaFeedbackWidget";
 
 export default function DashboardLayout() {
   return (
@@ -23,6 +24,7 @@ export default function DashboardLayout() {
       <ProductTour />
       <FloatingHelpButton />
       <UpgradeTriggers />
+      <BetaFeedbackWidget />
     </SidebarProvider>
   );
 }

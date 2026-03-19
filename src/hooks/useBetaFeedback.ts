@@ -143,7 +143,7 @@ export function useUpdateFeedbackStatus() {
       const updates: Record<string, unknown> = {};
       if (params.status) updates.status = params.status;
       if (params.admin_notes !== undefined) updates.admin_notes = params.admin_notes;
-      const { error } = await supabase.from("beta_feedback").update(updates).eq("id", params.id);
+      const { error } = await (supabase.from as any)("beta_feedback").update(updates).eq("id", params.id);
       if (error) throw error;
     },
     onSuccess: () => {

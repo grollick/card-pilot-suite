@@ -74,6 +74,9 @@ export default function AdminPage() {
         <TabsContent value="beta" className="mt-4">
           <BetaManagementTab />
         </TabsContent>
+        <TabsContent value="feedback" className="mt-4">
+          <AdminFeedbackTab />
+        </TabsContent>
       </Tabs>
     </div>
   );
