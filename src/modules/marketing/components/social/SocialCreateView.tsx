@@ -35,6 +35,8 @@ const TRADE_TEMPLATES = [
 interface Props {
   editPost?: SocialPost | null;
   onDone?: () => void;
+  pendingContent?: { content: string; hashtags: string[]; imageUrl?: string } | null;
+  onPendingConsumed?: () => void;
 }
 
 export default function SocialCreateView({ editPost, onDone }: Props) {
