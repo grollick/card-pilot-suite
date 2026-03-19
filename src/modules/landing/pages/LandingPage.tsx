@@ -76,7 +76,7 @@ const steps = [
 ];
 
 const results = [
-  { value: "3×", label: "More Leads", desc: "Professionals using CardPilot capture 3x more leads than traditional business cards.", icon: Target },
+  { value: "3×", label: "More Leads", desc: "Professionals using guzzl.pro capture 3x more leads than traditional business cards.", icon: Target },
   { value: "40%", label: "More Bookings", desc: "Online booking eliminates friction and converts more inquiries into confirmed jobs.", icon: Calendar },
   { value: "2×", label: "Faster Payments", desc: "Digital estimates and invoices with online payment get you paid twice as fast.", icon: DollarSign },
 ];
@@ -90,7 +90,7 @@ const PROFESSION_ICONS: Record<string, typeof Wrench> = {
 };
 
 const testimonials = [
-  { name: "Jake M.", role: "Landscaper", text: "I went from losing half my leads to booking 90% of them. CardPilot paid for itself in a week.", rating: 5 },
+  { name: "Jake M.", role: "Landscaper", text: "I went from losing half my leads to booking 90% of them. guzzl.pro paid for itself in a week.", rating: 5 },
   { name: "Sarah L.", role: "Interior Painter", text: "Clients love scanning my card and booking instantly. I've never been this organized.", rating: 5 },
   { name: "Marco R.", role: "Electrician", text: "Estimates used to take me an hour. Now I send them on-site in two minutes.", rating: 5 },
 ];
@@ -252,7 +252,7 @@ export default function LandingPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-primary/20 bg-primary/5">
               <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-sm font-semibold text-foreground">CardPilot solves all of this — in one platform.</span>
+              <span className="text-sm font-semibold text-foreground">guzzl.pro solves all of this — in one platform.</span>
             </div>
           </motion.div>
 
@@ -336,7 +336,7 @@ export default function LandingPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Example Cards</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">Cards for every profession</h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">See how professionals in different industries use CardPilot to grow their business.</p>
+            <p className="text-muted-foreground max-w-lg mx-auto">See how professionals in different industries use guzzl.pro to grow their business.</p>
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
             {DEMO_CARDS.map((card, i) => {
@@ -391,7 +391,7 @@ export default function LandingPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Results</p>
             <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">Real outcomes for real businesses</h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">CardPilot helps service professionals get more leads, more bookings, and faster payments.</p>
+            <p className="text-muted-foreground max-w-lg mx-auto">guzzl.pro helps service professionals get more leads, more bookings, and faster payments.</p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {results.map((r, i) => (
