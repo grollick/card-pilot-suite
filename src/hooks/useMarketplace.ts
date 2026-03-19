@@ -82,23 +82,28 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         });
       }
 
-      let listings: MarketplaceListing[] = enabledProfiles.map((p: any) => ({
-        id: p.id,
-        name: p.name,
-        handle: p.handle,
-        avatar_url: p.avatar_url,
-        company: p.company,
-        city: p.city,
-        bio: p.bio,
-        profession_name: p.professions?.name ?? null,
-        profession_category: p.professions?.category ?? null,
-        service_area: p.service_area ?? null,
-        featured: p.featured ?? false,
-        avg_rating: ratingsMap[p.id]?.avg ?? null,
-        review_count: ratingsMap[p.id]?.count ?? 0,
-        services: servicesMap[p.id] ?? [],
-        updated_at: p.updated_at,
-      }));
+      const now = new Date();
+      let listings: MarketplaceListing[] = enabledProfiles.map((p: any) => {
+        const featuredUntil = p.featured_until ? new Date(p.featured_until) : null;
+        const isFeatured = p.featured || (featuredUntil && featuredUntil > now);
+        return {
+          id: p.id,
+          name: p.name,
+          handle: p.handle,
+          avatar_url: p.avatar_url,
+          company: p.company,
+          city: p.city,
+          bio: p.bio,
+          profession_name: p.professions?.name ?? null,
+          profession_category: p.professions?.category ?? null,
+          service_area: p.service_area ?? null,
+          featured: isFeatured ?? false,
+          avg_rating: ratingsMap[p.id]?.avg ?? null,
+          review_count: ratingsMap[p.id]?.count ?? 0,
+          services: servicesMap[p.id] ?? [],
+          updated_at: p.updated_at,
+        };
+      });
 
       // Filter by profession
       if (filters.profession) {
