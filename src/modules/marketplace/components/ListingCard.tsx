@@ -140,8 +140,8 @@ export default function ListingCard({ listing, boosted, variant = "default" }: L
                   </Badge>
                 )}
                 {listing.is_on_duty && (
-                  <Badge className="text-[10px] font-medium gap-0.5 bg-success/15 text-success border-success/20 animate-pulse">
-                    <Radio className="h-2.5 w-2.5" /> On Duty
+                  <Badge className="text-[10px] font-semibold gap-0.5 bg-success/20 text-success border-success/30 shadow-sm shadow-success/10">
+                    <Radio className="h-2.5 w-2.5 animate-pulse" /> On Duty for Estimates
                   </Badge>
                 )}
                 {listing.available_for_work && !listing.is_on_duty && (
@@ -203,54 +203,44 @@ export default function ListingCard({ listing, boosted, variant = "default" }: L
             </p>
           )}
 
-          {/* Primary CTA */}
+          {/* Trust text */}
+          {listing.review_count >= 5 && listing.avg_response_minutes !== null && listing.avg_response_minutes < 30 && (
+            <p className="text-[11px] text-muted-foreground italic flex items-center gap-1">
+              <ShieldCheck className="h-3 w-3 text-primary/60" />
+              Trusted by local homeowners · Fast response times
+            </p>
+          )}
+          {listing.review_count >= 3 && listing.review_count < 5 && (
+            <p className="text-[11px] text-muted-foreground italic flex items-center gap-1">
+              <ShieldCheck className="h-3 w-3 text-muted-foreground/60" />
+              Verified local professional
+            </p>
+          )}
+
+          {/* Primary CTA — Request Estimate is always dominant */}
           <div className="mt-auto pt-2 space-y-2">
-            {isHero ? (
-              <div className="flex gap-2">
-                <Button asChild size="sm" className="flex-1 gap-1.5 shadow-sm">
-                  <Link to={`/${listing.handle}?quote=1`}>
-                    <MessageSquare className="h-3.5 w-3.5" /> Get a Quote
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="sm" className="flex-1 gap-1.5">
-                  <Link to={`/book/${listing.handle}`}>
-                    <Calendar className="h-3.5 w-3.5" /> Book Now
-                  </Link>
-                </Button>
-              </div>
-            ) : (
-              <>
-                <Button asChild size="sm" className="w-full gap-1.5">
-                  <Link to={`/${listing.handle}`}>
-                    View Card <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                </Button>
-                <div className="flex gap-2">
-                  <Button asChild variant="outline" size="sm" className="flex-1 gap-1.5 text-xs">
-                    <Link to={`/book/${listing.handle}`}>
-                      <Calendar className="h-3.5 w-3.5" /> Book
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline" size="sm" className="flex-1 gap-1.5 text-xs">
-                    <Link to={`/${listing.handle}?quote=1`}>
-                      <MessageSquare className="h-3.5 w-3.5" /> Quote
-                    </Link>
-                  </Button>
-                  <Button asChild variant="ghost" size="sm" className="text-xs px-2">
-                    <Link to={`/${listing.handle}?contact=1`}>
-                      <Phone className="h-3.5 w-3.5" />
-                    </Link>
-                  </Button>
-                </div>
-              </>
-            )}
-            {isHero && (
-              <Button asChild variant="ghost" size="sm" className="w-full text-xs gap-1 text-muted-foreground hover:text-foreground">
+            <Button asChild size="sm" className={`w-full gap-1.5 shadow-sm ${listing.is_on_duty ? "bg-success hover:bg-success/90 text-success-foreground" : ""}`}>
+              <Link to={`/${listing.handle}?quote=1`}>
+                <MessageSquare className="h-3.5 w-3.5" /> Request Estimate
+              </Link>
+            </Button>
+            <div className="flex gap-2">
+              <Button asChild variant="outline" size="sm" className="flex-1 gap-1.5 text-xs">
                 <Link to={`/${listing.handle}`}>
-                  View full profile <ArrowRight className="h-3 w-3" />
+                  <ArrowRight className="h-3.5 w-3.5" /> View Profile
                 </Link>
               </Button>
-            )}
+              <Button asChild variant="outline" size="sm" className="flex-1 gap-1.5 text-xs">
+                <Link to={`/book/${listing.handle}`}>
+                  <Calendar className="h-3.5 w-3.5" /> Book
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm" className="text-xs px-2">
+                <Link to={`/${listing.handle}?contact=1`}>
+                  <Phone className="h-3.5 w-3.5" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
