@@ -4,10 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
   TrendingUp, Lightbulb, Loader2, RefreshCw, ArrowUpRight,
-  Zap, PenTool, Users, MessageSquare, Star,
+  Zap, PenTool, Users, MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 
 type Insight = { title: string; description: string; type: string; action?: string; route?: string };
