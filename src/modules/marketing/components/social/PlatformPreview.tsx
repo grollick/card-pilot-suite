@@ -19,7 +19,7 @@ function InstagramPreview({ content, hashtags, imageUrl }: { content: string; ha
       </div>
       <div className="h-32 bg-muted flex items-center justify-center overflow-hidden">
         {imageUrl ? (
-          <img src={imageUrl} alt="Post" className="w-full h-full object-cover" />
+          <img src={imageUrl} alt="Post" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${Date.now()}/800/600`; }} />
         ) : (
           <span className="text-xs text-muted-foreground">Image preview</span>
         )}

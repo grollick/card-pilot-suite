@@ -129,11 +129,12 @@ For each post, also suggest a specific stock photo search query that would pair 
 
     const result = JSON.parse(toolCall.function.arguments);
 
-    // Attach image URLs to each post using loremflickr (free, no API key)
+    // Attach image URLs using picsum.photos (reliable, no API key)
     if (result.posts) {
       for (let i = 0; i < result.posts.length; i++) {
         const post = result.posts[i];
-        post.image_url = `https://loremflickr.com/800/600/${encodeURIComponent(post.image_query)}?random=${i}`;
+        const seed = encodeURIComponent(post.image_query).slice(0, 50) + i;
+        post.image_url = `https://picsum.photos/seed/${seed}/800/600`;
       }
     }
 
