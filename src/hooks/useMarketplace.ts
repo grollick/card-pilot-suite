@@ -112,6 +112,9 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
       }
 
       const now = new Date();
+      const threeDaysAgoMs = now.getTime() - 3 * 24 * 60 * 60 * 1000;
+      const sevenDaysAgoMs = now.getTime() - 7 * 24 * 60 * 60 * 1000;
+
       let listings: MarketplaceListing[] = enabledProfiles.map((p: any) => {
         const featuredUntil = p.featured_until ? new Date(p.featured_until) : null;
         const isFeatured = p.featured || (featuredUntil && featuredUntil > now);
@@ -119,12 +122,30 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         const services = servicesMap[p.id] ?? [];
         const completeness = calcProfileCompleteness(p);
         const leads = leadCounts[p.id] ?? 0;
-        // Conversion score: higher if they have reviews + respond fast + have leads
-        const conversionScore =
+
+        // ── Velocity multipliers (mirrored from useLeadVelocity) ──
+        let velocityBoost = 1.0;
+
+        // Fast responder boost
+        const respMin = p.avg_response_minutes ?? 999;
+        if (respMin < 60) velocityBoost *= 1.3;
+        else if (respMin < 240) velocityBoost *= 1.1;
+
+        // Profile freshness boost (updated in last 3 days)
+        const profileUpdatedAt = p.updated_at ? new Date(p.updated_at).getTime() : 0;
+        if (profileUpdatedAt > threeDaysAgoMs) velocityBoost *= 1.2;
+
+        // Activity recency boost
+        if (profileUpdatedAt > sevenDaysAgoMs) velocityBoost *= 1.1;
+
+        // Conversion score with velocity boost applied
+        const baseConversion =
           (reviewData ? reviewData.avg * reviewData.count : 0) * 2 +
-          (p.avg_response_minutes && p.avg_response_minutes < 60 ? 30 : p.avg_response_minutes && p.avg_response_minutes < 240 ? 15 : 0) +
+          (respMin < 60 ? 30 : respMin < 240 ? 15 : 0) +
           Math.min(leads * 5, 50) +
           completeness * 0.3;
+
+        const conversionScore = baseConversion * velocityBoost;
 
         return {
           id: p.id,
