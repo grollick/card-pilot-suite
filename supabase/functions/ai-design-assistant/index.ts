@@ -11,19 +11,46 @@ serve(async (req) => {
   }
 
   try {
-    const { business_type, services, city, style, primary_cta, name, company } = await req.json();
+    const { business_type, services, city, style, primary_cta, name, company, template } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are an expert digital business card designer for service professionals. Given a user's business details, generate a COMPLETE card layout with content, sections, and theme settings.
+    // Build template-aware context for the AI
+    let templateContext = "";
+    if (template) {
+      const enabledSections = template.sections
+        ?.filter((s: any) => s.enabled)
+        .map((s: any) => s.id) || [];
+      const disabledSections = template.sections
+        ?.filter((s: any) => !s.enabled)
+        .map((s: any) => s.id) || [];
 
-PROFESSION-SPECIFIC RULES:
-- Contractors/Trades: Emphasize projects, quote requests, trust badges
-- Barbers/Beauty: Emphasize gallery, booking, social links
-- Realtors/Sales: Emphasize testimonials, contact form, professional headshot
-- Photographers/Creatives: Emphasize portfolio/gallery, testimonials, booking
-- Landscapers/Outdoor: Emphasize before/after projects, seasonal promos, booking
+      templateContext = `
+MATCHED TEMPLATE: "${template.name}" (${template.id})
+Template Category: ${template.category}
+Template Style: ${template.style}
+CTA Priority Order: ${(template.ctaPriority || []).join(" → ")}
+Emphasis: Hero style="${template.emphasis?.heroStyle}", Gallery=${template.emphasis?.showGallery}, Booking=${template.emphasis?.showBooking}, Quotes=${template.emphasis?.showQuote}, Testimonials=${template.emphasis?.showTestimonials}
+Enabled Sections (in order): ${enabledSections.join(", ")}
+Disabled Sections: ${disabledSections.join(", ") || "none"}
+Sample Tagline: "${template.preview?.tagline || ""}"
+Sample Services: ${(template.preview?.sampleServices || []).join(", ")}
+Sample Review: "${template.preview?.sampleReview || ""}"
+
+CRITICAL: You MUST follow this template's structure. Use the enabled sections in the given order for sections_order. Model your generated content after the sample data above — it represents the ideal tone and focus for this profession. If the template emphasizes quotes/gallery/booking, generate richer content for those sections.`;
+    }
+
+    const systemPrompt = `You are an expert digital business card designer for service professionals. Given a user's business details AND a matched profession template, generate a COMPLETE card layout with content, sections, and theme settings.
+
+${templateContext}
+
+PROFESSION-SPECIFIC RULES (use these as additional guidance):
+- Contractors/Trades: Emphasize projects, quote requests, trust badges, before/after work
+- Barbers/Beauty: Emphasize gallery, booking, social links, style showcase
+- Realtors/Sales: Emphasize testimonials, contact form, professional headshot, market expertise
+- Photographers/Creatives: Emphasize portfolio/gallery, testimonials, booking, visual storytelling
+- Landscapers/Outdoor: Emphasize before/after projects, seasonal promos, booking, outdoor transformations
 
 STYLE RULES:
 - modern: Clean lines, minimal, sans-serif fonts, subtle gradients
@@ -31,18 +58,19 @@ STYLE RULES:
 - bold: High contrast, large typography, vibrant colors
 - elegant: Refined palette, thin fonts, luxurious feel
 
-Generate realistic, profession-specific content. Do NOT use generic filler text.`;
+Generate realistic, profession-specific content that matches the template's tone and focus. Do NOT use generic filler text. Content must feel authentic to a real ${business_type || "professional"}.`;
 
     const userPrompt = `Create a complete digital business card for:
 - Business type: ${business_type}
 - Services offered: ${services || "Not specified"}
 - City/Region: ${city || "Not specified"}
-- Preferred style: ${style || "modern"}
-- Primary CTA: ${primary_cta || "Book Now"}
+- Preferred style: ${style || template?.style?.toLowerCase() || "modern"}
+- Primary CTA: ${primary_cta || template?.ctaPriority?.[0] || "Book Now"}
 - Name: ${name || "Not provided"}
 - Company: ${company || "Not provided"}
+${template ? `- Matched template: ${template.name} (${template.category})` : ""}
 
-Generate complete content for every section with realistic, compelling copy.`;
+Generate complete content for every section with realistic, compelling copy that sounds like a real ${business_type || "business"} in ${city || "your area"}.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
