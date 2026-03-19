@@ -21,6 +21,7 @@ export interface MarketplaceListing {
   avg_response_minutes: number | null;
   profile_completeness: number;
   conversion_score: number;
+  is_on_duty: boolean;
 }
 
 interface MarketplaceFilters {
@@ -28,7 +29,7 @@ interface MarketplaceFilters {
   city?: string;
   search?: string;
   service?: string;
-  intent?: "quote" | "book" | "available_now";
+  intent?: "quote" | "book" | "available_now" | "on_duty";
 }
 
 function calcProfileCompleteness(p: any): number {
