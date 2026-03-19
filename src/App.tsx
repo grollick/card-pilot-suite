@@ -60,6 +60,7 @@ const ContactsPage = lazy(() => import("@/modules/crm/pages/ContactsPage"));
 const ContactDetail = lazy(() => import("@/modules/crm/pages/ContactDetail"));
 const PipelinePage = lazy(() => import("@/modules/crm/pages/PipelinePage"));
 const TasksPage = lazy(() => import("@/modules/crm/pages/TasksPage"));
+const ScanBusinessCard = lazy(() => import("@/modules/crm/pages/ScanBusinessCard"));
 
 // Booking
 const BookingManager = lazy(() => import("@/modules/booking/pages/BookingManager"));
@@ -217,6 +218,7 @@ const App = () => (
               <Route path="contacts/:id" element={<LazyRoute><ContactDetail /></LazyRoute>} />
               <Route path="pipeline" element={<LazyRoute><PipelinePage /></LazyRoute>} />
               <Route path="tasks" element={<LazyRoute><TasksPage /></LazyRoute>} />
+              <Route path="scan-card" element={<LazyRoute><ScanBusinessCard /></LazyRoute>} />
               <Route path="bookings" element={<LazyRoute><BookingManager /></LazyRoute>} />
               <Route path="email" element={<LazyRoute><EmailMarketing /></LazyRoute>} />
               <Route path="social" element={<LazyRoute><SocialScheduler /></LazyRoute>} />
