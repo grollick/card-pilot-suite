@@ -275,6 +275,7 @@ const App = () => (
               <Route path="marketplace" element={<LazyRoute><MarketplacePage /></LazyRoute>} />
               <Route path="admin" element={<LazyRoute><AdminPage /></LazyRoute>} />
               <Route path="platform-admin" element={<LazyRoute><PlatformAdminDashboard /></LazyRoute>} />
+              <Route path="admin-marketing" element={<LazyRoute><AdminMarketingDashboard /></LazyRoute>} />
               <Route path="landing-pages" element={<LazyRoute><LandingPageManager /></LazyRoute>} />
               <Route path="page-builder" element={<LazyRoute><UserPageBuilder /></LazyRoute>} />
               <Route path="sales-crm" element={<LazyRoute><SalesCrmPage /></LazyRoute>} />
