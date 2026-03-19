@@ -283,6 +283,23 @@ serve(async (req) => {
         });
       }
 
+      // Track on-duty analytics
+      if (business.isOnDuty && leadId) {
+        await supabase.from("estimate_duty_log").insert({
+          user_id: business.id,
+          lead_id: leadId,
+          event_type: "lead_received",
+          was_on_duty: true,
+        });
+        // Increment leads_received counter
+        await supabase.rpc("increment_duty_leads", { p_user_id: business.id }).catch(() => {
+          // Fallback: direct update
+          supabase.from("estimate_duty_status")
+            .update({ leads_received: (onDutySet.get(business.id)?.leads_received ?? 0) + 1 })
+            .eq("user_id", business.id);
+        });
+      }
+
       matched++;
     }
 
