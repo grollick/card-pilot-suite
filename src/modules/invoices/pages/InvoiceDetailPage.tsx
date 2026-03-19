@@ -165,7 +165,7 @@ export default function InvoiceDetailPage() {
             </div>
             <div>
               <Label>Job (optional)</Label>
-              <Select value={jobId} onValueChange={setJobId}>
+              <Select value={jobId || "none"} onValueChange={(v) => setJobId(v === "none" ? "" : v)}>
                 <SelectTrigger><SelectValue placeholder="Link to job" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">None</SelectItem>
