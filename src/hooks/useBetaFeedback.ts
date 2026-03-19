@@ -74,7 +74,7 @@ export function useSubmitFeedback() {
       const pageUrl = params.page_url || window.location.pathname;
       const featureTag = params.feature_tag || autoTagFeature(pageUrl);
 
-      const { error } = await supabase.from("beta_feedback").insert({
+      const { error } = await (supabase.from as any)("beta_feedback").insert({
         user_id: user.id,
         feedback_type: params.feedback_type,
         message: params.message,
