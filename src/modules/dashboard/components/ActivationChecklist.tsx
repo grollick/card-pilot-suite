@@ -84,6 +84,11 @@ export default function ActivationChecklist() {
           tip: "Cards with images get 3× more engagement. Add a profile photo or work sample.",
           route: "/app/card", done: hasImage || hasPublishedCard, icon: Image,
         },
+        {
+          key: "estimate", label: "Send your first estimate", group: "setup",
+          tip: "Create and send an estimate to start your revenue workflow. Most contractors close their first job within a week.",
+          route: "/app/estimates", done: hasEstimateSent, icon: FileText,
+        },
         // Share group
         {
           key: "share_direct", label: "Send your card to 5 people", group: "share",
