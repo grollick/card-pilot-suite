@@ -17,7 +17,7 @@ import FirstLeadCelebration from "@/modules/dashboard/components/FirstLeadCelebr
 import PostLeadSharePrompt from "@/modules/dashboard/components/PostLeadSharePrompt";
 import BusinessPerformancePanel from "@/modules/dashboard/components/BusinessPerformancePanel";
 import RetentionInsightsWidget from "@/modules/dashboard/components/RetentionInsightsWidget";
-import GrowthCoachWidget from "@/modules/dashboard/components/GrowthCoachWidget";
+import AIGrowthAssistantPanel from "@/modules/dashboard/components/AIGrowthAssistantPanel";
 import LeadGuaranteeBanner from "@/components/LeadGuaranteeBanner";
 import { useLeadGuarantee } from "@/hooks/useLeadGuarantee";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -55,6 +55,9 @@ export default function DashboardHome() {
 
       {/* ── SECTION 2: KPI Row ── */}
       <RevenueKPICards />
+
+      {/* ── AI Growth Assistant Panel ── */}
+      <AIGrowthAssistantPanel />
 
       {/* ── Business Performance ── */}
       <BusinessPerformancePanel />
@@ -102,9 +105,6 @@ export default function DashboardHome() {
 
           {/* ── Retention Insights ── */}
           <RetentionInsightsWidget />
-
-          {/* ── AI Growth Coach ── */}
-          <GrowthCoachWidget />
 
           {/* ── SECTION 7: Growth & Insights ── */}
           <GrowthTrends />

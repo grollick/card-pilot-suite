@@ -96,6 +96,8 @@ export default function CardBuilderSections({
         </SortableContext>
       </DndContext>
 
+      {/* AI Suggestions */}
+      <BuilderAISuggestions sections={sections} />
       {/* AI Generate */}
       <div className="pt-3 border-t border-border/50">
         <Button variant="outline" className="w-full" onClick={onAIGenerate} disabled={isGenerating}>
