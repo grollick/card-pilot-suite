@@ -495,6 +495,66 @@ export default function DiscoverPage() {
                   className="overflow-hidden"
                 >
                   <div className="mt-3 p-4 rounded-xl border border-border/40 bg-card/70 backdrop-blur-sm space-y-4">
+                    {/* Profession, Location, Rating filters */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block flex items-center gap-1">
+                          <Briefcase className="h-3 w-3" /> Profession
+                        </label>
+                        <Select value={professionFilter} onValueChange={(v) => setProfessionFilter(v === "all" ? "" : v)}>
+                          <SelectTrigger className="h-9 text-xs">
+                            <SelectValue placeholder="All professions" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All professions</SelectItem>
+                            {professionNames.map((p) => (
+                              <SelectItem key={p} value={p}>{p}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block flex items-center gap-1">
+                          <MapPin className="h-3 w-3" /> Location
+                        </label>
+                        <div className="flex gap-1.5">
+                          <Input
+                            placeholder={detectedCity || "City or area…"}
+                            value={locationFilter}
+                            onChange={(e) => setLocationFilter(e.target.value)}
+                            className="h-9 text-xs flex-1"
+                          />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-9 w-9 shrink-0"
+                            onClick={handleDetectLocation}
+                            disabled={detectingLocation}
+                            title="Detect my location"
+                          >
+                            {detectingLocation ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Navigation className="h-3.5 w-3.5" />}
+                          </Button>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block flex items-center gap-1">
+                          <Star className="h-3 w-3" /> Minimum Rating
+                        </label>
+                        <Select value={ratingFilter} onValueChange={(v) => setRatingFilter(v === "any" ? "" : v as any)}>
+                          <SelectTrigger className="h-9 text-xs">
+                            <SelectValue placeholder="Any rating" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="any">Any rating</SelectItem>
+                            <SelectItem value="3">3+ stars</SelectItem>
+                            <SelectItem value="4">4+ stars</SelectItem>
+                            <SelectItem value="5">5 stars only</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    {/* Service tags */}
                     {topServices && topServices.length > 0 && (
                       <div>
                         <div className="flex items-center gap-2 mb-2">
