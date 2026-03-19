@@ -20,7 +20,7 @@ interface FeedItem {
 }
 
 interface Props {
-  onUsePost: (data: { content: string; hashtags: string[] }) => void;
+  onUsePost: (data: { content: string; hashtags: string[]; imageUrl?: string }) => void;
 }
 
 const CATEGORY_CONFIG: Record<string, { label: string; icon: typeof Flame; color: string }> = {
