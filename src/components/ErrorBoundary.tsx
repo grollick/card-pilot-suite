@@ -40,10 +40,10 @@ export default class ErrorBoundary extends Component<Props, State> {
             componentStack: info.componentStack?.slice(0, 500),
             url: window.location.href,
           },
-        }).then(() => {}).catch(() => {});
-      }).catch(() => {});
+        } as any);
+      });
     } catch {
-      // Silently ignore if logging fails
+      // Silently ignore
     }
   }
 
