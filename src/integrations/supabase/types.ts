@@ -449,6 +449,45 @@ export type Database = {
           },
         ]
       }
+      beta_access: {
+        Row: {
+          created_at: string
+          created_by_admin: string | null
+          expiry_date: string
+          granted_plan: string
+          id: string
+          is_active: boolean
+          notes: string | null
+          start_date: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by_admin?: string | null
+          expiry_date: string
+          granted_plan?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          start_date?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by_admin?: string | null
+          expiry_date?: string
+          granted_plan?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          start_date?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       booking_services: {
         Row: {
           active: boolean
@@ -3824,6 +3863,8 @@ export type Database = {
         }
         Returns: Json
       }
+      expire_beta_access: { Args: never; Returns: number }
+      get_effective_plan: { Args: { p_user_id: string }; Returns: Json }
       has_org_role: {
         Args: {
           _org_id: string
