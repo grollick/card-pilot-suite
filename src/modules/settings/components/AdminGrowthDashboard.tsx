@@ -659,6 +659,9 @@ export default function AdminGrowthDashboard() {
       {/* KPIs */}
       <KPICards kpis={data?.kpis} isLoading={isLoading} />
 
+      {/* Referral Metrics */}
+      <ReferralMetricsCard referrals={data?.referrals} isLoading={isLoading} />
+
       {/* Churn Risk + Weekly Goals */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <ChurnRiskAlerts kpis={data?.kpis} funnel={data?.funnel} />
