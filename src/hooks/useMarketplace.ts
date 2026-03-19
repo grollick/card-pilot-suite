@@ -63,8 +63,8 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
       const userIds = enabledProfiles.map((p: any) => p.id);
       if (userIds.length === 0) return [];
 
-      // Fetch ratings, services & lead counts in parallel
-      const [ratingsResult, servicesResult, leadsResult] = await Promise.all([
+      // Fetch ratings, services, lead counts & duty status in parallel
+      const [ratingsResult, servicesResult, leadsResult, dutyResult] = await Promise.all([
         supabase
           .from("reviews")
           .select("user_id, rating")
@@ -79,6 +79,10 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
           .from("marketplace_lead_credits")
           .select("user_id")
           .in("user_id", userIds),
+        supabase
+          .from("estimate_duty_status")
+          .select("user_id, is_on_duty")
+          .eq("is_on_duty", true),
       ]);
 
       // Build ratings map
