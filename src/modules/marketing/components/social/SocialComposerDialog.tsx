@@ -41,6 +41,7 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
   const [campaignId, setCampaignId] = useState<string>("");
   const [contentLabel, setContentLabel] = useState<string>("");
   const [activePlatformTab, setActivePlatformTab] = useState("base");
+  const [showAiGenerator, setShowAiGenerator] = useState(false);
 
   const resetForm = useCallback(() => {
     setContent(""); setSelectedPlatforms([]); setPlatformOverrides({});
