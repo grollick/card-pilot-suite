@@ -440,6 +440,12 @@ export default function DiscoverPage() {
                     className="pl-10 h-12 text-base bg-background/50 border-border/40 rounded-xl"
                   />
                 </div>
+                <Link to="/request-service">
+                  <Button size="lg" className="gap-2 h-12 shrink-0 rounded-xl">
+                    <Send className="h-4 w-4" />
+                    Get Quotes
+                  </Button>
+                </Link>
                 <Button
                   variant={showFilters ? "secondary" : "outline"}
                   size="lg"
