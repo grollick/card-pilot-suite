@@ -1530,6 +1530,7 @@ export type Database = {
           source: string
           status: string
           timeline: string | null
+          tracking_token: string | null
           updated_at: string
         }
         Insert: {
@@ -1549,6 +1550,7 @@ export type Database = {
           source?: string
           status?: string
           timeline?: string | null
+          tracking_token?: string | null
           updated_at?: string
         }
         Update: {
@@ -1568,6 +1570,7 @@ export type Database = {
           source?: string
           status?: string
           timeline?: string | null
+          tracking_token?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -2135,6 +2138,50 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_request_responses: {
+        Row: {
+          availability: string | null
+          created_at: string
+          estimate_request_id: string
+          id: string
+          message: string
+          price_estimate: number | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          availability?: string | null
+          created_at?: string
+          estimate_request_id: string
+          id?: string
+          message?: string
+          price_estimate?: number | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          availability?: string | null
+          created_at?: string
+          estimate_request_id?: string
+          id?: string
+          message?: string
+          price_estimate?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_request_responses_estimate_request_id_fkey"
+            columns: ["estimate_request_id"]
+            isOneToOne: false
+            referencedRelation: "estimate_requests"
             referencedColumns: ["id"]
           },
         ]

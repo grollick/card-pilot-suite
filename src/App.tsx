@@ -17,6 +17,7 @@ import PublicBooking from "@/modules/public/pages/PublicBooking";
 import QRLanding from "@/modules/public/pages/QRLanding";
 import ProductsPage from "@/modules/public/pages/ProductsPage";
 import DiscoverPage from "@/modules/public/pages/DiscoverPage";
+import RequestServicePage from "@/modules/public/pages/RequestServicePage";
 import HandleOrSeoRoute from "@/modules/public/pages/HandleOrSeoRoute";
 import PublicSite from "@/modules/public/pages/PublicSite";
 import DemoCardPreview from "@/modules/public/pages/DemoCardPreview";
@@ -105,6 +106,8 @@ const IndustryInsightsPage = lazy(() => import("@/modules/analytics/pages/Indust
 const ProjectsPage = lazy(() => import("@/modules/marketplace/pages/ProjectsPage"));
 const ReviewsPage = lazy(() => import("@/modules/marketplace/pages/ReviewsPage"));
 const MarketplacePerformancePage = lazy(() => import("@/modules/marketplace/pages/MarketplacePerformancePage"));
+const JobRequestsPage = lazy(() => import("@/modules/marketplace/pages/JobRequestsPage"));
+const RequestStatusPage = lazy(() => import("@/modules/public/pages/RequestStatusPage"));
 
 // AI Assistant
 const AssistantPage = lazy(() => import("@/modules/assistant/pages/AssistantPage"));
@@ -193,6 +196,8 @@ const App = () => (
             <Route path="/discover" element={<DiscoverPage />} />
             <Route path="/discover/:profession" element={<DiscoverPage />} />
             <Route path="/discover/:profession/:city" element={<DiscoverPage />} />
+            <Route path="/request-service" element={<RequestServicePage />} />
+            <Route path="/request-status/:token" element={<LazyRoute><RequestStatusPage /></LazyRoute>} />
             <Route path="/project/:projectId" element={<LazyRoute><PublicProjectPage /></LazyRoute>} />
             <Route path="/portal/:token" element={<LazyRoute><ClientPortal /></LazyRoute>} />
             <Route path="/pay/:token" element={<LazyRoute><PublicInvoicePage /></LazyRoute>} />
@@ -243,6 +248,7 @@ const App = () => (
               <Route path="projects" element={<LazyRoute><ProjectsPage /></LazyRoute>} />
               <Route path="reviews" element={<LazyRoute><ReviewsPage /></LazyRoute>} />
               <Route path="marketplace-performance" element={<LazyRoute><MarketplacePerformancePage /></LazyRoute>} />
+              <Route path="job-requests" element={<LazyRoute><JobRequestsPage /></LazyRoute>} />
               <Route path="estimates" element={<LazyRoute><EstimatesPage /></LazyRoute>} />
               <Route path="jobs" element={<LazyRoute><JobsPage /></LazyRoute>} />
               <Route path="jobs/:id" element={<LazyRoute><JobDetailPage /></LazyRoute>} />
