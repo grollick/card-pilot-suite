@@ -25,8 +25,14 @@ interface Insight {
   route?: string;
 }
 
-const typeConfig: Record<InsightType, { icon: typeof AlertTriangle; badge: string; badgeClass: string; cardClass: string }> = {
+const typeConfig: Record<string, { icon: typeof AlertTriangle; badge: string; badgeClass: string; cardClass: string }> = {
   problem: {
+    icon: AlertTriangle,
+    badge: "Fix This",
+    badgeClass: "bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive/20",
+    cardClass: "border-l-destructive/60",
+  },
+  warning: {
     icon: AlertTriangle,
     badge: "Fix This",
     badgeClass: "bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive/20",
@@ -38,7 +44,19 @@ const typeConfig: Record<InsightType, { icon: typeof AlertTriangle; badge: strin
     badgeClass: "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20",
     cardClass: "border-l-primary/60",
   },
+  tip: {
+    icon: TrendingUp,
+    badge: "Apply",
+    badgeClass: "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20",
+    cardClass: "border-l-primary/60",
+  },
   positive: {
+    icon: ThumbsUp,
+    badge: "Keep Going",
+    badgeClass: "bg-success/10 text-success border-success/20",
+    cardClass: "border-l-success/60",
+  },
+  info: {
     icon: ThumbsUp,
     badge: "Keep Going",
     badgeClass: "bg-success/10 text-success border-success/20",
