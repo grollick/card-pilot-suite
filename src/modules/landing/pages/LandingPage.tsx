@@ -96,7 +96,7 @@ const plans = [
 
     period: "forever",
     desc: "Get started with the basics",
-    features: ["1 Smart Card", "QR & link sharing", "Basic CRM (20 contacts)", "5 Leads/month", "Lead capture form"],
+    features: ["1 Smart Card", "QR & link sharing", "Basic CRM (20 contacts)", "5 Leads/month", "Lead capture form", "Business card scanner"],
     highlighted: false,
   },
   {
