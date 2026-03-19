@@ -18,7 +18,8 @@ const SOCIAL_PROOF_POINTS = [
 export default function Auth() {
   const [searchParams] = useSearchParams();
   const initialMode = searchParams.get("mode") === "signup" ? "signup" : "login";
-  const [mode, setMode] = useState<"login" | "signup">(initialMode);
+  const refCode = searchParams.get("ref") || "";
+  const [mode, setMode] = useState<"login" | "signup">(initialMode || (refCode ? "signup" : "login"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
