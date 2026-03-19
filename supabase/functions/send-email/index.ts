@@ -50,7 +50,7 @@ serve(async (req) => {
         from: from ?? "CardPilot <onboarding@resend.dev>",
         to: Array.isArray(to) ? to : [to],
         subject,
-        html,
+        html: html + getMarketplaceSignature(),
         ...(reply_to ? { reply_to } : {}),
       }),
     });
