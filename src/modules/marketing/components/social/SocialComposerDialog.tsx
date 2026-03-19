@@ -283,7 +283,7 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
               </div>
             </div>
           </div>
-        </ScrollArea>
+        </div>
 
         <DialogFooter className="pt-2 border-t border-border gap-1">
           <Button variant="outline" onClick={onClose}>Cancel</Button>
