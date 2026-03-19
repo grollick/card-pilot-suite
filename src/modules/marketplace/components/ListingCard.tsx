@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
   MapPin, Calendar, ArrowRight, Star, Crown, MessageSquare,
-  Rocket, Phone, DollarSign, Clock, ShieldCheck, CheckCircle2, Zap,
+  Rocket, Phone, DollarSign, Clock, ShieldCheck, CheckCircle2, Zap, Radio,
 } from "lucide-react";
 import type { MarketplaceListing } from "@/hooks/useMarketplace";
 import { motion } from "framer-motion";
