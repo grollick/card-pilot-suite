@@ -92,7 +92,7 @@ export default function ReferralsPage() {
   });
 
   const referralLink = referralCode
-    ? `${window.location.origin}/auth?ref=${referralCode}&mode=signup`
+    ? `${window.location.origin}/ref/${referralCode}`
     : "";
 
   const copyLink = () => {
