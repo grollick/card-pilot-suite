@@ -39,7 +39,7 @@ export default function Auth() {
 
     let result;
     if (mode === "signup") {
-      result = await signUp(email, password, name);
+      result = await signUp(email, password, name, refCode || undefined);
       if (!result.error) {
         toast({
           title: "Account created!",
