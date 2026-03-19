@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { professions, professionCategories, getProfessionsByCategory } from "@/data/professions";
 import { motion } from "framer-motion";
 import SystemEventsWidget from "@/modules/settings/components/SystemEventsWidget";
+import BetaManagementTab from "@/modules/settings/components/BetaManagementTab";
 
 export default function AdminPage() {
   const byCategory = getProfessionsByCategory();
