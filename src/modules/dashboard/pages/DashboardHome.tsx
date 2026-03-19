@@ -56,6 +56,15 @@ export default function DashboardHome() {
       {/* ── First Lead Celebration ── */}
       <FirstLeadCelebration />
 
+      {/* ── Milestone Celebration Listener (no UI) ── */}
+      <MilestoneCelebrationListener />
+
+      {/* ── Churn Recovery Banner ── */}
+      <ChurnRecoveryBanner />
+
+      {/* ── Aha Moment Prompt ── */}
+      <AhaPromptBanner />
+
       {/* ── Post-Lead Share Prompt ── */}
       <PostLeadSharePrompt />
 
