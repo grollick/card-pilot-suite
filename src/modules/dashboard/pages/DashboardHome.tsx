@@ -55,6 +55,9 @@ export default function DashboardHome() {
       {/* ── Post-Lead Share Prompt ── */}
       <PostLeadSharePrompt />
 
+      {/* ── On Duty for Estimates ── */}
+      <EstimateDutyPanel />
+
       {/* ── SECTION 2: KPI Row ── */}
       <RevenueKPICards />
 
