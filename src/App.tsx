@@ -223,6 +223,7 @@ const App = () => (
               <Route path="analytics" element={<LazyRoute><Analytics /></LazyRoute>} />
               <Route path="growth" element={<LazyRoute><GrowthDashboard /></LazyRoute>} />
               <Route path="automation" element={<LazyRoute><AutomationPage /></LazyRoute>} />
+              <Route path="auto-campaigns" element={<LazyRoute><AutoCampaignsPage /></LazyRoute>} />
               <Route path="autopilot" element={<LazyRoute><AutopilotPage /></LazyRoute>} />
               <Route path="qr-campaigns" element={<LazyRoute><QRCampaignsPage /></LazyRoute>} />
               <Route path="settings" element={<LazyRoute><SettingsPage /></LazyRoute>} />
