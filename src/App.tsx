@@ -193,6 +193,8 @@ const App = () => (
             <Route path="/q/:campaign" element={<QRLanding />} />
             <Route path="/book/:handle" element={<PublicBooking />} />
             <Route path="/products" element={<ProductsPage />} />
+            <Route path="/privacy" element={<LegalPage pageKey="privacy" />} />
+            <Route path="/terms" element={<LegalPage pageKey="terms" />} />
             <Route path="/site/:handle" element={<PublicSite />} />
             <Route path="/discover" element={<DiscoverPage />} />
             <Route path="/discover/:profession" element={<DiscoverPage />} />
