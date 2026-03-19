@@ -246,6 +246,7 @@ export default function DiscoverPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [showMatcher, setShowMatcher] = useState(false);
   const [topMatches, setTopMatches] = useState<MarketplaceListing[] | null>(null);
+  const [quoteDialogOpen, setQuoteDialogOpen] = useState(false);
 
   const { data: listings, isLoading } = useMarketplaceListings({
     profession,
