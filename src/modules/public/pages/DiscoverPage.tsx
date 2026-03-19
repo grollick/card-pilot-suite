@@ -488,6 +488,16 @@ export default function DiscoverPage() {
                 >
                   <Sparkles className="h-3.5 w-3.5" /> Instant Match
                 </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 text-xs rounded-lg border-success/30 text-success hover:bg-success/10"
+                >
+                  <Link to="/discover/map">
+                    <Navigation className="h-3.5 w-3.5" /> On-Duty Map
+                  </Link>
+                </Button>
               </div>
             </div>
 
