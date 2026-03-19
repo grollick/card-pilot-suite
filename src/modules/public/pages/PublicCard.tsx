@@ -1447,7 +1447,7 @@ export default function PublicCard() {
                 style={{ fontSize: 11, color: `${palette.secondary}90`, textDecoration: "none", display: "inline-block" }}
               >
                 Powered by{" "}
-                <span style={{ fontWeight: 700, color: palette.primary }}><span className="font-bold text-primary">guzzl</span>.pro</span>
+                <span><span style={{ fontWeight: 700, color: palette.primary }}>guzzl</span>.pro</span>
               </a>
               <p style={{ fontSize: 10, color: `${palette.secondary}60`, margin: "4px 0 0" }}>
                 <a
