@@ -19,6 +19,7 @@ import BusinessPerformancePanel from "@/modules/dashboard/components/BusinessPer
 import RetentionInsightsWidget from "@/modules/dashboard/components/RetentionInsightsWidget";
 import AIGrowthAssistantPanel from "@/modules/dashboard/components/AIGrowthAssistantPanel";
 import EstimateDutyPanel from "@/modules/dashboard/components/EstimateDutyPanel";
+import RevenuePipelineWidget from "@/modules/dashboard/components/RevenuePipelineWidget";
 import LeadGuaranteeBanner from "@/components/LeadGuaranteeBanner";
 import { useLeadGuarantee } from "@/hooks/useLeadGuarantee";
 import { useIsMobile } from "@/hooks/use-mobile";
