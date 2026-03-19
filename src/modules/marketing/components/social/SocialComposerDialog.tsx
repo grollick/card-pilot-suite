@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Sparkles, Hash, RefreshCw } from "lucide-react";
+import { Sparkles, Hash, RefreshCw, Wand2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,7 +20,7 @@ import type { SocialPost } from "@/hooks/useSocialPosts";
 import { PLATFORMS, CONTENT_LABELS, getPlatformConfig, deriveDbStatus } from "./constants";
 import type { PostStatus } from "./constants";
 import PlatformPreview from "./PlatformPreview";
-
+import AIPostGenerator from "./AIPostGenerator";
 interface Props {
   open: boolean;
   onOpenChange: (v: boolean) => void;
