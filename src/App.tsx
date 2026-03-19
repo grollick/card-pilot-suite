@@ -195,20 +195,20 @@ const App = () => (
             <Route path="/for/:industry" element={<IndustryLandingPage />} />
 
             {/* Demo cards — no auth */}
-            <Route path="/demo/:slug" element={<DemoCardPreview />} />
+            <Route path="/demo/:slug" element={<LazyRoute><DemoCardPreview /></LazyRoute>} />
 
             {/* Public routes — no auth required */}
-            <Route path="/q/:campaign" element={<QRLanding />} />
-            <Route path="/book/:handle" element={<PublicBooking />} />
-            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/q/:campaign" element={<LazyRoute><QRLanding /></LazyRoute>} />
+            <Route path="/book/:handle" element={<LazyRoute><PublicBooking /></LazyRoute>} />
+            <Route path="/products" element={<LazyRoute><ProductsPage /></LazyRoute>} />
             <Route path="/privacy" element={<LegalPage pageKey="privacy" />} />
             <Route path="/terms" element={<LegalPage pageKey="terms" />} />
-            <Route path="/site/:handle" element={<PublicSite />} />
-            <Route path="/discover" element={<DiscoverPage />} />
-            <Route path="/discover/map" element={<OnDutyMapPage />} />
-            <Route path="/discover/:profession" element={<DiscoverPage />} />
-            <Route path="/discover/:profession/:city" element={<DiscoverPage />} />
-            <Route path="/request-service" element={<RequestServicePage />} />
+            <Route path="/site/:handle" element={<LazyRoute><PublicSite /></LazyRoute>} />
+            <Route path="/discover" element={<LazyRoute><DiscoverPage /></LazyRoute>} />
+            <Route path="/discover/map" element={<LazyRoute><OnDutyMapPage /></LazyRoute>} />
+            <Route path="/discover/:profession" element={<LazyRoute><DiscoverPage /></LazyRoute>} />
+            <Route path="/discover/:profession/:city" element={<LazyRoute><DiscoverPage /></LazyRoute>} />
+            <Route path="/request-service" element={<LazyRoute><RequestServicePage /></LazyRoute>} />
             <Route path="/request-status/:token" element={<LazyRoute><RequestStatusPage /></LazyRoute>} />
             <Route path="/project/:projectId" element={<LazyRoute><PublicProjectPage /></LazyRoute>} />
             <Route path="/portal/:token" element={<LazyRoute><ClientPortal /></LazyRoute>} />
