@@ -165,6 +165,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
     features: [
       { title: "Get More Bookings", icon: "📅", description: "Clients can book instantly from your link." },
       { title: "Show Your Work", icon: "✂️", description: "Display your best fades, cuts, and styles." },
+      { title: "Scan to Save", icon: "📸", description: "Let walk-ins scan their card to become a contact — no typing needed." },
       { title: "Stay Organized", icon: "📊", description: "Track appointments and clients easily." },
       { title: "Bring Clients Back", icon: "🔔", description: "Encourage repeat bookings and loyalty." },
     ],
