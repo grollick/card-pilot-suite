@@ -76,7 +76,7 @@ const steps = [
 ];
 
 const results = [
-  { value: "3×", label: "More Leads", desc: "Professionals using CardPilot capture 3x more leads than traditional business cards.", icon: Target },
+  { value: "3×", label: "More Leads", desc: "Professionals using guzzl.pro capture 3x more leads than traditional business cards.", icon: Target },
   { value: "40%", label: "More Bookings", desc: "Online booking eliminates friction and converts more inquiries into confirmed jobs.", icon: Calendar },
   { value: "2×", label: "Faster Payments", desc: "Digital estimates and invoices with online payment get you paid twice as fast.", icon: DollarSign },
 ];
