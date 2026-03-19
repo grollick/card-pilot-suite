@@ -478,6 +478,7 @@ export default function CardBuilder() {
 
   return (
     <div className="flex flex-col -mx-4 md:-mx-6 lg:-mx-8 -mt-4 md:-mt-6 lg:-mt-8" style={{ height: "calc(100vh - 3.5rem)" }}>
+      <DesktopGuidanceNotice toolKey="card-builder" />
       {/* ── Top Bar ── */}
       <CardBuilderHeader
         globalSaveState={s.globalSaveState}

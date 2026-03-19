@@ -144,6 +144,7 @@ export default function PostDesigner() {
 
   return (
     <div className="h-[calc(100vh-56px)] flex flex-col">
+      <DesktopGuidanceNotice toolKey="post-designer" />
       {/* Top toolbar */}
       <div className="h-12 border-b border-border flex items-center justify-between px-4 bg-card shrink-0">
         <div className="flex items-center gap-3">

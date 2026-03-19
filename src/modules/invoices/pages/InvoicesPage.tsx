@@ -84,6 +84,7 @@ export default function InvoicesPage() {
 
   return (
     <div className="space-y-5">
+      <DesktopGuidanceNotice toolKey="invoice-builder" />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
