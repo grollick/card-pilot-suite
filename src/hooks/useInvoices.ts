@@ -164,9 +164,12 @@ export function useUpdateInvoice() {
 }
 
 export function useUpdateInvoiceStatus() {
+  const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: InvoiceStatus }) => {
+    mutationFn: async ({ id, status, lead_id, invoice_number }: {
+      id: string; status: InvoiceStatus; lead_id?: string | null; invoice_number?: string;
+    }) => {
       const updates: any = { status };
       if (status === "sent") updates.sent_at = new Date().toISOString();
       if (status === "paid") {
@@ -174,11 +177,25 @@ export function useUpdateInvoiceStatus() {
       }
       const { error } = await supabase.from("invoices").update(updates).eq("id", id);
       if (error) throw error;
+
+      // Log CRM activity for status changes
+      if (lead_id && user) {
+        const activityType = `invoice_${status}`;
+        await supabase.from("contact_activities").insert({
+          lead_id,
+          user_id: user.id,
+          activity_type: activityType,
+          title: `Invoice ${invoice_number ?? ""} marked ${status}`,
+          related_id: id,
+        });
+      }
+
       return { id, status };
     },
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["invoices"] });
       qc.invalidateQueries({ queryKey: ["invoice", vars.id] });
+      qc.invalidateQueries({ queryKey: ["contact-activities"] });
       toast.success(`Invoice marked as ${INVOICE_STATUS_LABELS[vars.status]}`);
     },
     onError: (e: any) => toast.error(e.message),
