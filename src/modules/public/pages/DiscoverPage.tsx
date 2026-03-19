@@ -9,10 +9,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, MapPin, Users, Loader2, Briefcase, Crown, Star,
   TrendingUp, Rocket, Wrench, SlidersHorizontal, X,
   CalendarCheck, MessageSquareText, CheckCircle2, Sparkles, ChevronRight,
+  ArrowRight,
 } from "lucide-react";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -44,71 +46,87 @@ function InstantMatchWizard({
 
   const handleFinish = useCallback(() => {
     if (!listings) return;
-    // Top 3 by conversion score
     const top3 = listings.slice(0, 3);
     onMatch(top3);
   }, [listings, onMatch]);
 
   return (
-    <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-background">
+    <Card className="border-primary/20 bg-gradient-to-br from-primary/5 via-background to-primary/3 backdrop-blur-sm overflow-hidden">
       <CardContent className="p-6 space-y-4">
         <div className="flex items-center gap-2 mb-1">
-          <Sparkles className="h-5 w-5 text-primary" />
-          <h3 className="font-semibold text-foreground">Find Your Perfect Match</h3>
+          <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Sparkles className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-foreground">Instant Match</h3>
+            <p className="text-xs text-muted-foreground">Answer 3 questions, get matched instantly</p>
+          </div>
         </div>
 
-        {step === 0 && (
-          <div className="space-y-3">
-            <Label className="text-sm">What type of professional do you need?</Label>
-            <Select value={profession} onValueChange={setProfession}>
-              <SelectTrigger><SelectValue placeholder="Select a profession…" /></SelectTrigger>
-              <SelectContent>
-                {professions.map((p) => (
-                  <SelectItem key={p} value={p}>{p}</SelectItem>
+        {/* Progress dots */}
+        <div className="flex items-center gap-1.5 justify-center">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className={`h-1.5 rounded-full transition-all ${
+              i <= step ? "w-8 bg-primary" : "w-4 bg-muted-foreground/20"
+            }`} />
+          ))}
+        </div>
+
+        <AnimatePresence mode="wait">
+          {step === 0 && (
+            <motion.div key="s0" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-3">
+              <Label className="text-sm font-medium">What type of professional do you need?</Label>
+              <Select value={profession} onValueChange={setProfession}>
+                <SelectTrigger className="h-11"><SelectValue placeholder="Select a profession…" /></SelectTrigger>
+                <SelectContent>
+                  {professions.map((p) => (
+                    <SelectItem key={p} value={p}>{p}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button disabled={!profession} onClick={() => setStep(1)} className="w-full gap-1 h-10">
+                Next <ChevronRight className="h-4 w-4" />
+              </Button>
+            </motion.div>
+          )}
+
+          {step === 1 && (
+            <motion.div key="s1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-3">
+              <Label className="text-sm font-medium">How soon do you need help?</Label>
+              <div className="grid grid-cols-3 gap-2">
+                {([["now", "ASAP"], ["week", "This week"], ["later", "Not urgent"]] as const).map(([key, label]) => (
+                  <Button
+                    key={key}
+                    variant={urgency === key ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setUrgency(key)}
+                    className="text-xs h-10"
+                  >
+                    {label}
+                  </Button>
                 ))}
-              </SelectContent>
-            </Select>
-            <Button disabled={!profession} onClick={() => setStep(1)} className="w-full gap-1">
-              Next <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
+              </div>
+              <Button onClick={() => setStep(2)} className="w-full gap-1 h-10">
+                Next <ChevronRight className="h-4 w-4" />
+              </Button>
+            </motion.div>
+          )}
 
-        {step === 1 && (
-          <div className="space-y-3">
-            <Label className="text-sm">How soon do you need help?</Label>
-            <div className="grid grid-cols-3 gap-2">
-              {([["now", "ASAP"], ["week", "This week"], ["later", "Not urgent"]] as const).map(([key, label]) => (
-                <Button
-                  key={key}
-                  variant={urgency === key ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setUrgency(key)}
-                  className="text-xs"
-                >
-                  {label}
-                </Button>
-              ))}
-            </div>
-            <Button onClick={() => setStep(2)} className="w-full gap-1">
-              Next <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-
-        {step === 2 && (
-          <div className="space-y-3">
-            <Label className="text-sm">Your city or area (optional)</Label>
-            <Input
-              placeholder="e.g. Austin, Dallas…"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-            />
-            <Button onClick={handleFinish} className="w-full gap-1">
-              <Sparkles className="h-4 w-4" /> Show My Top Matches
-            </Button>
-          </div>
-        )}
+          {step === 2 && (
+            <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-3">
+              <Label className="text-sm font-medium">Your city or area (optional)</Label>
+              <Input
+                placeholder="e.g. Austin, Dallas…"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                className="h-11"
+              />
+              <Button onClick={handleFinish} className="w-full gap-1.5 h-10 shadow-sm">
+                <Sparkles className="h-4 w-4" /> Show My Top Matches
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {step > 0 && (
           <Button variant="ghost" size="sm" className="text-xs" onClick={() => setStep(step - 1)}>
@@ -123,11 +141,21 @@ function InstantMatchWizard({
 // ── Top Matches Result ──
 function TopMatchesResult({ matches, onClear }: { matches: MarketplaceListing[]; onClear: () => void }) {
   return (
-    <div className="mb-10">
-      <div className="flex items-center justify-between mb-4">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="mb-12"
+    >
+      <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-primary" />
-          <h2 className="text-lg font-semibold text-foreground">Your Top Matches</h2>
+          <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Sparkles className="h-3.5 w-3.5 text-primary" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">Your Top Matches</h2>
+            <p className="text-xs text-muted-foreground">Ranked by reviews, response speed & availability</p>
+          </div>
         </div>
         <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={onClear}>
           <X className="h-3 w-3" /> Clear
@@ -135,14 +163,77 @@ function TopMatchesResult({ matches, onClear }: { matches: MarketplaceListing[];
       </div>
       {matches.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {matches.map((l) => (
-            <ListingCard key={l.id} listing={l} />
+          {matches.map((l, i) => (
+            <motion.div
+              key={l.id}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+            >
+              <ListingCard listing={l} variant="hero" />
+            </motion.div>
           ))}
         </div>
       ) : (
         <p className="text-sm text-muted-foreground">No matches found. Try broadening your criteria.</p>
       )}
-    </div>
+    </motion.div>
+  );
+}
+
+// ── Recommended section (always visible, auto top 3) ──
+function RecommendedSection({ listings }: { listings: MarketplaceListing[] }) {
+  const top3 = useMemo(() => listings.slice(0, 3), [listings]);
+  if (top3.length === 0) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.1 }}
+      className="mb-12"
+    >
+      <div className="flex items-center gap-2 mb-5">
+        <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center">
+          <Star className="h-3.5 w-3.5 text-primary fill-primary" />
+        </div>
+        <div>
+          <h2 className="text-lg font-semibold text-foreground">Top Recommended</h2>
+          <p className="text-xs text-muted-foreground">Highest rated, fastest responses</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {top3.map((l, i) => (
+          <motion.div
+            key={l.id}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 + i * 0.08 }}
+          >
+            <ListingCard listing={l} variant="hero" />
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Sticky CTA ──
+function StickyCTA() {
+  return (
+    <motion.div
+      initial={{ y: 100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ delay: 1.5, type: "spring", stiffness: 300, damping: 30 }}
+      className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 md:bottom-8"
+    >
+      <div className="bg-card/95 backdrop-blur-md border border-border/60 rounded-full shadow-xl px-2 py-2 flex items-center gap-2">
+        <span className="text-sm font-medium text-foreground pl-4 hidden sm:inline">Need help finding the right pro?</span>
+        <Button size="sm" className="rounded-full gap-1.5 shadow-sm px-5">
+          <MessageSquareText className="h-4 w-4" /> Request a Quote <ArrowRight className="h-3.5 w-3.5" />
+        </Button>
+      </div>
+    </motion.div>
   );
 }
 
@@ -195,7 +286,9 @@ export default function DiscoverPage() {
 
   const featuredListings = useMemo(() => listings?.filter((l) => l.featured) ?? [], [listings]);
   const boostedListings = useMemo(() => listings?.filter((l) => !l.featured && boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
-  const regularListings = useMemo(() => listings?.filter((l) => !l.featured && !boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
+  // Regular = everything after the top 3 recommended
+  const allNonFeatured = useMemo(() => listings?.filter((l) => !l.featured && !boostedIds.has(l.id)) ?? [], [listings, boostedIds]);
+  const regularListings = useMemo(() => allNonFeatured.slice(3), [allNonFeatured]);
 
   const boostedUserIdsArray = useMemo(() => boostedListings.map(l => l.id), [boostedListings]);
   useTrackBoostViews(boostedUserIdsArray);
@@ -205,134 +298,171 @@ export default function DiscoverPage() {
 
   const clearAll = () => { setSearch(""); setServiceFilter(""); setIntentFilter(""); };
 
+  // Show sticky CTA only when listings are loaded
+  const showSticky = !isLoading && (listings?.length ?? 0) > 0;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-24">
       <Helmet>
         <title>{title} | CardPilot</title>
         <meta name="description" content={metaDescription} />
       </Helmet>
 
       {/* Hero */}
-      <div className="bg-gradient-to-br from-primary/8 via-background to-primary/4 border-b border-border/40">
-        <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
-          <div className="flex items-center gap-2 mb-4">
+      <div className="relative bg-gradient-to-br from-primary/8 via-background to-primary/4 border-b border-border/40 overflow-hidden">
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,.015)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,.015)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
+
+        <div className="relative max-w-6xl mx-auto px-4 py-14 md:py-20">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 mb-6">
             <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">CardPilot</Link>
-            <span className="text-muted-foreground/50">/</span>
+            <span className="text-muted-foreground/40">/</span>
             <span className="text-sm text-foreground font-medium">Discover</span>
             {displayProfession && (
               <>
-                <span className="text-muted-foreground/50">/</span>
+                <span className="text-muted-foreground/40">/</span>
                 <span className="text-sm text-foreground font-medium capitalize">{displayProfession}</span>
               </>
             )}
             {displayCity && (
               <>
-                <span className="text-muted-foreground/50">/</span>
+                <span className="text-muted-foreground/40">/</span>
                 <span className="text-sm text-foreground font-medium capitalize">{displayCity}</span>
               </>
             )}
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground tracking-tight mb-3">{title}</h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mb-8">
-            Search by profession, location, or service. View ratings, response times, and book instantly.
-          </p>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-3xl md:text-5xl font-bold text-foreground tracking-tight mb-3">{title}</h1>
+            <p className="text-muted-foreground text-lg max-w-2xl mb-10">
+              Discover top-rated professionals. Compare reviews, response times, and book instantly.
+            </p>
+          </motion.div>
 
-          {/* Search bar */}
-          <div className="flex flex-col sm:flex-row gap-3 max-w-2xl">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by name, profession, service, or city…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 h-12 text-base bg-card border-border/60"
-              />
+          {/* Glassmorphism search panel */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="max-w-2xl"
+          >
+            <div className="bg-card/70 backdrop-blur-xl border border-border/40 rounded-2xl p-4 shadow-lg space-y-4">
+              {/* Search input */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search by name, profession, service, or city…"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="pl-10 h-12 text-base bg-background/50 border-border/40 rounded-xl"
+                  />
+                </div>
+                <Button
+                  variant={showFilters ? "secondary" : "outline"}
+                  size="lg"
+                  className="gap-2 h-12 shrink-0 rounded-xl"
+                  onClick={() => setShowFilters(!showFilters)}
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                  Filters
+                  {hasActiveFilters && (
+                    <span className="h-5 w-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-bold">
+                      {(serviceFilter ? 1 : 0) + (search ? 1 : 0) + (intentFilter ? 1 : 0)}
+                    </span>
+                  )}
+                </Button>
+              </div>
+
+              {/* Intent filter buttons */}
+              <div className="flex flex-wrap gap-2">
+                {([
+                  { key: "quote" as const, label: "Get a quote", icon: MessageSquareText },
+                  { key: "book" as const, label: "Book today", icon: CalendarCheck },
+                  { key: "available_now" as const, label: "Available this week", icon: CheckCircle2 },
+                ]).map(({ key, label, icon: Icon }) => (
+                  <Button
+                    key={key}
+                    variant={intentFilter === key ? "default" : "outline"}
+                    size="sm"
+                    className="gap-1.5 text-xs rounded-lg"
+                    onClick={() => setIntentFilter(intentFilter === key ? "" : key)}
+                  >
+                    <Icon className="h-3.5 w-3.5" /> {label}
+                  </Button>
+                ))}
+                <Button
+                  variant={showMatcher ? "secondary" : "outline"}
+                  size="sm"
+                  className="gap-1.5 text-xs rounded-lg"
+                  onClick={() => { setShowMatcher(!showMatcher); setTopMatches(null); }}
+                >
+                  <Sparkles className="h-3.5 w-3.5" /> Instant Match
+                </Button>
+              </div>
             </div>
-            <Button
-              variant={showFilters ? "secondary" : "outline"}
-              size="lg"
-              className="gap-2 h-12 shrink-0"
-              onClick={() => setShowFilters(!showFilters)}
-            >
-              <SlidersHorizontal className="h-4 w-4" />
-              Filters
-              {hasActiveFilters && (
-                <span className="h-5 w-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-bold">
-                  {(serviceFilter ? 1 : 0) + (search ? 1 : 0) + (intentFilter ? 1 : 0)}
-                </span>
-              )}
-            </Button>
-          </div>
 
-          {/* Intent filter buttons */}
-          <div className="flex flex-wrap gap-2 mt-4 max-w-2xl">
-            {([
-              { key: "quote" as const, label: "Get a quote now", icon: MessageSquareText },
-              { key: "book" as const, label: "Book today", icon: CalendarCheck },
-              { key: "available_now" as const, label: "Available this week", icon: CheckCircle2 },
-            ]).map(({ key, label, icon: Icon }) => (
-              <Button
-                key={key}
-                variant={intentFilter === key ? "default" : "outline"}
-                size="sm"
-                className="gap-1.5 text-xs"
-                onClick={() => setIntentFilter(intentFilter === key ? "" : key)}
-              >
-                <Icon className="h-3.5 w-3.5" /> {label}
-              </Button>
-            ))}
-            <Button
-              variant={showMatcher ? "secondary" : "outline"}
-              size="sm"
-              className="gap-1.5 text-xs"
-              onClick={() => { setShowMatcher(!showMatcher); setTopMatches(null); }}
-            >
-              <Sparkles className="h-3.5 w-3.5" /> Instant Match
-            </Button>
-          </div>
+            {/* Expanded service filters */}
+            <AnimatePresence>
+              {showFilters && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-3 p-4 rounded-xl border border-border/40 bg-card/70 backdrop-blur-sm space-y-4">
+                    {topServices && topServices.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-2">
+                          <Wrench className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Filter by Service</span>
+                          {serviceFilter && (
+                            <button onClick={() => setServiceFilter("")} className="ml-auto text-xs text-primary hover:underline flex items-center gap-0.5">
+                              <X className="h-3 w-3" /> Clear
+                            </button>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-1.5">
+                          {topServices.map((s) => (
+                            <Badge
+                              key={s.name}
+                              variant={serviceFilter === s.name ? "default" : "outline"}
+                              className="cursor-pointer hover:bg-primary/10 hover:border-primary/30 transition-colors text-xs"
+                              onClick={() => setServiceFilter(serviceFilter === s.name ? "" : s.name)}
+                            >
+                              {s.name}
+                              <span className="ml-1 opacity-60">({s.count})</span>
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
-          {/* Expanded filters */}
-          {showFilters && (
-            <div className="mt-4 p-4 rounded-xl border border-border/60 bg-card/80 backdrop-blur-sm max-w-2xl space-y-4">
-              {topServices && topServices.length > 0 && (
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Wrench className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Filter by Service</span>
-                    {serviceFilter && (
-                      <button onClick={() => setServiceFilter("")} className="ml-auto text-xs text-primary hover:underline flex items-center gap-0.5">
-                        <X className="h-3 w-3" /> Clear
-                      </button>
+                    {hasActiveFilters && (
+                      <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={clearAll}>
+                        <X className="h-3 w-3" /> Clear all filters
+                      </Button>
                     )}
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {topServices.map((s) => (
-                      <Badge
-                        key={s.name}
-                        variant={serviceFilter === s.name ? "default" : "outline"}
-                        className="cursor-pointer hover:bg-primary/10 hover:border-primary/30 transition-colors text-xs"
-                        onClick={() => setServiceFilter(serviceFilter === s.name ? "" : s.name)}
-                      >
-                        {s.name}
-                        <span className="ml-1 opacity-60">({s.count})</span>
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
+                </motion.div>
               )}
-
-              {hasActiveFilters && (
-                <Button variant="ghost" size="sm" className="text-xs gap-1" onClick={clearAll}>
-                  <X className="h-3 w-3" /> Clear all filters
-                </Button>
-              )}
-            </div>
-          )}
+            </AnimatePresence>
+          </motion.div>
 
           {/* Stats bar */}
           {!isLoading && listings && (
-            <div className="flex items-center gap-6 mt-6 text-sm text-muted-foreground">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="flex items-center gap-6 mt-6 text-sm text-muted-foreground"
+            >
               <span className="flex items-center gap-1.5">
                 <Users className="h-4 w-4" /> {listings.length} businesses
               </span>
@@ -342,30 +472,42 @@ export default function DiscoverPage() {
                 </span>
               )}
               <span className="flex items-center gap-1.5">
-                <Star className="h-4 w-4" /> {listings.filter(l => l.review_count > 0).length} with reviews
+                <Star className="h-4 w-4" /> {listings.filter(l => l.review_count > 0).length} reviewed
               </span>
-              <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="h-4 w-4 text-green-600" /> {listings.filter(l => l.available_for_work).length} available
+              <span className="flex items-center gap-1.5 hidden sm:flex">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600" /> {listings.filter(l => l.available_for_work).length} available
               </span>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-10">
         {/* Instant Matching Wizard */}
-        {showMatcher && !topMatches && (
-          <div className="mb-8 max-w-md">
-            <InstantMatchWizard
-              onMatch={(m) => setTopMatches(m)}
-              professions={professionNames}
-            />
-          </div>
-        )}
+        <AnimatePresence>
+          {showMatcher && !topMatches && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-8 max-w-md overflow-hidden"
+            >
+              <InstantMatchWizard
+                onMatch={(m) => setTopMatches(m)}
+                professions={professionNames}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* Top Matches */}
+        {/* Top Matches from wizard */}
         {topMatches && (
           <TopMatchesResult matches={topMatches} onClear={() => { setTopMatches(null); setShowMatcher(false); }} />
+        )}
+
+        {/* Auto top 3 recommended (when no wizard results and no active filters) */}
+        {!topMatches && !hasActiveFilters && allNonFeatured.length > 0 && (
+          <RecommendedSection listings={allNonFeatured} />
         )}
 
         {/* Profession pills */}
@@ -443,12 +585,12 @@ export default function DiscoverPage() {
           </div>
         )}
 
-        {/* Results header */}
+        {/* All results */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">
-              {isLoading ? "Loading…" : `${regularListings.length} businesses`}
+              {isLoading ? "Loading…" : `${hasActiveFilters ? allNonFeatured.length : regularListings.length} more businesses`}
             </span>
           </div>
           {hasActiveFilters && (
@@ -474,13 +616,13 @@ export default function DiscoverPage() {
           <div className="flex items-center justify-center py-20">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
-        ) : regularListings.length > 0 ? (
+        ) : (hasActiveFilters ? allNonFeatured : regularListings).length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {regularListings.map((l) => (
+            {(hasActiveFilters ? allNonFeatured : regularListings).map((l) => (
               <ListingCard key={l.id} listing={l} />
             ))}
           </div>
-        ) : featuredListings.length === 0 && boostedListings.length === 0 ? (
+        ) : featuredListings.length === 0 && boostedListings.length === 0 && (topMatches === null || topMatches.length === 0) ? (
           <div className="text-center py-20">
             <Users className="h-10 w-10 mx-auto text-muted-foreground/40 mb-4" />
             <h3 className="text-lg font-semibold text-foreground mb-1">No businesses found</h3>
@@ -505,6 +647,9 @@ export default function DiscoverPage() {
           </p>
         </div>
       </div>
+
+      {/* Sticky CTA */}
+      {showSticky && <StickyCTA />}
     </div>
   );
 }
