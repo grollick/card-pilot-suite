@@ -168,9 +168,7 @@ export default function HelpCenter() {
 
               {/* Expanded Content */}
               {isExpanded && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
+                <div
                   className="border-t border-border"
                 >
                   <div className="p-4 space-y-5">
