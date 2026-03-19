@@ -191,8 +191,11 @@ export function useSequenceEnrollments(sequenceId: string | null) {
 export function useRunSequenceProcessor() {
   return useMutation({
     mutationFn: async (action: "process" | "enroll_new_signups" | "check_stop_conditions") => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error("Not authenticated");
       const { data, error } = await supabase.functions.invoke("process-email-sequences", {
         body: { action },
+        headers: { Authorization: `Bearer ${session.access_token}` },
       });
       if (error) throw error;
       return data;
