@@ -151,6 +151,7 @@ export function useUpdateStep() {
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["sequence-steps", vars.sequence_id] });
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to update step"),
   });
 }
 
