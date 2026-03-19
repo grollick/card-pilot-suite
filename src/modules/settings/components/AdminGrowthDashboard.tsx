@@ -5,7 +5,7 @@ import {
   MessageSquare, Trash2, ChevronRight, Lightbulb, Rocket,
   Mail, Globe, UserPlus, Settings, BarChart, Megaphone,
   AlertTriangle, DollarSign, Calendar, Star, ArrowUpRight,
-  Clock, Trophy, Flame, Heart, RefreshCw
+  Clock, Trophy, Flame, Heart, RefreshCw, Gift
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
