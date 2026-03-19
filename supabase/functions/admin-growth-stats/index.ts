@@ -155,7 +155,7 @@ Deno.serve(async (req) => {
         responseRate,
       },
       funnel: {
-        outreach: 0, // manual tracking via outreach_contacts
+        outreach: 0,
         signups: signups30d,
         activated: activated30d,
         leads: leads30d || 0,
@@ -166,6 +166,12 @@ Deno.serve(async (req) => {
         onDutyUsers: onDutyCount || 0,
         totalRequests: totalJobRequests || 0,
         avgResponses: matches.length > 0 ? Math.round(matches.length / Math.max(totalJobRequests || 1, 1)) : 0,
+      },
+      referrals: {
+        total: totalReferrals,
+        activated: activatedReferrals,
+        rewardsIssued,
+        totalRewardDays,
       },
       signupsByDate,
       planCounts,
