@@ -63,6 +63,7 @@ Deno.serve(async (req) => {
       { data: recentProfiles },
       { data: recentRequests },
       { data: recentMatches },
+      { data: allReferrals },
     ] = await Promise.all([
       sc.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", d7),
       sc.from("profiles").select("id", { count: "exact", head: true }),
@@ -78,6 +79,7 @@ Deno.serve(async (req) => {
       sc.from("profiles").select("id, name, email, plan, created_at, handle").order("created_at", { ascending: false }).limit(15),
       sc.from("estimate_requests").select("id, requester_name, service_needed, status, created_at").order("created_at", { ascending: false }).limit(10),
       sc.from("estimate_matches").select("id, status, created_at, match_score").order("created_at", { ascending: false }).limit(10),
+      sc.from("referrals").select("id, status, rewarded, reward_days, created_at"),
     ]);
 
     // Activated = onboarding_completed OR has published card
