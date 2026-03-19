@@ -25,6 +25,7 @@ const OnDutyMapPage = lazy(() => import("@/modules/public/pages/OnDutyMapPage"))
 const RequestServicePage = lazy(() => import("@/modules/public/pages/RequestServicePage"));
 const PublicSite = lazy(() => import("@/modules/public/pages/PublicSite"));
 const DemoCardPreview = lazy(() => import("@/modules/public/pages/DemoCardPreview"));
+const ReferralRedirect = lazy(() => import("@/modules/public/pages/ReferralRedirect"));
 
 // Client Portal — loaded eagerly (public, token-based)
 const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
