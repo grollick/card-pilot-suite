@@ -191,7 +191,12 @@ export default function LandingPage() {
               </motion.div>
               <motion.h1 initial="hidden" animate="visible" variants={fade} custom={1} className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold tracking-tight leading-[1.08] mb-6">
                 Turn your business card into a{" "}
-                <span className="gradient-text">customer-generating machine</span>
+                <motion.span
+                  className="gradient-text inline-block origin-center"
+                  initial={{ scale: 1.15 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
+                >customer-generating machine</motion.span>
               </motion.h1>
               <motion.p initial="hidden" animate="visible" variants={fade} custom={2} className="text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8">
                 Capture leads, send estimates, get paid, and grow your business — all from one platform.
