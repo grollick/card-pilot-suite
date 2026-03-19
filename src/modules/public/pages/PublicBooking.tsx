@@ -388,6 +388,18 @@ export default function PublicBooking() {
                     </Link>
                   </div>
 
+                  {/* Marketplace Discovery CTA */}
+                  <div className="p-3 rounded-xl border border-border bg-muted/30 text-center space-y-1.5">
+                    <p className="text-xs text-muted-foreground">
+                      Need another service?
+                    </p>
+                    <Link to="/discover">
+                      <Button variant="outline" size="sm" className="gap-1.5 text-xs">
+                        Browse more professionals nearby →
+                      </Button>
+                    </Link>
+                  </div>
+
                   <Link to={`/${handle}`}>
                     <Button variant="ghost" className="w-full mt-1">Back to Card</Button>
                   </Link>
