@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import type { OnDutyProfessional } from "@/hooks/useOnDutyMap";
-import { Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, CheckCircle2, AlertCircle, Users, Clock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface Props {
@@ -21,6 +21,7 @@ export default function QuickQuoteForm({ professional, onSuccess }: Props) {
   );
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [matchCount, setMatchCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,7 +39,7 @@ export default function QuickQuoteForm({ professional, onSuccess }: Props) {
 
     setSubmitting(true);
     try {
-      // Use the capture_lead RPC to create a CRM lead for the professional
+      // 1. Create CRM lead for this specific professional
       const { error: rpcError } = await supabase.rpc("capture_lead", {
         p_owner_id: professional.id,
         p_name: name.trim(),
@@ -58,10 +59,41 @@ export default function QuickQuoteForm({ professional, onSuccess }: Props) {
 
       if (rpcError) throw rpcError;
 
+      // 2. Also create an estimate_request and trigger auto-matching
+      // to find additional nearby professionals
+      let matched = 1; // The direct professional counts as 1
+      try {
+        const { data: estReq } = await (supabase
+          .from("estimate_requests" as any)
+          .insert({
+            requester_name: name.trim(),
+            requester_email: email.trim() || null,
+            requester_phone: phone.trim() || null,
+            service_needed: professional.profession_name || null,
+            request_details: details.trim(),
+            city: professional.city || null,
+            profession: professional.profession_name || null,
+            source: "map_quote",
+          })
+          .select("id")
+          .single() as any);
+
+        if (estReq?.id) {
+          const { data: routeResult } = await supabase.functions.invoke(
+            "process-estimate-matches",
+            { body: { estimateRequestId: estReq.id } }
+          );
+          matched += routeResult?.matched ?? 0;
+        }
+      } catch (e) {
+        console.error("Auto-match error:", e);
+      }
+
+      setMatchCount(matched);
       setSubmitted(true);
       toast({
         title: "Request sent!",
-        description: `${professional.name.split(" ")[0]} will be notified right away.`,
+        description: `We've contacted ${matched} professional${matched > 1 ? "s" : ""} for you.`,
       });
     } catch (err: any) {
       console.error("QuickQuote error:", err);
@@ -75,16 +107,33 @@ export default function QuickQuoteForm({ professional, onSuccess }: Props) {
     return (
       <div className="text-center py-6">
         <CheckCircle2 className="h-10 w-10 text-success mx-auto mb-3" />
-        <h4 className="font-bold text-sm">Request Sent!</h4>
-        <p className="text-xs text-muted-foreground mt-1 max-w-[250px] mx-auto">
-          {professional.name.split(" ")[0]} has been notified and will reach out to you shortly.
+        <h4 className="font-bold text-sm">
+          {matchCount > 1
+            ? `We've contacted ${matchCount} professionals!`
+            : "Request Sent!"}
+        </h4>
+        <p className="text-xs text-muted-foreground mt-1 max-w-[280px] mx-auto">
+          {matchCount > 1
+            ? `${professional.name.split(" ")[0]} and ${matchCount - 1} other pro${matchCount - 1 > 1 ? "s" : ""} have been notified. Expect responses shortly.`
+            : `${professional.name.split(" ")[0]} has been notified and will reach out to you shortly.`}
         </p>
+
+        <div className="flex items-center justify-center gap-4 mt-3 text-[11px] text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <Users className="h-3 w-3" /> Up to 3 quotes
+          </span>
+          <span className="flex items-center gap-1">
+            <Clock className="h-3 w-3" /> Most respond in &lt;1hr
+          </span>
+        </div>
+
         <Button
           size="sm"
           variant="outline"
           className="mt-4"
           onClick={() => {
             setSubmitted(false);
+            setMatchCount(0);
             setName("");
             setEmail("");
             setPhone("");
@@ -157,7 +206,7 @@ export default function QuickQuoteForm({ professional, onSuccess }: Props) {
       <Button type="submit" className="w-full h-11" disabled={submitting}>
         {submitting ? (
           <>
-            <Loader2 className="h-4 w-4 animate-spin mr-2" /> Sending...
+            <Loader2 className="h-4 w-4 animate-spin mr-2" /> Finding professionals...
           </>
         ) : (
           "Send Quote Request"
@@ -165,7 +214,7 @@ export default function QuickQuoteForm({ professional, onSuccess }: Props) {
       </Button>
 
       <p className="text-[10px] text-muted-foreground text-center">
-        Your info goes directly to {professional.name.split(" ")[0]}'s CRM. No spam.
+        Your request goes to {professional.name.split(" ")[0]} and similar nearby pros. No spam.
       </p>
     </form>
   );
