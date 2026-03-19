@@ -8,11 +8,13 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useRevenuePrediction } from "@/hooks/useRevenuePrediction";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
 
 type Insight = { title: string; description: string; type: string; action?: string; route?: string };
 
 const typeStyles: Record<string, { icon: typeof Lightbulb; color: string }> = {
-  tip: { icon: Lightbulb, color: "text-warning bg-warning/10" },
+  tip: { icon: Lightbulb, color: "text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10" },
   warning: { icon: Zap, color: "text-destructive bg-destructive/10" },
   info: { icon: TrendingUp, color: "text-primary bg-primary/10" },
 };
@@ -27,6 +29,8 @@ const QUICK_PROMPTS = [
 export default function GrowthCoachWidget() {
   const navigate = useNavigate();
   const [refreshKey, setRefreshKey] = useState(0);
+  const { planKey } = usePlanLimits();
+  const { suggestions } = useRevenuePrediction();
 
   const { data: insights, isLoading, isFetching } = useQuery({
     queryKey: ["ai-insights", refreshKey],
@@ -40,6 +44,18 @@ export default function GrowthCoachWidget() {
     },
   });
 
+  // Merge AI insights with revenue coaching suggestions for richer output
+  const coachingInsights: Insight[] = [
+    ...(insights ?? []),
+    ...suggestions.slice(0, 2).map((s) => ({
+      title: s.title,
+      description: s.description,
+      type: s.priority === "high" ? "warning" : "tip",
+      action: s.action,
+      route: s.route,
+    })),
+  ].slice(0, 4);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -49,12 +65,14 @@ export default function GrowthCoachWidget() {
     >
       <div className="dash-card-header">
         <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary/10 to-success/10 flex items-center justify-center">
+          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary/10 to-[hsl(var(--success))]/10 flex items-center justify-center">
             <TrendingUp className="h-4 w-4 text-primary" />
           </div>
           <div>
             <h2 className="font-semibold text-sm">AI Growth Coach</h2>
-            <p className="text-2xs text-muted-foreground">Data-driven tips to grow faster</p>
+            <p className="text-2xs text-muted-foreground">
+              {planKey === "starter" ? "Basic tips" : "Personalized coaching"}
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -84,19 +102,20 @@ export default function GrowthCoachWidget() {
           <div className="flex items-center justify-center py-6">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>
-        ) : !insights || insights.length === 0 ? (
+        ) : coachingInsights.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-4">
             Share your card and get leads to unlock AI growth tips.
           </p>
         ) : (
           <div className="space-y-1.5">
-            {insights.slice(0, 3).map((insight, i) => {
+            {coachingInsights.slice(0, 3).map((insight, i) => {
               const style = typeStyles[insight.type] ?? typeStyles.info;
               const Icon = style.icon;
               return (
                 <div
                   key={i}
-                  className="flex items-start gap-3 p-2.5 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors group"
+                  className="flex items-start gap-3 p-2.5 rounded-xl bg-muted/30 hover:bg-muted/50 transition-colors group cursor-pointer"
+                  onClick={() => insight.route && navigate(insight.route)}
                 >
                   <div className={`h-6 w-6 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${style.color}`}>
                     <Icon className="h-3 w-3" />
@@ -107,6 +126,11 @@ export default function GrowthCoachWidget() {
                       {insight.description}
                     </p>
                   </div>
+                  {insight.action && (
+                    <span className="text-2xs text-primary font-medium shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {insight.action} →
+                    </span>
+                  )}
                 </div>
               );
             })}
