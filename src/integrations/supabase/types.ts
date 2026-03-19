@@ -1786,6 +1786,66 @@ export type Database = {
           },
         ]
       }
+      lead_routing_log: {
+        Row: {
+          converted_at: string | null
+          created_at: string
+          delivered_at: string
+          id: string
+          lead_id: string | null
+          quote_request_id: string | null
+          reminder_1h_sent: boolean
+          reminder_24h_sent: boolean
+          responded_at: string | null
+          status: string
+          user_id: string
+          viewed_at: string | null
+        }
+        Insert: {
+          converted_at?: string | null
+          created_at?: string
+          delivered_at?: string
+          id?: string
+          lead_id?: string | null
+          quote_request_id?: string | null
+          reminder_1h_sent?: boolean
+          reminder_24h_sent?: boolean
+          responded_at?: string | null
+          status?: string
+          user_id: string
+          viewed_at?: string | null
+        }
+        Update: {
+          converted_at?: string | null
+          created_at?: string
+          delivered_at?: string
+          id?: string
+          lead_id?: string | null
+          quote_request_id?: string | null
+          reminder_1h_sent?: boolean
+          reminder_24h_sent?: boolean
+          responded_at?: string | null
+          status?: string
+          user_id?: string
+          viewed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_routing_log_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_routing_log_quote_request_id_fkey"
+            columns: ["quote_request_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_quote_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           address: string | null
@@ -1991,6 +2051,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      marketplace_quote_requests: {
+        Row: {
+          budget: string | null
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string | null
+          id: string
+          location: string | null
+          notes: string | null
+          profession: string | null
+          service_needed: string | null
+          timeline: string | null
+        }
+        Insert: {
+          budget?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          profession?: string | null
+          service_needed?: string | null
+          timeline?: string | null
+        }
+        Update: {
+          budget?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          profession?: string | null
+          service_needed?: string | null
+          timeline?: string | null
+        }
+        Relationships: []
       }
       neighborhood_boosts: {
         Row: {
