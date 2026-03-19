@@ -1,16 +1,20 @@
 import { useMemo } from "react";
 import { useProfile } from "@/hooks/useCard";
+import { useEffectivePlan } from "@/hooks/useBetaAccess";
 import { getPlanLimits, isLimitReached, type PlanLimits, type PlanKey } from "@/lib/plans";
 
 /**
  * Returns the current user's plan limits and helpers to check them.
- * Usage:
- *   const { limits, checkLimit, planKey } = usePlanLimits();
- *   if (checkLimit("contacts", contactCount)) { show upgrade prompt }
+ * Now checks beta_access for temporary plan overrides.
  */
 export function usePlanLimits() {
   const { data: profile } = useProfile();
-  const planKey = (profile?.plan ?? "starter") as PlanKey;
+  const { data: effectivePlan } = useEffectivePlan();
+
+  const planKey = (effectivePlan?.plan ?? profile?.plan ?? "starter") as PlanKey;
+  const isBeta = effectivePlan?.is_beta ?? false;
+  const betaExpiryDate = effectivePlan?.expiry_date ?? null;
+
   const limits: PlanLimits = useMemo(() => getPlanLimits(planKey), [planKey]);
 
   const checkLimit = (resource: keyof PlanLimits, currentCount: number): boolean => {
@@ -24,5 +28,5 @@ export function usePlanLimits() {
     return typeof val === "boolean" ? val : true;
   };
 
-  return { planKey, limits, checkLimit, hasFeature, profile };
+  return { planKey, limits, checkLimit, hasFeature, profile, isBeta, betaExpiryDate };
 }

@@ -70,6 +70,9 @@ export default function AdminPage() {
         <TabsContent value="system-events" className="mt-4">
           <SystemEventsWidget />
         </TabsContent>
+        <TabsContent value="beta" className="mt-4">
+          <BetaManagementTab />
+        </TabsContent>
       </Tabs>
     </div>
   );
