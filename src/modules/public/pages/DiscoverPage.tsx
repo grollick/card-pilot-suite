@@ -468,18 +468,16 @@ export default function DiscoverPage() {
               className="flex items-center gap-6 mt-6 text-sm text-muted-foreground"
             >
               <span className="flex items-center gap-1.5">
-                <Users className="h-4 w-4" /> {listings.length} businesses
+                <Users className="h-4 w-4" /> {listings.length} professionals
               </span>
-              {featuredListings.length > 0 && (
-                <span className="flex items-center gap-1.5">
-                  <Crown className="h-4 w-4 text-primary" /> {featuredListings.length} featured
-                </span>
-              )}
               <span className="flex items-center gap-1.5">
                 <Star className="h-4 w-4" /> {listings.filter(l => l.review_count > 0).length} reviewed
               </span>
               <span className="flex items-center gap-1.5 hidden sm:flex">
                 <CheckCircle2 className="h-4 w-4 text-emerald-600" /> {listings.filter(l => l.available_for_work).length} available
+              </span>
+              <span className="flex items-center gap-1.5 hidden sm:flex">
+                <MapPin className="h-4 w-4" /> {cities.length} cities
               </span>
             </motion.div>
           )}
