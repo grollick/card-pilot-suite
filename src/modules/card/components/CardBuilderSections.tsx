@@ -1,4 +1,5 @@
 import { Paintbrush, Sparkles, Loader2, MousePointerClick, Globe } from "lucide-react";
+import BuilderAISuggestions from "./BuilderAISuggestions";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -96,6 +97,8 @@ export default function CardBuilderSections({
         </SortableContext>
       </DndContext>
 
+      {/* AI Suggestions */}
+      <BuilderAISuggestions sections={sections} />
       {/* AI Generate */}
       <div className="pt-3 border-t border-border/50">
         <Button variant="outline" className="w-full" onClick={onAIGenerate} disabled={isGenerating}>
