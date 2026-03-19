@@ -227,7 +227,9 @@ const AdminEmailSequences = forwardRef<HTMLDivElement>(function AdminEmailSequen
       ) : null}
     </div>
   );
-}
+});
+
+export default AdminEmailSequences;
 
 // ── Sequence Detail View ──
 function SequenceDetail({ sequenceId, onBack, preset }: { sequenceId: string; onBack: () => void; preset?: typeof PRESET_SEQUENCES[number] }) {
