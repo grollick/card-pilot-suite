@@ -51,8 +51,10 @@ export default function EstimateDutyPanel() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1, duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
-      className={`dash-card relative overflow-hidden transition-shadow duration-500 ${
-        isOnDuty ? "ring-1 ring-success/30 shadow-[0_0_20px_-4px_hsl(var(--success)/0.35)]" : ""
+      className={`dash-card relative overflow-hidden transition-all duration-500 ${
+        isOnDuty
+          ? "ring-2 ring-success/40 shadow-[0_0_30px_-4px_hsl(var(--success)/0.45),0_0_60px_-8px_hsl(var(--success)/0.2)] -translate-y-0.5"
+          : ""
       }`}
     >
       {isOnDuty && (
