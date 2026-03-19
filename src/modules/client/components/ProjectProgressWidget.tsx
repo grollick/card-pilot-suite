@@ -31,7 +31,7 @@ export default function ProjectProgressWidget({ leadIds }: Props) {
     queryFn: async () => {
       const { data } = await supabase
         .from("jobs")
-        .select("id, title, status, scheduled_date, completed_at, created_at")
+        .select("id, title, status, scheduled_start, actual_end, created_at")
         .in("lead_id", leadIds)
         .neq("status", "cancelled")
         .order("created_at", { ascending: false })
