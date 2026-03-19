@@ -1,20 +1,31 @@
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Globe, FileText, Eye, EyeOff, Pencil, GripVertical, ChevronRight,
+  Globe, FileText, Eye, Pencil, GripVertical,
   Plus, Save, ArrowLeft, Shield, Loader2, ExternalLink, Trash2,
-  ToggleLeft, ToggleRight, ChevronDown, ChevronUp, Copy,
+  ToggleLeft, ToggleRight, Copy, X, Monitor, Smartphone, Tablet,
+  ChevronRight, Layout, Type, Star, Megaphone, CreditCard,
+  MessageSquare, Image, Settings2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsAdmin } from "@/hooks/useAdminStats";
 import { useLandingPages, useSaveLandingPage, type LandingPageContent, type LandingPageSection } from "@/hooks/useLandingPages";
 import { toast } from "sonner";
+import {
+  DndContext, closestCenter, KeyboardSensor, PointerSensor,
+  useSensor, useSensors, type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy,
+  arrayMove, useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+// ─── Constants ───
 
 const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url: string; sections: LandingPageSection[] }[] = [
   {
@@ -34,10 +45,7 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
     ],
   },
   {
-    key: "for/contractors",
-    title: "Contractors Landing Page",
-    description: "Industry page at /for/contractors",
-    url: "/for/contractors",
+    key: "for/contractors", title: "Contractors Landing Page", description: "Industry page at /for/contractors", url: "/for/contractors",
     sections: [
       { id: "hero", type: "hero", label: "Hero", enabled: true, content: { headline: "Get More Renovation Leads and Book Jobs from One Link", subheadline: "Show your projects, capture quote requests, and let customers book consultations." } },
       { id: "problem", type: "problem_solution", label: "Problem / Solution", enabled: true, content: {} },
@@ -48,10 +56,7 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
     ],
   },
   {
-    key: "for/barbers",
-    title: "Barbers Landing Page",
-    description: "Industry page at /for/barbers",
-    url: "/for/barbers",
+    key: "for/barbers", title: "Barbers Landing Page", description: "Industry page at /for/barbers", url: "/for/barbers",
     sections: [
       { id: "hero", type: "hero", label: "Hero", enabled: true, content: {} },
       { id: "problem", type: "problem_solution", label: "Problem / Solution", enabled: true, content: {} },
@@ -60,10 +65,7 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
     ],
   },
   {
-    key: "for/realtors",
-    title: "Realtors Landing Page",
-    description: "Industry page at /for/realtors",
-    url: "/for/realtors",
+    key: "for/realtors", title: "Realtors Landing Page", description: "Industry page at /for/realtors", url: "/for/realtors",
     sections: [
       { id: "hero", type: "hero", label: "Hero", enabled: true, content: {} },
       { id: "problem", type: "problem_solution", label: "Problem / Solution", enabled: true, content: {} },
@@ -72,10 +74,7 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
     ],
   },
   {
-    key: "for/photographers",
-    title: "Photographers Landing Page",
-    description: "Industry page at /for/photographers",
-    url: "/for/photographers",
+    key: "for/photographers", title: "Photographers Landing Page", description: "Industry page at /for/photographers", url: "/for/photographers",
     sections: [
       { id: "hero", type: "hero", label: "Hero", enabled: true, content: {} },
       { id: "problem", type: "problem_solution", label: "Problem / Solution", enabled: true, content: {} },
@@ -84,10 +83,7 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
     ],
   },
   {
-    key: "for/landscapers",
-    title: "Landscapers Landing Page",
-    description: "Industry page at /for/landscapers",
-    url: "/for/landscapers",
+    key: "for/landscapers", title: "Landscapers Landing Page", description: "Industry page at /for/landscapers", url: "/for/landscapers",
     sections: [
       { id: "hero", type: "hero", label: "Hero", enabled: true, content: {} },
       { id: "problem", type: "problem_solution", label: "Problem / Solution", enabled: true, content: {} },
@@ -110,6 +106,19 @@ const SECTION_TYPE_LABELS: Record<string, string> = {
   custom: "Custom Section",
 };
 
+const SECTION_ICONS: Record<string, typeof Globe> = {
+  hero: Type,
+  problem_solution: MessageSquare,
+  features: Layout,
+  how_it_works: ChevronRight,
+  demo_cards: CreditCard,
+  results: Star,
+  pricing: CreditCard,
+  final_cta: Megaphone,
+  testimonials: Star,
+  custom: FileText,
+};
+
 const NEW_SECTION_TYPES = [
   { type: "hero", label: "Hero" },
   { type: "problem_solution", label: "Problem / Solution" },
@@ -122,6 +131,175 @@ const NEW_SECTION_TYPES = [
   { type: "final_cta", label: "Final CTA" },
   { type: "custom", label: "Custom Section" },
 ];
+
+// ─── Sortable Section Item ───
+
+function SortableSectionItem({
+  section, isActive, onSelect, onToggle, onDuplicate, onDelete,
+}: {
+  section: LandingPageSection;
+  isActive: boolean;
+  onSelect: () => void;
+  onToggle: () => void;
+  onDuplicate: () => void;
+  onDelete: () => void;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
+  const Icon = SECTION_ICONS[section.type] || FileText;
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+    zIndex: isDragging ? 50 : undefined,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`group flex items-center gap-2 py-2 px-2.5 rounded-lg cursor-pointer transition-all border ${
+        isActive
+          ? "bg-primary/10 border-primary/30 shadow-sm"
+          : section.enabled
+            ? "bg-card border-transparent hover:bg-muted/50 hover:border-border/50"
+            : "bg-card border-transparent opacity-40 hover:opacity-60"
+      }`}
+      onClick={onSelect}
+    >
+      <button
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing text-muted-foreground/40 hover:text-muted-foreground touch-none shrink-0"
+        aria-label="Drag to reorder"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <GripVertical className="h-3.5 w-3.5" />
+      </button>
+
+      <div className={`h-7 w-7 rounded-md flex items-center justify-center shrink-0 ${
+        isActive ? "bg-primary/15 text-primary" : section.enabled ? "bg-muted text-muted-foreground" : "bg-muted/50 text-muted-foreground/50"
+      }`}>
+        <Icon className="h-3.5 w-3.5" />
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <p className={`text-xs font-medium truncate ${isActive ? "text-primary" : ""}`}>
+          {section.label}
+        </p>
+      </div>
+
+      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+        <button onClick={onDuplicate} className="h-5 w-5 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted" title="Duplicate">
+          <Copy className="h-2.5 w-2.5" />
+        </button>
+        <button onClick={onDelete} className="h-5 w-5 rounded flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10" title="Delete">
+          <Trash2 className="h-2.5 w-2.5" />
+        </button>
+      </div>
+
+      <Switch
+        checked={section.enabled}
+        onCheckedChange={onToggle}
+        className="scale-[0.55] shrink-0"
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      />
+    </div>
+  );
+}
+
+// ─── Section Property Editor ───
+
+function SectionEditor({
+  section, onUpdate, onClose,
+}: {
+  section: LandingPageSection;
+  onUpdate: (id: string, patch: Partial<LandingPageSection>) => void;
+  onClose: () => void;
+}) {
+  const updateContent = (field: string, value: string) => {
+    onUpdate(section.id, { content: { ...section.content, [field]: value } });
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      transition={{ duration: 0.15 }}
+      className="absolute inset-0 bg-card z-10 flex flex-col"
+    >
+      {/* Editor header */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-border shrink-0">
+        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={onClose}>
+          <ArrowLeft className="h-3.5 w-3.5" />
+        </Button>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-semibold truncate">{section.label}</p>
+          <p className="text-2xs text-muted-foreground">{SECTION_TYPE_LABELS[section.type]}</p>
+        </div>
+      </div>
+
+      {/* Editor body */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Section Name</label>
+          <Input
+            value={section.label}
+            onChange={(e) => onUpdate(section.id, { label: e.target.value })}
+            className="text-sm h-9"
+          />
+        </div>
+
+        {Object.keys(section.content).length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center space-y-3">
+            <p className="text-xs text-muted-foreground">No custom content yet. Add fields:</p>
+            <div className="flex flex-wrap gap-1.5 justify-center">
+              {["headline", "subheadline", "cta_primary", "cta_secondary", "body_text", "image_url"].map((field) => (
+                <Button key={field} variant="outline" size="sm" className="text-2xs h-7 px-2" onClick={() => updateContent(field, "")}>
+                  <Plus className="h-2.5 w-2.5 mr-1" /> {field.replace(/_/g, " ")}
+                </Button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          Object.entries(section.content).map(([field, value]) => (
+            <div key={field}>
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block capitalize">
+                {field.replace(/_/g, " ")}
+              </label>
+              {String(value).length > 60 ? (
+                <Textarea
+                  value={String(value)}
+                  onChange={(e) => updateContent(field, e.target.value)}
+                  className="text-sm min-h-[70px]"
+                />
+              ) : (
+                <Input
+                  value={String(value)}
+                  onChange={(e) => updateContent(field, e.target.value)}
+                  className="text-sm h-9"
+                />
+              )}
+            </div>
+          ))
+        )}
+
+        <Button
+          variant="ghost" size="sm" className="text-xs w-full justify-start"
+          onClick={() => {
+            const name = prompt("Field name (e.g. body_text, badge_label):");
+            if (name) updateContent(name.trim(), "");
+          }}
+        >
+          <Plus className="h-3 w-3 mr-1.5" /> Add custom field
+        </Button>
+      </div>
+    </motion.div>
+  );
+}
+
+// ─── Main Component ───
 
 export default function LandingPageManager() {
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
@@ -137,8 +315,16 @@ export default function LandingPageManager() {
     settings: Record<string, any>;
     is_published: boolean;
   } | null>(null);
-  const [expandedSection, setExpandedSection] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const [editingSection, setEditingSection] = useState<string | null>(null);
   const [showAddSection, setShowAddSection] = useState(false);
+  const [previewDevice, setPreviewDevice] = useState<"desktop" | "tablet" | "mobile">("desktop");
+  const [showSettings, setShowSettings] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
 
   if (adminLoading) {
     return <div className="min-h-[400px] flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
@@ -153,22 +339,15 @@ export default function LandingPageManager() {
     );
   }
 
-  // Merge saved pages with defaults
   const pages = MAIN_PAGE_DEFAULTS.map((def) => {
     const saved = savedPages?.find((p) => p.page_key === def.key);
-    return {
-      ...def,
-      saved,
-      is_published: saved?.is_published ?? true,
-      updated_at: saved?.updated_at,
-    };
+    return { ...def, saved, is_published: saved?.is_published ?? true, updated_at: saved?.updated_at };
   });
 
   function startEditing(pageKey: string) {
     const def = MAIN_PAGE_DEFAULTS.find((p) => p.key === pageKey);
     const saved = savedPages?.find((p) => p.page_key === pageKey);
     if (!def) return;
-
     setEditData({
       page_key: pageKey,
       page_title: saved?.page_title || def.title,
@@ -178,7 +357,8 @@ export default function LandingPageManager() {
       is_published: saved?.is_published ?? true,
     });
     setEditingPage(pageKey);
-    setExpandedSection(null);
+    setActiveSection(null);
+    setEditingSection(null);
   }
 
   function handleSave() {
@@ -193,7 +373,7 @@ export default function LandingPageManager() {
         is_published: editData.is_published,
       },
       {
-        onSuccess: () => toast.success("Page saved successfully"),
+        onSuccess: () => toast.success("Page saved"),
         onError: (err: any) => toast.error(err.message || "Failed to save"),
       }
     );
@@ -203,29 +383,15 @@ export default function LandingPageManager() {
     if (!editData) return;
     setEditData({
       ...editData,
-      sections: editData.sections.map((s) =>
-        s.id === sectionId ? { ...s, enabled: !s.enabled } : s
-      ),
+      sections: editData.sections.map((s) => s.id === sectionId ? { ...s, enabled: !s.enabled } : s),
     });
-  }
-
-  function moveSection(sectionId: string, direction: "up" | "down") {
-    if (!editData) return;
-    const idx = editData.sections.findIndex((s) => s.id === sectionId);
-    if (idx < 0) return;
-    const newIdx = direction === "up" ? idx - 1 : idx + 1;
-    if (newIdx < 0 || newIdx >= editData.sections.length) return;
-    const newSections = [...editData.sections];
-    [newSections[idx], newSections[newIdx]] = [newSections[newIdx], newSections[idx]];
-    setEditData({ ...editData, sections: newSections });
   }
 
   function deleteSection(sectionId: string) {
     if (!editData) return;
-    setEditData({
-      ...editData,
-      sections: editData.sections.filter((s) => s.id !== sectionId),
-    });
+    setEditData({ ...editData, sections: editData.sections.filter((s) => s.id !== sectionId) });
+    if (activeSection === sectionId) setActiveSection(null);
+    if (editingSection === sectionId) setEditingSection(null);
   }
 
   function duplicateSection(sectionId: string) {
@@ -233,11 +399,7 @@ export default function LandingPageManager() {
     const idx = editData.sections.findIndex((s) => s.id === sectionId);
     if (idx < 0) return;
     const orig = editData.sections[idx];
-    const newSection: LandingPageSection = {
-      ...orig,
-      id: `${orig.type}_${Date.now()}`,
-      label: `${orig.label} (Copy)`,
-    };
+    const newSection: LandingPageSection = { ...orig, id: `${orig.type}_${Date.now()}`, label: `${orig.label} (Copy)` };
     const newSections = [...editData.sections];
     newSections.splice(idx + 1, 0, newSection);
     setEditData({ ...editData, sections: newSections });
@@ -246,42 +408,43 @@ export default function LandingPageManager() {
   function addSection(type: string) {
     if (!editData) return;
     const label = SECTION_TYPE_LABELS[type] || "Custom Section";
-    const newSection: LandingPageSection = {
-      id: `${type}_${Date.now()}`,
-      type,
-      label,
-      enabled: true,
-      content: {},
-    };
+    const newSection: LandingPageSection = { id: `${type}_${Date.now()}`, type, label, enabled: true, content: {} };
     setEditData({ ...editData, sections: [...editData.sections, newSection] });
     setShowAddSection(false);
-    setExpandedSection(newSection.id);
+    setActiveSection(newSection.id);
+    setEditingSection(newSection.id);
   }
 
-  function updateSectionContent(sectionId: string, field: string, value: string) {
+  function updateSection(sectionId: string, patch: Partial<LandingPageSection>) {
     if (!editData) return;
     setEditData({
       ...editData,
       sections: editData.sections.map((s) =>
-        s.id === sectionId ? { ...s, content: { ...s.content, [field]: value } } : s
+        s.id === sectionId ? { ...s, ...patch } : s
       ),
     });
   }
 
-  // ─── Page list view ───
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+    if (!over || active.id === over.id || !editData) return;
+    const oldIndex = editData.sections.findIndex((s) => s.id === active.id);
+    const newIndex = editData.sections.findIndex((s) => s.id === over.id);
+    setEditData({ ...editData, sections: arrayMove(editData.sections, oldIndex, newIndex) });
+  }
+
+  const currentDef = MAIN_PAGE_DEFAULTS.find((p) => p.key === editData?.page_key);
+
+  // ─── Page List ───
   if (!editingPage || !editData) {
     return (
       <div className="space-y-6 max-w-5xl">
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Globe className="h-6 w-6 text-primary" />
-            Landing Pages
+            <Globe className="h-6 w-6 text-primary" /> Landing Pages
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            View, edit, and manage all your landing pages.
-          </p>
+          <p className="text-muted-foreground text-sm mt-1">Manage and edit your landing pages with the visual editor.</p>
         </div>
-
         <div className="space-y-3">
           {pages.map((page, i) => (
             <motion.div
@@ -289,14 +452,11 @@ export default function LandingPageManager() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.04 }}
-              className="rounded-xl border border-border bg-card p-5 flex items-center gap-4 hover:shadow-card-hover transition-all group"
+              className="rounded-xl border border-border bg-card p-5 flex items-center gap-4 hover:shadow-card-hover transition-all group cursor-pointer"
+              onClick={() => startEditing(page.key)}
             >
               <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                {page.key === "main" ? (
-                  <Globe className="h-5 w-5 text-primary" />
-                ) : (
-                  <FileText className="h-5 w-5 text-primary" />
-                )}
+                {page.key === "main" ? <Globe className="h-5 w-5 text-primary" /> : <FileText className="h-5 w-5 text-primary" />}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
@@ -307,18 +467,14 @@ export default function LandingPageManager() {
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5">{page.description}</p>
                 {page.updated_at && (
-                  <p className="text-2xs text-muted-foreground mt-1">
-                    Last edited: {new Date(page.updated_at).toLocaleDateString()}
-                  </p>
+                  <p className="text-2xs text-muted-foreground mt-1">Last edited: {new Date(page.updated_at).toLocaleDateString()}</p>
                 )}
               </div>
               <div className="flex items-center gap-2 shrink-0">
-                <a href={page.url} target="_blank" rel="noopener noreferrer">
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
+                <a href={page.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                  <Button variant="ghost" size="icon" className="h-8 w-8"><ExternalLink className="h-4 w-4" /></Button>
                 </a>
-                <Button variant="outline" size="sm" onClick={() => startEditing(page.key)}>
+                <Button variant="outline" size="sm">
                   <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
                 </Button>
               </div>
@@ -329,215 +485,205 @@ export default function LandingPageManager() {
     );
   }
 
-  // ─── Page editor view ───
-  const currentDef = MAIN_PAGE_DEFAULTS.find((p) => p.key === editData.page_key);
+  // ─── Visual Editor ───
+  const previewWidths = { desktop: "100%", tablet: "768px", mobile: "375px" };
+  const activeSectionData = editData.sections.find((s) => s.id === editingSection);
 
   return (
-    <div className="space-y-6 max-w-5xl">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
+    <div className="fixed inset-0 z-50 bg-background flex flex-col">
+      {/* ─── Top Bar ─── */}
+      <div className="h-12 border-b border-border bg-card px-4 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditingPage(null); setEditData(null); }}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">{editData.page_title}</h1>
-            <p className="text-xs text-muted-foreground">{currentDef?.url || `/${editData.page_key}`}</p>
-          </div>
+          <div className="h-5 w-px bg-border" />
+          <p className="text-sm font-semibold truncate max-w-[200px]">{editData.page_title}</p>
+          <Badge variant={editData.is_published ? "default" : "secondary"} className="text-2xs">
+            {editData.is_published ? "Live" : "Draft"}
+          </Badge>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground text-xs">Published</span>
-            <Switch checked={editData.is_published} onCheckedChange={(v) => setEditData({ ...editData, is_published: v })} />
+
+        <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5">
+          {([
+            { key: "desktop", icon: Monitor },
+            { key: "tablet", icon: Tablet },
+            { key: "mobile", icon: Smartphone },
+          ] as const).map(({ key, icon: DevIcon }) => (
+            <button
+              key={key}
+              onClick={() => setPreviewDevice(key)}
+              className={`h-7 w-7 rounded-md flex items-center justify-center transition-colors ${
+                previewDevice === key ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <DevIcon className="h-3.5 w-3.5" />
+            </button>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 mr-2">
+            <span className="text-2xs text-muted-foreground">Published</span>
+            <Switch checked={editData.is_published} onCheckedChange={(v) => setEditData({ ...editData, is_published: v })} className="scale-75" />
           </div>
+          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setShowSettings(!showSettings)} title="Page settings">
+            <Settings2 className="h-4 w-4" />
+          </Button>
           <a href={currentDef?.url || `/${editData.page_key}`} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline" size="sm">
-              <Eye className="h-3.5 w-3.5 mr-1" /> Preview
+            <Button variant="outline" size="sm" className="h-8 text-xs">
+              <ExternalLink className="h-3 w-3 mr-1" /> Preview
             </Button>
           </a>
-          <Button size="sm" onClick={handleSave} disabled={saveMutation.isPending}>
-            {saveMutation.isPending ? <Loader2 className="h-3.5 w-3.5 mr-1 animate-spin" /> : <Save className="h-3.5 w-3.5 mr-1" />}
+          <Button size="sm" className="h-8 text-xs" onClick={handleSave} disabled={saveMutation.isPending}>
+            {saveMutation.isPending ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Save className="h-3 w-3 mr-1" />}
             Save
           </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="sections" className="w-full">
-        <TabsList>
-          <TabsTrigger value="sections">Sections</TabsTrigger>
-          <TabsTrigger value="settings">Page Settings</TabsTrigger>
-        </TabsList>
+      {/* ─── Main Area ─── */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* ─── Left Panel: Sections ─── */}
+        <div className="w-[280px] border-r border-border bg-card flex flex-col shrink-0 relative overflow-hidden">
+          {/* Section list header */}
+          <div className="px-3 py-2.5 border-b border-border flex items-center justify-between shrink-0">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Sections · {editData.sections.filter((s) => s.enabled).length} active
+            </span>
+            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setShowAddSection(!showAddSection)}>
+              <Plus className="h-3.5 w-3.5" />
+            </Button>
+          </div>
 
-        {/* ─── Sections Tab ─── */}
-        <TabsContent value="sections" className="space-y-3 mt-4">
-          {editData.sections.map((section, idx) => (
-            <div
-              key={section.id}
-              className={`rounded-xl border bg-card transition-all ${
-                section.enabled ? "border-border" : "border-border/50 opacity-60"
-              }`}
+          {/* Add section dropdown */}
+          <AnimatePresence>
+            {showAddSection && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="border-b border-border overflow-hidden shrink-0"
+              >
+                <div className="p-2 space-y-1">
+                  <p className="text-2xs text-muted-foreground px-2 py-1">Add a section:</p>
+                  {NEW_SECTION_TYPES.map((st) => {
+                    const SIcon = SECTION_ICONS[st.type] || FileText;
+                    return (
+                      <button
+                        key={st.type}
+                        className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-xs hover:bg-muted/50 transition-colors text-left"
+                        onClick={() => addSection(st.type)}
+                      >
+                        <SIcon className="h-3 w-3 text-muted-foreground" />
+                        {st.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Sortable section list */}
+          <div className="flex-1 overflow-y-auto p-2 space-y-0.5">
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={editData.sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+                {editData.sections.map((section) => (
+                  <SortableSectionItem
+                    key={section.id}
+                    section={section}
+                    isActive={activeSection === section.id}
+                    onSelect={() => {
+                      setActiveSection(section.id);
+                      setEditingSection(section.id);
+                    }}
+                    onToggle={() => toggleSection(section.id)}
+                    onDuplicate={() => duplicateSection(section.id)}
+                    onDelete={() => deleteSection(section.id)}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          </div>
+
+          {/* Section editor overlay */}
+          <AnimatePresence>
+            {editingSection && activeSectionData && (
+              <SectionEditor
+                key={editingSection}
+                section={activeSectionData}
+                onUpdate={updateSection}
+                onClose={() => setEditingSection(null)}
+              />
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* ─── Center: Live Preview ─── */}
+        <div className="flex-1 bg-muted/30 flex items-start justify-center p-6 overflow-auto">
+          <div
+            className="bg-background rounded-xl border border-border shadow-lg overflow-hidden transition-all duration-300"
+            style={{
+              width: previewWidths[previewDevice],
+              maxWidth: "100%",
+              height: previewDevice === "desktop" ? "calc(100vh - 120px)" : previewDevice === "tablet" ? "700px" : "667px",
+            }}
+          >
+            <iframe
+              src={currentDef?.url || `/${editData.page_key}`}
+              className="w-full h-full border-0"
+              title="Page preview"
+            />
+          </div>
+        </div>
+
+        {/* ─── Right Panel: Settings (conditional) ─── */}
+        <AnimatePresence>
+          {showSettings && (
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 300, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="border-l border-border bg-card overflow-hidden shrink-0"
             >
-              {/* Section header */}
-              <div className="flex items-center gap-3 px-4 py-3">
-                <GripVertical className="h-4 w-4 text-muted-foreground/50 cursor-grab shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium truncate">{section.label}</p>
-                    <Badge variant="secondary" className="text-2xs">{SECTION_TYPE_LABELS[section.type] || section.type}</Badge>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1 shrink-0">
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => moveSection(section.id, "up")} disabled={idx === 0}>
-                    <ChevronUp className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => moveSection(section.id, "down")} disabled={idx === editData.sections.length - 1}>
-                    <ChevronDown className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => toggleSection(section.id)}>
-                    {section.enabled ? <ToggleRight className="h-4 w-4 text-primary" /> : <ToggleLeft className="h-4 w-4 text-muted-foreground" />}
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => duplicateSection(section.id)}>
-                    <Copy className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive/70 hover:text-destructive" onClick={() => deleteSection(section.id)}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setExpandedSection(expandedSection === section.id ? null : section.id)}>
-                    <Pencil className="h-3.5 w-3.5" />
+              <div className="w-[300px] h-full overflow-y-auto">
+                <div className="px-4 py-3 border-b border-border flex items-center justify-between">
+                  <span className="text-xs font-semibold">Page Settings</span>
+                  <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setShowSettings(false)}>
+                    <X className="h-3.5 w-3.5" />
                   </Button>
                 </div>
-              </div>
-
-              {/* Expanded content editor */}
-              {expandedSection === section.id && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  transition={{ duration: 0.2 }}
-                  className="border-t border-border px-4 py-4 space-y-4"
-                >
+                <div className="p-4 space-y-4">
                   <div>
-                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Section Label</label>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Page Title</label>
                     <Input
-                      value={section.label}
-                      onChange={(e) => setEditData({
-                        ...editData,
-                        sections: editData.sections.map((s) =>
-                          s.id === section.id ? { ...s, label: e.target.value } : s
-                        ),
-                      })}
-                      className="text-sm"
+                      value={editData.page_title}
+                      onChange={(e) => setEditData({ ...editData, page_title: e.target.value })}
+                      className="text-sm h-9"
                     />
                   </div>
-
-                  {/* Dynamic content fields */}
-                  {Object.keys(section.content).length === 0 ? (
-                    <div className="rounded-lg bg-muted/50 p-4 text-center">
-                      <p className="text-xs text-muted-foreground">
-                        This section uses default content. Add custom fields below.
-                      </p>
-                      <div className="flex flex-wrap gap-2 justify-center mt-3">
-                        {["headline", "subheadline", "cta_primary", "cta_secondary"].map((field) => (
-                          <Button
-                            key={field}
-                            variant="outline"
-                            size="sm"
-                            className="text-xs"
-                            onClick={() => updateSectionContent(section.id, field, "")}
-                          >
-                            <Plus className="h-3 w-3 mr-1" /> {field.replace(/_/g, " ")}
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  ) : (
-                    Object.entries(section.content).map(([field, value]) => (
-                      <div key={field}>
-                        <label className="text-xs font-medium text-muted-foreground mb-1.5 block capitalize">
-                          {field.replace(/_/g, " ")}
-                        </label>
-                        {String(value).length > 80 ? (
-                          <Textarea
-                            value={String(value)}
-                            onChange={(e) => updateSectionContent(section.id, field, e.target.value)}
-                            className="text-sm min-h-[80px]"
-                          />
-                        ) : (
-                          <Input
-                            value={String(value)}
-                            onChange={(e) => updateSectionContent(section.id, field, e.target.value)}
-                            className="text-sm"
-                          />
-                        )}
-                      </div>
-                    ))
-                  )}
-
-                  {/* Add custom field */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs"
-                    onClick={() => {
-                      const fieldName = prompt("Field name (e.g. headline, body_text):");
-                      if (fieldName) updateSectionContent(section.id, fieldName.trim(), "");
-                    }}
-                  >
-                    <Plus className="h-3 w-3 mr-1" /> Add custom field
-                  </Button>
-                </motion.div>
-              )}
-            </div>
-          ))}
-
-          {/* Add section button */}
-          {showAddSection ? (
-            <div className="rounded-xl border border-dashed border-primary/30 bg-primary/5 p-4">
-              <p className="text-xs font-medium text-muted-foreground mb-3">Choose a section type to add:</p>
-              <div className="flex flex-wrap gap-2">
-                {NEW_SECTION_TYPES.map((st) => (
-                  <Button key={st.type} variant="outline" size="sm" className="text-xs" onClick={() => addSection(st.type)}>
-                    <Plus className="h-3 w-3 mr-1" /> {st.label}
-                  </Button>
-                ))}
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Description</label>
+                    <Textarea
+                      value={editData.page_description}
+                      onChange={(e) => setEditData({ ...editData, page_description: e.target.value })}
+                      className="text-sm min-h-[70px]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">URL Path</label>
+                    <Input value={currentDef?.url || `/${editData.page_key}`} disabled className="opacity-60 text-sm h-9" />
+                    <p className="text-2xs text-muted-foreground mt-1">URL path cannot be changed</p>
+                  </div>
+                </div>
               </div>
-              <Button variant="ghost" size="sm" className="text-xs mt-2" onClick={() => setShowAddSection(false)}>
-                Cancel
-              </Button>
-            </div>
-          ) : (
-            <Button variant="outline" className="w-full border-dashed" onClick={() => setShowAddSection(true)}>
-              <Plus className="h-4 w-4 mr-1.5" /> Add Section
-            </Button>
+            </motion.div>
           )}
-        </TabsContent>
-
-        {/* ─── Settings Tab ─── */}
-        <TabsContent value="settings" className="space-y-6 mt-4">
-          <div className="rounded-xl border border-border bg-card p-6 space-y-4">
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Page Title</label>
-              <Input
-                value={editData.page_title}
-                onChange={(e) => setEditData({ ...editData, page_title: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Page Description</label>
-              <Textarea
-                value={editData.page_description}
-                onChange={(e) => setEditData({ ...editData, page_description: e.target.value })}
-                className="min-h-[80px]"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">URL Path</label>
-              <Input value={currentDef?.url || `/${editData.page_key}`} disabled className="opacity-60" />
-              <p className="text-2xs text-muted-foreground mt-1">URL path cannot be changed</p>
-            </div>
-          </div>
-        </TabsContent>
-      </Tabs>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
