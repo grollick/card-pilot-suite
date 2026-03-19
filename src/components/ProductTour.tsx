@@ -57,19 +57,8 @@ export default function ProductTour() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 
-  const { data: tourCompleted } = useQuery({
-    queryKey: ["tour-completed", user?.id],
-    enabled: !!user,
-    staleTime: Infinity,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("tour_completed")
-        .eq("id", user!.id)
-        .single();
-      return data?.tour_completed ?? false;
-    },
-  });
+  const { data: profileCache } = useProfileCache();
+  const tourCompleted = profileCache?.tour_completed ?? false;
 
   const completeTour = useMutation({
     mutationFn: async () => {
