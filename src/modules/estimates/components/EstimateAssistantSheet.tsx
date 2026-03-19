@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import AiCreditTopupDialog from "@/components/AiCreditTopupDialog";
 import {
   Sparkles, FileText, DollarSign, ListChecks, TrendingUp, ShieldCheck,
   Loader2, Copy, RotateCcw, CheckCircle2, ArrowRight
@@ -48,6 +49,7 @@ export default function EstimateAssistantSheet({
   const [result, setResult] = useState("");
   const [parsedItems, setParsedItems] = useState<EstimateLineItem[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showTopup, setShowTopup] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -101,7 +103,8 @@ export default function EstimateAssistantSheet({
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({ error: "Request failed" }));
         if (resp.status === 403 && err.code === "AI_LIMIT_REACHED") {
-          toast.error("AI limit reached — upgrade your plan for more requests.");
+          setShowTopup(true);
+          toast.error("AI limit reached — buy more credits or upgrade your plan.");
         } else if (resp.status === 429) toast.error("Rate limit exceeded. Try again shortly.");
         else if (resp.status === 402) toast.error("AI credits exhausted.");
         throw new Error(err.error || "Request failed");
@@ -241,6 +244,7 @@ export default function EstimateAssistantSheet({
   };
 
   return (
+    <>
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-lg p-0 flex flex-col">
         <SheetHeader className="px-4 pt-4 pb-2 border-b border-border shrink-0">
@@ -414,5 +418,7 @@ export default function EstimateAssistantSheet({
         )}
       </SheetContent>
     </Sheet>
+    <AiCreditTopupDialog open={showTopup} onOpenChange={setShowTopup} />
+    </>
   );
 }

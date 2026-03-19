@@ -53,3 +53,6 @@ verify_jwt = false
 
 [functions.estimate-assist]
 verify_jwt = false
+
+[functions.purchase-ai-credits]
+verify_jwt = false

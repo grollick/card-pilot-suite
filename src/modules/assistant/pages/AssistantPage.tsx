@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import AiCreditTopupDialog from "@/components/AiCreditTopupDialog";
 import { Send, Loader2, Sparkles, Copy, RotateCcw, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -51,6 +52,7 @@ export default function AssistantPage() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showTopup, setShowTopup] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -88,6 +90,7 @@ export default function AssistantPage() {
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({ error: "Request failed" }));
         if (resp.status === 403 && err.code === "AI_LIMIT_REACHED") {
+          setShowTopup(true);
           throw new Error(err.error);
         }
         throw new Error(err.error || "Request failed");
@@ -305,6 +308,7 @@ export default function AssistantPage() {
           </Button>
         </div>
       </div>
+      <AiCreditTopupDialog open={showTopup} onOpenChange={setShowTopup} />
     </div>
   );
 }
