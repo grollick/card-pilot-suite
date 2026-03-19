@@ -90,11 +90,22 @@ export default function AdminMarketingDashboard() {
                 <CardDescription>Profession-specific success guides</CardDescription>
               </CardHeader>
             </Card>
+            <Card className="cursor-pointer hover:shadow-card transition-shadow" onClick={() => setActiveTab("sequences")}>
+              <CardHeader className="pb-2">
+                <Workflow className="h-8 w-8 text-primary mb-2" />
+                <CardTitle className="text-base">Email Sequences</CardTitle>
+                <CardDescription>Automated onboarding & engagement flows</CardDescription>
+              </CardHeader>
+            </Card>
           </div>
         </TabsContent>
 
         <TabsContent value="campaigns" className="mt-4">
           <AdminCampaignBuilder stats={stats} />
+        </TabsContent>
+
+        <TabsContent value="sequences" className="mt-4">
+          <AdminEmailSequences />
         </TabsContent>
 
         <TabsContent value="templates" className="mt-4">
