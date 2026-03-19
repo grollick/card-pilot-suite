@@ -319,7 +319,7 @@ export default function DiscoverPage() {
         <div className="relative max-w-6xl mx-auto px-4 py-14 md:py-20">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 mb-6">
-            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors"><span className="font-bold text-primary">guzzl</span>.pro</Link>
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors"><span className="font-extrabold text-primary">guzzl</span>.pro</Link>
             <span className="text-muted-foreground/40">/</span>
             <span className="text-sm text-foreground font-medium">Discover</span>
             {displayProfession && (
@@ -691,7 +691,7 @@ export default function DiscoverPage() {
         {/* SEO footer */}
         <div className="mt-16 pt-8 border-t border-border/40">
           <p className="text-xs text-muted-foreground text-center">
-            Powered by <Link to="/" className="text-primary hover:underline"><span className="font-bold text-primary">guzzl</span>.pro</Link> — the smart business card platform that helps local businesses get more customers.
+            Powered by <Link to="/" className="text-primary hover:underline"><span className="font-extrabold text-primary">guzzl</span>.pro</Link> — the smart business card platform that helps local businesses get more customers.
           </p>
         </div>
       </div>
