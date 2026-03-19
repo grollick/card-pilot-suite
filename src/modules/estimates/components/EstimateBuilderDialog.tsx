@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
+import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import { Plus, Trash2, Loader2, Download, ChevronDown, ChevronRight, Calculator, Bookmark, Sparkles } from "lucide-react";
 import EstimateAssistantSheet from "./EstimateAssistantSheet";
 import { Button } from "@/components/ui/button";

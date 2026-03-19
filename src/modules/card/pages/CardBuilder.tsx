@@ -1,4 +1,5 @@
 import { Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate, Sparkles, Loader2, MousePointerClick, Crown, Plus, Eye, Smartphone } from "lucide-react";
+import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import BlockMarketplaceDialog from "@/modules/card/components/BlockMarketplaceDialog";
 import { canAccessBlock, type MarketplaceBlock } from "@/lib/blockMarketplace";
 import AIDesignAssistantDialog, { type AICardResult } from "@/modules/card/components/AIDesignAssistantDialog";

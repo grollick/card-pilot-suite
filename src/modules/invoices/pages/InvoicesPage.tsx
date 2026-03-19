@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import { useNavigate } from "react-router-dom";
 import {
   Plus, Loader2, FileText, Send, Eye, CheckCircle, AlertTriangle,

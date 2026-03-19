@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";

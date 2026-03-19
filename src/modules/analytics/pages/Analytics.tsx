@@ -1,4 +1,5 @@
 import { Eye, MousePointer, Users, TrendingUp, Mail, BarChart3, Calendar, Globe, Smartphone, Monitor, Tablet, Download, Clock, RefreshCw, ArrowDown } from "lucide-react";
+import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import KPICard from "@/components/KPICard";
 import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
