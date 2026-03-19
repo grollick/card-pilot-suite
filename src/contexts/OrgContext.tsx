@@ -50,21 +50,23 @@ export function OrgProvider({ children }: { children: ReactNode }) {
       return data as Organization[];
     },
     enabled: !!user,
+    staleTime: 5 * 60 * 1000,
   });
 
-  // Fetch current org from profile
-  const { data: profile } = useQuery({
-    queryKey: ["profile-org", user?.id],
+  // Use profile cache for current_org_id instead of a separate query
+  const { data: profileCache } = useQuery({
+    queryKey: ["profile-cache", user?.id],
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("current_org_id")
+        .select("handle, name, avatar_url, plan, tour_completed, onboarding_completed, current_org_id")
         .eq("id", user!.id)
-        .single();
+        .maybeSingle();
       if (error) throw error;
       return data;
     },
-    enabled: !!user,
   });
 
   const currentOrg = orgs.find((o) => o.id === profile?.current_org_id) || orgs[0] || null;
