@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { HelmetProvider } from "react-helmet-async";
+import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -155,6 +156,7 @@ const queryClient = new QueryClient({
 });
 
 const App = () => (
+  <ThemeProvider attribute="class" defaultTheme="light" storageKey="cardpilot-theme">
   <HelmetProvider>
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -267,6 +269,7 @@ const App = () => (
     </TooltipProvider>
   </QueryClientProvider>
   </HelmetProvider>
+  </ThemeProvider>
 );
 
 export default App;

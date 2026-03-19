@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "next-themes";
 import {
   Search, Plus, ExternalLink, Bell, UserPlus, Calendar,
-  Mail, Share2, ChevronDown, Menu
+  Mail, Share2, ChevronDown, Menu, Moon, Sun
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 export default function TopBar() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
   const { data: profile } = useQuery({
     queryKey: ["profile-handle"],
@@ -88,6 +90,18 @@ export default function TopBar() {
           </a>
         </Button>
       )}
+
+      {/* Night mode toggle */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-9 w-9 rounded-lg"
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      >
+        <Sun className="h-4 w-4 rotate-0 scale-100 transition-transform dark:-rotate-90 dark:scale-0" />
+        <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
+        <span className="sr-only">Toggle night mode</span>
+      </Button>
 
       {/* Notifications */}
       <Button variant="ghost" size="icon" className="h-9 w-9 relative rounded-lg">
