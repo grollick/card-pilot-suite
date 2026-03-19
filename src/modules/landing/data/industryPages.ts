@@ -90,6 +90,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       { title: "Get More Leads", icon: "📥", description: "Capture quote requests from your card." },
       { title: "Show Your Work", icon: "🖼️", description: "Display before-and-after projects to build trust." },
       { title: "Book Consultations", icon: "📅", description: "Let customers schedule time with you." },
+      { title: "Scan Business Cards", icon: "📸", description: "Scan physical cards at job sites to add contacts instantly." },
       { title: "Stay Organized", icon: "📊", description: "Manage all your leads and jobs in one dashboard." },
     ],
     socialProof: {
