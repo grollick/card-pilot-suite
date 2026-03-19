@@ -233,19 +233,25 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         );
       }
 
-      // Smart ranking: featured → conversion_score → rating → activity → name
+      // Smart ranking: activity → reviews → completeness → response speed → name
+      // No paid ranking — all organic based on engagement
       const nowMs = Date.now();
       listings.sort((a, b) => {
-        if (a.featured !== b.featured) return a.featured ? -1 : 1;
-        // On Duty gets priority
+        // On Duty gets top priority
         if (a.is_on_duty !== b.is_on_duty) return a.is_on_duty ? -1 : 1;
-        // Available for work gets a slight boost
+        // Available for work gets a boost
         if (a.available_for_work !== b.available_for_work) return a.available_for_work ? -1 : 1;
-        // Conversion score (composite)
-        if (b.conversion_score !== a.conversion_score) return b.conversion_score - a.conversion_score;
-        const ratingA = a.avg_rating ?? 0;
-        const ratingB = b.avg_rating ?? 0;
+        // Profile completeness (rewards complete profiles)
+        if (b.profile_completeness !== a.profile_completeness) return b.profile_completeness - a.profile_completeness;
+        // Review score
+        const ratingA = (a.avg_rating ?? 0) * a.review_count;
+        const ratingB = (b.avg_rating ?? 0) * b.review_count;
         if (ratingB !== ratingA) return ratingB - ratingA;
+        // Response speed
+        const respA = a.avg_response_minutes ?? 999;
+        const respB = b.avg_response_minutes ?? 999;
+        if (respA !== respB) return respA - respB;
+        // Recent activity
         const activeA = nowMs - new Date(a.updated_at).getTime();
         const activeB = nowMs - new Date(b.updated_at).getTime();
         if (activeA !== activeB) return activeA - activeB;
