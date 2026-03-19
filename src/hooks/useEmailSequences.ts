@@ -71,6 +71,7 @@ export function useCreateSequence() {
       qc.invalidateQueries({ queryKey: ["email-sequences"] });
       toast.success("Sequence created");
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to create sequence"),
   });
 }
 
