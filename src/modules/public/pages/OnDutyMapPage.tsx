@@ -1,19 +1,19 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useOnDutyProfessionals, useUserLocation, type OnDutyProfessional } from "@/hooks/useOnDutyMap";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   MapPin, List, Map as MapIcon, Star, Clock, Zap, Shield,
-  MessageSquare, Eye, Radio, Loader2, Navigation, ArrowLeft,
+  MessageSquare, Eye, Radio, Loader2, ArrowLeft,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import InstantConnectPanel from "@/modules/public/components/InstantConnectPanel";
 
 // ── Leaflet icon factories ──
 function createIcon(color: string) {
@@ -46,13 +46,25 @@ function RecenterMap({ lat, lng }: { lat: number; lng: number }) {
   return null;
 }
 
+// ── Clickable marker wrapper ──
+function ClickableMarker({ pro, onSelect }: { pro: OnDutyProfessional; onSelect: (p: OnDutyProfessional) => void }) {
+  return (
+    <Marker
+      position={[pro.lat, pro.lng]}
+      icon={pro.status === "available" ? greenIcon : yellowIcon}
+      eventHandlers={{ click: () => onSelect(pro) }}
+    />
+  );
+}
+
 // ── Professional card (list view) ──
-function ProfessionalListCard({ pro }: { pro: OnDutyProfessional }) {
+function ProfessionalListCard({ pro, onSelect }: { pro: OnDutyProfessional; onSelect: (p: OnDutyProfessional) => void }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex items-start gap-3 p-3 rounded-xl border border-border bg-card hover:bg-accent/30 transition-colors"
+      className="flex items-start gap-3 p-3 rounded-xl border border-border bg-card hover:bg-accent/30 transition-colors cursor-pointer"
+      onClick={() => onSelect(pro)}
     >
       <Avatar className="h-11 w-11 ring-2 ring-offset-1 ring-offset-background ring-success/40 shrink-0">
         <AvatarImage src={pro.avatar_url ?? undefined} />
@@ -101,10 +113,8 @@ function ProfessionalListCard({ pro }: { pro: OnDutyProfessional }) {
               <Eye className="h-3 w-3" /> Profile
             </Link>
           </Button>
-          <Button asChild size="sm" className="h-7 text-xs gap-1">
-            <Link to={`/${pro.handle}?quote=1`}>
-              <MessageSquare className="h-3 w-3" /> Contact
-            </Link>
+          <Button size="sm" className="h-7 text-xs gap-1" onClick={(e) => { e.stopPropagation(); onSelect(pro); }}>
+            <MessageSquare className="h-3 w-3" /> Connect
           </Button>
         </div>
       </div>
@@ -114,12 +124,16 @@ function ProfessionalListCard({ pro }: { pro: OnDutyProfessional }) {
 
 export default function OnDutyMapPage() {
   const [view, setView] = useState<"map" | "list">("map");
+  const [selectedPro, setSelectedPro] = useState<OnDutyProfessional | null>(null);
   const { data: professionals, isLoading } = useOnDutyProfessionals();
-  const { location: userLocation, loading: locLoading } = useUserLocation();
+  const { location: userLocation } = useUserLocation();
 
   const center = userLocation ?? { lat: 39.8283, lng: -98.5795 };
   const availableCount = professionals?.filter(p => p.status === "available").length ?? 0;
   const recentCount = professionals?.filter(p => p.status === "recent").length ?? 0;
+
+  const handleSelect = useCallback((pro: OnDutyProfessional) => setSelectedPro(pro), []);
+  const handleClose = useCallback(() => setSelectedPro(null), []);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -147,7 +161,6 @@ export default function OnDutyMapPage() {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* View toggle */}
             <div className="flex rounded-lg border border-border overflow-hidden">
               <button
                 onClick={() => setView("map")}
@@ -180,7 +193,7 @@ export default function OnDutyMapPage() {
             <span className="h-2.5 w-2.5 rounded-full bg-warning" /> Recently active
           </span>
           <span className="flex items-center gap-1.5">
-            <Shield className="h-3 w-3" /> Approximate locations for privacy
+            <Shield className="h-3 w-3" /> Tap a pin to connect instantly
           </span>
         </div>
       </div>
@@ -204,71 +217,10 @@ export default function OnDutyMapPage() {
             />
             {userLocation && <RecenterMap lat={userLocation.lat} lng={userLocation.lng} />}
             {professionals?.map(pro => (
-              <Marker
-                key={pro.id}
-                position={[pro.lat, pro.lng]}
-                icon={pro.status === "available" ? greenIcon : yellowIcon}
-              >
-                <Popup>
-                  <div className="min-w-[200px] p-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold overflow-hidden">
-                        {pro.avatar_url ? (
-                          <img src={pro.avatar_url} alt="" className="h-full w-full object-cover" />
-                        ) : (
-                          pro.name.split(" ").map(n => n[0]).join("").slice(0, 2)
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm leading-tight">{pro.name}</p>
-                        {pro.profession_name && (
-                          <p className="text-xs text-gray-500">{pro.profession_name}</p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 mb-2 flex-wrap">
-                      {pro.status === "available" && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-green-700 bg-green-50 px-1.5 py-0.5 rounded-full">
-                          <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" /> Available
-                        </span>
-                      )}
-                      {pro.status === "recent" && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-medium text-yellow-700 bg-yellow-50 px-1.5 py-0.5 rounded-full">
-                          Recently Active
-                        </span>
-                      )}
-                      {pro.avg_rating && (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-600">
-                          ★ {pro.avg_rating}
-                        </span>
-                      )}
-                      {pro.avg_response_minutes && (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] text-gray-500">
-                          ⚡ {formatResponseTime(pro.avg_response_minutes)}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex gap-1.5">
-                      <a
-                        href={`/${pro.handle}`}
-                        className="flex-1 text-center text-xs px-2 py-1 rounded border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
-                      >
-                        View Profile
-                      </a>
-                      <a
-                        href={`/${pro.handle}?quote=1`}
-                        className="flex-1 text-center text-xs px-2 py-1 rounded bg-green-600 text-white hover:bg-green-700 transition-colors"
-                      >
-                        Contact
-                      </a>
-                    </div>
-                  </div>
-                </Popup>
-              </Marker>
+              <ClickableMarker key={pro.id} pro={pro} onSelect={handleSelect} />
             ))}
           </MapContainer>
 
-          {/* Floating info card */}
           {!professionals?.length && (
             <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[500] bg-card border border-border rounded-xl p-4 shadow-lg text-center max-w-xs">
               <MapPin className="h-5 w-5 text-muted-foreground mx-auto mb-2" />
@@ -281,16 +233,14 @@ export default function OnDutyMapPage() {
           )}
         </div>
       ) : (
-        /* List View */
         <div className="flex-1 max-w-3xl mx-auto w-full px-4 py-6">
           <div className="mb-4">
             <h2 className="text-lg font-bold">Available Near You Right Now</h2>
             <p className="text-xs text-muted-foreground">
-              Professionals currently on duty and ready to take your request.
+              Tap any professional to instantly connect.
             </p>
           </div>
 
-          {/* Benefits callout */}
           <div className="rounded-xl border border-success/20 bg-success/5 p-3 mb-4 flex items-start gap-2.5">
             <Zap className="h-4 w-4 text-success shrink-0 mt-0.5" />
             <div>
@@ -313,12 +263,15 @@ export default function OnDutyMapPage() {
           ) : (
             <div className="space-y-2">
               {professionals?.map(pro => (
-                <ProfessionalListCard key={pro.id} pro={pro} />
+                <ProfessionalListCard key={pro.id} pro={pro} onSelect={handleSelect} />
               ))}
             </div>
           )}
         </div>
       )}
+
+      {/* Instant Connect Panel */}
+      <InstantConnectPanel professional={selectedPro} onClose={handleClose} />
     </div>
   );
 }
