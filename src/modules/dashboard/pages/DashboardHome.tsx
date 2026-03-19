@@ -73,6 +73,9 @@ export default function DashboardHome() {
         </div>
       </div>
 
+      {/* ── Revenue Pipeline ── */}
+      <RevenuePipelineWidget />
+
       {/* ── Next Actions ── */}
       <NextActionsWidget />
 

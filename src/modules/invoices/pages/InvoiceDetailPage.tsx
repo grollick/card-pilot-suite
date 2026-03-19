@@ -135,13 +135,23 @@ export default function InvoiceDetailPage() {
         </div>
         <div className="flex gap-2">
           {!isNew && invoice?.status === "draft" && (
-            <Button variant="outline" onClick={() => updateStatus.mutate({ id: id!, status: "sent" })}>
+            <Button variant="outline" onClick={() => updateStatus.mutate({ id: id!, status: "sent", lead_id: invoice?.lead_id, invoice_number: invoice?.invoice_number })}>
               <Send className="h-4 w-4 mr-2" /> Mark Sent
             </Button>
           )}
           {!isNew && ["sent", "viewed", "overdue"].includes(invoice?.status) && (
-            <Button variant="outline" onClick={() => updateStatus.mutate({ id: id!, status: "paid" })}>
+            <Button variant="outline" onClick={() => updateStatus.mutate({ id: id!, status: "paid", lead_id: invoice?.lead_id, invoice_number: invoice?.invoice_number })}>
               <CheckCircle className="h-4 w-4 mr-2" /> Mark Paid
+            </Button>
+          )}
+          {!isNew && invoice && (
+            <Button variant="outline" onClick={() => exportInvoicePDF({
+              invoice: { ...invoice, leads: invoice.leads, jobs: invoice.jobs },
+              lineItems: items.filter(li => li.title),
+              profile: profile as any,
+              planKey,
+            })}>
+              <Download className="h-4 w-4 mr-2" /> PDF
             </Button>
           )}
           <Button onClick={handleSave} disabled={createInvoice.isPending || updateInvoice.isPending}>
