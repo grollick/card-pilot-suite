@@ -92,7 +92,7 @@ export function OrgProvider({ children }: { children: ReactNode }) {
   const switchOrg = useCallback(async (orgId: string) => {
     if (!user) return;
     await supabase.from("profiles").update({ current_org_id: orgId }).eq("id", user.id);
-    queryClient.invalidateQueries({ queryKey: ["profile-org"] });
+    queryClient.invalidateQueries({ queryKey: ["profile-cache"] });
   }, [user, queryClient]);
 
   const createOrg = useCallback(async (name: string, slug: string): Promise<Organization | null> => {
