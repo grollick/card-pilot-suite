@@ -26,8 +26,19 @@ export default function DutySettingsPanel({ isOnDuty, isProPlus, isPending, onSa
   const [autoOffOutside, setAutoOffOutside] = useState(false);
 
   const handleSave = () => {
+    // Convert time string "HH:MM" to a full ISO timestamp (today at that time)
+    let parsedUntil: string | null = null;
+    if (availableUntil) {
+      const [hours, minutes] = availableUntil.split(":").map(Number);
+      const d = new Date();
+      d.setHours(hours, minutes, 0, 0);
+      // If the time is in the past, assume tomorrow
+      if (d <= new Date()) d.setDate(d.getDate() + 1);
+      parsedUntil = d.toISOString();
+    }
+
     onSave({
-      available_until: availableUntil || null,
+      available_until: parsedUntil,
       max_leads: maxLeads ? parseInt(maxLeads) : null,
       service_radius_km: radiusKm ? parseInt(radiusKm) : null,
       auto_off_after_hours: autoOffHours ? parseInt(autoOffHours) : null,
