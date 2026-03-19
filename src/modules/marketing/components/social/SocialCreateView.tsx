@@ -58,7 +58,7 @@ export default function SocialCreateView({ editPost, onDone }: Props) {
   const [linkToCard, setLinkToCard] = useState(true);
 
   const resetForm = useCallback(() => {
-    setContent(""); setSelectedPlatforms(["Instagram", "Facebook"]); setPlatformOverrides({});
+    setContent(""); setImageUrl(""); setSelectedPlatforms(["Instagram", "Facebook"]); setPlatformOverrides({});
     setScheduledDate(undefined); setScheduledTime("10:00");
     setCampaignId(""); setContentLabel(""); setHashtags(""); setCta("");
     setShowAiGenerator(false); setShowSpinner(false); setTone("professional");
