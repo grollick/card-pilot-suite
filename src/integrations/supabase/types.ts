@@ -3455,14 +3455,21 @@ export type Database = {
       social_posts: {
         Row: {
           approval_status: string | null
+          bookings_generated: number
           campaign_id: string | null
+          clicks: number
           content: string
           content_label: string | null
+          content_type: string | null
           created_at: string
+          engagement_score: number
           id: string
           lead_id: string | null
+          leads_generated: number
+          link_clicks: number
           media_urls: string[] | null
           org_id: string | null
+          performance_notes: string | null
           platform_overrides: Json | null
           platforms_json: Json
           queue_position: number | null
@@ -3473,14 +3480,21 @@ export type Database = {
         }
         Insert: {
           approval_status?: string | null
+          bookings_generated?: number
           campaign_id?: string | null
+          clicks?: number
           content: string
           content_label?: string | null
+          content_type?: string | null
           created_at?: string
+          engagement_score?: number
           id?: string
           lead_id?: string | null
+          leads_generated?: number
+          link_clicks?: number
           media_urls?: string[] | null
           org_id?: string | null
+          performance_notes?: string | null
           platform_overrides?: Json | null
           platforms_json?: Json
           queue_position?: number | null
@@ -3491,14 +3505,21 @@ export type Database = {
         }
         Update: {
           approval_status?: string | null
+          bookings_generated?: number
           campaign_id?: string | null
+          clicks?: number
           content?: string
           content_label?: string | null
+          content_type?: string | null
           created_at?: string
+          engagement_score?: number
           id?: string
           lead_id?: string | null
+          leads_generated?: number
+          link_clicks?: number
           media_urls?: string[] | null
           org_id?: string | null
+          performance_notes?: string | null
           platform_overrides?: Json | null
           platforms_json?: Json
           queue_position?: number | null
