@@ -651,7 +651,15 @@ export default function DiscoverPage() {
       </div>
 
       {/* Sticky CTA */}
-      {showSticky && <StickyCTA />}
+      {showSticky && <StickyCTA onQuoteClick={() => setQuoteDialogOpen(true)} />}
+
+      {/* Quote Dialog */}
+      <MarketplaceQuoteDialog
+        open={quoteDialogOpen}
+        onOpenChange={setQuoteDialogOpen}
+        profession={displayProfession}
+        location={displayCity}
+      />
     </div>
   );
 }
