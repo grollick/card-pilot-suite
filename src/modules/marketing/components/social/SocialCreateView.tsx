@@ -39,7 +39,7 @@ interface Props {
   onPendingConsumed?: () => void;
 }
 
-export default function SocialCreateView({ editPost, onDone }: Props) {
+export default function SocialCreateView({ editPost, onDone, pendingContent, onPendingConsumed }: Props) {
   const createPost = useCreatePost();
   const updatePost = useUpdatePost();
   const { data: campaigns = [] } = useSocialCampaigns();
