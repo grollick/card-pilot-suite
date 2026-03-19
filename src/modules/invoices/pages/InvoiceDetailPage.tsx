@@ -168,7 +168,7 @@ export default function InvoiceDetailPage() {
               <Select value={jobId} onValueChange={setJobId}>
                 <SelectTrigger><SelectValue placeholder="Link to job" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {jobs.map((j: any) => (
                     <SelectItem key={j.id} value={j.id}>{j.job_number} — {j.title}</SelectItem>
                   ))}
