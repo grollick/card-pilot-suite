@@ -69,6 +69,15 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
     toast.success("Post added! You can edit it before saving.");
   };
 
+  const shuffleImage = (idx: number) => {
+    setIdeas(prev => prev.map((idea, i) => {
+      if (i !== idx) return idea;
+      const seed = `${idea.image_query}-${Date.now()}`;
+      return { ...idea, image_url: `https://picsum.photos/seed/${encodeURIComponent(seed)}/800/600` };
+    }));
+    toast.success("New image loaded!");
+  };
+
   return (
     <div className="space-y-3">
       <div className="flex gap-2">
