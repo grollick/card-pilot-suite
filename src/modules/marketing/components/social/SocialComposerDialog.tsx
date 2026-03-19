@@ -47,6 +47,7 @@ export default function SocialComposerDialog({ open, onOpenChange, editPost, onC
     setContent(""); setSelectedPlatforms([]); setPlatformOverrides({});
     setScheduledDate(undefined); setScheduledTime("10:00");
     setCampaignId(""); setContentLabel(""); setActivePlatformTab("base");
+    setShowAiGenerator(false);
   }, []);
 
   useEffect(() => {
