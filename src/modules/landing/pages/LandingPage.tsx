@@ -57,7 +57,7 @@ const steps = [
 const benefits = [
   { icon: UserPlus, title: "Capture Leads", desc: "Turn every card view into a contact. Auto-capture visitor info without lifting a finger." },
   { icon: Calendar, title: "Book Appointments", desc: "Let customers self-book from your card. No more back-and-forth scheduling." },
-  { icon: Camera, title: "Show Your Work", desc: "Showcase your best projects with before/after photos and galleries." },
+  { icon: Camera, title: "Scan Business Cards", desc: "Scan physical business cards with your camera — AI extracts contact info instantly. Or let visitors scan theirs to you." },
   { icon: BarChart3, title: "Track Your Growth", desc: "See card views, leads captured, bookings, and revenue — all in real-time." },
 ];
 
