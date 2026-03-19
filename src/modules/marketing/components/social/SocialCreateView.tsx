@@ -43,6 +43,7 @@ export default function SocialCreateView({ editPost, onDone }: Props) {
   const { data: campaigns = [] } = useSocialCampaigns();
 
   const [content, setContent] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["Instagram", "Facebook"]);
   const [platformOverrides, setPlatformOverrides] = useState<Record<string, { content?: string; hashtags?: string[] }>>({});
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
