@@ -321,6 +321,13 @@ export default function PricingPage() {
           </div>
         </section>
 
+        {/* ── LEAD GUARANTEE ── */}
+        <section className="px-6 pb-20">
+          <div className="mx-auto max-w-4xl">
+            <LeadGuaranteeBanner variant="pricing" />
+          </div>
+        </section>
+
         {/* ── ROI SECTION ── */}
         <section className="px-6 pb-20">
           <div className="mx-auto max-w-4xl rounded-2xl bg-gradient-to-br from-success/5 via-background to-primary/5 border border-border p-8 md:p-12">
