@@ -139,8 +139,13 @@ export default function ListingCard({ listing, boosted, variant = "default" }: L
                     {listing.profession_name}
                   </Badge>
                 )}
-                {listing.available_for_work && (
-                  <Badge variant="outline" className="text-[10px] font-normal gap-0.5 bg-emerald-500/5 text-emerald-700 border-emerald-500/20">
+                {listing.is_on_duty && (
+                  <Badge className="text-[10px] font-medium gap-0.5 bg-success/15 text-success border-success/20 animate-pulse">
+                    <Radio className="h-2.5 w-2.5" /> On Duty
+                  </Badge>
+                )}
+                {listing.available_for_work && !listing.is_on_duty && (
+                  <Badge variant="outline" className="text-[10px] font-normal gap-0.5 bg-success/5 text-success border-success/20">
                     <CheckCircle2 className="h-2.5 w-2.5" /> Available
                   </Badge>
                 )}
