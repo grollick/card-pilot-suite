@@ -27,6 +27,7 @@ const TABS = [
 ];
 
 export default function SocialScheduler() {
+  const navigate = useNavigate();
   const [composerOpen, setComposerOpen] = useState(false);
   const [editPost, setEditPost] = useState<SocialPost | null>(null);
   const [detailPost, setDetailPost] = useState<SocialPost | null>(null);
