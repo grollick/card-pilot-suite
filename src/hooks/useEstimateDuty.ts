@@ -7,6 +7,7 @@ export interface DutyStatus {
   id: string;
   user_id: string;
   is_on_duty: boolean;
+  duty_type: string;
   available_until: string | null;
   service_types: string[];
   service_radius_km: number | null;
@@ -15,6 +16,11 @@ export interface DutyStatus {
   auto_off_after_hours: number | null;
   auto_off_outside_hours: boolean;
   went_on_duty_at: string | null;
+  last_response_at: string | null;
+  avg_response_minutes: number | null;
+  missed_leads_count: number;
+  accepted_leads_count: number;
+  completed_estimates_count: number;
   updated_at: string;
 }
 
@@ -24,6 +30,8 @@ export interface DutyAnalytics {
   responseRate: number;
   missedLeads: number;
   bookingsFromDuty: number;
+  acceptedLeads: number;
+  completedEstimates: number;
 }
 
 export function useEstimateDuty() {
@@ -73,12 +81,17 @@ export function useEstimateDuty() {
         ? Math.round((responded.length / received) * 100)
         : 0;
 
+      // Get counters from status
+      const status = statusQuery.data;
+
       return {
         leadsReceived: received,
         avgResponseMin: avgResponse,
         responseRate,
         missedLeads: missed,
         bookingsFromDuty: booked,
+        acceptedLeads: status?.accepted_leads_count ?? 0,
+        completedEstimates: status?.completed_estimates_count ?? 0,
       };
     },
   });
@@ -86,6 +99,7 @@ export function useEstimateDuty() {
   const toggleDuty = useMutation({
     mutationFn: async (params: {
       is_on_duty: boolean;
+      duty_type?: string;
       available_until?: string | null;
       service_types?: string[];
       service_radius_km?: number | null;
@@ -96,6 +110,7 @@ export function useEstimateDuty() {
       const payload = {
         user_id: user!.id,
         is_on_duty: params.is_on_duty,
+        duty_type: params.duty_type ?? "estimates",
         available_until: params.available_until ?? null,
         service_types: params.service_types ?? [],
         service_radius_km: params.service_radius_km ?? null,
@@ -113,10 +128,19 @@ export function useEstimateDuty() {
         .select()
         .single();
       if (error) throw error;
+
+      // Log duty event
+      await supabase.from("estimate_duty_log").insert({
+        user_id: user!.id,
+        event_type: params.is_on_duty ? "went_on_duty" : "went_off_duty",
+        was_on_duty: params.is_on_duty,
+      });
+
       return data;
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["estimate-duty-status"] });
+      qc.invalidateQueries({ queryKey: ["estimate-duty-analytics"] });
       toast.success(data.is_on_duty ? "You're now On Duty for Estimates!" : "You're now Off Duty");
     },
     onError: () => toast.error("Failed to update duty status"),

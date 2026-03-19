@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Radio, Clock, MapPin, Target, Zap, Shield, ChevronDown, ChevronUp,
-  AlertTriangle, CheckCircle2, TrendingUp, BarChart3,
+  AlertTriangle, CheckCircle2, TrendingUp, BarChart3, Inbox,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -13,33 +13,28 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEstimateDuty } from "@/hooks/useEstimateDuty";
+import { useEstimateMatches } from "@/hooks/useEstimateRequests";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
+import DutySettingsPanel from "./duty/DutySettingsPanel";
+import DutyAnalyticsPanel from "./duty/DutyAnalyticsPanel";
+import DutyMatchesList from "./duty/DutyMatchesList";
 
 export default function EstimateDutyPanel() {
   const navigate = useNavigate();
   const { status, isOnDuty, isLoading, analytics, toggleDuty } = useEstimateDuty();
+  const { pendingCount } = useEstimateMatches();
   const { planKey } = usePlanLimits();
   const [showSettings, setShowSettings] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
-
-  // Local form state
-  const [availableUntil, setAvailableUntil] = useState("");
-  const [maxLeads, setMaxLeads] = useState("");
-  const [radiusKm, setRadiusKm] = useState("");
-  const [autoOffHours, setAutoOffHours] = useState("");
-  const [autoOffOutside, setAutoOffOutside] = useState(false);
+  const [showMatches, setShowMatches] = useState(false);
 
   const isFreePlan = planKey === "starter";
   const isProPlus = planKey === "pro" || planKey === "agency";
 
-  const handleToggle = (on: boolean) => {
+  const handleToggle = (on: boolean, settings?: any) => {
     toggleDuty.mutate({
       is_on_duty: on,
-      available_until: availableUntil || null,
-      max_leads: maxLeads ? parseInt(maxLeads) : null,
-      service_radius_km: radiusKm ? parseInt(radiusKm) : null,
-      auto_off_after_hours: autoOffHours ? parseInt(autoOffHours) : null,
-      auto_off_outside_hours: autoOffOutside,
+      ...settings,
     });
   };
 
@@ -58,7 +53,6 @@ export default function EstimateDutyPanel() {
       transition={{ delay: 0.1, duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
       className="dash-card relative overflow-hidden"
     >
-      {/* Accent bar */}
       {isOnDuty && (
         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-success to-success/60 rounded-t-xl" />
       )}
@@ -66,9 +60,7 @@ export default function EstimateDutyPanel() {
       <div className="dash-card-header pt-3">
         <div className="flex items-center gap-2.5">
           <div className={`h-9 w-9 rounded-xl flex items-center justify-center ring-1 ${
-            isOnDuty
-              ? "bg-success/15 ring-success/20"
-              : "bg-muted ring-border"
+            isOnDuty ? "bg-success/15 ring-success/20" : "bg-muted ring-border"
           }`}>
             <Radio className={`h-4.5 w-4.5 ${isOnDuty ? "text-success" : "text-muted-foreground"}`} />
           </div>
@@ -78,6 +70,11 @@ export default function EstimateDutyPanel() {
               {isOnDuty && (
                 <Badge className="text-[10px] h-4 px-1.5 font-medium bg-success/15 text-success border-success/20">
                   Live
+                </Badge>
+              )}
+              {pendingCount > 0 && (
+                <Badge className="text-[10px] h-4 px-1.5 font-medium bg-primary/15 text-primary border-primary/20">
+                  {pendingCount} new
                 </Badge>
               )}
             </h2>
@@ -93,7 +90,7 @@ export default function EstimateDutyPanel() {
           {!isFreePlan && (
             <Switch
               checked={isOnDuty}
-              onCheckedChange={handleToggle}
+              onCheckedChange={(on) => handleToggle(on)}
               disabled={toggleDuty.isPending}
               className={isOnDuty ? "data-[state=checked]:bg-success" : ""}
             />
@@ -126,7 +123,6 @@ export default function EstimateDutyPanel() {
         {/* Active duty status */}
         {isOnDuty && !isFreePlan && (
           <div className="space-y-2">
-            {/* Lead progress */}
             {leadsMax > 0 && (
               <div>
                 <div className="flex items-center justify-between mb-1">
@@ -137,7 +133,6 @@ export default function EstimateDutyPanel() {
               </div>
             )}
 
-            {/* Status badges */}
             <div className="flex flex-wrap gap-1.5">
               {status?.available_until && (
                 <Badge variant="outline" className="text-[10px] gap-1 font-normal">
@@ -157,159 +152,67 @@ export default function EstimateDutyPanel() {
                   {status!.service_types.length} services
                 </Badge>
               )}
+              {(status?.accepted_leads_count ?? 0) > 0 && (
+                <Badge variant="outline" className="text-[10px] gap-1 font-normal bg-success/5 border-success/20 text-success">
+                  <CheckCircle2 className="h-2.5 w-2.5" />
+                  {status!.accepted_leads_count} accepted
+                </Badge>
+              )}
             </div>
           </div>
         )}
 
-        {/* Settings expandable */}
+        {/* Expandable sections */}
         {!isFreePlan && (
-          <>
+          <div className="flex flex-wrap gap-1.5">
             <Button
               variant="ghost"
               size="sm"
-              className="w-full text-xs gap-1.5 h-7 text-muted-foreground"
-              onClick={() => setShowSettings(!showSettings)}
+              className="flex-1 text-xs gap-1.5 h-7 text-muted-foreground"
+              onClick={() => { setShowSettings(!showSettings); setShowAnalytics(false); setShowMatches(false); }}
             >
               {showSettings ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-              {showSettings ? "Hide settings" : "Duty settings"}
+              Settings
             </Button>
-
-            <AnimatePresence>
-              {showSettings && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="space-y-3 border-t border-border pt-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-[10px] text-muted-foreground">Available until</Label>
-                        <Input
-                          type="time"
-                          value={availableUntil}
-                          onChange={(e) => setAvailableUntil(e.target.value)}
-                          className="h-8 text-xs"
-                          placeholder="HH:MM"
-                        />
-                      </div>
-                      <div>
-                        <Label className="text-[10px] text-muted-foreground">Max leads</Label>
-                        <Input
-                          type="number"
-                          value={maxLeads}
-                          onChange={(e) => setMaxLeads(e.target.value)}
-                          className="h-8 text-xs"
-                          placeholder="e.g. 5"
-                          min={1}
-                        />
-                      </div>
-                    </div>
-
-                    {isProPlus && (
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <Label className="text-[10px] text-muted-foreground">Service radius (km)</Label>
-                          <Input
-                            type="number"
-                            value={radiusKm}
-                            onChange={(e) => setRadiusKm(e.target.value)}
-                            className="h-8 text-xs"
-                            placeholder="e.g. 25"
-                            min={1}
-                          />
-                        </div>
-                        <div>
-                          <Label className="text-[10px] text-muted-foreground">Auto-off after (hrs)</Label>
-                          <Input
-                            type="number"
-                            value={autoOffHours}
-                            onChange={(e) => setAutoOffHours(e.target.value)}
-                            className="h-8 text-xs"
-                            placeholder="e.g. 8"
-                            min={1}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {isProPlus && (
-                      <div className="flex items-center justify-between">
-                        <Label className="text-xs text-muted-foreground">Auto-off outside business hours</Label>
-                        <Switch
-                          checked={autoOffOutside}
-                          onCheckedChange={setAutoOffOutside}
-                          className="scale-90"
-                        />
-                      </div>
-                    )}
-
-                    <Button
-                      size="sm"
-                      className="w-full h-8 text-xs"
-                      onClick={() => handleToggle(true)}
-                      disabled={toggleDuty.isPending}
-                    >
-                      {isOnDuty ? "Update settings" : "Go On Duty"}
-                    </Button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </>
-        )}
-
-        {/* Analytics expandable */}
-        {!isFreePlan && (
-          <>
             <Button
               variant="ghost"
               size="sm"
-              className="w-full text-xs gap-1.5 h-7 text-muted-foreground"
-              onClick={() => setShowAnalytics(!showAnalytics)}
+              className="flex-1 text-xs gap-1.5 h-7 text-muted-foreground"
+              onClick={() => { setShowAnalytics(!showAnalytics); setShowSettings(false); setShowMatches(false); }}
             >
               <BarChart3 className="h-3 w-3" />
-              {showAnalytics ? "Hide analytics" : "View performance"}
+              Analytics
             </Button>
-
-            <AnimatePresence>
-              {showAnalytics && analytics && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="border-t border-border pt-3">
-                    <div className="grid grid-cols-2 gap-2">
-                      {[
-                        { label: "Leads received", value: analytics.leadsReceived, icon: Target },
-                        { label: "Response rate", value: `${analytics.responseRate}%`, icon: TrendingUp },
-                        { label: "Avg response", value: analytics.avgResponseMin ? `${analytics.avgResponseMin}m` : "—", icon: Clock },
-                        { label: "Missed", value: analytics.missedLeads, icon: AlertTriangle },
-                      ].map((m) => (
-                        <div key={m.label} className="p-2.5 rounded-lg bg-muted/40 text-center">
-                          <m.icon className="h-3 w-3 text-muted-foreground mx-auto mb-1" />
-                          <p className="text-sm font-bold tabular-nums">{m.value}</p>
-                          <p className="text-[10px] text-muted-foreground">{m.label}</p>
-                        </div>
-                      ))}
-                    </div>
-                    {analytics.bookingsFromDuty > 0 && (
-                      <div className="mt-2 flex items-center gap-2 p-2 rounded-lg bg-success/5 border border-success/10">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-success" />
-                        <span className="text-xs text-success font-medium">
-                          {analytics.bookingsFromDuty} booking{analytics.bookingsFromDuty > 1 ? "s" : ""} from On Duty leads
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </>
+            {pendingCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex-1 text-xs gap-1.5 h-7 text-muted-foreground"
+                onClick={() => { setShowMatches(!showMatches); setShowSettings(false); setShowAnalytics(false); }}
+              >
+                <Inbox className="h-3 w-3" />
+                Requests ({pendingCount})
+              </Button>
+            )}
+          </div>
         )}
+
+        <AnimatePresence>
+          {showSettings && !isFreePlan && (
+            <DutySettingsPanel
+              isOnDuty={isOnDuty}
+              isProPlus={isProPlus}
+              isPending={toggleDuty.isPending}
+              onSave={(settings) => handleToggle(true, settings)}
+            />
+          )}
+          {showAnalytics && analytics && !isFreePlan && (
+            <DutyAnalyticsPanel analytics={analytics} />
+          )}
+          {showMatches && !isFreePlan && (
+            <DutyMatchesList />
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );
