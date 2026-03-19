@@ -116,6 +116,7 @@ export default function ScanBusinessCard() {
     setStep("capture");
     setImagePreview(null);
     setContact({ name: "" });
+    setContactType("lead");
   };
 
   return (
