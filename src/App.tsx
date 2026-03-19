@@ -128,6 +128,7 @@ const TechDashboardPage = lazy(() => import("@/modules/team/pages/TechDashboardP
 const SettingsPage = lazy(() => import("@/modules/settings/pages/SettingsPage"));
 const AdminPage = lazy(() => import("@/modules/settings/pages/AdminPage"));
 const PlatformAdminDashboard = lazy(() => import("@/modules/admin/pages/PlatformAdminDashboard"));
+const AdminMarketingDashboard = lazy(() => import("@/modules/admin/pages/AdminMarketingDashboard"));
 const LandingPageManager = lazy(() => import("@/modules/admin/pages/LandingPageManager"));
 const SalesCrmPage = lazy(() => import("@/modules/admin/pages/SalesCrmPage"));
 const UserPageBuilder = lazy(() => import("@/modules/website/pages/UserPageBuilder"));
