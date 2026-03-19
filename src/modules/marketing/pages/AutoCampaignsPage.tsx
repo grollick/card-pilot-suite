@@ -42,8 +42,9 @@ export default function AutoCampaignsPage() {
   const createCampaign = useCreateCampaign();
   const updateCampaign = useUpdateCampaign();
   const deleteCampaign = useDeleteCampaign();
-  const { currentPlan } = usePlanLimits();
+  const { planKey } = usePlanLimits();
   const { user } = useAuth();
+  const limits = getCampaignLimits(planKey);
   const limits = getCampaignLimits(currentPlan);
 
   const [open, setOpen] = useState(false);
