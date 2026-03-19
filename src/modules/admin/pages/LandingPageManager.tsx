@@ -5,13 +5,14 @@ import {
   Plus, Save, ArrowLeft, Shield, Loader2, ExternalLink, Trash2,
   ToggleLeft, ToggleRight, Copy, X, Monitor, Smartphone, Tablet,
   ChevronRight, Layout, Type, Star, Megaphone, CreditCard,
-  MessageSquare, Image, Settings2,
+  MessageSquare, Image, Settings2, Sparkles, PanelTop, Scale,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useIsAdmin } from "@/hooks/useAdminStats";
 import { useLandingPages, useSaveLandingPage, type LandingPageContent, type LandingPageSection } from "@/hooks/useLandingPages";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ import {
   arrayMove, useSortable,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { supabase } from "@/integrations/supabase/client";
 
 // ─── Constants ───
 
@@ -34,6 +36,7 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
     description: "Primary homepage at /",
     url: "/",
     sections: [
+      { id: "header", type: "header", label: "Header / Navigation", enabled: true, content: { logo_text: "guzzl.pro", logo_url: "", nav_links: "Features,Pricing,Contact", cta_text: "Get Started", cta_url: "/auth", sticky: "true", style: "transparent" } },
       { id: "hero", type: "hero", label: "Hero", enabled: true, content: { headline: "Turn your business card into a customer-generating machine", subheadline: "Capture leads, send estimates, get paid, and grow your business — all from one platform.", cta_primary: "Get Started Free", cta_secondary: "View Demo" } },
       { id: "problem", type: "problem_solution", label: "Problem / Solution", enabled: true, content: { headline: "Sound familiar?", subheadline: "Most service professionals lose leads every day because they don't have the right tools." } },
       { id: "features", type: "features", label: "Features", enabled: true, content: { headline: "Everything you need to grow your business", subheadline: "Powerful tools designed for service professionals." } },
@@ -45,8 +48,29 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
     ],
   },
   {
+    key: "privacy",
+    title: "Privacy Policy",
+    description: "Privacy policy at /privacy",
+    url: "/privacy",
+    sections: [
+      { id: "header", type: "header", label: "Header", enabled: true, content: { logo_text: "guzzl.pro", nav_links: "Home", cta_text: "", style: "solid" } },
+      { id: "policy_content", type: "legal_content", label: "Privacy Policy", enabled: true, content: { title: "Privacy Policy", body: "" } },
+    ],
+  },
+  {
+    key: "terms",
+    title: "Terms of Service",
+    description: "Terms of service at /terms",
+    url: "/terms",
+    sections: [
+      { id: "header", type: "header", label: "Header", enabled: true, content: { logo_text: "guzzl.pro", nav_links: "Home", cta_text: "", style: "solid" } },
+      { id: "terms_content", type: "legal_content", label: "Terms of Service", enabled: true, content: { title: "Terms of Service", body: "" } },
+    ],
+  },
+  {
     key: "for/contractors", title: "Contractors Landing Page", description: "Industry page at /for/contractors", url: "/for/contractors",
     sections: [
+      { id: "header", type: "header", label: "Header", enabled: true, content: { logo_text: "guzzl.pro", nav_links: "Features,Pricing", cta_text: "Get Started", cta_url: "/auth", style: "transparent" } },
       { id: "hero", type: "hero", label: "Hero", enabled: true, content: { headline: "Get More Renovation Leads and Book Jobs from One Link", subheadline: "Show your projects, capture quote requests, and let customers book consultations." } },
       { id: "problem", type: "problem_solution", label: "Problem / Solution", enabled: true, content: {} },
       { id: "features", type: "features", label: "Features", enabled: true, content: {} },
@@ -59,7 +83,6 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
     key: "for/barbers", title: "Barbers Landing Page", description: "Industry page at /for/barbers", url: "/for/barbers",
     sections: [
       { id: "hero", type: "hero", label: "Hero", enabled: true, content: {} },
-      { id: "problem", type: "problem_solution", label: "Problem / Solution", enabled: true, content: {} },
       { id: "features", type: "features", label: "Features", enabled: true, content: {} },
       { id: "pricing", type: "pricing", label: "Pricing", enabled: true, content: {} },
     ],
@@ -68,7 +91,6 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
     key: "for/realtors", title: "Realtors Landing Page", description: "Industry page at /for/realtors", url: "/for/realtors",
     sections: [
       { id: "hero", type: "hero", label: "Hero", enabled: true, content: {} },
-      { id: "problem", type: "problem_solution", label: "Problem / Solution", enabled: true, content: {} },
       { id: "features", type: "features", label: "Features", enabled: true, content: {} },
       { id: "pricing", type: "pricing", label: "Pricing", enabled: true, content: {} },
     ],
@@ -77,7 +99,6 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
     key: "for/photographers", title: "Photographers Landing Page", description: "Industry page at /for/photographers", url: "/for/photographers",
     sections: [
       { id: "hero", type: "hero", label: "Hero", enabled: true, content: {} },
-      { id: "problem", type: "problem_solution", label: "Problem / Solution", enabled: true, content: {} },
       { id: "features", type: "features", label: "Features", enabled: true, content: {} },
       { id: "pricing", type: "pricing", label: "Pricing", enabled: true, content: {} },
     ],
@@ -86,7 +107,6 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
     key: "for/landscapers", title: "Landscapers Landing Page", description: "Industry page at /for/landscapers", url: "/for/landscapers",
     sections: [
       { id: "hero", type: "hero", label: "Hero", enabled: true, content: {} },
-      { id: "problem", type: "problem_solution", label: "Problem / Solution", enabled: true, content: {} },
       { id: "features", type: "features", label: "Features", enabled: true, content: {} },
       { id: "pricing", type: "pricing", label: "Pricing", enabled: true, content: {} },
     ],
@@ -94,6 +114,7 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
 ];
 
 const SECTION_TYPE_LABELS: Record<string, string> = {
+  header: "Header / Navigation",
   hero: "Hero Section",
   problem_solution: "Problem / Solution",
   features: "Features Grid",
@@ -103,10 +124,12 @@ const SECTION_TYPE_LABELS: Record<string, string> = {
   pricing: "Pricing Plans",
   final_cta: "Final Call to Action",
   testimonials: "Testimonials",
+  legal_content: "Legal Content",
   custom: "Custom Section",
 };
 
 const SECTION_ICONS: Record<string, typeof Globe> = {
+  header: PanelTop,
   hero: Type,
   problem_solution: MessageSquare,
   features: Layout,
@@ -116,10 +139,12 @@ const SECTION_ICONS: Record<string, typeof Globe> = {
   pricing: CreditCard,
   final_cta: Megaphone,
   testimonials: Star,
+  legal_content: Scale,
   custom: FileText,
 };
 
 const NEW_SECTION_TYPES = [
+  { type: "header", label: "Header / Nav" },
   { type: "hero", label: "Hero" },
   { type: "problem_solution", label: "Problem / Solution" },
   { type: "features", label: "Features" },
@@ -129,8 +154,117 @@ const NEW_SECTION_TYPES = [
   { type: "testimonials", label: "Testimonials" },
   { type: "pricing", label: "Pricing" },
   { type: "final_cta", label: "Final CTA" },
+  { type: "legal_content", label: "Legal / Policy" },
   { type: "custom", label: "Custom Section" },
 ];
+
+// ─── Header Editor ───
+
+function HeaderEditor({
+  content, onUpdate,
+}: {
+  content: Record<string, any>;
+  onUpdate: (field: string, value: string) => void;
+}) {
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Logo Text</label>
+        <Input value={content.logo_text || ""} onChange={(e) => onUpdate("logo_text", e.target.value)} className="text-sm h-9" placeholder="Your Brand" />
+      </div>
+      <div>
+        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Logo Image URL</label>
+        <Input value={content.logo_url || ""} onChange={(e) => onUpdate("logo_url", e.target.value)} className="text-sm h-9" placeholder="https://..." />
+      </div>
+      <div>
+        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Navigation Links</label>
+        <Input value={content.nav_links || ""} onChange={(e) => onUpdate("nav_links", e.target.value)} className="text-sm h-9" placeholder="Home,Features,Pricing,Contact" />
+        <p className="text-2xs text-muted-foreground mt-1">Comma-separated link labels</p>
+      </div>
+      <div>
+        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">CTA Button Text</label>
+        <Input value={content.cta_text || ""} onChange={(e) => onUpdate("cta_text", e.target.value)} className="text-sm h-9" placeholder="Get Started" />
+      </div>
+      <div>
+        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">CTA Button URL</label>
+        <Input value={content.cta_url || ""} onChange={(e) => onUpdate("cta_url", e.target.value)} className="text-sm h-9" placeholder="/auth" />
+      </div>
+      <div>
+        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Header Style</label>
+        <Select value={content.style || "transparent"} onValueChange={(v) => onUpdate("style", v)}>
+          <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="transparent">Transparent</SelectItem>
+            <SelectItem value="solid">Solid</SelectItem>
+            <SelectItem value="glass">Glass / Blur</SelectItem>
+            <SelectItem value="dark">Dark</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="flex items-center justify-between">
+        <label className="text-xs font-medium text-muted-foreground">Sticky Header</label>
+        <Switch checked={content.sticky === "true"} onCheckedChange={(v) => onUpdate("sticky", v ? "true" : "false")} className="scale-75" />
+      </div>
+    </div>
+  );
+}
+
+// ─── AI Legal Content Generator ───
+
+function LegalContentEditor({
+  content, onUpdate, pageKey,
+}: {
+  content: Record<string, any>;
+  onUpdate: (field: string, value: string) => void;
+  pageKey: string;
+}) {
+  const [generating, setGenerating] = useState(false);
+
+  async function generatePolicy() {
+    setGenerating(true);
+    try {
+      const policyType = content.title?.toLowerCase().includes("privacy") ? "privacy_policy" : "terms_of_service";
+      const { data, error } = await supabase.functions.invoke("generate-legal-content", {
+        body: { policy_type: policyType, business_name: "guzzl.pro", business_description: "A digital business card and CRM platform for service professionals" },
+      });
+      if (error) throw error;
+      if (data?.content) {
+        onUpdate("body", data.content);
+        toast.success(`${content.title || "Policy"} generated successfully`);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to generate policy");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Title</label>
+        <Input value={content.title || ""} onChange={(e) => onUpdate("title", e.target.value)} className="text-sm h-9" />
+      </div>
+      <div>
+        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Last Updated</label>
+        <Input value={content.last_updated || ""} onChange={(e) => onUpdate("last_updated", e.target.value)} className="text-sm h-9" placeholder="March 2026" />
+      </div>
+      <Button variant="outline" size="sm" className="w-full text-xs" onClick={generatePolicy} disabled={generating}>
+        {generating ? <Loader2 className="h-3 w-3 mr-1.5 animate-spin" /> : <Sparkles className="h-3 w-3 mr-1.5" />}
+        {generating ? "Generating with AI..." : "Generate with AI"}
+      </Button>
+      <div>
+        <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Content (Markdown)</label>
+        <Textarea
+          value={content.body || ""}
+          onChange={(e) => onUpdate("body", e.target.value)}
+          className="text-sm min-h-[300px] font-mono text-xs"
+          placeholder="Policy content will appear here..."
+        />
+      </div>
+    </div>
+  );
+}
 
 // ─── Sortable Section Item ───
 
@@ -211,15 +345,19 @@ function SortableSectionItem({
 // ─── Section Property Editor ───
 
 function SectionEditor({
-  section, onUpdate, onClose,
+  section, onUpdate, onClose, pageKey,
 }: {
   section: LandingPageSection;
   onUpdate: (id: string, patch: Partial<LandingPageSection>) => void;
   onClose: () => void;
+  pageKey: string;
 }) {
   const updateContent = (field: string, value: string) => {
     onUpdate(section.id, { content: { ...section.content, [field]: value } });
   };
+
+  const isHeader = section.type === "header";
+  const isLegal = section.type === "legal_content";
 
   return (
     <motion.div
@@ -251,49 +389,58 @@ function SectionEditor({
           />
         </div>
 
-        {Object.keys(section.content).length === 0 ? (
-          <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center space-y-3">
-            <p className="text-xs text-muted-foreground">No custom content yet. Add fields:</p>
-            <div className="flex flex-wrap gap-1.5 justify-center">
-              {["headline", "subheadline", "cta_primary", "cta_secondary", "body_text", "image_url"].map((field) => (
-                <Button key={field} variant="outline" size="sm" className="text-2xs h-7 px-2" onClick={() => updateContent(field, "")}>
-                  <Plus className="h-2.5 w-2.5 mr-1" /> {field.replace(/_/g, " ")}
-                </Button>
-              ))}
-            </div>
-          </div>
+        {/* Specialized editors */}
+        {isHeader ? (
+          <HeaderEditor content={section.content} onUpdate={updateContent} />
+        ) : isLegal ? (
+          <LegalContentEditor content={section.content} onUpdate={updateContent} pageKey={pageKey} />
         ) : (
-          Object.entries(section.content).map(([field, value]) => (
-            <div key={field}>
-              <label className="text-xs font-medium text-muted-foreground mb-1.5 block capitalize">
-                {field.replace(/_/g, " ")}
-              </label>
-              {String(value).length > 60 ? (
-                <Textarea
-                  value={String(value)}
-                  onChange={(e) => updateContent(field, e.target.value)}
-                  className="text-sm min-h-[70px]"
-                />
-              ) : (
-                <Input
-                  value={String(value)}
-                  onChange={(e) => updateContent(field, e.target.value)}
-                  className="text-sm h-9"
-                />
-              )}
-            </div>
-          ))
-        )}
+          <>
+            {Object.keys(section.content).length === 0 ? (
+              <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center space-y-3">
+                <p className="text-xs text-muted-foreground">No custom content yet. Add fields:</p>
+                <div className="flex flex-wrap gap-1.5 justify-center">
+                  {["headline", "subheadline", "cta_primary", "cta_secondary", "body_text", "image_url"].map((field) => (
+                    <Button key={field} variant="outline" size="sm" className="text-2xs h-7 px-2" onClick={() => updateContent(field, "")}>
+                      <Plus className="h-2.5 w-2.5 mr-1" /> {field.replace(/_/g, " ")}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              Object.entries(section.content).map(([field, value]) => (
+                <div key={field}>
+                  <label className="text-xs font-medium text-muted-foreground mb-1.5 block capitalize">
+                    {field.replace(/_/g, " ")}
+                  </label>
+                  {String(value).length > 60 ? (
+                    <Textarea
+                      value={String(value)}
+                      onChange={(e) => updateContent(field, e.target.value)}
+                      className="text-sm min-h-[70px]"
+                    />
+                  ) : (
+                    <Input
+                      value={String(value)}
+                      onChange={(e) => updateContent(field, e.target.value)}
+                      className="text-sm h-9"
+                    />
+                  )}
+                </div>
+              ))
+            )}
 
-        <Button
-          variant="ghost" size="sm" className="text-xs w-full justify-start"
-          onClick={() => {
-            const name = prompt("Field name (e.g. body_text, badge_label):");
-            if (name) updateContent(name.trim(), "");
-          }}
-        >
-          <Plus className="h-3 w-3 mr-1.5" /> Add custom field
-        </Button>
+            <Button
+              variant="ghost" size="sm" className="text-xs w-full justify-start"
+              onClick={() => {
+                const name = prompt("Field name (e.g. body_text, badge_label):");
+                if (name) updateContent(name.trim(), "");
+              }}
+            >
+              <Plus className="h-3 w-3 mr-1.5" /> Add custom field
+            </Button>
+          </>
+        )}
       </div>
     </motion.div>
   );
@@ -301,7 +448,11 @@ function SectionEditor({
 
 // ─── Main Component ───
 
-export default function LandingPageManager() {
+interface LandingPageManagerProps {
+  adminOnly?: boolean;
+}
+
+export default function LandingPageManager({ adminOnly = true }: LandingPageManagerProps) {
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
   const { data: savedPages, isLoading } = useLandingPages();
   const saveMutation = useSaveLandingPage();
@@ -326,17 +477,19 @@ export default function LandingPageManager() {
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  if (adminLoading) {
-    return <div className="min-h-[400px] flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
-  }
-  if (!isAdmin) {
-    return (
-      <div className="min-h-[400px] flex flex-col items-center justify-center gap-3">
-        <Shield className="h-12 w-12 text-muted-foreground/30" />
-        <h2 className="text-lg font-semibold">Access Denied</h2>
-        <p className="text-sm text-muted-foreground">Admin privileges required.</p>
-      </div>
-    );
+  if (adminOnly) {
+    if (adminLoading) {
+      return <div className="min-h-[400px] flex items-center justify-center"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
+    }
+    if (!isAdmin) {
+      return (
+        <div className="min-h-[400px] flex flex-col items-center justify-center gap-3">
+          <Shield className="h-12 w-12 text-muted-foreground/30" />
+          <h2 className="text-lg font-semibold">Access Denied</h2>
+          <p className="text-sm text-muted-foreground">Admin privileges required.</p>
+        </div>
+      );
+    }
   }
 
   const pages = MAIN_PAGE_DEFAULTS.map((def) => {
@@ -408,7 +561,12 @@ export default function LandingPageManager() {
   function addSection(type: string) {
     if (!editData) return;
     const label = SECTION_TYPE_LABELS[type] || "Custom Section";
-    const newSection: LandingPageSection = { id: `${type}_${Date.now()}`, type, label, enabled: true, content: {} };
+    const defaultContent: Record<string, any> = type === "header"
+      ? { logo_text: "", logo_url: "", nav_links: "", cta_text: "", cta_url: "", sticky: "true", style: "solid" }
+      : type === "legal_content"
+        ? { title: "", body: "", last_updated: "" }
+        : {};
+    const newSection: LandingPageSection = { id: `${type}_${Date.now()}`, type, label, enabled: true, content: defaultContent };
     setEditData({ ...editData, sections: [...editData.sections, newSection] });
     setShowAddSection(false);
     setActiveSection(newSection.id);
@@ -441,9 +599,9 @@ export default function LandingPageManager() {
       <div className="space-y-6 max-w-5xl">
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Globe className="h-6 w-6 text-primary" /> Landing Pages
+            <Globe className="h-6 w-6 text-primary" /> Page Builder
           </h1>
-          <p className="text-muted-foreground text-sm mt-1">Manage and edit your landing pages with the visual editor.</p>
+          <p className="text-muted-foreground text-sm mt-1">Create and edit pages with the visual drag-and-drop editor.</p>
         </div>
         <div className="space-y-3">
           {pages.map((page, i) => (
@@ -456,7 +614,13 @@ export default function LandingPageManager() {
               onClick={() => startEditing(page.key)}
             >
               <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                {page.key === "main" ? <Globe className="h-5 w-5 text-primary" /> : <FileText className="h-5 w-5 text-primary" />}
+                {page.key === "privacy" || page.key === "terms" ? (
+                  <Scale className="h-5 w-5 text-primary" />
+                ) : page.key === "main" ? (
+                  <Globe className="h-5 w-5 text-primary" />
+                ) : (
+                  <FileText className="h-5 w-5 text-primary" />
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
@@ -464,6 +628,9 @@ export default function LandingPageManager() {
                   <Badge variant={page.is_published ? "default" : "secondary"} className="text-2xs">
                     {page.is_published ? "Published" : "Draft"}
                   </Badge>
+                  {(page.key === "privacy" || page.key === "terms") && (
+                    <Badge variant="outline" className="text-2xs"><Sparkles className="h-2.5 w-2.5 mr-1" />AI Assisted</Badge>
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5">{page.description}</p>
                 {page.updated_at && (
@@ -616,6 +783,7 @@ export default function LandingPageManager() {
                 section={activeSectionData}
                 onUpdate={updateSection}
                 onClose={() => setEditingSection(null)}
+                pageKey={editData.page_key}
               />
             )}
           </AnimatePresence>
@@ -671,6 +839,24 @@ export default function LandingPageManager() {
                       value={editData.page_description}
                       onChange={(e) => setEditData({ ...editData, page_description: e.target.value })}
                       className="text-sm min-h-[70px]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">SEO Title</label>
+                    <Input
+                      value={editData.settings.seo_title || ""}
+                      onChange={(e) => setEditData({ ...editData, settings: { ...editData.settings, seo_title: e.target.value } })}
+                      className="text-sm h-9"
+                      placeholder="Override page title for search engines"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-muted-foreground mb-1.5 block">SEO Description</label>
+                    <Textarea
+                      value={editData.settings.seo_description || ""}
+                      onChange={(e) => setEditData({ ...editData, settings: { ...editData.settings, seo_description: e.target.value } })}
+                      className="text-sm min-h-[60px]"
+                      placeholder="Meta description for search engines"
                     />
                   </div>
                   <div>
