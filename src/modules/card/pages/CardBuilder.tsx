@@ -1,4 +1,8 @@
-import { Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate, Sparkles, Loader2, MousePointerClick, Crown, Plus, Eye, Smartphone } from "lucide-react";
+import {
+  Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate,
+  Sparkles, Loader2, MousePointerClick, Crown, Plus, Eye, Smartphone,
+  Type, PaintBucket, LayoutGrid, ChevronDown, Settings2,
+} from "lucide-react";
 import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import BlockMarketplaceDialog from "@/modules/card/components/BlockMarketplaceDialog";
 import { canAccessBlock, type MarketplaceBlock } from "@/lib/blockMarketplace";
@@ -23,13 +27,13 @@ import BuilderSectionLibrary from "@/modules/card/components/BuilderSectionLibra
 import TemplateSelector from "@/modules/card/components/TemplateSelector";
 import { getTemplate } from "@/lib/cardTemplates";
 import { useCardBuilderState } from "@/hooks/useCardBuilderState";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-
-import { motion } from "framer-motion";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { motion, AnimatePresence } from "framer-motion";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
+import CtaEditor from "@/modules/card/components/CtaEditor";
 
 const TEMPLATE_STYLE_PALETTES: Record<string, { primary: string; secondary: string; accent: string; background: string }> = {
   Modern: { primary: "#2563eb", secondary: "#0f172a", accent: "#14b8a6", background: "#f8fafc" },
@@ -37,6 +41,27 @@ const TEMPLATE_STYLE_PALETTES: Record<string, { primary: string; secondary: stri
   Bold: { primary: "#dc2626", secondary: "#111827", accent: "#f59e0b", background: "#fff7ed" },
   Minimal: { primary: "#374151", secondary: "#111827", accent: "#6b7280", background: "#f9fafb" },
 };
+
+/* ── Collapsible section wrapper ── */
+function PanelSection({ title, icon: Icon, children, defaultOpen = true }: {
+  title: string; icon: typeof Layers; children: React.ReactNode; defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <CollapsibleTrigger className="w-full flex items-center justify-between py-1.5 px-1 group">
+        <div className="flex items-center gap-1.5">
+          <Icon className="h-3 w-3 text-muted-foreground" />
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{title}</span>
+        </div>
+        <ChevronDown className={`h-3 w-3 text-muted-foreground transition-transform ${open ? "rotate-180" : ""}`} />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="pt-1">
+        {children}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
 
 export default function CardBuilder() {
   const s = useCardBuilderState();
@@ -46,20 +71,19 @@ export default function CardBuilder() {
   const isMobile = useIsMobile();
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [photoImportOpen, setPhotoImportOpen] = useState(false);
-  const [rightTab, setRightTab] = useState("identity");
+  const [rightTab, setRightTab] = useState("content");
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
   const [blockMarketOpen, setBlockMarketOpen] = useState(false);
   const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
-  const [mobileTab, setMobileTab] = useState<"preview" | "sections" | "identity" | "theme">("preview");
+  const [mobileTab, setMobileTab] = useState<"preview" | "sections" | "content" | "style">("preview");
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
+  // ── AI Card Generation ──
   const handleAICardGenerated = (result: AICardResult) => {
-    // Apply sections order
     const newSections = result.sections_order.map((id) => {
       const existing = s.sections.find((sec) => sec.id === id);
       const label = existing?.label || id.charAt(0).toUpperCase() + id.slice(1).replace(/_/g, " ");
       const content: Record<string, any> = existing?.content || {};
-
-      // Populate section content from AI result
       if (id === "hero") content.tagline = result.hero.tagline;
       if (id === "about") content.text = result.about;
       if (id === "services") content.items = result.services;
@@ -69,10 +93,8 @@ export default function CardBuilder() {
         content.body = result.promo.body;
         content.cta_text = result.promo.cta_text;
       }
-
       return { id, label, enabled: true, content };
     });
-    // Keep disabled sections not in the AI order
     s.sections.forEach((sec) => {
       if (!newSections.find((ns) => ns.id === sec.id)) {
         newSections.push({ ...sec, enabled: false, content: sec.content || {} });
@@ -80,8 +102,6 @@ export default function CardBuilder() {
     });
     s.setSections(newSections);
     s.saveSections(newSections, true);
-
-    // Apply theme
     s.saveThemeField({
       palette: {
         primary: result.theme.primary_color,
@@ -94,7 +114,7 @@ export default function CardBuilder() {
     });
   };
 
-  // Track installed marketplace blocks
+  // ── Block marketplace ──
   const installedBlockIds = s.sections
     .filter((sec) => !["hero","about","services","projects","quote_calculator","testimonials","gallery","contact","quote_request","booking","social"].includes(sec.id))
     .map((sec) => sec.id);
@@ -104,16 +124,10 @@ export default function CardBuilder() {
       toast.info(`${block.name} is already on your card.`);
       return;
     }
-    const newSection = {
-      id: block.id,
-      label: block.name,
-      enabled: true,
-      content: block.defaultContent,
-    };
-    const next = [...s.sections, newSection];
+    const next = [...s.sections, { id: block.id, label: block.name, enabled: true, content: block.defaultContent }];
     s.setSections(next);
     s.saveSections(next, true);
-    toast.success(`${block.name} added to your card!`);
+    toast.success(`${block.name} added!`);
     setBlockMarketOpen(false);
   };
 
@@ -121,20 +135,15 @@ export default function CardBuilder() {
     if (!user || projects.length === 0) return;
     try {
       const inserts = projects.map((p) => ({
-        user_id: user.id,
-        title: p.title,
-        description: p.description || null,
-        after_image_url: p.imageUrl,
-        before_image_url: p.beforeImageUrl || null,
-        is_public: true,
-        services_used: p.category ? [p.category] : [],
+        user_id: user.id, title: p.title, description: p.description || null,
+        after_image_url: p.imageUrl, before_image_url: p.beforeImageUrl || null,
+        is_public: true, services_used: p.category ? [p.category] : [],
       }));
       const { error } = await supabase.from("projects").insert(inserts);
       if (error) throw error;
-      toast.success(`${projects.length} projects added to your gallery!`);
+      toast.success(`${projects.length} projects imported!`);
     } catch (err: any) {
-      console.error("Import error:", err);
-      toast.error(err.message || "Failed to save imported projects");
+      toast.error(err.message || "Failed to import");
     }
   };
 
@@ -142,35 +151,20 @@ export default function CardBuilder() {
     setSelectedTemplateId(templateId);
     const template = getTemplate(templateId);
     if (!template) return;
-
     const newSections = template.sections.map(ts => {
       const existing = s.sections.find(es => es.id === ts.id);
-      return {
-        id: ts.id,
-        label: existing?.label || ts.id.charAt(0).toUpperCase() + ts.id.slice(1).replace(/_/g, " "),
-        enabled: ts.enabled,
-        content: existing?.content,
-      };
+      return { id: ts.id, label: existing?.label || ts.id.charAt(0).toUpperCase() + ts.id.slice(1).replace(/_/g, " "), enabled: ts.enabled, content: existing?.content };
     });
-
-    s.sections.forEach(es => {
-      if (!newSections.find(ns => ns.id === es.id)) {
-        newSections.push({ ...es, enabled: false } as any);
-      }
-    });
-
+    s.sections.forEach(es => { if (!newSections.find(ns => ns.id === es.id)) newSections.push({ ...es, enabled: false } as any); });
     s.setSections(newSections);
     s.saveSections(newSections, true);
-
     const palette = TEMPLATE_STYLE_PALETTES[template.style];
-    if (palette) {
-      s.saveThemeField({ palette: { ...palette } });
-    }
+    if (palette) s.saveThemeField({ palette: { ...palette } });
   };
 
   const editingSec = s.sections.find((sec) => sec.id === s.editingSection);
 
-  // Shared avatar theme props
+  // Avatar theme props
   const avatarThemeProps = {
     avatarShape: s.previewTheme.header.avatarShape,
     onAvatarShapeChange: (shape: any) => {
@@ -212,29 +206,53 @@ export default function CardBuilder() {
   if (s.cardLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-pulse text-muted-foreground">Loading card…</div>
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <span className="text-sm text-muted-foreground">Loading card…</span>
+        </div>
       </div>
     );
   }
 
-  // ── Left panel: Component library ──
-  const leftPanelContent = (
-    <div className="space-y-4">
-      {/* Templates */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2 px-1">
-          <LayoutTemplate className="h-3.5 w-3.5 text-primary" />
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Templates</span>
-        </div>
+  // ── Shared preview props ──
+  const previewProps = {
+    profile: s.profile, previewTheme: s.previewTheme,
+    currentThemeOverrides: s.currentThemeOverrides, sections: s.sections,
+    coverUrl: s.coverUrl, coverOffsetY: s.coverOffsetY,
+    avatarUrl: s.avatarUrl, avatarBgColor: s.avatarBgColor, avatarRotation: s.avatarRotation,
+    logoUrl: s.logoUrl, logoFrostedBg: s.logoFrostedBg, logoPosition: s.logoPosition,
+    logoSize: s.logoSize, logoOpacity: s.logoOpacity, logoPadding: s.logoPadding,
+    logoNameGap: s.logoNameGap, logoVerticalAlign: s.logoVerticalAlign,
+    ctaConfig: s.ctaConfig, ctaIconsOnly: s.ctaIconsOnly,
+    editName: s.editName, editCompany: s.editCompany, displayJobTitle: s.displayJobTitle,
+    boldLastName: s.boldLastName, uppercaseName: s.uppercaseName,
+    nameLetterSpacing: s.nameLetterSpacing, nameFontWeight: s.nameFontWeight,
+    firstNameFontWeight: s.firstNameFontWeight, nameItalic: s.nameItalic,
+    nameFontSize: s.nameFontSize, subtitleFontSize: s.subtitleFontSize,
+    subtitleItalic: s.subtitleItalic, subtitleSpacing: s.subtitleSpacing,
+    showCompany: s.showCompany, nameLineHeight: s.nameLineHeight,
+    nameTextStroke: s.nameTextStroke, nameTextStrokeWidth: s.nameTextStrokeWidth,
+    onAvatarChange: s.handleAvatarChange, setEditingSection: s.setEditingSection,
+    identityPosition: s.identityPosition,
+    onIdentityPositionChange: s.handleIdentityPositionChange,
+    logoCustomPosition: s.logoCustomPosition,
+    onLogoCustomPositionChange: s.handleLogoCustomPositionChange,
+  };
+
+  // ════════════════════════════════════════════════
+  //  LEFT PANEL — Section Library (minimal)
+  // ════════════════════════════════════════════════
+  const leftPanel = (
+    <div className="space-y-3">
+      <PanelSection title="Templates" icon={LayoutTemplate} defaultOpen={false}>
         <TemplateSelector
           selectedTemplateId={selectedTemplateId}
           onSelect={handleApplyTemplate}
           professionName={s.professionName}
           compact
         />
-      </div>
+      </PanelSection>
 
-      {/* Section library */}
       <BuilderSectionLibrary
         sections={s.sections}
         setSections={s.setSections}
@@ -243,96 +261,66 @@ export default function CardBuilder() {
         saveSections={s.saveSections}
       />
 
-      {/* Block Marketplace trigger */}
       <Button
-        variant="outline"
+        variant="ghost"
         size="sm"
-        className="w-full gap-1.5 border-dashed border-primary/30 text-primary hover:bg-primary/5"
+        className="w-full gap-1.5 text-[11px] text-muted-foreground hover:text-primary border border-dashed border-border/60 hover:border-primary/30"
         onClick={() => setBlockMarketOpen(true)}
       >
-        <Plus className="h-3.5 w-3.5" />
-        Browse Block Marketplace
+        <Plus className="h-3 w-3" />
+        Add Section
       </Button>
 
-      {/* AI Tools */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2 px-1">
-          <Sparkles className="h-3.5 w-3.5 text-primary" />
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">AI Tools</span>
+      <PanelSection title="AI Tools" icon={Sparkles} defaultOpen={false}>
+        <div className="space-y-1.5">
+          <Button size="sm" className="w-full gap-1.5 h-8 text-[11px]" onClick={() => setAiAssistantOpen(true)}>
+            <Sparkles className="h-3 w-3" /> AI Design Assistant
+          </Button>
+          <Button variant="outline" size="sm" className="w-full h-8 text-[11px]" onClick={s.handleAIGenerate} disabled={s.isGenerating}>
+            {s.isGenerating ? <Loader2 className="h-3 w-3 mr-1.5 animate-spin" /> : <Sparkles className="h-3 w-3 mr-1.5" />}
+            {s.isGenerating ? "Writing…" : "AI Write Copy"}
+          </Button>
         </div>
-        <Button
-          size="sm"
-          className="w-full gap-1.5"
-          onClick={() => setAiAssistantOpen(true)}
-        >
-          <Sparkles className="h-3.5 w-3.5" />
-          Generate My Card with AI
-        </Button>
-        <Button variant="outline" size="sm" className="w-full" onClick={s.handleAIGenerate} disabled={s.isGenerating}>
-          {s.isGenerating ? <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" /> : <Sparkles className="h-3.5 w-3.5 mr-2" />}
-          {s.isGenerating ? "Generating…" : "AI Write Copy Only"}
-        </Button>
-        {s.aiContent && (
-          <div className="rounded-lg bg-primary/5 border border-primary/20 p-2.5">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-primary mb-1">Tagline</p>
-            <p className="text-xs">{s.aiContent.tagline}</p>
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-primary mt-2 mb-1">Bio</p>
-            <p className="text-xs">{s.aiContent.bio}</p>
-          </div>
-        )}
-      </div>
+      </PanelSection>
 
-      {/* CTA & Social config */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-2">
-            <MousePointerClick className="h-3.5 w-3.5 text-primary" />
-            <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">CTA Buttons</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-[9px] text-muted-foreground">Icons</span>
-            <Switch checked={s.ctaIconsOnly} onCheckedChange={(v) => { s.setCtaIconsOnly(v); s.saveThemeField({ cta_icons_only: v }); }} className="scale-[0.65]" />
-          </div>
-        </div>
-      </div>
-
-      {/* Conversion Tips */}
       <ConversionTips sections={s.sections} />
 
-      {/* Premium features hint */}
       {!isPro && (
-        <div className="rounded-xl border border-primary/20 bg-primary/5 p-3 space-y-2">
-          <div className="flex items-center gap-2">
-            <Crown className="h-4 w-4 text-primary" />
-            <span className="text-xs font-semibold">Unlock Pro Features</span>
+        <div className="rounded-lg border border-primary/15 bg-primary/5 p-2.5 space-y-1.5">
+          <div className="flex items-center gap-1.5">
+            <Crown className="h-3.5 w-3.5 text-primary" />
+            <span className="text-[11px] font-semibold">Unlock Pro</span>
           </div>
           <p className="text-[10px] text-muted-foreground leading-relaxed">
-            Upgrade to unlock unlimited sections, animation effects, advanced layouts, AI design assistant, and more.
+            Unlimited sections, animations, AI tools, and more.
           </p>
-          <Button variant="default" size="sm" className="w-full text-xs" onClick={() => window.location.href = "/app/pricing"}>
-            Upgrade Plan
+          <Button size="sm" className="w-full h-7 text-[10px]" onClick={() => window.location.href = "/app/pricing"}>
+            Upgrade
           </Button>
         </div>
       )}
     </div>
   );
 
-  // ── Right panel: Design controls ──
-  const rightPanelContent = (
+  // ════════════════════════════════════════════════
+  //  RIGHT PANEL — Content / Style / Layout tabs
+  // ════════════════════════════════════════════════
+  const rightPanel = (
     <Tabs value={rightTab} onValueChange={setRightTab} className="w-full">
-      <TabsList className="w-full grid grid-cols-3 mb-3 h-9">
-        <TabsTrigger value="identity" className="text-[11px] gap-1">
-          <Pencil className="h-3 w-3" /> Identity
+      <TabsList className="w-full grid grid-cols-3 h-8 mb-2 bg-muted/30">
+        <TabsTrigger value="content" className="text-[11px] gap-1 h-7 data-[state=active]:shadow-sm">
+          <Pencil className="h-3 w-3" /> Content
         </TabsTrigger>
-        <TabsTrigger value="photos" className="text-[11px] gap-1">
-          <Camera className="h-3 w-3" /> Media
+        <TabsTrigger value="style" className="text-[11px] gap-1 h-7 data-[state=active]:shadow-sm">
+          <PaintBucket className="h-3 w-3" /> Style
         </TabsTrigger>
-        <TabsTrigger value="theme" className="text-[11px] gap-1">
-          <Palette className="h-3 w-3" /> Theme
+        <TabsTrigger value="layout" className="text-[11px] gap-1 h-7 data-[state=active]:shadow-sm">
+          <LayoutGrid className="h-3 w-3" /> Layout
         </TabsTrigger>
       </TabsList>
 
-      <TabsContent value="identity" className="mt-0">
+      {/* ── Content Tab ── */}
+      <TabsContent value="content" className="mt-0 space-y-4">
         <CardBuilderIdentity
           profile={s.profile} editName={s.editName} setEditName={s.setEditName}
           editCompany={s.editCompany} setEditCompany={s.setEditCompany}
@@ -348,61 +336,71 @@ export default function CardBuilder() {
           firstNameFontWeight={s.firstNameFontWeight} setFirstNameFontWeight={s.setFirstNameFontWeight}
           nameItalic={s.nameItalic} setNameItalic={s.setNameItalic}
           nameFontSize={s.nameFontSize} setNameFontSize={s.setNameFontSize}
-           subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
-           subtitleItalic={s.subtitleItalic} setSubtitleItalic={s.setSubtitleItalic}
-           subtitleSpacing={s.subtitleSpacing} setSubtitleSpacing={s.setSubtitleSpacing}
-           showCompany={s.showCompany} setShowCompany={s.setShowCompany}
-           nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
-           nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
-           nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}
-           saveThemeField={s.saveThemeField} qc={s.qc} hideWrapper
+          subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
+          subtitleItalic={s.subtitleItalic} setSubtitleItalic={s.setSubtitleItalic}
+          subtitleSpacing={s.subtitleSpacing} setSubtitleSpacing={s.setSubtitleSpacing}
+          showCompany={s.showCompany} setShowCompany={s.setShowCompany}
+          nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
+          nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
+          nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}
+          saveThemeField={s.saveThemeField} qc={s.qc} hideWrapper
         />
-      </TabsContent>
 
-      <TabsContent value="photos" className="mt-0 space-y-3">
-        <CardPhotoTools
-          avatarUrl={s.avatarUrl} coverUrl={s.coverUrl} profession={s.professionName}
-          onAvatarChange={s.handleAvatarChange} onCoverChange={s.handleCoverChange}
-          avatarBgColor={s.avatarBgColor} avatarRotation={s.avatarRotation}
-          onAvatarBgColorChange={s.handleAvatarBgColorChange}
-          onAvatarRotationChange={s.handleAvatarRotationChange}
-          coverOffsetY={s.coverOffsetY} onCoverOffsetYChange={s.handleCoverOffsetYChange}
-          logoUrl={s.logoUrl} onLogoChange={s.handleLogoChange}
-          logoFrostedBg={s.logoFrostedBg} onLogoFrostedBgChange={s.handleLogoFrostedBgChange}
-          logoGlow={s.logoGlow} onLogoGlowChange={s.handleLogoGlowChange}
-          logoPosition={s.logoPosition} onLogoPositionChange={s.handleLogoPositionChange}
-          logoSize={s.logoSize} onLogoSizeChange={s.handleLogoSizeChange}
-          logoOpacity={s.logoOpacity} onLogoOpacityChange={s.handleLogoOpacityChange}
-          logoPadding={s.logoPadding} onLogoPaddingChange={s.handleLogoPaddingChange}
-          logoNameGap={s.logoNameGap} onLogoNameGapChange={s.handleLogoNameGapChange}
-          logoVerticalAlign={s.logoVerticalAlign} onLogoVerticalAlignChange={s.handleLogoVerticalAlignChange}
-          {...avatarThemeProps}
-        />
-        <div className="pt-2 border-t border-border/50">
-          <Button variant="outline" size="sm" className="w-full" onClick={() => setPhotoImportOpen(true)}>
-            <Globe className="h-3.5 w-3.5 mr-2" /> Import Photos from URL
+        {/* CTA Buttons */}
+        <PanelSection title="CTA Buttons" icon={MousePointerClick}>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-muted-foreground">Icons only</span>
+              <Switch checked={s.ctaIconsOnly} onCheckedChange={(v) => { s.setCtaIconsOnly(v); s.saveThemeField({ cta_icons_only: v }); }} className="scale-[0.7]" />
+            </div>
+            <CtaEditor ctas={s.ctaConfig} onChange={s.handleCtaConfigChange} />
+          </div>
+        </PanelSection>
+
+        {/* Media */}
+        <PanelSection title="Photos & Media" icon={Camera}>
+          <CardPhotoTools
+            avatarUrl={s.avatarUrl} coverUrl={s.coverUrl} profession={s.professionName}
+            onAvatarChange={s.handleAvatarChange} onCoverChange={s.handleCoverChange}
+            avatarBgColor={s.avatarBgColor} avatarRotation={s.avatarRotation}
+            onAvatarBgColorChange={s.handleAvatarBgColorChange}
+            onAvatarRotationChange={s.handleAvatarRotationChange}
+            coverOffsetY={s.coverOffsetY} onCoverOffsetYChange={s.handleCoverOffsetYChange}
+            logoUrl={s.logoUrl} onLogoChange={s.handleLogoChange}
+            logoFrostedBg={s.logoFrostedBg} onLogoFrostedBgChange={s.handleLogoFrostedBgChange}
+            logoGlow={s.logoGlow} onLogoGlowChange={s.handleLogoGlowChange}
+            logoPosition={s.logoPosition} onLogoPositionChange={s.handleLogoPositionChange}
+            logoSize={s.logoSize} onLogoSizeChange={s.handleLogoSizeChange}
+            logoOpacity={s.logoOpacity} onLogoOpacityChange={s.handleLogoOpacityChange}
+            logoPadding={s.logoPadding} onLogoPaddingChange={s.handleLogoPaddingChange}
+            logoNameGap={s.logoNameGap} onLogoNameGapChange={s.handleLogoNameGapChange}
+            logoVerticalAlign={s.logoVerticalAlign} onLogoVerticalAlignChange={s.handleLogoVerticalAlignChange}
+            {...avatarThemeProps}
+          />
+          <Button variant="outline" size="sm" className="w-full mt-2 h-7 text-[11px]" onClick={() => setPhotoImportOpen(true)}>
+            <Globe className="h-3 w-3 mr-1.5" /> Import from URL
           </Button>
-        </div>
+        </PanelSection>
       </TabsContent>
 
-      <TabsContent value="theme" className="mt-0 space-y-4">
-        {/* Open full theme editor */}
-        <Button variant="default" className="w-full" onClick={() => s.setThemeEditorOpen(true)}>
-          <Sliders className="h-4 w-4 mr-2" /> Open Theme Editor
+      {/* ── Style Tab ── */}
+      <TabsContent value="style" className="mt-0 space-y-4">
+        <Button variant="default" className="w-full h-9 text-[12px]" onClick={() => s.setThemeEditorOpen(true)}>
+          <Sliders className="h-3.5 w-3.5 mr-2" /> Open Full Theme Editor
         </Button>
 
-        {/* Quick palette preview */}
+        {/* Color Palette */}
         <div className="space-y-2">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Current Palette</span>
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Color Palette</span>
           <div className="grid grid-cols-4 gap-1.5">
             {[
               { label: "Primary", color: s.previewTheme.palette.primary },
               { label: "Secondary", color: s.previewTheme.palette.secondary },
               { label: "Accent", color: s.previewTheme.palette.accent },
-              { label: "Bg", color: s.previewTheme.palette.background },
+              { label: "Background", color: s.previewTheme.palette.background },
             ].map((c) => (
               <div key={c.label} className="text-center">
-                <div className="h-8 rounded-md border border-border" style={{ background: c.color }} />
+                <div className="h-8 rounded-md border border-border/50 shadow-sm transition-transform hover:scale-105 cursor-pointer" style={{ background: c.color }} />
                 <span className="text-[9px] text-muted-foreground mt-0.5 block">{c.label}</span>
               </div>
             ))}
@@ -412,78 +410,104 @@ export default function CardBuilder() {
         {/* Typography */}
         <div className="space-y-1.5">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Typography</span>
-          <div className="rounded-lg border border-border p-2.5 space-y-1.5">
-            <div className="flex items-center justify-between text-xs">
+          <div className="rounded-lg border border-border/50 p-2.5 space-y-1.5 bg-muted/20">
+            <div className="flex items-center justify-between text-[11px]">
               <span className="text-muted-foreground">Heading</span>
               <span className="font-medium" style={{ fontFamily: s.previewTheme.fonts.primary }}>{s.previewTheme.fonts.primary}</span>
             </div>
-            <div className="flex items-center justify-between text-xs">
+            <div className="flex items-center justify-between text-[11px]">
               <span className="text-muted-foreground">Body</span>
               <span className="font-medium" style={{ fontFamily: s.previewTheme.fonts.secondary }}>{s.previewTheme.fonts.secondary}</span>
             </div>
           </div>
         </div>
 
-        {/* Quick settings */}
-        <div className="space-y-2">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Quick Settings</span>
+        {/* Social Button Style */}
+        <PanelSection title="Social Links" icon={Globe} defaultOpen={false}>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">Section icons</span>
-              <Switch checked={s.showSectionIcons} onCheckedChange={(val) => { s.setShowSectionIcons(val); s.saveThemeField({ section_icons: val }); }} className="scale-75" />
+              <span className="text-[11px] text-muted-foreground">Icons only</span>
+              <Switch checked={s.socialIconsOnly} onCheckedChange={(v) => { s.setSocialIconsOnly(v); s.saveThemeField({ social_icons_only: v }); }} className="scale-[0.7]" />
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">Social icons only</span>
-              <Switch checked={s.socialIconsOnly} onCheckedChange={(v) => { s.setSocialIconsOnly(v); s.saveThemeField({ social_icons_only: v }); }} className="scale-75" />
+              <span className="text-[11px] text-muted-foreground">Style</span>
+              <div className="flex gap-0.5 rounded-md border border-border/50 bg-muted/30 p-0.5">
+                {(["auto", "filled", "outline"] as const).map((st) => (
+                  <button key={st} onClick={() => { s.setSocialBtnStyle(st); s.saveThemeField({ social_btn_style: st }); }}
+                    className={`px-2 py-0.5 rounded text-[10px] font-medium transition-all ${s.socialBtnStyle === st ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                  >{st.charAt(0).toUpperCase() + st.slice(1)}</button>
+                ))}
+              </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">Scan to Save</span>
-              <Switch checked={(s.card?.theme_json as any)?.scan_to_save === true} onCheckedChange={(v) => { s.saveThemeField({ scan_to_save: v }); }} className="scale-75" />
+              <span className="text-[11px] text-muted-foreground">Color</span>
+              <div className="flex items-center gap-1.5">
+                <input type="color" value={s.socialBtnColor || "#4361ee"}
+                  onChange={(e) => { s.setSocialBtnColor(e.target.value); s.saveThemeField({ social_btn_color: e.target.value }); }}
+                  className="h-5 w-5 rounded border border-border cursor-pointer bg-transparent p-0"
+                />
+                {s.socialBtnColor && (
+                  <button onClick={() => { s.setSocialBtnColor(""); s.saveThemeField({ social_btn_color: "" }); }}
+                    className="text-[10px] text-muted-foreground hover:text-foreground">Reset</button>
+                )}
+              </div>
             </div>
+          </div>
+        </PanelSection>
+      </TabsContent>
+
+      {/* ── Layout Tab ── */}
+      <TabsContent value="layout" className="mt-0 space-y-4">
+        {/* Quick settings */}
+        <div className="space-y-2.5">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Display Settings</span>
+          <div className="space-y-2 rounded-lg border border-border/50 p-2.5 bg-muted/20">
+            {[
+              { label: "Section icons", checked: s.showSectionIcons, onChange: (val: boolean) => { s.setShowSectionIcons(val); s.saveThemeField({ section_icons: val }); } },
+              { label: "Social icons only", checked: s.socialIconsOnly, onChange: (v: boolean) => { s.setSocialIconsOnly(v); s.saveThemeField({ social_icons_only: v }); } },
+              { label: "CTA icons only", checked: s.ctaIconsOnly, onChange: (v: boolean) => { s.setCtaIconsOnly(v); s.saveThemeField({ cta_icons_only: v }); } },
+              { label: "Scan to Save", checked: (s.card?.theme_json as any)?.scan_to_save === true, onChange: (v: boolean) => { s.saveThemeField({ scan_to_save: v }); } },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center justify-between">
+                <span className="text-[11px] text-muted-foreground">{item.label}</span>
+                <Switch checked={item.checked} onCheckedChange={item.onChange} className="scale-[0.7]" />
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Social style */}
-        <div className="space-y-2">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Social Button Style</span>
-          <div className="flex gap-0.5 rounded-md border border-border bg-muted/50 p-0.5">
-            {(["auto", "filled", "outline"] as const).map((st) => (
-              <button key={st} onClick={() => { s.setSocialBtnStyle(st); s.saveThemeField({ social_btn_style: st }); }}
-                className={`flex-1 px-2 py-1 rounded text-[10px] font-medium transition-colors ${s.socialBtnStyle === st ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
-              >{st.charAt(0).toUpperCase() + st.slice(1)}</button>
-            ))}
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">Button color</span>
-            <div className="flex items-center gap-1.5">
-              <input type="color" value={s.socialBtnColor || "#4361ee"}
-                onChange={(e) => { s.setSocialBtnColor(e.target.value); s.saveThemeField({ social_btn_color: e.target.value }); }}
-                className="h-6 w-6 rounded border border-border cursor-pointer bg-transparent p-0"
-              />
-              {s.socialBtnColor && (
-                <button onClick={() => { s.setSocialBtnColor(""); s.saveThemeField({ social_btn_color: "" }); }}
-                  className="text-[10px] text-muted-foreground hover:text-foreground transition-colors">Reset</button>
-              )}
-            </div>
-          </div>
-        </div>
+        {/* Section order management */}
+        <PanelSection title="Section Order" icon={Layers}>
+          <CardBuilderSections
+            sections={s.sections} setSections={s.setSections}
+            toggleSection={s.toggleSection} setEditingSection={s.setEditingSection}
+            showSectionIcons={s.showSectionIcons} setShowSectionIcons={s.setShowSectionIcons}
+            saveThemeField={s.saveThemeField} saveSections={s.saveSections}
+            isGenerating={s.isGenerating} aiContent={s.aiContent} onAIGenerate={s.handleAIGenerate}
+            ctaConfig={s.ctaConfig} ctaIconsOnly={s.ctaIconsOnly} setCtaIconsOnly={s.setCtaIconsOnly}
+            onCtaConfigChange={s.handleCtaConfigChange}
+            socialIconsOnly={s.socialIconsOnly} setSocialIconsOnly={s.setSocialIconsOnly}
+            socialBtnColor={s.socialBtnColor} setSocialBtnColor={s.setSocialBtnColor}
+            socialBtnStyle={s.socialBtnStyle} setSocialBtnStyle={s.setSocialBtnStyle}
+            hideWrapper
+          />
+        </PanelSection>
       </TabsContent>
     </Tabs>
   );
 
-  // Mobile tab config
-
-  // Mobile tab config
+  // ── Mobile tab config ──
   const mobileTabs = [
     { id: "preview" as const, label: "Preview", icon: Smartphone },
     { id: "sections" as const, label: "Sections", icon: Layers },
-    { id: "identity" as const, label: "Identity", icon: Pencil },
-    { id: "theme" as const, label: "Theme", icon: Palette },
+    { id: "content" as const, label: "Content", icon: Pencil },
+    { id: "style" as const, label: "Style", icon: Palette },
   ];
 
   return (
     <div className="flex flex-col -mx-4 md:-mx-6 lg:-mx-8 -mt-4 md:-mt-6 lg:-mt-8" style={{ height: "calc(100vh - 3.5rem)" }}>
       <DesktopGuidanceNotice toolKey="card-builder" />
+
       {/* ── Top Bar ── */}
       <CardBuilderHeader
         globalSaveState={s.globalSaveState}
@@ -495,294 +519,201 @@ export default function CardBuilder() {
         onPreviewDeviceChange={setPreviewDevice}
       />
 
-      {/* ── Desktop: Three-panel layout ── */}
+      {/* ══════════════════════════════════════════════════ */}
+      {/*  DESKTOP — Three-panel layout                     */}
+      {/* ══════════════════════════════════════════════════ */}
       <div className="hidden lg:flex flex-1 min-h-0">
         <ResizablePanelGroup direction="horizontal" className="h-full">
-          {/* Left Panel — Components */}
-          <ResizablePanel defaultSize={20} minSize={16} maxSize={28}>
-            <div className="h-full flex flex-col bg-card border-r border-border">
-              <div className="flex items-center gap-2 px-3 py-2 border-b border-border shrink-0">
-                <Layers className="h-3.5 w-3.5 text-primary" />
-                <span className="text-xs font-semibold">Components</span>
+          {/* Left Panel — Section Library */}
+          <ResizablePanel defaultSize={18} minSize={14} maxSize={24}>
+            <div className="h-full flex flex-col bg-card/50 border-r border-border/40">
+              <div className="flex items-center gap-1.5 px-3 py-2 border-b border-border/40 shrink-0">
+                <Layers className="h-3 w-3 text-primary" />
+                <span className="text-[11px] font-semibold text-foreground">Components</span>
               </div>
-              <ScrollArea className="flex-1">
-                <div className="p-3">
-                  {leftPanelContent}
+              <div className="flex-1 overflow-y-auto">
+                <div className="p-2.5">
+                  {leftPanel}
                 </div>
-              </ScrollArea>
+              </div>
             </div>
           </ResizablePanel>
 
-          <ResizableHandle />
+          <ResizableHandle className="w-px bg-border/30 hover:bg-primary/30 transition-colors" />
 
-          {/* Center Panel — Preview Canvas (no duplicate toolbar) */}
-          <ResizablePanel defaultSize={46} minSize={30}>
-            <div className="h-full flex flex-col" style={{
-              background: "radial-gradient(circle, hsl(var(--muted)) 1px, transparent 1px)",
-              backgroundSize: "16px 16px",
+          {/* Center Panel — Preview Canvas */}
+          <ResizablePanel defaultSize={48} minSize={32}>
+            <div className="h-full flex flex-col bg-muted/20" style={{
+              backgroundImage: "radial-gradient(circle, hsl(var(--border) / 0.15) 1px, transparent 1px)",
+              backgroundSize: "20px 20px",
             }}>
-              <ScrollArea className="flex-1">
+              <div className="flex-1 overflow-y-auto">
                 <div className="p-6 flex items-start justify-center min-h-full">
                   <div className="w-full max-w-md">
-                    <CardBuilderPreview
-                      profile={s.profile}
-                      previewTheme={s.previewTheme}
-                      currentThemeOverrides={s.currentThemeOverrides}
-                      sections={s.sections}
-                      coverUrl={s.coverUrl}
-                      coverOffsetY={s.coverOffsetY}
-                      avatarUrl={s.avatarUrl}
-                      avatarBgColor={s.avatarBgColor}
-                      avatarRotation={s.avatarRotation}
-                      logoUrl={s.logoUrl}
-                      logoFrostedBg={s.logoFrostedBg}
-                      logoPosition={s.logoPosition}
-                      logoSize={s.logoSize}
-                      logoOpacity={s.logoOpacity}
-                      logoPadding={s.logoPadding}
-                      logoNameGap={s.logoNameGap}
-                      logoVerticalAlign={s.logoVerticalAlign}
-                      ctaConfig={s.ctaConfig}
-                      ctaIconsOnly={s.ctaIconsOnly}
-                      editName={s.editName}
-                      editCompany={s.editCompany}
-                      displayJobTitle={s.displayJobTitle}
-                      boldLastName={s.boldLastName}
-                      uppercaseName={s.uppercaseName}
-                      nameLetterSpacing={s.nameLetterSpacing}
-                      nameFontWeight={s.nameFontWeight}
-                      firstNameFontWeight={s.firstNameFontWeight}
-                      nameItalic={s.nameItalic}
-                      nameFontSize={s.nameFontSize}
-                      subtitleFontSize={s.subtitleFontSize}
-                      subtitleItalic={s.subtitleItalic}
-                      subtitleSpacing={s.subtitleSpacing}
-                      showCompany={s.showCompany}
-                      nameLineHeight={s.nameLineHeight}
-                      nameTextStroke={s.nameTextStroke}
-                      nameTextStrokeWidth={s.nameTextStrokeWidth}
-                      onAvatarChange={s.handleAvatarChange}
-                      setEditingSection={s.setEditingSection}
-                      identityPosition={s.identityPosition}
-                      onIdentityPositionChange={s.handleIdentityPositionChange}
-                      logoCustomPosition={s.logoCustomPosition}
-                      onLogoCustomPositionChange={s.handleLogoCustomPositionChange}
-                      previewDevice={previewDevice}
-                      hideToolbar
-                    />
+                    <CardBuilderPreview {...previewProps} previewDevice={previewDevice} hideToolbar />
                   </div>
                 </div>
-              </ScrollArea>
+              </div>
             </div>
           </ResizablePanel>
 
-          <ResizableHandle />
+          <ResizableHandle className="w-px bg-border/30 hover:bg-primary/30 transition-colors" />
 
-          {/* Right Panel — Design */}
-          <ResizablePanel defaultSize={34} minSize={22} maxSize={40}>
-            <div className="h-full flex flex-col bg-card border-l border-border">
-              <div className="flex items-center gap-2 px-3 py-2 border-b border-border shrink-0">
-                <Sliders className="h-3.5 w-3.5 text-primary" />
-                <span className="text-xs font-semibold">Design</span>
+          {/* Right Panel — Design Controls */}
+          <ResizablePanel defaultSize={34} minSize={24} maxSize={42}>
+            <div className="h-full flex flex-col bg-card/50 border-l border-border/40">
+              <div className="flex items-center gap-1.5 px-3 py-2 border-b border-border/40 shrink-0">
+                <Settings2 className="h-3 w-3 text-primary" />
+                <span className="text-[11px] font-semibold text-foreground">Design</span>
               </div>
-              <ScrollArea className="flex-1">
-                <div className="p-3">
-                  {rightPanelContent}
+              <div className="flex-1 overflow-y-auto">
+                <div className="p-2.5">
+                  {rightPanel}
                 </div>
-              </ScrollArea>
+              </div>
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
 
-      {/* ── Mobile: Tab-based layout with bottom nav ── */}
+      {/* ══════════════════════════════════════════════════ */}
+      {/*  MOBILE — Tab-based layout                        */}
+      {/* ══════════════════════════════════════════════════ */}
       <div className="lg:hidden flex-1 flex flex-col min-h-0">
-        {/* Content area */}
         <div className="flex-1 overflow-auto">
-          {mobileTab === "preview" && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4">
-              <CardBuilderPreview
-                profile={s.profile} previewTheme={s.previewTheme}
-                currentThemeOverrides={s.currentThemeOverrides} sections={s.sections}
-                coverUrl={s.coverUrl} coverOffsetY={s.coverOffsetY}
-                avatarUrl={s.avatarUrl} avatarBgColor={s.avatarBgColor} avatarRotation={s.avatarRotation}
-                logoUrl={s.logoUrl} logoFrostedBg={s.logoFrostedBg} logoPosition={s.logoPosition}
-                logoSize={s.logoSize} logoOpacity={s.logoOpacity} logoPadding={s.logoPadding}
-                logoNameGap={s.logoNameGap} logoVerticalAlign={s.logoVerticalAlign}
-                ctaConfig={s.ctaConfig} ctaIconsOnly={s.ctaIconsOnly}
-                editName={s.editName} editCompany={s.editCompany} displayJobTitle={s.displayJobTitle}
-                boldLastName={s.boldLastName} uppercaseName={s.uppercaseName}
-                nameLetterSpacing={s.nameLetterSpacing} nameFontWeight={s.nameFontWeight}
-                firstNameFontWeight={s.firstNameFontWeight} nameItalic={s.nameItalic}
-                      nameFontSize={s.nameFontSize} subtitleFontSize={s.subtitleFontSize}
-                      subtitleItalic={s.subtitleItalic}
-                      subtitleSpacing={s.subtitleSpacing}
-                      showCompany={s.showCompany}
-                      nameLineHeight={s.nameLineHeight}
-                      nameTextStroke={s.nameTextStroke}
-                      nameTextStrokeWidth={s.nameTextStrokeWidth}
-                onAvatarChange={s.handleAvatarChange} setEditingSection={s.setEditingSection}
-                identityPosition={s.identityPosition}
-                onIdentityPositionChange={s.handleIdentityPositionChange}
-                logoCustomPosition={s.logoCustomPosition}
-                onLogoCustomPositionChange={s.handleLogoCustomPositionChange}
-              />
-            </motion.div>
-          )}
+          <AnimatePresence mode="wait">
+            {mobileTab === "preview" && (
+              <motion.div key="preview" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-4">
+                <CardBuilderPreview {...previewProps} />
+              </motion.div>
+            )}
 
-          {mobileTab === "sections" && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="p-4 space-y-4">
-              {/* Templates */}
-              <div className="space-y-2">
-                <div className="flex items-center gap-2 px-1">
-                  <LayoutTemplate className="h-3.5 w-3.5 text-primary" />
-                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Templates</span>
-                </div>
+            {mobileTab === "sections" && (
+              <motion.div key="sections" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="p-4 space-y-4">
                 <TemplateSelector selectedTemplateId={selectedTemplateId} onSelect={handleApplyTemplate} professionName={s.professionName} compact />
-              </div>
-
-              {/* Section list */}
-              <CardBuilderSections
-                sections={s.sections} setSections={s.setSections}
-                toggleSection={s.toggleSection} setEditingSection={s.setEditingSection}
-                showSectionIcons={s.showSectionIcons} setShowSectionIcons={s.setShowSectionIcons}
-                saveThemeField={s.saveThemeField} saveSections={s.saveSections}
-                isGenerating={s.isGenerating} aiContent={s.aiContent} onAIGenerate={s.handleAIGenerate}
-                ctaConfig={s.ctaConfig} ctaIconsOnly={s.ctaIconsOnly} setCtaIconsOnly={s.setCtaIconsOnly}
-                onCtaConfigChange={s.handleCtaConfigChange}
-                socialIconsOnly={s.socialIconsOnly} setSocialIconsOnly={s.setSocialIconsOnly}
-                socialBtnColor={s.socialBtnColor} setSocialBtnColor={s.setSocialBtnColor}
-                socialBtnStyle={s.socialBtnStyle} setSocialBtnStyle={s.setSocialBtnStyle}
-                hideWrapper
-              />
-
-              <Button
-                variant="outline" size="sm"
-                className="w-full gap-1.5 border-dashed border-primary/30 text-primary"
-                onClick={() => setBlockMarketOpen(true)}
-              >
-                <Plus className="h-3.5 w-3.5" /> Browse Block Marketplace
-              </Button>
-            </motion.div>
-          )}
-
-          {mobileTab === "identity" && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="p-4">
-              <CardBuilderIdentity
-                profile={s.profile} editName={s.editName} setEditName={s.setEditName}
-                editCompany={s.editCompany} setEditCompany={s.setEditCompany}
-                editJobTitle={s.editJobTitle} setEditJobTitle={s.setEditJobTitle}
-                jobTitle={s.jobTitle} setJobTitle={s.setJobTitle}
-                boldLastName={s.boldLastName} setBoldLastName={s.setBoldLastName}
-                uppercaseName={s.uppercaseName} setUppercaseName={s.setUppercaseName}
-                professionName={s.professionName}
-                identitySaveTimers={s.identitySaveTimers}
-                identitySaveState={s.identitySaveState} setIdentitySaveState={s.setIdentitySaveState}
-                nameLetterSpacing={s.nameLetterSpacing} setNameLetterSpacing={s.setNameLetterSpacing}
-                nameFontWeight={s.nameFontWeight} setNameFontWeight={s.setNameFontWeight}
-                firstNameFontWeight={s.firstNameFontWeight} setFirstNameFontWeight={s.setFirstNameFontWeight}
-                nameItalic={s.nameItalic} setNameItalic={s.setNameItalic}
-                nameFontSize={s.nameFontSize} setNameFontSize={s.setNameFontSize}
-                subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
-                subtitleItalic={s.subtitleItalic} setSubtitleItalic={s.setSubtitleItalic}
-                subtitleSpacing={s.subtitleSpacing} setSubtitleSpacing={s.setSubtitleSpacing}
-                showCompany={s.showCompany} setShowCompany={s.setShowCompany}
-                nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
-                nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
-                nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}
-                saveThemeField={s.saveThemeField} qc={s.qc} hideWrapper
-              />
-              <div className="mt-4 space-y-3">
-                <CardPhotoTools
-                  avatarUrl={s.avatarUrl} coverUrl={s.coverUrl} profession={s.professionName}
-                  onAvatarChange={s.handleAvatarChange} onCoverChange={s.handleCoverChange}
-                  avatarBgColor={s.avatarBgColor} avatarRotation={s.avatarRotation}
-                  onAvatarBgColorChange={s.handleAvatarBgColorChange}
-                  onAvatarRotationChange={s.handleAvatarRotationChange}
-                  coverOffsetY={s.coverOffsetY} onCoverOffsetYChange={s.handleCoverOffsetYChange}
-                  logoUrl={s.logoUrl} onLogoChange={s.handleLogoChange}
-                  logoFrostedBg={s.logoFrostedBg} onLogoFrostedBgChange={s.handleLogoFrostedBgChange}
-                  logoGlow={s.logoGlow} onLogoGlowChange={s.handleLogoGlowChange}
-                  logoPosition={s.logoPosition} onLogoPositionChange={s.handleLogoPositionChange}
-                  logoSize={s.logoSize} onLogoSizeChange={s.handleLogoSizeChange}
-                  logoOpacity={s.logoOpacity} onLogoOpacityChange={s.handleLogoOpacityChange}
-                  logoPadding={s.logoPadding} onLogoPaddingChange={s.handleLogoPaddingChange}
-                  logoNameGap={s.logoNameGap} onLogoNameGapChange={s.handleLogoNameGapChange}
-                  logoVerticalAlign={s.logoVerticalAlign} onLogoVerticalAlignChange={s.handleLogoVerticalAlignChange}
-                  {...avatarThemeProps}
+                <CardBuilderSections
+                  sections={s.sections} setSections={s.setSections}
+                  toggleSection={s.toggleSection} setEditingSection={s.setEditingSection}
+                  showSectionIcons={s.showSectionIcons} setShowSectionIcons={s.setShowSectionIcons}
+                  saveThemeField={s.saveThemeField} saveSections={s.saveSections}
+                  isGenerating={s.isGenerating} aiContent={s.aiContent} onAIGenerate={s.handleAIGenerate}
+                  ctaConfig={s.ctaConfig} ctaIconsOnly={s.ctaIconsOnly} setCtaIconsOnly={s.setCtaIconsOnly}
+                  onCtaConfigChange={s.handleCtaConfigChange}
+                  socialIconsOnly={s.socialIconsOnly} setSocialIconsOnly={s.setSocialIconsOnly}
+                  socialBtnColor={s.socialBtnColor} setSocialBtnColor={s.setSocialBtnColor}
+                  socialBtnStyle={s.socialBtnStyle} setSocialBtnStyle={s.setSocialBtnStyle}
+                  hideWrapper
                 />
-              </div>
-            </motion.div>
-          )}
+                <Button variant="ghost" size="sm" className="w-full gap-1.5 border border-dashed border-border/60 text-muted-foreground" onClick={() => setBlockMarketOpen(true)}>
+                  <Plus className="h-3 w-3" /> Add Section
+                </Button>
+              </motion.div>
+            )}
 
-          {mobileTab === "theme" && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="p-4 space-y-4">
-              <Button variant="default" className="w-full" onClick={() => s.setThemeEditorOpen(true)}>
-                <Sliders className="h-4 w-4 mr-2" /> Open Theme Editor
-              </Button>
+            {mobileTab === "content" && (
+              <motion.div key="content" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="p-4">
+                <CardBuilderIdentity
+                  profile={s.profile} editName={s.editName} setEditName={s.setEditName}
+                  editCompany={s.editCompany} setEditCompany={s.setEditCompany}
+                  editJobTitle={s.editJobTitle} setEditJobTitle={s.setEditJobTitle}
+                  jobTitle={s.jobTitle} setJobTitle={s.setJobTitle}
+                  boldLastName={s.boldLastName} setBoldLastName={s.setBoldLastName}
+                  uppercaseName={s.uppercaseName} setUppercaseName={s.setUppercaseName}
+                  professionName={s.professionName}
+                  identitySaveTimers={s.identitySaveTimers}
+                  identitySaveState={s.identitySaveState} setIdentitySaveState={s.setIdentitySaveState}
+                  nameLetterSpacing={s.nameLetterSpacing} setNameLetterSpacing={s.setNameLetterSpacing}
+                  nameFontWeight={s.nameFontWeight} setNameFontWeight={s.setNameFontWeight}
+                  firstNameFontWeight={s.firstNameFontWeight} setFirstNameFontWeight={s.setFirstNameFontWeight}
+                  nameItalic={s.nameItalic} setNameItalic={s.setNameItalic}
+                  nameFontSize={s.nameFontSize} setNameFontSize={s.setNameFontSize}
+                  subtitleFontSize={s.subtitleFontSize} setSubtitleFontSize={s.setSubtitleFontSize}
+                  subtitleItalic={s.subtitleItalic} setSubtitleItalic={s.setSubtitleItalic}
+                  subtitleSpacing={s.subtitleSpacing} setSubtitleSpacing={s.setSubtitleSpacing}
+                  showCompany={s.showCompany} setShowCompany={s.setShowCompany}
+                  nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
+                  nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
+                  nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}
+                  saveThemeField={s.saveThemeField} qc={s.qc} hideWrapper
+                />
+                <div className="mt-4">
+                  <CardPhotoTools
+                    avatarUrl={s.avatarUrl} coverUrl={s.coverUrl} profession={s.professionName}
+                    onAvatarChange={s.handleAvatarChange} onCoverChange={s.handleCoverChange}
+                    avatarBgColor={s.avatarBgColor} avatarRotation={s.avatarRotation}
+                    onAvatarBgColorChange={s.handleAvatarBgColorChange}
+                    onAvatarRotationChange={s.handleAvatarRotationChange}
+                    coverOffsetY={s.coverOffsetY} onCoverOffsetYChange={s.handleCoverOffsetYChange}
+                    logoUrl={s.logoUrl} onLogoChange={s.handleLogoChange}
+                    logoFrostedBg={s.logoFrostedBg} onLogoFrostedBgChange={s.handleLogoFrostedBgChange}
+                    logoGlow={s.logoGlow} onLogoGlowChange={s.handleLogoGlowChange}
+                    logoPosition={s.logoPosition} onLogoPositionChange={s.handleLogoPositionChange}
+                    logoSize={s.logoSize} onLogoSizeChange={s.handleLogoSizeChange}
+                    logoOpacity={s.logoOpacity} onLogoOpacityChange={s.handleLogoOpacityChange}
+                    logoPadding={s.logoPadding} onLogoPaddingChange={s.handleLogoPaddingChange}
+                    logoNameGap={s.logoNameGap} onLogoNameGapChange={s.handleLogoNameGapChange}
+                    logoVerticalAlign={s.logoVerticalAlign} onLogoVerticalAlignChange={s.handleLogoVerticalAlignChange}
+                    {...avatarThemeProps}
+                  />
+                </div>
+              </motion.div>
+            )}
 
-              {/* Quick palette */}
-              <div className="space-y-2">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Current Palette</span>
-                <div className="grid grid-cols-4 gap-1.5">
+            {mobileTab === "style" && (
+              <motion.div key="style" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="p-4 space-y-4">
+                <Button variant="default" className="w-full" onClick={() => s.setThemeEditorOpen(true)}>
+                  <Sliders className="h-4 w-4 mr-2" /> Theme Editor
+                </Button>
+                <div className="space-y-2">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Palette</span>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {[
+                      { label: "Primary", color: s.previewTheme.palette.primary },
+                      { label: "Secondary", color: s.previewTheme.palette.secondary },
+                      { label: "Accent", color: s.previewTheme.palette.accent },
+                      { label: "Bg", color: s.previewTheme.palette.background },
+                    ].map((c) => (
+                      <div key={c.label} className="text-center">
+                        <div className="h-10 rounded-lg border border-border shadow-sm" style={{ background: c.color }} />
+                        <span className="text-[10px] text-muted-foreground mt-1 block">{c.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2.5 rounded-lg border border-border p-3 bg-card">
                   {[
-                    { label: "Primary", color: s.previewTheme.palette.primary },
-                    { label: "Secondary", color: s.previewTheme.palette.secondary },
-                    { label: "Accent", color: s.previewTheme.palette.accent },
-                    { label: "Bg", color: s.previewTheme.palette.background },
-                  ].map((c) => (
-                    <div key={c.label} className="text-center">
-                      <div className="h-10 rounded-lg border border-border shadow-sm" style={{ background: c.color }} />
-                      <span className="text-[10px] text-muted-foreground mt-1 block">{c.label}</span>
+                    { label: "Section icons", checked: s.showSectionIcons, onChange: (val: boolean) => { s.setShowSectionIcons(val); s.saveThemeField({ section_icons: val }); } },
+                    { label: "CTA icons only", checked: s.ctaIconsOnly, onChange: (v: boolean) => { s.setCtaIconsOnly(v); s.saveThemeField({ cta_icons_only: v }); } },
+                    { label: "Social icons only", checked: s.socialIconsOnly, onChange: (v: boolean) => { s.setSocialIconsOnly(v); s.saveThemeField({ social_icons_only: v }); } },
+                  ].map((item) => (
+                    <div key={item.label} className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">{item.label}</span>
+                      <Switch checked={item.checked} onCheckedChange={item.onChange} />
                     </div>
                   ))}
                 </div>
-              </div>
-
-              {/* Quick settings */}
-              <div className="space-y-2">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Quick Settings</span>
-                <div className="space-y-3 rounded-xl border border-border bg-card p-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Section icons</span>
-                    <Switch checked={s.showSectionIcons} onCheckedChange={(val) => { s.setShowSectionIcons(val); s.saveThemeField({ section_icons: val }); }} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Social icons only</span>
-                    <Switch checked={s.socialIconsOnly} onCheckedChange={(v) => { s.setSocialIconsOnly(v); s.saveThemeField({ social_icons_only: v }); }} />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">CTA icons only</span>
-                    <Switch checked={s.ctaIconsOnly} onCheckedChange={(v) => { s.setCtaIconsOnly(v); s.saveThemeField({ cta_icons_only: v }); }} />
-                  </div>
-                </div>
-              </div>
-
-              {/* AI Tools */}
-              <div className="space-y-2">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">AI Tools</span>
                 <Button size="sm" className="w-full gap-1.5" onClick={() => setAiAssistantOpen(true)}>
-                  <Sparkles className="h-3.5 w-3.5" /> Generate My Card with AI
+                  <Sparkles className="h-3.5 w-3.5" /> AI Design Assistant
                 </Button>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Bottom tab bar */}
-        <div className="shrink-0 border-t border-border bg-card/95 backdrop-blur-sm safe-area-bottom">
-          <div className="grid grid-cols-4 h-14">
+        <div className="shrink-0 border-t border-border/60 bg-card/95 backdrop-blur-sm safe-area-bottom">
+          <div className="grid grid-cols-4 h-13">
             {mobileTabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setMobileTab(tab.id)}
-                className={`flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-colors ${
+                className={`flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium transition-all ${
                   mobileTab === tab.id
                     ? "text-primary"
                     : "text-muted-foreground"
                 }`}
               >
-                <tab.icon className={`h-5 w-5 transition-transform ${mobileTab === tab.id ? "scale-110" : ""}`} />
+                <tab.icon className={`h-4.5 w-4.5 transition-transform ${mobileTab === tab.id ? "scale-110" : ""}`} />
                 {tab.label}
               </button>
             ))}
@@ -790,7 +721,7 @@ export default function CardBuilder() {
         </div>
       </div>
 
-      {/* Section Editor Sheet */}
+      {/* ── Dialogs ── */}
       {editingSec && (
         <SectionEditor
           sectionId={editingSec.id}
@@ -805,7 +736,6 @@ export default function CardBuilder() {
         />
       )}
 
-      {/* Theme Editor Sheet */}
       <CardThemeEditor
         open={s.themeEditorOpen}
         onOpenChange={s.setThemeEditorOpen}
@@ -821,7 +751,6 @@ export default function CardBuilder() {
         onPreview={s.handleThemePreview}
       />
 
-      {/* AI Assistant */}
       <CardAssistant
         context={{
           name: s.profile?.name || "",
