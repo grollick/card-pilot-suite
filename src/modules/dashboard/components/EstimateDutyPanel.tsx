@@ -29,8 +29,8 @@ export default function EstimateDutyPanel() {
   const [autoOffHours, setAutoOffHours] = useState("");
   const [autoOffOutside, setAutoOffOutside] = useState(false);
 
-  const isFreePlan = currentPlan === "starter" || currentPlan === "free";
-  const isProPlus = currentPlan === "pro" || currentPlan === "agency";
+  const isFreePlan = planKey === "starter";
+  const isProPlus = planKey === "pro" || planKey === "agency";
 
   const handleToggle = (on: boolean) => {
     toggleDuty.mutate({
