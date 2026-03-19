@@ -220,7 +220,7 @@ function RecommendedSection({ listings }: { listings: MarketplaceListing[] }) {
 }
 
 // ── Sticky CTA ──
-function StickyCTA() {
+function StickyCTA({ onQuoteClick }: { onQuoteClick: () => void }) {
   return (
     <motion.div
       initial={{ y: 100, opacity: 0 }}
@@ -230,7 +230,7 @@ function StickyCTA() {
     >
       <div className="bg-card/95 backdrop-blur-md border border-border/60 rounded-full shadow-xl px-2 py-2 flex items-center gap-2">
         <span className="text-sm font-medium text-foreground pl-4 hidden sm:inline">Need help finding the right pro?</span>
-        <Button size="sm" className="rounded-full gap-1.5 shadow-sm px-5">
+        <Button size="sm" className="rounded-full gap-1.5 shadow-sm px-5" onClick={onQuoteClick}>
           <MessageSquareText className="h-4 w-4" /> Request a Quote <ArrowRight className="h-3.5 w-3.5" />
         </Button>
       </div>
