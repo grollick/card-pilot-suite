@@ -44,12 +44,13 @@ export default function ActivationChecklist() {
     queryFn: async (): Promise<ChecklistItem[]> => {
       const uid = user!.id;
 
-      const [cardRes, serviceRes, leadRes, bookingRes, analyticsRes] = await Promise.all([
+      const [cardRes, serviceRes, leadRes, bookingRes, analyticsRes, estimateRes] = await Promise.all([
         supabase.from("cards").select("id, status, sections_json").eq("user_id", uid).limit(1).maybeSingle(),
         supabase.from("booking_services").select("id").eq("user_id", uid).eq("active", true).limit(1),
         supabase.from("leads").select("id").eq("user_id", uid).limit(1),
         supabase.from("bookings").select("id").eq("user_id", uid).limit(1),
         supabase.from("analytics_events").select("id").eq("user_id", uid).eq("event_type", "card_view").limit(5),
+        supabase.from("estimates").select("id, status").eq("user_id", uid).limit(1),
       ]);
 
       const hasPublishedCard = cardRes.data?.status === "published";
