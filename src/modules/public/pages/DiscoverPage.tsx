@@ -433,8 +433,8 @@ export default function DiscoverPage() {
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search by name, profession, service, or city…"
+                   <Input
+                    placeholder="What service do you need?"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="pl-10 h-12 text-base bg-background/50 border-border/40 rounded-xl"
