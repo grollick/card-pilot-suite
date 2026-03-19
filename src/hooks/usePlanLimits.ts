@@ -24,5 +24,5 @@ export function usePlanLimits() {
     return typeof val === "boolean" ? val : true;
   };
 
-  return { planKey, limits, checkLimit, profile };
+  return { planKey, limits, checkLimit, hasFeature, profile };
 }
