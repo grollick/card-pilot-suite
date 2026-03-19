@@ -285,7 +285,7 @@ export function AppSidebar() {
       <SidebarFooter className="px-2 pb-3">
         {!collapsed && <Separator className="mx-2 mb-2 w-auto opacity-50" />}
         <SidebarMenu>
-          {settingsItems.map(renderItem)}
+          {[...settingsItemsBase, ...(isAdmin ? adminOnlyItems : [])].map(renderItem)}
         </SidebarMenu>
 
         {/* User section */}
