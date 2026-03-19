@@ -30,18 +30,18 @@ export default class ErrorBoundary extends Component<Props, State> {
 
     // Log to system_events if possible (fire-and-forget)
     try {
-      const { supabase } = require("@/integrations/supabase/client");
-      supabase.from("system_events").insert({
-        event_type: "client_error",
-        severity: "error",
-        message: error.message?.slice(0, 500),
-        meta_data: {
-          stack: error.stack?.slice(0, 1000),
-          componentStack: info.componentStack?.slice(0, 500),
-          url: window.location.href,
-          userAgent: navigator.userAgent,
-        },
-      }).then(() => {}).catch(() => {});
+      import("@/integrations/supabase/client").then(({ supabase }) => {
+        supabase.from("system_events").insert({
+          event_type: "client_error",
+          severity: "error",
+          message: error.message?.slice(0, 500),
+          meta_data: {
+            stack: error.stack?.slice(0, 1000),
+            componentStack: info.componentStack?.slice(0, 500),
+            url: window.location.href,
+          },
+        }).then(() => {}).catch(() => {});
+      }).catch(() => {});
     } catch {
       // Silently ignore if logging fails
     }
