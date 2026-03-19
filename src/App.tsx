@@ -12,17 +12,19 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Loader2 } from "lucide-react";
 
-// ── Public routes — loaded eagerly for fast <500ms render ──
-import PublicBooking from "@/modules/public/pages/PublicBooking";
-import QRLanding from "@/modules/public/pages/QRLanding";
-import ProductsPage from "@/modules/public/pages/ProductsPage";
-import DiscoverPage from "@/modules/public/pages/DiscoverPage";
-import OnDutyMapPage from "@/modules/public/pages/OnDutyMapPage";
+// ── Public routes — most eagerly loaded for fast render ──
 import LegalPage from "@/modules/public/pages/LegalPage";
-import RequestServicePage from "@/modules/public/pages/RequestServicePage";
 import HandleOrSeoRoute from "@/modules/public/pages/HandleOrSeoRoute";
-import PublicSite from "@/modules/public/pages/PublicSite";
-import DemoCardPreview from "@/modules/public/pages/DemoCardPreview";
+
+// ── Public routes — lazy loaded (heavier) ──
+const PublicBooking = lazy(() => import("@/modules/public/pages/PublicBooking"));
+const QRLanding = lazy(() => import("@/modules/public/pages/QRLanding"));
+const ProductsPage = lazy(() => import("@/modules/public/pages/ProductsPage"));
+const DiscoverPage = lazy(() => import("@/modules/public/pages/DiscoverPage"));
+const OnDutyMapPage = lazy(() => import("@/modules/public/pages/OnDutyMapPage"));
+const RequestServicePage = lazy(() => import("@/modules/public/pages/RequestServicePage"));
+const PublicSite = lazy(() => import("@/modules/public/pages/PublicSite"));
+const DemoCardPreview = lazy(() => import("@/modules/public/pages/DemoCardPreview"));
 
 // Client Portal — loaded eagerly (public, token-based)
 const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
