@@ -1,27 +1,12 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate, useLocation } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useProfileCache } from "@/hooks/useProfileCache";
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  const { data: profile, isLoading: profileLoading, error: profileError } = useQuery({
-    queryKey: ["profile-onboarding", user?.id],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("onboarding_completed")
-        .eq("id", user!.id)
-        .maybeSingle();
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!user,
-    retry: 2,
-    staleTime: 5 * 60 * 1000,
-  });
+  const { data: profile, isLoading: profileLoading, error: profileError } = useProfileCache();
 
   if (loading || (user && profileLoading)) {
     return (

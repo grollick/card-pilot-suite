@@ -150,20 +150,22 @@ export function OrgProvider({ children }: { children: ReactNode }) {
     queryClient.invalidateQueries({ queryKey: ["org-members"] });
   }, [queryClient]);
 
+  const value = useMemo(() => ({
+    currentOrg,
+    orgs,
+    members,
+    myRole,
+    isOrgAdmin,
+    loading: orgsLoading || membersLoading,
+    switchOrg,
+    createOrg,
+    inviteMember,
+    removeMember,
+    updateMemberRole,
+  }), [currentOrg, orgs, members, myRole, isOrgAdmin, orgsLoading, membersLoading, switchOrg, createOrg, inviteMember, removeMember, updateMemberRole]);
+
   return (
-    <OrgContext.Provider value={{
-      currentOrg,
-      orgs,
-      members,
-      myRole,
-      isOrgAdmin,
-      loading: orgsLoading || membersLoading,
-      switchOrg,
-      createOrg,
-      inviteMember,
-      removeMember,
-      updateMemberRole,
-    }}>
+    <OrgContext.Provider value={value}>
       {children}
     </OrgContext.Provider>
   );
