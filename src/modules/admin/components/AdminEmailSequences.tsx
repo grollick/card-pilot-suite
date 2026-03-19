@@ -91,7 +91,7 @@ const PRESET_SEQUENCES = [
   },
 ];
 
-export default function AdminEmailSequences() {
+const AdminEmailSequences = forwardRef<HTMLDivElement>(function AdminEmailSequences(_props, ref) {
   const { data: sequences = [], isLoading } = useEmailSequences();
   const createSeq = useCreateSequence();
   const updateSeq = useUpdateSequence();
