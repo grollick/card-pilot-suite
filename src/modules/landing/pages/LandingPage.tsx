@@ -90,7 +90,7 @@ const PROFESSION_ICONS: Record<string, typeof Wrench> = {
 };
 
 const testimonials = [
-  { name: "Jake M.", role: "Landscaper", text: "I went from losing half my leads to booking 90% of them. CardPilot paid for itself in a week.", rating: 5 },
+  { name: "Jake M.", role: "Landscaper", text: "I went from losing half my leads to booking 90% of them. guzzl.pro paid for itself in a week.", rating: 5 },
   { name: "Sarah L.", role: "Interior Painter", text: "Clients love scanning my card and booking instantly. I've never been this organized.", rating: 5 },
   { name: "Marco R.", role: "Electrician", text: "Estimates used to take me an hour. Now I send them on-site in two minutes.", rating: 5 },
 ];
