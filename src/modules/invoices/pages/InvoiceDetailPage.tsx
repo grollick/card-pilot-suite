@@ -38,6 +38,7 @@ export default function InvoiceDetailPage() {
   const updateStatus = useUpdateInvoiceStatus();
   const saveLineItems = useSaveInvoiceLineItems();
   const createInvoice = useCreateInvoice();
+  const { planKey, profile } = usePlanLimits();
 
   const [leadId, setLeadId] = useState<string>("");
   const [jobId, setJobId] = useState<string>("");
