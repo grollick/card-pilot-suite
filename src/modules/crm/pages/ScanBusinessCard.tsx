@@ -39,6 +39,7 @@ export default function ScanBusinessCard() {
   const [step, setStep] = useState<Step>("capture");
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [contact, setContact] = useState<ExtractedContact>({ name: "" });
+  const [contactType, setContactType] = useState<string>("lead");
   const [saving, setSaving] = useState(false);
 
   const processImage = useCallback(async (base64: string) => {
