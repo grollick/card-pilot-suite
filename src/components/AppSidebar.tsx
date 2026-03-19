@@ -80,6 +80,7 @@ const moreItems = [
   { title: "Autopilot", url: "/app/autopilot", icon: Bot },
   { title: "Automation", url: "/app/automation", icon: Zap },
   { title: "Card Editor", url: "/app/card", icon: CreditCard },
+  { title: "Page Builder", url: "/app/page-builder", icon: Globe },
   { title: "QR Code", url: "/app/card/qr", icon: QrCode },
   { title: "Card Viewers", url: "/app/viewers", icon: Eye },
   { title: "Revenue", url: "/app/revenue", icon: DollarSign },
