@@ -174,7 +174,7 @@ export function exportEstimatePDF({
   ${estimate.notes ? `<div class="notes"><h3>Notes</h3><p>${estimate.notes}</p></div>` : ""}
   ${estimate.terms_conditions ? `<div class="terms"><h3>Terms & Conditions</h3><p>${estimate.terms_conditions}</p></div>` : ""}
 
-  ${hasBranding ? `<div class="watermark">Powered by CardPilot</div>` : ""}
+  ${hasBranding ? `<div class="watermark">Powered by guzzl.pro</div>` : ""}
 </body>
 </html>`;
 

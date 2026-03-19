@@ -372,7 +372,7 @@ export default function Onboarding() {
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-primary)" }}>
-            CardPilot
+            guzzl.pro
           </h1>
           <p className="text-sm text-muted-foreground mt-1">Set up → Send an estimate → Start earning</p>
         </div>

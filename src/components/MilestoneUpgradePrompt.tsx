@@ -19,7 +19,7 @@ const milestoneContent = {
   first_lead: {
     icon: PartyPopper,
     title: "You got your first lead! 🎉",
-    description: "Your CardPilot card is working. Imagine what happens when you add automated follow-ups — never let a lead go cold again.",
+    description: "Your guzzl.pro card is working. Imagine what happens when you add automated follow-ups — never let a lead go cold again.",
     ctaText: "Unlock Automated Follow-ups",
     stat: "Pro users convert 3x more leads with automation",
   },

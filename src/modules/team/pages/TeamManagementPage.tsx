@@ -96,7 +96,7 @@ export default function TeamManagementPage() {
                 <div className="space-y-2">
                   <Label>Email Address</Label>
                   <Input type="email" value={inviteEmail} onChange={e => setInviteEmail(e.target.value)} placeholder="team@example.com" />
-                  <p className="text-xs text-muted-foreground">They must have a CardPilot account first</p>
+                  <p className="text-xs text-muted-foreground">They must have a guzzl.pro account first</p>
                 </div>
                 <div className="space-y-2">
                   <Label>Role</Label>

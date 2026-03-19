@@ -151,7 +151,7 @@ serve(async (req) => {
 
 async function hashIP(ip: string): Promise<string> {
   const encoder = new TextEncoder();
-  const data = encoder.encode(ip + "cardpilot-salt");
+  const data = encoder.encode(ip + "guzzl-pro-salt");
   const hash = await crypto.subtle.digest("SHA-256", data);
   return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("").slice(0, 16);
 }
@@ -215,7 +215,7 @@ async function sendViewNotification(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "CardPilot <onboarding@resend.dev>",
+      from: "guzzl.pro <onboarding@resend.dev>",
       to: [profile.email],
       subject,
       html: `
@@ -230,8 +230,8 @@ async function sendViewNotification(
             <tr><td style="padding:12px 16px;color:#6b7280;font-size:13px;">Time</td><td style="padding:12px 16px;color:#111827;font-weight:600;font-size:13px;">${new Date().toLocaleString("en-US", { timeZone: "UTC" })} UTC</td></tr>
             ${meta.referrer ? `<tr><td style="padding:12px 16px;color:#6b7280;font-size:13px;">Source</td><td style="padding:12px 16px;color:#111827;font-weight:600;font-size:13px;">${meta.referrer}</td></tr>` : ""}
           </table>
-          <a href="https://cardpilot.com/app/viewers" style="display:inline-block;padding:12px 24px;background:#4361ee;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;margin-top:20px;">View All Visitors</a>
-          <p style="color:#9ca3af;font-size:11px;margin:24px 0 0;">CardPilot — Your digital business card platform</p>
+          <a href="https://guzzl-pro.com/app/viewers" style="display:inline-block;padding:12px 24px;background:#4361ee;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;margin-top:20px;">View All Visitors</a>
+          <p style="color:#9ca3af;font-size:11px;margin:24px 0 0;">guzzl.pro — Your digital business card platform</p>
         </div>
       `,
     }),

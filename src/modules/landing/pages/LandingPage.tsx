@@ -78,7 +78,7 @@ const PROFESSION_COLORS: Record<string, string> = {
 };
 
 const testimonials = [
-  { name: "Jake M.", role: "Landscaper", text: "I went from losing half my leads to booking 90% of them. CardPilot paid for itself in a week.", rating: 5 },
+  { name: "Jake M.", role: "Landscaper", text: "I went from losing half my leads to booking 90% of them. guzzl.pro paid for itself in a week.", rating: 5 },
   { name: "Sarah L.", role: "Interior Painter", text: "Clients love scanning my card and booking instantly. I've never been this organized.", rating: 5 },
   { name: "Marco R.", role: "Electrician", text: "Estimates used to take me an hour. Now I send them on-site in two minutes.", rating: 5 },
 ];
@@ -221,7 +221,7 @@ export default function LandingPage() {
       <nav className="border-b border-border/50 bg-card/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link to="/" className="text-lg font-extrabold tracking-tight shrink-0">
-            <span className="gradient-text">CardPilot</span>
+            <span className="gradient-text">guzzl.pro</span>
           </Link>
           <div className="hidden md:flex items-center gap-6">
             {NAV_LINKS.map((l) => (
@@ -328,7 +328,7 @@ export default function LandingPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={4} className="text-center mt-12">
             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-primary/20 bg-primary/5">
               <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-sm font-semibold text-foreground">CardPilot solves all of this — in one tool.</span>
+              <span className="text-sm font-semibold text-foreground">guzzl.pro solves all of this — in one tool.</span>
             </div>
           </motion.div>
         </div>

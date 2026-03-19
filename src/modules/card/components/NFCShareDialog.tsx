@@ -40,7 +40,7 @@ export default function NFCShareDialog({ url, name = "Card" }: NFCShareDialogPro
           {nfcSupported ? (
             <>
               <p className="text-sm text-muted-foreground">
-                Hold an NFC tag or card near your device to write your CardPilot profile URL.
+                Hold an NFC tag or card near your device to write your guzzl.pro profile URL.
               </p>
               <Button onClick={handleNFCWrite} className="w-full shadow-glow">
                 <Nfc className="h-4 w-4 mr-1.5" /> Write to NFC Tag

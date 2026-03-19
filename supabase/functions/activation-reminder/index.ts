@@ -55,7 +55,7 @@ Deno.serve(async (req) => {
 
       // Send reminder email via send-email function
       const firstName = profile.name?.split(" ")[0] || "there";
-      const cardUrl = `${Deno.env.get("SUPABASE_URL")?.replace(".supabase.co", "")?.includes("http") ? "" : "https://"}${profile.handle ? `card-pilot-suite.lovable.app/${profile.handle}` : ""}`;
+      const cardUrl = `${Deno.env.get("SUPABASE_URL")?.replace(".supabase.co", "")?.includes("http") ? "" : "https://"}${profile.handle ? `guzzl.pro/${profile.handle}` : ""}`;
 
       const resendKey = Deno.env.get("RESEND_API_KEY");
       if (resendKey && profile.email) {
@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              from: "CardPilot <noreply@cardpilot.app>",
+              from: "guzzl.pro <noreply@guzzl-pro.app>",
               to: [profile.email],
               subject: `${firstName}, your card is ready — now let's get your first lead! 🚀`,
               html: `
@@ -83,14 +83,14 @@ Deno.serve(async (req) => {
                     <li><strong>Add it</strong> to your social media bio</li>
                   </ol>
                   <p style="color: #555; line-height: 1.6;">
-                    Most CardPilot users get their first lead within 48 hours of sharing. You're almost there!
+                    Most guzzl.pro users get their first lead within 48 hours of sharing. You're almost there!
                   </p>
-                  <a href="https://card-pilot-suite.lovable.app/app" 
+                  <a href="https://guzzl.pro/app" 
                      style="display: inline-block; background: #6366f1; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 12px;">
                     Share Your Card Now →
                   </a>
                   <p style="color: #999; font-size: 12px; margin-top: 24px;">
-                    You're receiving this because you signed up for CardPilot and haven't gotten your first lead yet.
+                    You're receiving this because you signed up for guzzl.pro and haven't gotten your first lead yet.
                   </p>
                 </div>
               `,

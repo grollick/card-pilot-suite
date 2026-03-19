@@ -15,7 +15,7 @@ interface TourStep {
 
 const TOUR_STEPS: TourStep[] = [
   {
-    title: "Welcome to CardPilot! 🚀",
+    title: "Welcome to guzzl.pro! 🚀",
     description: "Let's take a quick tour of your business growth platform. We'll show you how to generate leads and book more customers in just a few minutes.",
     icon: "👋",
   },

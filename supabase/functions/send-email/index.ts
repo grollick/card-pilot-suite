@@ -47,7 +47,7 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: from ?? "CardPilot <onboarding@resend.dev>",
+        from: from ?? "guzzl.pro <onboarding@resend.dev>",
         to: Array.isArray(to) ? to : [to],
         subject,
         html: html + getMarketplaceSignature(),
@@ -123,11 +123,11 @@ function getMarketplaceSignature(): string {
   return `
     <div style="margin-top:32px;padding-top:16px;border-top:1px solid #e5e7eb;text-align:center;">
       <p style="font-size:11px;color:#9ca3af;margin:0;">
-        Sent via <a href="https://card-pilot-suite.lovable.app" style="color:#4361ee;text-decoration:none;font-weight:600;">CardPilot</a>
+        Sent via <a href="https://guzzl.pro" style="color:#4361ee;text-decoration:none;font-weight:600;">guzzl.pro</a>
       </p>
       <p style="font-size:10px;color:#b0b0b0;margin:4px 0 0;">
-        <a href="https://card-pilot-suite.lovable.app/discover" style="color:#6366f1;text-decoration:none;">
-          Find trusted professionals on the CardPilot Marketplace →
+        <a href="https://guzzl.pro/discover" style="color:#6366f1;text-decoration:none;">
+          Find trusted professionals on the guzzl.pro Marketplace →
         </a>
       </p>
     </div>

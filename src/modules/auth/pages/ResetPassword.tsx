@@ -38,7 +38,7 @@ export default function ResetPassword() {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <Link to="/"><h1 className="text-2xl font-bold gradient-text">CardPilot</h1></Link>
+          <Link to="/"><h1 className="text-2xl font-bold gradient-text">guzzl.pro</h1></Link>
           <p className="text-sm text-muted-foreground mt-1">Set your new password</p>
         </div>
         <div className="rounded-2xl border border-border bg-card p-6 shadow-card">

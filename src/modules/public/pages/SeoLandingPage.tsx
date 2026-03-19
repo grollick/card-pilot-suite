@@ -77,9 +77,9 @@ export default function SeoLandingPage() {
       .map((p) => p.name);
   }, [profData, parsed]);
 
-  const pageTitle = `Best ${profPlural} in ${cityDisplay} — Book Online | CardPilot`;
-  const metaDesc = `Find top-rated ${profPlural.toLowerCase()} in ${cityDisplay}. View profiles, compare services & pricing, read reviews, and book appointments online. Trusted local professionals on CardPilot.`;
-  const canonicalUrl = `https://cardpilot.app/${slug}`;
+  const pageTitle = `Best ${profPlural} in ${cityDisplay} — Book Online | guzzl.pro`;
+  const metaDesc = `Find top-rated ${profPlural.toLowerCase()} in ${cityDisplay}. View profiles, compare services & pricing, read reviews, and book appointments online. Trusted local professionals on guzzl.pro.`;
+  const canonicalUrl = `https://guzzl-pro.app/${slug}`;
 
   // FAQ data
   const faqs = useMemo(() => [
@@ -93,10 +93,10 @@ export default function SeoLandingPage() {
     },
     {
       q: `Is it free to browse and book ${profPlural.toLowerCase()}?`,
-      a: `Yes, browsing profiles and booking through CardPilot is completely free for customers. No account or credit card required.`,
+      a: `Yes, browsing profiles and booking through guzzl.pro is completely free for customers. No account or credit card required.`,
     },
     {
-      q: `Are ${profPlural.toLowerCase()} on CardPilot verified?`,
+      q: `Are ${profPlural.toLowerCase()} on guzzl.pro verified?`,
       a: `All professionals create and manage their own profiles, services, and availability. We encourage users to review profiles, check ratings, and read reviews before booking.`,
     },
     {
@@ -105,7 +105,7 @@ export default function SeoLandingPage() {
     },
     {
       q: `I'm a ${profDisplay.toLowerCase()} — how do I get listed in ${cityDisplay}?`,
-      a: `Sign up for a free CardPilot account, set your profession and city, create your digital business card, and enable marketplace visibility. You'll automatically appear in local search results.`,
+      a: `Sign up for a free guzzl.pro account, set your profession and city, create your digital business card, and enable marketplace visibility. You'll automatically appear in local search results.`,
     },
   ], [profDisplay, profPlural, cityDisplay]);
 
@@ -118,7 +118,7 @@ export default function SeoLandingPage() {
         "@type": "LocalBusiness",
         name: l.name,
         description: l.bio || `${l.profession_name ?? profDisplay} in ${cityDisplay}`,
-        url: `https://cardpilot.app/${l.handle}`,
+        url: `https://guzzl-pro.app/${l.handle}`,
         ...(l.city ? { address: { "@type": "PostalAddress", addressLocality: l.city } } : {}),
         ...(l.avatar_url ? { image: l.avatar_url } : {}),
         ...(l.avg_rating !== null
@@ -179,7 +179,7 @@ export default function SeoLandingPage() {
           <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
             {/* Breadcrumb */}
             <nav className="flex items-center gap-2 mb-5 text-sm" aria-label="Breadcrumb">
-              <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">CardPilot</Link>
+              <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">guzzl.pro</Link>
               <span className="text-muted-foreground/50">/</span>
               <Link to="/discover" className="text-muted-foreground hover:text-foreground transition-colors">Discover</Link>
               <span className="text-muted-foreground/50">/</span>
@@ -243,7 +243,7 @@ export default function SeoLandingPage() {
               Find a {profDisplay} in {cityDisplay}
             </h2>
             <p className="text-muted-foreground leading-relaxed max-w-3xl">
-              Looking for a trusted {profDisplay.toLowerCase()} in {cityDisplay}? CardPilot connects you with local
+              Looking for a trusted {profDisplay.toLowerCase()} in {cityDisplay}? guzzl.pro connects you with local
               {" "}{profPlural.toLowerCase()} who are ready to help. Browse their profiles below to view services,
               pricing, and customer reviews. Book your appointment online in seconds — it's free and no account is required.
             </p>
@@ -275,7 +275,7 @@ export default function SeoLandingPage() {
                   No {profPlural.toLowerCase()} listed in {cityDisplay} yet
                 </h3>
                 <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                  Are you a {profDisplay.toLowerCase()} in {cityDisplay}? Create your free CardPilot profile and start getting leads from local customers.
+                  Are you a {profDisplay.toLowerCase()} in {cityDisplay}? Create your free guzzl.pro profile and start getting leads from local customers.
                 </p>
                 <Button asChild>
                   <Link to="/auth">
@@ -352,7 +352,7 @@ export default function SeoLandingPage() {
               Are you a {profDisplay} in {cityDisplay}?
             </h2>
             <p className="text-muted-foreground mb-6 max-w-lg mx-auto">
-              Create your free CardPilot profile and start getting leads from customers searching for {profPlural.toLowerCase()} in {cityDisplay}.
+              Create your free guzzl.pro profile and start getting leads from customers searching for {profPlural.toLowerCase()} in {cityDisplay}.
             </p>
             <Button asChild size="lg">
               <Link to="/auth">
@@ -364,7 +364,7 @@ export default function SeoLandingPage() {
           {/* Footer */}
           <footer className="mt-12 pt-8 border-t border-border/40 text-center">
             <p className="text-xs text-muted-foreground">
-              Powered by <Link to="/" className="text-primary hover:underline">CardPilot</Link> — the smart business card platform that helps local businesses get more customers.
+              Powered by <Link to="/" className="text-primary hover:underline">guzzl.pro</Link> — the smart business card platform that helps local businesses get more customers.
             </p>
           </footer>
         </main>

@@ -228,7 +228,7 @@ export default function GrowthDashboard() {
             </Button>
           </div>
           <p className="text-sm text-muted-foreground">
-            Share your project cards to attract new leads. Each project includes a "Powered by CardPilot" footer that helps grow the platform organically.
+            Share your project cards to attract new leads. Each project includes a "Powered by guzzl.pro" footer that helps grow the platform organically.
           </p>
           <Button variant="outline" size="sm" onClick={() => navigate("/app/projects")}>
             View Projects

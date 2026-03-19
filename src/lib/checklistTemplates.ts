@@ -88,7 +88,7 @@ const STEP = {
   }),
   shareBio: (o = 7): ChecklistStepTemplate => ({
     key: "share_bio", label: "Add card link to your social bio", group: "share", order: o,
-    tip: "Put your CardPilot link in your Instagram, Facebook, or TikTok bio for ongoing traffic.",
+    tip: "Put your guzzl.pro link in your Instagram, Facebook, or TikTok bio for ongoing traffic.",
     route: "/app/card/qr", icon: AtSign, signal: "has_lead",
   }),
   lead: (o = 8): ChecklistStepTemplate => ({
@@ -114,7 +114,7 @@ const COMMON_MILESTONES: ChecklistMilestone[] = [
   { key: "card", title: "🎉 Your card is live!", description: "Customers can now find and contact you." },
   { key: "services", title: "✅ Services added!", description: "Customers can see what you offer." },
   { key: "lead", title: "🎉 First lead captured!", description: "Your marketing is working. Keep sharing!" },
-  { key: "booking", title: "🎊 First booking!", description: "Your first customer booked through CardPilot." },
+  { key: "booking", title: "🎊 First booking!", description: "Your first customer booked through guzzl.pro." },
   { key: "review", title: "⭐ First review!", description: "Social proof makes you stand out." },
 ];
 

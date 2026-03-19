@@ -31,7 +31,7 @@ const fadeUp = {
 /* ── Comparison table data ── */
 
 const COMPETITORS = [
-  { name: "CardPilot", highlight: true },
+  { name: "guzzl.pro", highlight: true },
   { name: "Link-in-bio tools", highlight: false },
   { name: "Scheduling tools", highlight: false },
   { name: "CRM tools", highlight: false },
@@ -118,7 +118,7 @@ export default function ComparisonSection() {
             One Platform Instead of Five
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Most small businesses juggle multiple tools to manage leads, bookings, marketing, and customer relationships. CardPilot brings everything together in one simple platform.
+            Most small businesses juggle multiple tools to manage leads, bookings, marketing, and customer relationships. guzzl.pro brings everything together in one simple platform.
           </p>
         </motion.div>
 
@@ -132,7 +132,7 @@ export default function ComparisonSection() {
         >
           {/* Scattered tools */}
           <div className="rounded-2xl border border-border bg-card p-8">
-            <p className="text-xs font-semibold text-destructive uppercase tracking-wider mb-5">Without CardPilot</p>
+            <p className="text-xs font-semibold text-destructive uppercase tracking-wider mb-5">Without guzzl.pro</p>
             <div className="flex flex-wrap gap-3">
               {SCATTERED_TOOLS.map((t, i) => (
                 <motion.div
@@ -156,16 +156,16 @@ export default function ComparisonSection() {
             <p className="text-sm text-muted-foreground mt-4">5 logins · 5 invoices · data spread everywhere</p>
           </div>
 
-          {/* CardPilot unified */}
+          {/* guzzl.pro unified */}
           <div className="rounded-2xl border-2 border-primary/30 bg-primary/[0.03] p-8 relative">
             <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">Recommended</div>
-            <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-5">With CardPilot</p>
+            <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-5">With guzzl.pro</p>
             <div className="flex items-center gap-3 mb-4">
               <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
                 <Zap className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="text-lg font-bold text-foreground">CardPilot</p>
+                <p className="text-lg font-bold text-foreground">guzzl.pro</p>
                 <p className="text-xs text-muted-foreground">Everything in one place</p>
               </div>
             </div>
@@ -264,7 +264,7 @@ export default function ComparisonSection() {
             Stop juggling tools. Start growing your business.
           </h3>
           <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-            Join thousands of service professionals who simplified their business with CardPilot.
+            Join thousands of service professionals who simplified their business with guzzl.pro.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to="/onboarding">

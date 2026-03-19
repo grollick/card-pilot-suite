@@ -5,7 +5,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const SYSTEM_PROMPT = `You are CardPilot AI — a friendly, expert assistant built into the Card Builder. You help users create compelling digital business cards.
+const SYSTEM_PROMPT = `You are guzzl.pro AI — a friendly, expert assistant built into the Card Builder. You help users create compelling digital business cards.
 
 Your capabilities:
 - Write professional bios, taglines, about sections, and service descriptions
@@ -22,7 +22,7 @@ Rules:
 - When writing content, provide it in a ready-to-copy format
 - Use markdown formatting for clarity
 - Be warm and encouraging — many users are solopreneurs building their first digital presence
-- If asked about features outside the card builder, briefly mention the relevant CardPilot feature (bookings, CRM, email, etc.)`;
+- If asked about features outside the card builder, briefly mention the relevant guzzl.pro feature (bookings, CRM, email, etc.)`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {

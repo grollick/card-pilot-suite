@@ -78,7 +78,7 @@ serve(async (req) => {
                   Book Again
                 </a>
                 <p style="color:#9ca3af;font-size:12px;margin:24px 0 0;">
-                  Sent via CardPilot on behalf of ${profile.company || profile.name}
+                  Sent via guzzl.pro on behalf of ${profile.company || profile.name}
                 </p>
               </div>
             `,

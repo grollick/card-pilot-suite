@@ -23,7 +23,7 @@ export default function IndustryLandingPage() {
 
   if (!page) return <NotFound />;
 
-  const pageTitle = `${page.heroHeadline} | CardPilot`;
+  const pageTitle = `${page.heroHeadline} | guzzl.pro`;
   const metaDesc = page.heroSubheadline.slice(0, 155);
 
   return (
@@ -31,7 +31,7 @@ export default function IndustryLandingPage() {
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={metaDesc} />
-        <link rel="canonical" href={`https://cardpilot.app/for/${page.slug}`} />
+        <link rel="canonical" href={`https://guzzl-pro.app/for/${page.slug}`} />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={metaDesc} />
         <meta property="og:type" content="website" />
@@ -41,7 +41,7 @@ export default function IndustryLandingPage() {
         {/* ── Nav ── */}
         <nav className="border-b border-border/40 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-            <Link to="/" className="text-lg font-bold text-primary">CardPilot</Link>
+            <Link to="/" className="text-lg font-bold text-primary">guzzl.pro</Link>
             <div className="flex items-center gap-3">
               <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline">Pricing</Link>
               <Button asChild size="sm">
@@ -302,7 +302,7 @@ export default function IndustryLandingPage() {
               >
                 <h2 className="text-2xl md:text-3xl font-bold mb-3">{page.demoSection.headline}</h2>
                 <p className="text-muted-foreground mb-4 max-w-xl mx-auto">
-                  See a sample {page.profession.toLowerCase()} card built with CardPilot.
+                  See a sample {page.profession.toLowerCase()} card built with guzzl.pro.
                 </p>
 
                 {/* Mini card preview */}
@@ -342,7 +342,7 @@ export default function IndustryLandingPage() {
               See What Your Card Could Look Like
             </motion.h2>
             <p className="text-center text-muted-foreground mb-10 max-w-xl mx-auto">
-              Here's a sample {page.profession.toLowerCase()} card built with CardPilot.
+              Here's a sample {page.profession.toLowerCase()} card built with guzzl.pro.
             </p>
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={1}
@@ -418,7 +418,7 @@ export default function IndustryLandingPage() {
                 {page.finalCtaHeadline || `Ready to Grow Your ${page.profession} Business?`}
               </h2>
               <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-                {page.finalCtaSubheadline || `Join thousands of ${page.profession.toLowerCase()}s who use CardPilot to capture more leads, book more jobs, and build a stronger reputation.`}
+                {page.finalCtaSubheadline || `Join thousands of ${page.profession.toLowerCase()}s who use guzzl.pro to capture more leads, book more jobs, and build a stronger reputation.`}
               </p>
               <Button asChild size="lg" className="text-base px-10">
                 <Link to="/auth">
@@ -434,7 +434,7 @@ export default function IndustryLandingPage() {
         <footer className="border-t border-border/40 py-8 text-center">
           <p className="text-xs text-muted-foreground">
             {page.footerNote && <span className="block mb-1">{page.footerNote}</span>}
-            © {new Date().getFullYear()} <Link to="/" className="text-primary hover:underline">CardPilot</Link> — The smart business card platform for local professionals.
+            © {new Date().getFullYear()} <Link to="/" className="text-primary hover:underline">guzzl.pro</Link> — The smart business card platform for local professionals.
           </p>
         </footer>
       </div>

@@ -36,7 +36,7 @@ export default function WorkflowSection() {
             From first contact to repeat customer
           </h2>
           <p className="text-muted-foreground mt-4 max-w-lg mx-auto text-lg">
-            One seamless workflow. No switching between apps. CardPilot manages the entire process.
+            One seamless workflow. No switching between apps. guzzl.pro manages the entire process.
           </p>
         </motion.div>
 

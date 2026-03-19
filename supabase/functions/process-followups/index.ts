@@ -108,7 +108,7 @@ serve(async (req) => {
           "{{sender_name}}": profile.name || "Your contact",
           "{{sender_email}}": profile.email || "",
           "{{card_link}}": profile.handle
-            ? `${Deno.env.get("SUPABASE_URL")?.replace(".supabase.co", "")?.includes("localhost") ? "http://localhost:5173" : "https://" + (profile.handle + ".cardpilot.app")}/${profile.handle}`
+            ? `${Deno.env.get("SUPABASE_URL")?.replace(".supabase.co", "")?.includes("localhost") ? "http://localhost:5173" : "https://" + (profile.handle + ".guzzl-pro.app")}/${profile.handle}`
             : "",
           "{{step_number}}": String(followup.step_number || 1),
         };
@@ -131,7 +131,7 @@ serve(async (req) => {
               — ${profile.name || ""}
             </p>
             <p style="color:#9ca3af;font-size:12px;margin:24px 0 0;">
-              Sent via CardPilot
+              Sent via guzzl.pro
             </p>
           </div>
         `;
@@ -144,7 +144,7 @@ serve(async (req) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: `${profile.name || "CardPilot"} <onboarding@resend.dev>`,
+            from: `${profile.name || "guzzl.pro"} <onboarding@resend.dev>`,
             to: [followup.recipient_email],
             subject,
             html: emailHtml,

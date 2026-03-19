@@ -233,7 +233,7 @@ serve(async (req) => {
                     ${estReq.timeline ? `<p><strong>Timeline:</strong> ${estReq.timeline}</p>` : ""}
                   </div>
                   <p style="color:#e11d48;font-weight:600">⏱ Respond within ${RESPONSE_WINDOW_MINUTES} minutes to keep this lead!</p>
-                  <p><a href="https://card-pilot-suite.lovable.app/app/contacts" style="background:#6366f1;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block">View in Dashboard</a></p>
+                  <p><a href="https://guzzl.pro/app/contacts" style="background:#6366f1;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block">View in Dashboard</a></p>
                 </div>
               `,
             },

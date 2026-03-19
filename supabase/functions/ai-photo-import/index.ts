@@ -271,7 +271,7 @@ serve(async (req) => {
 
       const imgResp = await fetch(imageUrl, {
         headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; CardPilot/1.0)",
+          "User-Agent": "Mozilla/5.0 (compatible; guzzl.pro/1.0)",
           Accept: "image/*",
         },
       });

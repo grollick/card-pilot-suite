@@ -256,7 +256,7 @@ export default function InstantCardGenerator() {
   const handleSignup = () => {
     try {
       localStorage.setItem(
-        "cardpilot_demo",
+        "guzzl-pro_demo",
         JSON.stringify({ profession, name: company, company, city, style: "Modern", aiContent: content })
       );
     } catch {}

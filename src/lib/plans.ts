@@ -1,4 +1,4 @@
-// ── CardPilot Pricing Tiers ──
+// ── guzzl.pro Pricing Tiers ──
 // 4-tier model: Starter (free) → Growth → Pro → Agency
 
 export const PLAN_TIERS = [
@@ -56,7 +56,7 @@ export const PLAN_TIERS = [
       "Full CRM pipeline",
       "Social media scheduler",
       "Promotion banners on your card",
-      "Remove CardPilot watermark",
+      "Remove guzzl.pro watermark",
       "50 AI requests per month",
     ],
     limits: {
@@ -218,7 +218,7 @@ export const AI_LIMITS: Record<string, number> = {
   agency: -1,
 };
 
-/** Whether this plan shows "Powered by CardPilot" branding */
+/** Whether this plan shows "Powered by guzzl.pro" branding */
 export function showsBranding(planKey: string): boolean {
   return planKey === "starter" || planKey === "free" || !planKey;
 }

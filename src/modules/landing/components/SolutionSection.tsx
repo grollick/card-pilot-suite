@@ -42,7 +42,7 @@ export default function SolutionSection() {
             <span className="gradient-text">in one place</span>
           </h2>
           <p className="text-muted-foreground mt-4 max-w-xl mx-auto text-lg">
-            CardPilot replaces 5+ tools so you can focus on what you do best.
+            guzzl.pro replaces 5+ tools so you can focus on what you do best.
           </p>
         </motion.div>
 

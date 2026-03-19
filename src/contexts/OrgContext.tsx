@@ -125,7 +125,7 @@ export function OrgProvider({ children }: { children: ReactNode }) {
       .select("id")
       .eq("email", email)
       .single();
-    if (lookupErr || !targetProfile) return { error: "User not found. They need a CardPilot account first." };
+    if (lookupErr || !targetProfile) return { error: "User not found. They need a guzzl.pro account first." };
 
     const { error } = await supabase.from("organization_members").insert({
       org_id: currentOrg.id,
