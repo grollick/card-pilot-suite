@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 export default function TopBar() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
   const { data: profile } = useQuery({
     queryKey: ["profile-handle"],
