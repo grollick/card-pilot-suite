@@ -4,6 +4,7 @@ import { Helmet } from "react-helmet-async";
 import { useMarketplaceListings, useMarketplaceProfessions, useMarketplaceServices, type MarketplaceListing } from "@/hooks/useMarketplace";
 import { useBoostedUserIds, useTrackBoostViews } from "@/hooks/useBoosts";
 import ListingCard from "@/modules/marketplace/components/ListingCard";
+import MarketplaceQuoteDialog from "@/modules/marketplace/components/MarketplaceQuoteDialog";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
