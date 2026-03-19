@@ -13,9 +13,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
+import { useLeadPerformance } from "@/hooks/useLeadPerformance";
 import {
   Briefcase, Loader2, Send, MapPin, DollarSign, Clock,
-  CheckCircle2, MessageSquare, TrendingUp, ArrowRight, Inbox,
+  CheckCircle2, MessageSquare, TrendingUp, ArrowRight, Inbox, Zap, AlertTriangle,
 } from "lucide-react";
 
 export default function JobRequestsPage() {
@@ -131,6 +132,13 @@ export default function JobRequestsPage() {
                   >
                     <Card className={`border-border transition-all ${!responded ? "hover:border-primary/30 hover:shadow-md" : ""}`}>
                       <CardContent className="p-5">
+                        {/* Competition nudge for unresponded */}
+                        {!responded && request.match_status === "pending" && (
+                          <div className="flex items-center gap-2 text-xs text-amber-600 bg-amber-500/10 rounded-lg px-3 py-1.5 mb-3">
+                            <Zap className="h-3 w-3 shrink-0" />
+                            <span>Respond quickly to improve your chances — fast replies win more leads.</span>
+                          </div>
+                        )}
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0 space-y-2">
                             <div className="flex items-center gap-2 flex-wrap">
