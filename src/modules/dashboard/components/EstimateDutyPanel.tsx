@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Radio, Clock, MapPin, Target, Zap, Shield, ChevronDown, ChevronUp,
-  AlertTriangle, CheckCircle2, TrendingUp, BarChart3, Inbox,
+  AlertTriangle, CheckCircle2, TrendingUp, BarChart3, Inbox, HelpCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEstimateDuty } from "@/hooks/useEstimateDuty";
 import { useEstimateMatches } from "@/hooks/useEstimateRequests";
@@ -91,6 +92,25 @@ export default function EstimateDutyPanel() {
         </div>
 
         <div className="flex items-center gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
+                <HelpCircle className="h-3.5 w-3.5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent side="bottom" align="end" className="w-72 text-xs space-y-2">
+              <p className="font-semibold text-sm">How On Duty Works</p>
+              <ul className="list-disc pl-4 space-y-1 text-muted-foreground">
+                <li>Toggle on to mark yourself as <span className="text-foreground font-medium">available</span> for real-time estimate requests from the marketplace.</li>
+                <li>Set a <span className="text-foreground font-medium">max leads cap</span>, <span className="text-foreground font-medium">service radius</span>, and <span className="text-foreground font-medium">availability window</span> in Settings.</li>
+                <li>Incoming requests appear in the <span className="text-foreground font-medium">Requests</span> tab — accept or decline before the deadline.</li>
+                <li>Your <span className="text-foreground font-medium">response speed</span> boosts your ranking in marketplace results.</li>
+              </ul>
+              <p className="text-[10px] text-muted-foreground pt-1 border-t border-border">
+                Pro plan required. Pro+ unlocks radius filtering and auto-off timers.
+              </p>
+            </PopoverContent>
+          </Popover>
           {!isFreePlan && (
             <Switch
               checked={isOnDuty}
