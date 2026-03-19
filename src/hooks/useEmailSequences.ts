@@ -78,7 +78,7 @@ export function useUpdateSequence() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...updates }: { id: string; name?: string; status?: string; description?: string; max_emails_per_day?: number }) => {
-      const { error } = await supabase.from("email_sequences").update(updates).eq("id", id);
+      const { error } = await supabase.from("email_sequences").update(updates as any).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
