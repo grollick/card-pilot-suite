@@ -3137,32 +3137,44 @@ export type Database = {
       }
       referrals: {
         Row: {
+          activated_at: string | null
           created_at: string
+          fraud_flags: Json | null
           id: string
           referral_code: string
           referred_email: string
           referred_user_id: string | null
           referrer_id: string
+          reward_days: number | null
+          reward_type: string | null
           rewarded: boolean
           status: string
         }
         Insert: {
+          activated_at?: string | null
           created_at?: string
+          fraud_flags?: Json | null
           id?: string
           referral_code: string
           referred_email: string
           referred_user_id?: string | null
           referrer_id: string
+          reward_days?: number | null
+          reward_type?: string | null
           rewarded?: boolean
           status?: string
         }
         Update: {
+          activated_at?: string | null
           created_at?: string
+          fraud_flags?: Json | null
           id?: string
           referral_code?: string
           referred_email?: string
           referred_user_id?: string | null
           referrer_id?: string
+          reward_days?: number | null
+          reward_type?: string | null
           rewarded?: boolean
           status?: string
         }
@@ -3782,6 +3794,7 @@ export type Database = {
         Args: { p_limit: number; p_user_id: string }
         Returns: Json
       }
+      check_referral_activation: { Args: { p_user_id: string }; Returns: Json }
       create_workspace_from_profession: {
         Args: {
           p_owner_user_id: string
