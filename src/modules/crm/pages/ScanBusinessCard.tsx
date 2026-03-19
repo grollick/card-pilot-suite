@@ -93,6 +93,7 @@ export default function ScanBusinessCard() {
         phone: contact.phone?.trim() || null,
         company: contact.company?.trim() || null,
         source: "business_card" as any,
+        contact_type: contactType as any,
         notes: [
           contact.job_title && `Title: ${contact.job_title}`,
           contact.website && `Website: ${contact.website}`,
