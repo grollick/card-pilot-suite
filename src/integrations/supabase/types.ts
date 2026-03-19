@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      ai_credit_purchases: {
+        Row: {
+          amount_paid: number
+          created_at: string
+          credits_purchased: number
+          credits_remaining: number
+          expires_at: string | null
+          id: string
+          purchase_type: string
+          stripe_payment_intent_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount_paid?: number
+          created_at?: string
+          credits_purchased?: number
+          credits_remaining?: number
+          expires_at?: string | null
+          id?: string
+          purchase_type?: string
+          stripe_payment_intent_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount_paid?: number
+          created_at?: string
+          credits_purchased?: number
+          credits_remaining?: number
+          expires_at?: string | null
+          id?: string
+          purchase_type?: string
+          stripe_payment_intent_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       ai_usage: {
         Row: {
           created_at: string
