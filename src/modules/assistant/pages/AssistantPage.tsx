@@ -87,6 +87,9 @@ export default function AssistantPage() {
 
       if (!resp.ok) {
         const err = await resp.json().catch(() => ({ error: "Request failed" }));
+        if (resp.status === 403 && err.code === "AI_LIMIT_REACHED") {
+          throw new Error(err.error);
+        }
         throw new Error(err.error || "Request failed");
       }
       if (!resp.body) throw new Error("No response body");
