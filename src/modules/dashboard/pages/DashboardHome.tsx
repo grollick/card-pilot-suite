@@ -15,6 +15,8 @@ import ActivationChecklist from "@/modules/dashboard/components/ActivationCheckl
 import ShareMessageCard from "@/modules/dashboard/components/ShareMessageCard";
 import FirstLeadCelebration from "@/modules/dashboard/components/FirstLeadCelebration";
 import PostLeadSharePrompt from "@/modules/dashboard/components/PostLeadSharePrompt";
+import BusinessPerformancePanel from "@/modules/dashboard/components/BusinessPerformancePanel";
+import RetentionInsightsWidget from "@/modules/dashboard/components/RetentionInsightsWidget";
 import LeadGuaranteeBanner from "@/components/LeadGuaranteeBanner";
 import { useLeadGuarantee } from "@/hooks/useLeadGuarantee";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -52,6 +54,9 @@ export default function DashboardHome() {
 
       {/* ── SECTION 2: KPI Row ── */}
       <RevenueKPICards />
+
+      {/* ── Business Performance ── */}
+      <BusinessPerformancePanel />
 
       {/* ── Activation System ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -93,6 +98,9 @@ export default function DashboardHome() {
 
           {/* ── Lead Velocity ── */}
           <LeadVelocityWidget />
+
+          {/* ── Retention Insights ── */}
+          <RetentionInsightsWidget />
 
           {/* ── SECTION 7: Growth & Insights ── */}
           <GrowthTrends />
