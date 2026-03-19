@@ -198,6 +198,7 @@ const App = () => (
             <Route path="/terms" element={<LegalPage pageKey="terms" />} />
             <Route path="/site/:handle" element={<PublicSite />} />
             <Route path="/discover" element={<DiscoverPage />} />
+            <Route path="/discover/map" element={<OnDutyMapPage />} />
             <Route path="/discover/:profession" element={<DiscoverPage />} />
             <Route path="/discover/:profession/:city" element={<DiscoverPage />} />
             <Route path="/request-service" element={<RequestServicePage />} />
