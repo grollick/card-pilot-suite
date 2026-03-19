@@ -51,10 +51,12 @@ export default function EstimateDutyPanel() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.1, duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
-      className="dash-card relative overflow-hidden"
+      className={`dash-card relative overflow-hidden transition-shadow duration-500 ${
+        isOnDuty ? "ring-1 ring-success/30 shadow-[0_0_20px_-4px_hsl(var(--success)/0.35)]" : ""
+      }`}
     >
       {isOnDuty && (
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-success to-success/60 rounded-t-xl" />
+        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-success via-success/80 to-success/40 rounded-t-xl animate-pulse" />
       )}
 
       <div className="dash-card-header pt-3">
