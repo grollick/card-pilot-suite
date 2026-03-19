@@ -631,3 +631,144 @@ export default function InvoiceDetailPage() {
     </div>
   );
 }
+
+/* ── Payment Panel sub-component ── */
+function InvoicePaymentPanel({ invoice, invoiceId, grandTotal }: { invoice: any; invoiceId: string; grandTotal: number }) {
+  const { data: payments = [] } = useInvoicePayments(invoiceId);
+  const recordPayment = useRecordPayment();
+  const [showRecordForm, setShowRecordForm] = useState(false);
+  const [payMethod, setPayMethod] = useState("bank_transfer");
+  const [payRef, setPayRef] = useState("");
+
+  const amountPaid = Number(invoice.amount_paid ?? 0);
+  const remaining = Math.max(0, grandTotal - amountPaid);
+  const isPaid = invoice.status === "paid";
+
+  return (
+    <div className="dash-card p-5 space-y-3">
+      <h2 className="text-sm font-semibold text-foreground">Payment</h2>
+      <DocumentStatusBadge status={invoice.status} />
+
+      <div className="space-y-2 text-sm">
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Total</span>
+          <span className="font-medium tabular-nums">${grandTotal.toFixed(2)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-muted-foreground">Paid</span>
+          <span className="font-medium tabular-nums text-success">${amountPaid.toFixed(2)}</span>
+        </div>
+        {!isPaid && remaining > 0 && (
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Balance</span>
+            <span className="font-semibold tabular-nums text-destructive">${remaining.toFixed(2)}</span>
+          </div>
+        )}
+      </div>
+
+      {invoice.paid_at && (
+        <p className="text-xs text-success">
+          Paid {format(new Date(invoice.paid_at), "MMM d, yyyy")}
+        </p>
+      )}
+
+      {/* Record payment form */}
+      {!isPaid && !showRecordForm && (
+        <Button
+          size="sm"
+          className="w-full gap-2"
+          onClick={() => setShowRecordForm(true)}
+        >
+          <CreditCard className="h-3.5 w-3.5" /> Record Payment
+        </Button>
+      )}
+
+      {showRecordForm && (
+        <div className="space-y-3 pt-2 border-t border-border">
+          <div>
+            <Label className="text-xs text-muted-foreground">Method</Label>
+            <Select value={payMethod} onValueChange={setPayMethod}>
+              <SelectTrigger className="h-8">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                <SelectItem value="cash">Cash</SelectItem>
+                <SelectItem value="check">Check</SelectItem>
+                <SelectItem value="e_transfer">E-Transfer</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground">Reference #</Label>
+            <Input
+              placeholder="Optional"
+              value={payRef}
+              onChange={(e) => setPayRef(e.target.value)}
+              className="h-8"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" className="flex-1" onClick={() => setShowRecordForm(false)}>
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              className="flex-1"
+              disabled={recordPayment.isPending}
+              onClick={() =>
+                recordPayment.mutate({
+                  invoiceId,
+                  amount: remaining,
+                  paymentMethod: payMethod,
+                  paymentReference: payRef,
+                  leadId: invoice.lead_id,
+                  invoiceNumber: invoice.invoice_number,
+                  grandTotal,
+                }, { onSuccess: () => setShowRecordForm(false) })
+              }
+            >
+              {recordPayment.isPending && <Loader2 className="h-3 w-3 animate-spin" />}
+              ${remaining.toFixed(2)}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Payment history */}
+      {payments.length > 0 && (
+        <div className="space-y-2 pt-2 border-t border-border">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">History</p>
+          {payments.map((p: any) => (
+            <div key={p.id} className="flex justify-between text-xs">
+              <span className="text-muted-foreground capitalize">{(p.payment_method || "").replace(/_/g, " ")}</span>
+              <span className="tabular-nums font-medium">${Number(p.amount).toFixed(2)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Copy Pay Link button ── */
+function CopyPayLinkButton({ invoiceId }: { invoiceId: string }) {
+  const { data: payLink } = useInvoicePaymentLink(invoiceId);
+
+  if (!payLink) return null;
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      className="w-full justify-start gap-2"
+      onClick={() => {
+        navigator.clipboard.writeText(payLink);
+        toast.success("Payment link copied!");
+      }}
+    >
+      <Link2 className="h-3.5 w-3.5" /> Copy Pay Link
+    </Button>
+  );
+}
