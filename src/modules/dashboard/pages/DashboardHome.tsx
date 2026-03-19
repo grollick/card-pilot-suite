@@ -20,6 +20,7 @@ import RetentionInsightsWidget from "@/modules/dashboard/components/RetentionIns
 import AIGrowthAssistantPanel from "@/modules/dashboard/components/AIGrowthAssistantPanel";
 import EstimateDutyPanel from "@/modules/dashboard/components/EstimateDutyPanel";
 import RevenuePipelineWidget from "@/modules/dashboard/components/RevenuePipelineWidget";
+import SmartRevenueWidget from "@/modules/dashboard/components/SmartRevenueWidget";
 import LeadGuaranteeBanner from "@/components/LeadGuaranteeBanner";
 import MobileQuickCreate from "@/modules/invoices/components/MobileQuickCreate";
 import AhaPromptBanner from "@/modules/dashboard/components/AhaPromptBanner";
