@@ -21,7 +21,7 @@ export default function SocialScheduler() {
   const [activeTab, setActiveTab] = useState("create");
   const [detailPost, setDetailPost] = useState<SocialPost | null>(null);
   const [editPost, setEditPost] = useState<SocialPost | null>(null);
-  const [pendingContent, setPendingContent] = useState<{ content: string; hashtags: string[] } | null>(null);
+  const [pendingContent, setPendingContent] = useState<{ content: string; hashtags: string[]; imageUrl?: string } | null>(null);
 
   const openCreate = (post?: SocialPost) => {
     setEditPost(post ?? null);
