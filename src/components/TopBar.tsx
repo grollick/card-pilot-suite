@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "next-themes";
 import {
   Search, Plus, ExternalLink, Bell, UserPlus, Calendar,
-  Mail, Share2, ChevronDown, Menu
+  Mail, Share2, ChevronDown, Menu, Moon, Sun
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
