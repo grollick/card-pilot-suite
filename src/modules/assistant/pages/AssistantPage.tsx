@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import AiCreditTopupDialog from "@/components/AiCreditTopupDialog";
 import { Send, Loader2, Sparkles, Copy, RotateCcw, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
