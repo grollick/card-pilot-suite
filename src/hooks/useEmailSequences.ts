@@ -100,6 +100,7 @@ export function useDeleteSequence() {
       qc.invalidateQueries({ queryKey: ["email-sequences"] });
       toast.success("Sequence deleted");
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to delete sequence"),
   });
 }
 
