@@ -36,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, name?: string, referralCode?: string) => {
+  const signUp = useCallback(async (email: string, password: string, name?: string, referralCode?: string) => {
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -46,27 +46,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
     });
     return { error: error as Error | null };
-  };
+  }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     return { error: error as Error | null };
-  };
+  }, []);
 
-  const signInWithMagicLink = async (email: string) => {
+  const signInWithMagicLink = useCallback(async (email: string) => {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: window.location.origin },
     });
     return { error: error as Error | null };
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     await supabase.auth.signOut();
-  };
+  }, []);
+
+  const value = useMemo(() => ({
+    session, user, loading, signUp, signIn, signInWithMagicLink, signOut,
+  }), [session, user, loading, signUp, signIn, signInWithMagicLink, signOut]);
 
   return (
-    <AuthContext.Provider value={{ session, user, loading, signUp, signIn, signInWithMagicLink, signOut }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

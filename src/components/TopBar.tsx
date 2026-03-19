@@ -13,27 +13,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { useProfileCache } from "@/hooks/useProfileCache";
 
 export default function TopBar() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
-  const { data: profile } = useQuery({
-    queryKey: ["profile-handle"],
-    enabled: !!user,
-    staleTime: 10 * 60 * 1000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("handle, name, avatar_url")
-        .eq("id", user!.id)
-        .single();
-      return data;
-    },
-  });
+  const { data: profile } = useProfileCache();
 
   const initials = profile?.name
     ? profile.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()

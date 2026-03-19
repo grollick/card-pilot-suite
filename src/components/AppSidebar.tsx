@@ -115,20 +115,7 @@ export function AppSidebar() {
   const { signOut, user } = useAuth();
   const navigate = useNavigate();
   const { data: isAdmin } = useIsAdmin();
-
-  const { data: profile } = useQuery({
-    queryKey: ["profile-handle"],
-    enabled: !!user,
-    staleTime: 10 * 60 * 1000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("handle, name, avatar_url")
-        .eq("id", user!.id)
-        .single();
-      return data;
-    },
-  });
+  const { data: profile } = useProfileCache();
 
   const isActive = (path: string, end?: boolean) => {
     if (end) return location.pathname === path;
