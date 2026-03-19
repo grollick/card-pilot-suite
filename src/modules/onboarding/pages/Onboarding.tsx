@@ -371,8 +371,8 @@ export default function Onboarding() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-primary)" }}>
-            guzzl.pro
+          <h1 className="text-2xl font-bold">
+            <span className="font-bold text-primary">guzzl</span><span className="text-foreground">.pro</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-1">Set up → Send an estimate → Start earning</p>
         </div>
