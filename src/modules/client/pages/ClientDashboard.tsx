@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import { format, isPast, isFuture } from "date-fns";
 import {
@@ -21,6 +21,10 @@ import {
 } from "@/hooks/useClientPortalData";
 import { useClientCancelBooking } from "@/hooks/useClientPortalActions";
 import PortalReviewDialog from "@/modules/client/components/PortalReviewDialog";
+import UpcomingAppointmentWidget from "@/modules/client/components/UpcomingAppointmentWidget";
+import PaymentSummaryWidget from "@/modules/client/components/PaymentSummaryWidget";
+import ProjectProgressWidget from "@/modules/client/components/ProjectProgressWidget";
+import DocumentVaultWidget from "@/modules/client/components/DocumentVaultWidget";
 import { toast } from "sonner";
 
 const anim = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } };
@@ -44,7 +48,7 @@ export default function ClientDashboard() {
   const [reviewTarget, setReviewTarget] = useState<{ businessUserId: string; businessName: string | null; leadId: string } | null>(null);
 
   const isLoading = profileLoading || bizLoading || bookingsLoading;
-
+  const leadIds = useMemo(() => businesses.map(b => b.leadId), [businesses]);
   const upcomingBookings = bookings.filter(
     b => isFuture(new Date(b.start_datetime)) && b.status !== "cancelled"
   );
@@ -142,6 +146,19 @@ export default function ClientDashboard() {
             </motion.div>
           ))}
         </div>
+
+        {/* ── New Portal Widgets ── */}
+        <UpcomingAppointmentWidget
+          bookings={bookings}
+          onReschedule={(booking) => handleBookAgain(booking)}
+        />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ProjectProgressWidget leadIds={leadIds} />
+          <PaymentSummaryWidget leadIds={leadIds} />
+        </div>
+
+        <DocumentVaultWidget leadIds={leadIds} />
 
         {/* Bookings */}
         <motion.div {...anim} transition={{ delay: 0.1 }}>

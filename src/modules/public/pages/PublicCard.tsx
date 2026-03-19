@@ -1465,6 +1465,22 @@ export default function PublicCard() {
                   Create your own smart business card →
                 </a>
               </p>
+              <p style={{ fontSize: 10, color: `${palette.secondary}50`, margin: "6px 0 0" }}>
+                <a
+                  href="/discover"
+                  onClick={() => {
+                    supabase.from("analytics_events").insert({
+                      user_id: profile.id,
+                      handle: handle!,
+                      event_type: "button_click" as const,
+                      meta_json: { cta: "find_more_pros", referrer_handle: handle },
+                    }).then();
+                  }}
+                  style={{ color: `${palette.secondary}80`, textDecoration: "none", fontWeight: 400 }}
+                >
+                  Find more professionals nearby →
+                </a>
+              </p>
             </div>
           )}
         </div>
