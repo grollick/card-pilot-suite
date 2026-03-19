@@ -45,7 +45,7 @@ export default function AutoCampaignsPage() {
   const { planKey } = usePlanLimits();
   const { user } = useAuth();
   const limits = getCampaignLimits(planKey);
-  const limits = getCampaignLimits(currentPlan);
+  
 
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
