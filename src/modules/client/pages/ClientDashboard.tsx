@@ -304,6 +304,31 @@ export default function ClientDashboard() {
             </div>
           </motion.div>
         )}
+
+        {/* Marketplace Discovery CTA */}
+        <motion.div {...anim} transition={{ delay: 0.2 }}
+          className="rounded-xl border border-primary/20 bg-primary/5 p-5"
+        >
+          <div className="flex items-start gap-4">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <Search className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-sm">Need another service?</h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                Browse our marketplace to find trusted professionals near you — from plumbers to photographers.
+              </p>
+              <Button
+                variant="default"
+                size="sm"
+                className="mt-3"
+                onClick={() => navigate("/discover")}
+              >
+                Browse Marketplace <ChevronRight className="h-3.5 w-3.5 ml-1" />
+              </Button>
+            </div>
+          </div>
+        </motion.div>
       </main>
 
       {/* Cancel Confirmation */}
