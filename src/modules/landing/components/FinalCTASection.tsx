@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import LeadGuaranteeBanner from "@/components/LeadGuaranteeBanner";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -80,6 +81,11 @@ export default function FinalCTASection() {
         >
           No credit card required • Setup in 2 minutes • Free forever plan
         </motion.p>
+
+        {/* Lead Guarantee */}
+        <div className="mt-10 max-w-2xl mx-auto">
+          <LeadGuaranteeBanner variant="landing" />
+        </div>
       </div>
     </section>
   );

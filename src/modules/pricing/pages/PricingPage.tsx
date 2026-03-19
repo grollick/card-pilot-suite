@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
+import LeadGuaranteeBanner from "@/components/LeadGuaranteeBanner";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import {
@@ -317,6 +318,13 @@ export default function PricingPage() {
                 </motion.div>
               );
             })}
+          </div>
+        </section>
+
+        {/* ── LEAD GUARANTEE ── */}
+        <section className="px-6 pb-20">
+          <div className="mx-auto max-w-4xl">
+            <LeadGuaranteeBanner variant="pricing" />
           </div>
         </section>
 
