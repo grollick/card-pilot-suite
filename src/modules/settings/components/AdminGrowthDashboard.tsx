@@ -11,13 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useAdminGrowthStats, useOutreachContacts } from "@/hooks/useAdminGrowthStats";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 
-const fadeUp = { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 } };
 
 // ─── KPI Cards ───
 function KPICards({ kpis, isLoading }: { kpis: any; isLoading: boolean }) {
