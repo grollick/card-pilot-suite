@@ -1793,6 +1793,7 @@ export type Database = {
           delivered_at: string
           id: string
           lead_id: string | null
+          lead_quality_score: number
           quote_request_id: string | null
           reminder_1h_sent: boolean
           reminder_24h_sent: boolean
@@ -1807,6 +1808,7 @@ export type Database = {
           delivered_at?: string
           id?: string
           lead_id?: string | null
+          lead_quality_score?: number
           quote_request_id?: string | null
           reminder_1h_sent?: boolean
           reminder_24h_sent?: boolean
@@ -1821,6 +1823,7 @@ export type Database = {
           delivered_at?: string
           id?: string
           lead_id?: string | null
+          lead_quality_score?: number
           quote_request_id?: string | null
           reminder_1h_sent?: boolean
           reminder_24h_sent?: boolean
@@ -2060,6 +2063,7 @@ export type Database = {
           customer_name: string
           customer_phone: string | null
           id: string
+          lead_quality_score: number
           location: string | null
           notes: string | null
           profession: string | null
@@ -2073,6 +2077,7 @@ export type Database = {
           customer_name: string
           customer_phone?: string | null
           id?: string
+          lead_quality_score?: number
           location?: string | null
           notes?: string | null
           profession?: string | null
@@ -2086,6 +2091,7 @@ export type Database = {
           customer_name?: string
           customer_phone?: string | null
           id?: string
+          lead_quality_score?: number
           location?: string | null
           notes?: string | null
           profession?: string | null

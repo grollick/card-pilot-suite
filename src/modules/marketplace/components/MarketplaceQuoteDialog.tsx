@@ -97,7 +97,12 @@ export default function MarketplaceQuoteDialog({
 
       setMatchCount(routeResult?.matched ?? 0);
       setStep("success");
-      toast.success("Quote request sent!");
+      const tier = routeResult?.qualityTier;
+      if (tier === "high") {
+        toast.success("High-quality request sent! Expect fast responses.");
+      } else {
+        toast.success("Quote request sent!");
+      }
     } catch (err) {
       console.error("Quote submission error:", err);
       toast.error("Failed to send quote request. Please try again.");
