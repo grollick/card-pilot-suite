@@ -1041,16 +1041,51 @@ export type Database = {
         }
         Relationships: []
       }
+      estimate_duty_services: {
+        Row: {
+          created_at: string
+          id: string
+          service_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          service_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          service_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estimate_duty_services_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "booking_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       estimate_duty_status: {
         Row: {
+          accepted_leads_count: number
           auto_off_after_hours: number | null
           auto_off_outside_hours: boolean
           available_until: string | null
+          avg_response_minutes: number | null
+          completed_estimates_count: number
           created_at: string
+          duty_type: string
           id: string
           is_on_duty: boolean
+          last_response_at: string | null
           leads_received: number
           max_leads: number | null
+          missed_leads_count: number
           service_radius_km: number | null
           service_types: string[] | null
           updated_at: string
@@ -1058,14 +1093,20 @@ export type Database = {
           went_on_duty_at: string | null
         }
         Insert: {
+          accepted_leads_count?: number
           auto_off_after_hours?: number | null
           auto_off_outside_hours?: boolean
           available_until?: string | null
+          avg_response_minutes?: number | null
+          completed_estimates_count?: number
           created_at?: string
+          duty_type?: string
           id?: string
           is_on_duty?: boolean
+          last_response_at?: string | null
           leads_received?: number
           max_leads?: number | null
+          missed_leads_count?: number
           service_radius_km?: number | null
           service_types?: string[] | null
           updated_at?: string
@@ -1073,14 +1114,20 @@ export type Database = {
           went_on_duty_at?: string | null
         }
         Update: {
+          accepted_leads_count?: number
           auto_off_after_hours?: number | null
           auto_off_outside_hours?: boolean
           available_until?: string | null
+          avg_response_minutes?: number | null
+          completed_estimates_count?: number
           created_at?: string
+          duty_type?: string
           id?: string
           is_on_duty?: boolean
+          last_response_at?: string | null
           leads_received?: number
           max_leads?: number | null
+          missed_leads_count?: number
           service_radius_km?: number | null
           service_types?: string[] | null
           updated_at?: string
@@ -1176,6 +1223,62 @@ export type Database = {
           },
         ]
       }
+      estimate_matches: {
+        Row: {
+          created_at: string
+          estimate_request_id: string
+          id: string
+          lead_id: string | null
+          match_score: number
+          notified_at: string | null
+          priority_rank: number
+          responded_at: string | null
+          response_deadline_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          was_notified: boolean
+        }
+        Insert: {
+          created_at?: string
+          estimate_request_id: string
+          id?: string
+          lead_id?: string | null
+          match_score?: number
+          notified_at?: string | null
+          priority_rank?: number
+          responded_at?: string | null
+          response_deadline_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          was_notified?: boolean
+        }
+        Update: {
+          created_at?: string
+          estimate_request_id?: string
+          id?: string
+          lead_id?: string | null
+          match_score?: number
+          notified_at?: string | null
+          priority_rank?: number
+          responded_at?: string | null
+          response_deadline_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          was_notified?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estimate_matches_estimate_request_id_fkey"
+            columns: ["estimate_request_id"]
+            isOneToOne: false
+            referencedRelation: "estimate_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       estimate_presets: {
         Row: {
           created_at: string
@@ -1203,6 +1306,66 @@ export type Database = {
           sort_order?: number
           user_id?: string
           value?: number
+        }
+        Relationships: []
+      }
+      estimate_requests: {
+        Row: {
+          budget: string | null
+          category: string | null
+          city: string | null
+          created_at: string
+          id: string
+          lead_quality_score: number | null
+          location: string | null
+          profession: string | null
+          request_details: string | null
+          requester_email: string | null
+          requester_name: string
+          requester_phone: string | null
+          service_needed: string | null
+          source: string
+          status: string
+          timeline: string | null
+          updated_at: string
+        }
+        Insert: {
+          budget?: string | null
+          category?: string | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          lead_quality_score?: number | null
+          location?: string | null
+          profession?: string | null
+          request_details?: string | null
+          requester_email?: string | null
+          requester_name: string
+          requester_phone?: string | null
+          service_needed?: string | null
+          source?: string
+          status?: string
+          timeline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          budget?: string | null
+          category?: string | null
+          city?: string | null
+          created_at?: string
+          id?: string
+          lead_quality_score?: number | null
+          location?: string | null
+          profession?: string | null
+          request_details?: string | null
+          requester_email?: string | null
+          requester_name?: string
+          requester_phone?: string | null
+          service_needed?: string | null
+          source?: string
+          status?: string
+          timeline?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
