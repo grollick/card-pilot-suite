@@ -61,6 +61,7 @@ export default function EstimatesPage() {
   const updateStatus = useUpdateEstimateStatus();
   const duplicateEstimate = useDuplicateEstimate();
   const convertToJob = useConvertEstimateToJob();
+  const convertToInvoice = useConvertEstimateToInvoice();
   const { data: stages = [] } = usePipelineStages();
   const { planKey, profile } = usePlanLimits();
 
