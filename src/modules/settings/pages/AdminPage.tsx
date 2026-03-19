@@ -33,6 +33,8 @@ export default function AdminPage() {
            <TabsTrigger value="system-events">System Events</TabsTrigger>
            <TabsTrigger value="beta">Beta Access</TabsTrigger>
            <TabsTrigger value="feedback">Feedback</TabsTrigger>
+           <TabsTrigger value="bugs">Bug Priority</TabsTrigger>
+           <TabsTrigger value="roadmap">Roadmap</TabsTrigger>
          </TabsList>
 
         <TabsContent value="professions" className="mt-4 space-y-6">
