@@ -1,14 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import {
-  FileText, Briefcase, UserPlus, Share2, Tag, Zap, QrCode
+  FileText, Briefcase, UserPlus, Share2, Tag, Zap, QrCode, DollarSign
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
 const actions = [
   { icon: FileText, label: "Estimate", route: "/app/estimates", color: "text-warning", desc: "Create quote" },
+  { icon: DollarSign, label: "Invoice", route: "/app/invoices/new", color: "text-success", desc: "Bill customer" },
   { icon: Briefcase, label: "Job", route: "/app/jobs", color: "text-primary", desc: "Start a job" },
-  { icon: UserPlus, label: "Contact", route: "/app/contacts", color: "text-success", desc: "Add lead" },
+  { icon: UserPlus, label: "Contact", route: "/app/contacts", color: "text-accent", desc: "Add lead" },
   { icon: Share2, label: "Social Post", route: "/app/social", color: "text-accent", desc: "Post content" },
   { icon: Tag, label: "Promotion", route: "/app/promotions", color: "text-destructive", desc: "Run promo" },
   { icon: QrCode, label: "QR Code", route: "/app/card/qr", color: "text-primary", desc: "Share card" },
