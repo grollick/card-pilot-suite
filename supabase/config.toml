@@ -56,3 +56,9 @@ verify_jwt = false
 
 [functions.purchase-ai-credits]
 verify_jwt = false
+
+[functions.process-estimate-matches]
+verify_jwt = false
+
+[functions.expire-estimate-matches]
+verify_jwt = false
