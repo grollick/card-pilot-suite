@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Radio, Clock, MapPin, Target, Zap, Shield, ChevronDown, ChevronUp,
-  AlertTriangle, CheckCircle2, TrendingUp, BarChart3, Inbox,
+  AlertTriangle, CheckCircle2, TrendingUp, BarChart3, Inbox, HelpCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
