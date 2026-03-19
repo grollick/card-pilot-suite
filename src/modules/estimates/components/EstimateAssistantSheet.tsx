@@ -244,6 +244,7 @@ export default function EstimateAssistantSheet({
   };
 
   return (
+    <>
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" className="w-full sm:max-w-lg p-0 flex flex-col">
         <SheetHeader className="px-4 pt-4 pb-2 border-b border-border shrink-0">
