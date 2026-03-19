@@ -97,6 +97,19 @@ serve(async (req) => {
       .eq("id", quoteRequestId);
 
     // 3. Find matching businesses — priority routing for high-quality leads
+    // First check for on-duty users
+    const { data: onDutyUsers } = await supabase
+      .from("estimate_duty_status")
+      .select("user_id, service_types, service_radius_km, max_leads, leads_received")
+      .eq("is_on_duty", true);
+
+    const onDutySet = new Map<string, any>();
+    (onDutyUsers ?? []).forEach((d: any) => {
+      // Skip users who hit their lead cap
+      if (d.max_leads && d.leads_received >= d.max_leads) return;
+      onDutySet.set(d.user_id, d);
+    });
+
     let query = supabase
       .from("profiles")
       .select("id, name, handle, email, city, available_for_work, avg_response_minutes, plan, professions(name)")
