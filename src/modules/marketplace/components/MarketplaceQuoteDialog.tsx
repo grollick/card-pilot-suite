@@ -82,7 +82,7 @@ export default function MarketplaceQuoteDialog({
 
       if (insertErr) throw insertErr;
 
-      // 2. Call the edge function to route the lead
+      // 2. Call the edge function to route the lead (existing marketplace flow)
       const { data: routeResult, error: routeErr } = await supabase.functions.invoke(
         "route-marketplace-lead",
         {
@@ -92,10 +92,37 @@ export default function MarketplaceQuoteDialog({
 
       if (routeErr) {
         console.error("Lead routing error:", routeErr);
-        // Still show success - the quote was saved
       }
 
-      setMatchCount(routeResult?.matched ?? 0);
+      // 3. Also create an estimate_request to trigger On-Duty matching
+      try {
+        const { data: estReq } = await (supabase
+          .from("estimate_requests" as any)
+          .insert({
+            requester_name: form.name.trim(),
+            requester_email: form.email.trim() || null,
+            requester_phone: form.phone.trim() || null,
+            service_needed: form.service_needed.trim() || null,
+            request_details: form.notes.trim() || null,
+            budget: form.budget || null,
+            timeline: form.timeline || null,
+            city: location || null,
+            profession: profession || null,
+            source: "marketplace",
+          })
+          .select("id")
+          .single() as any);
+
+        if (estReq?.id) {
+          await supabase.functions.invoke("process-estimate-matches", {
+            body: { estimateRequestId: estReq.id },
+          });
+        }
+      } catch (e) {
+        console.error("Estimate routing error:", e);
+      }
+
+      setMatchCount((routeResult?.matched ?? 0));
       setStep("success");
       const tier = routeResult?.qualityTier;
       if (tier === "high") {

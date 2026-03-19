@@ -559,6 +559,50 @@ export default function DiscoverPage() {
           </div>
         )}
 
+        {/* On Duty for Estimates Now */}
+        {onDutyListings.length > 0 && !search && !serviceFilter && intentFilter !== "on_duty" && (
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.05 }}
+            className="mb-10"
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <div className="h-7 w-7 rounded-lg bg-success/10 flex items-center justify-center">
+                <Sparkles className="h-3.5 w-3.5 text-success" />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold text-foreground">Available for Estimates Now</h2>
+                <p className="text-xs text-muted-foreground">These businesses are on duty and ready to respond fast</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-4">
+              {onDutyListings.slice(0, 3).map((l, i) => (
+                <motion.div
+                  key={l.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1 + i * 0.08 }}
+                >
+                  <ListingCard listing={l} variant="hero" />
+                </motion.div>
+              ))}
+            </div>
+            {onDutyListings.length > 3 && (
+              <div className="text-center mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 text-xs"
+                  onClick={() => setIntentFilter("on_duty")}
+                >
+                  View all {onDutyListings.length} on-duty providers <ArrowRight className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+          </motion.div>
+        )}
+
         {/* Featured section */}
         {featuredListings.length > 0 && !search && !serviceFilter && !intentFilter && (
           <div className="mb-10">
