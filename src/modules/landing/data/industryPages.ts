@@ -296,6 +296,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       { title: "Portfolio Gallery", icon: "🖼️", description: "A beautiful, fast-loading gallery that showcases your best work." },
       { title: "Session Booking", icon: "📅", description: "Clients choose a package and book a date — no emails needed." },
       { title: "Inquiry Forms", icon: "📝", description: "Smart forms capture event type, date, location, and budget." },
+      { title: "Business Card Scanner", icon: "📸", description: "Scan client cards at events and networking mixers to grow your contact list." },
       { title: "Package Display", icon: "💎", description: "Show your pricing packages with what's included in each tier." },
       { title: "Client Testimonials", icon: "⭐", description: "Display glowing reviews from past clients to build trust." },
       { title: "Social Links", icon: "📱", description: "Connect your Instagram, TikTok, and portfolio site in one place." },
