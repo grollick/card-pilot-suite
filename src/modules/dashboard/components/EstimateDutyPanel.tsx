@@ -18,7 +18,7 @@ import { usePlanLimits } from "@/hooks/usePlanLimits";
 export default function EstimateDutyPanel() {
   const navigate = useNavigate();
   const { status, isOnDuty, isLoading, analytics, toggleDuty } = useEstimateDuty();
-  const { currentPlan } = usePlanLimits();
+  const { planKey } = usePlanLimits();
   const [showSettings, setShowSettings] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
 
