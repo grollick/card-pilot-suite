@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2, Rocket, ArrowRight, Lightbulb,
   Globe, Wrench, Share2, UserPlus, CalendarCheck, PartyPopper, Sparkles,
-  Image, Send, LinkIcon, AtSign,
+  Image, Send, LinkIcon, AtSign, FileText,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useProfile } from "@/hooks/useCard";
