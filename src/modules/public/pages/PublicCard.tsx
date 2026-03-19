@@ -54,6 +54,7 @@ import StickyActionBar from "@/modules/card/components/StickyActionBar";
 import GalleryLightbox from "@/modules/card/components/GalleryLightbox";
 import ProjectShowcase from "@/modules/card/components/ProjectShowcase";
 import QuoteCalculator from "@/modules/card/components/QuoteCalculator";
+import ScanToSaveWidget from "@/modules/card/components/ScanToSaveWidget";
 import { getHeroBackgroundForProfession, getHeroBackgroundById } from "@/lib/heroBackgrounds";
 import { showsBranding } from "@/lib/plans";
 
