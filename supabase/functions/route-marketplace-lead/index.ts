@@ -131,6 +131,20 @@ serve(async (req) => {
     const scored = (candidates ?? []).map((c: any) => {
       let score = 0;
 
+      // ON DUTY PRIORITY BOOST
+      const dutyInfo = onDutySet.get(c.id);
+      if (dutyInfo) {
+        score += 60; // Major boost for on-duty users
+
+        // Service type match for on-duty
+        if (dutyInfo.service_types?.length > 0 && quoteReq.service_needed) {
+          const svcMatch = dutyInfo.service_types.some((st: string) =>
+            quoteReq.service_needed.toLowerCase().includes(st.toLowerCase())
+          );
+          if (svcMatch) score += 20;
+        }
+      }
+
       // Profession match
       if (quoteReq.profession && c.professions?.name) {
         const profMatch = c.professions.name.toLowerCase().includes(
@@ -159,7 +173,7 @@ serve(async (req) => {
         if (c.avg_response_minutes && c.avg_response_minutes < 30) score += 10;
       }
 
-      return { ...c, score };
+      return { ...c, score, isOnDuty: !!dutyInfo };
     });
 
     scored.sort((a: any, b: any) => b.score - a.score);

@@ -93,6 +93,9 @@ export default function DashboardHome() {
           {/* ── SECTION 3: Funnel ── */}
           <FunnelView />
 
+          {/* ── On Duty for Estimates ── */}
+          <EstimateDutyPanel />
+
           {/* ── Lead Guarantee Tracker ── */}
           {guaranteeData && !guaranteeData.targetMet && (
             <LeadGuaranteeBanner variant="dashboard" guaranteeData={guaranteeData} />
