@@ -85,6 +85,7 @@ export function useUpdateSequence() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["email-sequences"] });
     },
+    onError: (err: Error) => toast.error(err.message || "Failed to update sequence"),
   });
 }
 
