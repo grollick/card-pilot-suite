@@ -327,6 +327,31 @@ function GrowthInsights({ kpis, funnel, marketplace }: { kpis: any; funnel: any;
   );
 }
 
+// ─── Quick Actions Bar ───
+function QuickActions({ navigate }: { navigate: (path: string) => void }) {
+  const actions = [
+    { label: "Add Contact", icon: UserPlus, onClick: () => toast.info("Use the Outreach Tracker below to add contacts"), variant: "default" as const },
+    { label: "Send Outreach", icon: Send, onClick: () => navigate("/app/admin-marketing"), variant: "outline" as const },
+    { label: "Email Campaign", icon: Mail, onClick: () => navigate("/app/admin-marketing"), variant: "outline" as const },
+    { label: "View Users", icon: Users, onClick: () => navigate("/app/platform-admin"), variant: "outline" as const },
+    { label: "Marketplace", icon: Globe, onClick: () => navigate("/app/marketplace"), variant: "outline" as const },
+    { label: "Analytics", icon: BarChart, onClick: () => navigate("/app/analytics"), variant: "outline" as const },
+    { label: "Beta Access", icon: Settings, onClick: () => navigate("/app/admin"), variant: "outline" as const },
+    { label: "Feedback", icon: MessageSquare, onClick: () => navigate("/app/admin"), variant: "outline" as const },
+  ];
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {actions.map(a => (
+        <Button key={a.label} variant={a.variant} size="sm" className="gap-1.5" onClick={a.onClick}>
+          <a.icon className="h-3.5 w-3.5" />
+          {a.label}
+        </Button>
+      ))}
+    </div>
+  );
+}
+
 // ─── Main Dashboard ───
 export default function AdminGrowthDashboard() {
   const navigate = useNavigate();
@@ -335,10 +360,15 @@ export default function AdminGrowthDashboard() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h2 className="text-lg font-bold tracking-tight">Growth Dashboard</h2>
-        <p className="text-sm text-muted-foreground">Track acquisition, activation, and marketplace performance</p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h2 className="text-lg font-bold tracking-tight">Growth Dashboard</h2>
+          <p className="text-sm text-muted-foreground">Track acquisition, activation, and marketplace performance</p>
+        </div>
       </div>
+
+      {/* Quick Actions — top of page */}
+      <QuickActions navigate={navigate} />
 
       {/* KPIs */}
       <KPICards kpis={data?.kpis} isLoading={isLoading} />
@@ -356,23 +386,6 @@ export default function AdminGrowthDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <DailyActions kpis={data?.kpis} contacts={contacts || []} />
         <ActivityFeed feed={data?.activityFeed || []} isLoading={isLoading} />
-      </div>
-
-      {/* Quick Actions */}
-      <div
-        className="flex flex-wrap gap-2">
-        <Button variant="outline" size="sm" className="gap-1.5"
-          onClick={() => { /* open add contact dialog via state would require lifting — using outreach tracker instead */ toast.info("Use the Outreach Tracker above to add contacts"); }}>
-          <Plus className="h-3.5 w-3.5" /> Add Contact
-        </Button>
-        <Button variant="outline" size="sm" className="gap-1.5"
-          onClick={() => navigate("/app/admin-marketing")}>
-          <Send className="h-3.5 w-3.5" /> Send Outreach
-        </Button>
-        <Button variant="outline" size="sm" className="gap-1.5"
-          onClick={() => navigate("/app/platform-admin")}>
-          <Eye className="h-3.5 w-3.5" /> View Users
-        </Button>
       </div>
 
       {/* Insights */}
