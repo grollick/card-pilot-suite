@@ -417,5 +417,7 @@ export default function EstimateAssistantSheet({
         )}
       </SheetContent>
     </Sheet>
+    <AiCreditTopupDialog open={showTopup} onOpenChange={setShowTopup} />
+    </>
   );
 }
