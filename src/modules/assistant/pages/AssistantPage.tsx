@@ -1,54 +1,73 @@
 import { useState, useRef, useEffect } from "react";
 import AiCreditTopupDialog from "@/components/AiCreditTopupDialog";
-import { Send, Loader2, Sparkles, Copy, RotateCcw, Bot } from "lucide-react";
+import { Send, Loader2, Sparkles, Copy, RotateCcw, TrendingUp, Zap, Target, MessageSquare, PenTool, BarChart3, Users, CalendarPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/job-assistant`;
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/growth-coach`;
 
 const PROMPT_CATEGORIES = [
   {
-    label: "Estimates",
+    label: "Performance",
+    icon: BarChart3,
+    color: "text-primary",
     prompts: [
-      "Generate an estimate for a bathroom renovation",
-      "Create a line-item breakdown for exterior painting",
-      "Suggest pricing for my top services",
+      "Give me my weekly performance summary",
+      "What's my conversion rate and how can I improve it?",
+      "Which leads should I follow up with today?",
     ],
   },
   {
-    label: "Messages",
+    label: "Growth Tips",
+    icon: TrendingUp,
+    color: "text-success",
     prompts: [
-      "Write a follow-up message for a pending estimate",
-      "Draft a booking confirmation text",
-      "Write a review request after job completion",
+      "How can I get more leads this week?",
+      "What should I improve on my card to convert better?",
+      "Analyze my business and give me 3 quick wins",
     ],
   },
   {
-    label: "Marketing",
+    label: "Content",
+    icon: PenTool,
+    color: "text-warning",
     prompts: [
-      "Write a social media post promoting my services",
-      "Create a seasonal promotion offer",
-      "Draft an email campaign for past customers",
+      "Write service descriptions for my top services",
+      "Create a seasonal promotion for my business",
+      "Draft a follow-up message for my pending leads",
     ],
   },
   {
-    label: "Business",
+    label: "Strategy",
+    icon: Target,
+    color: "text-destructive",
     prompts: [
-      "Analyze my recent business performance",
-      "Which leads should I follow up with?",
-      "Summarize my active jobs",
+      "Create a 30-day growth plan for my business",
+      "How should I price my services compared to market?",
+      "What automations should I set up to save time?",
     ],
   },
 ];
 
+/* Quick action buttons that appear after AI responses */
+const QUICK_ACTIONS = [
+  { label: "View Contacts", icon: Users, route: "/app/contacts" },
+  { label: "Create Booking", icon: CalendarPlus, route: "/app/bookings" },
+  { label: "Set Up Automation", icon: Zap, route: "/app/automation" },
+  { label: "Edit Card", icon: PenTool, route: "/app/card" },
+];
+
 export default function AssistantPage() {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -93,6 +112,8 @@ export default function AssistantPage() {
           setShowTopup(true);
           throw new Error(err.error);
         }
+        if (resp.status === 429) throw new Error("Rate limited — please wait a moment and try again.");
+        if (resp.status === 402) throw new Error("AI credits exhausted. Add credits in Settings.");
         throw new Error(err.error || "Request failed");
       }
       if (!resp.body) throw new Error("No response body");
@@ -161,7 +182,7 @@ export default function AssistantPage() {
         }
       }
     } catch (err: any) {
-      console.error("Assistant error:", err);
+      console.error("Growth coach error:", err);
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: `Sorry, something went wrong: ${err.message}` },
@@ -184,20 +205,23 @@ export default function AssistantPage() {
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-6 py-12">
-            <div className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <Bot className="h-8 w-8 text-primary" />
+            <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-primary/20 to-success/20 flex items-center justify-center">
+              <TrendingUp className="h-8 w-8 text-primary" />
             </div>
             <div className="text-center space-y-1.5">
-              <h2 className="text-xl font-bold">AI Job Assistant</h2>
+              <h2 className="text-xl font-bold">AI Growth Coach</h2>
               <p className="text-sm text-muted-foreground max-w-md">
-                Generate estimates, write messages, create marketing content, and get business insights — all powered by your data.
+                Your personal business advisor. Get data-driven insights, generate content, and create growth strategies — all based on your real performance data.
               </p>
             </div>
 
             <div className={`w-full max-w-2xl grid gap-3 ${isMobile ? "grid-cols-1" : "grid-cols-2"}`}>
               {PROMPT_CATEGORIES.map((cat) => (
                 <div key={cat.label} className="rounded-xl border border-border/60 p-3 space-y-2">
-                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{cat.label}</p>
+                  <div className="flex items-center gap-2">
+                    <cat.icon className={`h-3.5 w-3.5 ${cat.color}`} />
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{cat.label}</p>
+                  </div>
                   <div className="space-y-1">
                     {cat.prompts.map((prompt) => (
                       <button
@@ -219,8 +243,8 @@ export default function AssistantPage() {
               <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[85%] ${msg.role === "user" ? "" : "flex gap-3"}`}>
                   {msg.role === "assistant" && (
-                    <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-1">
-                      <Sparkles className="h-3.5 w-3.5 text-primary" />
+                    <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-primary/10 to-success/10 flex items-center justify-center shrink-0 mt-1">
+                      <TrendingUp className="h-3.5 w-3.5 text-primary" />
                     </div>
                   )}
                   <div className="space-y-1.5">
@@ -240,18 +264,38 @@ export default function AssistantPage() {
                       )}
                     </div>
                     {msg.role === "assistant" && !isLoading && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-[10px] text-muted-foreground hover:text-foreground"
-                        onClick={() => {
-                          navigator.clipboard.writeText(msg.content);
-                          toast.success("Copied to clipboard");
-                        }}
-                      >
-                        <Copy className="h-3 w-3 mr-1" />
-                        Copy
-                      </Button>
+                      <div className="flex items-center gap-1 flex-wrap">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-[10px] text-muted-foreground hover:text-foreground"
+                          onClick={() => {
+                            navigator.clipboard.writeText(msg.content);
+                            toast.success("Copied to clipboard");
+                          }}
+                        >
+                          <Copy className="h-3 w-3 mr-1" />
+                          Copy
+                        </Button>
+                        {/* Quick action buttons after last assistant message */}
+                        {i === messages.length - 1 && (
+                          <>
+                            <span className="text-muted-foreground/30 mx-1">|</span>
+                            {QUICK_ACTIONS.map((action) => (
+                              <Button
+                                key={action.route}
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 px-2 text-[10px] text-muted-foreground hover:text-foreground gap-1"
+                                onClick={() => navigate(action.route)}
+                              >
+                                <action.icon className="h-3 w-3" />
+                                {action.label}
+                              </Button>
+                            ))}
+                          </>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
@@ -261,8 +305,8 @@ export default function AssistantPage() {
             {isLoading && messages[messages.length - 1]?.role !== "assistant" && (
               <div className="flex justify-start">
                 <div className="flex gap-3">
-                  <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                    <Sparkles className="h-3.5 w-3.5 text-primary" />
+                  <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-primary/10 to-success/10 flex items-center justify-center shrink-0">
+                    <TrendingUp className="h-3.5 w-3.5 text-primary" />
                   </div>
                   <div className="bg-muted/50 rounded-xl px-4 py-3">
                     <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -276,36 +320,53 @@ export default function AssistantPage() {
 
       {/* Input bar */}
       <div className="border-t border-border bg-background p-4">
-        <div className="max-w-2xl mx-auto flex items-end gap-2">
-          {messages.length > 0 && (
+        <div className="max-w-2xl mx-auto">
+          {/* Quick suggestion chips when conversation is active */}
+          {messages.length > 0 && !isLoading && (
+            <div className="flex gap-1.5 mb-2 flex-wrap">
+              {["What else can I improve?", "Write me a follow-up message", "Give me a weekly summary"].map((q) => (
+                <Badge
+                  key={q}
+                  variant="outline"
+                  className="cursor-pointer hover:bg-muted/60 transition-colors text-2xs"
+                  onClick={() => sendMessage(q)}
+                >
+                  {q}
+                </Badge>
+              ))}
+            </div>
+          )}
+          <div className="flex items-end gap-2">
+            {messages.length > 0 && (
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 shrink-0"
+                onClick={() => setMessages([])}
+                title="New conversation"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            )}
+            <Textarea
+              ref={inputRef}
+              placeholder="Ask for growth tips, content, performance analysis…"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={isLoading}
+              rows={1}
+              className="min-h-[40px] max-h-[120px] resize-none"
+            />
             <Button
-              variant="outline"
               size="icon"
               className="h-10 w-10 shrink-0"
-              onClick={() => setMessages([])}
-              title="New conversation"
+              disabled={!input.trim() || isLoading}
+              onClick={() => sendMessage(input)}
             >
-              <RotateCcw className="h-4 w-4" />
+              <Send className="h-4 w-4" />
             </Button>
-          )}
-          <Textarea
-            ref={inputRef}
-            placeholder="Ask anything — estimates, messages, marketing, insights…"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isLoading}
-            rows={1}
-            className="min-h-[40px] max-h-[120px] resize-none"
-          />
-          <Button
-            size="icon"
-            className="h-10 w-10 shrink-0"
-            disabled={!input.trim() || isLoading}
-            onClick={() => sendMessage(input)}
-          >
-            <Send className="h-4 w-4" />
-          </Button>
+          </div>
         </div>
       </div>
       <AiCreditTopupDialog open={showTopup} onOpenChange={setShowTopup} />
