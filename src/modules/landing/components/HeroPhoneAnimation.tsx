@@ -9,10 +9,13 @@ import {
   Bell,
   UserPlus,
   CheckCircle2,
+  Star,
 } from "lucide-react";
+import mikeImg from "@/assets/demo/mike-reynolds.jpg";
+import projectKitchen from "@/assets/demo/project-kitchen.jpg";
 
 const STAGES = [
-  { key: "idle", duration: 2000 },
+  { key: "idle", duration: 2200 },
   { key: "tap", duration: 800 },
   { key: "form", duration: 1800 },
   { key: "submitted", duration: 1200 },
@@ -50,50 +53,79 @@ export default function HeroPhoneAnimation() {
             animate={{ opacity: stage === "crm" ? 0.15 : 1 }}
             transition={{ duration: 0.4 }}
           >
-            {/* Cover */}
-            <div className="h-20 bg-gradient-to-r from-primary to-accent relative">
-              <div className="absolute -bottom-7 left-1/2 -translate-x-1/2">
-                <div className="h-14 w-14 rounded-full bg-card border-[3px] border-card shadow-lg flex items-center justify-center">
-                  <span className="text-sm font-bold text-foreground">AJ</span>
+            {/* Cover photo */}
+            <div className="h-24 relative overflow-hidden">
+              <img
+                src={projectKitchen}
+                alt="Cover"
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+              {/* Avatar overlapping cover */}
+              <div className="absolute -bottom-6 left-4">
+                <div className="h-12 w-12 rounded-full overflow-hidden ring-[3px] ring-card shadow-lg">
+                  <img src={mikeImg} alt="Mike Reynolds" className="h-full w-full object-cover" />
                 </div>
+              </div>
+              {/* Verified badge */}
+              <div className="absolute top-2 right-3">
+                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold bg-black/40 text-white backdrop-blur-sm">
+                  <CheckCircle2 className="h-2.5 w-2.5" /> Verified
+                </span>
               </div>
             </div>
 
             {/* Identity */}
-            <div className="text-center mt-9 px-4">
-              <h3 className="text-sm font-bold text-foreground">Alex Johnson</h3>
-              <p className="text-[11px] text-muted-foreground">Premium Landscaping</p>
-              <p className="text-[10px] text-muted-foreground flex items-center justify-center gap-0.5 mt-0.5">
-                <MapPin className="h-2.5 w-2.5" /> Austin, TX
-              </p>
+            <div className="px-4 mt-8">
+              <h3 className="text-sm font-bold text-foreground">Mike Reynolds</h3>
+              <p className="text-[11px] text-muted-foreground font-medium">Reynolds Construction</p>
+              <p className="text-[10px] text-primary font-medium mt-0.5">Quality builds. On time. On budget.</p>
+              <div className="flex items-center gap-2 mt-1">
+                <p className="text-[10px] text-muted-foreground flex items-center gap-0.5">
+                  <MapPin className="h-2.5 w-2.5" /> Austin, TX
+                </p>
+                <div className="flex items-center gap-0.5">
+                  {[1, 2, 3, 4, 5].map(i => (
+                    <Star key={i} className="h-2.5 w-2.5 fill-warning text-warning" />
+                  ))}
+                  <span className="text-[9px] text-muted-foreground ml-0.5">5.0</span>
+                </div>
+              </div>
             </div>
 
             {/* Action buttons */}
             <div className="grid grid-cols-3 gap-1.5 px-4 mt-3">
               {[
-                { icon: Phone, label: "Call" },
-                { icon: MessageSquare, label: "Text" },
-                { icon: Calendar, label: "Book" },
-              ].map(({ icon: Icon, label }) => (
+                { icon: Phone, label: "Call", color: "hsl(142,71%,45%)" },
+                { icon: MessageSquare, label: "Text", color: "hsl(217,91%,60%)" },
+                { icon: Calendar, label: "Book", color: "hsl(25,95%,53%)" },
+              ].map(({ icon: Icon, label, color }) => (
                 <div
                   key={label}
-                  className="flex items-center justify-center gap-1 rounded-lg py-1.5 text-[10px] font-medium bg-primary/10 text-primary"
+                  className="flex items-center justify-center gap-1 rounded-lg py-1.5 text-[10px] font-medium bg-card border border-border"
                 >
-                  <Icon className="h-3 w-3" />
+                  <Icon className="h-3 w-3" style={{ color }} />
                   {label}
                 </div>
               ))}
             </div>
 
             {/* Services */}
-            <div className="px-4 mt-3">
-              {["Lawn Care", "Garden Design", "Hardscaping"].map((s) => (
+            <div className="px-4 mt-3 space-y-1">
+              {[
+                { name: "Kitchen Remodel", price: "$15,000+" },
+                { name: "Bathroom Renovation", price: "$8,000+" },
+                { name: "Deck & Patio Build", price: "$5,000+" },
+              ].map((s) => (
                 <div
-                  key={s}
-                  className="flex items-center gap-1.5 py-1.5 text-[10px] text-foreground border-b border-border/50 last:border-0"
+                  key={s.name}
+                  className="flex items-center justify-between py-1.5 text-[10px] border-b border-border/40 last:border-0"
                 >
-                  <ChevronRight className="h-2.5 w-2.5 text-muted-foreground" />
-                  {s}
+                  <span className="flex items-center gap-1 text-foreground">
+                    <CheckCircle2 className="h-2.5 w-2.5 text-success" />
+                    {s.name}
+                  </span>
+                  <span className="text-muted-foreground font-medium">{s.price}</span>
                 </div>
               ))}
             </div>
@@ -120,7 +152,7 @@ export default function HeroPhoneAnimation() {
                     />
                   )}
                 </AnimatePresence>
-                📋 Request Quote
+                📋 Get Free Estimate
               </motion.div>
             </div>
           </motion.div>
