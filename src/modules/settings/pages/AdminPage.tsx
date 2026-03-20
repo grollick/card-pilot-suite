@@ -1,4 +1,4 @@
-import { Shield, Edit, LayoutGrid, Settings2, MessageSquare, TrendingUp } from "lucide-react";
+import { Shield, Edit, LayoutGrid, Settings2, MessageSquare, TrendingUp, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { professions, professionCategories, getProfessionsByCategory } from "@/data/professions";
@@ -8,12 +8,14 @@ import AdminFeedbackTab from "@/modules/settings/components/AdminFeedbackTab";
 import BugPriorityDashboard from "@/modules/settings/components/BugPriorityDashboard";
 import RoadmapBoard from "@/modules/settings/components/RoadmapBoard";
 import AdminGrowthDashboard from "@/modules/settings/components/AdminGrowthDashboard";
+import AbuseMonitorDashboard from "@/modules/admin/components/AbuseMonitorDashboard";
 import { useState } from "react";
 
-type Section = "growth" | "content" | "feedback" | "system";
+type Section = "growth" | "content" | "feedback" | "system" | "abuse";
 
 const sections: { id: Section; label: string; icon: typeof Shield }[] = [
   { id: "growth", label: "Growth", icon: TrendingUp },
+  { id: "abuse", label: "Abuse Monitor", icon: ShieldAlert },
   { id: "content", label: "Content & Professions", icon: LayoutGrid },
   { id: "feedback", label: "Feedback & Bugs", icon: MessageSquare },
   { id: "system", label: "System", icon: Settings2 },
