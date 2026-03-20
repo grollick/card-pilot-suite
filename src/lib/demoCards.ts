@@ -30,6 +30,7 @@ export interface DemoProject {
 export interface DemoCard {
   slug: string;
   avatarUrl: string;
+  coverUrl: string;
   name: string;
   profession: string;
   company: string;
