@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Megaphone, Mail, FileText, BookOpen, BarChart3, Users, UserCheck, Target, Send, Workflow, ShieldAlert, Loader2 } from "lucide-react";
+import { Megaphone, Mail, FileText, BookOpen, BarChart3, Users, UserCheck, Target, Send, Workflow, ShieldAlert, Loader2, FlaskConical } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import AdminEmailTemplates from "@/modules/admin/components/AdminEmailTemplates"
 import AdminSuccessPlaybooks from "@/modules/admin/components/AdminSuccessPlaybooks";
 import AdminMarketingAnalytics from "@/modules/admin/components/AdminMarketingAnalytics";
 import AdminEmailSequences from "@/modules/admin/components/AdminEmailSequences";
+import ABTestDashboard from "@/modules/admin/components/ABTestDashboard";
 
 export default function AdminMarketingDashboard() {
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
