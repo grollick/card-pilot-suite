@@ -94,13 +94,6 @@ const results = [
   { value: "2×", label: "Faster Payments", desc: "Digital estimates and invoices with online payment get you paid twice as fast.", icon: DollarSign },
 ];
 
-const PROFESSION_ICONS: Record<string, typeof Wrench> = {
-  Contractor: Wrench,
-  Barber: Scissors,
-  Realtor: Home,
-  Photographer: Camera,
-  Landscaper: TreePine,
-};
 
 const testimonials = [
   { name: "Jake M.", role: "Landscaper", text: "I went from losing half my leads to booking 90% of them. guzzl.pro paid for itself in a week.", rating: 5 },
