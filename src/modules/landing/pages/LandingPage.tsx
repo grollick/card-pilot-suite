@@ -230,7 +230,7 @@ export default function LandingPage() {
                 <motion.div initial="hidden" animate="visible" variants={fade} custom={3} className="flex flex-col sm:flex-row items-center lg:items-start gap-3">
                   <Link to="/onboarding">
                     <Button size="lg" className="text-base h-13 px-10 rounded-xl shadow-glow-lg group">
-                      Get Started Free
+                      Start Free
                       <ArrowRight className="h-4 w-4 ml-1.5 group-hover:translate-x-0.5 transition-transform" />
                     </Button>
                   </Link>
