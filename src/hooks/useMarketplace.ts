@@ -22,6 +22,7 @@ export interface MarketplaceListing {
   profile_completeness: number;
   conversion_score: number;
   is_on_duty: boolean;
+  verification_level: string;
 }
 
 interface MarketplaceFilters {
