@@ -69,7 +69,7 @@ export const DEMO_CARDS: DemoCard[] = [
     tagline: "Quality builds. On time. On budget.",
     phone: "(555) 234-5678",
     email: "mike@reynoldsconstruction.com",
-    city: "Austin, TX",
+    city: "Toronto, ON",
     bio: "Licensed general contractor with 15 years of experience in residential remodeling, custom builds, and commercial renovations. Fully insured and bonded.",
     services: [
       { name: "Kitchen Remodel", price: "$15,000+", duration: "3–6 weeks" },
@@ -100,7 +100,7 @@ export const DEMO_CARDS: DemoCard[] = [
     tagline: "Sharp looks. Sharp confidence.",
     phone: "(555) 345-6789",
     email: "book@freshcutsstudio.com",
-    city: "Atlanta, GA",
+    city: "Vancouver, BC",
     bio: "Master barber specializing in fades, beard sculpting, and modern men's grooming. Walk-ins welcome, appointments preferred.",
     services: [
       { name: "Classic Haircut", price: "$35", duration: "30 min" },
@@ -161,7 +161,7 @@ export const DEMO_CARDS: DemoCard[] = [
     tagline: "Capturing moments that last forever.",
     phone: "(555) 567-8901",
     email: "hello@lensandlight.com",
-    city: "Denver, CO",
+    city: "Calgary, AB",
     bio: "Award-winning photographer specializing in weddings, portraits, and commercial work. Published in Denver Life Magazine. Natural light enthusiast.",
     services: [
       { name: "Wedding Photography", price: "$3,500+", duration: "8 hours" },
@@ -223,7 +223,7 @@ export const DEMO_CARDS: DemoCard[] = [
     tagline: "Stronger every day.",
     phone: "(555) 789-0123",
     email: "jess@fitlifecoaching.com",
-    city: "Miami, FL",
+    city: "Montreal, QC",
     bio: "NASM-certified personal trainer and nutrition coach with 8 years of experience. Specializing in body recomposition, strength training, and sustainable lifestyle changes.",
     services: [
       { name: "1-on-1 Training", price: "$85/session", duration: "60 min" },
