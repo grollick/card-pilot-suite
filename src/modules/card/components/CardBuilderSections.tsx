@@ -123,7 +123,7 @@ export default function CardBuilderSections({
           </span>
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] text-muted-foreground">Icons only</span>
-            <Switch checked={ctaIconsOnly} onCheckedChange={(v) => { setCtaIconsOnly(v); saveThemeField({ cta_icons_only: v }); }} className="scale-75" />
+            <Switch checked={ctaIconsOnly} onCheckedChange={(v) => { setCtaIconsOnly(v); saveThemeField({ cta_icons_only: v }); }} className="scale-[0.7]" />
           </div>
         </div>
         <CtaEditor ctas={ctaConfig} onChange={onCtaConfigChange} />
