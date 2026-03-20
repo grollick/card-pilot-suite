@@ -213,6 +213,37 @@ export const DEMO_CARDS: DemoCard[] = [
     promoText: "Get a full spring cleanup + first month of maintenance free when you sign up for a yearly plan.",
     accentColor: "hsl(142, 71%, 45%)",
   },
+  {
+    slug: "demo-trainer",
+    avatarUrl: jessicaImg,
+    coverUrl: coverTrainer,
+    name: "Jessica Martinez",
+    profession: "Personal Trainer",
+    company: "FitLife Coaching",
+    tagline: "Stronger every day.",
+    phone: "(555) 789-0123",
+    email: "jess@fitlifecoaching.com",
+    city: "Miami, FL",
+    bio: "NASM-certified personal trainer and nutrition coach with 8 years of experience. Specializing in body recomposition, strength training, and sustainable lifestyle changes.",
+    services: [
+      { name: "1-on-1 Training", price: "$85/session", duration: "60 min" },
+      { name: "Group Fitness Class", price: "$25/class", duration: "45 min" },
+      { name: "Nutrition Coaching", price: "$200/mo", duration: "Ongoing" },
+      { name: "Online Program", price: "$150/mo", duration: "Ongoing" },
+      { name: "Body Comp Assessment", price: "Free", duration: "30 min" },
+    ],
+    testimonials: [
+      { name: "Maria L.", text: "Jessica helped me lose 30 lbs and completely changed my relationship with food. Her programs are challenging but realistic. Best investment I've made.", rating: 5 },
+      { name: "Derek S.", text: "I've tried other trainers but Jess actually listens and adjusts. Down 4 inches on my waist and deadlifting 315 now. She's the real deal.", rating: 5 },
+    ],
+    projects: [
+      { title: "Outdoor Boot Camp Series", description: "12-week community fitness program at Bayfront Park. 40+ participants across 3 weekly sessions with progressive difficulty and team challenges.", services: "Group Fitness Class", imageUrl: projectTrainerGroup },
+      { title: "Custom Meal Prep Program", description: "Designed a 90-day nutrition plan for a client prepping for a physique competition. Macros, meal timing, and weekly check-ins included.", services: "Nutrition Coaching", imageUrl: projectTrainerNutrition },
+    ],
+    promoTitle: "💪 Free Trial Session",
+    promoText: "Book your first 1-on-1 training session completely free. No commitment, just results.",
+    accentColor: "hsl(199, 89%, 48%)",
+  },
 ];
 
 export function getDemoCardBySlug(slug: string): DemoCard | undefined {
