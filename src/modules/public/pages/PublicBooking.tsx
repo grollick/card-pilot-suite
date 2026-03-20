@@ -114,34 +114,31 @@ export default function PublicBooking() {
       const startDt = setMinutes(setHours(selectedDate, h), m);
       const endDt = new Date(startDt.getTime() + (selectedService.duration_min ?? 30) * 60000);
 
-      // Visitor metadata for referral tracking
+      // Create booking via secure edge function (handle resolved server-side)
+      const { data: bookingData, error: bookingError } = await supabase.functions.invoke("create-booking", {
+        body: {
+          handle: handle!,
+          service_id: selectedService.id,
+          customer_name: formData.name.trim(),
+          customer_email: formData.email?.trim() || null,
+          customer_phone: formData.phone?.trim() || null,
+          notes: formData.notes?.trim() || null,
+          start_datetime: startDt.toISOString(),
+          end_datetime: endDt.toISOString(),
+        },
+      });
+
+      if (bookingError) throw bookingError;
+      if (!bookingData?.success) throw new Error(bookingData?.error || "Booking failed");
+
+      // Track analytics event (non-sensitive, fire-and-forget)
       const visitorMeta = {
         referrer: document.referrer || null,
         utm_source: new URLSearchParams(window.location.search).get("utm_source"),
-        user_agent: navigator.userAgent,
-        capture_url: window.location.href,
         timestamp: new Date().toISOString(),
       };
 
-      // Create booking — the DB trigger (trg_booking_lead_capture) automatically:
-      // 1. Matches or creates a CRM contact
-      // 2. Links the booking to the contact
-      // 3. Logs an activity event
-      // 4. Updates daily_metrics (bookings + revenue)
-      await supabase.from("bookings").insert({
-        user_id: data.profile.id,
-        service_id: selectedService.id,
-        customer_name: formData.name,
-        customer_email: formData.email || null,
-        customer_phone: formData.phone || null,
-        notes: formData.notes || null,
-        start_datetime: startDt.toISOString(),
-        end_datetime: endDt.toISOString(),
-        status: "requested" as const,
-      });
-
-      // Track analytics event
-      await supabase.from("analytics_events").insert({
+      supabase.from("analytics_events").insert({
         user_id: data.profile.id,
         handle: handle!,
         event_type: "booking_created" as const,
