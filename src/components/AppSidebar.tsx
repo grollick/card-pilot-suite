@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import Tip from "@/components/Tip";
 import {
   Collapsible, CollapsibleContent, CollapsibleTrigger
 } from "@/components/ui/collapsible";
@@ -135,19 +137,21 @@ export function AppSidebar() {
 
   const renderItem = (item: NavItem) => (
     <SidebarMenuItem key={item.title}>
-      <SidebarMenuButton asChild>
-        <NavLink
-          to={item.url}
-          end={item.end}
-          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-all hover:bg-muted/60 ${
-            isActive(item.url, item.end) ? "bg-primary/8 text-primary font-medium" : "text-sidebar-foreground"
-          }`}
-          activeClassName="bg-primary/8 text-primary font-medium"
-        >
-          <item.icon className="h-[18px] w-[18px] shrink-0" />
-          {!collapsed && <span>{item.title}</span>}
-        </NavLink>
-      </SidebarMenuButton>
+      <Tip label={item.title} side="right" delayDuration={collapsed ? 100 : 600}>
+        <SidebarMenuButton asChild>
+          <NavLink
+            to={item.url}
+            end={item.end}
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-all hover:bg-muted/60 ${
+              isActive(item.url, item.end) ? "bg-primary/8 text-primary font-medium" : "text-sidebar-foreground"
+            }`}
+            activeClassName="bg-primary/8 text-primary font-medium"
+          >
+            <item.icon className="h-[18px] w-[18px] shrink-0" />
+            {!collapsed && <span>{item.title}</span>}
+          </NavLink>
+        </SidebarMenuButton>
+      </Tip>
     </SidebarMenuItem>
   );
 
@@ -195,6 +199,7 @@ export function AppSidebar() {
     : "U";
 
   return (
+    <TooltipProvider delayDuration={collapsed ? 100 : 500}>
     <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
       <SidebarHeader className="p-4 pb-2">
         <div className="flex items-center justify-between">
@@ -209,14 +214,16 @@ export function AppSidebar() {
               </div>
             </div>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleSidebar}
-            className="h-7 w-7 text-muted-foreground hover:text-foreground"
-          >
-            <ChevronLeft className={`h-3.5 w-3.5 transition-transform duration-200 ${collapsed ? "rotate-180" : ""}`} />
-          </Button>
+          <Tip label={collapsed ? "Expand sidebar" : "Collapse sidebar"} side="right">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebar}
+              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+            >
+              <ChevronLeft className={`h-3.5 w-3.5 transition-transform duration-200 ${collapsed ? "rotate-180" : ""}`} />
+            </Button>
+          </Tip>
         </div>
       </SidebarHeader>
 
@@ -291,28 +298,32 @@ export function AppSidebar() {
               <p className="text-xs font-medium truncate">{profile?.name || "User"}</p>
               <p className="text-2xs text-muted-foreground truncate">@{profile?.handle || "—"}</p>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleSignOut}
-              className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
-              title="Sign out"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-            </Button>
+            <Tip label="Sign out" side="top">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleSignOut}
+                className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+              </Button>
+            </Tip>
           </div>
         )}
         {collapsed && (
           <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={handleSignOut}
-              className="flex items-center gap-3 rounded-lg px-3 py-1.5 text-[13px] transition-all hover:bg-destructive/10 text-muted-foreground hover:text-destructive cursor-pointer"
-            >
-              <LogOut className="h-[18px] w-[18px] shrink-0" />
-            </SidebarMenuButton>
+            <Tip label="Sign out" side="right">
+              <SidebarMenuButton
+                onClick={handleSignOut}
+                className="flex items-center gap-3 rounded-lg px-3 py-1.5 text-[13px] transition-all hover:bg-destructive/10 text-muted-foreground hover:text-destructive cursor-pointer"
+              >
+                <LogOut className="h-[18px] w-[18px] shrink-0" />
+              </SidebarMenuButton>
+            </Tip>
           </SidebarMenuItem>
         )}
       </SidebarFooter>
     </Sidebar>
+    </TooltipProvider>
   );
 }
