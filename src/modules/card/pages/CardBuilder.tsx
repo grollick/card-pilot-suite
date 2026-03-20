@@ -71,6 +71,7 @@ export default function CardBuilder() {
   const isPro = planKey !== "starter";
   const isMobile = useIsMobile();
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [showTemplateChooser, setShowTemplateChooser] = useState(false);
   const [photoImportOpen, setPhotoImportOpen] = useState(false);
   const [rightTab, setRightTab] = useState("content");
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
