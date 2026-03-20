@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Palette, Type, Check, RotateCcw, Layers, Sun, Moon, Circle, Share2, Save, Trash2, Plus, Undo2, Redo2, Sparkles, Image } from "lucide-react";
+import { Palette, Type, Check, RotateCcw, Layers, Sun, Moon, Circle, Share2, Save, Trash2, Plus, Undo2, Redo2, Sparkles, Image, Briefcase } from "lucide-react";
 import { HERO_BACKGROUNDS, getHeroBackgroundsByCategory, type HeroBackground } from "@/lib/heroBackgrounds";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -193,6 +193,24 @@ const PALETTE_CATEGORIES: PaletteCategory[] = [
       { name: "Gold Light", palette: { primary: "#9A7B2F", secondary: "#6b5c3e", accent: "#C9A94F", background: "#FFFDF5" } },
       { name: "Silver Light", palette: { primary: "#6b6b6b", secondary: "#999999", accent: "#888888", background: "#F8F8FA" } },
       { name: "Rose Light", palette: { primary: "#B76E79", secondary: "#9a7a7f", accent: "#D4A0A7", background: "#FFF5F5" } },
+    ],
+  },
+  {
+    label: "Industry",
+    icon: <Briefcase className="h-3 w-3" />,
+    palettes: [
+      { name: "Contractor", palette: { primary: "#ea6d1f", secondary: "#78716c", accent: "#f59e0b", background: "#fffbf5" } },
+      { name: "Barber", palette: { primary: "#7c3aed", secondary: "#6b7280", accent: "#a855f7", background: "#faf5ff" } },
+      { name: "Realtor", palette: { primary: "#16a34a", secondary: "#64748b", accent: "#22c55e", background: "#f0fdf4" } },
+      { name: "Photographer", palette: { primary: "#e11d64", secondary: "#71717a", accent: "#f43f7e", background: "#fff1f5" } },
+      { name: "Landscaper", palette: { primary: "#15803d", secondary: "#6b7280", accent: "#4ade80", background: "#f0fdf4" } },
+      { name: "Trainer", palette: { primary: "#0284c7", secondary: "#64748b", accent: "#38bdf8", background: "#f0f9ff" } },
+      { name: "Electrician", palette: { primary: "#eab308", secondary: "#525252", accent: "#facc15", background: "#fefce8" } },
+      { name: "Plumber", palette: { primary: "#2563eb", secondary: "#6b7280", accent: "#60a5fa", background: "#eff6ff" } },
+      { name: "Chef", palette: { primary: "#dc2626", secondary: "#78716c", accent: "#f87171", background: "#fef2f2" } },
+      { name: "Auto", palette: { primary: "#1e293b", secondary: "#64748b", accent: "#ef4444", background: "#f8fafc" } },
+      { name: "Cleaner", palette: { primary: "#0891b2", secondary: "#64748b", accent: "#22d3ee", background: "#ecfeff" } },
+      { name: "Lawyer", palette: { primary: "#1e3a5f", secondary: "#64748b", accent: "#8b5e3c", background: "#f8f6f4" } },
     ],
   },
 ];
