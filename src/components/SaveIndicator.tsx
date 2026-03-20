@@ -33,8 +33,8 @@ export default function SaveIndicator({ status, className = "" }: Props) {
         )}
         {status === "saved" && (
           <>
-            <Check className="h-3 w-3 text-green-500" />
-            <span className="text-green-600">Saved</span>
+            <Check className="h-3 w-3 text-success" />
+            <span className="text-success">Saved</span>
           </>
         )}
         {status === "error" && (
