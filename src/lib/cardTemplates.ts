@@ -176,6 +176,8 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     description: "Gallery-first layout that lets your work do the talking. Large visuals, elegant typography, and seamless booking for creative professionals.",
     category: "creative",
     style: "Elegant",
+    premium: true,
+    style: "Elegant",
     sections: [
       { id: "hero", enabled: true },
       { id: "gallery", enabled: true },
