@@ -79,39 +79,46 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
       </button>
 
       {/* Hover controls */}
-      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-        <button
-          onClick={() => onEdit(section.id)}
-          className="h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-accent transition-colors"
-          title="Edit"
-        >
-          <Pencil className="h-3 w-3" />
-        </button>
-        {onDuplicate && (
-          <button
-            onClick={() => onDuplicate(section.id)}
-            className="h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-accent transition-colors"
-            title="Duplicate"
-          >
-            <Copy className="h-3 w-3" />
-          </button>
-        )}
-        {onDelete && !["hero", "contact", "social"].includes(section.id) && (
-          <button
-            onClick={() => onDelete(section.id)}
-            className="h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground/50 hover:text-destructive hover:bg-destructive/8 transition-colors"
-            title="Remove"
-          >
-            <Trash2 className="h-3 w-3" />
-          </button>
-        )}
-      </div>
+      <TooltipProvider delayDuration={200}>
+        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          <Tip label="Edit section" side="top">
+            <button
+              onClick={() => onEdit(section.id)}
+              className="h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-accent transition-colors"
+            >
+              <Pencil className="h-3 w-3" />
+            </button>
+          </Tip>
+          {onDuplicate && (
+            <Tip label="Duplicate section" side="top">
+              <button
+                onClick={() => onDuplicate(section.id)}
+                className="h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-accent transition-colors"
+              >
+                <Copy className="h-3 w-3" />
+              </button>
+            </Tip>
+          )}
+          {onDelete && !["hero", "contact", "social"].includes(section.id) && (
+            <Tip label="Remove section" side="top">
+              <button
+                onClick={() => onDelete(section.id)}
+                className="h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground/50 hover:text-destructive hover:bg-destructive/8 transition-colors"
+              >
+                <Trash2 className="h-3 w-3" />
+              </button>
+            </Tip>
+          )}
+        </div>
+      </TooltipProvider>
 
-      <Switch
-        checked={section.enabled}
-        onCheckedChange={() => onToggle(section.id)}
-        className="scale-[0.65] shrink-0"
-      />
+      <Tip label={section.enabled ? "Hide section" : "Show section"}>
+        <Switch
+          checked={section.enabled}
+          onCheckedChange={() => onToggle(section.id)}
+          className="scale-[0.65] shrink-0"
+        />
+      </Tip>
     </div>
   );
 }
