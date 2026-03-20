@@ -1,12 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import { UserPlus, CalendarPlus, Share2, ExternalLink } from "lucide-react";
+import { UserPlus, CalendarPlus, Share2, ExternalLink, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfileCache } from "@/hooks/useProfileCache";
 
 const actions = [
-  { icon: UserPlus, label: "Add Lead", route: "/app/contacts?new=1", variant: "default" as const },
+  { icon: Pencil, label: "Tweak Card", route: "/app/card", variant: "default" as const },
+  { icon: UserPlus, label: "Add Lead", route: "/app/contacts?new=1", variant: "outline" as const },
   { icon: CalendarPlus, label: "Book Appointment", route: "/app/bookings?new=1", variant: "outline" as const },
   { icon: Share2, label: "Share Card", route: "/app/card/qr", variant: "outline" as const },
 ];
