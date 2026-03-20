@@ -27,7 +27,7 @@ export default function VerificationChecklist() {
   // Auto-recalculate when checklist loads
   useEffect(() => {
     if (checklist && !recalculate.isPending) {
-      recalculate.mutate();
+      recalculate.mutate(undefined);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checklist?.hasActivity, checklist?.hasCard]);
