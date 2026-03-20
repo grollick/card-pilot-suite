@@ -45,20 +45,25 @@ const TEMPLATE_STYLE_PALETTES: Record<string, { primary: string; secondary: stri
 };
 
 /* ── Collapsible section wrapper ── */
-function PanelSection({ title, icon: Icon, children, defaultOpen = true }: {
-  title: string; icon: typeof Layers; children: React.ReactNode; defaultOpen?: boolean;
+function PanelSection({ title, icon: Icon, children, defaultOpen = true, badge }: {
+  title: string; icon: typeof Layers; children: React.ReactNode; defaultOpen?: boolean; badge?: string;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger className="w-full flex items-center justify-between py-2.5 px-1 group">
+      <CollapsibleTrigger className="w-full flex items-center justify-between py-2 px-1.5 group rounded-lg hover:bg-accent/30 transition-colors duration-150">
         <div className="flex items-center gap-2">
-          <Icon className="h-3.5 w-3.5 text-muted-foreground/50" />
-          <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">{title}</span>
+          <div className="h-5 w-5 rounded-md bg-primary/6 flex items-center justify-center">
+            <Icon className="h-3 w-3 text-primary/70" />
+          </div>
+          <span className="text-[11px] font-semibold text-foreground/80 tracking-wide">{title}</span>
+          {badge && (
+            <span className="text-[9px] font-medium text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded-full">{badge}</span>
+          )}
         </div>
-        <ChevronDown className={`h-3 w-3 text-muted-foreground/30 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-3 w-3 text-muted-foreground/40 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </CollapsibleTrigger>
-      <CollapsibleContent className="pt-1 pb-2">
+      <CollapsibleContent className="pt-1.5 pb-1">
         {children}
       </CollapsibleContent>
     </Collapsible>
