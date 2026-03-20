@@ -425,7 +425,7 @@ export default function IndustryLandingPage() {
                 {page.finalCtaSubheadline || `Join thousands of ${page.profession.toLowerCase()}s who use guzzl.pro to capture more leads, book more jobs, and build a stronger reputation.`}
               </p>
               <Button asChild size="lg" className="text-base px-10">
-                <Link to="/auth">
+                <Link to={authLink(page.slug)}>
                   {page.ctaText} <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
