@@ -253,6 +253,7 @@ export default function AbuseMonitorDashboard() {
                     <TableHead className="text-xs">Email</TableHead>
                     <TableHead className="text-xs">Trust Score</TableHead>
                     <TableHead className="text-xs">Level</TableHead>
+                    <TableHead className="text-xs">Verification</TableHead>
                     <TableHead className="text-xs">Flags</TableHead>
                     <TableHead className="text-xs">Actions</TableHead>
                   </TableRow>
