@@ -178,6 +178,7 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
           profile_completeness: completeness,
           conversion_score: conversionScore,
           is_on_duty: isOnDuty,
+          verification_level: p.verification_level ?? "basic",
         };
       });
 

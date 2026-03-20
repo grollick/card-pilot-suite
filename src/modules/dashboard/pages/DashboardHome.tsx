@@ -95,7 +95,10 @@ export default function DashboardHome() {
 
       {/* ── Activation System ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ActivationChecklist />
+        <div className="space-y-6">
+          <VerificationChecklist />
+          <ActivationChecklist />
+        </div>
         <div className="space-y-6">
           <ShareMessageCard />
           <ShareCardWidget />

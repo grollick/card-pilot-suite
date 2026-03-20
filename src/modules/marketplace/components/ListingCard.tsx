@@ -112,7 +112,7 @@ export default function ListingCard({ listing, boosted, variant = "default" }: L
               <div className="flex items-center gap-1.5">
                 <h3 className={`font-semibold text-foreground truncate ${isHero ? "text-lg" : ""}`}>{listing.name}</h3>
                 {isVerified && (
-                  <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
+                  <VerificationBadge level={listing.verification_level as any} size="xs" showLabel={false} />
                 )}
               </div>
               {listing.company && (
