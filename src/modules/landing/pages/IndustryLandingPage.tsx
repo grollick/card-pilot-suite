@@ -75,7 +75,7 @@ export default function IndustryLandingPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button asChild size="lg" className="text-base px-8">
-                  <Link to="/auth">
+                  <Link to={authLink(page.slug)}>
                     {page.ctaText} <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
