@@ -74,7 +74,7 @@ export default function ListingCard({ listing, boosted, variant = "default" }: L
     .slice(0, 2)
     .toUpperCase();
 
-  const isVerified = listing.profile_completeness >= 70 && listing.review_count >= 1;
+  const isVerified = listing.verification_level === "verified" || listing.verification_level === "pro_verified";
   const isHero = variant === "hero";
 
   return (
