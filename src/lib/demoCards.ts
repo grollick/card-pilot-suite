@@ -9,10 +9,17 @@ import elenaImg from "@/assets/demo/elena-vasquez.jpg";
 import alexImg from "@/assets/demo/alex-greenfield.jpg";
 import projectKitchen from "@/assets/demo/project-kitchen.jpg";
 import projectDeck from "@/assets/demo/project-deck.jpg";
-import projectBarbershop from "@/assets/demo/project-barbershop.jpg";
+import coverBarbershop from "@/assets/demo/cover-barbershop.jpg";
+import projectBarberFade from "@/assets/demo/project-barber-fade.jpg";
+import coverRealtor from "@/assets/demo/cover-realtor.jpg";
+import projectRealtorInterior from "@/assets/demo/project-realtor-interior.jpg";
 import projectOceanview from "@/assets/demo/project-oceanview.jpg";
+import coverPhotographer from "@/assets/demo/cover-photographer.jpg";
 import projectWedding from "@/assets/demo/project-wedding.jpg";
+import projectPhotographerHeadshots from "@/assets/demo/project-photographer-headshots.jpg";
+import coverLandscaper from "@/assets/demo/cover-landscaper.jpg";
 import projectBackyard from "@/assets/demo/project-backyard.jpg";
+import projectLandscaperFrontyard from "@/assets/demo/project-landscaper-frontyard.jpg";
 
 export interface DemoTestimonial {
   name: string;
@@ -82,7 +89,7 @@ export const DEMO_CARDS: DemoCard[] = [
   {
     slug: "demo-barber",
     avatarUrl: marcusImg,
-    coverUrl: projectBarbershop,
+    coverUrl: coverBarbershop,
     name: "Marcus Cole",
     profession: "Barber",
     company: "Fresh Cuts Studio",
@@ -103,8 +110,8 @@ export const DEMO_CARDS: DemoCard[] = [
       { name: "Andre W.", text: "Booked online, walked in, got the best haircut of my life. The hot towel shave is an experience. 10/10.", rating: 5 },
     ],
     projects: [
-      { title: "Wedding Party Grooming", description: "Styled 6 groomsmen with custom fades and beard shaping for a black-tie wedding. On-location service at the hotel.", services: "Skin Fade, Beard Trim", imageUrl: projectBarbershop },
-      { title: "Before & After Transformation", description: "Full transformation from grown-out hair to a clean mid-fade with a hard part. Client's first professional haircut in 6 months.", services: "Skin Fade", imageUrl: projectBarbershop },
+      { title: "Wedding Party Grooming", description: "Styled 6 groomsmen with custom fades and beard shaping for a black-tie wedding. On-location service at the hotel.", services: "Skin Fade, Beard Trim", imageUrl: coverBarbershop },
+      { title: "Before & After Transformation", description: "Full transformation from grown-out hair to a clean mid-fade with a hard part. Client's first professional haircut in 6 months.", services: "Skin Fade", imageUrl: projectBarberFade },
     ],
     promoTitle: "✂️ First Visit Special",
     promoText: "New clients get 20% off their first haircut. Book online today!",
@@ -113,7 +120,7 @@ export const DEMO_CARDS: DemoCard[] = [
   {
     slug: "demo-realtor",
     avatarUrl: sarahImg,
-    coverUrl: projectOceanview,
+    coverUrl: coverRealtor,
     name: "Sarah Chen",
     profession: "Realtor",
     company: "Chen Realty Group",
@@ -134,7 +141,7 @@ export const DEMO_CARDS: DemoCard[] = [
     ],
     projects: [
       { title: "Oceanview Townhome — Sold in 5 Days", description: "Listed at $1.2M, sold for $1.28M. Professional staging, drone photography, and targeted social media campaign generated 22 showings.", services: "Listing & Market Analysis", imageUrl: projectOceanview },
-      { title: "First-Time Buyer Success", description: "Helped a young couple navigate a competitive market and secure a 3BR home in North Park with a VA loan — $15K under budget.", services: "Home Buying Consultation", imageUrl: projectOceanview },
+      { title: "First-Time Buyer Success", description: "Helped a young couple navigate a competitive market and secure a 3BR home in North Park with a VA loan — $15K under budget.", services: "Home Buying Consultation", imageUrl: projectRealtorInterior },
     ],
     promoTitle: "🏡 Free Home Valuation",
     promoText: "Curious what your home is worth? Get a free, no-obligation market analysis today.",
@@ -143,7 +150,7 @@ export const DEMO_CARDS: DemoCard[] = [
   {
     slug: "demo-photographer",
     avatarUrl: elenaImg,
-    coverUrl: projectWedding,
+    coverUrl: coverPhotographer,
     name: "Elena Vasquez",
     profession: "Photographer",
     company: "Lens & Light Studio",
@@ -165,7 +172,7 @@ export const DEMO_CARDS: DemoCard[] = [
     ],
     projects: [
       { title: "Mountain Wedding at Red Rocks", description: "Golden hour ceremony with 200 guests at Red Rocks Amphitheatre. 600+ edited photos delivered in 3 weeks with a custom leather-bound album.", services: "Wedding Photography", imageUrl: projectWedding },
-      { title: "Corporate Headshot Day", description: "Shot professional headshots for a 40-person law firm in one day. Consistent lighting and branding across all portraits.", services: "Headshots", imageUrl: projectWedding },
+      { title: "Corporate Headshot Day", description: "Shot professional headshots for a 40-person law firm in one day. Consistent lighting and branding across all portraits.", services: "Headshots", imageUrl: projectPhotographerHeadshots },
     ],
     promoTitle: "📸 Mini Session Special",
     promoText: "Book a 30-minute mini portrait session for just $199 (normally $350). Limited slots available!",
@@ -174,7 +181,7 @@ export const DEMO_CARDS: DemoCard[] = [
   {
     slug: "demo-landscaper",
     avatarUrl: alexImg,
-    coverUrl: projectBackyard,
+    coverUrl: coverLandscaper,
     name: "Alex Greenfield",
     profession: "Landscaper",
     company: "Greenfield Landscapes",
@@ -196,7 +203,7 @@ export const DEMO_CARDS: DemoCard[] = [
     ],
     projects: [
       { title: "Backyard Oasis Renovation", description: "Complete backyard overhaul: removed old lawn, installed a flagstone patio with fire pit, native drought-resistant plantings, and landscape lighting.", services: "Hardscaping & Patios, Landscape Design", imageUrl: projectBackyard },
-      { title: "Front Yard Curb Appeal", description: "Replaced overgrown shrubs with a modern low-maintenance design. Added a stone walkway, decorative boulders, and drip irrigation system.", services: "Landscape Design, Irrigation Install", imageUrl: projectBackyard },
+      { title: "Front Yard Curb Appeal", description: "Replaced overgrown shrubs with a modern low-maintenance design. Added a stone walkway, decorative boulders, and drip irrigation system.", services: "Landscape Design, Irrigation Install", imageUrl: projectLandscaperFrontyard },
     ],
     promoTitle: "🌿 Spring Cleanup Special",
     promoText: "Get a full spring cleanup + first month of maintenance free when you sign up for a yearly plan.",
