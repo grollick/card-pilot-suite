@@ -45,61 +45,62 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
     <div
       ref={setNodeRef}
       style={style}
-      className={`group flex items-center gap-1.5 py-1.5 px-2 rounded-lg transition-all ${
+      className={`group flex items-center gap-2 py-2 px-2.5 rounded-xl transition-all duration-200 ${
         section.enabled
-          ? "hover:bg-muted/50"
-          : "opacity-40 hover:opacity-60"
+          ? "hover:bg-accent/50"
+          : "opacity-35 hover:opacity-55"
       }`}
     >
       <button
         {...attributes}
         {...listeners}
-        className="cursor-grab active:cursor-grabbing text-muted-foreground/50 hover:text-muted-foreground touch-none shrink-0"
+        className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground/60 touch-none shrink-0 transition-colors"
         aria-label="Drag to reorder"
       >
-        <GripVertical className="h-3 w-3" />
+        <GripVertical className="h-3.5 w-3.5" />
       </button>
 
       <button
-        className="flex items-center gap-2 flex-1 min-w-0 text-left"
+        className="flex items-center gap-2.5 flex-1 min-w-0 text-left"
         onClick={() => onEdit(section.id)}
       >
-        <div className={`h-6 w-6 rounded-md flex items-center justify-center shrink-0 transition-colors ${
-          section.enabled ? "bg-primary/8 text-primary" : "bg-muted text-muted-foreground"
+        <div className={`h-7 w-7 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200 ${
+          section.enabled ? "bg-primary/8 text-primary" : "bg-muted/60 text-muted-foreground/60"
         }`}>
-          <Icon className="h-3 w-3" />
+          <Icon className="h-3.5 w-3.5" />
         </div>
-        <span className={`text-[11px] font-medium truncate ${section.enabled ? "text-foreground" : "text-muted-foreground"}`}>
-          {section.label}
-        </span>
-        {hasContent && <span className="h-1 w-1 rounded-full bg-primary shrink-0" />}
+        <div className="min-w-0 flex-1">
+          <span className={`text-[12px] font-medium block truncate ${section.enabled ? "text-foreground" : "text-muted-foreground"}`}>
+            {section.label}
+          </span>
+        </div>
       </button>
 
       {/* Hover controls */}
-      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
         <button
           onClick={() => onEdit(section.id)}
-          className="h-5 w-5 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+          className="h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-accent transition-colors"
           title="Edit"
         >
-          <Pencil className="h-2.5 w-2.5" />
+          <Pencil className="h-3 w-3" />
         </button>
         {onDuplicate && (
           <button
             onClick={() => onDuplicate(section.id)}
-            className="h-5 w-5 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-accent transition-colors"
             title="Duplicate"
           >
-            <Copy className="h-2.5 w-2.5" />
+            <Copy className="h-3 w-3" />
           </button>
         )}
         {onDelete && !["hero", "contact", "social"].includes(section.id) && (
           <button
             onClick={() => onDelete(section.id)}
-            className="h-5 w-5 rounded flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+            className="h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground/50 hover:text-destructive hover:bg-destructive/8 transition-colors"
             title="Remove"
           >
-            <Trash2 className="h-2.5 w-2.5" />
+            <Trash2 className="h-3 w-3" />
           </button>
         )}
       </div>
@@ -107,7 +108,7 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
       <Switch
         checked={section.enabled}
         onCheckedChange={() => onToggle(section.id)}
-        className="scale-[0.6] shrink-0"
+        className="scale-[0.65] shrink-0"
       />
     </div>
   );
