@@ -16,6 +16,7 @@ export interface DemoProject {
 
 export interface DemoCard {
   slug: string;
+  avatarUrl: string;
   name: string;
   profession: string;
   company: string;
