@@ -7,6 +7,12 @@ import marcusImg from "@/assets/demo/marcus-cole.jpg";
 import sarahImg from "@/assets/demo/sarah-chen.jpg";
 import elenaImg from "@/assets/demo/elena-vasquez.jpg";
 import alexImg from "@/assets/demo/alex-greenfield.jpg";
+import projectKitchen from "@/assets/demo/project-kitchen.jpg";
+import projectDeck from "@/assets/demo/project-deck.jpg";
+import projectBarbershop from "@/assets/demo/project-barbershop.jpg";
+import projectOceanview from "@/assets/demo/project-oceanview.jpg";
+import projectWedding from "@/assets/demo/project-wedding.jpg";
+import projectBackyard from "@/assets/demo/project-backyard.jpg";
 
 export interface DemoTestimonial {
   name: string;
@@ -18,11 +24,13 @@ export interface DemoProject {
   title: string;
   description: string;
   services: string;
+  imageUrl?: string;
 }
 
 export interface DemoCard {
   slug: string;
   avatarUrl: string;
+  coverUrl: string;
   name: string;
   profession: string;
   company: string;
@@ -43,6 +51,7 @@ export const DEMO_CARDS: DemoCard[] = [
   {
     slug: "demo-contractor",
     avatarUrl: mikeImg,
+    coverUrl: projectKitchen,
     name: "Mike Reynolds",
     profession: "Contractor",
     company: "Reynolds Construction",
@@ -63,8 +72,8 @@ export const DEMO_CARDS: DemoCard[] = [
       { name: "David & Lisa P.", text: "We hired Reynolds Construction for a full basement finish. The craftsmanship was top-notch and the crew was professional every single day.", rating: 5 },
     ],
     projects: [
-      { title: "Modern Farmhouse Kitchen", description: "Complete kitchen gut-renovation with custom cabinetry, quartz countertops, and a 12-foot island. Project completed in 5 weeks.", services: "Kitchen Remodel" },
-      { title: "Cedar Deck & Pergola", description: "Built a 400 sq ft composite deck with a custom cedar pergola and built-in LED lighting. Perfect outdoor entertaining space.", services: "Deck & Patio Build" },
+      { title: "Modern Farmhouse Kitchen", description: "Complete kitchen gut-renovation with custom cabinetry, quartz countertops, and a 12-foot island. Project completed in 5 weeks.", services: "Kitchen Remodel", imageUrl: projectKitchen },
+      { title: "Cedar Deck & Pergola", description: "Built a 400 sq ft composite deck with a custom cedar pergola and built-in LED lighting. Perfect outdoor entertaining space.", services: "Deck & Patio Build", imageUrl: projectDeck },
     ],
     promoTitle: "🔨 Spring Special",
     promoText: "Book a kitchen remodel this month and get a free backsplash upgrade ($1,500 value).",
@@ -73,6 +82,7 @@ export const DEMO_CARDS: DemoCard[] = [
   {
     slug: "demo-barber",
     avatarUrl: marcusImg,
+    coverUrl: projectBarbershop,
     name: "Marcus Cole",
     profession: "Barber",
     company: "Fresh Cuts Studio",
@@ -93,8 +103,8 @@ export const DEMO_CARDS: DemoCard[] = [
       { name: "Andre W.", text: "Booked online, walked in, got the best haircut of my life. The hot towel shave is an experience. 10/10.", rating: 5 },
     ],
     projects: [
-      { title: "Wedding Party Grooming", description: "Styled 6 groomsmen with custom fades and beard shaping for a black-tie wedding. On-location service at the hotel.", services: "Skin Fade, Beard Trim" },
-      { title: "Before & After Transformation", description: "Full transformation from grown-out hair to a clean mid-fade with a hard part. Client's first professional haircut in 6 months.", services: "Skin Fade" },
+      { title: "Wedding Party Grooming", description: "Styled 6 groomsmen with custom fades and beard shaping for a black-tie wedding. On-location service at the hotel.", services: "Skin Fade, Beard Trim", imageUrl: projectBarbershop },
+      { title: "Before & After Transformation", description: "Full transformation from grown-out hair to a clean mid-fade with a hard part. Client's first professional haircut in 6 months.", services: "Skin Fade", imageUrl: projectBarbershop },
     ],
     promoTitle: "✂️ First Visit Special",
     promoText: "New clients get 20% off their first haircut. Book online today!",
@@ -103,6 +113,7 @@ export const DEMO_CARDS: DemoCard[] = [
   {
     slug: "demo-realtor",
     avatarUrl: sarahImg,
+    coverUrl: projectOceanview,
     name: "Sarah Chen",
     profession: "Realtor",
     company: "Chen Realty Group",
@@ -122,8 +133,8 @@ export const DEMO_CARDS: DemoCard[] = [
       { name: "Tom & Karen B.", text: "We sold our condo in 6 days above asking price. Sarah's staging recommendations and marketing strategy made all the difference.", rating: 5 },
     ],
     projects: [
-      { title: "Oceanview Townhome — Sold in 5 Days", description: "Listed at $1.2M, sold for $1.28M. Professional staging, drone photography, and targeted social media campaign generated 22 showings.", services: "Listing & Market Analysis" },
-      { title: "First-Time Buyer Success", description: "Helped a young couple navigate a competitive market and secure a 3BR home in North Park with a VA loan — $15K under budget.", services: "Home Buying Consultation" },
+      { title: "Oceanview Townhome — Sold in 5 Days", description: "Listed at $1.2M, sold for $1.28M. Professional staging, drone photography, and targeted social media campaign generated 22 showings.", services: "Listing & Market Analysis", imageUrl: projectOceanview },
+      { title: "First-Time Buyer Success", description: "Helped a young couple navigate a competitive market and secure a 3BR home in North Park with a VA loan — $15K under budget.", services: "Home Buying Consultation", imageUrl: projectOceanview },
     ],
     promoTitle: "🏡 Free Home Valuation",
     promoText: "Curious what your home is worth? Get a free, no-obligation market analysis today.",
@@ -132,6 +143,7 @@ export const DEMO_CARDS: DemoCard[] = [
   {
     slug: "demo-photographer",
     avatarUrl: elenaImg,
+    coverUrl: projectWedding,
     name: "Elena Vasquez",
     profession: "Photographer",
     company: "Lens & Light Studio",
@@ -152,8 +164,8 @@ export const DEMO_CARDS: DemoCard[] = [
       { name: "Samantha D.", text: "My headshots look so natural and professional. Elena made me feel completely comfortable and the results exceeded my expectations.", rating: 5 },
     ],
     projects: [
-      { title: "Mountain Wedding at Red Rocks", description: "Golden hour ceremony with 200 guests at Red Rocks Amphitheatre. 600+ edited photos delivered in 3 weeks with a custom leather-bound album.", services: "Wedding Photography" },
-      { title: "Corporate Headshot Day", description: "Shot professional headshots for a 40-person law firm in one day. Consistent lighting and branding across all portraits.", services: "Headshots" },
+      { title: "Mountain Wedding at Red Rocks", description: "Golden hour ceremony with 200 guests at Red Rocks Amphitheatre. 600+ edited photos delivered in 3 weeks with a custom leather-bound album.", services: "Wedding Photography", imageUrl: projectWedding },
+      { title: "Corporate Headshot Day", description: "Shot professional headshots for a 40-person law firm in one day. Consistent lighting and branding across all portraits.", services: "Headshots", imageUrl: projectWedding },
     ],
     promoTitle: "📸 Mini Session Special",
     promoText: "Book a 30-minute mini portrait session for just $199 (normally $350). Limited slots available!",
@@ -162,6 +174,7 @@ export const DEMO_CARDS: DemoCard[] = [
   {
     slug: "demo-landscaper",
     avatarUrl: alexImg,
+    coverUrl: projectBackyard,
     name: "Alex Greenfield",
     profession: "Landscaper",
     company: "Greenfield Landscapes",
@@ -182,8 +195,8 @@ export const DEMO_CARDS: DemoCard[] = [
       { name: "Greg & Amy H.", text: "Reliable, creative, and reasonably priced. Our weekly maintenance keeps the yard looking magazine-worthy year-round.", rating: 5 },
     ],
     projects: [
-      { title: "Backyard Oasis Renovation", description: "Complete backyard overhaul: removed old lawn, installed a flagstone patio with fire pit, native drought-resistant plantings, and landscape lighting.", services: "Hardscaping & Patios, Landscape Design" },
-      { title: "Front Yard Curb Appeal", description: "Replaced overgrown shrubs with a modern low-maintenance design. Added a stone walkway, decorative boulders, and drip irrigation system.", services: "Landscape Design, Irrigation Install" },
+      { title: "Backyard Oasis Renovation", description: "Complete backyard overhaul: removed old lawn, installed a flagstone patio with fire pit, native drought-resistant plantings, and landscape lighting.", services: "Hardscaping & Patios, Landscape Design", imageUrl: projectBackyard },
+      { title: "Front Yard Curb Appeal", description: "Replaced overgrown shrubs with a modern low-maintenance design. Added a stone walkway, decorative boulders, and drip irrigation system.", services: "Landscape Design, Irrigation Install", imageUrl: projectBackyard },
     ],
     promoTitle: "🌿 Spring Cleanup Special",
     promoText: "Get a full spring cleanup + first month of maintenance free when you sign up for a yearly plan.",
