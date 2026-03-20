@@ -119,7 +119,7 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
           <Switch
             checked={section.enabled}
             onCheckedChange={() => onToggle(section.id)}
-            className="scale-[0.65] shrink-0"
+            className="scale-[0.7] shrink-0"
           />
         </Tip>
       </div>

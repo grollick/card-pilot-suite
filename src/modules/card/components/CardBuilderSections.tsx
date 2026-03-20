@@ -76,14 +76,14 @@ export default function CardBuilderSections({
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Icons</span>
-            <Switch checked={showSectionIcons} onCheckedChange={(val) => { setShowSectionIcons(val); saveThemeField({ section_icons: val }); }} />
+          <Switch checked={showSectionIcons} onCheckedChange={(val) => { setShowSectionIcons(val); saveThemeField({ section_icons: val }); }} className="scale-[0.7]" />
           </div>
         </div>
       )}
       {hideWrapper && (
         <div className="flex items-center justify-end gap-2">
           <span className="text-xs text-muted-foreground">Icons</span>
-          <Switch checked={showSectionIcons} onCheckedChange={(val) => { setShowSectionIcons(val); saveThemeField({ section_icons: val }); }} />
+          <Switch checked={showSectionIcons} onCheckedChange={(val) => { setShowSectionIcons(val); saveThemeField({ section_icons: val }); }} className="scale-[0.7]" />
         </div>
       )}
 
@@ -123,7 +123,7 @@ export default function CardBuilderSections({
           </span>
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] text-muted-foreground">Icons only</span>
-            <Switch checked={ctaIconsOnly} onCheckedChange={(v) => { setCtaIconsOnly(v); saveThemeField({ cta_icons_only: v }); }} className="scale-75" />
+            <Switch checked={ctaIconsOnly} onCheckedChange={(v) => { setCtaIconsOnly(v); saveThemeField({ cta_icons_only: v }); }} className="scale-[0.7]" />
           </div>
         </div>
         <CtaEditor ctas={ctaConfig} onChange={onCtaConfigChange} />
@@ -137,7 +137,7 @@ export default function CardBuilderSections({
           </span>
           <div className="flex items-center gap-1.5">
             <span className="text-[10px] text-muted-foreground">Icons only</span>
-            <Switch checked={socialIconsOnly} onCheckedChange={(v) => { setSocialIconsOnly(v); saveThemeField({ social_icons_only: v }); }} className="scale-75" />
+            <Switch checked={socialIconsOnly} onCheckedChange={(v) => { setSocialIconsOnly(v); saveThemeField({ social_icons_only: v }); }} className="scale-[0.7]" />
           </div>
         </div>
         <div className="flex items-center justify-between">
