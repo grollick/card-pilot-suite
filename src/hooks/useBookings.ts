@@ -137,10 +137,10 @@ export function usePublicBookingData(handle: string | undefined) {
     gcTime: 15 * 60 * 1000,
     queryFn: async () => {
       const { data: profile, error: pErr } = await supabase
-        .from("profiles")
-        .select("id, name, handle, avatar_url, email, phone")
+        .from("public_profiles" as any)
+        .select("id, name, handle, avatar_url")
         .eq("handle", handle!)
-        .single();
+        .single() as { data: any; error: any };
       if (pErr) throw pErr;
 
       const now = new Date();

@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -28,6 +29,37 @@ serve(async (req) => {
     if (!RESEND_API_KEY) {
       throw new Error("RESEND_API_KEY is not configured");
     }
+
+    // ── Auth check: require authenticated user or service_role ──
+    const authHeader = req.headers.get("authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await supabase.auth.getClaims(token);
+
+    if (claimsError || !claimsData?.claims) {
+      // Also allow service_role tokens (used by other edge functions)
+      const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (token !== serviceRoleKey) {
+        return new Response(
+          JSON.stringify({ error: "Unauthorized" }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    const userId = claimsData?.claims?.sub;
 
     const body: EmailRequest = await req.json();
     const { to, subject, html, from, reply_to, email_type, lead_id } = body;
@@ -65,32 +97,17 @@ serve(async (req) => {
     }
 
     // Optionally log activity if lead_id is provided
-    if (lead_id) {
-      const authHeader = req.headers.get("authorization");
-      if (authHeader) {
-        const { createClient } = await import(
-          "https://esm.sh/@supabase/supabase-js@2"
-        );
-        const supabase = createClient(
-          Deno.env.get("SUPABASE_URL")!,
-          Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-        );
+    if (lead_id && userId) {
+      const svcClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-        // Decode JWT to get user_id
-        const token = authHeader.replace("Bearer ", "");
-        const { data: { user } } = await supabase.auth.getUser(token);
-
-        if (user) {
-          await supabase.from("contact_activities").insert({
-            user_id: user.id,
-            lead_id,
-            activity_type: "email",
-            title: `Email sent: ${subject}`,
-            description: `Type: ${email_type ?? "custom"} | To: ${Array.isArray(to) ? to.join(", ") : to}`,
-            occurred_at: new Date().toISOString(),
-          });
-        }
-      }
+      await svcClient.from("contact_activities").insert({
+        user_id: userId,
+        lead_id,
+        activity_type: "email",
+        title: `Email sent: ${subject}`,
+        description: `Type: ${email_type ?? "custom"} | To: ${Array.isArray(to) ? to.join(", ") : to}`,
+        occurred_at: new Date().toISOString(),
+      });
     }
 
     return new Response(
@@ -102,7 +119,6 @@ serve(async (req) => {
 
     // Log to system_events
     try {
-      const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2");
       const svc = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
       await svc.from("system_events").insert({
         event_type: "email_failure",
@@ -113,7 +129,7 @@ serve(async (req) => {
     } catch (_) { /* best effort */ }
 
     return new Response(
-      JSON.stringify({ error: err.message }),
+      JSON.stringify({ error: "Email send failed" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

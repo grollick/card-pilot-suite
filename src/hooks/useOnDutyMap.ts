@@ -89,9 +89,8 @@ export function useOnDutyProfessionals() {
     queryFn: async (): Promise<OnDutyProfessional[]> => {
       // Get all marketplace-enabled profiles
       const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, name, handle, avatar_url, company, city, bio, service_area, available_for_work, avg_response_minutes, marketplace_enabled, professions(name)" as any)
-        .not("handle", "is", null)
+        .from("public_profiles" as any)
+        .select("id, name, handle, avatar_url, company, city, bio, service_area, available_for_work, avg_response_minutes, marketplace_enabled, profession_id")
         .not("name", "is", null);
 
       const enabled = (profiles ?? []).filter((p: any) => p.marketplace_enabled);

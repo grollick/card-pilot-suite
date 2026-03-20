@@ -50,10 +50,10 @@ export default function PublicProjectPage() {
       setProject(proj as unknown as ProjectData);
 
       const { data: prof } = await supabase
-        .from("profiles")
-        .select("id, name, handle, phone, company, avatar_url")
+        .from("public_profiles" as any)
+        .select("id, name, handle, company, avatar_url")
         .eq("id", (proj as any).user_id)
-        .maybeSingle();
+        .maybeSingle() as { data: any; error: any };
       setProfile(prof as ProfileData | null);
       setLoading(false);
     })();
