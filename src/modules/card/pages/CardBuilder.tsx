@@ -45,7 +45,7 @@ const TEMPLATE_STYLE_PALETTES: Record<string, { primary: string; secondary: stri
 };
 
 /* ── Collapsible section wrapper ── */
-function PanelSection({ title, icon: Icon, children, defaultOpen = true, badge }: {
+function PanelSection({ title, icon: Icon, children, defaultOpen = false, badge }: {
   title: string; icon: typeof Layers; children: React.ReactNode; defaultOpen?: boolean; badge?: string;
 }) {
   const [open, setOpen] = useState(defaultOpen);
