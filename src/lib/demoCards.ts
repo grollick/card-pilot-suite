@@ -2,6 +2,12 @@
 // These are rendered on the landing page and demo preview pages
 // without needing real database records.
 
+import mikeImg from "@/assets/demo/mike-reynolds.jpg";
+import marcusImg from "@/assets/demo/marcus-cole.jpg";
+import sarahImg from "@/assets/demo/sarah-chen.jpg";
+import elenaImg from "@/assets/demo/elena-vasquez.jpg";
+import alexImg from "@/assets/demo/alex-greenfield.jpg";
+
 export interface DemoTestimonial {
   name: string;
   text: string;
@@ -16,6 +22,7 @@ export interface DemoProject {
 
 export interface DemoCard {
   slug: string;
+  avatarUrl: string;
   name: string;
   profession: string;
   company: string;
@@ -35,6 +42,7 @@ export interface DemoCard {
 export const DEMO_CARDS: DemoCard[] = [
   {
     slug: "demo-contractor",
+    avatarUrl: mikeImg,
     name: "Mike Reynolds",
     profession: "Contractor",
     company: "Reynolds Construction",
@@ -64,6 +72,7 @@ export const DEMO_CARDS: DemoCard[] = [
   },
   {
     slug: "demo-barber",
+    avatarUrl: marcusImg,
     name: "Marcus Cole",
     profession: "Barber",
     company: "Fresh Cuts Studio",
@@ -93,6 +102,7 @@ export const DEMO_CARDS: DemoCard[] = [
   },
   {
     slug: "demo-realtor",
+    avatarUrl: sarahImg,
     name: "Sarah Chen",
     profession: "Realtor",
     company: "Chen Realty Group",
@@ -121,6 +131,7 @@ export const DEMO_CARDS: DemoCard[] = [
   },
   {
     slug: "demo-photographer",
+    avatarUrl: elenaImg,
     name: "Elena Vasquez",
     profession: "Photographer",
     company: "Lens & Light Studio",
@@ -150,6 +161,7 @@ export const DEMO_CARDS: DemoCard[] = [
   },
   {
     slug: "demo-landscaper",
+    avatarUrl: alexImg,
     name: "Alex Greenfield",
     profession: "Landscaper",
     company: "Greenfield Landscapes",
