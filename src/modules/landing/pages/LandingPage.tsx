@@ -1,6 +1,6 @@
 import { useState, useRef, useMemo } from "react";
 import { useABTest } from "@/hooks/useABTest";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
   ArrowRight,
@@ -159,17 +159,45 @@ export default function LandingPage() {
 
   const { variant: abVariant, trackClick: abTrackClick, hasTest: hasABTest } = useABTest("hero");
 
-  // Defaults that can be overridden by A/B test variant
-  const heroHeadline = abVariant?.headline || "Get More Local Customers —";
+  // ── Profession-based dynamic headlines ──
+  const [searchParams] = useSearchParams();
+  const professionParam = searchParams.get("profession")?.toLowerCase().trim() || "";
+
+  const professionHeadlines: Record<string, { main: string; accent: string }> = useMemo(() => ({
+    contractor: { main: "Get More Local Jobs —", accent: "Without Chasing Leads" },
+    trades: { main: "Get More Local Jobs —", accent: "Without Chasing Leads" },
+    plumber: { main: "Get More Local Jobs —", accent: "Without Chasing Leads" },
+    electrician: { main: "Get More Local Jobs —", accent: "Without Chasing Leads" },
+    hvac: { main: "Get More Local Jobs —", accent: "Without Chasing Leads" },
+    roofer: { main: "Get More Local Jobs —", accent: "Without Chasing Leads" },
+    painter: { main: "Get More Local Jobs —", accent: "Without Chasing Leads" },
+    landscaper: { main: "Get More Local Jobs —", accent: "Without Chasing Leads" },
+    realtor: { main: "Get More Clients and Book More Showings —", accent: "All From One Smart Card" },
+    "real estate": { main: "Get More Clients and Book More Showings —", accent: "All From One Smart Card" },
+    barber: { main: "Fill Your Schedule —", accent: "Get More Repeat Clients" },
+    salon: { main: "Fill Your Schedule —", accent: "Get More Repeat Clients" },
+    hairstylist: { main: "Fill Your Schedule —", accent: "Get More Repeat Clients" },
+    photographer: { main: "Book More Shoots —", accent: "All From One Simple Card" },
+    cleaner: { main: "Get More Cleaning Jobs —", accent: "Without Cold Calling" },
+    trainer: { main: "Fill Your Client Roster —", accent: "Without Chasing Leads" },
+    "personal trainer": { main: "Fill Your Client Roster —", accent: "Without Chasing Leads" },
+  }), []);
+
+  const defaultHeadline = { main: "Get More Local Customers —", accent: "All From One Simple Business Card" };
+
+  // Priority: A/B test > profession param > default
   const heroHeadlineAccent = useMemo(() => {
     if (abVariant?.headline) {
-      // If variant has headline, split on " — " for accent portion
       const parts = abVariant.headline.split(" — ");
       return parts.length > 1 ? { main: parts[0] + " —", accent: parts[1] } : { main: abVariant.headline, accent: "" };
     }
-    return { main: "Get More Local Customers —", accent: "All From One Simple Business Card" };
-  }, [abVariant]);
-  const heroSubheadline = abVariant?.subheadline || "Create a premium digital business card that captures leads, books jobs, and manages your customers — all in one place.";
+    if (professionParam && professionHeadlines[professionParam]) {
+      return professionHeadlines[professionParam];
+    }
+    return defaultHeadline;
+  }, [abVariant, professionParam, professionHeadlines]);
+
+  const heroSubheadline = abVariant?.subheadline || "Create a premium business card that captures leads, books jobs, and manages your customers — all in one place.";
   const heroCta = abVariant?.cta_text || "Start Free";
 
   return (
