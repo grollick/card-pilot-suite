@@ -216,16 +216,16 @@ export default function LandingPage() {
                   <Zap className="h-3 w-3" /> The all-in-one platform for service professionals
                 </motion.div>
                 <motion.h1 initial="hidden" animate="visible" variants={fade} custom={1} className="text-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] mb-6">
-                  Turn your business card into a{" "}
+                  Get More Local Customers —{" "}
                   <motion.span
                     className="gradient-text inline-block origin-center"
                     initial={{ scale: 1.15, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
-                  >customer-generating machine</motion.span>
+                  >All From One Simple Business Card</motion.span>
                 </motion.h1>
                 <motion.p initial="hidden" animate="visible" variants={fade} custom={2} className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8">
-                  Capture leads, send estimates, get paid, and grow your business — all from one platform built for trades.
+                  Create a premium digital business card that captures leads, books jobs, and manages your customers — all in one place.
                 </motion.p>
                 <motion.div initial="hidden" animate="visible" variants={fade} custom={3} className="flex flex-col sm:flex-row items-center lg:items-start gap-3">
                   <Link to="/onboarding">
