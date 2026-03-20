@@ -1,3 +1,4 @@
+import CardTemplateChooser from "@/modules/card/components/CardTemplateChooser";
 import {
   Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate,
   Sparkles, Loader2, MousePointerClick, Crown, Plus, Eye, Smartphone,
@@ -70,6 +71,7 @@ export default function CardBuilder() {
   const isPro = planKey !== "starter";
   const isMobile = useIsMobile();
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [showTemplateChooser, setShowTemplateChooser] = useState(false);
   const [photoImportOpen, setPhotoImportOpen] = useState(false);
   const [rightTab, setRightTab] = useState("content");
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
@@ -223,6 +225,9 @@ export default function CardBuilder() {
     },
   };
 
+  // Show template chooser for new cards (no existing card data)
+  const isNewCard = !s.cardLoading && !s.card;
+
   if (s.cardLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -231,6 +236,21 @@ export default function CardBuilder() {
           <span className="text-sm text-muted-foreground">Loading card…</span>
         </div>
       </div>
+    );
+  }
+
+  if (isNewCard) {
+    return (
+      <CardTemplateChooser
+        onSelect={(templateId) => {
+          handleApplyTemplate(templateId);
+        }}
+        onSkip={() => {
+          // Trigger card creation with defaults by saving
+          s.saveSections(s.sections, true);
+        }}
+        professionName={s.professionName}
+      />
     );
   }
 
