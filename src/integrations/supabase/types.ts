@@ -3237,6 +3237,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          abuse_flags: string[] | null
           available_for_work: boolean
           avatar_url: string | null
           avg_response_minutes: number | null
@@ -3255,6 +3256,7 @@ export type Database = {
           followup_subject: string | null
           handle: string | null
           id: string
+          is_suspended: boolean
           marketplace_enabled: boolean
           name: string | null
           onboarding_completed: boolean
@@ -3266,10 +3268,13 @@ export type Database = {
           referred_by: string | null
           service_area: string | null
           style_pack: string | null
+          suspended_reason: string | null
           tour_completed: boolean
+          trust_level: string
           updated_at: string
         }
         Insert: {
+          abuse_flags?: string[] | null
           available_for_work?: boolean
           avatar_url?: string | null
           avg_response_minutes?: number | null
@@ -3288,6 +3293,7 @@ export type Database = {
           followup_subject?: string | null
           handle?: string | null
           id: string
+          is_suspended?: boolean
           marketplace_enabled?: boolean
           name?: string | null
           onboarding_completed?: boolean
@@ -3299,10 +3305,13 @@ export type Database = {
           referred_by?: string | null
           service_area?: string | null
           style_pack?: string | null
+          suspended_reason?: string | null
           tour_completed?: boolean
+          trust_level?: string
           updated_at?: string
         }
         Update: {
+          abuse_flags?: string[] | null
           available_for_work?: boolean
           avatar_url?: string | null
           avg_response_minutes?: number | null
@@ -3321,6 +3330,7 @@ export type Database = {
           followup_subject?: string | null
           handle?: string | null
           id?: string
+          is_suspended?: boolean
           marketplace_enabled?: boolean
           name?: string | null
           onboarding_completed?: boolean
@@ -3332,7 +3342,9 @@ export type Database = {
           referred_by?: string | null
           service_area?: string | null
           style_pack?: string | null
+          suspended_reason?: string | null
           tour_completed?: boolean
+          trust_level?: string
           updated_at?: string
         }
         Relationships: [
@@ -3929,6 +3941,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      signup_abuse_log: {
+        Row: {
+          blocked: boolean | null
+          created_at: string
+          email: string | null
+          email_domain: string | null
+          fingerprint_hash: string | null
+          flags: string[] | null
+          id: string
+          ip_hash: string
+          risk_level: string
+          user_id: string | null
+        }
+        Insert: {
+          blocked?: boolean | null
+          created_at?: string
+          email?: string | null
+          email_domain?: string | null
+          fingerprint_hash?: string | null
+          flags?: string[] | null
+          id?: string
+          ip_hash: string
+          risk_level?: string
+          user_id?: string | null
+        }
+        Update: {
+          blocked?: boolean | null
+          created_at?: string
+          email?: string | null
+          email_domain?: string | null
+          fingerprint_hash?: string | null
+          flags?: string[] | null
+          id?: string
+          ip_hash?: string
+          risk_level?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       social_accounts: {
         Row: {
