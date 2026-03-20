@@ -131,6 +131,7 @@ export const DEMO_CARDS: DemoCard[] = [
   },
   {
     slug: "demo-photographer",
+    avatarUrl: elenaImg,
     name: "Elena Vasquez",
     profession: "Photographer",
     company: "Lens & Light Studio",
