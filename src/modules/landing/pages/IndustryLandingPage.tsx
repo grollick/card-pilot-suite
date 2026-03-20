@@ -7,6 +7,10 @@ import { ArrowRight, CheckCircle2, Star, ChevronRight } from "lucide-react";
 import { getIndustryPage, getIndustryDemoCard } from "@/modules/landing/data/industryPages";
 import NotFound from "@/modules/shared/pages/NotFound";
 
+function authLink(slug: string) {
+  return `/auth?mode=signup&profession=${slug}`;
+}
+
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
   visible: (i: number) => ({
