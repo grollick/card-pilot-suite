@@ -7,6 +7,12 @@ import marcusImg from "@/assets/demo/marcus-cole.jpg";
 import sarahImg from "@/assets/demo/sarah-chen.jpg";
 import elenaImg from "@/assets/demo/elena-vasquez.jpg";
 import alexImg from "@/assets/demo/alex-greenfield.jpg";
+import projectKitchen from "@/assets/demo/project-kitchen.jpg";
+import projectDeck from "@/assets/demo/project-deck.jpg";
+import projectBarbershop from "@/assets/demo/project-barbershop.jpg";
+import projectOceanview from "@/assets/demo/project-oceanview.jpg";
+import projectWedding from "@/assets/demo/project-wedding.jpg";
+import projectBackyard from "@/assets/demo/project-backyard.jpg";
 
 export interface DemoTestimonial {
   name: string;
@@ -18,6 +24,7 @@ export interface DemoProject {
   title: string;
   description: string;
   services: string;
+  imageUrl?: string;
 }
 
 export interface DemoCard {
