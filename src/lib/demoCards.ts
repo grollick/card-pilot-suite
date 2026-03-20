@@ -203,7 +203,7 @@ export const DEMO_CARDS: DemoCard[] = [
     ],
     projects: [
       { title: "Backyard Oasis Renovation", description: "Complete backyard overhaul: removed old lawn, installed a flagstone patio with fire pit, native drought-resistant plantings, and landscape lighting.", services: "Hardscaping & Patios, Landscape Design", imageUrl: projectBackyard },
-      { title: "Front Yard Curb Appeal", description: "Replaced overgrown shrubs with a modern low-maintenance design. Added a stone walkway, decorative boulders, and drip irrigation system.", services: "Landscape Design, Irrigation Install", imageUrl: projectBackyard },
+      { title: "Front Yard Curb Appeal", description: "Replaced overgrown shrubs with a modern low-maintenance design. Added a stone walkway, decorative boulders, and drip irrigation system.", services: "Landscape Design, Irrigation Install", imageUrl: projectLandscaperFrontyard },
     ],
     promoTitle: "🌿 Spring Cleanup Special",
     promoText: "Get a full spring cleanup + first month of maintenance free when you sign up for a yearly plan.",
