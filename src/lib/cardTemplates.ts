@@ -56,8 +56,8 @@ export const CARD_TEMPLATES: CardTemplate[] = [
   // ── General Templates ──
   {
     id: "modern_professional",
-    name: "Modern Professional",
-    description: "Clean and versatile. Works for any industry with a balanced layout.",
+    name: "Pro Business — Growth Engine",
+    description: "A polished, conversion-optimized card for any industry. Strong CTA placement, trust signals, and a clean layout that turns visitors into clients.",
     category: "general",
     style: "Modern",
     sections: [
@@ -79,16 +79,16 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       showTestimonials: true,
     },
     preview: {
-      tagline: "Professional services you can trust",
-      sampleServices: ["Consultation", "Assessment", "Follow-Up"],
-      sampleReview: "Excellent service and very professional!",
+      tagline: "Trusted by hundreds of local customers",
+      sampleServices: ["Free Consultation", "Custom Solutions", "Priority Support"],
+      sampleReview: "Hands down the most professional service I've experienced. Will absolutely hire again.",
     },
     recommendedFor: ["sales_advising", "legal_finance", "education_services"],
   },
   {
     id: "service_pro",
-    name: "Service Pro",
-    description: "Optimized for service businesses. Quote requests and booking front and center.",
+    name: "Service Pro — Quote Machine",
+    description: "Built for service businesses that close deals fast. Quote calculator, instant booking, and before/after galleries front and center.",
     category: "general",
     style: "Modern",
     sections: [
@@ -113,9 +113,9 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       showTestimonials: true,
     },
     preview: {
-      tagline: "Quality work, fair prices",
-      sampleServices: ["Installation", "Repair", "Maintenance"],
-      sampleReview: "Great work and completed on time. Highly recommend!",
+      tagline: "Quality craftsmanship, transparent pricing",
+      sampleServices: ["Full Installation", "Emergency Repair", "Annual Maintenance Plan"],
+      sampleReview: "Got a detailed quote within minutes. Work was done perfectly and on schedule.",
     },
     recommendedFor: ["home_trade", "automotive_services"],
   },
