@@ -164,8 +164,8 @@ export const DEMO_CARDS: DemoCard[] = [
       { name: "Samantha D.", text: "My headshots look so natural and professional. Elena made me feel completely comfortable and the results exceeded my expectations.", rating: 5 },
     ],
     projects: [
-      { title: "Mountain Wedding at Red Rocks", description: "Golden hour ceremony with 200 guests at Red Rocks Amphitheatre. 600+ edited photos delivered in 3 weeks with a custom leather-bound album.", services: "Wedding Photography" },
-      { title: "Corporate Headshot Day", description: "Shot professional headshots for a 40-person law firm in one day. Consistent lighting and branding across all portraits.", services: "Headshots" },
+      { title: "Mountain Wedding at Red Rocks", description: "Golden hour ceremony with 200 guests at Red Rocks Amphitheatre. 600+ edited photos delivered in 3 weeks with a custom leather-bound album.", services: "Wedding Photography", imageUrl: projectWedding },
+      { title: "Corporate Headshot Day", description: "Shot professional headshots for a 40-person law firm in one day. Consistent lighting and branding across all portraits.", services: "Headshots", imageUrl: projectWedding },
     ],
     promoTitle: "📸 Mini Session Special",
     promoText: "Book a 30-minute mini portrait session for just $199 (normally $350). Limited slots available!",
