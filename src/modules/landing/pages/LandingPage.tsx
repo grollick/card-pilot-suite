@@ -467,8 +467,8 @@ export default function LandingPage() {
                   <div className="p-6 text-center relative overflow-hidden">
                     <div className="absolute inset-0 opacity-30" style={{ background: `radial-gradient(circle at 50% 0%, ${card.accentColor}20, transparent 70%)` }} />
                     <div className="relative">
-                      <div className="h-14 w-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:shadow-glow transition-all duration-300">
-                        <Icon className="h-6 w-6 text-primary" />
+                      <div className="h-14 w-14 mx-auto rounded-full overflow-hidden mb-3 group-hover:scale-110 group-hover:shadow-glow transition-all duration-300 ring-2 ring-primary/20">
+                        <img src={card.avatarUrl} alt={card.name} className="h-full w-full object-cover" />
                       </div>
                       <h3 className="font-bold text-foreground text-sm">{card.name}</h3>
                       <p className="text-xs text-muted-foreground mt-0.5">{card.profession}</p>
