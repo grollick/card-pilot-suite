@@ -316,17 +316,17 @@ export default function CardBuilder() {
         />
       </PanelSection>
 
-      <div className="h-px bg-border/20 my-2" />
-
-      <BuilderSectionLibrary
-        sections={s.sections}
-        setSections={s.setSections}
-        toggleSection={s.toggleSection}
-        setEditingSection={s.setEditingSection}
-        saveSections={s.saveSections}
-        onDuplicate={handleDuplicateSection}
-        onDelete={handleDeleteSection}
-      />
+      <PanelSection title="Sections" icon={Layers}>
+        <BuilderSectionLibrary
+          sections={s.sections}
+          setSections={s.setSections}
+          toggleSection={s.toggleSection}
+          setEditingSection={s.setEditingSection}
+          saveSections={s.saveSections}
+          onDuplicate={handleDuplicateSection}
+          onDelete={handleDeleteSection}
+        />
+      </PanelSection>
 
       <Button
         variant="ghost"

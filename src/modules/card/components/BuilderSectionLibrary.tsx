@@ -162,15 +162,6 @@ export default function BuilderSectionLibrary({
 
   return (
     <div className="space-y-0.5">
-      <div className="flex items-center justify-between px-2.5 py-1.5">
-        <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-          Sections
-        </span>
-        <span className="text-[10px] font-medium text-muted-foreground/40 tabular-nums">
-          {enabledCount} active
-        </span>
-      </div>
-
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-0.5">
