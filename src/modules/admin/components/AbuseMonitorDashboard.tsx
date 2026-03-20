@@ -15,6 +15,7 @@ import { Progress } from "@/components/ui/progress";
 export default function AbuseMonitorDashboard() {
   const [search, setSearch] = useState("");
   const queryClient = useQueryClient();
+  const recalcTrust = useRecalculateTrust();
 
   // Fetch abuse logs
   const { data: abuseLogs, isLoading: logsLoading } = useQuery({
