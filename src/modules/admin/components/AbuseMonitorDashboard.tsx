@@ -6,15 +6,34 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ShieldAlert, Ban, Search, Eye, AlertTriangle, Shield, CheckCircle, Users, RefreshCw } from "lucide-react";
+import { ShieldAlert, Ban, Search, Eye, AlertTriangle, Shield, CheckCircle, Users, RefreshCw, BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useRecalculateTrust } from "@/hooks/useTrustScore";
+import { useRecalculateVerification } from "@/hooks/useVerification";
+import VerificationBadge from "@/components/trust/VerificationBadge";
+import type { VerificationLevel } from "@/components/trust/VerificationBadge";
 
 export default function AbuseMonitorDashboard() {
   const [search, setSearch] = useState("");
   const queryClient = useQueryClient();
   const recalcTrust = useRecalculateTrust();
+  const recalcVerification = useRecalculateVerification();
+
+  // Set verification level manually
+  const setVerification = useMutation({
+    mutationFn: async ({ userId, level }: { userId: string; level: string }) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ verification_level: level as any })
+        .eq("id", userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Verification level updated");
+      queryClient.invalidateQueries({ queryKey: ["flagged-profiles"] });
+    },
+  });
 
   // Fetch abuse logs
   const { data: abuseLogs, isLoading: logsLoading } = useQuery({
@@ -36,7 +55,7 @@ export default function AbuseMonitorDashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, name, email, trust_level, trust_score, trust_signals, abuse_flags, is_suspended, suspended_reason, created_at")
+        .select("id, name, email, trust_level, trust_score, trust_signals, abuse_flags, is_suspended, suspended_reason, verification_level, created_at")
         .or("is_suspended.eq.true,trust_level.eq.new,abuse_flags.cs.{disposable_email}")
         .order("created_at", { ascending: false })
         .limit(100);
@@ -234,6 +253,7 @@ export default function AbuseMonitorDashboard() {
                     <TableHead className="text-xs">Email</TableHead>
                     <TableHead className="text-xs">Trust Score</TableHead>
                     <TableHead className="text-xs">Level</TableHead>
+                    <TableHead className="text-xs">Verification</TableHead>
                     <TableHead className="text-xs">Flags</TableHead>
                     <TableHead className="text-xs">Actions</TableHead>
                   </TableRow>
@@ -256,6 +276,33 @@ export default function AbuseMonitorDashboard() {
                         </TableCell>
                         <TableCell>{p.is_suspended ? trustBadge("suspended") : trustBadge(p.trust_level)}</TableCell>
                         <TableCell>
+                          <div className="flex items-center gap-1">
+                            <VerificationBadge level={((p as any).verification_level ?? "basic") as VerificationLevel} size="xs" />
+                            {!p.is_suspended && (
+                              <div className="flex gap-0.5 ml-1">
+                                {(p as any).verification_level !== "verified" && (
+                                  <Button size="sm" variant="ghost" className="h-5 px-1 text-[9px]"
+                                    onClick={() => setVerification.mutate({ userId: p.id, level: "verified" })}>
+                                    Verify
+                                  </Button>
+                                )}
+                                {(p as any).verification_level !== "pro_verified" && (
+                                  <Button size="sm" variant="ghost" className="h-5 px-1 text-[9px]"
+                                    onClick={() => setVerification.mutate({ userId: p.id, level: "pro_verified" })}>
+                                    Pro
+                                  </Button>
+                                )}
+                                {(p as any).verification_level !== "basic" && (
+                                  <Button size="sm" variant="ghost" className="h-5 px-1 text-[9px] text-destructive"
+                                    onClick={() => setVerification.mutate({ userId: p.id, level: "basic" })}>
+                                    Remove
+                                  </Button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
                           <div className="flex gap-1 flex-wrap">
                             {(p.abuse_flags as string[] || []).map(f => (
                               <Badge key={f} variant="outline" className="text-[9px]">{f}</Badge>
@@ -265,8 +312,8 @@ export default function AbuseMonitorDashboard() {
                         <TableCell>
                           <div className="flex gap-1">
                             <Button size="sm" variant="ghost" className="h-6 w-6 p-0"
-                              title="Recalculate trust score"
-                              onClick={() => recalcTrust.mutate(p.id)}>
+                              title="Recalculate trust + verification"
+                              onClick={() => { recalcTrust.mutate(p.id); recalcVerification.mutate(p.id); }}>
                               <RefreshCw className="h-3 w-3" />
                             </Button>
                             {p.is_suspended ? (

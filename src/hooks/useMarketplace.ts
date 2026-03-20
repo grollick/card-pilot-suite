@@ -22,6 +22,7 @@ export interface MarketplaceListing {
   profile_completeness: number;
   conversion_score: number;
   is_on_duty: boolean;
+  verification_level: string;
 }
 
 interface MarketplaceFilters {
@@ -51,7 +52,7 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
     queryFn: async (): Promise<MarketplaceListing[]> => {
       const query = supabase
         .from("profiles")
-        .select("id, name, handle, avatar_url, company, city, bio, service_area, featured, featured_until, marketplace_enabled, updated_at, available_for_work, avg_response_minutes, professions(name, category)" as any)
+        .select("id, name, handle, avatar_url, company, city, bio, service_area, featured, featured_until, marketplace_enabled, updated_at, available_for_work, avg_response_minutes, verification_level, professions(name, category)" as any)
         .not("handle", "is", null)
         .not("name", "is", null)
         .order("name");
@@ -177,6 +178,7 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
           profile_completeness: completeness,
           conversion_score: conversionScore,
           is_on_duty: isOnDuty,
+          verification_level: p.verification_level ?? "basic",
         };
       });
 

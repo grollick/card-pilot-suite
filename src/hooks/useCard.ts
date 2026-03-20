@@ -157,7 +157,7 @@ export function usePublicCard(handle: string | undefined) {
       // Step 1: Get profile (required for user_id)
       const { data: profile, error: pErr } = await supabase
         .from("profiles")
-        .select("id, name, handle, email, phone, company, avatar_url, primary_cta, style_pack, profession_id, professions(name, category)")
+        .select("id, name, handle, email, phone, company, avatar_url, primary_cta, style_pack, profession_id, verification_level, professions(name, category)")
         .eq("handle", handle!)
         .single();
       if (pErr) throw pErr;

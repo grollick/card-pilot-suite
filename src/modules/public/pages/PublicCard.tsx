@@ -28,6 +28,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { Link, useParams } from "react-router-dom";
+import VerificationBadge from "@/components/trust/VerificationBadge";
 import { usePublicCard, CTA_TYPES, type CardSection } from "@/hooks/useCard";
 import { usePublicReviews } from "@/hooks/useReviews";
 import { usePublicProjects } from "@/hooks/useProjects";
@@ -693,6 +694,13 @@ export default function PublicCard() {
             </div>
           );
         })()}
+
+        {/* Verification badge */}
+        {profile.verification_level && profile.verification_level !== "basic" && (
+          <div style={{ display: "flex", justifyContent: "center", padding: `${spacing.section / 2}px ${spacing.section}px 0` }}>
+            <VerificationBadge level={profile.verification_level as any} size="sm" />
+          </div>
+        )}
 
         <div style={{ padding: `${spacing.section}px`, display: "flex", flexDirection: "column", gap: spacing.section, position: "relative", zIndex: 2 }}>
           {/* ── CTA Buttons (skip if already rendered inside immersive hero) ── */}

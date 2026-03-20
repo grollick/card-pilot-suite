@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import VerificationBadge from "@/components/trust/VerificationBadge";
 import {
   MapPin, Calendar, ArrowRight, Star, Crown, MessageSquare,
   Rocket, Phone, DollarSign, Clock, ShieldCheck, CheckCircle2, Zap, Radio,
@@ -73,7 +74,7 @@ export default function ListingCard({ listing, boosted, variant = "default" }: L
     .slice(0, 2)
     .toUpperCase();
 
-  const isVerified = listing.profile_completeness >= 70 && listing.review_count >= 1;
+  const isVerified = listing.verification_level === "verified" || listing.verification_level === "pro_verified";
   const isHero = variant === "hero";
 
   return (
@@ -111,7 +112,7 @@ export default function ListingCard({ listing, boosted, variant = "default" }: L
               <div className="flex items-center gap-1.5">
                 <h3 className={`font-semibold text-foreground truncate ${isHero ? "text-lg" : ""}`}>{listing.name}</h3>
                 {isVerified && (
-                  <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
+                  <VerificationBadge level={listing.verification_level as any} size="xs" showLabel={false} />
                 )}
               </div>
               {listing.company && (

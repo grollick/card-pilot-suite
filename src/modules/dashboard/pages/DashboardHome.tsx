@@ -29,6 +29,7 @@ import ChurnRecoveryBanner from "@/modules/dashboard/components/ChurnRecoveryBan
 import MilestoneCelebrationListener from "@/modules/dashboard/components/MilestoneCelebrationListener";
 import ReferralActivationChecker from "@/modules/dashboard/components/ReferralActivationChecker";
 import ReferralWidget from "@/modules/dashboard/components/ReferralWidget";
+import VerificationChecklist from "@/modules/dashboard/components/VerificationChecklist";
 import MarketplaceAwarenessWidget from "@/modules/dashboard/components/MarketplaceAwarenessWidget";
 import { useLeadGuarantee } from "@/hooks/useLeadGuarantee";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -94,7 +95,10 @@ export default function DashboardHome() {
 
       {/* ── Activation System ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ActivationChecklist />
+        <div className="space-y-6">
+          <VerificationChecklist />
+          <ActivationChecklist />
+        </div>
         <div className="space-y-6">
           <ShareMessageCard />
           <ShareCardWidget />
