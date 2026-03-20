@@ -12,6 +12,40 @@ serve(async (req) => {
   }
 
   try {
+    // ── Authentication: require JWT or service-role key ──
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+
+    let callerUserId: string | null = null;
+    let isServiceRole = false;
+
+    if (token === serviceRoleKey) {
+      // Service-role caller (trusted server-to-server)
+      isServiceRole = true;
+    } else {
+      // Validate JWT via Supabase auth
+      const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: claimsData, error: claimsError } = await anonClient.auth.getClaims(token);
+      if (claimsError || !claimsData?.claims) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      callerUserId = claimsData.claims.sub as string;
+    }
+
     const body = await req.json();
     const { type, user_id, data } = body;
 
@@ -22,10 +56,15 @@ serve(async (req) => {
       });
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    // ── Authorization: caller must own the user_id or be service-role ──
+    if (!isServiceRole && callerUserId !== user_id) {
+      return new Response(JSON.stringify({ error: "Forbidden: user_id mismatch" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey);
 
     let result: any = null;
 
@@ -55,11 +94,11 @@ serve(async (req) => {
         result = lead;
 
         // Trigger automation
-        await fetch(`${Deno.env.get("SUPABASE_URL")}/functions/v1/run-automations`, {
+        await fetch(`${supabaseUrl}/functions/v1/run-automations`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")}`,
+            Authorization: `Bearer ${serviceRoleKey}`,
           },
           body: JSON.stringify({
             userId: user_id,
