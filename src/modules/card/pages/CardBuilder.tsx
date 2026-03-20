@@ -574,48 +574,62 @@ export default function CardBuilder() {
         <ResizablePanelGroup direction="horizontal" className="h-full">
           {/* Left Panel — Section Library */}
           <ResizablePanel defaultSize={17} minSize={14} maxSize={22}>
-            <div className="h-full flex flex-col bg-background border-r border-border/30">
-              <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border/30 shrink-0">
-                <Layers className="h-3.5 w-3.5 text-primary/70" />
-                <span className="text-[11px] font-semibold tracking-wide text-foreground/80">Components</span>
+            <div className="h-full flex flex-col bg-background">
+              <div className="flex items-center gap-2.5 px-4 py-3 border-b border-border/20 shrink-0">
+                <div className="h-6 w-6 rounded-lg bg-primary/8 flex items-center justify-center">
+                  <Layers className="h-3 w-3 text-primary" />
+                </div>
+                <span className="text-[12px] font-semibold text-foreground">Components</span>
               </div>
               <div className="flex-1 overflow-y-auto scrollbar-thin">
-                <div className="p-2">
+                <div className="p-3">
                   {leftPanel}
                 </div>
               </div>
             </div>
           </ResizablePanel>
 
-          <ResizableHandle className="w-px bg-border/20 hover:bg-primary/20 transition-colors data-[resize-handle-active]:bg-primary/40" />
+          <ResizableHandle className="w-px bg-border/15 hover:bg-primary/20 transition-colors data-[resize-handle-active]:bg-primary/40" />
 
           {/* Center Panel — Preview Canvas */}
           <ResizablePanel defaultSize={50} minSize={34}>
-            <div className="h-full flex flex-col bg-muted/30" style={{
-              backgroundImage: "radial-gradient(circle, hsl(var(--border) / 0.08) 1px, transparent 1px)",
-              backgroundSize: "24px 24px",
+            <div className="h-full flex flex-col bg-muted/15" style={{
+              backgroundImage: "radial-gradient(circle, hsl(var(--border) / 0.05) 1px, transparent 1px)",
+              backgroundSize: "20px 20px",
             }}>
               <div className="flex-1 overflow-y-auto">
-                <div className="p-8 flex items-start justify-center min-h-full">
-                  <div className="w-full max-w-md">
-                    <CardBuilderPreview {...previewProps} previewDevice={previewDevice} hideToolbar />
-                  </div>
+                <div className="p-10 flex items-start justify-center min-h-full">
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                    className="w-full max-w-md"
+                  >
+                    {/* Device frame */}
+                    <div className="rounded-[2rem] bg-foreground/5 p-2 shadow-lg shadow-black/[0.03]">
+                      <div className="rounded-[1.5rem] overflow-hidden bg-background shadow-sm ring-1 ring-border/10">
+                        <CardBuilderPreview {...previewProps} previewDevice={previewDevice} hideToolbar />
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
               </div>
             </div>
           </ResizablePanel>
 
-          <ResizableHandle className="w-px bg-border/20 hover:bg-primary/20 transition-colors data-[resize-handle-active]:bg-primary/40" />
+          <ResizableHandle className="w-px bg-border/15 hover:bg-primary/20 transition-colors data-[resize-handle-active]:bg-primary/40" />
 
           {/* Right Panel — Design Controls */}
           <ResizablePanel defaultSize={33} minSize={24} maxSize={42}>
-            <div className="h-full flex flex-col bg-background border-l border-border/30">
-              <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border/30 shrink-0">
-                <Settings2 className="h-3.5 w-3.5 text-primary/70" />
-                <span className="text-[11px] font-semibold tracking-wide text-foreground/80">Inspector</span>
+            <div className="h-full flex flex-col bg-background">
+              <div className="flex items-center gap-2.5 px-4 py-3 border-b border-border/20 shrink-0">
+                <div className="h-6 w-6 rounded-lg bg-primary/8 flex items-center justify-center">
+                  <Settings2 className="h-3 w-3 text-primary" />
+                </div>
+                <span className="text-[12px] font-semibold text-foreground">Design</span>
               </div>
               <div className="flex-1 overflow-y-auto scrollbar-thin">
-                <div className="p-3">
+                <div className="p-4">
                   {rightPanel}
                 </div>
               </div>
