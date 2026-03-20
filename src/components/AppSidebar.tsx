@@ -137,19 +137,21 @@ export function AppSidebar() {
 
   const renderItem = (item: NavItem) => (
     <SidebarMenuItem key={item.title}>
-      <SidebarMenuButton asChild>
-        <NavLink
-          to={item.url}
-          end={item.end}
-          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-all hover:bg-muted/60 ${
-            isActive(item.url, item.end) ? "bg-primary/8 text-primary font-medium" : "text-sidebar-foreground"
-          }`}
-          activeClassName="bg-primary/8 text-primary font-medium"
-        >
-          <item.icon className="h-[18px] w-[18px] shrink-0" />
-          {!collapsed && <span>{item.title}</span>}
-        </NavLink>
-      </SidebarMenuButton>
+      <Tip label={item.title} side="right" delayDuration={collapsed ? 100 : 600}>
+        <SidebarMenuButton asChild>
+          <NavLink
+            to={item.url}
+            end={item.end}
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-all hover:bg-muted/60 ${
+              isActive(item.url, item.end) ? "bg-primary/8 text-primary font-medium" : "text-sidebar-foreground"
+            }`}
+            activeClassName="bg-primary/8 text-primary font-medium"
+          >
+            <item.icon className="h-[18px] w-[18px] shrink-0" />
+            {!collapsed && <span>{item.title}</span>}
+          </NavLink>
+        </SidebarMenuButton>
+      </Tip>
     </SidebarMenuItem>
   );
 
