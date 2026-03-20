@@ -37,7 +37,7 @@ export default function AbuseMonitorDashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, name, email, trust_level, abuse_flags, is_suspended, suspended_reason, created_at")
+        .select("id, name, email, trust_level, trust_score, trust_signals, abuse_flags, is_suspended, suspended_reason, created_at")
         .or("is_suspended.eq.true,trust_level.eq.new,abuse_flags.cs.{disposable_email}")
         .order("created_at", { ascending: false })
         .limit(100);
