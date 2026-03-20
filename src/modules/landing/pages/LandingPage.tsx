@@ -460,51 +460,74 @@ export default function LandingPage() {
             <p className="text-muted-foreground max-w-lg mx-auto text-lg">See how professionals in different industries use guzzl.pro to grow their business.</p>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
-            {DEMO_CARDS.map((card) => {
-              const Icon = PROFESSION_ICONS[card.profession] ?? Wrench;
-              return (
-                <motion.div key={card.slug} variants={scaleIn} className="landing-card rounded-2xl overflow-hidden group">
-                  <div className="p-6 text-center relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-30" style={{ background: `radial-gradient(circle at 50% 0%, ${card.accentColor}20, transparent 70%)` }} />
-                    <div className="relative">
-                      <div className="h-14 w-14 mx-auto rounded-full overflow-hidden mb-3 group-hover:scale-110 group-hover:shadow-glow transition-all duration-300 ring-2 ring-primary/20">
-                        <img src={card.avatarUrl} alt={card.name} className="h-full w-full object-cover" />
-                      </div>
-                      <h3 className="font-bold text-foreground text-sm">{card.name}</h3>
-                      <p className="text-xs text-muted-foreground mt-0.5">{card.profession}</p>
-                      <p className="text-2xs text-muted-foreground mt-1">{card.city}</p>
-                    </div>
-                  </div>
-                  <div className="p-4 space-y-1.5">
-                    {card.services.slice(0, 3).map((s) => (
-                      <div key={s.name} className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5 text-foreground">
-                          <CheckCircle2 className="h-3 w-3 text-success shrink-0" />
-                          <span className="truncate">{s.name}</span>
+            {DEMO_CARDS.map((card) => (
+              <motion.div key={card.slug} variants={scaleIn}>
+                <Link to={`/demo/${card.slug}`} className="block group">
+                  <div className="landing-card rounded-2xl overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+                    {/* Cover image */}
+                    <div className="relative h-28 overflow-hidden">
+                      <img
+                        src={card.coverUrl}
+                        alt={card.company}
+                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                      {/* Avatar overlapping cover bottom */}
+                      <div className="absolute -bottom-5 left-4">
+                        <div className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-card shadow-md">
+                          <img src={card.avatarUrl} alt={card.name} className="h-full w-full object-cover" />
                         </div>
-                        <span className="text-muted-foreground shrink-0 ml-2">{s.price}</span>
                       </div>
-                    ))}
-                    {card.services.length > 3 && (
-                      <p className="text-2xs text-muted-foreground">+{card.services.length - 3} more services</p>
-                    )}
-                    <div className="flex gap-0.5 pt-1">
-                      {Array.from({ length: 5 }).map((_, j) => (
-                        <Star key={j} className="h-3 w-3 fill-warning text-warning" />
-                      ))}
-                      <span className="text-2xs text-muted-foreground ml-1">({card.testimonials.length})</span>
+                      {/* Profession badge */}
+                      <div className="absolute top-2.5 right-2.5">
+                        <span className="px-2 py-0.5 rounded-full text-2xs font-semibold bg-black/40 text-white backdrop-blur-sm">
+                          {card.profession}
+                        </span>
+                      </div>
                     </div>
-                    <div className="pt-2">
-                      <Link to={`/demo/${card.slug}`}>
-                        <Button variant="outline" size="sm" className="w-full text-xs group/btn">
-                          View Card <ArrowUpRight className="h-3 w-3 ml-1 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
-                        </Button>
-                      </Link>
+
+                    {/* Card body */}
+                    <div className="pt-7 px-4 pb-4 space-y-2.5">
+                      <div>
+                        <h3 className="font-bold text-foreground text-sm leading-tight">{card.name}</h3>
+                        <p className="text-2xs text-muted-foreground mt-0.5">{card.company} · {card.city}</p>
+                      </div>
+
+                      {/* Services */}
+                      <div className="space-y-1">
+                        {card.services.slice(0, 3).map((s) => (
+                          <div key={s.name} className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-1.5 text-foreground">
+                              <CheckCircle2 className="h-3 w-3 text-success shrink-0" />
+                              <span className="truncate">{s.name}</span>
+                            </div>
+                            <span className="text-muted-foreground shrink-0 ml-2 font-medium">{s.price}</span>
+                          </div>
+                        ))}
+                        {card.services.length > 3 && (
+                          <p className="text-2xs text-muted-foreground">+{card.services.length - 3} more</p>
+                        )}
+                      </div>
+
+                      {/* Rating */}
+                      <div className="flex items-center gap-0.5 pt-0.5">
+                        {Array.from({ length: 5 }).map((_, j) => (
+                          <Star key={j} className="h-3 w-3 fill-warning text-warning" />
+                        ))}
+                        <span className="text-2xs text-muted-foreground ml-1">5.0 ({card.testimonials.length})</span>
+                      </div>
+
+                      {/* CTA */}
+                      <div className="pt-1">
+                        <span className="flex items-center justify-center w-full py-2 rounded-lg bg-primary/10 text-primary text-xs font-semibold group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                          View Card <ArrowUpRight className="h-3 w-3 ml-1" />
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </motion.div>
-              );
-            })}
+                </Link>
+              </motion.div>
+            ))}
           </motion.div>
         </div>
       </section>
