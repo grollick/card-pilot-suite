@@ -378,12 +378,12 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">How it works</p>
-            <h2 className="text-display text-3xl md:text-4xl lg:text-5xl">Four steps to more customers</h2>
+            <h2 className="text-display text-3xl md:text-4xl lg:text-5xl">Three steps to more customers</h2>
           </motion.div>
           <div className="relative">
             {/* Connecting line */}
-            <div className="hidden lg:block absolute top-[52px] left-[12%] right-[12%] h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="hidden lg:block absolute top-[52px] left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-3 gap-8">
               {steps.map((s) => (
                 <motion.div key={s.title} variants={scaleIn} className="text-center">
                   <div className="relative mx-auto mb-5">
