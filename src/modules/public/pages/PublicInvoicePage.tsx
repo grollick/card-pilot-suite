@@ -433,7 +433,11 @@ export default function PublicInvoicePage() {
         )}
 
         {/* Footer */}
-        <div className="text-center py-6">
+        <div className="text-center py-6 space-y-1.5">
+          <p className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground/70">
+            <span className="inline-block h-3 w-3">🔒</span>
+            Secure and encrypted transactions
+          </p>
           <p className="text-xs text-muted-foreground">
             Powered by guzzl.pro
           </p>
