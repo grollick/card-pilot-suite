@@ -239,20 +239,19 @@ export default function CardBuilder() {
     );
   }
 
-  if ((isNewCard && !showTemplateChooser) || showTemplateChooser) {
-    // Show chooser for new cards automatically, or when explicitly opened
-    if (isNewCard || showTemplateChooser) {
-      return (
-        <CardTemplateChooser
-          onSelect={(templateId) => {
-            handleApplyTemplate(templateId);
-            setShowTemplateChooser(false);
-          }}
-          onSkip={() => setShowTemplateChooser(false)}
-          professionName={s.professionName}
-        />
-      );
-    }
+  if (isNewCard) {
+    return (
+      <CardTemplateChooser
+        onSelect={(templateId) => {
+          handleApplyTemplate(templateId);
+        }}
+        onSkip={() => {
+          // Trigger card creation with defaults by saving
+          s.saveSections(s.sections, true);
+        }}
+        professionName={s.professionName}
+      />
+    );
   }
 
   // ── Shared preview props ──
