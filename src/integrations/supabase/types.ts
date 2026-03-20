@@ -4692,6 +4692,7 @@ export type Database = {
         | "referral"
         | "other"
         | "business_card"
+        | "marketplace"
       org_role: "owner" | "admin" | "member"
       priority_level: "critical" | "high" | "medium" | "low"
       recurring_billing_cycle: "per_visit" | "monthly" | "custom"
@@ -4922,6 +4923,7 @@ export const Constants = {
         "referral",
         "other",
         "business_card",
+        "marketplace",
       ],
       org_role: ["owner", "admin", "member"],
       priority_level: ["critical", "high", "medium", "low"],
