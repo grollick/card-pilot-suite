@@ -453,7 +453,7 @@ export default function LandingPage() {
             <h2 className="text-display text-3xl md:text-4xl lg:text-5xl mb-4">Cards for every profession</h2>
             <p className="text-muted-foreground max-w-lg mx-auto text-lg">See how professionals in different industries use guzzl.pro to grow their business.</p>
           </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
             {DEMO_CARDS.map((card) => (
               <motion.div key={card.slug} variants={scaleIn}>
                 <Link to={`/demo/${card.slug}`} className="block group">
