@@ -69,7 +69,7 @@ export const DEMO_CARDS: DemoCard[] = [
     tagline: "Quality builds. On time. On budget.",
     phone: "(555) 234-5678",
     email: "mike@reynoldsconstruction.com",
-    city: "Austin, TX",
+    city: "Toronto, ON",
     bio: "Licensed general contractor with 15 years of experience in residential remodeling, custom builds, and commercial renovations. Fully insured and bonded.",
     services: [
       { name: "Kitchen Remodel", price: "$15,000+", duration: "3–6 weeks" },
