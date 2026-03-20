@@ -76,7 +76,7 @@ export default function CardBuilderSections({
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">Icons</span>
-            <Switch checked={showSectionIcons} onCheckedChange={(val) => { setShowSectionIcons(val); saveThemeField({ section_icons: val }); }} />
+          <Switch checked={showSectionIcons} onCheckedChange={(val) => { setShowSectionIcons(val); saveThemeField({ section_icons: val }); }} className="scale-[0.7]" />
           </div>
         </div>
       )}
