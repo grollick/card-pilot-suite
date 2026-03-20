@@ -14,6 +14,137 @@ export type Database = {
   }
   public: {
     Tables: {
+      ab_test_events: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          session_id: string | null
+          test_id: string
+          variant_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          session_id?: string | null
+          test_id: string
+          variant_id: string
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          session_id?: string | null
+          test_id?: string
+          variant_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ab_test_events_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "ab_tests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ab_test_events_variant_id_fkey"
+            columns: ["variant_id"]
+            isOneToOne: false
+            referencedRelation: "ab_test_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ab_test_variants: {
+        Row: {
+          clicks: number
+          created_at: string
+          cta_text: string | null
+          headline: string | null
+          hero_visual_url: string | null
+          id: string
+          signups: number
+          subheadline: string | null
+          test_id: string
+          variant_key: string
+          views: number
+          weight: number
+        }
+        Insert: {
+          clicks?: number
+          created_at?: string
+          cta_text?: string | null
+          headline?: string | null
+          hero_visual_url?: string | null
+          id?: string
+          signups?: number
+          subheadline?: string | null
+          test_id: string
+          variant_key: string
+          views?: number
+          weight?: number
+        }
+        Update: {
+          clicks?: number
+          created_at?: string
+          cta_text?: string | null
+          headline?: string | null
+          hero_visual_url?: string | null
+          id?: string
+          signups?: number
+          subheadline?: string | null
+          test_id?: string
+          variant_key?: string
+          views?: number
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ab_test_variants_test_id_fkey"
+            columns: ["test_id"]
+            isOneToOne: false
+            referencedRelation: "ab_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ab_tests: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          page: string
+          section: string
+          status: string
+          updated_at: string
+          winner_variant_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          page?: string
+          section?: string
+          status?: string
+          updated_at?: string
+          winner_variant_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          page?: string
+          section?: string
+          status?: string
+          updated_at?: string
+          winner_variant_id?: string | null
+        }
+        Relationships: []
+      }
       ai_credit_purchases: {
         Row: {
           amount_paid: number
@@ -4466,6 +4597,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_ab_variant_counter: {
+        Args: { p_counter: string; p_variant_id: string }
+        Returns: undefined
       }
       increment_boost_views: { Args: { p_user_id: string }; Returns: undefined }
       is_org_admin: {
