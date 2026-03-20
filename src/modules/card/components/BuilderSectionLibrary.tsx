@@ -4,6 +4,8 @@ import {
   GripVertical, Pencil, Copy, Trash2, Eye, EyeOff,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import Tip from "@/components/Tip";
 import {
   DndContext, closestCenter, KeyboardSensor, PointerSensor,
   useSensor, useSensors, type DragEndEvent,
