@@ -84,7 +84,7 @@ export function useLeadAssignments() {
         .order("created_at", { ascending: false })
         .limit(200);
       if (error) throw error;
-      return (data || []) as LeadAssignment[];
+      return (data || []) as unknown as LeadAssignment[];
     },
   });
 }
