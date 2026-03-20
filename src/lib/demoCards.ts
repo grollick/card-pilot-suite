@@ -19,7 +19,10 @@ import projectWedding from "@/assets/demo/project-wedding.jpg";
 import projectPhotographerHeadshots from "@/assets/demo/project-photographer-headshots.jpg";
 import coverLandscaper from "@/assets/demo/cover-landscaper.jpg";
 import projectBackyard from "@/assets/demo/project-backyard.jpg";
-import projectLandscaperFrontyard from "@/assets/demo/project-landscaper-frontyard.jpg";
+import jessicaImg from "@/assets/demo/jessica-martinez.jpg";
+import coverTrainer from "@/assets/demo/cover-trainer.jpg";
+import projectTrainerGroup from "@/assets/demo/project-trainer-group.jpg";
+import projectTrainerNutrition from "@/assets/demo/project-trainer-nutrition.jpg";
 
 export interface DemoTestimonial {
   name: string;
