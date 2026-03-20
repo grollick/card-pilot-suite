@@ -353,14 +353,14 @@ export default function CardBuilder() {
   // ════════════════════════════════════════════════
   const rightPanel = (
     <Tabs value={rightTab} onValueChange={setRightTab} className="w-full">
-      <TabsList className="w-full grid grid-cols-3 h-9 mb-3 bg-muted/40 rounded-lg p-0.5">
-        <TabsTrigger value="content" className="text-[11px] gap-1.5 h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+      <TabsList className="w-full grid grid-cols-3 h-10 mb-4 bg-muted/25 rounded-xl p-0.5 border border-border/20">
+        <TabsTrigger value="content" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200">
           <Pencil className="h-3 w-3" /> Content
         </TabsTrigger>
-        <TabsTrigger value="style" className="text-[11px] gap-1.5 h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+        <TabsTrigger value="style" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200">
           <PaintBucket className="h-3 w-3" /> Style
         </TabsTrigger>
-        <TabsTrigger value="layout" className="text-[11px] gap-1.5 h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+        <TabsTrigger value="layout" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200">
           <LayoutGrid className="h-3 w-3" /> Layout
         </TabsTrigger>
       </TabsList>
