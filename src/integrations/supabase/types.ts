@@ -2554,7 +2554,10 @@ export type Database = {
           match_by_location: boolean
           match_by_services: boolean
           org_id: string | null
+          recovery_enabled: boolean
+          recovery_mode: string
           round_robin_index: number
+          timeout_minutes: number
           updated_at: string
           user_id: string
         }
@@ -2567,7 +2570,10 @@ export type Database = {
           match_by_location?: boolean
           match_by_services?: boolean
           org_id?: string | null
+          recovery_enabled?: boolean
+          recovery_mode?: string
           round_robin_index?: number
+          timeout_minutes?: number
           updated_at?: string
           user_id: string
         }
@@ -2580,7 +2586,10 @@ export type Database = {
           match_by_location?: boolean
           match_by_services?: boolean
           org_id?: string | null
+          recovery_enabled?: boolean
+          recovery_mode?: string
           round_robin_index?: number
+          timeout_minutes?: number
           updated_at?: string
           user_id?: string
         }
@@ -2602,8 +2611,13 @@ export type Database = {
           created_at: string
           id: string
           lead_id: string
+          missed_at: string | null
           org_id: string | null
+          reassigned_from: string | null
+          recovery_status: string
+          responded_at: string | null
           status: string
+          timeout_minutes: number
         }
         Insert: {
           assigned_by?: string | null
@@ -2612,8 +2626,13 @@ export type Database = {
           created_at?: string
           id?: string
           lead_id: string
+          missed_at?: string | null
           org_id?: string | null
+          reassigned_from?: string | null
+          recovery_status?: string
+          responded_at?: string | null
           status?: string
+          timeout_minutes?: number
         }
         Update: {
           assigned_by?: string | null
@@ -2622,8 +2641,13 @@ export type Database = {
           created_at?: string
           id?: string
           lead_id?: string
+          missed_at?: string | null
           org_id?: string | null
+          reassigned_from?: string | null
+          recovery_status?: string
+          responded_at?: string | null
           status?: string
+          timeout_minutes?: number
         }
         Relationships: [
           {

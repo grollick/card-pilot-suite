@@ -5,6 +5,7 @@ import { useOrg } from "@/contexts/OrgContext";
 import { toast } from "sonner";
 
 export type AssignmentMode = "round_robin" | "availability" | "manual";
+export type RecoveryMode = "reassign" | "notify_backup" | "open_to_all";
 
 export interface LeadAssignmentSettings {
   id: string;
@@ -16,6 +17,9 @@ export interface LeadAssignmentSettings {
   match_by_location: boolean;
   filter_by_availability: boolean;
   round_robin_index: number;
+  recovery_enabled: boolean;
+  timeout_minutes: number;
+  recovery_mode: RecoveryMode;
 }
 
 export interface LeadAssignment {
@@ -27,6 +31,11 @@ export interface LeadAssignment {
   assignment_mode: string;
   status: string;
   created_at: string;
+  responded_at: string | null;
+  missed_at: string | null;
+  recovery_status: string;
+  reassigned_from: string | null;
+  timeout_minutes: number;
 }
 
 export function useLeadAssignmentSettings() {
@@ -95,7 +104,11 @@ export function useAssignLead() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ leadId, assignTo, mode = "manual" }: { leadId: string; assignTo: string; mode?: string }) => {
+    mutationFn: async ({
+      leadId, assignTo, mode = "manual", reassignedFrom,
+    }: {
+      leadId: string; assignTo: string; mode?: string; reassignedFrom?: string;
+    }) => {
       const { error } = await supabase
         .from("lead_assignments" as any)
         .insert({
@@ -104,15 +117,30 @@ export function useAssignLead() {
           assigned_by: user!.id,
           org_id: currentOrg?.id || null,
           assignment_mode: mode,
+          reassigned_from: reassignedFrom || null,
+          recovery_status: reassignedFrom ? "recovered" : "none",
         });
       if (error) throw error;
 
-      // Create notification for assigned staff
+      // Notification
       if (assignTo !== user!.id) {
+        const title = reassignedFrom
+          ? "Missed lead reassigned to you"
+          : "New lead assigned to you";
         await supabase.from("notifications" as any).insert({
           user_id: assignTo,
-          title: "New lead assigned to you",
+          title,
           type: "lead_assigned",
+          related_id: leadId,
+        });
+      }
+
+      // Notify original assignee about missed lead
+      if (reassignedFrom) {
+        await supabase.from("notifications" as any).insert({
+          user_id: reassignedFrom,
+          title: "Lead reassigned due to no response",
+          type: "lead_missed",
           related_id: leadId,
         });
       }
@@ -126,9 +154,45 @@ export function useAssignLead() {
   });
 }
 
+export function useMarkLeadResponded() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (assignmentId: string) => {
+      const { error } = await supabase
+        .from("lead_assignments" as any)
+        .update({ responded_at: new Date().toISOString(), status: "responded" })
+        .eq("id", assignmentId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lead-assignments"] });
+    },
+  });
+}
+
+export function useMarkLeadMissed() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (assignmentId: string) => {
+      const { error } = await supabase
+        .from("lead_assignments" as any)
+        .update({
+          missed_at: new Date().toISOString(),
+          status: "missed",
+          recovery_status: "missed",
+        })
+        .eq("id", assignmentId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["lead-assignments"] });
+    },
+  });
+}
+
 export function useAutoAssignLead() {
   const { user } = useAuth();
-  const { currentOrg, members } = useOrg();
+  const { members } = useOrg();
   const { data: settings } = useLeadAssignmentSettings();
   const assignLead = useAssignLead();
   const upsertSettings = useUpsertLeadAssignmentSettings();
@@ -138,7 +202,6 @@ export function useAutoAssignLead() {
 
     const eligibleMembers = members.filter((m) => m.user_id !== user.id || members.length === 1);
     if (eligibleMembers.length === 0) {
-      // Fallback to owner
       if (settings.fallback_to_owner) {
         const owner = members.find((m) => m.role === "owner");
         if (owner) {
@@ -158,7 +221,6 @@ export function useAutoAssignLead() {
     }
 
     if (settings.assignment_mode === "availability") {
-      // Simple: pick first available member (could be enhanced with real availability checks)
       const target = eligibleMembers[0];
       if (target) {
         await assignLead.mutateAsync({ leadId, assignTo: target.user_id, mode: "availability" });
@@ -166,7 +228,6 @@ export function useAutoAssignLead() {
       }
     }
 
-    // Fallback
     if (settings.fallback_to_owner) {
       const owner = members.find((m) => m.role === "owner");
       if (owner) {
@@ -179,6 +240,85 @@ export function useAutoAssignLead() {
   };
 
   return { autoAssign };
+}
+
+export function useRecoverMissedLead() {
+  const { members } = useOrg();
+  const { data: settings } = useLeadAssignmentSettings();
+  const { data: assignments = [] } = useLeadAssignments();
+  const assignLead = useAssignLead();
+  const markMissed = useMarkLeadMissed();
+
+  const recover = async (assignment: LeadAssignment) => {
+    // Mark original as missed
+    await markMissed.mutateAsync(assignment.id);
+
+    if (!settings?.recovery_enabled) return null;
+
+    // Find eligible members excluding the one who missed
+    const eligible = members.filter((m) => m.user_id !== assignment.assigned_to);
+
+    // Count current assignments per member for fairness
+    const loadMap = assignments.reduce<Record<string, number>>((acc, a) => {
+      if (a.status === "active") acc[a.assigned_to] = (acc[a.assigned_to] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Sort by lowest load for fairness
+    const sorted = [...eligible].sort(
+      (a, b) => (loadMap[a.user_id] || 0) - (loadMap[b.user_id] || 0)
+    );
+
+    if (sorted.length === 0) return null;
+
+    if (settings.recovery_mode === "reassign" || settings.recovery_mode === "open_to_all") {
+      const target = sorted[0];
+      await assignLead.mutateAsync({
+        leadId: assignment.lead_id,
+        assignTo: target.user_id,
+        mode: "recovery",
+        reassignedFrom: assignment.assigned_to,
+      });
+      return target.user_id;
+    }
+
+    if (settings.recovery_mode === "notify_backup") {
+      // Notify top 2 backup staff
+      const backups = sorted.slice(0, 2);
+      for (const b of backups) {
+        await supabase.from("notifications" as any).insert({
+          user_id: b.user_id,
+          title: "Missed lead available — respond now!",
+          type: "lead_backup",
+          related_id: assignment.lead_id,
+        });
+      }
+      return "notified";
+    }
+
+    return null;
+  };
+
+  return { recover };
+}
+
+export function useMissedLeadStats() {
+  const { data: assignments = [] } = useLeadAssignments();
+
+  const missed = assignments.filter((a) => a.recovery_status === "missed" || a.status === "missed");
+  const recovered = assignments.filter((a) => a.recovery_status === "recovered");
+  const responded = assignments.filter((a) => a.status === "responded");
+  const active = assignments.filter((a) => a.status === "active");
+
+  return {
+    total: assignments.length,
+    missedCount: missed.length,
+    recoveredCount: recovered.length,
+    respondedCount: responded.length,
+    activeCount: active.length,
+    recoveryRate: missed.length > 0 ? Math.round((recovered.length / missed.length) * 100) : 0,
+    responseRate: assignments.length > 0 ? Math.round((responded.length / assignments.length) * 100) : 0,
+  };
 }
 
 export function useLeadDistribution() {
