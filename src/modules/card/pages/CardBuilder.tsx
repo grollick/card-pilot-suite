@@ -360,15 +360,17 @@ export default function CardBuilder() {
       <ConversionTips sections={s.sections} />
 
       {!isPro && (
-        <div className="rounded-xl border border-primary/8 bg-primary/[0.02] p-3 space-y-2 mt-3">
-          <div className="flex items-center gap-1.5">
-            <Crown className="h-3.5 w-3.5 text-primary" />
+        <div className="rounded-xl border border-primary/10 bg-gradient-to-b from-primary/[0.04] to-transparent p-3.5 space-y-2.5 mt-3">
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Crown className="h-3 w-3 text-primary" />
+            </div>
             <span className="text-[11px] font-semibold text-foreground">Unlock Pro</span>
           </div>
-          <p className="text-[10px] text-muted-foreground leading-relaxed">
+          <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
             Premium templates, animations, AI tools, and more.
           </p>
-          <Button size="sm" className="w-full h-8 text-[10px] rounded-lg" onClick={() => window.location.href = "/app/pricing"}>
+          <Button size="sm" className="w-full h-8 text-[10px] rounded-xl shadow-sm" onClick={() => window.location.href = "/app/pricing"}>
             Upgrade
           </Button>
         </div>
