@@ -2544,6 +2544,104 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_assignment_settings: {
+        Row: {
+          assignment_mode: string
+          created_at: string
+          fallback_to_owner: boolean
+          filter_by_availability: boolean
+          id: string
+          match_by_location: boolean
+          match_by_services: boolean
+          org_id: string | null
+          round_robin_index: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assignment_mode?: string
+          created_at?: string
+          fallback_to_owner?: boolean
+          filter_by_availability?: boolean
+          id?: string
+          match_by_location?: boolean
+          match_by_services?: boolean
+          org_id?: string | null
+          round_robin_index?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assignment_mode?: string
+          created_at?: string
+          fallback_to_owner?: boolean
+          filter_by_availability?: boolean
+          id?: string
+          match_by_location?: boolean
+          match_by_services?: boolean
+          org_id?: string | null
+          round_robin_index?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_assignment_settings_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_assignments: {
+        Row: {
+          assigned_by: string | null
+          assigned_to: string
+          assignment_mode: string
+          created_at: string
+          id: string
+          lead_id: string
+          org_id: string | null
+          status: string
+        }
+        Insert: {
+          assigned_by?: string | null
+          assigned_to: string
+          assignment_mode?: string
+          created_at?: string
+          id?: string
+          lead_id: string
+          org_id?: string | null
+          status?: string
+        }
+        Update: {
+          assigned_by?: string | null
+          assigned_to?: string
+          assignment_mode?: string
+          created_at?: string
+          id?: string
+          lead_id?: string
+          org_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_assignments_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_assignments_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lead_routing_log: {
         Row: {
           converted_at: string | null

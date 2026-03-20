@@ -74,6 +74,7 @@ const marketingItems = [
 
 const teamItems = [
   { title: "Team Management", url: "/app/team-management", icon: Users },
+  { title: "Lead Routing", url: "/app/lead-routing", icon: Inbox },
   { title: "Tech Dashboard", url: "/app/tech-dashboard", icon: HardHat },
 ];
 
