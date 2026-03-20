@@ -49,7 +49,7 @@ export default function IndustryLandingPage() {
             <div className="flex items-center gap-3">
               <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline">Pricing</Link>
               <Button asChild size="sm">
-                <Link to="/auth">{page.ctaText}</Link>
+                <Link to={authLink(page.slug)}>{page.ctaText}</Link>
               </Button>
             </div>
           </div>
