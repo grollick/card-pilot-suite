@@ -161,7 +161,7 @@ export const DEMO_CARDS: DemoCard[] = [
     tagline: "Capturing moments that last forever.",
     phone: "(555) 567-8901",
     email: "hello@lensandlight.com",
-    city: "Denver, CO",
+    city: "Calgary, AB",
     bio: "Award-winning photographer specializing in weddings, portraits, and commercial work. Published in Denver Life Magazine. Natural light enthusiast.",
     services: [
       { name: "Wedding Photography", price: "$3,500+", duration: "8 hours" },
