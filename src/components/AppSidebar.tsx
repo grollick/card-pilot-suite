@@ -299,15 +299,16 @@ export function AppSidebar() {
               <p className="text-xs font-medium truncate">{profile?.name || "User"}</p>
               <p className="text-2xs text-muted-foreground truncate">@{profile?.handle || "—"}</p>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleSignOut}
-              className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
-              title="Sign out"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-            </Button>
+            <Tip label="Sign out" side="top">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleSignOut}
+                className="h-7 w-7 text-muted-foreground hover:text-destructive shrink-0"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+              </Button>
+            </Tip>
           </div>
         )}
         {collapsed && (
