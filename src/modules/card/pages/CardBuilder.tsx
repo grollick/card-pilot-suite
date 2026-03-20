@@ -80,6 +80,7 @@ export default function CardBuilder() {
   const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<"preview" | "sections" | "content" | "style">("preview");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [activePresetId, setActivePresetId] = useState<string | null>(null);
 
   // ── AI Card Generation ──
   const handleAICardGenerated = (result: AICardResult) => {
