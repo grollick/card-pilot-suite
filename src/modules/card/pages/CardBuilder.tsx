@@ -225,6 +225,9 @@ export default function CardBuilder() {
     },
   };
 
+  // Show template chooser for new cards (no existing card data)
+  const isNewCard = !s.cardLoading && !s.card;
+
   if (s.cardLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -234,6 +237,22 @@ export default function CardBuilder() {
         </div>
       </div>
     );
+  }
+
+  if ((isNewCard && !showTemplateChooser) || showTemplateChooser) {
+    // Show chooser for new cards automatically, or when explicitly opened
+    if (isNewCard || showTemplateChooser) {
+      return (
+        <CardTemplateChooser
+          onSelect={(templateId) => {
+            handleApplyTemplate(templateId);
+            setShowTemplateChooser(false);
+          }}
+          onSkip={() => setShowTemplateChooser(false)}
+          professionName={s.professionName}
+        />
+      );
+    }
   }
 
   // ── Shared preview props ──
