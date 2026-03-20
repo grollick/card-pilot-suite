@@ -2,6 +2,12 @@ import { createContext, useContext, useEffect, useState, useMemo, useCallback, R
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import {
+  assessSignupRisk,
+  recordSignupAttempt,
+  generateFingerprint,
+  getEmailDomain,
+} from "@/utils/antiAbuse";
 
 interface AuthContextType {
   session: Session | null;
@@ -37,6 +43,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signUp = useCallback(async (email: string, password: string, name?: string, referralCode?: string) => {
+    // Anti-abuse checks
+    const risk = assessSignupRisk(email);
+    const fingerprint = generateFingerprint();
+    const domain = getEmailDomain(email);
+
+    // Record attempt for rate limiting
+    recordSignupAttempt();
+
+    // Log abuse attempt (fire-and-forget, non-blocking)
+    const ipHash = fingerprint; // Use fingerprint as proxy for IP in client-side
+    supabase.from("signup_abuse_log").insert({
+      ip_hash: ipHash,
+      email_domain: domain,
+      fingerprint_hash: fingerprint,
+      email,
+      risk_level: risk.level,
+      flags: risk.flags,
+      blocked: risk.blocked,
+    }).then(() => {});
+
+    // Block high-risk signups
+    if (risk.blocked) {
+      return { error: new Error("Signup temporarily unavailable. Please try again later.") };
+    }
+
+    // Warn on disposable emails
+    if (risk.flags.includes("disposable_email")) {
+      return { error: new Error("Please use a permanent email address. Temporary emails are not accepted.") };
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
