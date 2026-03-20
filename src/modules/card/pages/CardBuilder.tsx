@@ -234,12 +234,31 @@ export default function CardBuilder() {
 
   if (s.cardLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          <span className="text-sm text-muted-foreground">Loading card…</span>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex items-center justify-center min-h-[400px]"
+      >
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <div className="absolute inset-0 h-6 w-6 rounded-full bg-primary/20 animate-ping" />
+          </div>
+          <div className="space-y-2 text-center">
+            <span className="text-sm text-muted-foreground">Loading your card…</span>
+            <div className="flex gap-1.5 justify-center">
+              {[0, 1, 2].map(i => (
+                <motion.div
+                  key={i}
+                  className="h-1.5 w-1.5 rounded-full bg-primary/40"
+                  animate={{ opacity: [0.3, 1, 0.3] }}
+                  transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }}
+                />
+              ))}
+            </div>
+          </div>
         </div>
-      </div>
+      </motion.div>
     );
   }
 

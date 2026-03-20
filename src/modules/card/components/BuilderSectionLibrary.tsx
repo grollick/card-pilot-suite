@@ -161,16 +161,25 @@ export default function BuilderSectionLibrary({
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-0.5">
-            {sections.map((section) => (
-              <SortableSection
-                key={section.id}
-                section={section}
-                onEdit={setEditingSection}
-                onToggle={toggleSection}
-                onDuplicate={onDuplicate}
-                onDelete={onDelete}
-              />
-            ))}
+            <AnimatePresence initial={false}>
+              {sections.map((section) => (
+                <motion.div
+                  key={section.id}
+                  initial={{ opacity: 0, height: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, height: "auto", scale: 1 }}
+                  exit={{ opacity: 0, height: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <SortableSection
+                    section={section}
+                    onEdit={setEditingSection}
+                    onToggle={toggleSection}
+                    onDuplicate={onDuplicate}
+                    onDelete={onDelete}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         </SortableContext>
       </DndContext>

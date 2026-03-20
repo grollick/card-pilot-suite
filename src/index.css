@@ -392,4 +392,34 @@
   .filter-chip-active {
     @apply border-primary/40 bg-primary/10 text-primary;
   }
+
+  /* ── Micro-interaction: smooth theme transitions ── */
+  .theme-transition,
+  .theme-transition * {
+    transition-property: color, background-color, border-color, box-shadow, opacity;
+    transition-duration: var(--duration-base);
+    transition-timing-function: var(--ease-out);
+  }
+
+  /* ── Press feedback ── */
+  .press-scale {
+    @apply transition-transform duration-100;
+  }
+  .press-scale:active {
+    transform: scale(0.97);
+  }
+
+  /* ── Lift on hover ── */
+  .hover-lift {
+    @apply transition-all;
+    transition-duration: var(--duration-fast);
+    transition-timing-function: var(--ease-out);
+  }
+  .hover-lift:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  .hover-lift:active {
+    transform: translateY(0);
+  }
 }
