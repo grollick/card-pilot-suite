@@ -54,13 +54,15 @@ export default function HeroPhoneAnimation() {
             transition={{ duration: 0.4 }}
           >
             {/* Cover photo */}
-            <div className="h-24 relative overflow-hidden">
-              <img
-                src={projectKitchen}
-                alt="Cover"
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+            <div className="h-24 relative">
+              <div className="absolute inset-0 overflow-hidden">
+                <img
+                  src={projectKitchen}
+                  alt="Cover"
+                  className="h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+              </div>
               {/* Avatar overlapping cover */}
               <div className="absolute -bottom-6 left-4">
                 <div className="h-12 w-12 rounded-full overflow-hidden ring-[3px] ring-card shadow-lg">
