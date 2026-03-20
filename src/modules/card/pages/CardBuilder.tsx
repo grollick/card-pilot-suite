@@ -283,7 +283,7 @@ export default function CardBuilder() {
   //  LEFT PANEL — Section Library (minimal)
   // ════════════════════════════════════════════════
   const leftPanel = (
-    <div className="space-y-1">
+    <div className="space-y-2">
       <PanelSection title="Templates" icon={LayoutTemplate} defaultOpen={false}>
         <TemplateSelector
           selectedTemplateId={selectedTemplateId}
@@ -293,7 +293,7 @@ export default function CardBuilder() {
         />
       </PanelSection>
 
-      <div className="h-px bg-border/30 my-1" />
+      <div className="h-px bg-border/20 my-2" />
 
       <BuilderSectionLibrary
         sections={s.sections}
@@ -308,21 +308,21 @@ export default function CardBuilder() {
       <Button
         variant="ghost"
         size="sm"
-        className="w-full gap-1.5 text-[11px] text-muted-foreground hover:text-primary border border-dashed border-border/50 hover:border-primary/30 h-8 mt-1"
+        className="w-full gap-1.5 text-[11px] text-muted-foreground/60 hover:text-primary border border-dashed border-border/30 hover:border-primary/30 h-9 mt-2 rounded-xl transition-all duration-200"
         onClick={() => setBlockMarketOpen(true)}
       >
         <Plus className="h-3 w-3" />
         Add Section
       </Button>
 
-      <div className="h-px bg-border/30 my-1" />
+      <div className="h-px bg-border/20 my-2" />
 
       <PanelSection title="AI Tools" icon={Sparkles} defaultOpen={false}>
-        <div className="space-y-1.5">
-          <Button size="sm" className="w-full gap-1.5 h-8 text-[11px]" onClick={() => setAiAssistantOpen(true)}>
+        <div className="space-y-2">
+          <Button size="sm" className="w-full gap-1.5 h-9 text-[11px] rounded-lg" onClick={() => setAiAssistantOpen(true)}>
             <Sparkles className="h-3 w-3" /> AI Design Assistant
           </Button>
-          <Button variant="outline" size="sm" className="w-full h-8 text-[11px]" onClick={s.handleAIGenerate} disabled={s.isGenerating}>
+          <Button variant="outline" size="sm" className="w-full h-9 text-[11px] rounded-lg" onClick={s.handleAIGenerate} disabled={s.isGenerating}>
             {s.isGenerating ? <Loader2 className="h-3 w-3 mr-1.5 animate-spin" /> : <Sparkles className="h-3 w-3 mr-1.5" />}
             {s.isGenerating ? "Writing…" : "AI Write Copy"}
           </Button>
@@ -332,15 +332,15 @@ export default function CardBuilder() {
       <ConversionTips sections={s.sections} />
 
       {!isPro && (
-        <div className="rounded-lg border border-primary/10 bg-primary/[0.03] p-2.5 space-y-1.5 mt-2">
+        <div className="rounded-xl border border-primary/8 bg-primary/[0.02] p-3 space-y-2 mt-3">
           <div className="flex items-center gap-1.5">
             <Crown className="h-3.5 w-3.5 text-primary" />
-            <span className="text-[11px] font-semibold">Unlock Pro</span>
+            <span className="text-[11px] font-semibold text-foreground">Unlock Pro</span>
           </div>
           <p className="text-[10px] text-muted-foreground leading-relaxed">
-            Unlimited sections, animations, AI tools, and more.
+            Premium templates, animations, AI tools, and more.
           </p>
-          <Button size="sm" className="w-full h-7 text-[10px]" onClick={() => window.location.href = "/app/pricing"}>
+          <Button size="sm" className="w-full h-8 text-[10px] rounded-lg" onClick={() => window.location.href = "/app/pricing"}>
             Upgrade
           </Button>
         </div>
