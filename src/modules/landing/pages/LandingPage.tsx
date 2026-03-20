@@ -599,6 +599,9 @@ export default function LandingPage() {
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={4} className="text-xs text-muted-foreground mt-6">
             Free forever • No credit card • Setup in 2 minutes
           </motion.p>
+          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={5} className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground/70 mt-4">
+            <Shield className="h-3 w-3" /> Trusted and secure platform for local businesses
+          </motion.p>
         </div>
       </section>
 
