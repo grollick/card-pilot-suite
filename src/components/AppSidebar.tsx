@@ -313,15 +313,18 @@ export function AppSidebar() {
         )}
         {collapsed && (
           <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={handleSignOut}
-              className="flex items-center gap-3 rounded-lg px-3 py-1.5 text-[13px] transition-all hover:bg-destructive/10 text-muted-foreground hover:text-destructive cursor-pointer"
-            >
-              <LogOut className="h-[18px] w-[18px] shrink-0" />
-            </SidebarMenuButton>
+            <Tip label="Sign out" side="right">
+              <SidebarMenuButton
+                onClick={handleSignOut}
+                className="flex items-center gap-3 rounded-lg px-3 py-1.5 text-[13px] transition-all hover:bg-destructive/10 text-muted-foreground hover:text-destructive cursor-pointer"
+              >
+                <LogOut className="h-[18px] w-[18px] shrink-0" />
+              </SidebarMenuButton>
+            </Tip>
           </SidebarMenuItem>
         )}
       </SidebarFooter>
     </Sidebar>
+    </TooltipProvider>
   );
 }
