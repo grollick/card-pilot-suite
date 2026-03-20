@@ -56,8 +56,8 @@ export const CARD_TEMPLATES: CardTemplate[] = [
   // ── General Templates ──
   {
     id: "modern_professional",
-    name: "Modern Professional",
-    description: "Clean and versatile. Works for any industry with a balanced layout.",
+    name: "Pro Business — Growth Engine",
+    description: "A polished, conversion-optimized card for any industry. Strong CTA placement, trust signals, and a clean layout that turns visitors into clients.",
     category: "general",
     style: "Modern",
     sections: [
@@ -79,16 +79,16 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       showTestimonials: true,
     },
     preview: {
-      tagline: "Professional services you can trust",
-      sampleServices: ["Consultation", "Assessment", "Follow-Up"],
-      sampleReview: "Excellent service and very professional!",
+      tagline: "Trusted by hundreds of local customers",
+      sampleServices: ["Free Consultation", "Custom Solutions", "Priority Support"],
+      sampleReview: "Hands down the most professional service I've experienced. Will absolutely hire again.",
     },
     recommendedFor: ["sales_advising", "legal_finance", "education_services"],
   },
   {
     id: "service_pro",
-    name: "Service Pro",
-    description: "Optimized for service businesses. Quote requests and booking front and center.",
+    name: "Service Pro — Quote Machine",
+    description: "Built for service businesses that close deals fast. Quote calculator, instant booking, and before/after galleries front and center.",
     category: "general",
     style: "Modern",
     sections: [
@@ -113,16 +113,16 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       showTestimonials: true,
     },
     preview: {
-      tagline: "Quality work, fair prices",
-      sampleServices: ["Installation", "Repair", "Maintenance"],
-      sampleReview: "Great work and completed on time. Highly recommend!",
+      tagline: "Quality craftsmanship, transparent pricing",
+      sampleServices: ["Full Installation", "Emergency Repair", "Annual Maintenance Plan"],
+      sampleReview: "Got a detailed quote within minutes. Work was done perfectly and on schedule.",
     },
     recommendedFor: ["home_trade", "automotive_services"],
   },
   {
     id: "portfolio_showcase",
-    name: "Portfolio Showcase",
-    description: "Gallery-first layout. Perfect for visual professionals.",
+    name: "Creative Portfolio — Visual Impact",
+    description: "Gallery-first layout that lets your work do the talking. Large visuals, elegant typography, and seamless booking for creative professionals.",
     category: "creative",
     style: "Elegant",
     sections: [
@@ -145,16 +145,16 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       showTestimonials: true,
     },
     preview: {
-      tagline: "Creating moments that last forever",
-      sampleServices: ["Photography", "Editing", "Albums"],
-      sampleReview: "Absolutely stunning work. Captured every moment beautifully.",
+      tagline: "Creating moments that last a lifetime",
+      sampleServices: ["Wedding Coverage", "Portrait Sessions", "Commercial Shoots"],
+      sampleReview: "Absolutely breathtaking work. Every single photo was frame-worthy.",
     },
     recommendedFor: ["creative_media"],
   },
   {
     id: "booking_first",
-    name: "Booking First",
-    description: "Booking is the star. Ideal for appointment-based businesses.",
+    name: "Wellness Pro — Appointment Magnet",
+    description: "Designed for appointment-based businesses. One-tap booking, service menu, and client reviews positioned to fill your calendar.",
     category: "beauty_wellness",
     style: "Modern",
     sections: [
@@ -176,16 +176,16 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       showTestimonials: true,
     },
     preview: {
-      tagline: "Book your appointment in seconds",
-      sampleServices: ["Haircut", "Color", "Styling"],
-      sampleReview: "Best salon experience I've ever had. Booking was so easy!",
+      tagline: "Your next appointment is one tap away",
+      sampleServices: ["Premium Cut & Style", "Color Treatment", "Full Grooming Package"],
+      sampleReview: "Best experience I've had. Booking was instant and the service was flawless.",
     },
     recommendedFor: ["beauty_personal_care", "health_wellness"],
   },
   {
     id: "minimal_contact",
-    name: "Minimal Contact",
-    description: "Simple and elegant. Just the essentials — name, info, and a CTA.",
+    name: "Executive Card — Clean & Direct",
+    description: "Minimalist sophistication. Your name, your brand, and one clear call to action. Nothing more, nothing less.",
     category: "general",
     style: "Minimal",
     sections: [
@@ -207,7 +207,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       showTestimonials: false,
     },
     preview: {
-      tagline: "Let's connect",
+      tagline: "Let's build something together",
       sampleServices: [],
       sampleReview: "",
     },
@@ -217,8 +217,8 @@ export const CARD_TEMPLATES: CardTemplate[] = [
   // ── Profession-Specific Templates ──
   {
     id: "contractor_template",
-    name: "Contractor Pro",
-    description: "Built for contractors. Quotes, gallery of past work, and reviews.",
+    name: "Pro Contractor — Lead Generator",
+    description: "Purpose-built for contractors who want more jobs. Instant quote calculator, before/after project gallery, and verified reviews that close deals.",
     category: "trades",
     style: "Bold",
     sections: [
@@ -243,16 +243,16 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       showTestimonials: true,
     },
     preview: {
-      tagline: "Built right, built to last",
-      sampleServices: ["Renovation", "New Build", "Repairs"],
-      sampleReview: "Top-notch craftsmanship. The team was professional from start to finish.",
+      tagline: "Licensed, insured, and ready to build",
+      sampleServices: ["Kitchen Renovation", "Basement Finishing", "Custom Deck Build"],
+      sampleReview: "Incredible attention to detail. Project came in on time and under budget. Already planning our next one.",
     },
     recommendedFor: ["home_trade"],
   },
   {
     id: "landscaper_template",
-    name: "Landscaper Pro",
-    description: "Showcase your outdoor transformations with before/after galleries.",
+    name: "Elite Landscaper — Transformation Showcase",
+    description: "Show off stunning outdoor transformations with side-by-side galleries. Built to turn curb appeal into booked contracts.",
     category: "trades",
     style: "Modern",
     sections: [
@@ -277,16 +277,16 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       showTestimonials: true,
     },
     preview: {
-      tagline: "Transform your outdoor space",
-      sampleServices: ["Lawn Care", "Hardscaping", "Garden Design"],
-      sampleReview: "Our yard has never looked better. Amazing transformation!",
+      tagline: "From vision to reality — your outdoor space transformed",
+      sampleServices: ["Complete Landscape Design", "Paver Patios & Walkways", "Seasonal Maintenance Plans"],
+      sampleReview: "They completely transformed our backyard. The neighbors keep asking for their number!",
     },
     recommendedFor: ["home_trade"],
   },
   {
     id: "realtor_template",
-    name: "Realtor Card",
-    description: "Designed for real estate agents. Contact-forward with trust signals.",
+    name: "Premium Realtor — Client Capture",
+    description: "Trust-forward design for real estate professionals. Testimonials, market expertise, and instant scheduling that converts browsers into buyers.",
     category: "real_estate",
     style: "Elegant",
     sections: [
@@ -308,16 +308,16 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       showTestimonials: true,
     },
     preview: {
-      tagline: "Your trusted real estate partner",
-      sampleServices: ["Home Buying", "Home Selling", "Market Analysis"],
-      sampleReview: "Found us our dream home in just two weeks. Incredible agent!",
+      tagline: "Your trusted partner in finding the perfect home",
+      sampleServices: ["Buyer Representation", "Seller Strategy", "Comparative Market Analysis"],
+      sampleReview: "Found us our dream home in under three weeks. Incredible negotiation skills and always available.",
     },
     recommendedFor: ["sales_advising"],
   },
   {
     id: "photographer_template",
-    name: "Photographer Card",
-    description: "Visual-first with large gallery. Let your work speak for itself.",
+    name: "Studio Pro — Visual Storyteller",
+    description: "Let your images speak volumes. Full-bleed gallery, elegant presentation, and seamless booking designed for visual artists.",
     category: "creative",
     style: "Elegant",
     sections: [
@@ -339,16 +339,16 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       showTestimonials: true,
     },
     preview: {
-      tagline: "Every moment tells a story",
-      sampleServices: ["Wedding", "Portrait", "Commercial"],
-      sampleReview: "The photos exceeded every expectation. True artistry!",
+      tagline: "Every frame tells your story",
+      sampleServices: ["Wedding Day Coverage", "Brand Photography", "Family Portraits"],
+      sampleReview: "The photos exceeded every expectation. Pure artistry — we'll treasure these forever.",
     },
     recommendedFor: ["creative_media"],
   },
   {
     id: "barber_template",
-    name: "Barber Card",
-    description: "Book-first with style gallery. Clean and bold.",
+    name: "Elite Barber — Booking Focused",
+    description: "Bold, confident, and built to fill your chair. One-tap booking, style gallery, and 5-star reviews that keep clients coming back.",
     category: "beauty_wellness",
     style: "Bold",
     sections: [
@@ -370,9 +370,9 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       showTestimonials: true,
     },
     preview: {
-      tagline: "Fresh cuts, sharp style",
-      sampleServices: ["Haircut", "Beard Trim", "Hot Towel Shave"],
-      sampleReview: "Best barber in town. Always leave looking great!",
+      tagline: "Sharp cuts. Clean fades. Walk out confident.",
+      sampleServices: ["Signature Haircut", "Beard Sculpt & Hot Towel", "Premium Grooming Package"],
+      sampleReview: "Best barber I've ever had. The attention to detail is unreal. Won't go anywhere else.",
     },
     recommendedFor: ["beauty_personal_care"],
   },

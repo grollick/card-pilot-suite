@@ -1,75 +1,155 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Hammer, Scissors, Home, Briefcase, Sparkles, ArrowRight, Check,
-  Camera, Dumbbell, ChefHat,
+  Camera, Dumbbell, Star, Phone, Calendar, FileText, Shield, Smartphone, Monitor,
+  ChevronRight, Zap,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CARD_TEMPLATES, getTemplate } from "@/lib/cardTemplates";
 
 interface TemplateOption {
   id: string;
   templateId: string;
   label: string;
+  subtitle: string;
   description: string;
   icon: typeof Hammer;
-  color: string;
-  sections: string[];
+  accentColor: string;
+  bgGradient: string;
+  highlights: string[];
+  previewSections: Array<{ label: string; height: number }>;
+  ctaLabels: string[];
+  sampleTagline: string;
+  sampleReview: string;
 }
 
 const TEMPLATE_OPTIONS: TemplateOption[] = [
   {
     id: "contractor",
     templateId: "contractor_template",
-    label: "Contractor",
-    description: "Quotes, gallery, testimonials & booking",
+    label: "Pro Contractor",
+    subtitle: "Lead Generator",
+    description: "Purpose-built for contractors who want more jobs. Quote calculator, project gallery, and verified reviews.",
     icon: Hammer,
-    color: "hsl(25, 95%, 53%)",
-    sections: ["Hero", "Services", "Gallery", "Testimonials", "Quote Request"],
+    accentColor: "hsl(25, 95%, 53%)",
+    bgGradient: "linear-gradient(135deg, hsl(25, 95%, 53%) 0%, hsl(15, 90%, 45%) 100%)",
+    highlights: ["Instant Quotes", "Before/After Gallery", "5-Star Reviews", "Lead Capture"],
+    previewSections: [
+      { label: "Hero + CTA", height: 48 },
+      { label: "Services", height: 28 },
+      { label: "Projects", height: 32 },
+      { label: "Reviews", height: 24 },
+      { label: "Get a Quote", height: 20 },
+    ],
+    ctaLabels: ["Call Now", "Get Quote"],
+    sampleTagline: "Licensed, insured, and ready to build",
+    sampleReview: "Incredible attention to detail. On time and under budget.",
   },
   {
     id: "barber",
     templateId: "barber_template",
-    label: "Barber / Salon",
-    description: "Booking-first with style gallery",
+    label: "Elite Barber",
+    subtitle: "Booking Focused",
+    description: "Bold and confident. One-tap booking, style gallery, and 5-star reviews that keep clients coming back.",
     icon: Scissors,
-    color: "hsl(262, 83%, 58%)",
-    sections: ["Hero", "Booking", "Services", "Gallery", "Reviews"],
+    accentColor: "hsl(262, 83%, 58%)",
+    bgGradient: "linear-gradient(135deg, hsl(262, 83%, 58%) 0%, hsl(280, 70%, 45%) 100%)",
+    highlights: ["One-Tap Booking", "Style Gallery", "Service Menu", "Client Reviews"],
+    previewSections: [
+      { label: "Hero + CTA", height: 48 },
+      { label: "Book Now", height: 24 },
+      { label: "Services & Pricing", height: 32 },
+      { label: "Gallery", height: 28 },
+      { label: "Reviews", height: 20 },
+    ],
+    ctaLabels: ["Book Now", "Call"],
+    sampleTagline: "Sharp cuts. Clean fades. Walk out confident.",
+    sampleReview: "Best barber I've ever had. Won't go anywhere else.",
   },
   {
     id: "realtor",
     templateId: "realtor_template",
-    label: "Realtor",
-    description: "Contact-forward with trust signals",
+    label: "Premium Realtor",
+    subtitle: "Client Capture",
+    description: "Trust-forward design. Testimonials, market expertise, and instant scheduling that converts browsers into buyers.",
     icon: Home,
-    color: "hsl(199, 89%, 48%)",
-    sections: ["Hero", "About", "Testimonials", "Booking", "Contact"],
+    accentColor: "hsl(199, 89%, 48%)",
+    bgGradient: "linear-gradient(135deg, hsl(199, 89%, 48%) 0%, hsl(210, 80%, 40%) 100%)",
+    highlights: ["Trust Signals", "Market Expertise", "Instant Scheduling", "Client Testimonials"],
+    previewSections: [
+      { label: "Hero + CTA", height: 48 },
+      { label: "About & Expertise", height: 28 },
+      { label: "Testimonials", height: 28 },
+      { label: "Services", height: 24 },
+      { label: "Schedule Showing", height: 24 },
+    ],
+    ctaLabels: ["Call Agent", "Schedule"],
+    sampleTagline: "Your trusted partner in finding the perfect home",
+    sampleReview: "Found our dream home in under three weeks.",
   },
   {
     id: "photographer",
     templateId: "photographer_template",
-    label: "Photographer",
-    description: "Visual-first with large gallery",
+    label: "Studio Pro",
+    subtitle: "Visual Storyteller",
+    description: "Let your images speak volumes. Full-bleed gallery, elegant presentation, and seamless booking.",
     icon: Camera,
-    color: "hsl(340, 82%, 52%)",
-    sections: ["Hero", "Gallery", "Services", "Testimonials", "Booking"],
+    accentColor: "hsl(340, 82%, 52%)",
+    bgGradient: "linear-gradient(135deg, hsl(340, 82%, 52%) 0%, hsl(320, 70%, 42%) 100%)",
+    highlights: ["Full Gallery", "Portfolio Display", "Session Booking", "Client Stories"],
+    previewSections: [
+      { label: "Hero + CTA", height: 48 },
+      { label: "Gallery Grid", height: 36 },
+      { label: "Packages", height: 28 },
+      { label: "Client Love", height: 24 },
+      { label: "Book Session", height: 20 },
+    ],
+    ctaLabels: ["Book Session", "Inquire"],
+    sampleTagline: "Every frame tells your story",
+    sampleReview: "Pure artistry — we'll treasure these forever.",
   },
   {
-    id: "trainer",
+    id: "wellness",
     templateId: "booking_first",
-    label: "Health & Wellness",
-    description: "Appointments and services front & center",
+    label: "Wellness Pro",
+    subtitle: "Appointment Magnet",
+    description: "Designed for appointment-based businesses. Service menu, instant booking, and client reviews to fill your calendar.",
     icon: Dumbbell,
-    color: "hsl(142, 71%, 45%)",
-    sections: ["Hero", "Booking", "Services", "Gallery", "About"],
+    accentColor: "hsl(142, 71%, 45%)",
+    bgGradient: "linear-gradient(135deg, hsl(142, 71%, 45%) 0%, hsl(160, 60%, 38%) 100%)",
+    highlights: ["Instant Booking", "Service Menu", "Client Results", "Social Proof"],
+    previewSections: [
+      { label: "Hero + CTA", height: 48 },
+      { label: "Book Appointment", height: 24 },
+      { label: "Services & Pricing", height: 32 },
+      { label: "Transformations", height: 28 },
+      { label: "Reviews", height: 20 },
+    ],
+    ctaLabels: ["Book Now", "Call"],
+    sampleTagline: "Your next appointment is one tap away",
+    sampleReview: "Best experience I've had. Booking was instant.",
   },
   {
     id: "general",
     templateId: "modern_professional",
-    label: "General Business",
-    description: "Clean and versatile for any industry",
+    label: "Pro Business",
+    subtitle: "Growth Engine",
+    description: "A polished, conversion-optimized card for any industry. Strong CTA placement and trust signals that turn visitors into clients.",
     icon: Briefcase,
-    color: "hsl(221, 83%, 53%)",
-    sections: ["Hero", "About", "Services", "Testimonials", "Booking"],
+    accentColor: "hsl(221, 83%, 53%)",
+    bgGradient: "linear-gradient(135deg, hsl(221, 83%, 53%) 0%, hsl(240, 70%, 45%) 100%)",
+    highlights: ["Lead Capture", "Trust Signals", "Service Showcase", "Smart CTAs"],
+    previewSections: [
+      { label: "Hero + CTA", height: 48 },
+      { label: "About", height: 24 },
+      { label: "Services", height: 32 },
+      { label: "Testimonials", height: 24 },
+      { label: "Contact", height: 24 },
+    ],
+    ctaLabels: ["Get Started", "Call"],
+    sampleTagline: "Trusted by hundreds of local customers",
+    sampleReview: "Most professional service I've experienced.",
   },
 ];
 
@@ -81,117 +161,287 @@ interface Props {
 
 export default function CardTemplateChooser({ onSelect, onSkip, professionName }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
+  const [previewDevice, setPreviewDevice] = useState<"mobile" | "desktop">("mobile");
+
+  const selectedOption = TEMPLATE_OPTIONS.find((o) => o.id === selected);
 
   const handleContinue = () => {
-    if (selected) {
-      const option = TEMPLATE_OPTIONS.find((o) => o.id === selected);
-      if (option) onSelect(option.templateId);
-    }
+    if (selectedOption) onSelect(selectedOption.templateId);
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col items-center justify-center overflow-y-auto">
-      <div className="w-full max-w-3xl px-6 py-12">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="text-center mb-10"
-        >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium mb-4">
-            <Sparkles className="h-3.5 w-3.5" />
-            Quick Start
+    <div className="fixed inset-0 z-50 bg-background overflow-y-auto">
+      <div className="min-h-full flex flex-col">
+        {/* Top bar */}
+        <div className="shrink-0 border-b border-border/40 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Zap className="h-3.5 w-3.5 text-primary" />
+              </div>
+              <span className="text-sm font-semibold text-foreground">Card Builder</span>
+            </div>
+            <Button variant="ghost" size="sm" className="text-muted-foreground text-xs" onClick={onSkip}>
+              Start from scratch <ChevronRight className="h-3 w-3 ml-0.5" />
+            </Button>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2" style={{ lineHeight: 1.15 }}>
-            Choose a starting template
-          </h1>
-          <p className="text-sm text-muted-foreground max-w-md mx-auto">
-            Pick one that fits your business. Everything is fully customizable after.
-          </p>
-        </motion.div>
-
-        {/* Template Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
-          {TEMPLATE_OPTIONS.map((option, i) => {
-            const isSelected = selected === option.id;
-            const Icon = option.icon;
-
-            return (
-              <motion.button
-                key={option.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
-                onClick={() => setSelected(option.id)}
-                className={`relative text-left rounded-xl border p-4 transition-all duration-200 active:scale-[0.97] ${
-                  isSelected
-                    ? "border-primary bg-primary/[0.04] shadow-md ring-1 ring-primary/20"
-                    : "border-border/60 hover:border-border hover:shadow-sm bg-card"
-                }`}
-              >
-                {/* Icon */}
-                <div
-                  className="h-9 w-9 rounded-lg flex items-center justify-center mb-3"
-                  style={{ background: `${option.color}14` }}
-                >
-                  <Icon className="h-4.5 w-4.5" style={{ color: option.color }} />
-                </div>
-
-                <h3 className="text-sm font-semibold text-foreground mb-0.5">{option.label}</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed mb-3">{option.description}</p>
-
-                {/* Section pills */}
-                <div className="flex flex-wrap gap-1">
-                  {option.sections.map((sec) => (
-                    <span
-                      key={sec}
-                      className="text-[10px] px-1.5 py-0.5 rounded-md bg-muted text-muted-foreground"
-                    >
-                      {sec}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Selection indicator */}
-                {isSelected && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute top-3 right-3 h-5 w-5 rounded-full bg-primary flex items-center justify-center"
-                  >
-                    <Check className="h-3 w-3 text-primary-foreground" />
-                  </motion.div>
-                )}
-              </motion.button>
-            );
-          })}
         </div>
 
-        {/* Actions */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3"
-        >
-          <Button
-            size="lg"
-            className="gap-2 min-w-[200px]"
-            disabled={!selected}
-            onClick={handleContinue}
+        <div className="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            className="text-center mb-8 sm:mb-12"
           >
-            Use Template <ArrowRight className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="lg"
-            className="text-muted-foreground"
-            onClick={onSkip}
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/8 text-primary text-xs font-medium mb-4">
+              <Sparkles className="h-3.5 w-3.5" />
+              Premium Templates
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2" style={{ lineHeight: 1.1 }}>
+              Launch your card in seconds
+            </h1>
+            <p className="text-sm text-muted-foreground max-w-lg mx-auto leading-relaxed">
+              Choose a professionally designed template built to convert. Every layout is fully customizable.
+            </p>
+          </motion.div>
+
+          {/* Two-column: grid + preview */}
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+            {/* Template grid */}
+            <div className="flex-1">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {TEMPLATE_OPTIONS.map((option, i) => {
+                  const isSelected = selected === option.id;
+                  const Icon = option.icon;
+
+                  return (
+                    <motion.button
+                      key={option.id}
+                      initial={{ opacity: 0, y: 14 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+                      onClick={() => setSelected(option.id)}
+                      className={`group relative text-left rounded-xl border p-4 transition-all duration-200 active:scale-[0.97] ${
+                        isSelected
+                          ? "border-primary/60 bg-primary/[0.03] shadow-lg ring-1 ring-primary/15"
+                          : "border-border/50 hover:border-border hover:shadow-md bg-card"
+                      }`}
+                    >
+                      {/* Top row: icon + name */}
+                      <div className="flex items-start gap-3 mb-3">
+                        <div
+                          className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
+                          style={{ background: `${option.accentColor}12` }}
+                        >
+                          <Icon className="h-5 w-5" style={{ color: option.accentColor }} />
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="text-sm font-bold text-foreground leading-tight">{option.label}</h3>
+                          <span className="text-[11px] font-medium" style={{ color: option.accentColor }}>
+                            {option.subtitle}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-xs text-muted-foreground leading-relaxed mb-3 line-clamp-2">
+                        {option.description}
+                      </p>
+
+                      {/* Highlight pills */}
+                      <div className="flex flex-wrap gap-1">
+                        {option.highlights.slice(0, 3).map((h) => (
+                          <span
+                            key={h}
+                            className="text-[10px] px-2 py-0.5 rounded-md bg-muted/70 text-muted-foreground font-medium"
+                          >
+                            {h}
+                          </span>
+                        ))}
+                        {option.highlights.length > 3 && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-md bg-muted/50 text-muted-foreground/60">
+                            +{option.highlights.length - 3}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Selection check */}
+                      {isSelected && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                          className="absolute top-3 right-3 h-6 w-6 rounded-full bg-primary flex items-center justify-center shadow-sm"
+                        >
+                          <Check className="h-3.5 w-3.5 text-primary-foreground" />
+                        </motion.div>
+                      )}
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Preview panel */}
+            <div className="lg:w-[320px] shrink-0">
+              <div className="sticky top-20">
+                <AnimatePresence mode="wait">
+                  {selectedOption ? (
+                    <motion.div
+                      key={selectedOption.id}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -6 }}
+                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                      className="rounded-2xl border border-border/50 bg-card overflow-hidden shadow-lg"
+                    >
+                      {/* Preview header */}
+                      <div className="px-4 py-3 border-b border-border/30 flex items-center justify-between">
+                        <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Preview</span>
+                        <div className="flex gap-0.5 rounded-lg border border-border/40 bg-muted/30 p-0.5">
+                          <button
+                            onClick={() => setPreviewDevice("mobile")}
+                            className={`p-1.5 rounded-md transition-all ${previewDevice === "mobile" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}
+                          >
+                            <Smartphone className="h-3 w-3" />
+                          </button>
+                          <button
+                            onClick={() => setPreviewDevice("desktop")}
+                            className={`p-1.5 rounded-md transition-all ${previewDevice === "desktop" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"}`}
+                          >
+                            <Monitor className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Mini card preview */}
+                      <div className="p-4">
+                        <div
+                          className={`mx-auto rounded-xl overflow-hidden border border-border/30 bg-background shadow-inner transition-all duration-300 ${
+                            previewDevice === "mobile" ? "w-[200px]" : "w-full"
+                          }`}
+                        >
+                          {/* Hero mock */}
+                          <div
+                            className="relative"
+                            style={{
+                              height: previewDevice === "mobile" ? 80 : 64,
+                              background: selectedOption.bgGradient,
+                            }}
+                          >
+                            {/* Avatar circle */}
+                            <div className="absolute -bottom-4 left-4 h-10 w-10 rounded-full bg-background border-2 border-background shadow-md flex items-center justify-center">
+                              <selectedOption.icon className="h-4 w-4" style={{ color: selectedOption.accentColor }} />
+                            </div>
+                          </div>
+
+                          <div className="pt-6 pb-3 px-3">
+                            {/* Name + tagline */}
+                            <div className="mb-2">
+                              <div className="h-2.5 w-24 rounded bg-foreground/80 mb-1" />
+                              <div className="h-1.5 w-32 rounded bg-muted-foreground/30" />
+                            </div>
+
+                            {/* CTA buttons */}
+                            <div className="flex gap-1.5 mb-3">
+                              {selectedOption.ctaLabels.map((cta) => (
+                                <div
+                                  key={cta}
+                                  className="flex-1 h-5 rounded-md flex items-center justify-center"
+                                  style={{ background: selectedOption.accentColor }}
+                                >
+                                  <span className="text-[7px] text-white font-bold">{cta}</span>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Section blocks */}
+                            <div className="space-y-1.5">
+                              {selectedOption.previewSections.map((sec, idx) => (
+                                <div key={idx} className="rounded-md bg-muted/40 overflow-hidden">
+                                  <div className="px-2 py-1 flex items-center justify-between">
+                                    <span className="text-[7px] font-semibold text-muted-foreground/70">{sec.label}</span>
+                                  </div>
+                                  <div
+                                    className="mx-1.5 mb-1.5 rounded-sm"
+                                    style={{
+                                      height: sec.height * (previewDevice === "mobile" ? 0.4 : 0.3),
+                                      background: `${selectedOption.accentColor}08`,
+                                      border: `1px solid ${selectedOption.accentColor}10`,
+                                    }}
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Template info */}
+                      <div className="px-4 pb-4 space-y-3">
+                        {/* Sample quote */}
+                        <div className="rounded-lg bg-muted/30 p-3">
+                          <div className="flex items-center gap-1 mb-1">
+                            <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
+                            <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
+                            <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
+                            <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
+                            <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
+                          </div>
+                          <p className="text-[11px] text-muted-foreground italic leading-relaxed">
+                            "{selectedOption.sampleReview}"
+                          </p>
+                        </div>
+
+                        {/* Trust signals */}
+                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground/60">
+                          <span className="flex items-center gap-1">
+                            <Shield className="h-2.5 w-2.5" /> Verified
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Sparkles className="h-2.5 w-2.5" /> Conversion optimized
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="empty"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="rounded-2xl border border-dashed border-border/50 bg-muted/10 p-8 text-center"
+                    >
+                      <div className="h-12 w-12 rounded-xl bg-muted/30 flex items-center justify-center mx-auto mb-3">
+                        <Sparkles className="h-5 w-5 text-muted-foreground/40" />
+                      </div>
+                      <p className="text-sm font-medium text-muted-foreground/60 mb-1">Select a template</p>
+                      <p className="text-xs text-muted-foreground/40">Preview will appear here</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom CTA */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-3 mt-10 pb-8"
           >
-            Start from scratch
-          </Button>
-        </motion.div>
+            <Button
+              size="lg"
+              className="gap-2 min-w-[220px] h-12 text-[15px] font-semibold shadow-md"
+              disabled={!selected}
+              onClick={handleContinue}
+            >
+              Launch with Template <ArrowRight className="h-4 w-4" />
+            </Button>
+          </motion.div>
+        </div>
       </div>
     </div>
   );
