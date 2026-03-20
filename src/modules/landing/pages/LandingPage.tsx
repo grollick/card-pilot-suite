@@ -231,21 +231,23 @@ export default function LandingPage() {
                   <Zap className="h-3 w-3" /> The all-in-one platform for service professionals
                 </motion.div>
                 <motion.h1 initial="hidden" animate="visible" variants={fade} custom={1} className="text-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] mb-6">
-                  Get More Local Customers —{" "}
-                  <motion.span
-                    className="gradient-text inline-block origin-center"
-                    initial={{ scale: 1.15, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
-                  >All From One Simple Business Card</motion.span>
+                  {heroHeadlineAccent.main}{" "}
+                  {heroHeadlineAccent.accent && (
+                    <motion.span
+                      className="gradient-text inline-block origin-center"
+                      initial={{ scale: 1.15, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
+                    >{heroHeadlineAccent.accent}</motion.span>
+                  )}
                 </motion.h1>
                 <motion.p initial="hidden" animate="visible" variants={fade} custom={2} className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8">
-                  Create a premium digital business card that captures leads, books jobs, and manages your customers — all in one place.
+                  {heroSubheadline}
                 </motion.p>
                 <motion.div initial="hidden" animate="visible" variants={fade} custom={3} className="flex flex-col sm:flex-row items-center lg:items-start gap-3">
-                  <Link to="/onboarding">
+                  <Link to="/onboarding" onClick={() => abTrackClick()}>
                     <Button size="lg" className="text-base h-13 px-10 rounded-xl shadow-glow-lg group">
-                      Start Free
+                      {heroCta}
                       <ArrowRight className="h-4 w-4 ml-1.5 group-hover:translate-x-0.5 transition-transform" />
                     </Button>
                   </Link>
