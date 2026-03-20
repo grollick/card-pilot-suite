@@ -214,13 +214,16 @@ export function AppSidebar() {
               </div>
             </div>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleSidebar}
-            className="h-7 w-7 text-muted-foreground hover:text-foreground"
-          >
-            <ChevronLeft className={`h-3.5 w-3.5 transition-transform duration-200 ${collapsed ? "rotate-180" : ""}`} />
+          <Tip label={collapsed ? "Expand sidebar" : "Collapse sidebar"} side="right">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleSidebar}
+              className="h-7 w-7 text-muted-foreground hover:text-foreground"
+            >
+              <ChevronLeft className={`h-3.5 w-3.5 transition-transform duration-200 ${collapsed ? "rotate-180" : ""}`} />
+            </Button>
+          </Tip>
           </Button>
         </div>
       </SidebarHeader>
