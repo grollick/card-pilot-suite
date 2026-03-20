@@ -274,6 +274,8 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     description: "Purpose-built for contractors who want more jobs. Instant quote calculator, before/after project gallery, and verified reviews that close deals.",
     category: "trades",
     style: "Bold",
+    premium: true,
+    style: "Bold",
     sections: [
       { id: "hero", enabled: true },
       { id: "services", enabled: true },
