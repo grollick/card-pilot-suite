@@ -148,12 +148,12 @@ export default function BuilderSectionLibrary({
   const enabledCount = sections.filter(s => s.enabled).length;
 
   return (
-    <div className="space-y-1">
-      <div className="flex items-center justify-between px-2 py-1">
-        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+    <div className="space-y-0.5">
+      <div className="flex items-center justify-between px-2.5 py-1.5">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
           Sections
         </span>
-        <span className="text-[10px] text-muted-foreground/60">
+        <span className="text-[10px] font-medium text-muted-foreground/40 tabular-nums">
           {enabledCount} active
         </span>
       </div>
