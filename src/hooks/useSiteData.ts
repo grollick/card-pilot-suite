@@ -30,8 +30,8 @@ export function useSiteData(handle: string | undefined) {
     staleTime: 10 * 60 * 1000,
     queryFn: async (): Promise<SiteData> => {
       const { data: profile, error: pErr } = await supabase
-        .from("profiles")
-        .select("id, name, handle, email, phone, company, avatar_url, bio, city, professions(name, category)")
+        .from("public_profiles" as any)
+        .select("id, name, handle, company, avatar_url, bio, city, profession_id")
         .eq("handle", handle!)
         .single();
       if (pErr) throw pErr;

@@ -38,7 +38,7 @@ export default function QRLanding() {
 
         // 2. Get card owner's handle
         const { data: profile } = await supabase
-          .from("profiles")
+          .from("public_profiles" as any)
           .select("handle")
           .eq("id", qrCampaign.user_id)
           .single();
