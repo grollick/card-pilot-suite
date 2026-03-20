@@ -199,6 +199,7 @@ export function AppSidebar() {
     : "U";
 
   return (
+    <TooltipProvider delayDuration={collapsed ? 100 : 500}>
     <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar">
       <SidebarHeader className="p-4 pb-2">
         <div className="flex items-center justify-between">
