@@ -31,6 +31,7 @@ import ReferralActivationChecker from "@/modules/dashboard/components/ReferralAc
 import ReferralWidget from "@/modules/dashboard/components/ReferralWidget";
 import VerificationChecklist from "@/modules/dashboard/components/VerificationChecklist";
 import MarketplaceAwarenessWidget from "@/modules/dashboard/components/MarketplaceAwarenessWidget";
+import YouAreLiveBanner from "@/modules/dashboard/components/YouAreLiveBanner";
 import { useLeadGuarantee } from "@/hooks/useLeadGuarantee";
 import { useIsMobile } from "@/hooks/use-mobile";
 
