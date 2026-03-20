@@ -336,7 +336,7 @@ export default function CardBuilder() {
       <Button
         variant="ghost"
         size="sm"
-        className="w-full gap-1.5 text-[11px] text-muted-foreground/60 hover:text-primary border border-dashed border-border/30 hover:border-primary/30 h-9 mt-2 rounded-xl transition-all duration-200"
+        className="w-full gap-1.5 text-[11px] text-muted-foreground/50 hover:text-primary border border-dashed border-border/20 hover:border-primary/25 hover:bg-primary/[0.03] h-9 mt-2 rounded-xl transition-all duration-200"
         onClick={() => setBlockMarketOpen(true)}
       >
         <Plus className="h-3 w-3" />
