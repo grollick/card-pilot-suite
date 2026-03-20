@@ -7,6 +7,10 @@ import { ArrowRight, CheckCircle2, Star, ChevronRight } from "lucide-react";
 import { getIndustryPage, getIndustryDemoCard } from "@/modules/landing/data/industryPages";
 import NotFound from "@/modules/shared/pages/NotFound";
 
+function authLink(slug: string) {
+  return `/auth?mode=signup&profession=${slug}`;
+}
+
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
   visible: (i: number) => ({
@@ -45,7 +49,7 @@ export default function IndustryLandingPage() {
             <div className="flex items-center gap-3">
               <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline">Pricing</Link>
               <Button asChild size="sm">
-                <Link to="/auth">{page.ctaText}</Link>
+                <Link to={authLink(page.slug)}>{page.ctaText}</Link>
               </Button>
             </div>
           </div>
@@ -71,7 +75,7 @@ export default function IndustryLandingPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <Button asChild size="lg" className="text-base px-8">
-                  <Link to="/auth">
+                  <Link to={authLink(page.slug)}>
                     {page.ctaText} <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -421,7 +425,7 @@ export default function IndustryLandingPage() {
                 {page.finalCtaSubheadline || `Join thousands of ${page.profession.toLowerCase()}s who use guzzl.pro to capture more leads, book more jobs, and build a stronger reputation.`}
               </p>
               <Button asChild size="lg" className="text-base px-10">
-                <Link to="/auth">
+                <Link to={authLink(page.slug)}>
                   {page.ctaText} <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

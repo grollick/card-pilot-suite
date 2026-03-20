@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Rocket, ArrowRight, Sparkles, CalendarCheck, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
@@ -63,6 +63,7 @@ const categoryKeyMap: Record<string, string> = {
 
 export default function Onboarding() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -93,6 +94,41 @@ export default function Onboarding() {
   });
 
   const selectedProfession = professions.find(p => p.id === selectedProfessionId);
+
+  // Auto-select profession from URL param (e.g. ?profession=contractors)
+  useEffect(() => {
+    if (selectedProfessionId || professions.length === 0) return;
+    const profParam = searchParams.get("profession")?.toLowerCase().trim();
+    if (!profParam) return;
+
+    const profMap: Record<string, string[]> = {
+      contractor: ["contractor", "general contractor"],
+      contractors: ["contractor", "general contractor"],
+      realtor: ["realtor", "real estate agent"],
+      realtors: ["realtor", "real estate agent"],
+      barber: ["barber"],
+      barbers: ["barber"],
+      photographer: ["photographer"],
+      photographers: ["photographer"],
+      landscaper: ["landscaper"],
+      landscapers: ["landscaper"],
+      plumber: ["plumber"],
+      electrician: ["electrician"],
+      painter: ["painter", "interior painter"],
+      cleaner: ["house cleaner", "cleaner"],
+      trainer: ["personal trainer"],
+    };
+
+    const matchNames = profMap[profParam] || [profParam];
+    const match = professions.find(p =>
+      matchNames.some(n => p.name.toLowerCase().includes(n))
+    );
+    if (match) {
+      setSelectedProfessionId(match.id);
+      // Skip profession selection step
+      if (step === 0) setStep(1);
+    }
+  }, [professions, searchParams, selectedProfessionId, step]);
 
   const categoryKey = useMemo(() => {
     if (!selectedProfession) return "";
