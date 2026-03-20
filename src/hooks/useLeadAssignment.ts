@@ -41,7 +41,7 @@ export function useLeadAssignmentSettings() {
         .eq("user_id", user!.id)
         .maybeSingle();
       if (error) throw error;
-      return data as LeadAssignmentSettings | null;
+      return data as unknown as LeadAssignmentSettings | null;
     },
   });
 }
