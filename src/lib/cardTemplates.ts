@@ -346,6 +346,8 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     description: "Trust-forward design for real estate professionals. Testimonials, market expertise, and instant scheduling that converts browsers into buyers.",
     category: "real_estate",
     style: "Elegant",
+    premium: true,
+    style: "Elegant",
     sections: [
       { id: "hero", enabled: true },
       { id: "about", enabled: true },
