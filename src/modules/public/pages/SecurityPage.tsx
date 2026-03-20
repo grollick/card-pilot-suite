@@ -73,7 +73,7 @@ export default function SecurityPage() {
             transition={{ duration: 0.5 }}
             className="text-center mb-16"
           >
-            <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-emerald-500/10 text-emerald-600 mb-5">
+            <div className="inline-flex items-center justify-center h-14 w-14 rounded-2xl bg-primary/10 text-primary mb-5">
               <Shield className="h-7 w-7" />
             </div>
             <h1 className="text-3xl font-bold tracking-tight text-foreground mb-3">
