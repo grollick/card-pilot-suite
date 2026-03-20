@@ -207,6 +207,7 @@ const App = () => (
             <Route path="/products" element={<LazyRoute><ProductsPage /></LazyRoute>} />
             <Route path="/privacy" element={<LegalPage pageKey="privacy" />} />
             <Route path="/terms" element={<LegalPage pageKey="terms" />} />
+            <Route path="/security" element={<LazyRoute><SecurityPage /></LazyRoute>} />
             <Route path="/site/:handle" element={<LazyRoute><PublicSite /></LazyRoute>} />
             <Route path="/discover" element={<LazyRoute><DiscoverPage /></LazyRoute>} />
             <Route path="/discover/map" element={<LazyRoute><OnDutyMapPage /></LazyRoute>} />

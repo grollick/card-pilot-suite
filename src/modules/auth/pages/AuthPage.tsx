@@ -265,12 +265,18 @@ export default function Auth() {
             )}
           </p>
 
-          {/* Terms */}
-          {isSignup && (
-            <p className="text-center text-[11px] text-muted-foreground/60 mt-4 leading-relaxed">
-              By creating an account, you agree to our Terms of Service and Privacy Policy.
+          {/* Security message + Terms */}
+          <div className="mt-5 space-y-2">
+            <p className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground/70">
+              <Lock className="h-3 w-3 shrink-0" />
+              Your data is protected with modern security standards
             </p>
-          )}
+            {isSignup && (
+              <p className="text-center text-[11px] text-muted-foreground/60 leading-relaxed">
+                By creating an account, you agree to our Terms of Service and Privacy Policy.
+              </p>
+            )}
+          </div>
         </motion.div>
       </div>
     </div>
