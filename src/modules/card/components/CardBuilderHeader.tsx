@@ -41,27 +41,29 @@ export default function CardBuilderHeader({
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="h-11 flex items-center justify-between px-3 border-b border-border/60 bg-card/95 backdrop-blur-sm shrink-0">
+      <div className="h-12 flex items-center justify-between px-4 border-b border-border/40 bg-background/95 backdrop-blur-md shrink-0">
         {/* ── Left: Back + Card name + Save status ── */}
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-3 min-w-0">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => navigate("/app")}>
+              <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 rounded-lg hover:bg-muted/60" onClick={() => navigate("/app")}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="bottom">Back to Dashboard</TooltipContent>
           </Tooltip>
 
-          <div className="flex items-center gap-2 min-w-0">
-            <h1 className="text-sm font-semibold truncate max-w-[160px] text-foreground">
+          <Separator orientation="vertical" className="h-5 hidden sm:block" />
+
+          <div className="flex items-center gap-2.5 min-w-0">
+            <h1 className="text-[13px] font-semibold truncate max-w-[180px] text-foreground">
               {name || "Untitled Card"}
             </h1>
-            <div className={`flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded-full shrink-0 transition-colors ${
-              globalSaveState === "saving" ? "text-primary"
-              : globalSaveState === "saved" ? "text-muted-foreground"
-              : globalSaveState === "error" ? "text-destructive"
-              : "text-muted-foreground"
+            <div className={`flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 transition-colors ${
+              globalSaveState === "saving" ? "text-primary bg-primary/5"
+              : globalSaveState === "saved" ? "text-emerald-600 bg-emerald-500/5"
+              : globalSaveState === "error" ? "text-destructive bg-destructive/5"
+              : "text-muted-foreground bg-muted/30"
             }`}>
               {globalSaveState === "saving" && <Loader2 className="h-2.5 w-2.5 animate-spin" />}
               {globalSaveState === "saved" && <Cloud className="h-2.5 w-2.5" />}
@@ -73,7 +75,7 @@ export default function CardBuilderHeader({
         </div>
 
         {/* ── Center: Device preview toggle ── */}
-        <div className="hidden md:flex items-center gap-0.5 rounded-lg border border-border/50 bg-muted/30 p-0.5">
+        <div className="hidden md:flex items-center gap-0.5 rounded-lg border border-border/40 bg-muted/20 p-0.5">
           {([
             { id: "phone" as const, icon: Smartphone, label: "Phone" },
             { id: "tablet" as const, icon: Tablet, label: "Tablet" },
@@ -82,7 +84,7 @@ export default function CardBuilderHeader({
               <TooltipTrigger asChild>
                 <button
                   onClick={() => onPreviewDeviceChange(d.id)}
-                  className={`flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-medium transition-all ${
+                  className={`flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[11px] font-medium transition-all duration-200 ${
                     previewDevice === d.id
                       ? "bg-background text-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground"
@@ -98,12 +100,12 @@ export default function CardBuilderHeader({
         </div>
 
         {/* ── Right: Preview + Share + Publish ── */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           {handle && (
             <>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" asChild>
                     <a href={`/${handle}`} target="_blank" rel="noreferrer">
                       <Eye className="h-3.5 w-3.5" />
                     </a>
@@ -114,7 +116,7 @@ export default function CardBuilderHeader({
 
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7"
+                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg"
                     onClick={() => { navigator.clipboard.writeText(`${window.location.origin}/${handle}`); toast.success("Link copied!"); }}
                   >
                     <Link2 className="h-3.5 w-3.5" />
@@ -129,11 +131,11 @@ export default function CardBuilderHeader({
             </>
           )}
 
-          <Separator orientation="vertical" className="h-5 mx-0.5" />
+          <Separator orientation="vertical" className="h-5 mx-1" />
 
           {/* Publish */}
-          <div className="flex items-center gap-1.5 rounded-lg border border-border/50 bg-muted/30 px-2 py-1">
-            <Badge variant={published ? "default" : "secondary"} className={`text-[10px] px-1.5 py-0 font-semibold uppercase ${published ? "bg-emerald-500/15 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/20" : ""}`}>
+          <div className="flex items-center gap-2 rounded-xl border border-border/40 bg-muted/15 px-3 py-1.5">
+            <Badge variant={published ? "default" : "secondary"} className={`text-[10px] px-2 py-0.5 font-semibold uppercase tracking-wide rounded-md ${published ? "bg-emerald-500/12 text-emerald-600 border-emerald-500/25 hover:bg-emerald-500/18" : ""}`}>
               {published ? "Live" : "Draft"}
             </Badge>
             <Switch checked={published} onCheckedChange={onPublishToggle} className="scale-[0.8]" />
@@ -143,9 +145,8 @@ export default function CardBuilderHeader({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant="default"
                   size="sm"
-                  className="h-7 gap-1 text-[11px] ml-1"
+                  className="h-8 gap-1.5 text-[11px] font-semibold ml-1 rounded-lg shadow-sm"
                   onClick={() => setNetworkingOpen(true)}
                 >
                   <Wifi className="h-3 w-3" /> Share

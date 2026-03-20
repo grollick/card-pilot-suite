@@ -50,14 +50,14 @@ function PanelSection({ title, icon: Icon, children, defaultOpen = true }: {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger className="w-full flex items-center justify-between py-2 px-0.5 group">
+      <CollapsibleTrigger className="w-full flex items-center justify-between py-2.5 px-1 group">
         <div className="flex items-center gap-2">
-          <Icon className="h-3.5 w-3.5 text-muted-foreground/70" />
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{title}</span>
+          <Icon className="h-3.5 w-3.5 text-muted-foreground/50" />
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">{title}</span>
         </div>
-        <ChevronDown className={`h-3 w-3 text-muted-foreground/50 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-3 w-3 text-muted-foreground/30 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </CollapsibleTrigger>
-      <CollapsibleContent className="pt-1.5 pb-1">
+      <CollapsibleContent className="pt-1 pb-2">
         {children}
       </CollapsibleContent>
     </Collapsible>
@@ -283,7 +283,7 @@ export default function CardBuilder() {
   //  LEFT PANEL — Section Library (minimal)
   // ════════════════════════════════════════════════
   const leftPanel = (
-    <div className="space-y-1">
+    <div className="space-y-2">
       <PanelSection title="Templates" icon={LayoutTemplate} defaultOpen={false}>
         <TemplateSelector
           selectedTemplateId={selectedTemplateId}
@@ -293,7 +293,7 @@ export default function CardBuilder() {
         />
       </PanelSection>
 
-      <div className="h-px bg-border/30 my-1" />
+      <div className="h-px bg-border/20 my-2" />
 
       <BuilderSectionLibrary
         sections={s.sections}
@@ -308,21 +308,21 @@ export default function CardBuilder() {
       <Button
         variant="ghost"
         size="sm"
-        className="w-full gap-1.5 text-[11px] text-muted-foreground hover:text-primary border border-dashed border-border/50 hover:border-primary/30 h-8 mt-1"
+        className="w-full gap-1.5 text-[11px] text-muted-foreground/60 hover:text-primary border border-dashed border-border/30 hover:border-primary/30 h-9 mt-2 rounded-xl transition-all duration-200"
         onClick={() => setBlockMarketOpen(true)}
       >
         <Plus className="h-3 w-3" />
         Add Section
       </Button>
 
-      <div className="h-px bg-border/30 my-1" />
+      <div className="h-px bg-border/20 my-2" />
 
       <PanelSection title="AI Tools" icon={Sparkles} defaultOpen={false}>
-        <div className="space-y-1.5">
-          <Button size="sm" className="w-full gap-1.5 h-8 text-[11px]" onClick={() => setAiAssistantOpen(true)}>
+        <div className="space-y-2">
+          <Button size="sm" className="w-full gap-1.5 h-9 text-[11px] rounded-lg" onClick={() => setAiAssistantOpen(true)}>
             <Sparkles className="h-3 w-3" /> AI Design Assistant
           </Button>
-          <Button variant="outline" size="sm" className="w-full h-8 text-[11px]" onClick={s.handleAIGenerate} disabled={s.isGenerating}>
+          <Button variant="outline" size="sm" className="w-full h-9 text-[11px] rounded-lg" onClick={s.handleAIGenerate} disabled={s.isGenerating}>
             {s.isGenerating ? <Loader2 className="h-3 w-3 mr-1.5 animate-spin" /> : <Sparkles className="h-3 w-3 mr-1.5" />}
             {s.isGenerating ? "Writing…" : "AI Write Copy"}
           </Button>
@@ -332,15 +332,15 @@ export default function CardBuilder() {
       <ConversionTips sections={s.sections} />
 
       {!isPro && (
-        <div className="rounded-lg border border-primary/10 bg-primary/[0.03] p-2.5 space-y-1.5 mt-2">
+        <div className="rounded-xl border border-primary/8 bg-primary/[0.02] p-3 space-y-2 mt-3">
           <div className="flex items-center gap-1.5">
             <Crown className="h-3.5 w-3.5 text-primary" />
-            <span className="text-[11px] font-semibold">Unlock Pro</span>
+            <span className="text-[11px] font-semibold text-foreground">Unlock Pro</span>
           </div>
           <p className="text-[10px] text-muted-foreground leading-relaxed">
-            Unlimited sections, animations, AI tools, and more.
+            Premium templates, animations, AI tools, and more.
           </p>
-          <Button size="sm" className="w-full h-7 text-[10px]" onClick={() => window.location.href = "/app/pricing"}>
+          <Button size="sm" className="w-full h-8 text-[10px] rounded-lg" onClick={() => window.location.href = "/app/pricing"}>
             Upgrade
           </Button>
         </div>
@@ -353,14 +353,14 @@ export default function CardBuilder() {
   // ════════════════════════════════════════════════
   const rightPanel = (
     <Tabs value={rightTab} onValueChange={setRightTab} className="w-full">
-      <TabsList className="w-full grid grid-cols-3 h-9 mb-3 bg-muted/40 rounded-lg p-0.5">
-        <TabsTrigger value="content" className="text-[11px] gap-1.5 h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+      <TabsList className="w-full grid grid-cols-3 h-10 mb-4 bg-muted/25 rounded-xl p-0.5 border border-border/20">
+        <TabsTrigger value="content" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200">
           <Pencil className="h-3 w-3" /> Content
         </TabsTrigger>
-        <TabsTrigger value="style" className="text-[11px] gap-1.5 h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+        <TabsTrigger value="style" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200">
           <PaintBucket className="h-3 w-3" /> Style
         </TabsTrigger>
-        <TabsTrigger value="layout" className="text-[11px] gap-1.5 h-full rounded-md data-[state=active]:bg-background data-[state=active]:shadow-sm">
+        <TabsTrigger value="layout" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200">
           <LayoutGrid className="h-3 w-3" /> Layout
         </TabsTrigger>
       </TabsList>
@@ -574,48 +574,62 @@ export default function CardBuilder() {
         <ResizablePanelGroup direction="horizontal" className="h-full">
           {/* Left Panel — Section Library */}
           <ResizablePanel defaultSize={17} minSize={14} maxSize={22}>
-            <div className="h-full flex flex-col bg-background border-r border-border/30">
-              <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border/30 shrink-0">
-                <Layers className="h-3.5 w-3.5 text-primary/70" />
-                <span className="text-[11px] font-semibold tracking-wide text-foreground/80">Components</span>
+            <div className="h-full flex flex-col bg-background">
+              <div className="flex items-center gap-2.5 px-4 py-3 border-b border-border/20 shrink-0">
+                <div className="h-6 w-6 rounded-lg bg-primary/8 flex items-center justify-center">
+                  <Layers className="h-3 w-3 text-primary" />
+                </div>
+                <span className="text-[12px] font-semibold text-foreground">Components</span>
               </div>
               <div className="flex-1 overflow-y-auto scrollbar-thin">
-                <div className="p-2">
+                <div className="p-3">
                   {leftPanel}
                 </div>
               </div>
             </div>
           </ResizablePanel>
 
-          <ResizableHandle className="w-px bg-border/20 hover:bg-primary/20 transition-colors data-[resize-handle-active]:bg-primary/40" />
+          <ResizableHandle className="w-px bg-border/15 hover:bg-primary/20 transition-colors data-[resize-handle-active]:bg-primary/40" />
 
           {/* Center Panel — Preview Canvas */}
           <ResizablePanel defaultSize={50} minSize={34}>
-            <div className="h-full flex flex-col bg-muted/30" style={{
-              backgroundImage: "radial-gradient(circle, hsl(var(--border) / 0.08) 1px, transparent 1px)",
-              backgroundSize: "24px 24px",
+            <div className="h-full flex flex-col bg-muted/15" style={{
+              backgroundImage: "radial-gradient(circle, hsl(var(--border) / 0.05) 1px, transparent 1px)",
+              backgroundSize: "20px 20px",
             }}>
               <div className="flex-1 overflow-y-auto">
-                <div className="p-8 flex items-start justify-center min-h-full">
-                  <div className="w-full max-w-md">
-                    <CardBuilderPreview {...previewProps} previewDevice={previewDevice} hideToolbar />
-                  </div>
+                <div className="p-10 flex items-start justify-center min-h-full">
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                    className="w-full max-w-md"
+                  >
+                    {/* Device frame */}
+                    <div className="rounded-[2rem] bg-foreground/5 p-2 shadow-lg shadow-black/[0.03]">
+                      <div className="rounded-[1.5rem] overflow-hidden bg-background shadow-sm ring-1 ring-border/10">
+                        <CardBuilderPreview {...previewProps} previewDevice={previewDevice} hideToolbar />
+                      </div>
+                    </div>
+                  </motion.div>
                 </div>
               </div>
             </div>
           </ResizablePanel>
 
-          <ResizableHandle className="w-px bg-border/20 hover:bg-primary/20 transition-colors data-[resize-handle-active]:bg-primary/40" />
+          <ResizableHandle className="w-px bg-border/15 hover:bg-primary/20 transition-colors data-[resize-handle-active]:bg-primary/40" />
 
           {/* Right Panel — Design Controls */}
           <ResizablePanel defaultSize={33} minSize={24} maxSize={42}>
-            <div className="h-full flex flex-col bg-background border-l border-border/30">
-              <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border/30 shrink-0">
-                <Settings2 className="h-3.5 w-3.5 text-primary/70" />
-                <span className="text-[11px] font-semibold tracking-wide text-foreground/80">Inspector</span>
+            <div className="h-full flex flex-col bg-background">
+              <div className="flex items-center gap-2.5 px-4 py-3 border-b border-border/20 shrink-0">
+                <div className="h-6 w-6 rounded-lg bg-primary/8 flex items-center justify-center">
+                  <Settings2 className="h-3 w-3 text-primary" />
+                </div>
+                <span className="text-[12px] font-semibold text-foreground">Design</span>
               </div>
               <div className="flex-1 overflow-y-auto scrollbar-thin">
-                <div className="p-3">
+                <div className="p-4">
                   {rightPanel}
                 </div>
               </div>
