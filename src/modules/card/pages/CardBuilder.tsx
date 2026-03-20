@@ -45,20 +45,25 @@ const TEMPLATE_STYLE_PALETTES: Record<string, { primary: string; secondary: stri
 };
 
 /* ── Collapsible section wrapper ── */
-function PanelSection({ title, icon: Icon, children, defaultOpen = true }: {
-  title: string; icon: typeof Layers; children: React.ReactNode; defaultOpen?: boolean;
+function PanelSection({ title, icon: Icon, children, defaultOpen = true, badge }: {
+  title: string; icon: typeof Layers; children: React.ReactNode; defaultOpen?: boolean; badge?: string;
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger className="w-full flex items-center justify-between py-2.5 px-1 group">
+      <CollapsibleTrigger className="w-full flex items-center justify-between py-2 px-1.5 group rounded-lg hover:bg-accent/30 transition-colors duration-150">
         <div className="flex items-center gap-2">
-          <Icon className="h-3.5 w-3.5 text-muted-foreground/50" />
-          <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">{title}</span>
+          <div className="h-5 w-5 rounded-md bg-primary/6 flex items-center justify-center">
+            <Icon className="h-3 w-3 text-primary/70" />
+          </div>
+          <span className="text-[11px] font-semibold text-foreground/80 tracking-wide">{title}</span>
+          {badge && (
+            <span className="text-[9px] font-medium text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded-full">{badge}</span>
+          )}
         </div>
-        <ChevronDown className={`h-3 w-3 text-muted-foreground/30 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-3 w-3 text-muted-foreground/40 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </CollapsibleTrigger>
-      <CollapsibleContent className="pt-1 pb-2">
+      <CollapsibleContent className="pt-1.5 pb-1">
         {children}
       </CollapsibleContent>
     </Collapsible>
@@ -331,7 +336,7 @@ export default function CardBuilder() {
       <Button
         variant="ghost"
         size="sm"
-        className="w-full gap-1.5 text-[11px] text-muted-foreground/60 hover:text-primary border border-dashed border-border/30 hover:border-primary/30 h-9 mt-2 rounded-xl transition-all duration-200"
+        className="w-full gap-1.5 text-[11px] text-muted-foreground/50 hover:text-primary border border-dashed border-border/20 hover:border-primary/25 hover:bg-primary/[0.03] h-9 mt-2 rounded-xl transition-all duration-200"
         onClick={() => setBlockMarketOpen(true)}
       >
         <Plus className="h-3 w-3" />
@@ -355,15 +360,17 @@ export default function CardBuilder() {
       <ConversionTips sections={s.sections} />
 
       {!isPro && (
-        <div className="rounded-xl border border-primary/8 bg-primary/[0.02] p-3 space-y-2 mt-3">
-          <div className="flex items-center gap-1.5">
-            <Crown className="h-3.5 w-3.5 text-primary" />
+        <div className="rounded-xl border border-primary/10 bg-gradient-to-b from-primary/[0.04] to-transparent p-3.5 space-y-2.5 mt-3">
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Crown className="h-3 w-3 text-primary" />
+            </div>
             <span className="text-[11px] font-semibold text-foreground">Unlock Pro</span>
           </div>
-          <p className="text-[10px] text-muted-foreground leading-relaxed">
+          <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
             Premium templates, animations, AI tools, and more.
           </p>
-          <Button size="sm" className="w-full h-8 text-[10px] rounded-lg" onClick={() => window.location.href = "/app/pricing"}>
+          <Button size="sm" className="w-full h-8 text-[10px] rounded-xl shadow-sm" onClick={() => window.location.href = "/app/pricing"}>
             Upgrade
           </Button>
         </div>
@@ -376,14 +383,14 @@ export default function CardBuilder() {
   // ════════════════════════════════════════════════
   const rightPanel = (
     <Tabs value={rightTab} onValueChange={setRightTab} className="w-full">
-      <TabsList className="w-full grid grid-cols-3 h-10 mb-4 bg-muted/25 rounded-xl p-0.5 border border-border/20">
-        <TabsTrigger value="content" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200">
+      <TabsList className="w-full grid grid-cols-3 h-11 mb-4 bg-muted/15 rounded-xl p-1 border border-border/10 shadow-sm">
+        <TabsTrigger value="content" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-border/10 transition-all duration-200">
           <Pencil className="h-3 w-3" /> Content
         </TabsTrigger>
-        <TabsTrigger value="style" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200">
+        <TabsTrigger value="style" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-border/10 transition-all duration-200">
           <PaintBucket className="h-3 w-3" /> Style
         </TabsTrigger>
-        <TabsTrigger value="layout" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200">
+        <TabsTrigger value="layout" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-border/10 transition-all duration-200">
           <LayoutGrid className="h-3 w-3" /> Layout
         </TabsTrigger>
       </TabsList>
@@ -474,25 +481,25 @@ export default function CardBuilder() {
           />
         </PanelSection>
 
-        <Button variant="outline" className="w-full h-9 text-[12px] gap-2 border-border/50 hover:border-primary/30" onClick={() => s.setThemeEditorOpen(true)}>
+        <Button variant="outline" className="w-full h-10 text-[12px] gap-2 border-border/20 hover:border-primary/25 hover:bg-primary/[0.03] rounded-xl shadow-sm transition-all duration-200" onClick={() => s.setThemeEditorOpen(true)}>
           <Sliders className="h-3.5 w-3.5" /> Open Full Theme Editor
         </Button>
 
         {/* Color Palette */}
         <PanelSection title="Colors" icon={Palette}>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-2.5">
             {[
               { label: "Primary", color: s.previewTheme.palette.primary },
               { label: "Secondary", color: s.previewTheme.palette.secondary },
               { label: "Accent", color: s.previewTheme.palette.accent },
               { label: "Background", color: s.previewTheme.palette.background },
             ].map((c) => (
-              <div key={c.label} className="text-center group">
+              <div key={c.label} className="text-center group cursor-pointer">
                 <div
-                  className="h-9 rounded-lg border border-border/40 shadow-sm transition-all duration-200 cursor-pointer group-hover:scale-105 group-hover:shadow-md"
+                  className="h-10 rounded-xl border border-border/20 shadow-sm transition-all duration-200 cursor-pointer group-hover:scale-105 group-hover:shadow-md group-hover:ring-2 group-hover:ring-primary/20"
                   style={{ background: c.color }}
                 />
-                <span className="text-[9px] text-muted-foreground/70 mt-1 block">{c.label}</span>
+                <span className="text-[9px] text-muted-foreground/60 mt-1.5 block font-medium">{c.label}</span>
               </div>
             ))}
           </div>
@@ -500,14 +507,15 @@ export default function CardBuilder() {
 
         {/* Typography */}
         <PanelSection title="Typography" icon={Type}>
-          <div className="rounded-lg border border-border/40 p-3 space-y-2 bg-muted/10">
+          <div className="rounded-xl border border-border/15 p-3.5 space-y-3 bg-gradient-to-b from-muted/10 to-transparent">
             <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground">Heading</span>
-              <span className="font-medium" style={{ fontFamily: s.previewTheme.fonts.primary }}>{s.previewTheme.fonts.primary}</span>
+              <span className="text-muted-foreground/60">Heading</span>
+              <span className="font-semibold text-foreground/80" style={{ fontFamily: s.previewTheme.fonts.primary }}>{s.previewTheme.fonts.primary}</span>
             </div>
+            <div className="h-px bg-border/10" />
             <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground">Body</span>
-              <span className="font-medium" style={{ fontFamily: s.previewTheme.fonts.secondary }}>{s.previewTheme.fonts.secondary}</span>
+              <span className="text-muted-foreground/60">Body</span>
+              <span className="font-medium text-foreground/80" style={{ fontFamily: s.previewTheme.fonts.secondary }}>{s.previewTheme.fonts.secondary}</span>
             </div>
           </div>
         </PanelSection>
@@ -550,15 +558,15 @@ export default function CardBuilder() {
       <TabsContent value="layout" className="mt-0 space-y-3">
         {/* Quick settings */}
         <PanelSection title="Display Settings" icon={Settings2}>
-          <div className="space-y-2 rounded-lg border border-border/40 p-3 bg-muted/10">
+          <div className="space-y-1 rounded-xl border border-border/15 p-3.5 bg-gradient-to-b from-muted/10 to-transparent">
             {[
               { label: "Section icons", checked: s.showSectionIcons, onChange: (val: boolean) => { s.setShowSectionIcons(val); s.saveThemeField({ section_icons: val }); } },
               { label: "Social icons only", checked: s.socialIconsOnly, onChange: (v: boolean) => { s.setSocialIconsOnly(v); s.saveThemeField({ social_icons_only: v }); } },
               { label: "CTA icons only", checked: s.ctaIconsOnly, onChange: (v: boolean) => { s.setCtaIconsOnly(v); s.saveThemeField({ cta_icons_only: v }); } },
               { label: "Scan to Save", checked: (s.card?.theme_json as any)?.scan_to_save === true, onChange: (v: boolean) => { s.saveThemeField({ scan_to_save: v }); } },
             ].map((item) => (
-              <div key={item.label} className="flex items-center justify-between">
-                <span className="text-[11px] text-muted-foreground">{item.label}</span>
+              <div key={item.label} className="flex items-center justify-between py-1">
+                <span className="text-[11px] text-muted-foreground/70">{item.label}</span>
                 <Switch checked={item.checked} onCheckedChange={item.onChange} className="scale-[0.7]" />
               </div>
             ))}
@@ -615,28 +623,34 @@ export default function CardBuilder() {
         <ResizablePanelGroup direction="horizontal" className="h-full">
           {/* Left Panel — Section Library */}
           <ResizablePanel defaultSize={17} minSize={14} maxSize={22}>
-            <div className="h-full flex flex-col bg-background">
-              <div className="flex items-center gap-2.5 px-4 py-3 border-b border-border/20 shrink-0">
-                <div className="h-6 w-6 rounded-lg bg-primary/8 flex items-center justify-center">
-                  <Layers className="h-3 w-3 text-primary" />
+            <div className="h-full flex flex-col bg-background/80 backdrop-blur-sm">
+              <div className="flex items-center gap-2.5 px-4 py-3.5 border-b border-border/15 shrink-0">
+                <div className="h-7 w-7 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center shadow-sm ring-1 ring-primary/10">
+                  <Layers className="h-3.5 w-3.5 text-primary" />
                 </div>
-                <span className="text-[12px] font-semibold text-foreground">Components</span>
+                <div>
+                  <span className="text-[12px] font-semibold text-foreground block leading-tight">Components</span>
+                  <span className="text-[10px] text-muted-foreground/50">Drag to reorder</span>
+                </div>
               </div>
               <div className="flex-1 overflow-y-auto scrollbar-thin">
-                <div className="p-3">
+                <div className="p-3 space-y-1">
                   {leftPanel}
                 </div>
               </div>
             </div>
           </ResizablePanel>
 
-          <ResizableHandle className="w-px bg-border/15 hover:bg-primary/20 transition-colors data-[resize-handle-active]:bg-primary/40" />
+          <ResizableHandle className="w-[3px] bg-transparent hover:bg-primary/15 transition-colors duration-200 data-[resize-handle-active]:bg-primary/30 relative after:absolute after:inset-y-0 after:-left-px after:w-px after:bg-border/10" />
 
           {/* Center Panel — Preview Canvas */}
           <ResizablePanel defaultSize={50} minSize={34}>
-            <div className="h-full flex flex-col bg-muted/15" style={{
-              backgroundImage: "radial-gradient(circle, hsl(var(--border) / 0.05) 1px, transparent 1px)",
-              backgroundSize: "20px 20px",
+            <div className="h-full flex flex-col bg-gradient-to-b from-muted/10 via-muted/5 to-muted/10" style={{
+              backgroundImage: `
+                radial-gradient(circle at 50% 0%, hsl(var(--primary) / 0.02) 0%, transparent 50%),
+                radial-gradient(circle, hsl(var(--border) / 0.04) 1px, transparent 1px)
+              `,
+              backgroundSize: "100% 100%, 24px 24px",
             }}>
               <div className="flex-1 overflow-y-auto">
                 <div className="p-10 flex items-start justify-center min-h-full">
@@ -647,8 +661,12 @@ export default function CardBuilder() {
                     className="w-full max-w-md"
                   >
                     {/* Device frame */}
-                    <div className="rounded-[2rem] bg-foreground/5 p-2 shadow-lg shadow-black/[0.03]">
-                      <div className="rounded-[1.5rem] overflow-hidden bg-background shadow-sm ring-1 ring-border/10">
+                    <div className="rounded-[2.5rem] bg-gradient-to-b from-foreground/[0.06] to-foreground/[0.03] p-2.5 shadow-xl shadow-black/[0.04] ring-1 ring-foreground/[0.04]">
+                      {/* Notch */}
+                      <div className="flex justify-center -mb-1 relative z-10">
+                        <div className="h-5 w-28 bg-foreground/[0.07] rounded-b-2xl" />
+                      </div>
+                      <div className="rounded-[2rem] overflow-hidden bg-background shadow-inner ring-1 ring-border/5">
                         <CardBuilderPreview {...previewProps} previewDevice={previewDevice} hideToolbar />
                       </div>
                     </div>
@@ -658,16 +676,19 @@ export default function CardBuilder() {
             </div>
           </ResizablePanel>
 
-          <ResizableHandle className="w-px bg-border/15 hover:bg-primary/20 transition-colors data-[resize-handle-active]:bg-primary/40" />
+          <ResizableHandle className="w-[3px] bg-transparent hover:bg-primary/15 transition-colors duration-200 data-[resize-handle-active]:bg-primary/30 relative after:absolute after:inset-y-0 after:-left-px after:w-px after:bg-border/10" />
 
           {/* Right Panel — Design Controls */}
           <ResizablePanel defaultSize={33} minSize={24} maxSize={42}>
-            <div className="h-full flex flex-col bg-background">
-              <div className="flex items-center gap-2.5 px-4 py-3 border-b border-border/20 shrink-0">
-                <div className="h-6 w-6 rounded-lg bg-primary/8 flex items-center justify-center">
-                  <Settings2 className="h-3 w-3 text-primary" />
+            <div className="h-full flex flex-col bg-background/80 backdrop-blur-sm">
+              <div className="flex items-center gap-2.5 px-4 py-3.5 border-b border-border/15 shrink-0">
+                <div className="h-7 w-7 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center shadow-sm ring-1 ring-primary/10">
+                  <Settings2 className="h-3.5 w-3.5 text-primary" />
                 </div>
-                <span className="text-[12px] font-semibold text-foreground">Design</span>
+                <div>
+                  <span className="text-[12px] font-semibold text-foreground block leading-tight">Design</span>
+                  <span className="text-[10px] text-muted-foreground/50">Customize your card</span>
+                </div>
               </div>
               <div className="flex-1 overflow-y-auto scrollbar-thin">
                 <div className="p-4">

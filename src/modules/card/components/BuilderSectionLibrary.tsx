@@ -50,8 +50,8 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
         style={style}
         className={`group flex items-center gap-2 py-2 px-2.5 rounded-xl transition-all duration-200 ${
           section.enabled
-            ? "hover:bg-accent/50"
-            : "opacity-35 hover:opacity-55"
+            ? "hover:bg-accent/30 hover:shadow-sm"
+            : "opacity-30 hover:opacity-50"
         }`}
       >
         <Tip label="Drag to reorder" side="left">
