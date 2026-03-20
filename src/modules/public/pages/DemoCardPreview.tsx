@@ -52,7 +52,7 @@ export default function DemoCardPreview() {
         {/* Hero with cover image */}
         <motion.div
           initial="hidden" animate="visible" variants={fade}
-          className="mx-4 mt-4 rounded-2xl overflow-hidden shadow-xl"
+          className="mx-4 mt-4 rounded-2xl overflow-visible shadow-xl"
         >
           {/* Cover photo */}
           <div className="relative h-44 overflow-hidden">
