@@ -120,7 +120,7 @@ export const DEMO_CARDS: DemoCard[] = [
   {
     slug: "demo-realtor",
     avatarUrl: sarahImg,
-    coverUrl: projectOceanview,
+    coverUrl: coverRealtor,
     name: "Sarah Chen",
     profession: "Realtor",
     company: "Chen Realty Group",
