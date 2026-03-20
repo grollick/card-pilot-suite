@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
   ArrowRight,
   Smartphone,
@@ -30,6 +30,9 @@ import {
   Target,
   Megaphone,
   Bot,
+  Shield,
+  Globe,
+  ArrowUpRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import FooterSection from "@/modules/landing/components/FooterSection";
@@ -44,6 +47,16 @@ const fade = {
     y: 0,
     transition: { delay: i * 0.1, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
   }),
+};
+
+const stagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
 };
 
 /* ── data ── */
@@ -62,10 +75,10 @@ const solutions = [
 ];
 
 const features = [
-  { icon: Smartphone, title: "Digital Business Card", desc: "A professional, mobile-first card with your services, portfolio, reviews, and booking — all in one link.", tag: "Core" },
-  { icon: FileText, title: "Estimates & Invoices", desc: "Create, send, and track professional estimates and invoices. Get paid faster with online payments.", tag: "Revenue" },
-  { icon: Megaphone, title: "Social Marketing", desc: "AI-powered social posts, automated campaigns, and content scheduling to keep your business visible.", tag: "Growth" },
-  { icon: Bot, title: "CRM & Automation", desc: "Track every lead, automate follow-ups, and manage your pipeline — all on autopilot.", tag: "Automation" },
+  { icon: Smartphone, title: "Digital Business Card", desc: "A professional, mobile-first card with your services, portfolio, reviews, and booking — all in one link.", tag: "Core", gradient: "from-blue-500/10 to-indigo-500/10" },
+  { icon: FileText, title: "Estimates & Invoices", desc: "Create, send, and track professional estimates and invoices. Get paid faster with online payments.", tag: "Revenue", gradient: "from-emerald-500/10 to-teal-500/10" },
+  { icon: Megaphone, title: "Social Marketing", desc: "AI-powered social posts, automated campaigns, and content scheduling to keep your business visible.", tag: "Growth", gradient: "from-orange-500/10 to-amber-500/10" },
+  { icon: Bot, title: "CRM & Automation", desc: "Track every lead, automate follow-ups, and manage your pipeline — all on autopilot.", tag: "Automation", gradient: "from-violet-500/10 to-purple-500/10" },
 ];
 
 const steps = [
@@ -125,6 +138,11 @@ const plans = [
   },
 ];
 
+const TRUST_ITEMS = [
+  "Contractors", "Plumbers", "Electricians", "Landscapers", "Painters", "Roofers",
+  "HVAC Pros", "Photographers", "Barbers", "Realtors", "Personal Trainers", "Cleaners",
+];
+
 const NAV_LINKS = [
   { label: "Features", href: "#features" },
   { label: "Examples", href: "#examples" },
@@ -134,13 +152,17 @@ const NAV_LINKS = [
 /* ────────────────────────────── PAGE ────────────────────────────── */
 export default function LandingPage() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* ─── NAV ─── */}
-      <nav className="border-b border-border/40 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
+      <nav className="border-b border-border/40 bg-background/70 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="text-lg font-extrabold tracking-tight shrink-0">
+          <Link to="/" className="text-xl font-extrabold tracking-tight shrink-0">
             <span className="text-primary font-extrabold">guzzl</span><span className="text-foreground">.pro</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
@@ -151,7 +173,7 @@ export default function LandingPage() {
           <div className="hidden md:flex items-center gap-3">
             <Link to="/auth"><Button variant="ghost" size="sm">Log in</Button></Link>
             <Link to="/onboarding">
-              <Button size="sm">Get Started Free <ArrowRight className="h-3.5 w-3.5 ml-1" /></Button>
+              <Button size="sm" className="shadow-glow">Get Started Free <ArrowRight className="h-3.5 w-3.5 ml-1" /></Button>
             </Link>
           </div>
           <div className="flex md:hidden items-center gap-2">
@@ -178,94 +200,132 @@ export default function LandingPage() {
       </nav>
 
       {/* ─── 1. HERO ─── */}
-      <section className="relative overflow-hidden">
+      <section ref={heroRef} className="relative overflow-hidden">
+        {/* Animated background orbs */}
         <div className="absolute inset-0 -z-10">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full bg-primary/[0.04] blur-[120px]" />
-          <div className="absolute bottom-0 right-0 w-[400px] h-[300px] rounded-full bg-accent/[0.03] blur-[100px]" />
+          <div className="orb-primary w-[700px] h-[500px] top-[-100px] left-[10%]" />
+          <div className="orb-accent w-[500px] h-[400px] top-[50px] right-[-5%]" />
+          <div className="orb-primary w-[300px] h-[300px] bottom-[-50px] left-[40%] opacity-50" />
         </div>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-12 md:pt-24 md:pb-20">
-          <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
-            <div className="flex-1 text-center lg:text-left max-w-2xl">
-              <motion.div initial="hidden" animate="visible" variants={fade} custom={0} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/8 border border-primary/15 text-primary text-xs font-semibold mb-6">
-                <Zap className="h-3 w-3" /> The all-in-one platform for service professionals
+
+        <motion.div style={{ opacity: heroOpacity, scale: heroScale }}>
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-12 md:pt-28 md:pb-24">
+            <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+              <div className="flex-1 text-center lg:text-left max-w-2xl">
+                <motion.div initial="hidden" animate="visible" variants={fade} custom={0} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/8 border border-primary/15 text-primary text-xs font-semibold mb-6">
+                  <Zap className="h-3 w-3" /> The all-in-one platform for service professionals
+                </motion.div>
+                <motion.h1 initial="hidden" animate="visible" variants={fade} custom={1} className="text-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] mb-6">
+                  Turn your business card into a{" "}
+                  <motion.span
+                    className="gradient-text inline-block origin-center"
+                    initial={{ scale: 1.15, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
+                  >customer-generating machine</motion.span>
+                </motion.h1>
+                <motion.p initial="hidden" animate="visible" variants={fade} custom={2} className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8">
+                  Capture leads, send estimates, get paid, and grow your business — all from one platform built for trades.
+                </motion.p>
+                <motion.div initial="hidden" animate="visible" variants={fade} custom={3} className="flex flex-col sm:flex-row items-center lg:items-start gap-3">
+                  <Link to="/onboarding">
+                    <Button size="lg" className="text-base h-13 px-10 rounded-xl shadow-glow-lg group">
+                      Get Started Free
+                      <ArrowRight className="h-4 w-4 ml-1.5 group-hover:translate-x-0.5 transition-transform" />
+                    </Button>
+                  </Link>
+                  <a href="#examples">
+                    <Button variant="outline" size="lg" className="text-base h-13 px-6 rounded-xl">
+                      <ExternalLink className="h-4 w-4 mr-1.5" /> View Demo
+                    </Button>
+                  </a>
+                </motion.div>
+                <motion.div initial="hidden" animate="visible" variants={fade} custom={4} className="flex items-center justify-center lg:justify-start gap-5 mt-8">
+                  {[
+                    { icon: Check, label: "Free forever" },
+                    { icon: Shield, label: "No credit card" },
+                    { icon: Clock, label: "2 min setup" },
+                  ].map(({ icon: Icon, label }) => (
+                    <span key={label} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Icon className="h-3.5 w-3.5 text-success" /> {label}
+                    </span>
+                  ))}
+                </motion.div>
+              </div>
+              <motion.div
+                initial={{ opacity: 0, y: 40, scale: 0.92 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                className="flex-shrink-0 relative"
+              >
+                {/* Phone glow ring */}
+                <div className="absolute -inset-8 rounded-[3rem] bg-primary/5 blur-2xl -z-10" />
+                <HeroPhoneAnimation />
               </motion.div>
-              <motion.h1 initial="hidden" animate="visible" variants={fade} custom={1} className="text-4xl sm:text-5xl lg:text-[3.5rem] font-extrabold tracking-tight leading-[1.08] mb-6">
-                Turn your business card into a{" "}
-                <motion.span
-                  className="gradient-text inline-block origin-center"
-                  initial={{ scale: 1.15 }}
-                  animate={{ scale: 1 }}
-                  transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
-                >customer-generating machine</motion.span>
-              </motion.h1>
-              <motion.p initial="hidden" animate="visible" variants={fade} custom={2} className="text-lg text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8">
-                Capture leads, send estimates, get paid, and grow your business — all from one platform.
-              </motion.p>
-              <motion.div initial="hidden" animate="visible" variants={fade} custom={3} className="flex flex-col sm:flex-row items-center lg:items-start gap-3">
-                <Link to="/onboarding">
-                  <Button size="lg" className="text-base h-12 px-8 rounded-xl shadow-glow">
-                    Get Started Free <ArrowRight className="h-4 w-4 ml-1.5" />
-                  </Button>
-                </Link>
-                <a href="#examples">
-                  <Button variant="outline" size="lg" className="text-base h-12 px-6 rounded-xl">
-                    <ExternalLink className="h-4 w-4 mr-1.5" /> View Demo
-                  </Button>
-                </a>
-              </motion.div>
-              <motion.p initial="hidden" animate="visible" variants={fade} custom={4} className="text-xs text-muted-foreground mt-6 flex items-center justify-center lg:justify-start gap-4">
-                <span className="flex items-center gap-1"><Check className="h-3 w-3 text-success" /> Free forever</span>
-                <span className="flex items-center gap-1"><Check className="h-3 w-3 text-success" /> No credit card</span>
-                <span className="flex items-center gap-1"><Check className="h-3 w-3 text-success" /> 2 min setup</span>
-              </motion.p>
             </div>
-            <motion.div
-              initial={{ opacity: 0, y: 30, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
-              className="flex-shrink-0"
-            >
-              <HeroPhoneAnimation />
-            </motion.div>
+          </div>
+        </motion.div>
+
+        {/* ─── TRUST BAR ─── */}
+        <div className="relative py-8 border-t border-border/30">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <p className="text-center text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-5">
+              Trusted by 1,000+ professionals across every trade
+            </p>
+            <div className="overflow-hidden relative">
+              <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-background to-transparent z-10" />
+              <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-background to-transparent z-10" />
+              <div className="flex animate-marquee gap-8 w-max">
+                {[...TRUST_ITEMS, ...TRUST_ITEMS].map((item, i) => (
+                  <span key={`${item}-${i}`} className="text-sm font-medium text-muted-foreground/60 whitespace-nowrap flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary/30" />
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
+      <div className="glow-line" />
+
       {/* ─── 2. PROBLEM / SOLUTION ─── */}
-      <section className="py-20 md:py-28 bg-muted/30">
+      <section className="py-20 md:py-28 relative">
+        <div className="absolute inset-0 -z-10 gradient-mesh" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">The Problem</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">Sound familiar?</h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">Most service professionals lose leads every day because they don't have the right tools.</p>
+            <h2 className="text-display text-3xl md:text-4xl lg:text-5xl mb-4">Sound familiar?</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto text-lg">Most service professionals lose leads every day because they don't have the right tools.</p>
           </motion.div>
 
           {/* Problems */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
-            {problems.map((p, i) => (
-              <motion.div key={p.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i} className="rounded-2xl border border-border bg-card p-6 text-center hover:shadow-card-hover transition-all">
-                <div className="h-11 w-11 mx-auto rounded-xl bg-destructive/10 flex items-center justify-center mb-4">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
+            {problems.map((p) => (
+              <motion.div key={p.title} variants={scaleIn} className="landing-card rounded-2xl p-6 text-center">
+                <div className="h-12 w-12 mx-auto rounded-2xl bg-destructive/10 flex items-center justify-center mb-4">
                   <p.icon className="h-5 w-5 text-destructive" />
                 </div>
                 <h3 className="font-bold text-foreground mb-1.5 text-sm">{p.title}</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">{p.desc}</p>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           {/* Arrow transition */}
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-primary/20 bg-primary/5">
+            <div className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-primary/20 bg-primary/5 shadow-glow">
               <Sparkles className="h-4 w-4 text-primary" />
               <span className="text-sm font-semibold text-foreground">guzzl.pro solves all of this — in one platform.</span>
             </div>
           </motion.div>
 
           {/* Solutions */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            {solutions.map((s, i) => (
-              <motion.div key={s.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i} className="rounded-2xl border border-border bg-card p-6 flex gap-4 hover:shadow-card-hover hover:border-primary/15 transition-all">
-                <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {solutions.map((s) => (
+              <motion.div key={s.title} variants={scaleIn} className="landing-card rounded-2xl p-6 flex gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
                   <s.icon className="h-5 w-5 text-primary" />
                 </div>
                 <div>
@@ -274,25 +334,29 @@ export default function LandingPage() {
                 </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
+      <div className="glow-line" />
+
       {/* ─── 3. FEATURES ─── */}
-      <section id="features" className="py-20 md:py-28">
+      <section id="features" className="py-20 md:py-28 relative">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Features</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
+            <h2 className="text-display text-3xl md:text-4xl lg:text-5xl mb-4">
               Everything you need to <span className="gradient-text">grow your business</span>
             </h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">Powerful tools designed for service professionals. Focus on your work — we handle the rest.</p>
+            <p className="text-muted-foreground max-w-lg mx-auto text-lg">Powerful tools designed for service professionals. Focus on your work — we handle the rest.</p>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {features.map((f, i) => (
-              <motion.div key={f.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i} className="group rounded-2xl border border-border bg-card p-8 hover:shadow-elevated hover:border-primary/15 transition-all">
-                <div className="flex items-start gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {features.map((f) => (
+              <motion.div key={f.title} variants={scaleIn} className="group landing-card rounded-2xl p-8 relative overflow-hidden">
+                {/* Subtle gradient bg */}
+                <div className={`absolute inset-0 bg-gradient-to-br ${f.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                <div className="relative flex items-start gap-4">
+                  <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 group-hover:scale-105 transition-all duration-300">
                     <f.icon className="h-6 w-6 text-primary" />
                   </div>
                   <div>
@@ -305,56 +369,66 @@ export default function LandingPage() {
                 </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ─── 4. HOW IT WORKS ─── */}
-      <section className="py-20 md:py-28 bg-muted/30">
+      <section className="py-20 md:py-28 relative">
+        <div className="absolute inset-0 -z-10 gradient-mesh" />
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">How it works</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight">Four steps to more customers</h2>
+            <h2 className="text-display text-3xl md:text-4xl lg:text-5xl">Four steps to more customers</h2>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((s, i) => (
-              <motion.div key={s.title} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i} className="text-center">
-                <div className="relative mx-auto mb-5">
-                  <div className="h-16 w-16 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center">
-                    <s.icon className="h-7 w-7 text-primary" />
+          <div className="relative">
+            {/* Connecting line */}
+            <div className="hidden lg:block absolute top-[52px] left-[12%] right-[12%] h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {steps.map((s) => (
+                <motion.div key={s.title} variants={scaleIn} className="text-center">
+                  <div className="relative mx-auto mb-5">
+                    <div className="h-[68px] w-[68px] mx-auto rounded-2xl bg-card border border-border shadow-card flex items-center justify-center group-hover:shadow-elevated transition-all">
+                      <s.icon className="h-7 w-7 text-primary" />
+                    </div>
+                    <div className="absolute -top-2 -right-2 h-7 w-7 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shadow-glow">
+                      {s.num}
+                    </div>
                   </div>
-                  <div className="absolute -top-2 -right-2 h-7 w-7 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shadow-sm">
-                    {s.num}
-                  </div>
-                </div>
-                <h3 className="font-bold text-foreground mb-2">{s.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed max-w-[220px] mx-auto">{s.desc}</p>
-              </motion.div>
-            ))}
+                  <h3 className="font-bold text-foreground mb-2">{s.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed max-w-[220px] mx-auto">{s.desc}</p>
+                </motion.div>
+              ))}
+            </motion.div>
           </div>
         </div>
       </section>
+
+      <div className="glow-line" />
 
       {/* ─── 5. DEMO CARDS ─── */}
       <section id="examples" className="py-20 md:py-28">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Example Cards</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">Cards for every profession</h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">See how professionals in different industries use guzzl.pro to grow their business.</p>
+            <h2 className="text-display text-3xl md:text-4xl lg:text-5xl mb-4">Cards for every profession</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto text-lg">See how professionals in different industries use guzzl.pro to grow their business.</p>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
-            {DEMO_CARDS.map((card, i) => {
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5">
+            {DEMO_CARDS.map((card) => {
               const Icon = PROFESSION_ICONS[card.profession] ?? Wrench;
               return (
-                <motion.div key={card.slug} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i} className="rounded-2xl border border-border bg-card overflow-hidden hover:shadow-elevated hover:-translate-y-1 transition-all duration-300 group">
-                  <div className="p-6 text-center" style={{ background: `linear-gradient(135deg, ${card.accentColor}12, ${card.accentColor}06)` }}>
-                    <div className="h-14 w-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-3 group-hover:scale-105 transition-transform">
-                      <Icon className="h-6 w-6 text-primary" />
+                <motion.div key={card.slug} variants={scaleIn} className="landing-card rounded-2xl overflow-hidden group">
+                  <div className="p-6 text-center relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-30" style={{ background: `radial-gradient(circle at 50% 0%, ${card.accentColor}20, transparent 70%)` }} />
+                    <div className="relative">
+                      <div className="h-14 w-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:shadow-glow transition-all duration-300">
+                        <Icon className="h-6 w-6 text-primary" />
+                      </div>
+                      <h3 className="font-bold text-foreground text-sm">{card.name}</h3>
+                      <p className="text-xs text-muted-foreground mt-0.5">{card.profession}</p>
+                      <p className="text-2xs text-muted-foreground mt-1">{card.city}</p>
                     </div>
-                    <h3 className="font-bold text-foreground text-sm">{card.name}</h3>
-                    <p className="text-xs text-muted-foreground mt-0.5">{card.profession}</p>
-                    <p className="text-2xs text-muted-foreground mt-1">{card.city}</p>
                   </div>
                   <div className="p-4 space-y-1.5">
                     {card.services.slice(0, 3).map((s) => (
@@ -377,8 +451,8 @@ export default function LandingPage() {
                     </div>
                     <div className="pt-2">
                       <Link to={`/demo/${card.slug}`}>
-                        <Button variant="outline" size="sm" className="w-full text-xs">
-                          View Card <ExternalLink className="h-3 w-3 ml-1" />
+                        <Button variant="outline" size="sm" className="w-full text-xs group/btn">
+                          View Card <ArrowUpRight className="h-3 w-3 ml-1 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                         </Button>
                       </Link>
                     </div>
@@ -386,35 +460,36 @@ export default function LandingPage() {
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ─── 6. RESULTS ─── */}
-      <section className="py-20 md:py-28 bg-muted/30">
+      <section className="py-20 md:py-28 relative">
+        <div className="absolute inset-0 -z-10 gradient-mesh" />
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Results</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">Real outcomes for real businesses</h2>
-            <p className="text-muted-foreground max-w-lg mx-auto">guzzl.pro helps service professionals get more leads, more bookings, and faster payments.</p>
+            <h2 className="text-display text-3xl md:text-4xl lg:text-5xl mb-4">Real outcomes for real businesses</h2>
+            <p className="text-muted-foreground max-w-lg mx-auto text-lg">guzzl.pro helps service professionals get more leads, more bookings, and faster payments.</p>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {results.map((r, i) => (
-              <motion.div key={r.label} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i} className="rounded-2xl border border-border bg-card p-8 text-center hover:shadow-card-hover transition-all">
-                <div className="h-12 w-12 mx-auto rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {results.map((r) => (
+              <motion.div key={r.label} variants={scaleIn} className="landing-card rounded-2xl p-8 text-center">
+                <div className="h-14 w-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
                   <r.icon className="h-6 w-6 text-primary" />
                 </div>
-                <p className="text-5xl font-extrabold gradient-text mb-2">{r.value}</p>
+                <p className="text-6xl font-extrabold gradient-text mb-2 tracking-tighter">{r.value}</p>
                 <p className="text-lg font-bold text-foreground mb-2">{r.label}</p>
                 <p className="text-sm text-muted-foreground leading-relaxed">{r.desc}</p>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           {/* Testimonials inline */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-12">
-            {testimonials.map((t, i) => (
-              <motion.div key={t.name} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={i} className="rounded-2xl border border-border bg-card p-6">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-12">
+            {testimonials.map((t) => (
+              <motion.div key={t.name} variants={scaleIn} className="landing-card rounded-2xl p-6">
                 <div className="flex gap-0.5 mb-3">
                   {Array.from({ length: t.rating }).map((_, j) => (
                     <Star key={j} className="h-4 w-4 fill-warning text-warning" />
@@ -427,35 +502,33 @@ export default function LandingPage() {
                 </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
+
+      <div className="glow-line" />
 
       {/* ─── 7. PRICING ─── */}
       <section id="pricing" className="py-20 md:py-28">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Pricing</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">Simple, transparent pricing</h2>
-            <p className="text-muted-foreground max-w-md mx-auto">Start free. Upgrade when you're ready to grow. One new job pays for your entire month.</p>
+            <h2 className="text-display text-3xl md:text-4xl lg:text-5xl mb-4">Simple, transparent pricing</h2>
+            <p className="text-muted-foreground max-w-md mx-auto text-lg">Start free. Upgrade when you're ready to grow. One new job pays for your entire month.</p>
           </motion.div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {plans.map((p, i) => (
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            {plans.map((p) => (
               <motion.div
                 key={p.name}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fade}
-                custom={i}
-                className={`rounded-2xl border p-7 flex flex-col transition-all ${
+                variants={scaleIn}
+                className={`rounded-2xl border p-7 flex flex-col transition-all duration-300 ${
                   p.highlighted
-                    ? "border-primary/40 bg-card shadow-elevated relative scale-[1.02]"
-                    : "border-border bg-card hover:shadow-card-hover"
+                    ? "border-primary/40 bg-card shadow-glow-lg relative scale-[1.03]"
+                    : "border-border bg-card landing-card"
                 }`}
               >
                 {p.highlighted && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-sm">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-5 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-glow">
                     Most Popular
                   </div>
                 )}
@@ -463,7 +536,7 @@ export default function LandingPage() {
                   <h3 className="text-lg font-bold text-foreground mb-1">{p.name}</h3>
                   <p className="text-sm text-muted-foreground mb-4">{p.desc}</p>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-foreground">{p.price}</span>
+                    <span className="text-5xl font-extrabold text-foreground tracking-tight">{p.price}</span>
                     <span className="text-sm text-muted-foreground">{p.period}</span>
                   </div>
                 </div>
@@ -477,17 +550,17 @@ export default function LandingPage() {
                 </ul>
                 <Link to="/onboarding" className="block">
                   <Button
-                    className={`w-full rounded-xl ${p.highlighted ? "shadow-glow" : ""}`}
+                    className={`w-full rounded-xl group ${p.highlighted ? "shadow-glow" : ""}`}
                     variant={p.highlighted ? "default" : "outline"}
                     size="lg"
                   >
                     {p.cta}
-                    <ArrowRight className="h-4 w-4 ml-1" />
+                    <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
                   </Button>
                 </Link>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={3} className="text-center text-xs text-muted-foreground mt-8">
             No credit card required • Cancel anytime • 14-day free trial on paid plans
           </motion.p>
@@ -495,18 +568,18 @@ export default function LandingPage() {
       </section>
 
       {/* ─── 8. FINAL CTA ─── */}
-      <section className="relative py-20 md:py-28 overflow-hidden">
+      <section className="relative py-24 md:py-32 overflow-hidden">
         <div className="absolute inset-0 -z-10">
-          <div className="absolute inset-0 bg-primary/[0.03]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] rounded-full bg-primary/[0.05] blur-[120px]" />
+          <div className="orb-primary w-[800px] h-[400px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+          <div className="orb-accent w-[400px] h-[300px] bottom-0 right-[10%]" />
         </div>
         <div className="max-w-2xl mx-auto px-4 sm:px-6 text-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0}>
-            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6">
+            <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold mb-6">
               <Sparkles className="h-3 w-3" /> Ready to grow your business?
             </div>
           </motion.div>
-          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1} className="text-3xl md:text-4xl font-extrabold tracking-tight mb-5">
+          <motion.h2 initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={1} className="text-display text-3xl md:text-4xl lg:text-5xl mb-5">
             Start getting more customers today
           </motion.h2>
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2} className="text-lg text-muted-foreground mb-10 max-w-md mx-auto">
@@ -514,12 +587,12 @@ export default function LandingPage() {
           </motion.p>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={3} className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link to="/onboarding">
-              <Button size="lg" className="text-base h-12 px-10 rounded-xl shadow-glow">
-                Get Started Free <ArrowRight className="h-4 w-4 ml-1.5" />
+              <Button size="lg" className="text-base h-13 px-10 rounded-xl shadow-glow-lg group">
+                Get Started Free <ArrowRight className="h-4 w-4 ml-1.5 group-hover:translate-x-0.5 transition-transform" />
               </Button>
             </Link>
             <a href="#examples">
-              <Button variant="outline" size="lg" className="text-base h-12 px-6 rounded-xl">
+              <Button variant="outline" size="lg" className="text-base h-13 px-6 rounded-xl">
                 View Demo
               </Button>
             </a>
