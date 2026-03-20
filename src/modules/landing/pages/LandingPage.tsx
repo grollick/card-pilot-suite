@@ -83,9 +83,8 @@ const features = [
 
 const steps = [
   { num: "1", icon: Smartphone, title: "Create Your Card", desc: "Build a professional digital card with your services, portfolio, and booking link in under 2 minutes." },
-  { num: "2", icon: Share2, title: "Share Everywhere", desc: "Share via QR code, NFC tap, text, social media, or email signature — reach customers anywhere." },
-  { num: "3", icon: UserPlus, title: "Capture & Convert", desc: "Every visitor's info is captured automatically. They can book you, request an estimate, or call — instantly." },
-  { num: "4", icon: TrendingUp, title: "Grow Your Business", desc: "Track results, automate follow-ups, and watch your leads, bookings, and revenue grow." },
+  { num: "2", icon: Globe, title: "Get Discovered Locally", desc: "Share your card via QR code, NFC, text, or social media — customers find you everywhere." },
+  { num: "3", icon: TrendingUp, title: "Turn Visitors Into Customers", desc: "Capture leads, book jobs, send estimates, and grow your revenue — automatically." },
 ];
 
 const results = [
@@ -216,21 +215,21 @@ export default function LandingPage() {
                   <Zap className="h-3 w-3" /> The all-in-one platform for service professionals
                 </motion.div>
                 <motion.h1 initial="hidden" animate="visible" variants={fade} custom={1} className="text-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] mb-6">
-                  Turn your business card into a{" "}
+                  Get More Local Customers —{" "}
                   <motion.span
                     className="gradient-text inline-block origin-center"
                     initial={{ scale: 1.15, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
-                  >customer-generating machine</motion.span>
+                  >All From One Simple Business Card</motion.span>
                 </motion.h1>
                 <motion.p initial="hidden" animate="visible" variants={fade} custom={2} className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8">
-                  Capture leads, send estimates, get paid, and grow your business — all from one platform built for trades.
+                  Create a premium digital business card that captures leads, books jobs, and manages your customers — all in one place.
                 </motion.p>
                 <motion.div initial="hidden" animate="visible" variants={fade} custom={3} className="flex flex-col sm:flex-row items-center lg:items-start gap-3">
                   <Link to="/onboarding">
                     <Button size="lg" className="text-base h-13 px-10 rounded-xl shadow-glow-lg group">
-                      Get Started Free
+                      Start Free
                       <ArrowRight className="h-4 w-4 ml-1.5 group-hover:translate-x-0.5 transition-transform" />
                     </Button>
                   </Link>
@@ -242,9 +241,9 @@ export default function LandingPage() {
                 </motion.div>
                 <motion.div initial="hidden" animate="visible" variants={fade} custom={4} className="flex items-center justify-center lg:justify-start gap-5 mt-8">
                   {[
-                    { icon: Check, label: "Free forever" },
-                    { icon: Shield, label: "No credit card" },
-                    { icon: Clock, label: "2 min setup" },
+                    { icon: Check, label: "Free to start" },
+                    { icon: Shield, label: "No credit card required" },
+                    { icon: Shield, label: "Secure platform" },
                   ].map(({ icon: Icon, label }) => (
                     <span key={label} className="flex items-center gap-1.5 text-xs text-muted-foreground">
                       <Icon className="h-3.5 w-3.5 text-success" /> {label}
@@ -344,7 +343,7 @@ export default function LandingPage() {
       <section id="features" className="py-20 md:py-28 relative">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
-            <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Features</p>
+            <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Why Guzzl</p>
             <h2 className="text-display text-3xl md:text-4xl lg:text-5xl mb-4">
               Everything you need to <span className="gradient-text">grow your business</span>
             </h2>
@@ -379,12 +378,12 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">How it works</p>
-            <h2 className="text-display text-3xl md:text-4xl lg:text-5xl">Four steps to more customers</h2>
+            <h2 className="text-display text-3xl md:text-4xl lg:text-5xl">Three steps to more customers</h2>
           </motion.div>
           <div className="relative">
             {/* Connecting line */}
-            <div className="hidden lg:block absolute top-[52px] left-[12%] right-[12%] h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="hidden lg:block absolute top-[52px] left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
+            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-3 gap-8">
               {steps.map((s) => (
                 <motion.div key={s.title} variants={scaleIn} className="text-center">
                   <div className="relative mx-auto mb-5">
@@ -599,6 +598,9 @@ export default function LandingPage() {
           </motion.div>
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={4} className="text-xs text-muted-foreground mt-6">
             Free forever • No credit card • Setup in 2 minutes
+          </motion.p>
+          <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={5} className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground/70 mt-4">
+            <Shield className="h-3 w-3" /> Trusted and secure platform for local businesses
           </motion.p>
         </div>
       </section>
