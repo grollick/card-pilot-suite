@@ -556,15 +556,15 @@ export default function CardBuilder() {
       <TabsContent value="layout" className="mt-0 space-y-3">
         {/* Quick settings */}
         <PanelSection title="Display Settings" icon={Settings2}>
-          <div className="space-y-2 rounded-lg border border-border/40 p-3 bg-muted/10">
+          <div className="space-y-1 rounded-xl border border-border/15 p-3.5 bg-gradient-to-b from-muted/10 to-transparent">
             {[
               { label: "Section icons", checked: s.showSectionIcons, onChange: (val: boolean) => { s.setShowSectionIcons(val); s.saveThemeField({ section_icons: val }); } },
               { label: "Social icons only", checked: s.socialIconsOnly, onChange: (v: boolean) => { s.setSocialIconsOnly(v); s.saveThemeField({ social_icons_only: v }); } },
               { label: "CTA icons only", checked: s.ctaIconsOnly, onChange: (v: boolean) => { s.setCtaIconsOnly(v); s.saveThemeField({ cta_icons_only: v }); } },
               { label: "Scan to Save", checked: (s.card?.theme_json as any)?.scan_to_save === true, onChange: (v: boolean) => { s.saveThemeField({ scan_to_save: v }); } },
             ].map((item) => (
-              <div key={item.label} className="flex items-center justify-between">
-                <span className="text-[11px] text-muted-foreground">{item.label}</span>
+              <div key={item.label} className="flex items-center justify-between py-1">
+                <span className="text-[11px] text-muted-foreground/70">{item.label}</span>
                 <Switch checked={item.checked} onCheckedChange={item.onChange} className="scale-[0.7]" />
               </div>
             ))}
