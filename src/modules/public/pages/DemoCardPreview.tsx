@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { getDemoCardBySlug } from "@/lib/demoCards";
 import {
   Phone, MessageSquare, Mail, Calendar, Star, MapPin,
-  ArrowLeft, ChevronRight, Sparkles, CheckCircle2, Clock, DollarSign,
+  ArrowLeft, ChevronRight, Sparkles, CheckCircle2, Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
