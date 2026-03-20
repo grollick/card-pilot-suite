@@ -344,7 +344,6 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     category: "real_estate",
     style: "Elegant",
     premium: true,
-    style: "Elegant",
     sections: [
       { id: "hero", enabled: true },
       { id: "about", enabled: true },
