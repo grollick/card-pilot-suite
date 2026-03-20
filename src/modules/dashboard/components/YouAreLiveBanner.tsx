@@ -16,8 +16,10 @@ export default function YouAreLiveBanner() {
   const [showConfetti, setShowConfetti] = useState(false);
 
   const isLive = card?.status === "published";
-  const isNew = profile?.created_at
-    ? Date.now() - new Date(profile.created_at).getTime() < 7 * 24 * 60 * 60 * 1000
+  // Show for first 7 days — use updated_at as proxy if created_at unavailable
+  const cardDate = card?.created_at || card?.updated_at;
+  const isNew = cardDate
+    ? Date.now() - new Date(cardDate).getTime() < 7 * 24 * 60 * 60 * 1000
     : false;
 
   const show = isLive && isNew && !dismissed;
