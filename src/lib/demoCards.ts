@@ -172,7 +172,7 @@ export const DEMO_CARDS: DemoCard[] = [
     ],
     projects: [
       { title: "Mountain Wedding at Red Rocks", description: "Golden hour ceremony with 200 guests at Red Rocks Amphitheatre. 600+ edited photos delivered in 3 weeks with a custom leather-bound album.", services: "Wedding Photography", imageUrl: projectWedding },
-      { title: "Corporate Headshot Day", description: "Shot professional headshots for a 40-person law firm in one day. Consistent lighting and branding across all portraits.", services: "Headshots", imageUrl: projectWedding },
+      { title: "Corporate Headshot Day", description: "Shot professional headshots for a 40-person law firm in one day. Consistent lighting and branding across all portraits.", services: "Headshots", imageUrl: projectPhotographerHeadshots },
     ],
     promoTitle: "📸 Mini Session Special",
     promoText: "Book a 30-minute mini portrait session for just $199 (normally $350). Limited slots available!",
