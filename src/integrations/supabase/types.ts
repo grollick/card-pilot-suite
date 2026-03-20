@@ -3271,6 +3271,8 @@ export type Database = {
           suspended_reason: string | null
           tour_completed: boolean
           trust_level: string
+          trust_score: number
+          trust_signals: Json
           updated_at: string
         }
         Insert: {
@@ -3308,6 +3310,8 @@ export type Database = {
           suspended_reason?: string | null
           tour_completed?: boolean
           trust_level?: string
+          trust_score?: number
+          trust_signals?: Json
           updated_at?: string
         }
         Update: {
@@ -3345,6 +3349,8 @@ export type Database = {
           suspended_reason?: string | null
           tour_completed?: boolean
           trust_level?: string
+          trust_score?: number
+          trust_signals?: Json
           updated_at?: string
         }
         Relationships: [
@@ -4475,6 +4481,7 @@ export type Database = {
         Args: { _lead_id: string; _user_id: string }
         Returns: boolean
       }
+      recalculate_trust_score: { Args: { p_user_id: string }; Returns: number }
     }
     Enums: {
       analytics_event_type:

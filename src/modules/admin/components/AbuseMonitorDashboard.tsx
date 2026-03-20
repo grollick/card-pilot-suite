@@ -6,13 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ShieldAlert, Ban, Search, Eye, AlertTriangle, Shield, CheckCircle, Users } from "lucide-react";
+import { ShieldAlert, Ban, Search, Eye, AlertTriangle, Shield, CheckCircle, Users, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { useRecalculateTrust } from "@/hooks/useTrustScore";
 
 export default function AbuseMonitorDashboard() {
   const [search, setSearch] = useState("");
   const queryClient = useQueryClient();
+  const recalcTrust = useRecalculateTrust();
 
   // Fetch abuse logs
   const { data: abuseLogs, isLoading: logsLoading } = useQuery({
@@ -34,7 +36,7 @@ export default function AbuseMonitorDashboard() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, name, email, trust_level, abuse_flags, is_suspended, suspended_reason, created_at")
+        .select("id, name, email, trust_level, trust_score, trust_signals, abuse_flags, is_suspended, suspended_reason, created_at")
         .or("is_suspended.eq.true,trust_level.eq.new,abuse_flags.cs.{disposable_email}")
         .order("created_at", { ascending: false })
         .limit(100);
@@ -230,47 +232,65 @@ export default function AbuseMonitorDashboard() {
                   <TableRow>
                     <TableHead className="text-xs">Name</TableHead>
                     <TableHead className="text-xs">Email</TableHead>
-                    <TableHead className="text-xs">Trust</TableHead>
+                    <TableHead className="text-xs">Trust Score</TableHead>
+                    <TableHead className="text-xs">Level</TableHead>
                     <TableHead className="text-xs">Flags</TableHead>
                     <TableHead className="text-xs">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {flaggedProfiles.map(p => (
-                    <TableRow key={p.id}>
-                      <TableCell className="text-xs font-medium">{p.name || "—"}</TableCell>
-                      <TableCell className="text-xs">{p.email}</TableCell>
-                      <TableCell>{p.is_suspended ? trustBadge("suspended") : trustBadge(p.trust_level)}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-1 flex-wrap">
-                          {(p.abuse_flags as string[] || []).map(f => (
-                            <Badge key={f} variant="outline" className="text-[9px]">{f}</Badge>
-                          ))}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          {p.is_suspended ? (
-                            <Button size="sm" variant="outline" className="h-6 text-[10px]"
-                              onClick={() => unsuspendUser.mutate(p.id)}>
-                              <CheckCircle className="h-3 w-3 mr-1" />Unsuspend
+                  {flaggedProfiles.map(p => {
+                    const score = (p as any).trust_score ?? 10;
+                    const scoreColor = score >= 60 ? "bg-emerald-500" : score >= 30 ? "bg-amber-500" : "bg-destructive";
+                    return (
+                      <TableRow key={p.id}>
+                        <TableCell className="text-xs font-medium">{p.name || "—"}</TableCell>
+                        <TableCell className="text-xs">{p.email}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2 min-w-[100px]">
+                            <div className="h-1.5 flex-1 rounded-full bg-muted overflow-hidden">
+                              <div className={`h-full rounded-full ${scoreColor}`} style={{ width: `${score}%` }} />
+                            </div>
+                            <span className="text-[11px] font-mono font-medium w-6 text-right">{score}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>{p.is_suspended ? trustBadge("suspended") : trustBadge(p.trust_level)}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-1 flex-wrap">
+                            {(p.abuse_flags as string[] || []).map(f => (
+                              <Badge key={f} variant="outline" className="text-[9px]">{f}</Badge>
+                            ))}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button size="sm" variant="ghost" className="h-6 w-6 p-0"
+                              title="Recalculate trust score"
+                              onClick={() => recalcTrust.mutate(p.id)}>
+                              <RefreshCw className="h-3 w-3" />
                             </Button>
-                          ) : (
-                            <Button size="sm" variant="destructive" className="h-6 text-[10px]"
-                              onClick={() => suspendUser.mutate({ userId: p.id, reason: "Admin review" })}>
-                              <Ban className="h-3 w-3 mr-1" />Suspend
-                            </Button>
-                          )}
-                          {p.trust_level === "new" && !p.is_suspended && (
-                            <Button size="sm" variant="outline" className="h-6 text-[10px]"
-                              onClick={() => updateTrust.mutate({ userId: p.id, level: "trusted" })}>
-                              <Shield className="h-3 w-3 mr-1" />Trust
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                            {p.is_suspended ? (
+                              <Button size="sm" variant="outline" className="h-6 text-[10px]"
+                                onClick={() => unsuspendUser.mutate(p.id)}>
+                                <CheckCircle className="h-3 w-3 mr-1" />Unsuspend
+                              </Button>
+                            ) : (
+                              <Button size="sm" variant="destructive" className="h-6 text-[10px]"
+                                onClick={() => suspendUser.mutate({ userId: p.id, reason: "Admin review" })}>
+                                <Ban className="h-3 w-3 mr-1" />Suspend
+                              </Button>
+                            )}
+                            {p.trust_level === "new" && !p.is_suspended && (
+                              <Button size="sm" variant="outline" className="h-6 text-[10px]"
+                                onClick={() => updateTrust.mutate({ userId: p.id, level: "trusted" })}>
+                                <Shield className="h-3 w-3 mr-1" />Trust
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </div>
