@@ -100,7 +100,7 @@ export const DEMO_CARDS: DemoCard[] = [
     tagline: "Sharp looks. Sharp confidence.",
     phone: "(555) 345-6789",
     email: "book@freshcutsstudio.com",
-    city: "Atlanta, GA",
+    city: "Vancouver, BC",
     bio: "Master barber specializing in fades, beard sculpting, and modern men's grooming. Walk-ins welcome, appointments preferred.",
     services: [
       { name: "Classic Haircut", price: "$35", duration: "30 min" },
