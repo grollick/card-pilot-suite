@@ -485,19 +485,19 @@ export default function CardBuilder() {
 
         {/* Color Palette */}
         <PanelSection title="Colors" icon={Palette}>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-2.5">
             {[
               { label: "Primary", color: s.previewTheme.palette.primary },
               { label: "Secondary", color: s.previewTheme.palette.secondary },
               { label: "Accent", color: s.previewTheme.palette.accent },
               { label: "Background", color: s.previewTheme.palette.background },
             ].map((c) => (
-              <div key={c.label} className="text-center group">
+              <div key={c.label} className="text-center group cursor-pointer">
                 <div
-                  className="h-9 rounded-lg border border-border/40 shadow-sm transition-all duration-200 cursor-pointer group-hover:scale-105 group-hover:shadow-md"
+                  className="h-10 rounded-xl border border-border/20 shadow-sm transition-all duration-200 cursor-pointer group-hover:scale-105 group-hover:shadow-md group-hover:ring-2 group-hover:ring-primary/20"
                   style={{ background: c.color }}
                 />
-                <span className="text-[9px] text-muted-foreground/70 mt-1 block">{c.label}</span>
+                <span className="text-[9px] text-muted-foreground/60 mt-1.5 block font-medium">{c.label}</span>
               </div>
             ))}
           </div>

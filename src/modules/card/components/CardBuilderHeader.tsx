@@ -41,7 +41,7 @@ export default function CardBuilderHeader({
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="h-12 flex items-center justify-between px-4 border-b border-border/40 bg-background/95 backdrop-blur-md shrink-0">
+      <div className="h-13 flex items-center justify-between px-4 border-b border-border/15 bg-background/90 backdrop-blur-xl shrink-0 shadow-sm">
         {/* ── Left: Back + Card name + Save status ── */}
         <div className="flex items-center gap-3 min-w-0">
           <Tooltip>
