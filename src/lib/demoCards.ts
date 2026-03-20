@@ -72,8 +72,8 @@ export const DEMO_CARDS: DemoCard[] = [
       { name: "David & Lisa P.", text: "We hired Reynolds Construction for a full basement finish. The craftsmanship was top-notch and the crew was professional every single day.", rating: 5 },
     ],
     projects: [
-      { title: "Modern Farmhouse Kitchen", description: "Complete kitchen gut-renovation with custom cabinetry, quartz countertops, and a 12-foot island. Project completed in 5 weeks.", services: "Kitchen Remodel" },
-      { title: "Cedar Deck & Pergola", description: "Built a 400 sq ft composite deck with a custom cedar pergola and built-in LED lighting. Perfect outdoor entertaining space.", services: "Deck & Patio Build" },
+      { title: "Modern Farmhouse Kitchen", description: "Complete kitchen gut-renovation with custom cabinetry, quartz countertops, and a 12-foot island. Project completed in 5 weeks.", services: "Kitchen Remodel", imageUrl: projectKitchen },
+      { title: "Cedar Deck & Pergola", description: "Built a 400 sq ft composite deck with a custom cedar pergola and built-in LED lighting. Perfect outdoor entertaining space.", services: "Deck & Patio Build", imageUrl: projectDeck },
     ],
     promoTitle: "🔨 Spring Special",
     promoText: "Book a kitchen remodel this month and get a free backsplash upgrade ($1,500 value).",
