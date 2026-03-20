@@ -253,23 +253,8 @@ export default function PublicBooking() {
                       <Clock className="h-8 w-8 text-muted-foreground mx-auto" />
                       <p className="text-sm font-medium text-foreground">No availability set</p>
                       <p className="text-xs text-muted-foreground">
-                        This person hasn't configured their available hours yet. You can reach out directly:
+                        This person hasn't configured their available hours yet. Please check back later or visit their card page for contact options.
                       </p>
-                      <div className="flex flex-col items-center gap-2">
-                        {data.profile.email && (
-                          <a href={`mailto:${data.profile.email}`} className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline">
-                            ✉ {data.profile.email}
-                          </a>
-                        )}
-                        {data.profile.phone && (
-                          <a href={`tel:${data.profile.phone}`} className="inline-flex items-center gap-1.5 text-sm text-primary hover:underline">
-                            📞 {data.profile.phone}
-                          </a>
-                        )}
-                        {!data.profile.email && !data.profile.phone && (
-                          <p className="text-xs text-muted-foreground">No contact info available. Please check back later.</p>
-                        )}
-                      </div>
                     </div>
                   ) : (
                     <CalendarPicker
