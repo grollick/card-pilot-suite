@@ -157,6 +157,21 @@ export default function LandingPage() {
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
 
+  const { variant: abVariant, trackClick: abTrackClick, hasTest: hasABTest } = useABTest("hero");
+
+  // Defaults that can be overridden by A/B test variant
+  const heroHeadline = abVariant?.headline || "Get More Local Customers —";
+  const heroHeadlineAccent = useMemo(() => {
+    if (abVariant?.headline) {
+      // If variant has headline, split on " — " for accent portion
+      const parts = abVariant.headline.split(" — ");
+      return parts.length > 1 ? { main: parts[0] + " —", accent: parts[1] } : { main: abVariant.headline, accent: "" };
+    }
+    return { main: "Get More Local Customers —", accent: "All From One Simple Business Card" };
+  }, [abVariant]);
+  const heroSubheadline = abVariant?.subheadline || "Create a premium digital business card that captures leads, books jobs, and manages your customers — all in one place.";
+  const heroCta = abVariant?.cta_text || "Start Free";
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* ─── NAV ─── */}
