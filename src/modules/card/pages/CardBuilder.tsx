@@ -94,11 +94,24 @@ export default function CardBuilder() {
     const newSections = result.sections_order.map((id) => {
       const existing = s.sections.find((sec) => sec.id === id);
       const label = existing?.label || id.charAt(0).toUpperCase() + id.slice(1).replace(/_/g, " ");
-      const content: Record<string, any> = existing?.content || {};
-      if (id === "hero") content.tagline = result.hero.tagline;
+      const content: Record<string, any> = { ...(existing?.content || {}) };
+      if (id === "hero") {
+        content.tagline = result.hero.tagline;
+        if (result.hero.bio) content.subtitle = result.hero.bio;
+      }
       if (id === "about") content.text = result.about;
-      if (id === "services") content.items = result.services;
-      if (id === "testimonials") content.items = result.testimonials;
+      if (id === "services") {
+        // Map price_hint to price for compatibility with public card renderer
+        content.items = result.services.map(svc => ({
+          name: svc.name,
+          description: svc.description,
+          price: svc.price_hint || "",
+        }));
+      }
+      if (id === "testimonials") {
+        // Store as 'testimonials' key — both preview and public card read this key
+        content.testimonials = result.testimonials;
+      }
       if (id === "promo" || id === "offer_banner") {
         content.headline = result.promo.headline;
         content.body = result.promo.body;
@@ -113,6 +126,7 @@ export default function CardBuilder() {
     });
     s.setSections(newSections);
     s.saveSections(newSections, true);
+    // Apply theme: palette, fonts, border radius, and CTA text
     s.saveThemeField({
       palette: {
         primary: result.theme.primary_color,
@@ -120,6 +134,7 @@ export default function CardBuilder() {
         accent: result.theme.accent_color,
         background: result.theme.background_color,
       },
+      primary_cta: result.cta_text,
       ...(result.theme.font_primary && { fonts: { primary: result.theme.font_primary, secondary: result.theme.font_secondary || result.theme.font_primary } }),
       ...(result.theme.border_radius && { border_radius: result.theme.border_radius }),
     });
