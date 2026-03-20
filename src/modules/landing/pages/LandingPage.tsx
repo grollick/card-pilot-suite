@@ -83,9 +83,8 @@ const features = [
 
 const steps = [
   { num: "1", icon: Smartphone, title: "Create Your Card", desc: "Build a professional digital card with your services, portfolio, and booking link in under 2 minutes." },
-  { num: "2", icon: Share2, title: "Share Everywhere", desc: "Share via QR code, NFC tap, text, social media, or email signature — reach customers anywhere." },
-  { num: "3", icon: UserPlus, title: "Capture & Convert", desc: "Every visitor's info is captured automatically. They can book you, request an estimate, or call — instantly." },
-  { num: "4", icon: TrendingUp, title: "Grow Your Business", desc: "Track results, automate follow-ups, and watch your leads, bookings, and revenue grow." },
+  { num: "2", icon: Globe, title: "Get Discovered Locally", desc: "Share your card via QR code, NFC, text, or social media — customers find you everywhere." },
+  { num: "3", icon: TrendingUp, title: "Turn Visitors Into Customers", desc: "Capture leads, book jobs, send estimates, and grow your revenue — automatically." },
 ];
 
 const results = [
