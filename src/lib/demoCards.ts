@@ -133,8 +133,8 @@ export const DEMO_CARDS: DemoCard[] = [
       { name: "Tom & Karen B.", text: "We sold our condo in 6 days above asking price. Sarah's staging recommendations and marketing strategy made all the difference.", rating: 5 },
     ],
     projects: [
-      { title: "Oceanview Townhome — Sold in 5 Days", description: "Listed at $1.2M, sold for $1.28M. Professional staging, drone photography, and targeted social media campaign generated 22 showings.", services: "Listing & Market Analysis" },
-      { title: "First-Time Buyer Success", description: "Helped a young couple navigate a competitive market and secure a 3BR home in North Park with a VA loan — $15K under budget.", services: "Home Buying Consultation" },
+      { title: "Oceanview Townhome — Sold in 5 Days", description: "Listed at $1.2M, sold for $1.28M. Professional staging, drone photography, and targeted social media campaign generated 22 showings.", services: "Listing & Market Analysis", imageUrl: projectOceanview },
+      { title: "First-Time Buyer Success", description: "Helped a young couple navigate a competitive market and secure a 3BR home in North Park with a VA loan — $15K under budget.", services: "Home Buying Consultation", imageUrl: projectOceanview },
     ],
     promoTitle: "🏡 Free Home Valuation",
     promoText: "Curious what your home is worth? Get a free, no-obligation market analysis today.",
