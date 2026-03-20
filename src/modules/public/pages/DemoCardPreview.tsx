@@ -55,7 +55,7 @@ export default function DemoCardPreview() {
           className="mx-4 mt-4 rounded-2xl overflow-visible shadow-xl"
         >
           {/* Cover photo */}
-          <div className="relative h-44 overflow-hidden">
+          <div className="relative h-44 overflow-hidden rounded-t-2xl">
             <img
               src={card.coverUrl}
               alt={card.company}
@@ -65,7 +65,7 @@ export default function DemoCardPreview() {
           </div>
 
           {/* Profile overlay */}
-          <div className="relative bg-card px-5 pb-5 overflow-visible">
+          <div className="relative bg-card px-5 pb-5 rounded-b-2xl overflow-visible">
             {/* Avatar */}
             <div className="absolute -top-8 left-5">
               <div className="h-16 w-16 rounded-full overflow-hidden ring-4 ring-card shadow-lg">
