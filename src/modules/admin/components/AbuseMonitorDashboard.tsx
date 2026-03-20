@@ -10,7 +10,6 @@ import { ShieldAlert, Ban, Search, Eye, AlertTriangle, Shield, CheckCircle, User
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useRecalculateTrust } from "@/hooks/useTrustScore";
-import { Progress } from "@/components/ui/progress";
 
 export default function AbuseMonitorDashboard() {
   const [search, setSearch] = useState("");
