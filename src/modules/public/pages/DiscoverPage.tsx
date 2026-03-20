@@ -850,9 +850,13 @@ export default function DiscoverPage() {
           </div>
         ) : null}
 
-        {/* SEO footer */}
-        <div className="mt-16 pt-8 border-t border-border/40">
-          <p className="text-xs text-muted-foreground text-center">
+        {/* Trust + SEO footer */}
+        <div className="mt-16 pt-8 border-t border-border/40 space-y-2 text-center">
+          <p className="flex items-center justify-center gap-1.5 text-[11px] text-muted-foreground/70">
+            <ShieldCheck className="h-3 w-3 shrink-0" />
+            Trusted local professionals on a secure platform
+          </p>
+          <p className="text-xs text-muted-foreground">
             Powered by <Link to="/" className="text-primary hover:underline"><span className="font-extrabold text-primary">guzzl</span>.pro</Link> — the smart business card platform that helps local businesses get more customers.
           </p>
         </div>
