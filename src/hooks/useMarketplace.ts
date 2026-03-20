@@ -52,7 +52,7 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
     queryFn: async (): Promise<MarketplaceListing[]> => {
       const query = supabase
         .from("profiles")
-        .select("id, name, handle, avatar_url, company, city, bio, service_area, featured, featured_until, marketplace_enabled, updated_at, available_for_work, avg_response_minutes, professions(name, category)" as any)
+        .select("id, name, handle, avatar_url, company, city, bio, service_area, featured, featured_until, marketplace_enabled, updated_at, available_for_work, avg_response_minutes, verification_level, professions(name, category)" as any)
         .not("handle", "is", null)
         .not("name", "is", null)
         .order("name");
