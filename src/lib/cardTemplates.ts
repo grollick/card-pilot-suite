@@ -274,7 +274,6 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     category: "trades",
     style: "Bold",
     premium: true,
-    style: "Bold",
     sections: [
       { id: "hero", enabled: true },
       { id: "services", enabled: true },
