@@ -44,6 +44,7 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
   };
 
   return (
+    <TooltipProvider delayDuration={200}>
     <div
       ref={setNodeRef}
       style={style}
@@ -53,30 +54,34 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
           : "opacity-35 hover:opacity-55"
       }`}
     >
-      <button
-        {...attributes}
-        {...listeners}
-        className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground/60 touch-none shrink-0 transition-colors"
-        aria-label="Drag to reorder"
-      >
-        <GripVertical className="h-3.5 w-3.5" />
-      </button>
+      <Tip label="Drag to reorder" side="left">
+        <button
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground/60 touch-none shrink-0 transition-colors"
+          aria-label="Drag to reorder"
+        >
+          <GripVertical className="h-3.5 w-3.5" />
+        </button>
+      </Tip>
 
-      <button
-        className="flex items-center gap-2.5 flex-1 min-w-0 text-left"
-        onClick={() => onEdit(section.id)}
-      >
-        <div className={`h-7 w-7 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200 ${
-          section.enabled ? "bg-primary/8 text-primary" : "bg-muted/60 text-muted-foreground/60"
-        }`}>
-          <Icon className="h-3.5 w-3.5" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <span className={`text-[12px] font-medium block truncate ${section.enabled ? "text-foreground" : "text-muted-foreground"}`}>
-            {section.label}
-          </span>
-        </div>
-      </button>
+      <Tip label={`Edit ${section.label}`} side="top">
+        <button
+          className="flex items-center gap-2.5 flex-1 min-w-0 text-left"
+          onClick={() => onEdit(section.id)}
+        >
+          <div className={`h-7 w-7 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200 ${
+            section.enabled ? "bg-primary/8 text-primary" : "bg-muted/60 text-muted-foreground/60"
+          }`}>
+            <Icon className="h-3.5 w-3.5" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <span className={`text-[12px] font-medium block truncate ${section.enabled ? "text-foreground" : "text-muted-foreground"}`}>
+              {section.label}
+            </span>
+          </div>
+        </button>
+      </Tip>
 
       {/* Hover controls */}
       <TooltipProvider delayDuration={200}>
