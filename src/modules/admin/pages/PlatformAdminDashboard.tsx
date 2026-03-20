@@ -1,13 +1,20 @@
 import { motion } from "framer-motion";
-import { formatDistanceToNow, format } from "date-fns";
+import { formatDistanceToNow } from "date-fns";
 import {
   Users, TrendingUp, CreditCard, Eye, Loader2, Shield,
-  BarChart3, UserPlus, Globe, Layers
+  BarChart3, UserPlus, Globe, Layers, ChevronRight, ExternalLink,
+  Mail, MoreHorizontal, UserCheck, Ban, Gift
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminStats, useIsAdmin } from "@/hooks/useAdminStats";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 const anim = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 } };
 
@@ -15,12 +22,14 @@ const PLAN_LABELS: Record<string, { label: string; color: string }> = {
   starter: { label: "Free", color: "bg-muted text-muted-foreground" },
   free: { label: "Free", color: "bg-muted text-muted-foreground" },
   pro: { label: "Pro", color: "bg-primary/15 text-primary" },
+  pro_plus: { label: "Pro Plus", color: "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" },
   business: { label: "Pro Plus", color: "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" },
   agency: { label: "Agency", color: "bg-[hsl(var(--warning))]/15 text-[hsl(var(--warning))]" },
 };
 
 const PLAN_PRICES: Record<string, number> = {
   pro: 29,
+  pro_plus: 79,
   business: 79,
   agency: 249,
 };
@@ -28,6 +37,8 @@ const PLAN_PRICES: Record<string, number> = {
 export default function PlatformAdminDashboard() {
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
   const { data: stats, isLoading } = useAdminStats();
+  const navigate = useNavigate();
+  const [expandedUser, setExpandedUser] = useState<string | null>(null);
 
   const mrr = useMemo(() => {
     if (!stats) return 0;
@@ -39,7 +50,7 @@ export default function PlatformAdminDashboard() {
   const paidUsers = useMemo(() => {
     if (!stats) return 0;
     return Object.entries(stats.planCounts)
-      .filter(([plan]) => plan !== "starter")
+      .filter(([plan]) => plan !== "starter" && plan !== "free")
       .reduce((sum, [, count]) => sum + count, 0);
   }, [stats]);
 
@@ -48,7 +59,6 @@ export default function PlatformAdminDashboard() {
     return Math.round(((stats.signups30d - stats.signupsPrev30d) / stats.signupsPrev30d) * 100);
   }, [stats]);
 
-  // Sparkline data for signup trend
   const sparkData = useMemo(() => {
     if (!stats?.signupsByDate) return [];
     const today = new Date();
@@ -86,6 +96,7 @@ export default function PlatformAdminDashboard() {
       sub: `+${stats?.signups7d ?? 0} this week`,
       icon: Users,
       color: "text-primary bg-primary/10",
+      onClick: () => navigate("/app/admin/marketing"),
     },
     {
       label: "Signups (30d)",
@@ -93,6 +104,7 @@ export default function PlatformAdminDashboard() {
       sub: growthPct !== null ? `${growthPct >= 0 ? "+" : ""}${growthPct}% vs prev 30d` : "—",
       icon: UserPlus,
       color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10",
+      onClick: () => navigate("/app/admin/marketing"),
     },
     {
       label: "Monthly Revenue",
@@ -100,6 +112,7 @@ export default function PlatformAdminDashboard() {
       sub: `${paidUsers} paying customer${paidUsers !== 1 ? "s" : ""}`,
       icon: CreditCard,
       color: "text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10",
+      onClick: () => navigate("/app/settings/admin"),
     },
     {
       label: "Card Views (30d)",
@@ -107,27 +120,68 @@ export default function PlatformAdminDashboard() {
       sub: `${stats?.publishedCards ?? 0} published cards`,
       icon: Eye,
       color: "text-accent-foreground bg-accent",
+      onClick: () => navigate("/app/settings/admin"),
     },
+  ];
+
+  const quickActions = [
+    { label: "Marketing", icon: Mail, to: "/app/admin/marketing", desc: "Campaigns & sequences" },
+    { label: "Growth", icon: TrendingUp, to: "/app/settings/admin", desc: "KPIs & goals" },
+    { label: "Abuse Monitor", icon: Shield, to: "/app/settings/admin", desc: "Flagged accounts" },
   ];
 
   return (
     <div className="space-y-8 max-w-6xl">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <Shield className="h-6 w-6 text-primary" />
-          Platform Admin
-        </h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          Overview of all platform users, plans, revenue, and activity.
-        </p>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+            <Shield className="h-6 w-6 text-primary" />
+            Platform Admin
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            Overview of all platform users, plans, revenue, and activity.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => navigate("/app/admin/marketing")}>
+            <Mail className="h-3.5 w-3.5 mr-1" /> Marketing
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => navigate("/app/settings/admin")}>
+            <TrendingUp className="h-3.5 w-3.5 mr-1" /> Growth
+          </Button>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {quickActions.map((action) => (
+          <button
+            key={action.label}
+            onClick={() => navigate(action.to)}
+            className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card hover:shadow-card-hover hover:border-border/80 transition-all text-left group active:scale-[0.98]"
+          >
+            <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
+              <action.icon className="h-4 w-4 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold">{action.label}</p>
+              <p className="text-xs text-muted-foreground">{action.desc}</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+          </button>
+        ))}
       </div>
 
       {/* KPI Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {kpis.map((kpi, i) => (
-          <motion.div key={kpi.label} {...anim} transition={{ delay: i * 0.05 }}
-            className="rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-card-hover transition-shadow"
+          <motion.button
+            key={kpi.label}
+            {...anim}
+            transition={{ delay: i * 0.05 }}
+            onClick={kpi.onClick}
+            className="rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-card-hover transition-all text-left active:scale-[0.98] cursor-pointer"
           >
             <div className="flex items-start justify-between">
               <div className="space-y-1.5">
@@ -141,7 +195,7 @@ export default function PlatformAdminDashboard() {
                 <kpi.icon className="h-5 w-5" />
               </div>
             </div>
-          </motion.div>
+          </motion.button>
         ))}
       </div>
 
@@ -180,35 +234,81 @@ export default function PlatformAdminDashboard() {
                 const initials = user.name
                   ? user.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
                   : "?";
+                const isExpanded = expandedUser === user.id;
 
                 return (
-                  <div key={user.id}
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors"
-                  >
-                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                      <span className="text-xs font-semibold text-primary">{initials}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium truncate">{user.name || "Unnamed"}</p>
-                        <Badge className={`text-[10px] px-1.5 py-0 border-0 ${planInfo.color}`}>
-                          {planInfo.label}
-                        </Badge>
+                  <div key={user.id}>
+                    <button
+                      onClick={() => setExpandedUser(isExpanded ? null : user.id)}
+                      className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-muted/30 transition-colors text-left active:scale-[0.99]"
+                    >
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                        <span className="text-xs font-semibold text-primary">{initials}</span>
                       </div>
-                      <div className="flex items-center gap-3 mt-0.5">
-                        <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium truncate">{user.name || "Unnamed"}</p>
+                          <Badge className={`text-[10px] px-1.5 py-0 border-0 ${planInfo.color}`}>
+                            {planInfo.label}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center gap-3 mt-0.5">
+                          <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+                          {user.handle && (
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Globe className="h-3 w-3" /> @{user.handle}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[10px] text-muted-foreground">
+                          {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
+                        </span>
+                        <ChevronRight className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${isExpanded ? "rotate-90" : ""}`} />
+                      </div>
+                    </button>
+
+                    {/* Expanded actions */}
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="ml-[52px] pb-3 flex flex-wrap gap-2"
+                      >
                         {user.handle && (
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Globe className="h-3 w-3" /> @{user.handle}
-                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={(e) => { e.stopPropagation(); navigate(`/${user.handle}`); }}
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" /> View Card
+                          </Button>
                         )}
-                      </div>
-                    </div>
-                    <div className="text-right shrink-0">
-                      <span className="text-[10px] text-muted-foreground block">
-                        {formatDistanceToNow(new Date(user.created_at), { addSuffix: true })}
-                      </span>
-                    </div>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <MoreHorizontal className="h-3 w-3 mr-1" /> Actions
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start">
+                            <DropdownMenuItem onClick={() => toast.info(`Grant beta to ${user.name}`)}>
+                              <Gift className="h-3.5 w-3.5 mr-2" /> Grant Beta Access
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => toast.info(`Verify ${user.name}`)}>
+                              <UserCheck className="h-3.5 w-3.5 mr-2" /> Mark Verified
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() => toast.info(`Suspend ${user.name}`)}
+                            >
+                              <Ban className="h-3.5 w-3.5 mr-2" /> Suspend Account
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </motion.div>
+                    )}
                   </div>
                 );
               })}
@@ -229,27 +329,33 @@ export default function PlatformAdminDashboard() {
               </div>
             ) : (
               <div className="space-y-3">
-                {Object.entries(PLAN_LABELS).map(([key, info]) => {
-                  const count = stats?.planCounts[key] || 0;
-                  const total = stats?.totalUsers || 1;
-                  const pct = Math.round((count / total) * 100);
-                  return (
-                    <div key={key}>
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-medium flex items-center gap-1.5">
-                          <Badge className={`text-[10px] px-1.5 py-0 border-0 ${info.color}`}>{info.label}</Badge>
-                        </span>
-                        <span className="text-xs text-muted-foreground">{count} ({pct}%)</span>
+                {Object.entries(PLAN_LABELS)
+                  .filter(([key], idx, arr) => {
+                    // Deduplicate: skip "starter" since it's same as "free", skip "business" same as "pro_plus"
+                    if (key === "starter" || key === "business") return false;
+                    return true;
+                  })
+                  .map(([key, info]) => {
+                    const count = stats?.planCounts[key] || 0;
+                    const total = stats?.totalUsers || 1;
+                    const pct = Math.round((count / total) * 100);
+                    return (
+                      <div key={key}>
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs font-medium flex items-center gap-1.5">
+                            <Badge className={`text-[10px] px-1.5 py-0 border-0 ${info.color}`}>{info.label}</Badge>
+                          </span>
+                          <span className="text-xs text-muted-foreground">{count} ({pct}%)</span>
+                        </div>
+                        <div className="h-2 rounded-full bg-muted overflow-hidden">
+                          <motion.div className="h-full rounded-full bg-primary"
+                            initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+                            transition={{ duration: 0.6, ease: "easeOut" }}
+                          />
+                        </div>
                       </div>
-                      <div className="h-2 rounded-full bg-muted overflow-hidden">
-                        <motion.div className="h-full rounded-full bg-primary"
-                          initial={{ width: 0 }} animate={{ width: `${pct}%` }}
-                          transition={{ duration: 0.6, ease: "easeOut" }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
               </div>
             )}
           </motion.div>
@@ -304,12 +410,10 @@ function MiniBarChart({ data }: { data: number[] }) {
   return (
     <div className="flex items-end gap-[2px] h-16">
       {data.map((v, i) => (
-        <motion.div
+        <div
           key={i}
-          className="flex-1 bg-primary/60 rounded-t-sm min-h-[2px]"
-          initial={{ height: 0 }}
-          animate={{ height: `${(v / max) * 100}%` }}
-          transition={{ duration: 0.4, delay: i * 0.01 }}
+          className="flex-1 bg-primary/60 rounded-t-sm min-h-[2px] transition-all hover:bg-primary"
+          style={{ height: `${(v / max) * 100}%` }}
           title={`${v} signups`}
         />
       ))}
