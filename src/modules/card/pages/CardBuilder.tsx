@@ -620,28 +620,34 @@ export default function CardBuilder() {
         <ResizablePanelGroup direction="horizontal" className="h-full">
           {/* Left Panel — Section Library */}
           <ResizablePanel defaultSize={17} minSize={14} maxSize={22}>
-            <div className="h-full flex flex-col bg-background">
-              <div className="flex items-center gap-2.5 px-4 py-3 border-b border-border/20 shrink-0">
-                <div className="h-6 w-6 rounded-lg bg-primary/8 flex items-center justify-center">
-                  <Layers className="h-3 w-3 text-primary" />
+            <div className="h-full flex flex-col bg-background/80 backdrop-blur-sm">
+              <div className="flex items-center gap-2.5 px-4 py-3.5 border-b border-border/15 shrink-0">
+                <div className="h-7 w-7 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center shadow-sm ring-1 ring-primary/10">
+                  <Layers className="h-3.5 w-3.5 text-primary" />
                 </div>
-                <span className="text-[12px] font-semibold text-foreground">Components</span>
+                <div>
+                  <span className="text-[12px] font-semibold text-foreground block leading-tight">Components</span>
+                  <span className="text-[10px] text-muted-foreground/50">Drag to reorder</span>
+                </div>
               </div>
               <div className="flex-1 overflow-y-auto scrollbar-thin">
-                <div className="p-3">
+                <div className="p-3 space-y-1">
                   {leftPanel}
                 </div>
               </div>
             </div>
           </ResizablePanel>
 
-          <ResizableHandle className="w-px bg-border/15 hover:bg-primary/20 transition-colors data-[resize-handle-active]:bg-primary/40" />
+          <ResizableHandle className="w-[3px] bg-transparent hover:bg-primary/15 transition-colors duration-200 data-[resize-handle-active]:bg-primary/30 relative after:absolute after:inset-y-0 after:-left-px after:w-px after:bg-border/10" />
 
           {/* Center Panel — Preview Canvas */}
           <ResizablePanel defaultSize={50} minSize={34}>
-            <div className="h-full flex flex-col bg-muted/15" style={{
-              backgroundImage: "radial-gradient(circle, hsl(var(--border) / 0.05) 1px, transparent 1px)",
-              backgroundSize: "20px 20px",
+            <div className="h-full flex flex-col bg-gradient-to-b from-muted/10 via-muted/5 to-muted/10" style={{
+              backgroundImage: `
+                radial-gradient(circle at 50% 0%, hsl(var(--primary) / 0.02) 0%, transparent 50%),
+                radial-gradient(circle, hsl(var(--border) / 0.04) 1px, transparent 1px)
+              `,
+              backgroundSize: "100% 100%, 24px 24px",
             }}>
               <div className="flex-1 overflow-y-auto">
                 <div className="p-10 flex items-start justify-center min-h-full">
@@ -652,8 +658,12 @@ export default function CardBuilder() {
                     className="w-full max-w-md"
                   >
                     {/* Device frame */}
-                    <div className="rounded-[2rem] bg-foreground/5 p-2 shadow-lg shadow-black/[0.03]">
-                      <div className="rounded-[1.5rem] overflow-hidden bg-background shadow-sm ring-1 ring-border/10">
+                    <div className="rounded-[2.5rem] bg-gradient-to-b from-foreground/[0.06] to-foreground/[0.03] p-2.5 shadow-xl shadow-black/[0.04] ring-1 ring-foreground/[0.04]">
+                      {/* Notch */}
+                      <div className="flex justify-center -mb-1 relative z-10">
+                        <div className="h-5 w-28 bg-foreground/[0.07] rounded-b-2xl" />
+                      </div>
+                      <div className="rounded-[2rem] overflow-hidden bg-background shadow-inner ring-1 ring-border/5">
                         <CardBuilderPreview {...previewProps} previewDevice={previewDevice} hideToolbar />
                       </div>
                     </div>
@@ -663,16 +673,19 @@ export default function CardBuilder() {
             </div>
           </ResizablePanel>
 
-          <ResizableHandle className="w-px bg-border/15 hover:bg-primary/20 transition-colors data-[resize-handle-active]:bg-primary/40" />
+          <ResizableHandle className="w-[3px] bg-transparent hover:bg-primary/15 transition-colors duration-200 data-[resize-handle-active]:bg-primary/30 relative after:absolute after:inset-y-0 after:-left-px after:w-px after:bg-border/10" />
 
           {/* Right Panel — Design Controls */}
           <ResizablePanel defaultSize={33} minSize={24} maxSize={42}>
-            <div className="h-full flex flex-col bg-background">
-              <div className="flex items-center gap-2.5 px-4 py-3 border-b border-border/20 shrink-0">
-                <div className="h-6 w-6 rounded-lg bg-primary/8 flex items-center justify-center">
-                  <Settings2 className="h-3 w-3 text-primary" />
+            <div className="h-full flex flex-col bg-background/80 backdrop-blur-sm">
+              <div className="flex items-center gap-2.5 px-4 py-3.5 border-b border-border/15 shrink-0">
+                <div className="h-7 w-7 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center shadow-sm ring-1 ring-primary/10">
+                  <Settings2 className="h-3.5 w-3.5 text-primary" />
                 </div>
-                <span className="text-[12px] font-semibold text-foreground">Design</span>
+                <div>
+                  <span className="text-[12px] font-semibold text-foreground block leading-tight">Design</span>
+                  <span className="text-[10px] text-muted-foreground/50">Customize your card</span>
+                </div>
               </div>
               <div className="flex-1 overflow-y-auto scrollbar-thin">
                 <div className="p-4">
