@@ -9,8 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 
 const fade = {
-  hidden: { opacity: 0, y: 16, filter: "blur(4px)" },
-  visible: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
 };
 
 const stagger = {
