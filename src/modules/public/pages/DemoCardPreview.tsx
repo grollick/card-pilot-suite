@@ -51,8 +51,8 @@ export default function DemoCardPreview() {
           style={{ background: `linear-gradient(135deg, ${card.accentColor}, ${card.accentColor}dd)` }}
         >
           <div className="p-8 text-center text-white">
-            <div className="h-20 w-20 mx-auto rounded-full bg-white/20 backdrop-blur flex items-center justify-center text-3xl font-bold mb-4">
-              {card.name.split(" ").map(n => n[0]).join("")}
+            <div className="h-20 w-20 mx-auto rounded-full overflow-hidden ring-4 ring-white/20 mb-4">
+              <img src={card.avatarUrl} alt={card.name} className="h-full w-full object-cover" />
             </div>
             <h1 className="text-2xl font-extrabold">{card.name}</h1>
             <p className="text-white/80 text-sm mt-1">{card.company}</p>
