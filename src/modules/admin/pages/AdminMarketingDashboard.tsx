@@ -139,6 +139,10 @@ export default function AdminMarketingDashboard() {
         <TabsContent value="analytics" className="mt-4">
           <AdminMarketingAnalytics stats={stats} isLoading={isLoading} />
         </TabsContent>
+
+        <TabsContent value="ab-tests" className="mt-4">
+          <ABTestDashboard />
+        </TabsContent>
       </Tabs>
     </div>
   );
