@@ -141,7 +141,7 @@ export const DEMO_CARDS: DemoCard[] = [
     ],
     projects: [
       { title: "Oceanview Townhome — Sold in 5 Days", description: "Listed at $1.2M, sold for $1.28M. Professional staging, drone photography, and targeted social media campaign generated 22 showings.", services: "Listing & Market Analysis", imageUrl: projectOceanview },
-      { title: "First-Time Buyer Success", description: "Helped a young couple navigate a competitive market and secure a 3BR home in North Park with a VA loan — $15K under budget.", services: "Home Buying Consultation", imageUrl: projectOceanview },
+      { title: "First-Time Buyer Success", description: "Helped a young couple navigate a competitive market and secure a 3BR home in North Park with a VA loan — $15K under budget.", services: "Home Buying Consultation", imageUrl: projectRealtorInterior },
     ],
     promoTitle: "🏡 Free Home Valuation",
     promoText: "Curious what your home is worth? Get a free, no-obligation market analysis today.",
