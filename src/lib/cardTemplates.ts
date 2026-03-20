@@ -310,6 +310,8 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     description: "Show off stunning outdoor transformations with side-by-side galleries. Built to turn curb appeal into booked contracts.",
     category: "trades",
     style: "Modern",
+    premium: true,
+    style: "Modern",
     sections: [
       { id: "hero", enabled: true },
       { id: "projects", enabled: true },
