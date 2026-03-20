@@ -50,14 +50,14 @@ function PanelSection({ title, icon: Icon, children, defaultOpen = true }: {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <Collapsible open={open} onOpenChange={setOpen}>
-      <CollapsibleTrigger className="w-full flex items-center justify-between py-2 px-0.5 group">
+      <CollapsibleTrigger className="w-full flex items-center justify-between py-2.5 px-1 group">
         <div className="flex items-center gap-2">
-          <Icon className="h-3.5 w-3.5 text-muted-foreground/70" />
-          <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{title}</span>
+          <Icon className="h-3.5 w-3.5 text-muted-foreground/50" />
+          <span className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground/60">{title}</span>
         </div>
-        <ChevronDown className={`h-3 w-3 text-muted-foreground/50 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className={`h-3 w-3 text-muted-foreground/30 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
       </CollapsibleTrigger>
-      <CollapsibleContent className="pt-1.5 pb-1">
+      <CollapsibleContent className="pt-1 pb-2">
         {children}
       </CollapsibleContent>
     </Collapsible>
