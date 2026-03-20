@@ -103,8 +103,8 @@ export const DEMO_CARDS: DemoCard[] = [
       { name: "Andre W.", text: "Booked online, walked in, got the best haircut of my life. The hot towel shave is an experience. 10/10.", rating: 5 },
     ],
     projects: [
-      { title: "Wedding Party Grooming", description: "Styled 6 groomsmen with custom fades and beard shaping for a black-tie wedding. On-location service at the hotel.", services: "Skin Fade, Beard Trim" },
-      { title: "Before & After Transformation", description: "Full transformation from grown-out hair to a clean mid-fade with a hard part. Client's first professional haircut in 6 months.", services: "Skin Fade" },
+      { title: "Wedding Party Grooming", description: "Styled 6 groomsmen with custom fades and beard shaping for a black-tie wedding. On-location service at the hotel.", services: "Skin Fade, Beard Trim", imageUrl: projectBarbershop },
+      { title: "Before & After Transformation", description: "Full transformation from grown-out hair to a clean mid-fade with a hard part. Client's first professional haircut in 6 months.", services: "Skin Fade", imageUrl: projectBarbershop },
     ],
     promoTitle: "✂️ First Visit Special",
     promoText: "New clients get 20% off their first haircut. Book online today!",
