@@ -343,7 +343,7 @@ export default function LandingPage() {
       <section id="features" className="py-20 md:py-28 relative">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
-            <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Features</p>
+            <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Why Guzzl</p>
             <h2 className="text-display text-3xl md:text-4xl lg:text-5xl mb-4">
               Everything you need to <span className="gradient-text">grow your business</span>
             </h2>
