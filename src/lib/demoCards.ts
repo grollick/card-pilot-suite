@@ -42,6 +42,7 @@ export interface DemoCard {
 export const DEMO_CARDS: DemoCard[] = [
   {
     slug: "demo-contractor",
+    avatarUrl: mikeImg,
     name: "Mike Reynolds",
     profession: "Contractor",
     company: "Reynolds Construction",
