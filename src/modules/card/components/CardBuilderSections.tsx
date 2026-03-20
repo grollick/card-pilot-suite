@@ -83,7 +83,7 @@ export default function CardBuilderSections({
       {hideWrapper && (
         <div className="flex items-center justify-end gap-2">
           <span className="text-xs text-muted-foreground">Icons</span>
-          <Switch checked={showSectionIcons} onCheckedChange={(val) => { setShowSectionIcons(val); saveThemeField({ section_icons: val }); }} />
+          <Switch checked={showSectionIcons} onCheckedChange={(val) => { setShowSectionIcons(val); saveThemeField({ section_icons: val }); }} className="scale-[0.7]" />
         </div>
       )}
 
