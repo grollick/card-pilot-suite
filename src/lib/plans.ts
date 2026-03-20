@@ -189,6 +189,7 @@ export interface PlanLimits {
   deposits: boolean;
   recurring_invoices: boolean;
   advanced_reporting: boolean;
+  premium_templates: boolean;
 }
 
 export function getPlanByKey(key: string): (typeof PLAN_TIERS)[number] | undefined {
