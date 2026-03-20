@@ -82,6 +82,7 @@ export const DEMO_CARDS: DemoCard[] = [
   {
     slug: "demo-barber",
     avatarUrl: marcusImg,
+    coverUrl: projectBarbershop,
     name: "Marcus Cole",
     profession: "Barber",
     company: "Fresh Cuts Studio",
