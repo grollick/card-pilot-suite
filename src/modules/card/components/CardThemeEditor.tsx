@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { Palette, Type, Check, RotateCcw, Layers, Sun, Moon, Circle, Share2, Save, Trash2, Plus, Undo2, Redo2, Sparkles, Image } from "lucide-react";
+import { Palette, Type, Check, RotateCcw, Layers, Sun, Moon, Circle, Share2, Save, Trash2, Plus, Undo2, Redo2, Sparkles, Image, Briefcase } from "lucide-react";
 import { HERO_BACKGROUNDS, getHeroBackgroundsByCategory, type HeroBackground } from "@/lib/heroBackgrounds";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
