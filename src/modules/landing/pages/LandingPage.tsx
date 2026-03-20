@@ -242,9 +242,9 @@ export default function LandingPage() {
                 </motion.div>
                 <motion.div initial="hidden" animate="visible" variants={fade} custom={4} className="flex items-center justify-center lg:justify-start gap-5 mt-8">
                   {[
-                    { icon: Check, label: "Free forever" },
-                    { icon: Shield, label: "No credit card" },
-                    { icon: Clock, label: "2 min setup" },
+                    { icon: Check, label: "Free to start" },
+                    { icon: Shield, label: "No credit card required" },
+                    { icon: Shield, label: "Secure platform" },
                   ].map(({ icon: Icon, label }) => (
                     <span key={label} className="flex items-center gap-1.5 text-xs text-muted-foreground">
                       <Icon className="h-3.5 w-3.5 text-success" /> {label}
