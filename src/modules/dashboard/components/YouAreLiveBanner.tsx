@@ -3,14 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Rocket, CheckCircle2, Share2, Users, MessageSquare, ArrowRight, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useProfile } from "@/hooks/useProfile";
+import { useProfileCache } from "@/hooks/useProfileCache";
 import { useCard } from "@/hooks/useCard";
 
 const STORAGE_KEY = "guzzl_you_are_live_dismissed";
 
 export default function YouAreLiveBanner() {
-  const { data: profile } = useProfile();
-  const { card } = useCard();
+  const { data: profile } = useProfileCache();
+  const { data: card } = useCard();
   const navigate = useNavigate();
   const [dismissed, setDismissed] = useState(() => sessionStorage.getItem(STORAGE_KEY) === "true");
   const [showConfetti, setShowConfetti] = useState(false);
