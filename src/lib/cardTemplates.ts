@@ -141,6 +141,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     description: "Built for service businesses that close deals fast. Quote calculator, instant booking, and before/after galleries front and center.",
     category: "general",
     style: "Modern",
+    premium: true,
     sections: [
       { id: "hero", enabled: true },
       { id: "services", enabled: true },
