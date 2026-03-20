@@ -65,7 +65,7 @@ export default function DemoCardPreview() {
           </div>
 
           {/* Profile overlay */}
-          <div className="relative bg-card px-5 pb-5">
+          <div className="relative bg-card px-5 pb-5 overflow-visible">
             {/* Avatar */}
             <div className="absolute -top-8 left-5">
               <div className="h-16 w-16 rounded-full overflow-hidden ring-4 ring-card shadow-lg">
