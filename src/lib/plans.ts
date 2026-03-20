@@ -81,6 +81,7 @@ export const PLAN_TIERS = [
       deposits: false,
       recurring_invoices: false,
       advanced_reporting: false,
+      premium_templates: true,
     },
   },
   {
