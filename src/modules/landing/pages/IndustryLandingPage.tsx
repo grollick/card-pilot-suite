@@ -360,8 +360,15 @@ export default function IndustryLandingPage() {
               className="max-w-md mx-auto bg-card rounded-2xl border border-border/60 shadow-lg overflow-hidden"
             >
               <div className="p-6" style={{ borderTop: `4px solid ${demo.accentColor}` }}>
-                <h3 className="text-xl font-bold text-foreground">{demo.name}</h3>
-                <p className="text-sm text-muted-foreground">{demo.company} · {demo.city}</p>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="h-14 w-14 rounded-full overflow-hidden ring-2 ring-primary/20 shrink-0">
+                    <img src={demo.avatarUrl} alt={demo.name} className="h-full w-full object-cover" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-xl font-bold text-foreground">{demo.name}</h3>
+                    <p className="text-sm text-muted-foreground">{demo.company} · {demo.city}</p>
+                  </div>
+                </div>
                 <p className="text-sm text-muted-foreground italic mt-2">"{demo.tagline}"</p>
                 <div className="mt-4 space-y-2">
                   {demo.services.slice(0, 3).map((s) => (
