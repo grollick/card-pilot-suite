@@ -459,13 +459,15 @@ export default function LandingPage() {
                 <Link to={`/demo/${card.slug}`} className="block group">
                   <div className="landing-card rounded-2xl overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
                     {/* Cover image */}
-                    <div className="relative h-28 overflow-hidden">
-                      <img
-                        src={card.coverUrl}
-                        alt={card.company}
-                        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                    <div className="relative h-28">
+                      <div className="absolute inset-0 overflow-hidden">
+                        <img
+                          src={card.coverUrl}
+                          alt={card.company}
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                      </div>
                       {/* Avatar overlapping cover bottom */}
                       <div className="absolute -bottom-5 left-4">
                         <div className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-card shadow-md">
