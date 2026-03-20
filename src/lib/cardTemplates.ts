@@ -11,6 +11,8 @@ export interface CardTemplate {
   description: string;
   category: TemplateCategory;
   style: "Modern" | "Elegant" | "Bold" | "Minimal";
+  /** Whether this template requires a paid plan */
+  premium?: boolean;
   /** Ordered section IDs with enabled state */
   sections: Array<{ id: string; enabled: boolean }>;
   /** CTA buttons in priority order */
@@ -32,6 +34,54 @@ export interface CardTemplate {
   /** Which profession categories this template is recommended for */
   recommendedFor: string[];
 }
+
+// ── Style Presets ──
+export interface StylePreset {
+  id: string;
+  name: string;
+  description: string;
+  premium?: boolean;
+  palette: { primary: string; secondary: string; accent: string; background: string };
+  fonts: { primary: string; secondary: string };
+  borderRadius: string;
+}
+
+export const STYLE_PRESETS: StylePreset[] = [
+  {
+    id: "modern",
+    name: "Modern",
+    description: "Clean and professional with sharp accents",
+    palette: { primary: "#2563eb", secondary: "#0f172a", accent: "#14b8a6", background: "#f8fafc" },
+    fonts: { primary: "Inter", secondary: "Inter" },
+    borderRadius: "12px",
+  },
+  {
+    id: "bold",
+    name: "Bold",
+    description: "High-contrast and attention-grabbing",
+    premium: true,
+    palette: { primary: "#dc2626", secondary: "#111827", accent: "#f59e0b", background: "#fff7ed" },
+    fonts: { primary: "DM Sans", secondary: "Inter" },
+    borderRadius: "16px",
+  },
+  {
+    id: "luxury",
+    name: "Luxury",
+    description: "Refined elegance with gold accents",
+    premium: true,
+    palette: { primary: "#9f1239", secondary: "#3f1d2e", accent: "#d4a017", background: "#fffaf3" },
+    fonts: { primary: "Playfair Display", secondary: "Inter" },
+    borderRadius: "8px",
+  },
+  {
+    id: "minimal",
+    name: "Minimal",
+    description: "Less is more — quiet confidence",
+    palette: { primary: "#374151", secondary: "#111827", accent: "#6b7280", background: "#f9fafb" },
+    fonts: { primary: "Inter", secondary: "Inter" },
+    borderRadius: "10px",
+  },
+];
 
 export type TemplateCategory =
   | "general"
