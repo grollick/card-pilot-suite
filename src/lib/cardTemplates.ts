@@ -408,7 +408,6 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     category: "beauty_wellness",
     style: "Bold",
     premium: true,
-    style: "Bold",
     sections: [
       { id: "hero", enabled: true },
       { id: "booking", enabled: true },
