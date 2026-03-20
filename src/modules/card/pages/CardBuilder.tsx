@@ -1,4 +1,5 @@
 import CardTemplateChooser from "@/modules/card/components/CardTemplateChooser";
+import StylePresetSelector, { type StylePreset } from "@/modules/card/components/StylePresetSelector";
 import {
   Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate,
   Sparkles, Loader2, MousePointerClick, Crown, Plus, Eye, Smartphone,
@@ -79,6 +80,9 @@ export default function CardBuilder() {
   const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<"preview" | "sections" | "content" | "style">("preview");
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [activePresetId, setActivePresetId] = useState<string | null>(
+    () => (s.card?.theme_json as any)?.style_preset_id ?? null
+  );
 
   // ── AI Card Generation ──
   const handleAICardGenerated = (result: AICardResult) => {
@@ -433,6 +437,24 @@ export default function CardBuilder() {
 
       {/* ── Style Tab ── */}
       <TabsContent value="style" className="mt-0 space-y-3">
+        {/* Style Presets */}
+        <PanelSection title="Style Presets" icon={Sparkles}>
+          <StylePresetSelector
+            activePresetId={activePresetId}
+            isPro={isPro}
+            onSelect={(preset: StylePreset) => {
+              setActivePresetId(preset.id);
+              s.saveThemeField({
+                palette: { ...preset.palette },
+                fonts: { ...preset.fonts },
+                tokens: { ...preset.tokens },
+                style_preset_id: preset.id,
+              });
+            }}
+            onUpgrade={() => { window.location.href = "/app/pricing"; }}
+          />
+        </PanelSection>
+
         <Button variant="outline" className="w-full h-9 text-[12px] gap-2 border-border/50 hover:border-primary/30" onClick={() => s.setThemeEditorOpen(true)}>
           <Sliders className="h-3.5 w-3.5" /> Open Full Theme Editor
         </Button>
