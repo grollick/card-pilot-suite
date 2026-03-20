@@ -18,6 +18,22 @@ export default function AbuseMonitorDashboard() {
   const [search, setSearch] = useState("");
   const queryClient = useQueryClient();
   const recalcTrust = useRecalculateTrust();
+  const recalcVerification = useRecalculateVerification();
+
+  // Set verification level manually
+  const setVerification = useMutation({
+    mutationFn: async ({ userId, level }: { userId: string; level: string }) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ verification_level: level as any })
+        .eq("id", userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Verification level updated");
+      queryClient.invalidateQueries({ queryKey: ["flagged-profiles"] });
+    },
+  });
 
   // Fetch abuse logs
   const { data: abuseLogs, isLoading: logsLoading } = useQuery({
