@@ -44,42 +44,46 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
   };
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={`group flex items-center gap-2 py-2 px-2.5 rounded-xl transition-all duration-200 ${
-        section.enabled
-          ? "hover:bg-accent/50"
-          : "opacity-35 hover:opacity-55"
-      }`}
-    >
-      <button
-        {...attributes}
-        {...listeners}
-        className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground/60 touch-none shrink-0 transition-colors"
-        aria-label="Drag to reorder"
+    <TooltipProvider delayDuration={200}>
+      <div
+        ref={setNodeRef}
+        style={style}
+        className={`group flex items-center gap-2 py-2 px-2.5 rounded-xl transition-all duration-200 ${
+          section.enabled
+            ? "hover:bg-accent/50"
+            : "opacity-35 hover:opacity-55"
+        }`}
       >
-        <GripVertical className="h-3.5 w-3.5" />
-      </button>
+        <Tip label="Drag to reorder" side="left">
+          <button
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing text-muted-foreground/30 hover:text-muted-foreground/60 touch-none shrink-0 transition-colors"
+            aria-label="Drag to reorder"
+          >
+            <GripVertical className="h-3.5 w-3.5" />
+          </button>
+        </Tip>
 
-      <button
-        className="flex items-center gap-2.5 flex-1 min-w-0 text-left"
-        onClick={() => onEdit(section.id)}
-      >
-        <div className={`h-7 w-7 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200 ${
-          section.enabled ? "bg-primary/8 text-primary" : "bg-muted/60 text-muted-foreground/60"
-        }`}>
-          <Icon className="h-3.5 w-3.5" />
-        </div>
-        <div className="min-w-0 flex-1">
-          <span className={`text-[12px] font-medium block truncate ${section.enabled ? "text-foreground" : "text-muted-foreground"}`}>
-            {section.label}
-          </span>
-        </div>
-      </button>
+        <Tip label={`Edit ${section.label}`} side="top">
+          <button
+            className="flex items-center gap-2.5 flex-1 min-w-0 text-left"
+            onClick={() => onEdit(section.id)}
+          >
+            <div className={`h-7 w-7 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200 ${
+              section.enabled ? "bg-primary/8 text-primary" : "bg-muted/60 text-muted-foreground/60"
+            }`}>
+              <Icon className="h-3.5 w-3.5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <span className={`text-[12px] font-medium block truncate ${section.enabled ? "text-foreground" : "text-muted-foreground"}`}>
+                {section.label}
+              </span>
+            </div>
+          </button>
+        </Tip>
 
-      {/* Hover controls */}
-      <TooltipProvider delayDuration={200}>
+        {/* Hover controls */}
         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           <Tip label="Edit section" side="top">
             <button
@@ -110,16 +114,16 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
             </Tip>
           )}
         </div>
-      </TooltipProvider>
 
-      <Tip label={section.enabled ? "Hide section" : "Show section"}>
-        <Switch
-          checked={section.enabled}
-          onCheckedChange={() => onToggle(section.id)}
-          className="scale-[0.65] shrink-0"
-        />
-      </Tip>
-    </div>
+        <Tip label={section.enabled ? "Hide section" : "Show section"}>
+          <Switch
+            checked={section.enabled}
+            onCheckedChange={() => onToggle(section.id)}
+            className="scale-[0.65] shrink-0"
+          />
+        </Tip>
+      </div>
+    </TooltipProvider>
   );
 }
 
