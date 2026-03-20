@@ -1,4 +1,5 @@
 import CardTemplateChooser from "@/modules/card/components/CardTemplateChooser";
+import StylePresetSelector, { type StylePreset } from "@/modules/card/components/StylePresetSelector";
 import {
   Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate,
   Sparkles, Loader2, MousePointerClick, Crown, Plus, Eye, Smartphone,
