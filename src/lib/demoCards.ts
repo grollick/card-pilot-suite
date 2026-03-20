@@ -223,7 +223,7 @@ export const DEMO_CARDS: DemoCard[] = [
     tagline: "Stronger every day.",
     phone: "(555) 789-0123",
     email: "jess@fitlifecoaching.com",
-    city: "Miami, FL",
+    city: "Montreal, QC",
     bio: "NASM-certified personal trainer and nutrition coach with 8 years of experience. Specializing in body recomposition, strength training, and sustainable lifestyle changes.",
     services: [
       { name: "1-on-1 Training", price: "$85/session", duration: "60 min" },
