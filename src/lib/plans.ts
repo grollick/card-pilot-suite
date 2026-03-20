@@ -165,6 +165,7 @@ export const PLAN_TIERS = [
       deposits: true,
       recurring_invoices: true,
       advanced_reporting: true,
+      premium_templates: true,
     },
   },
 ] as const;
