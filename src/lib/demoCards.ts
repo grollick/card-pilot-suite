@@ -2,6 +2,12 @@
 // These are rendered on the landing page and demo preview pages
 // without needing real database records.
 
+import mikeImg from "@/assets/demo/mike-reynolds.jpg";
+import marcusImg from "@/assets/demo/marcus-cole.jpg";
+import sarahImg from "@/assets/demo/sarah-chen.jpg";
+import elenaImg from "@/assets/demo/elena-vasquez.jpg";
+import alexImg from "@/assets/demo/alex-greenfield.jpg";
+
 export interface DemoTestimonial {
   name: string;
   text: string;
