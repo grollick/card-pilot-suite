@@ -694,6 +694,13 @@ export default function PublicCard() {
           );
         })()}
 
+        {/* Verification badge */}
+        {profile.verification_level && profile.verification_level !== "basic" && (
+          <div style={{ display: "flex", justifyContent: "center", padding: `${spacing.section / 2}px ${spacing.section}px 0` }}>
+            <VerificationBadge level={profile.verification_level as any} size="sm" />
+          </div>
+        )}
+
         <div style={{ padding: `${spacing.section}px`, display: "flex", flexDirection: "column", gap: spacing.section, position: "relative", zIndex: 2 }}>
           {/* ── CTA Buttons (skip if already rendered inside immersive hero) ── */}
           {primaryCtaItem && theme.header.layout !== "hero" && (
