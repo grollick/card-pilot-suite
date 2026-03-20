@@ -59,7 +59,7 @@ export default function SecurityPage() {
               Back
             </Link>
             <span className="text-sm font-semibold text-foreground ml-auto flex items-center gap-1.5">
-              <Shield className="h-4 w-4 text-emerald-600" />
+              <Shield className="h-4 w-4 text-primary" />
               Security
             </span>
           </div>
