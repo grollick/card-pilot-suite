@@ -3274,6 +3274,7 @@ export type Database = {
           trust_score: number
           trust_signals: Json
           updated_at: string
+          verification_level: Database["public"]["Enums"]["verification_level"]
         }
         Insert: {
           abuse_flags?: string[] | null
@@ -3313,6 +3314,7 @@ export type Database = {
           trust_score?: number
           trust_signals?: Json
           updated_at?: string
+          verification_level?: Database["public"]["Enums"]["verification_level"]
         }
         Update: {
           abuse_flags?: string[] | null
@@ -3352,6 +3354,7 @@ export type Database = {
           trust_score?: number
           trust_signals?: Json
           updated_at?: string
+          verification_level?: Database["public"]["Enums"]["verification_level"]
         }
         Relationships: [
           {
@@ -4482,6 +4485,10 @@ export type Database = {
         Returns: boolean
       }
       recalculate_trust_score: { Args: { p_user_id: string }; Returns: number }
+      recalculate_verification_level: {
+        Args: { p_user_id: string }
+        Returns: string
+      }
     }
     Enums: {
       analytics_event_type:
@@ -4579,6 +4586,7 @@ export type Database = {
         | "manual"
       social_post_status: "draft" | "scheduled" | "published" | "failed"
       system_event_severity: "info" | "warning" | "error" | "critical"
+      verification_level: "basic" | "verified" | "pro_verified"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -4812,6 +4820,7 @@ export const Constants = {
       ],
       social_post_status: ["draft", "scheduled", "published", "failed"],
       system_event_severity: ["info", "warning", "error", "critical"],
+      verification_level: ["basic", "verified", "pro_verified"],
     },
   },
 } as const
