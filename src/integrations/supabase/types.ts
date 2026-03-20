@@ -4550,7 +4550,80 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          available_for_work: boolean | null
+          avatar_url: string | null
+          avg_response_minutes: number | null
+          bio: string | null
+          city: string | null
+          company: string | null
+          featured: boolean | null
+          featured_until: string | null
+          handle: string | null
+          id: string | null
+          marketplace_enabled: boolean | null
+          name: string | null
+          primary_cta: string | null
+          profession_id: string | null
+          service_area: string | null
+          style_pack: string | null
+          verification_level:
+            | Database["public"]["Enums"]["verification_level"]
+            | null
+        }
+        Insert: {
+          available_for_work?: boolean | null
+          avatar_url?: string | null
+          avg_response_minutes?: number | null
+          bio?: string | null
+          city?: string | null
+          company?: string | null
+          featured?: boolean | null
+          featured_until?: string | null
+          handle?: string | null
+          id?: string | null
+          marketplace_enabled?: boolean | null
+          name?: string | null
+          primary_cta?: string | null
+          profession_id?: string | null
+          service_area?: string | null
+          style_pack?: string | null
+          verification_level?:
+            | Database["public"]["Enums"]["verification_level"]
+            | null
+        }
+        Update: {
+          available_for_work?: boolean | null
+          avatar_url?: string | null
+          avg_response_minutes?: number | null
+          bio?: string | null
+          city?: string | null
+          company?: string | null
+          featured?: boolean | null
+          featured_until?: string | null
+          handle?: string | null
+          id?: string | null
+          marketplace_enabled?: boolean | null
+          name?: string | null
+          primary_cta?: string | null
+          profession_id?: string | null
+          service_area?: string | null
+          style_pack?: string | null
+          verification_level?:
+            | Database["public"]["Enums"]["verification_level"]
+            | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_profession_id_fkey"
+            columns: ["profession_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       capture_lead: {
