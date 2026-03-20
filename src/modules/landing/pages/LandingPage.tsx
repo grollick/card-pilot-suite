@@ -32,6 +32,7 @@ import {
   Megaphone,
   Bot,
   Shield,
+  CreditCard,
   Globe,
   ArrowUpRight,
 } from "lucide-react";
