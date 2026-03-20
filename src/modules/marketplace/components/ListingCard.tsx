@@ -3,7 +3,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import VerificationBadge, { getVerificationLevel } from "@/components/trust/VerificationBadge";
+import VerificationBadge from "@/components/trust/VerificationBadge";
+import {
   MapPin, Calendar, ArrowRight, Star, Crown, MessageSquare,
   Rocket, Phone, DollarSign, Clock, ShieldCheck, CheckCircle2, Zap, Radio,
 } from "lucide-react";
