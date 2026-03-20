@@ -412,6 +412,8 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     description: "Bold, confident, and built to fill your chair. One-tap booking, style gallery, and 5-star reviews that keep clients coming back.",
     category: "beauty_wellness",
     style: "Bold",
+    premium: true,
+    style: "Bold",
     sections: [
       { id: "hero", enabled: true },
       { id: "booking", enabled: true },
