@@ -249,7 +249,9 @@ export default function AbuseMonitorDashboard() {
                         <TableCell className="text-xs">{p.email}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2 min-w-[100px]">
-                            <Progress value={score} className="h-1.5 flex-1" indicatorClassName={scoreColor} />
+                            <div className="h-1.5 flex-1 rounded-full bg-muted overflow-hidden">
+                              <div className={`h-full rounded-full ${scoreColor}`} style={{ width: `${score}%` }} />
+                            </div>
                             <span className="text-[11px] font-mono font-medium w-6 text-right">{score}</span>
                           </div>
                         </TableCell>
