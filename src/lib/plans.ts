@@ -39,6 +39,7 @@ export const PLAN_TIERS = [
       deposits: false,
       recurring_invoices: false,
       advanced_reporting: false,
+      premium_templates: false,
     },
   },
   {
@@ -80,6 +81,7 @@ export const PLAN_TIERS = [
       deposits: false,
       recurring_invoices: false,
       advanced_reporting: false,
+      premium_templates: true,
     },
   },
   {
@@ -121,6 +123,7 @@ export const PLAN_TIERS = [
       deposits: true,
       recurring_invoices: true,
       advanced_reporting: true,
+      premium_templates: true,
     },
   },
   {
@@ -162,6 +165,7 @@ export const PLAN_TIERS = [
       deposits: true,
       recurring_invoices: true,
       advanced_reporting: true,
+      premium_templates: true,
     },
   },
 ] as const;
@@ -189,6 +193,7 @@ export interface PlanLimits {
   deposits: boolean;
   recurring_invoices: boolean;
   advanced_reporting: boolean;
+  premium_templates: boolean;
 }
 
 export function getPlanByKey(key: string): (typeof PLAN_TIERS)[number] | undefined {

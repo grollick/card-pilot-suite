@@ -2,11 +2,12 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Hammer, Scissors, Home, Briefcase, Sparkles, ArrowRight, Check,
-  Camera, Dumbbell, Star, Phone, Calendar, FileText, Shield, Smartphone, Monitor,
-  ChevronRight, Zap,
+  Camera, Dumbbell, Star, Shield, Smartphone, Monitor,
+  ChevronRight, Zap, Lock, Crown, X, Palette,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { CARD_TEMPLATES, getTemplate } from "@/lib/cardTemplates";
+import { CARD_TEMPLATES, STYLE_PRESETS, type StylePreset } from "@/lib/cardTemplates";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
 
 interface TemplateOption {
   id: string;
@@ -22,6 +23,7 @@ interface TemplateOption {
   ctaLabels: string[];
   sampleTagline: string;
   sampleReview: string;
+  premium?: boolean;
 }
 
 const TEMPLATE_OPTIONS: TemplateOption[] = [
@@ -45,6 +47,7 @@ const TEMPLATE_OPTIONS: TemplateOption[] = [
     ctaLabels: ["Call Now", "Get Quote"],
     sampleTagline: "Licensed, insured, and ready to build",
     sampleReview: "Incredible attention to detail. On time and under budget.",
+    premium: true,
   },
   {
     id: "barber",
@@ -66,6 +69,7 @@ const TEMPLATE_OPTIONS: TemplateOption[] = [
     ctaLabels: ["Book Now", "Call"],
     sampleTagline: "Sharp cuts. Clean fades. Walk out confident.",
     sampleReview: "Best barber I've ever had. Won't go anywhere else.",
+    premium: true,
   },
   {
     id: "realtor",
@@ -87,6 +91,7 @@ const TEMPLATE_OPTIONS: TemplateOption[] = [
     ctaLabels: ["Call Agent", "Schedule"],
     sampleTagline: "Your trusted partner in finding the perfect home",
     sampleReview: "Found our dream home in under three weeks.",
+    premium: true,
   },
   {
     id: "photographer",
@@ -108,6 +113,7 @@ const TEMPLATE_OPTIONS: TemplateOption[] = [
     ctaLabels: ["Book Session", "Inquire"],
     sampleTagline: "Every frame tells your story",
     sampleReview: "Pure artistry — we'll treasure these forever.",
+    premium: true,
   },
   {
     id: "wellness",
@@ -162,8 +168,21 @@ interface Props {
 export default function CardTemplateChooser({ onSelect, onSkip, professionName }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const [previewDevice, setPreviewDevice] = useState<"mobile" | "desktop">("mobile");
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [lockedTemplateName, setLockedTemplateName] = useState("");
+  const { hasFeature } = usePlanLimits();
 
+  const hasPremiumTemplates = hasFeature("premium_templates");
   const selectedOption = TEMPLATE_OPTIONS.find((o) => o.id === selected);
+
+  const handleTemplateClick = (option: TemplateOption) => {
+    if (option.premium && !hasPremiumTemplates) {
+      setLockedTemplateName(option.label);
+      setShowUpgradeModal(true);
+      return;
+    }
+    setSelected(option.id);
+  };
 
   const handleContinue = () => {
     if (selectedOption) onSelect(selectedOption.templateId);
@@ -214,6 +233,7 @@ export default function CardTemplateChooser({ onSelect, onSkip, professionName }
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {TEMPLATE_OPTIONS.map((option, i) => {
                   const isSelected = selected === option.id;
+                  const isLocked = option.premium && !hasPremiumTemplates;
                   const Icon = option.icon;
 
                   return (
@@ -222,31 +242,42 @@ export default function CardTemplateChooser({ onSelect, onSkip, professionName }
                       initial={{ opacity: 0, y: 14 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.5, delay: i * 0.07, ease: [0.16, 1, 0.3, 1] }}
-                      onClick={() => setSelected(option.id)}
+                      onClick={() => handleTemplateClick(option)}
                       className={`group relative text-left rounded-xl border p-4 transition-all duration-200 active:scale-[0.97] ${
                         isSelected
                           ? "border-primary/60 bg-primary/[0.03] shadow-lg ring-1 ring-primary/15"
+                          : isLocked
+                          ? "border-border/30 bg-muted/20 hover:border-border/50 hover:shadow-sm"
                           : "border-border/50 hover:border-border hover:shadow-md bg-card"
                       }`}
                     >
                       {/* Top row: icon + name */}
                       <div className="flex items-start gap-3 mb-3">
                         <div
-                          className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105"
+                          className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 transition-transform duration-200 group-hover:scale-105 ${isLocked ? "opacity-60" : ""}`}
                           style={{ background: `${option.accentColor}12` }}
                         >
                           <Icon className="h-5 w-5" style={{ color: option.accentColor }} />
                         </div>
-                        <div className="min-w-0">
-                          <h3 className="text-sm font-bold text-foreground leading-tight">{option.label}</h3>
-                          <span className="text-[11px] font-medium" style={{ color: option.accentColor }}>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <h3 className={`text-sm font-bold leading-tight ${isLocked ? "text-muted-foreground" : "text-foreground"}`}>
+                              {option.label}
+                            </h3>
+                            {isLocked && (
+                              <span className="inline-flex items-center gap-0.5 text-[9px] font-semibold px-1.5 py-0.5 rounded-md bg-primary/10 text-primary">
+                                <Crown className="h-2.5 w-2.5" /> PRO
+                              </span>
+                            )}
+                          </div>
+                          <span className={`text-[11px] font-medium ${isLocked ? "text-muted-foreground/60" : ""}`} style={isLocked ? {} : { color: option.accentColor }}>
                             {option.subtitle}
                           </span>
                         </div>
                       </div>
 
                       {/* Description */}
-                      <p className="text-xs text-muted-foreground leading-relaxed mb-3 line-clamp-2">
+                      <p className={`text-xs leading-relaxed mb-3 line-clamp-2 ${isLocked ? "text-muted-foreground/50" : "text-muted-foreground"}`}>
                         {option.description}
                       </p>
 
@@ -255,7 +286,7 @@ export default function CardTemplateChooser({ onSelect, onSkip, professionName }
                         {option.highlights.slice(0, 3).map((h) => (
                           <span
                             key={h}
-                            className="text-[10px] px-2 py-0.5 rounded-md bg-muted/70 text-muted-foreground font-medium"
+                            className={`text-[10px] px-2 py-0.5 rounded-md font-medium ${isLocked ? "bg-muted/40 text-muted-foreground/40" : "bg-muted/70 text-muted-foreground"}`}
                           >
                             {h}
                           </span>
@@ -267,8 +298,15 @@ export default function CardTemplateChooser({ onSelect, onSkip, professionName }
                         )}
                       </div>
 
+                      {/* Lock overlay */}
+                      {isLocked && (
+                        <div className="absolute top-3 right-3 h-6 w-6 rounded-full bg-muted/80 flex items-center justify-center">
+                          <Lock className="h-3 w-3 text-muted-foreground/60" />
+                        </div>
+                      )}
+
                       {/* Selection check */}
-                      {isSelected && (
+                      {isSelected && !isLocked && (
                         <motion.div
                           initial={{ scale: 0 }}
                           animate={{ scale: 1 }}
@@ -281,6 +319,52 @@ export default function CardTemplateChooser({ onSelect, onSkip, professionName }
                     </motion.button>
                   );
                 })}
+              </div>
+
+              {/* Style Presets */}
+              <div className="mt-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <Palette className="h-4 w-4 text-muted-foreground/60" />
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Style Presets</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {STYLE_PRESETS.map((preset) => {
+                    const isPresetLocked = preset.premium && !hasPremiumTemplates;
+                    return (
+                      <button
+                        key={preset.id}
+                        onClick={() => isPresetLocked ? (setLockedTemplateName(preset.name + " Style"), setShowUpgradeModal(true)) : null}
+                        className={`relative rounded-lg border p-3 text-left transition-all duration-200 ${
+                          isPresetLocked
+                            ? "border-border/30 bg-muted/10 cursor-pointer hover:border-border/50"
+                            : "border-border/50 bg-card hover:shadow-sm"
+                        }`}
+                      >
+                        {/* Color swatches */}
+                        <div className="flex gap-1 mb-2">
+                          {Object.values(preset.palette).map((color, idx) => (
+                            <div
+                              key={idx}
+                              className={`h-5 flex-1 rounded-sm ${isPresetLocked ? "opacity-40" : ""}`}
+                              style={{ background: color }}
+                            />
+                          ))}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <span className={`text-[11px] font-semibold ${isPresetLocked ? "text-muted-foreground/50" : "text-foreground"}`}>
+                            {preset.name}
+                          </span>
+                          {isPresetLocked && (
+                            <Crown className="h-2.5 w-2.5 text-primary/60" />
+                          )}
+                        </div>
+                        <p className={`text-[10px] ${isPresetLocked ? "text-muted-foreground/30" : "text-muted-foreground/60"}`}>
+                          {preset.description}
+                        </p>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
 
@@ -331,20 +415,17 @@ export default function CardTemplateChooser({ onSelect, onSkip, professionName }
                               background: selectedOption.bgGradient,
                             }}
                           >
-                            {/* Avatar circle */}
                             <div className="absolute -bottom-4 left-4 h-10 w-10 rounded-full bg-background border-2 border-background shadow-md flex items-center justify-center">
                               <selectedOption.icon className="h-4 w-4" style={{ color: selectedOption.accentColor }} />
                             </div>
                           </div>
 
                           <div className="pt-6 pb-3 px-3">
-                            {/* Name + tagline */}
                             <div className="mb-2">
                               <div className="h-2.5 w-24 rounded bg-foreground/80 mb-1" />
                               <div className="h-1.5 w-32 rounded bg-muted-foreground/30" />
                             </div>
 
-                            {/* CTA buttons */}
                             <div className="flex gap-1.5 mb-3">
                               {selectedOption.ctaLabels.map((cta) => (
                                 <div
@@ -357,11 +438,10 @@ export default function CardTemplateChooser({ onSelect, onSkip, professionName }
                               ))}
                             </div>
 
-                            {/* Section blocks */}
                             <div className="space-y-1.5">
                               {selectedOption.previewSections.map((sec, idx) => (
                                 <div key={idx} className="rounded-md bg-muted/40 overflow-hidden">
-                                  <div className="px-2 py-1 flex items-center justify-between">
+                                  <div className="px-2 py-1">
                                     <span className="text-[7px] font-semibold text-muted-foreground/70">{sec.label}</span>
                                   </div>
                                   <div
@@ -381,21 +461,16 @@ export default function CardTemplateChooser({ onSelect, onSkip, professionName }
 
                       {/* Template info */}
                       <div className="px-4 pb-4 space-y-3">
-                        {/* Sample quote */}
                         <div className="rounded-lg bg-muted/30 p-3">
                           <div className="flex items-center gap-1 mb-1">
-                            <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
-                            <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
-                            <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
-                            <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
-                            <Star className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
+                            {[1,2,3,4,5].map(n => (
+                              <Star key={n} className="h-2.5 w-2.5 text-amber-500 fill-amber-500" />
+                            ))}
                           </div>
                           <p className="text-[11px] text-muted-foreground italic leading-relaxed">
                             "{selectedOption.sampleReview}"
                           </p>
                         </div>
-
-                        {/* Trust signals */}
                         <div className="flex items-center gap-3 text-[10px] text-muted-foreground/60">
                           <span className="flex items-center gap-1">
                             <Shield className="h-2.5 w-2.5" /> Verified
@@ -443,6 +518,78 @@ export default function CardTemplateChooser({ onSelect, onSkip, professionName }
           </motion.div>
         </div>
       </div>
+
+      {/* Upgrade Modal */}
+      <AnimatePresence>
+        {showUpgradeModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4"
+            onClick={() => setShowUpgradeModal(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="bg-card rounded-2xl border border-border/50 shadow-2xl max-w-md w-full overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Gradient header */}
+              <div className="relative bg-gradient-to-br from-primary/90 to-primary px-6 py-8 text-center">
+                <button
+                  onClick={() => setShowUpgradeModal(false)}
+                  className="absolute top-3 right-3 h-7 w-7 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"
+                >
+                  <X className="h-3.5 w-3.5 text-white" />
+                </button>
+                <div className="h-12 w-12 rounded-2xl bg-white/15 flex items-center justify-center mx-auto mb-3">
+                  <Crown className="h-6 w-6 text-white" />
+                </div>
+                <h2 className="text-lg font-bold text-white mb-1">
+                  Unlock {lockedTemplateName}
+                </h2>
+                <p className="text-sm text-white/70">
+                  Premium templates are available on Pro plans
+                </p>
+              </div>
+
+              {/* Benefits */}
+              <div className="px-6 py-5 space-y-3">
+                {[
+                  { icon: Zap, text: "Set up your card in under 30 seconds" },
+                  { icon: Sparkles, text: "Professionally designed, conversion-optimized layouts" },
+                  { icon: Star, text: "Premium style presets and design options" },
+                  { icon: Shield, text: "Trusted by thousands of local businesses" },
+                ].map(({ icon: BenefitIcon, text }) => (
+                  <div key={text} className="flex items-start gap-3">
+                    <div className="h-6 w-6 rounded-lg bg-primary/8 flex items-center justify-center shrink-0 mt-0.5">
+                      <BenefitIcon className="h-3 w-3 text-primary" />
+                    </div>
+                    <span className="text-sm text-foreground/80 leading-relaxed">{text}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA */}
+              <div className="px-6 pb-6 pt-1 space-y-2">
+                <Button
+                  size="lg"
+                  className="w-full h-11 gap-2 font-semibold shadow-md"
+                  onClick={() => window.location.href = "/app/pricing"}
+                >
+                  <Crown className="h-4 w-4" /> Upgrade to Pro
+                </Button>
+                <p className="text-[11px] text-muted-foreground text-center">
+                  One new job pays for your month. Cancel anytime.
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
