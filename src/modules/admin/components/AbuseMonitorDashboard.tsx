@@ -276,6 +276,33 @@ export default function AbuseMonitorDashboard() {
                         </TableCell>
                         <TableCell>{p.is_suspended ? trustBadge("suspended") : trustBadge(p.trust_level)}</TableCell>
                         <TableCell>
+                          <div className="flex items-center gap-1">
+                            <VerificationBadge level={((p as any).verification_level ?? "basic") as VerificationLevel} size="xs" />
+                            {!p.is_suspended && (
+                              <div className="flex gap-0.5 ml-1">
+                                {(p as any).verification_level !== "verified" && (
+                                  <Button size="sm" variant="ghost" className="h-5 px-1 text-[9px]"
+                                    onClick={() => setVerification.mutate({ userId: p.id, level: "verified" })}>
+                                    Verify
+                                  </Button>
+                                )}
+                                {(p as any).verification_level !== "pro_verified" && (
+                                  <Button size="sm" variant="ghost" className="h-5 px-1 text-[9px]"
+                                    onClick={() => setVerification.mutate({ userId: p.id, level: "pro_verified" })}>
+                                    Pro
+                                  </Button>
+                                )}
+                                {(p as any).verification_level !== "basic" && (
+                                  <Button size="sm" variant="ghost" className="h-5 px-1 text-[9px] text-destructive"
+                                    onClick={() => setVerification.mutate({ userId: p.id, level: "basic" })}>
+                                    Remove
+                                  </Button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </TableCell>
+                        <TableCell>
                           <div className="flex gap-1 flex-wrap">
                             {(p.abuse_flags as string[] || []).map(f => (
                               <Badge key={f} variant="outline" className="text-[9px]">{f}</Badge>
@@ -285,8 +312,8 @@ export default function AbuseMonitorDashboard() {
                         <TableCell>
                           <div className="flex gap-1">
                             <Button size="sm" variant="ghost" className="h-6 w-6 p-0"
-                              title="Recalculate trust score"
-                              onClick={() => recalcTrust.mutate(p.id)}>
+                              title="Recalculate trust + verification"
+                              onClick={() => { recalcTrust.mutate(p.id); recalcVerification.mutate(p.id); }}>
                               <RefreshCw className="h-3 w-3" />
                             </Button>
                             {p.is_suspended ? (
