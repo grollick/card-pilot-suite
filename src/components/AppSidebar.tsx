@@ -224,7 +224,6 @@ export function AppSidebar() {
               <ChevronLeft className={`h-3.5 w-3.5 transition-transform duration-200 ${collapsed ? "rotate-180" : ""}`} />
             </Button>
           </Tip>
-          </Button>
         </div>
       </SidebarHeader>
 
