@@ -41,7 +41,7 @@ export default function QRLanding() {
           .from("public_profiles" as any)
           .select("handle")
           .eq("id", qrCampaign.user_id)
-          .single();
+          .single() as { data: any; error: any };
 
         if (!profile?.handle) {
           navigate("/", { replace: true });

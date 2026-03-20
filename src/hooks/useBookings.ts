@@ -140,7 +140,7 @@ export function usePublicBookingData(handle: string | undefined) {
         .from("public_profiles" as any)
         .select("id, name, handle, avatar_url")
         .eq("handle", handle!)
-        .single();
+        .single() as { data: any; error: any };
       if (pErr) throw pErr;
 
       const now = new Date();

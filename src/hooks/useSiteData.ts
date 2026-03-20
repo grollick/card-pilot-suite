@@ -33,7 +33,7 @@ export function useSiteData(handle: string | undefined) {
         .from("public_profiles" as any)
         .select("id, name, handle, company, avatar_url, bio, city, profession_id")
         .eq("handle", handle!)
-        .single();
+        .single() as { data: any; error: any };
       if (pErr) throw pErr;
 
       const [cardResult, servicesResult] = await Promise.all([

@@ -53,7 +53,7 @@ export default function PublicProjectPage() {
         .from("public_profiles" as any)
         .select("id, name, handle, company, avatar_url")
         .eq("id", (proj as any).user_id)
-        .maybeSingle();
+        .maybeSingle() as { data: any; error: any };
       setProfile(prof as ProfileData | null);
       setLoading(false);
     })();
