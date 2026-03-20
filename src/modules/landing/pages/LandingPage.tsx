@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
+import { useABTest } from "@/hooks/useABTest";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
@@ -156,6 +157,21 @@ export default function LandingPage() {
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
 
+  const { variant: abVariant, trackClick: abTrackClick, hasTest: hasABTest } = useABTest("hero");
+
+  // Defaults that can be overridden by A/B test variant
+  const heroHeadline = abVariant?.headline || "Get More Local Customers —";
+  const heroHeadlineAccent = useMemo(() => {
+    if (abVariant?.headline) {
+      // If variant has headline, split on " — " for accent portion
+      const parts = abVariant.headline.split(" — ");
+      return parts.length > 1 ? { main: parts[0] + " —", accent: parts[1] } : { main: abVariant.headline, accent: "" };
+    }
+    return { main: "Get More Local Customers —", accent: "All From One Simple Business Card" };
+  }, [abVariant]);
+  const heroSubheadline = abVariant?.subheadline || "Create a premium digital business card that captures leads, books jobs, and manages your customers — all in one place.";
+  const heroCta = abVariant?.cta_text || "Start Free";
+
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* ─── NAV ─── */}
@@ -215,21 +231,23 @@ export default function LandingPage() {
                   <Zap className="h-3 w-3" /> The all-in-one platform for service professionals
                 </motion.div>
                 <motion.h1 initial="hidden" animate="visible" variants={fade} custom={1} className="text-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] mb-6">
-                  Get More Local Customers —{" "}
-                  <motion.span
-                    className="gradient-text inline-block origin-center"
-                    initial={{ scale: 1.15, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
-                  >All From One Simple Business Card</motion.span>
+                  {heroHeadlineAccent.main}{" "}
+                  {heroHeadlineAccent.accent && (
+                    <motion.span
+                      className="gradient-text inline-block origin-center"
+                      initial={{ scale: 1.15, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
+                    >{heroHeadlineAccent.accent}</motion.span>
+                  )}
                 </motion.h1>
                 <motion.p initial="hidden" animate="visible" variants={fade} custom={2} className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8">
-                  Create a premium digital business card that captures leads, books jobs, and manages your customers — all in one place.
+                  {heroSubheadline}
                 </motion.p>
                 <motion.div initial="hidden" animate="visible" variants={fade} custom={3} className="flex flex-col sm:flex-row items-center lg:items-start gap-3">
-                  <Link to="/onboarding">
+                  <Link to="/onboarding" onClick={() => abTrackClick()}>
                     <Button size="lg" className="text-base h-13 px-10 rounded-xl shadow-glow-lg group">
-                      Start Free
+                      {heroCta}
                       <ArrowRight className="h-4 w-4 ml-1.5 group-hover:translate-x-0.5 transition-transform" />
                     </Button>
                   </Link>
