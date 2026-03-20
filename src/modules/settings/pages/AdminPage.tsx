@@ -51,6 +51,9 @@ export default function AdminPage() {
       {/* Growth */}
       {section === "growth" && <AdminGrowthDashboard />}
 
+      {/* Abuse Monitor */}
+      {section === "abuse" && <AbuseMonitorDashboard />}
+
       {/* Content & Professions */}
       {section === "content" && (
         <Tabs defaultValue="professions">
