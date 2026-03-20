@@ -479,7 +479,7 @@ export default function CardBuilder() {
           />
         </PanelSection>
 
-        <Button variant="outline" className="w-full h-9 text-[12px] gap-2 border-border/50 hover:border-primary/30" onClick={() => s.setThemeEditorOpen(true)}>
+        <Button variant="outline" className="w-full h-10 text-[12px] gap-2 border-border/20 hover:border-primary/25 hover:bg-primary/[0.03] rounded-xl shadow-sm transition-all duration-200" onClick={() => s.setThemeEditorOpen(true)}>
           <Sliders className="h-3.5 w-3.5" /> Open Full Theme Editor
         </Button>
 
