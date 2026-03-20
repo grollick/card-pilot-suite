@@ -9,10 +9,17 @@ import elenaImg from "@/assets/demo/elena-vasquez.jpg";
 import alexImg from "@/assets/demo/alex-greenfield.jpg";
 import projectKitchen from "@/assets/demo/project-kitchen.jpg";
 import projectDeck from "@/assets/demo/project-deck.jpg";
-import projectBarbershop from "@/assets/demo/project-barbershop.jpg";
+import coverBarbershop from "@/assets/demo/cover-barbershop.jpg";
+import projectBarberFade from "@/assets/demo/project-barber-fade.jpg";
+import coverRealtor from "@/assets/demo/cover-realtor.jpg";
+import projectRealtorInterior from "@/assets/demo/project-realtor-interior.jpg";
 import projectOceanview from "@/assets/demo/project-oceanview.jpg";
+import coverPhotographer from "@/assets/demo/cover-photographer.jpg";
 import projectWedding from "@/assets/demo/project-wedding.jpg";
+import projectPhotographerHeadshots from "@/assets/demo/project-photographer-headshots.jpg";
+import coverLandscaper from "@/assets/demo/cover-landscaper.jpg";
 import projectBackyard from "@/assets/demo/project-backyard.jpg";
+import projectLandscaperFrontyard from "@/assets/demo/project-landscaper-frontyard.jpg";
 
 export interface DemoTestimonial {
   name: string;
