@@ -61,6 +61,9 @@ export default function DashboardHome() {
       {/* Mobile Job Dashboard */}
       {isMobile && <MobileJobDashboard />}
 
+      {/* ── You Are Live Banner ── */}
+      <YouAreLiveBanner />
+
       {/* ── First Lead Celebration ── */}
       <FirstLeadCelebration />
 
