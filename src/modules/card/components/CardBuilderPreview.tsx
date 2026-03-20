@@ -247,7 +247,7 @@ export default function CardBuilderPreview({
                 previewDevice === "phone" ? "w-[100px]" : "w-[140px]"
               }`} />
               <div className="lg:max-h-[calc(100vh-10rem)] overflow-y-auto scroll-smooth snap-y snap-proximity">
-                <div className="relative" style={{
+                <div className="relative theme-transition" style={{
                   background: currentThemeOverrides.gradientBg?.enabled
                     ? `linear-gradient(${currentThemeOverrides.gradientBg.direction}, ${previewTheme.palette.background}, ${currentThemeOverrides.gradientBg.color2})`
                     : previewTheme.palette.background,
