@@ -505,14 +505,15 @@ export default function CardBuilder() {
 
         {/* Typography */}
         <PanelSection title="Typography" icon={Type}>
-          <div className="rounded-lg border border-border/40 p-3 space-y-2 bg-muted/10">
+          <div className="rounded-xl border border-border/15 p-3.5 space-y-3 bg-gradient-to-b from-muted/10 to-transparent">
             <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground">Heading</span>
-              <span className="font-medium" style={{ fontFamily: s.previewTheme.fonts.primary }}>{s.previewTheme.fonts.primary}</span>
+              <span className="text-muted-foreground/60">Heading</span>
+              <span className="font-semibold text-foreground/80" style={{ fontFamily: s.previewTheme.fonts.primary }}>{s.previewTheme.fonts.primary}</span>
             </div>
+            <div className="h-px bg-border/10" />
             <div className="flex items-center justify-between text-[11px]">
-              <span className="text-muted-foreground">Body</span>
-              <span className="font-medium" style={{ fontFamily: s.previewTheme.fonts.secondary }}>{s.previewTheme.fonts.secondary}</span>
+              <span className="text-muted-foreground/60">Body</span>
+              <span className="font-medium text-foreground/80" style={{ fontFamily: s.previewTheme.fonts.secondary }}>{s.previewTheme.fonts.secondary}</span>
             </div>
           </div>
         </PanelSection>
