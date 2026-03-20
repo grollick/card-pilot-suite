@@ -379,6 +379,8 @@ export const CARD_TEMPLATES: CardTemplate[] = [
     description: "Let your images speak volumes. Full-bleed gallery, elegant presentation, and seamless booking designed for visual artists.",
     category: "creative",
     style: "Elegant",
+    premium: true,
+    style: "Elegant",
     sections: [
       { id: "hero", enabled: true },
       { id: "gallery", enabled: true },
