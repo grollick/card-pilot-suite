@@ -55,10 +55,9 @@ export default function VerificationBadge({
 
   if (!showLabel) {
     return (
-      <Icon
-        className={cn(sizeClasses[size], level === "pro_verified" ? "text-amber-600" : "text-primary", className)}
-        title={c.tooltip}
-      />
+      <span className={cn("inline-flex", className)} aria-label={c.tooltip}>
+        <Icon className={cn(sizeClasses[size], level === "pro_verified" ? "text-amber-600" : "text-primary")} />
+      </span>
     );
   }
 
@@ -70,7 +69,7 @@ export default function VerificationBadge({
         c.className,
         className
       )}
-      title={c.tooltip}
+      aria-label={c.tooltip}
     >
       <Icon className={sizeClasses[size]} />
       {c.label}
@@ -81,19 +80,17 @@ export default function VerificationBadge({
 /** Determine verification level from profile data (client-side fallback) */
 export function getVerificationLevel(profile: {
   name?: string | null;
-  profession?: string | null;
+  profession_id?: string | null;
   phone?: string | null;
   avatar_url?: string | null;
   trust_score?: number | null;
   verification_level?: string | null;
 }, stats?: { leadCount?: number; bookingCount?: number; hasCard?: boolean }): VerificationLevel {
-  // If DB has it, use it
   if (profile.verification_level && profile.verification_level !== "basic") {
     return profile.verification_level as VerificationLevel;
   }
 
-  // Client-side estimation
-  const hasProfile = !!profile.name && !!profile.profession;
+  const hasProfile = !!profile.name && !!profile.profession_id;
   const hasActivity = (stats?.leadCount ?? 0) >= 1 || (stats?.bookingCount ?? 0) >= 1;
   const trustScore = profile.trust_score ?? 0;
 

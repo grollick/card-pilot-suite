@@ -13,7 +13,7 @@ export function useVerificationLevel(userId?: string) {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("verification_level, trust_score, name, profession, phone, avatar_url")
+        .select("verification_level, trust_score, name, profession_id, phone, avatar_url")
         .eq("id", uid!)
         .single();
       if (error) throw error;
@@ -53,7 +53,7 @@ export function useVerificationChecklist() {
       const uid = user!.id;
 
       const [profileRes, cardRes, leadRes, bookingRes] = await Promise.all([
-        supabase.from("profiles").select("name, profession, phone, avatar_url, verification_level, trust_score").eq("id", uid).single(),
+        supabase.from("profiles").select("name, profession_id, phone, avatar_url, verification_level, trust_score").eq("id", uid).single(),
         supabase.from("cards").select("id").eq("user_id", uid).eq("status", "published").limit(1),
         supabase.from("leads").select("id").eq("user_id", uid).limit(5),
         supabase.from("bookings").select("id").eq("user_id", uid).limit(3),
@@ -65,9 +65,9 @@ export function useVerificationChecklist() {
       const hasCard = (cardRes.data?.length ?? 0) > 0;
 
       return {
-        emailVerified: true, // if they can query, email is verified
+        emailVerified: true,
         hasName: !!p?.name,
-        hasProfession: !!p?.profession,
+        hasProfession: !!p?.profession_id,
         hasPhone: !!p?.phone,
         hasAvatar: !!p?.avatar_url,
         hasCard,
