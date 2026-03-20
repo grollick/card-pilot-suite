@@ -6,10 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ShieldAlert, Ban, Search, Eye, AlertTriangle, Shield, CheckCircle, Users, RefreshCw } from "lucide-react";
+import { ShieldAlert, Ban, Search, Eye, AlertTriangle, Shield, CheckCircle, Users, RefreshCw, BadgeCheck } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useRecalculateTrust } from "@/hooks/useTrustScore";
+import { useRecalculateVerification } from "@/hooks/useVerification";
+import VerificationBadge from "@/components/trust/VerificationBadge";
+import type { VerificationLevel } from "@/components/trust/VerificationBadge";
 
 export default function AbuseMonitorDashboard() {
   const [search, setSearch] = useState("");
