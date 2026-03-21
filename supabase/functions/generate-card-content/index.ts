@@ -127,7 +127,7 @@ Do NOT use generic filler. Be specific to the profession.`;
   } catch (err) {
     console.error("generate-card-content error:", err);
     return new Response(
-      JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" }),
+      JSON.stringify({ error: "Internal server error" }),
       {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

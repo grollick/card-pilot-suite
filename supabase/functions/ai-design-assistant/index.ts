@@ -221,7 +221,7 @@ Generate complete content for every section with realistic, compelling copy that
     console.error("ai-design-assistant error:", err);
     return new Response(
       JSON.stringify({
-        error: err instanceof Error ? err.message : "AI assistant temporarily unavailable. Please try again.",
+        error: "Internal server error",
       }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

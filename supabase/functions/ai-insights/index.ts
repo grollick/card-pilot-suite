@@ -179,7 +179,7 @@ Conversion rate: ${views > 0 ? Math.round(((leadsWeek ?? 0) / views) * 100) : 0}
   } catch (err) {
     console.error("ai-insights error:", err);
     return new Response(
-      JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

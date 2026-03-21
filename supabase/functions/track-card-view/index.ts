@@ -159,7 +159,7 @@ serve(async (req) => {
   } catch (err) {
     console.error("track-card-view error:", err);
     return new Response(
-      JSON.stringify({ error: err.message }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
