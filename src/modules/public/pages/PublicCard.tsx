@@ -1,6 +1,7 @@
 import {
   Phone,
   MessageSquare,
+  MessageCircle,
   Mail,
   Download,
   Star,
@@ -20,6 +21,7 @@ import {
   Image,
   Share2,
   CheckCircle2,
+  Play,
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
