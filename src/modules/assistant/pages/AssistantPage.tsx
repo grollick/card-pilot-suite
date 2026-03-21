@@ -122,17 +122,31 @@ function getFollowUps(lastMsg: string): string[] {
   return ["What else can I improve?", "Give me a weekly summary", "Write me a follow-up message"];
 }
 
-/** Formats the user's query into a proper title with capitalization and punctuation. */
+/** Formats the user's query into a clean, title-cased result heading. */
 function formatResultTitle(text: string): string {
   let t = text.trim();
-  // Capitalize first letter of each sentence-like segment
-  t = t.replace(/(^|\.\s+)([a-z])/g, (_, pre, char) => pre + char.toUpperCase());
-  // Ensure first char is uppercase
+
+  // Remove trailing punctuation for a clean title
+  t = t.replace(/[?.!,;:]+$/, "");
+
+  // Strip leading filler words for punchier titles
+  t = t.replace(/^(please\s+|can you\s+|could you\s+|i want to\s+|i need to\s+|help me\s+|show me\s+|tell me\s+|give me\s+)/i, "");
+
+  // Title-case: capitalize first letter of every word (except small words mid-sentence)
+  const smallWords = new Set(["a", "an", "the", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with", "by", "my", "is", "it", "vs"]);
+  t = t
+    .split(" ")
+    .map((word, i) => {
+      if (i === 0 || !smallWords.has(word.toLowerCase())) {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      }
+      return word.toLowerCase();
+    })
+    .join(" ");
+
+  // Ensure first char is always uppercase
   t = t.charAt(0).toUpperCase() + t.slice(1);
-  // Remove trailing question marks for a statement-style title
-  t = t.replace(/\?+$/, "");
-  // Add period if no ending punctuation
-  if (!/[.!]$/.test(t)) t += ".";
+
   return t;
 }
 
