@@ -309,6 +309,8 @@ const App = () => (
               <Route path="team-management" element={<LazyRoute><TeamManagementPage /></LazyRoute>} />
               <Route path="tech-dashboard" element={<LazyRoute><TechDashboardPage /></LazyRoute>} />
               <Route path="lead-routing" element={<LazyRoute><LeadRoutingPage /></LazyRoute>} />
+              <Route path="team-cards" element={<LazyRoute><TeamCardsPage /></LazyRoute>} />
+              <Route path="expenses" element={<LazyRoute><ExpensesPage /></LazyRoute>} />
               <Route path="help" element={<LazyRoute><HelpCenter /></LazyRoute>} />
             </Route>
 

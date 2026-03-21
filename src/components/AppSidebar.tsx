@@ -74,6 +74,7 @@ const toolsItems = [
 
 const teamItems = [
   { title: "Members", url: "/app/team-management", icon: Users },
+  { title: "Team Cards", url: "/app/team-cards", icon: CreditCard },
   { title: "Lead Routing", url: "/app/lead-routing", icon: Inbox },
   { title: "Agency", url: "/app/agency", icon: Building2 },
 ];
