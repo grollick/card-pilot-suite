@@ -36,6 +36,8 @@ interface Props {
   setSubtitleSpacing: (v: number | null) => void;
   showCompany: boolean;
   setShowCompany: (v: boolean) => void;
+  companyColor: string | null;
+  setCompanyColor: (v: string | null) => void;
   nameLineHeight: number | null;
   setNameLineHeight: (v: number | null) => void;
   nameTextStroke: boolean;
