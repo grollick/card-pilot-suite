@@ -271,8 +271,8 @@ export default function AssistantPage() {
                                   {children}
                                 </h3>
                               ),
-                              li: ({ children, ordered, ...props }) => (
-                                <li className="flex items-start gap-2 my-1" {...props}>
+                              li: ({ children }) => (
+                                <li className="flex items-start gap-2 my-1">
                                   <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0 mt-0.5" />
                                   <span>{children}</span>
                                 </li>
