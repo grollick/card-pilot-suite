@@ -115,6 +115,27 @@ const PERSONAS: Persona[] = [
       { key: "crm", duration: 2600 },
     ],
   },
+  {
+    name: "Tanya Brooks",
+    company: "Glow Hair Studio",
+    tagline: "Your best hair day, every day.",
+    city: "Austin, TX",
+    avatarUrl: tanyaImg,
+    coverUrl: coverHairstylist,
+    accentHsl: "330, 70%, 55%",
+    services: [
+      { name: "Cut & Style", price: "$65" },
+      { name: "Color & Highlights", price: "$120+" },
+      { name: "Blowout", price: "$45" },
+    ],
+    cta: "💇‍♀️ Book Appointment",
+    stages: [
+      { key: "idle", duration: 2200 },
+      { key: "tap", duration: 800 },
+      { key: "booking", duration: 2200 },
+      { key: "booked", duration: 1400 },
+    ],
+  },
 ];
 
 /* ── Component ── */
