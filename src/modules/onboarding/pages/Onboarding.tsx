@@ -287,7 +287,7 @@ export default function Onboarding() {
     }
   };
 
-  const totalSteps = 9;
+  const totalSteps = 10;
   const handle = (company || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
   const cardUrl = `${window.location.origin}/${handle}`;
   const shareMessage = `Hey! I just set up my digital business card — check it out and let me know if you ever need ${selectedProfession?.name?.toLowerCase() || "my"} services: ${cardUrl}`;
