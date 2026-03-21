@@ -136,6 +136,21 @@ export default function MarketplacePage() {
                     onView={() => setSelectedApp(app)}
                   />
                 ))}
+                {/* Request an App CTA */}
+                <Card
+                  className="group border-dashed border-2 border-muted-foreground/20 hover:border-primary/40 hover:bg-muted/30 transition-all cursor-pointer"
+                  onClick={() => setRequestOpen(true)}
+                >
+                  <CardContent className="p-5 flex flex-col items-center justify-center text-center h-full min-h-[180px] gap-3">
+                    <div className="h-11 w-11 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <MessageSquarePlus className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-semibold group-hover:text-primary transition-colors">Request an App</h3>
+                      <p className="text-2xs text-muted-foreground mt-0.5">Don't see what you need? Let us know!</p>
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
             )}
           </div>
