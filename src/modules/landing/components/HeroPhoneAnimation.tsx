@@ -8,10 +8,12 @@ import mikeImg from "@/assets/demo/mike-reynolds.jpg";
 import marcusImg from "@/assets/demo/marcus-cole.jpg";
 import sarahImg from "@/assets/demo/sarah-chen.jpg";
 import jessicaImg from "@/assets/demo/jessica-martinez.jpg";
+import tanyaImg from "@/assets/demo/tanya-brooks.jpg";
 import projectKitchen from "@/assets/demo/project-kitchen.jpg";
 import coverBarbershop from "@/assets/demo/cover-barbershop.jpg";
 import coverRealtor from "@/assets/demo/cover-realtor.jpg";
 import coverTrainer from "@/assets/demo/cover-trainer.jpg";
+import coverHairstylist from "@/assets/demo/cover-hairstylist.jpg";
 
 /* ── Persona definitions ── */
 interface Persona {
