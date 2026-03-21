@@ -27,7 +27,7 @@ export default function MarketplacePage() {
   const [category, setCategory] = useState<AppCategory | "all">("all");
   const [selectedApp, setSelectedApp] = useState<MarketplaceApp | null>(null);
   const [tab, setTab] = useState("browse");
-
+  const [requestOpen, setRequestOpen] = useState(false);
   const { data: allApps, isLoading } = useMarketplaceApps(category === "all" ? undefined : category);
   const { data: featured } = useFeaturedApps();
   const { data: installed } = useInstalledApps();
