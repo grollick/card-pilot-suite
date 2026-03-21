@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfileCache } from "@/hooks/useProfileCache";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useJobRequestStats } from "@/hooks/useJobRequests";
 import RevenueKPICards from "@/modules/dashboard/components/RevenueKPICards";
 import NextActionsWidget from "@/modules/dashboard/components/NextActionsWidget";
 import DashboardActivityFeed from "@/modules/dashboard/components/DashboardActivityFeed";
@@ -18,7 +19,7 @@ import AIBusinessAssistant from "@/modules/dashboard/components/AIBusinessAssist
 import FirstLeadGuaranteeWidget from "@/modules/dashboard/components/FirstLeadGuaranteeWidget";
 import {
   Pencil, UserPlus, CalendarPlus, ExternalLink,
-  Zap, Sparkles,
+  Zap, Sparkles, Bell,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
