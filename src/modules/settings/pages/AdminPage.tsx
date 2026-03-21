@@ -53,10 +53,10 @@ export default function AdminPage() {
       </div>
 
       {/* Command Center */}
-      {section === "command" && <FounderCommandCenter />}
+      {section === "command" && <FounderCommandCenter onNavigateSection={setSection} />}
 
       {/* Growth Engine */}
-      {section === "engine" && <GrowthEngine />}
+      {section === "engine" && <GrowthEngine onNavigateSection={setSection} />}
 
       {/* Growth */}
       {section === "growth" && <AdminGrowthDashboard />}
