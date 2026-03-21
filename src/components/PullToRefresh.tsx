@@ -4,30 +4,35 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const THRESHOLD = 80;
 const MAX_PULL = 120;
-const DEAD_ZONE = 10; // Minimum px before pull activates
+const DEAD_ZONE = 15;
 
 export default function PullToRefresh({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [pullDistance, setPullDistance] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const startY = useRef(0);
-  const activated = useRef(false); // true only after exceeding dead zone
-  const tracking = useRef(false); // true when we might pull
-  const containerRef = useRef<HTMLDivElement>(null);
+  const activated = useRef(false);
+  const tracking = useRef(false);
 
-  const onTouchStart = useCallback((e: React.TouchEvent) => {
-    const el = containerRef.current;
-    if (!el || el.scrollTop > 0 || refreshing) return;
-    startY.current = e.touches[0].clientY;
-    tracking.current = true;
-    activated.current = false;
-  }, [refreshing]);
+  const onTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      // Only allow pull when scrolled to the very top
+      const scrollTop =
+        document.documentElement.scrollTop ||
+        document.body.scrollTop ||
+        (e.currentTarget as HTMLElement).scrollTop;
+      if (scrollTop > 0 || refreshing) return;
+      startY.current = e.touches[0].clientY;
+      tracking.current = true;
+      activated.current = false;
+    },
+    [refreshing]
+  );
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
     if (!tracking.current) return;
     const delta = e.touches[0].clientY - startY.current;
 
-    // If swiping up, abort
     if (delta < 0) {
       tracking.current = false;
       activated.current = false;
@@ -35,19 +40,17 @@ export default function PullToRefresh({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Don't activate until past dead zone
     if (!activated.current) {
       if (delta < DEAD_ZONE) return;
       activated.current = true;
     }
 
-    const dampened = Math.min((delta - DEAD_ZONE) * 0.5, MAX_PULL);
+    const dampened = Math.min((delta - DEAD_ZONE) * 0.4, MAX_PULL);
     setPullDistance(dampened);
   }, []);
 
   const onTouchEnd = useCallback(async () => {
     if (!activated.current) {
-      // Was just a tap or small movement — don't interfere
       tracking.current = false;
       return;
     }
@@ -57,7 +60,7 @@ export default function PullToRefresh({ children }: { children: ReactNode }) {
 
     if (pullDistance >= THRESHOLD) {
       setRefreshing(true);
-      setPullDistance(THRESHOLD * 0.6);
+      setPullDistance(THRESHOLD * 0.5);
       await queryClient.invalidateQueries();
       await new Promise((r) => setTimeout(r, 400));
       setRefreshing(false);
@@ -70,16 +73,14 @@ export default function PullToRefresh({ children }: { children: ReactNode }) {
 
   return (
     <div
-      ref={containerRef}
-      className="flex-1 overflow-auto relative"
+      className="flex-1 flex flex-col min-w-0"
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      {/* Pull indicator */}
       {showIndicator && (
         <div
-          className="flex items-center justify-center pointer-events-none"
+          className="flex items-center justify-center pointer-events-none select-none"
           style={{
             height: pullDistance,
             transition: activated.current ? "none" : "height 0.25s ease-out",
@@ -99,7 +100,6 @@ export default function PullToRefresh({ children }: { children: ReactNode }) {
           </div>
         </div>
       )}
-
       {children}
     </div>
   );

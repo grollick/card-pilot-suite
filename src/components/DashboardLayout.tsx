@@ -14,7 +14,7 @@ export default function DashboardLayout() {
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
         <AppSidebar />
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 overflow-auto flex flex-col min-w-0">
           <TopBar />
           <PullToRefresh>
             <div className="p-4 md:p-6 lg:p-8">
