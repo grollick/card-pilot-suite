@@ -98,7 +98,7 @@ export function AppSidebar() {
   const { data: isAdmin } = useIsAdmin();
   const { data: profile } = useProfileCache();
   const { data: jobStats } = useJobRequestStats();
-  const hasPendingOpportunities = (jobStats?.newRequests ?? 0) > 0;
+  const hasPendingOpportunities = (jobStats?.newRequests ?? 0) > 0 || (jobStats?.hasGuaranteeMatch ?? false);
 
   const isActive = (path: string, end?: boolean) => {
     if (end) return location.pathname === path;
