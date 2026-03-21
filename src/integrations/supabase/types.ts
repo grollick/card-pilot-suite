@@ -4735,6 +4735,72 @@ export type Database = {
           },
         ]
       }
+      public_reviews: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          is_public: boolean | null
+          lead_id: string | null
+          owner_response: string | null
+          owner_response_at: string | null
+          project_id: string | null
+          rating: number | null
+          reported: boolean | null
+          reported_reason: string | null
+          review_text: string | null
+          reviewer_name: string | null
+          source: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string | null
+          is_public?: boolean | null
+          lead_id?: string | null
+          owner_response?: string | null
+          owner_response_at?: string | null
+          project_id?: string | null
+          rating?: number | null
+          reported?: boolean | null
+          reported_reason?: string | null
+          review_text?: string | null
+          reviewer_name?: string | null
+          source?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string | null
+          is_public?: boolean | null
+          lead_id?: string | null
+          owner_response?: string | null
+          owner_response_at?: string | null
+          project_id?: string | null
+          rating?: number | null
+          reported?: boolean | null
+          reported_reason?: string | null
+          review_text?: string | null
+          reviewer_name?: string | null
+          source?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       capture_lead: {
