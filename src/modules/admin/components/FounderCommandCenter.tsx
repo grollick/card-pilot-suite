@@ -5,7 +5,7 @@ import {
   Activity, Target, Shield, DollarSign, Mail, Workflow,
   Megaphone, FlaskConical, Gift, Lightbulb, Rocket,
   AlertTriangle, Clock, Eye, Globe, Layers, CreditCard,
-  MessageSquare, CheckCircle2, XCircle, ArrowUpRight,
+  MessageSquare, CheckCircle2, XCircle, ArrowUpRight, ArrowDown,
   Send, FileText, BookOpen, Settings, RefreshCw, UserPlus,
   Loader2, ShieldAlert, Flame, Heart, Star, Ban
 } from "lucide-react";
@@ -18,6 +18,7 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminStats } from "@/hooks/useAdminStats";
 import { useAdminGrowthStats } from "@/hooks/useAdminGrowthStats";
+import { useAdminFunnelStats } from "@/hooks/useAdminFunnelStats";
 
 // ─── Metric Card ───
 function MetricCard({ icon: Icon, label, value, sub, color = "text-primary", loading }: {
