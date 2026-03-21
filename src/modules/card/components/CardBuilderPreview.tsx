@@ -1,4 +1,4 @@
-import { CreditCard, Eye, Pencil, Smartphone, Tablet, Move } from "lucide-react";
+import { CreditCard, Eye, Pencil, Smartphone, Tablet, Move, Star, Calendar, Send, Globe, Instagram, Facebook, Linkedin, Twitter, Youtube, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useCallback } from "react";
 import { toast } from "sonner";
@@ -7,6 +7,8 @@ import { CTA_ICON_MAP } from "./CtaEditor";
 import type { CtaItem } from "./CtaEditor";
 import type { ResolvedCardTheme } from "@/lib/cardTokens";
 import type { CardSection } from "@/hooks/useCard";
+import CardSectionWrapper from "./CardSectionWrapper";
+import type { MetallicEffect } from "./CardThemeEditor";
 
 interface Props {
   profile: any;
@@ -57,65 +59,239 @@ interface Props {
   hideToolbar?: boolean;
 }
 
-function getSectionPreview(section: CardSection) {
+const SOCIAL_ICONS: Record<string, React.ReactNode> = {
+  instagram: <Instagram className="h-4 w-4" />,
+  facebook: <Facebook className="h-4 w-4" />,
+  linkedin: <Linkedin className="h-4 w-4" />,
+  twitter: <Twitter className="h-4 w-4" />,
+  youtube: <Youtube className="h-4 w-4" />,
+  website: <Globe className="h-4 w-4" />,
+};
+
+function ThemedSectionPreview({ section, theme, metallicEffect, index }: {
+  section: CardSection; theme: ResolvedCardTheme; metallicEffect?: MetallicEffect; index: number;
+}) {
   const c = section.content;
-  if (!c) return <p className="text-xs text-muted-foreground text-center">{section.label} Section</p>;
+  const { palette, fonts, radii } = theme;
+
   switch (section.id) {
     case "hero":
-      return c.tagline ? (
-        <div className="text-center">
-          <p className="text-sm font-semibold">{c.tagline}</p>
-          {c.subtitle && <p className="text-xs text-muted-foreground mt-0.5">{c.subtitle}</p>}
-        </div>
-      ) : <p className="text-xs text-muted-foreground text-center">Hero Section</p>;
-    case "about":
-      return c.text ? <p className="text-xs leading-relaxed">{c.text}</p> : <p className="text-xs text-muted-foreground text-center">About Section</p>;
-    case "services":
-      return c.items?.length ? (
-        <div className="space-y-1.5">
-          {c.items.map((item: any, i: number) => (
-            <div key={i} className="flex items-center justify-between text-xs">
-              <span>{item.name || "Untitled"}</span>
-              {item.price && <span className="text-muted-foreground">{item.price}</span>}
-            </div>
-          ))}
-        </div>
-      ) : <p className="text-xs text-muted-foreground text-center">Services Section</p>;
-    case "testimonials":
-      return c.testimonials?.length ? (
-        <div className="space-y-2">
-          {c.testimonials.map((t: any, i: number) => (
-            <div key={i} className="text-xs italic">"{t.text}" — <span className="font-medium not-italic">{t.name}</span></div>
-          ))}
-        </div>
-      ) : <p className="text-xs text-muted-foreground text-center">Testimonials Section</p>;
-    case "gallery":
-      return c.images?.length ? (
-        <div className="grid grid-cols-3 gap-1">
-          {c.images.slice(0, 6).map((img: any, i: number) => (
-            <img key={i} src={img.url} alt={img.caption || ""} className="w-full h-16 object-cover rounded" />
-          ))}
-        </div>
-      ) : <p className="text-xs text-muted-foreground text-center">Gallery Section</p>;
-    case "social":
-      return c.links?.length ? (
-        <div className="flex flex-wrap gap-2">
-          {c.links.map((l: any, i: number) => (
-            <span key={i} className="text-xs px-2 py-1 rounded-full bg-muted text-muted-foreground">{l.platform}</span>
-          ))}
-        </div>
-      ) : <p className="text-xs text-muted-foreground text-center">Social Links</p>;
-    case "contact":
+      if (!c?.tagline) return (
+        <CardSectionWrapper theme={theme} index={index} metallicEffect={metallicEffect}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: palette.primary, textAlign: "center", margin: 0, fontFamily: `'${fonts.primary}', sans-serif` }}>
+            Hero Section
+          </p>
+        </CardSectionWrapper>
+      );
       return (
-        <div className="text-center">
-          <p className="text-xs font-medium">{c.heading || "Get in Touch"}</p>
-          {c.description && <p className="text-[10px] text-muted-foreground mt-0.5">{c.description}</p>}
+        <CardSectionWrapper theme={theme} index={index} metallicEffect={metallicEffect}>
+          <div style={{ textAlign: "center" }}>
+            <p style={{ fontSize: 14, fontWeight: 600, color: palette.primary, margin: 0, fontFamily: `'${fonts.primary}', sans-serif` }}>{c.tagline}</p>
+            {c.subtitle && <p style={{ fontSize: 12, color: `${palette.secondary}99`, margin: "4px 0 0" }}>{c.subtitle}</p>}
+          </div>
+        </CardSectionWrapper>
+      );
+
+    case "about":
+      return (
+        <CardSectionWrapper theme={theme} index={index} metallicEffect={metallicEffect}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: palette.primary, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1, fontFamily: `'${fonts.primary}', sans-serif` }}>About</p>
+          <p style={{ fontSize: 13, lineHeight: 1.7, color: palette.secondary, margin: 0 }}>
+            {c?.text || "Passionate professional dedicated to delivering exceptional results."}
+          </p>
+        </CardSectionWrapper>
+      );
+
+    case "video_intro": {
+      const videoUrl = c?.videoUrl;
+      if (!videoUrl) return null;
+      return (
+        <div>
+          <p style={{ fontSize: 11, fontWeight: 600, color: palette.primary, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1, fontFamily: `'${fonts.primary}', sans-serif` }}>
+            {c?.videoHeading || "Watch"}
+          </p>
+          <CardSectionWrapper theme={theme} index={index} metallicEffect={metallicEffect}>
+            <div style={{ borderRadius: radii.button, overflow: "hidden", aspectRatio: "16/9", background: `${palette.secondary}15`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Play style={{ width: 24, height: 24, color: palette.primary, opacity: 0.5 }} />
+            </div>
+            {c?.videoCaption && (
+              <p style={{ fontSize: 11, color: `${palette.secondary}99`, margin: "6px 0 0", textAlign: "center" }}>{c.videoCaption}</p>
+            )}
+          </CardSectionWrapper>
         </div>
       );
+    }
+
+    case "services": {
+      const items = c?.items as { name: string; description?: string; price?: string }[] | undefined;
+      return (
+        <CardSectionWrapper theme={theme} index={index} metallicEffect={metallicEffect}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: palette.primary, margin: "0 0 8px", textTransform: "uppercase", letterSpacing: 1, fontFamily: `'${fonts.primary}', sans-serif` }}>Services</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {items?.length ? items.map((item, i) => (
+              <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 8px", borderRadius: radii.button, background: `${palette.primary}06` }}>
+                <div>
+                  <span style={{ fontSize: 13, fontWeight: 500, color: palette.primary }}>{item.name || "Untitled"}</span>
+                  {item.description && <p style={{ fontSize: 11, color: `${palette.secondary}80`, margin: "2px 0 0" }}>{item.description}</p>}
+                </div>
+                {item.price && <span style={{ fontSize: 12, color: palette.secondary, fontWeight: 500 }}>{item.price}</span>}
+              </div>
+            )) : (
+              <p style={{ fontSize: 12, color: `${palette.secondary}60`, textAlign: "center" }}>Add your services</p>
+            )}
+          </div>
+        </CardSectionWrapper>
+      );
+    }
+
+    case "testimonials": {
+      const testimonials = c?.testimonials as { name: string; text: string; role?: string }[] | undefined;
+      return (
+        <div>
+          <p style={{ fontSize: 11, fontWeight: 600, color: palette.primary, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1, fontFamily: `'${fonts.primary}', sans-serif` }}>Testimonials</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {testimonials?.length ? testimonials.map((t, i) => (
+              <CardSectionWrapper key={i} theme={theme} index={index + i} metallicEffect={metallicEffect}>
+                <div style={{ display: "flex", gap: 2, marginBottom: 6 }}>
+                  {[...Array(5)].map((_, j) => (
+                    <Star key={j} style={{ width: 12, height: 12, fill: "#f59e0b", color: "#f59e0b" }} />
+                  ))}
+                </div>
+                <p style={{ fontSize: 12, fontStyle: "italic", color: palette.secondary, margin: 0, lineHeight: 1.6 }}>"{t.text}"</p>
+                <p style={{ fontSize: 11, color: `${palette.secondary}99`, margin: "6px 0 0" }}>— {t.name}{t.role ? `, ${t.role}` : ""}</p>
+              </CardSectionWrapper>
+            )) : (
+              <CardSectionWrapper theme={theme} index={index} metallicEffect={metallicEffect}>
+                <div style={{ display: "flex", gap: 2, marginBottom: 6 }}>
+                  {[...Array(5)].map((_, j) => (
+                    <Star key={j} style={{ width: 12, height: 12, fill: "#f59e0b", color: "#f59e0b" }} />
+                  ))}
+                </div>
+                <p style={{ fontSize: 12, fontStyle: "italic", color: palette.secondary, margin: 0, lineHeight: 1.6 }}>"Absolutely amazing experience. Highly recommend!"</p>
+                <p style={{ fontSize: 11, color: `${palette.secondary}99`, margin: "6px 0 0" }}>— Happy Client</p>
+              </CardSectionWrapper>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    case "gallery": {
+      const images = c?.images as { url: string; caption?: string }[] | undefined;
+      return (
+        <div>
+          <p style={{ fontSize: 11, fontWeight: 600, color: palette.primary, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1, fontFamily: `'${fonts.primary}', sans-serif` }}>Gallery</p>
+          {images?.length ? (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 4, borderRadius: radii.button, overflow: "hidden" }}>
+              {images.slice(0, 6).map((img, i) => (
+                <img key={i} src={img.url} alt={img.caption || ""} style={{ width: "100%", height: 60, objectFit: "cover" }} />
+              ))}
+            </div>
+          ) : (
+            <CardSectionWrapper theme={theme} index={index} metallicEffect={metallicEffect}>
+              <p style={{ fontSize: 12, color: `${palette.secondary}60`, textAlign: "center" }}>Add gallery images</p>
+            </CardSectionWrapper>
+          )}
+        </div>
+      );
+    }
+
+    case "social": {
+      const links = c?.links as { platform: string; url: string }[] | undefined;
+      return (
+        <div>
+          <p style={{ fontSize: 11, fontWeight: 600, color: palette.primary, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1, fontFamily: `'${fonts.primary}', sans-serif` }}>Connect</p>
+          <div style={{ display: "flex", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+            {(links?.length ? links : [{ platform: "instagram" }, { platform: "facebook" }, { platform: "linkedin" }]).map((l: any, i: number) => (
+              <div key={i} style={{
+                width: 36, height: 36, borderRadius: radii.button,
+                border: `1px solid ${palette.primary}20`, background: `${palette.primary}08`,
+                display: "flex", alignItems: "center", justifyContent: "center", color: palette.primary,
+              }}>
+                {SOCIAL_ICONS[l.platform?.toLowerCase()] || <Globe style={{ width: 16, height: 16 }} />}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    case "contact":
+      return (
+        <div>
+          <p style={{ fontSize: 11, fontWeight: 600, color: palette.primary, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1, fontFamily: `'${fonts.primary}', sans-serif` }}>
+            {c?.heading || "Get in Touch"}
+          </p>
+          {c?.description && <p style={{ fontSize: 12, color: palette.secondary, margin: "0 0 8px", lineHeight: 1.5 }}>{c.description}</p>}
+          <CardSectionWrapper theme={theme} index={index} metallicEffect={metallicEffect}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {["Your name *", "Phone number", "Email", "Message"].map((ph, i) => (
+                <div key={i} style={{
+                  padding: "8px 12px", borderRadius: radii.button,
+                  border: `1px solid ${palette.secondary}30`, fontSize: 12,
+                  color: `${palette.secondary}50`, fontFamily: `'${fonts.secondary}', sans-serif`,
+                }}>{ph}</div>
+              ))}
+              <div style={{
+                padding: "10px", borderRadius: radii.button,
+                background: palette.primary, color: palette.background,
+                textAlign: "center", fontSize: 13, fontWeight: 600,
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+              }}>
+                <Send style={{ width: 14, height: 14 }} /> Send Message
+              </div>
+            </div>
+          </CardSectionWrapper>
+        </div>
+      );
+
     case "booking":
-      return <p className="text-xs text-center font-medium">{c.bookingHeading || "Book an Appointment"}</p>;
+      return (
+        <div style={{
+          padding: "10px 16px", borderRadius: theme.button.shape === "pill" ? "9999px" : radii.button,
+          background: palette.primary, color: palette.background,
+          textAlign: "center", fontSize: 13, fontWeight: 600,
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+        }}>
+          <Calendar style={{ width: 14, height: 14 }} />
+          {c?.bookingHeading || "Book an Appointment"}
+        </div>
+      );
+
+    case "quote_request":
+      return (
+        <CardSectionWrapper theme={theme} index={index} metallicEffect={metallicEffect}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: palette.primary, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1 }}>Quote Request</p>
+          <p style={{ fontSize: 12, color: `${palette.secondary}60`, textAlign: "center" }}>Clients can request a custom quote</p>
+        </CardSectionWrapper>
+      );
+
+    case "quote_calculator":
+      return (
+        <CardSectionWrapper theme={theme} index={index} metallicEffect={metallicEffect}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: palette.primary, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1 }}>
+            {c?.heading || "Instant Quote"}
+          </p>
+          <p style={{ fontSize: 12, color: `${palette.secondary}60`, textAlign: "center" }}>Interactive pricing calculator</p>
+        </CardSectionWrapper>
+      );
+
+    case "projects":
+      return (
+        <CardSectionWrapper theme={theme} index={index} metallicEffect={metallicEffect}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: palette.primary, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1 }}>
+            {c?.heading || "Our Work"}
+          </p>
+          <p style={{ fontSize: 12, color: `${palette.secondary}60`, textAlign: "center" }}>Before & After transformations</p>
+        </CardSectionWrapper>
+      );
+
     default:
-      return <p className="text-xs text-muted-foreground text-center">{section.label} Section</p>;
+      return (
+        <CardSectionWrapper theme={theme} index={index} metallicEffect={metallicEffect}>
+          <p style={{ fontSize: 12, color: `${palette.secondary}60`, textAlign: "center" }}>{section.label} Section</p>
+        </CardSectionWrapper>
+      );
   }
 }
 
@@ -469,17 +645,23 @@ export default function CardBuilderPreview({
                       );
                     })()}
 
-                    {/* Section Previews */}
-                    {sections.filter((s) => s.enabled).map((section) => (
+                    {/* Section Previews — themed to match public card */}
+                    {sections.filter((s) => s.enabled).map((section, idx) => (
                       <div key={section.id}
-                        className="mt-4 p-3 rounded-lg border border-dashed border-border/60 bg-muted/20 cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-colors group"
+                        className="mt-4 cursor-pointer group relative"
                         onClick={() => setEditingSection(section.id)}
                       >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{section.label}</span>
-                          <Pencil className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="bg-primary/90 text-primary-foreground rounded-full p-1 shadow-md">
+                            <Pencil className="h-3 w-3" />
+                          </div>
                         </div>
-                        {getSectionPreview(section)}
+                        <ThemedSectionPreview
+                          section={section}
+                          theme={previewTheme}
+                          metallicEffect={currentThemeOverrides.metallicEffect}
+                          index={idx}
+                        />
                       </div>
                     ))}
                   </div>
