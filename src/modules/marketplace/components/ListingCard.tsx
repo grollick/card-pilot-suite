@@ -142,7 +142,7 @@ export default function ListingCard({ listing, boosted, variant = "default" }: L
               <StarRating rating={listing.avg_rating} count={listing.review_count} />
             )}
             {listing.avg_response_minutes !== null && (
-              <ResponseBadge minutes={listing.avg_response_minutes} />
+              <ResponseSpeedBadge minutes={listing.avg_response_minutes} />
             )}
             {listing.city && (
               <span className="flex items-center gap-0.5 text-xs text-muted-foreground">
