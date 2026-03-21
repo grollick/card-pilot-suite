@@ -75,6 +75,9 @@ export default function AdminPage() {
       {/* Growth */}
       {section === "growth" && <AdminGrowthDashboard />}
 
+      {/* Sources */}
+      {section === "sources" && <SourceAttributionDashboard />}
+
       {/* Abuse Monitor */}
       {section === "abuse" && <AbuseMonitorDashboard />}
 
