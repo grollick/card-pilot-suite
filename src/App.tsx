@@ -28,6 +28,7 @@ const PublicSite = lazy(() => import("@/modules/public/pages/PublicSite"));
 const DemoCardPreview = lazy(() => import("@/modules/public/pages/DemoCardPreview"));
 const SecurityPage = lazy(() => import("@/modules/public/pages/SecurityPage"));
 const ReferralRedirect = lazy(() => import("@/modules/public/pages/ReferralRedirect"));
+const SimpleLandingPage = lazy(() => import("@/modules/landing/pages/SimpleLandingPage"));
 
 // Client Portal — loaded eagerly (public, token-based)
 const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
@@ -215,6 +216,7 @@ const App = () => (
 
             {/* Industry landing pages */}
             <Route path="/for/:industry" element={<IndustryLandingPage />} />
+            <Route path="/get-started" element={<LazyRoute><SimpleLandingPage /></LazyRoute>} />
 
             {/* Demo cards — no auth */}
             <Route path="/demo/:slug" element={<LazyRoute><DemoCardPreview /></LazyRoute>} />
