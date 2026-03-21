@@ -434,6 +434,9 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
         </CardContent>
       </Card>
 
+      {/* ── SECTION: Research Summary ── */}
+      <ResearchSummaryWidget onNavigate={() => onNavigateSection?.("research")} />
+
       {/* ── SECTION 16: Quick Actions ── */}
       <SectionHeader icon={Rocket} title="Quick Actions" description="Common admin tasks" />
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
