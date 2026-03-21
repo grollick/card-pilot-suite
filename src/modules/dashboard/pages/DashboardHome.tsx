@@ -98,7 +98,7 @@ export default function DashboardHome() {
       </div>
 
       {/* ── Smart Revenue & Coaching ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <RevenuePipelineWidget />
         <SmartRevenueWidget />
       </div>
