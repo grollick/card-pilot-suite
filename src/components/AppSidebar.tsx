@@ -48,6 +48,7 @@ const jobsItems = [
 const customersItems = [
   { title: "Contacts", url: "/app/contacts?stage=customer", icon: UserCircle },
   { title: "Reviews", url: "/app/reviews", icon: Star },
+  { title: "Loyalty", url: "/app/loyalty", icon: Gift },
   { title: "Projects", url: "/app/projects", icon: Briefcase },
 ];
 

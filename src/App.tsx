@@ -59,6 +59,7 @@ const DashboardLayout = lazy(() => import("@/components/DashboardLayout"));
 
 // Dashboard
 const DashboardHome = lazy(() => import("@/modules/dashboard/pages/DashboardHome"));
+const LoyaltyPage = lazy(() => import("@/modules/dashboard/pages/LoyaltyPage"));
 
 // Card Builder
 const CardBuilder = lazy(() => import("@/modules/card/pages/CardBuilder"));
@@ -281,6 +282,7 @@ const App = () => (
               <Route path="boost" element={<LazyRoute><BoostPage /></LazyRoute>} />
               <Route path="projects" element={<LazyRoute><ProjectsPage /></LazyRoute>} />
               <Route path="reviews" element={<LazyRoute><ReviewsPage /></LazyRoute>} />
+              <Route path="loyalty" element={<LazyRoute><LoyaltyPage /></LazyRoute>} />
               <Route path="marketplace-performance" element={<LazyRoute><MarketplacePerformancePage /></LazyRoute>} />
               <Route path="job-requests" element={<LazyRoute><JobRequestsPage /></LazyRoute>} />
               <Route path="estimates" element={<LazyRoute><EstimatesPage /></LazyRoute>} />
