@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useProfileCache } from "@/hooks/useProfileCache";
+import { useLocation } from "react-router-dom";
 
 interface TourStep {
   title: string;
@@ -55,11 +56,15 @@ const TOUR_STEPS: TourStep[] = [
 export default function ProductTour() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const location = useLocation();
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 
   const { data: profileCache } = useProfileCache();
   const tourCompleted = profileCache?.tour_completed ?? false;
+
+  // Never show tour on admin pages
+  const isAdminPage = location.pathname.includes("/admin");
 
   const completeTour = useMutation({
     mutationFn: async () => {
@@ -74,11 +79,15 @@ export default function ProductTour() {
   });
 
   useEffect(() => {
+    if (isAdminPage) {
+      setIsVisible(false);
+      return;
+    }
     if (tourCompleted === false) {
       const timer = setTimeout(() => setIsVisible(true), 1500);
       return () => clearTimeout(timer);
     }
-  }, [tourCompleted]);
+  }, [tourCompleted, isAdminPage]);
 
   const handleNext = useCallback(() => {
     if (currentStep < TOUR_STEPS.length - 1) {
