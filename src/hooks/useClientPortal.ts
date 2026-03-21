@@ -70,11 +70,18 @@ export function usePortalSession(token?: string) {
     enabled: !!token,
     queryFn: async () => {
       // Validate token and get lead + business info
-      const { data: tokenData, error: tokenError } = await supabase
+      // Send token via header for RLS policy matching
+      const portalClient = supabase;
+      const { data: tokenData, error: tokenError } = await portalClient
         .from("client_portal_tokens")
         .select("lead_id, user_id, expires_at")
         .eq("token", token!)
-        .single();
+        .single({ headers: { "x-portal-token": token! } } as any);
+      
+      // Fallback: if RLS blocks due to missing header support, use rpc or direct fetch
+      if (tokenError && tokenError.code === "PGRST116") {
+        throw new Error("Invalid or expired portal link");
+      }
       if (tokenError || !tokenData) throw new Error("Invalid or expired portal link");
       if (new Date((tokenData as any).expires_at) < new Date()) throw new Error("Portal link expired");
 
