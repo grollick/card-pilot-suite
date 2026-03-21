@@ -73,19 +73,34 @@ export default function DashboardHome() {
         <MarketplaceAwarenessWidget />
       </div>
 
-      {/* ── SECTION 2: KPI Row ── */}
+      {/* ── KPI Row ── */}
       <RevenueKPICards />
 
-      {/* ── AI Growth Assistant Panel ── */}
-      <AIGrowthAssistantPanel />
+      {/* ── AI Growth + Next Actions side-by-side ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <AIGrowthAssistantPanel />
+        <NextActionsWidget />
+      </div>
 
-      {/* ── Business Performance ── */}
-      <BusinessPerformancePanel />
+      {/* ── Business Performance + Lead Performance ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <BusinessPerformancePanel />
+        <LeadPerformanceWidget />
+      </div>
 
-      {/* ── Referral Widget ── */}
-      <ReferralWidget />
+      {/* ── Revenue Pipeline + Funnel ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <RevenuePipelineWidget />
+        <FunnelView />
+      </div>
 
-      {/* ── Activation System ── */}
+      {/* ── Smart Revenue + Opportunities ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <SmartRevenueWidget />
+        <RevenueOpportunities />
+      </div>
+
+      {/* ── Activation + Sharing ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="space-y-4">
           <VerificationChecklist />
@@ -97,35 +112,27 @@ export default function DashboardHome() {
         </div>
       </div>
 
-      {/* ── Smart Revenue & Coaching ── */}
+      {/* ── Referral + Lead Guarantee ── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <RevenuePipelineWidget />
-        <SmartRevenueWidget />
+        <ReferralWidget />
+        {guaranteeData && !guaranteeData.targetMet ? (
+          <LeadGuaranteeBanner variant="dashboard" guaranteeData={guaranteeData} />
+        ) : (
+          <MissedOpportunities />
+        )}
       </div>
 
-      {/* ── Lead Performance ── */}
-      <LeadPerformanceWidget />
+      {/* ── Bottom insights row ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <LeadQualityWidget />
+        <LeadVelocityWidget />
+        <RetentionInsightsWidget />
+      </div>
 
-      {/* ── Next Actions ── */}
-      <NextActionsWidget />
-
-      {/* ── Main Grid: 2-column layout ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
-        <div className="lg:col-span-3 space-y-4">
-          <RevenueOpportunities />
-          <MissedOpportunities />
-          <DashboardActivityFeed />
-        </div>
-        <div className="lg:col-span-2 space-y-4">
-          <FunnelView />
-          {guaranteeData && !guaranteeData.targetMet && (
-            <LeadGuaranteeBanner variant="dashboard" guaranteeData={guaranteeData} />
-          )}
-          <LeadQualityWidget />
-          <LeadVelocityWidget />
-          <RetentionInsightsWidget />
-          <GrowthTrends />
-        </div>
+      {/* ── Activity + Growth ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <DashboardActivityFeed />
+        <GrowthTrends />
       </div>
 
       {/* Mobile floating quick-create buttons */}
