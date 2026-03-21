@@ -43,10 +43,10 @@ export function exportEstimatePDF({
         (li) => `
       <tr class="${li.is_optional ? 'optional' : ''}">
         <td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:13px;">
-          <strong>${li.title}</strong>${li.is_optional ? ' <span style="color:#999;font-size:11px;">(Optional)</span>' : ""}
-          ${li.description ? `<br/><span style="color:#888;font-size:12px;">${li.description}</span>` : ""}
+          <strong>${escHtml(li.title)}</strong>${li.is_optional ? ' <span style="color:#999;font-size:11px;">(Optional)</span>' : ""}
+          ${li.description ? `<br/><span style="color:#888;font-size:12px;">${escHtml(li.description)}</span>` : ""}
         </td>
-        <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;font-size:13px;">${li.quantity} ${li.unit}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;font-size:13px;">${li.quantity} ${escHtml(li.unit)}</td>
         <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right;font-size:13px;">${fmt(li.line_total)}</td>
       </tr>`
       )
@@ -56,7 +56,7 @@ export function exportEstimatePDF({
     const showHeader = sections.length > 1 || sec.name !== "General";
 
     return `
-      ${showHeader ? `<tr><td colspan="3" style="padding:14px 12px 6px;font-size:14px;font-weight:700;color:#333;border-bottom:1px solid #ddd;">${sec.name}${sec.notes ? `<br/><span style="font-weight:400;color:#888;font-size:12px;">${sec.notes}</span>` : ""}</td></tr>` : ""}
+      ${showHeader ? `<tr><td colspan="3" style="padding:14px 12px 6px;font-size:14px;font-weight:700;color:#333;border-bottom:1px solid #ddd;">${escHtml(sec.name)}${sec.notes ? `<br/><span style="font-weight:400;color:#888;font-size:12px;">${escHtml(sec.notes)}</span>` : ""}</td></tr>` : ""}
       ${rows}
       ${showHeader ? `<tr><td colspan="2" style="padding:6px 12px;font-size:12px;color:#888;text-align:right;">Section subtotal</td><td style="padding:6px 12px;text-align:right;font-size:12px;font-weight:600;">${fmt(sectionSubtotal)}</td></tr>` : ""}
     `;
@@ -72,7 +72,7 @@ export function exportEstimatePDF({
 <html>
 <head>
   <meta charset="utf-8"/>
-  <title>Estimate ${estimate.estimate_number}</title>
+  <title>Estimate ${escHtml(estimate.estimate_number)}</title>
   <style>
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:#1a1a1a; padding:40px; max-width:800px; margin:0 auto; }
@@ -110,14 +110,14 @@ export function exportEstimatePDF({
 <body>
   <div class="header">
     <div>
-      <div class="company">${profile?.company || profile?.name || "Your Business"}</div>
+      <div class="company">${escHtml(profile?.company || profile?.name || "Your Business")}</div>
       <div class="company-details">
-        ${[profile?.phone, profile?.email].filter(Boolean).join(" · ")}
+        ${[profile?.phone, profile?.email].filter(Boolean).map(v => escHtml(v)).join(" · ")}
       </div>
     </div>
     <div class="estimate-meta">
       <h1>ESTIMATE</h1>
-      <p><strong>${estimate.estimate_number}</strong></p>
+      <p><strong>${escHtml(estimate.estimate_number)}</strong></p>
       <p>Issued: ${estimate.issue_date ? format(new Date(estimate.issue_date + "T00:00:00"), "MMM d, yyyy") : "—"}</p>
       ${estimate.expiry_date ? `<p>Expires: ${format(new Date(estimate.expiry_date + "T00:00:00"), "MMM d, yyyy")}</p>` : ""}
       ${statusBadge ? `<p style="margin-top:6px;">${statusBadge}</p>` : ""}
@@ -128,21 +128,21 @@ export function exportEstimatePDF({
     <div class="info-box">
       <h3>Customer</h3>
       <p>
-        ${contact?.name || "—"}<br/>
-        ${contact?.company ? contact.company + "<br/>" : ""}
-        ${[contact?.email, contact?.phone].filter(Boolean).join("<br/>")}
+        ${escHtml(contact?.name) || "—"}<br/>
+        ${contact?.company ? escHtml(contact.company) + "<br/>" : ""}
+        ${[contact?.email, contact?.phone].filter(Boolean).map(v => escHtml(v)).join("<br/>")}
       </p>
     </div>
     <div class="info-box">
       <h3>Job Details</h3>
       <p>
-        ${estimate.job_type ? `<strong>${estimate.job_type}</strong><br/>` : ""}
-        ${estimate.job_address || ""}
+        ${estimate.job_type ? `<strong>${escHtml(estimate.job_type)}</strong><br/>` : ""}
+        ${escHtml(estimate.job_address)}
       </p>
     </div>
   </div>
 
-  ${estimate.scope_of_work ? `<div class="scope"><h3>Scope of Work</h3><p>${estimate.scope_of_work}</p></div>` : ""}
+  ${estimate.scope_of_work ? `<div class="scope"><h3>Scope of Work</h3><p>${escHtml(estimate.scope_of_work)}</p></div>` : ""}
 
   <table>
     <thead>
@@ -174,8 +174,8 @@ export function exportEstimatePDF({
     ${totals.optional_total > 0 ? `<div class="row muted" style="margin-top:8px;font-style:italic;"><span>Optional items</span><span>${fmt(totals.optional_total)}</span></div>` : ""}
   </div>
 
-  ${estimate.notes ? `<div class="notes"><h3>Notes</h3><p>${estimate.notes}</p></div>` : ""}
-  ${estimate.terms_conditions ? `<div class="terms"><h3>Terms & Conditions</h3><p>${estimate.terms_conditions}</p></div>` : ""}
+  ${estimate.notes ? `<div class="notes"><h3>Notes</h3><p>${escHtml(estimate.notes)}</p></div>` : ""}
+  ${estimate.terms_conditions ? `<div class="terms"><h3>Terms & Conditions</h3><p>${escHtml(estimate.terms_conditions)}</p></div>` : ""}
 
   ${hasBranding ? `<div class="watermark">Powered by guzzl.pro</div>` : ""}
 </body>
