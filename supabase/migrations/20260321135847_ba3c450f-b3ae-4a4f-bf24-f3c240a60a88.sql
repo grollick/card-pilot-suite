@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Anon can insert payment for valid invoice" ON public.invoice_payments;

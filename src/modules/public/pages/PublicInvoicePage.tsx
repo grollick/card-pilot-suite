@@ -77,45 +77,19 @@ export default function PublicInvoicePage() {
   const remainingBalance = Math.max(0, grandTotal - amountPaid);
   const isPaid = invoice?.status === "paid";
 
-  // Record payment mutation
+  // Record payment mutation via secure edge function
   const recordPayment = useMutation({
     mutationFn: async () => {
-      // Insert payment record
-      const { error: payError } = await supabase
-        .from("invoice_payments")
-        .insert({
-          invoice_id: invoice.id,
-          user_id: invoice.user_id,
-          amount: remainingBalance,
+      const { data, error } = await supabase.functions.invoke("record-invoice-payment", {
+        body: {
+          payment_token: token,
           payment_method: paymentMethod,
           payment_reference: paymentRef || null,
           notes: paymentNotes || null,
-        });
-      if (payError) throw payError;
-
-      // Update invoice
-      const { error: invError } = await supabase
-        .from("invoices")
-        .update({
-          amount_paid: grandTotal,
-          payment_method: paymentMethod,
-          payment_reference: paymentRef || null,
-          status: "paid" as any,
-          paid_at: new Date().toISOString(),
-        })
-        .eq("id", invoice.id);
-      if (invError) throw invError;
-
-      // Log CRM activity
-      if (invoice.lead_id) {
-        await supabase.from("contact_activities").insert({
-          lead_id: invoice.lead_id,
-          user_id: invoice.user_id,
-          activity_type: "invoice_paid",
-          title: `Invoice ${invoice.invoice_number} paid via ${paymentMethod}`,
-          related_id: invoice.id,
-        });
-      }
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["public-invoice", token] });
