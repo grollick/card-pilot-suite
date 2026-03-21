@@ -40,7 +40,7 @@ export default function DashboardHome() {
   const { data: guaranteeData } = useLeadGuarantee();
 
   return (
-    <div className="space-y-5 max-w-[1280px]">
+    <div className="space-y-4 max-w-[1280px]">
       <ReferralActivationChecker />
       {/* ── Header ── */}
       <motion.div
@@ -62,7 +62,7 @@ export default function DashboardHome() {
       {isMobile && <MobileJobDashboard />}
 
       {/* ── Contextual banners (grouped to avoid empty gaps) ── */}
-      <div className="flex flex-col gap-4 empty:hidden [&:not(:has(>*))]:hidden">
+      <div className="flex flex-col gap-3 empty:hidden [&:not(:has(>*))]:hidden">
         <YouAreLiveBanner />
         <FirstLeadCelebration />
         <MilestoneCelebrationListener />
@@ -86,19 +86,19 @@ export default function DashboardHome() {
       <ReferralWidget />
 
       {/* ── Activation System ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="space-y-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="space-y-4">
           <VerificationChecklist />
           <ActivationChecklist />
         </div>
-        <div className="space-y-5">
+        <div className="space-y-4">
           <ShareMessageCard />
           <ShareCardWidget />
         </div>
       </div>
 
       {/* ── Smart Revenue & Coaching ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <RevenuePipelineWidget />
         <SmartRevenueWidget />
       </div>
@@ -110,16 +110,13 @@ export default function DashboardHome() {
       <NextActionsWidget />
 
       {/* ── Main Grid: 2-column layout ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        {/* Left Column (3/5) */}
-        <div className="lg:col-span-3 space-y-5">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <div className="lg:col-span-3 space-y-4">
           <RevenueOpportunities />
           <MissedOpportunities />
           <DashboardActivityFeed />
         </div>
-
-        {/* Right Column (2/5) */}
-        <div className="lg:col-span-2 space-y-5">
+        <div className="lg:col-span-2 space-y-4">
           <FunnelView />
           {guaranteeData && !guaranteeData.targetMet && (
             <LeadGuaranteeBanner variant="dashboard" guaranteeData={guaranteeData} />
