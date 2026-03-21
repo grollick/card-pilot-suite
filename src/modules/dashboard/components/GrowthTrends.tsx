@@ -55,9 +55,9 @@ function InsightTip({ text }: { text: string }) {
 }
 
 export default function GrowthTrends() {
+  const navigate = useNavigate();
   const { data, isLoading } = useBusinessPerformance();
 
-  // Generate a contextual insight
   const getInsight = () => {
     if (!data) return null;
     if (data.leads > 0 && data.bookings === 0) return "You're getting leads but no bookings yet. Try following up within 1 hour.";
@@ -78,7 +78,12 @@ export default function GrowthTrends() {
     >
       <div className="px-5 pt-5 pb-2 flex items-center justify-between">
         <h2 className="font-semibold text-sm text-foreground">Growth & Insights</h2>
-        <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">vs. last month</span>
+        <button
+          onClick={() => navigate("/app/analytics")}
+          className="text-[10px] font-medium text-primary hover:text-primary/80 uppercase tracking-widest transition-colors flex items-center gap-1"
+        >
+          View All <ArrowRight className="h-2.5 w-2.5" />
+        </button>
       </div>
       <div className="px-5 pb-5">
         {isLoading ? (
@@ -88,10 +93,10 @@ export default function GrowthTrends() {
         ) : (
           <>
             <div className="divide-y divide-border/60">
-              <TrendRow label="Card Views" icon={Eye} value={data?.views ?? 0} trend={data?.trends?.views ?? 0} />
-              <TrendRow label="Leads" icon={UserPlus} value={data?.leads ?? 0} trend={data?.trends?.leads ?? 0} />
-              <TrendRow label="Bookings" icon={CalendarCheck} value={data?.bookings ?? 0} trend={data?.trends?.bookings ?? 0} />
-              <TrendRow label="Revenue" icon={DollarSign} value={data?.estimatedRevenue ?? 0} trend={data?.trends?.revenue ?? 0} prefix="$" />
+              <TrendRow label="Card Views" icon={Eye} value={data?.views ?? 0} trend={data?.trends?.views ?? 0} onClick={() => navigate("/app/analytics")} />
+              <TrendRow label="Leads" icon={UserPlus} value={data?.leads ?? 0} trend={data?.trends?.leads ?? 0} onClick={() => navigate("/app/contacts")} />
+              <TrendRow label="Bookings" icon={CalendarCheck} value={data?.bookings ?? 0} trend={data?.trends?.bookings ?? 0} onClick={() => navigate("/app/bookings")} />
+              <TrendRow label="Revenue" icon={DollarSign} value={data?.estimatedRevenue ?? 0} trend={data?.trends?.revenue ?? 0} prefix="$" onClick={() => navigate("/app/invoices")} />
             </div>
             {insight && <div className="mt-4"><InsightTip text={insight} /></div>}
           </>
