@@ -16,22 +16,37 @@ import { motion } from "framer-motion";
 import InstantConnectPanel from "@/modules/public/components/InstantConnectPanel";
 
 // ── Leaflet icon factories ──
-function createIcon(color: string) {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="40" viewBox="0 0 28 40">
+function createIcon(color: string, isAvailable: boolean) {
+  const pulseRings = isAvailable ? `
+    <circle cx="14" cy="14" r="18" fill="none" stroke="${color}" stroke-width="1.5" opacity="0.4">
+      <animate attributeName="r" values="14;24" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.5;0" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="14" cy="14" r="14" fill="none" stroke="${color}" stroke-width="1" opacity="0.3">
+      <animate attributeName="r" values="14;20" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0.4;0" dur="2s" begin="0.5s" repeatCount="indefinite"/>
+    </circle>
+  ` : "";
+  const glow = isAvailable
+    ? `<circle cx="14" cy="14" r="10" fill="${color}" opacity="0.25"><animate attributeName="opacity" values="0.15;0.35;0.15" dur="2s" repeatCount="indefinite"/></circle>`
+    : "";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="56" viewBox="-10 -10 48 56">
+    ${pulseRings}
+    ${glow}
     <path d="M14 0C6.27 0 0 6.27 0 14c0 10.5 14 26 14 26s14-15.5 14-26C28 6.27 21.73 0 14 0z" fill="${color}" stroke="white" stroke-width="2"/>
     <circle cx="14" cy="14" r="6" fill="white"/>
   </svg>`;
   return L.divIcon({
     html: svg,
     className: "",
-    iconSize: [28, 40],
-    iconAnchor: [14, 40],
-    popupAnchor: [0, -40],
+    iconSize: [48, 56],
+    iconAnchor: [24, 46],
+    popupAnchor: [0, -46],
   });
 }
 
-const greenIcon = createIcon("#22c55e");
-const yellowIcon = createIcon("#eab308");
+const greenIcon = createIcon("#22c55e", true);
+const yellowIcon = createIcon("#eab308", false);
 
 function formatResponseTime(min: number | null) {
   if (!min) return null;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Radio, Clock, MapPin, Target, Zap, Shield, ChevronDown, ChevronUp,
@@ -18,6 +18,7 @@ import { usePlanLimits } from "@/hooks/usePlanLimits";
 import DutySettingsPanel from "./duty/DutySettingsPanel";
 import DutyAnalyticsPanel from "./duty/DutyAnalyticsPanel";
 import DutyMatchesList from "./duty/DutyMatchesList";
+import DutyGoLiveOverlay from "./duty/DutyGoLiveOverlay";
 
 /* ───────── CSS keyframes injected once ───────── */
 const glowKeyframes = `
@@ -39,13 +40,19 @@ export default function EstimateDutyPanel() {
   const [showSettings, setShowSettings] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showMatches, setShowMatches] = useState(false);
+  const [showGoLive, setShowGoLive] = useState(false);
 
   const isFreePlan = planKey === "starter";
   const isProPlus = planKey === "pro" || planKey === "agency";
 
   const handleToggle = (on: boolean, settings?: any) => {
-    toggleDuty.mutate({ is_on_duty: on, ...settings });
+    toggleDuty.mutate(
+      { is_on_duty: on, ...settings },
+      { onSuccess: (data) => { if (data?.is_on_duty) setShowGoLive(true); } }
+    );
   };
+
+  const handleGoLiveComplete = useCallback(() => setShowGoLive(false), []);
 
   if (isLoading) {
     return <Skeleton className="h-32 w-full rounded-xl" />;
@@ -286,6 +293,9 @@ export default function EstimateDutyPanel() {
           </div>
         </motion.div>
       </div>
+
+      {/* Go-live celebration overlay */}
+      <DutyGoLiveOverlay show={showGoLive} onComplete={handleGoLiveComplete} />
     </>
   );
 }
