@@ -27,6 +27,23 @@ Deno.serve(async (req) => {
     );
 
     if (action === "send-magic-link") {
+      // Rate limit: max 3 magic links per email per hour
+      const oneHourAgo = new Date(Date.now() - 3600_000).toISOString();
+      const { count } = await serviceClient
+        .from("email_send_log")
+        .select("id", { count: "exact", head: true })
+        .eq("recipient_email", email)
+        .eq("template_name", "magic_link")
+        .gte("created_at", oneHourAgo);
+
+      if ((count ?? 0) >= 3) {
+        // Silent success to prevent enumeration
+        return new Response(
+          JSON.stringify({ success: true, message: "If an account exists, a login link has been sent to your email." }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       // Check if this email exists as a lead in any business
       const { data: leads } = await serviceClient
         .from("leads")
@@ -59,6 +76,13 @@ Deno.serve(async (req) => {
           { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+
+      // Log the send for rate limiting
+      await serviceClient.from("email_send_log").insert({
+        recipient_email: email,
+        template_name: "magic_link",
+        status: "sent",
+      });
 
       return new Response(
         JSON.stringify({ success: true, message: "Magic link sent to your email" }),

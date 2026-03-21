@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Public view responses by tracking token" ON public.job_request_responses;
