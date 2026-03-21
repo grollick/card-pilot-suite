@@ -182,14 +182,14 @@ export default function DashboardHome() {
         <RevenueKPICards />
       </motion.div>
 
-      {/* ── Main Content: Actions + Business Score ── */}
+      {/* ── AI Business Coach ── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         <motion.div
           variants={fadeUp}
           transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
           className="lg:col-span-3"
         >
-          <NextActionsWidget />
+          <AIBusinessCoachWidget />
         </motion.div>
         <motion.div
           variants={fadeUp}
@@ -199,6 +199,14 @@ export default function DashboardHome() {
           <BusinessHealthScore />
         </motion.div>
       </div>
+
+      {/* ── Main Content: Actions ── */}
+      <motion.div
+        variants={fadeUp}
+        transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
+      >
+        <NextActionsWidget />
+      </motion.div>
 
       {/* ── Activity Feed ── */}
       <motion.div
