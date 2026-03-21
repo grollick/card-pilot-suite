@@ -471,6 +471,9 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
           </Button>
         ))}
       </div>
+
+      {/* ── Success Stories ── */}
+      <SuccessStoriesManager />
     </div>
   );
 }
