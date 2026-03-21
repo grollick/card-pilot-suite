@@ -69,7 +69,7 @@ export default function EstimateDutyPanel() {
       {isOnDuty && (
         <>
           {/* Top glow bar */}
-          <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-success via-success/90 to-success/50 rounded-t-xl" />
+          <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-success via-success/90 to-success/50 rounded-t-xl" />
           {/* Full-card pulsing ambient glow */}
           <motion.div
             className="absolute -inset-4 rounded-3xl pointer-events-none"
