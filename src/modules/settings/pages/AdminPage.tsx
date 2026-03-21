@@ -15,6 +15,7 @@ import { useState } from "react";
 type Section = "command" | "growth" | "content" | "feedback" | "system" | "abuse";
 
 const sections: { id: Section; label: string; icon: typeof Shield }[] = [
+  { id: "command", label: "Command Center", icon: Rocket },
   { id: "growth", label: "Growth", icon: TrendingUp },
   { id: "abuse", label: "Abuse Monitor", icon: ShieldAlert },
   { id: "content", label: "Content & Professions", icon: LayoutGrid },
