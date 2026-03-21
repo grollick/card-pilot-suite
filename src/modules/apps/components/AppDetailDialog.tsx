@@ -32,7 +32,11 @@ export default function AppDetailDialog({ app, isInstalled, onInstall, onClose }
       <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center text-lg">📦</div>
+            <div className="h-10 w-10 rounded-xl bg-muted flex items-center justify-center text-lg shrink-0">
+              {app.icon_url ? (
+                <img src={app.icon_url} alt={app.name} className="h-8 w-8 rounded-lg object-contain" />
+              ) : "📦"}
+            </div>
             <div>
               <span className="block">{app.name}</span>
               <span className="text-xs font-normal text-muted-foreground">by {app.developer_name}</span>
