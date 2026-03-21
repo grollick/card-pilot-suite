@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAdminFunnelStats, type FunnelStage } from "@/hooks/useAdminFunnelStats";
+import FunnelHealthMonitor from "@/modules/admin/components/FunnelHealthMonitor";
 
 const stageIcons: Record<string, typeof Users> = {
   leads: Users,
