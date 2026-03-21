@@ -570,6 +570,13 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ─── SUCCESS STORIES ─── */}
+      <section className="py-10 md:py-14">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <SuccessStoryBanner location="landing" />
+        </div>
+      </section>
+
       <div className="glow-line" />
 
       {/* ─── 7. PRICING ─── */}
