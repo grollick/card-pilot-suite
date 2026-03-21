@@ -78,6 +78,9 @@ export default function FunnelVisualizationDashboard() {
         </div>
       </div>
 
+      {/* Health Monitor */}
+      <FunnelHealthMonitor />
+
       {/* Filters */}
       <Card>
         <CardContent className="pt-5 pb-4">
