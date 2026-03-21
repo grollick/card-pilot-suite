@@ -2,6 +2,18 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+export interface AdminSuccessMetrics {
+  activationRate: number;
+  firstLeadRate: number;
+  responseRate: number;
+  avgTimeToActionHours: number;
+  dau: number;
+  totalActivated: number;
+  totalWithLeads: number;
+  totalMatches: number;
+  totalResponded: number;
+}
+
 export interface AdminStats {
   totalUsers: number;
   signups30d: number;
@@ -22,6 +34,7 @@ export interface AdminStats {
     handle: string | null;
   }[];
   signupsByDate: Record<string, number>;
+  successMetrics?: AdminSuccessMetrics;
 }
 
 export function useAdminStats() {

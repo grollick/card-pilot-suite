@@ -5,6 +5,7 @@ import {
   BarChart3, UserPlus, Globe, Layers, ChevronRight, ExternalLink,
   Mail, MoreHorizontal, UserCheck, Ban, Gift
 } from "lucide-react";
+import SuccessMetricsPanel from "@/modules/admin/components/SuccessMetricsPanel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -198,6 +199,13 @@ export default function PlatformAdminDashboard() {
           </motion.button>
         ))}
       </div>
+
+      {/* Success Metrics */}
+      <SuccessMetricsPanel
+        metrics={stats?.successMetrics}
+        totalUsers={stats?.totalUsers}
+        isLoading={isLoading}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Signups — 2 cols */}
