@@ -2,6 +2,9 @@ import type { EstimateSection, EstimateTotals } from "@/hooks/useEstimates";
 import { showsBranding } from "@/lib/plans";
 import { format } from "date-fns";
 
+const escHtml = (s: string | null | undefined): string =>
+  (s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+
 export function exportEstimatePDF({
   estimate,
   sections,
