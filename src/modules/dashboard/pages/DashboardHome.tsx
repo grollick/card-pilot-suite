@@ -12,14 +12,18 @@ import MobileQuickCreate from "@/modules/invoices/components/MobileQuickCreate";
 import ReferralActivationChecker from "@/modules/dashboard/components/ReferralActivationChecker";
 import EstimateDutyPanel from "@/modules/dashboard/components/EstimateDutyPanel";
 import {
-  Pencil, UserPlus, CalendarPlus, Share2, ExternalLink,
-  Zap,
+  Pencil, UserPlus, CalendarPlus, ExternalLink,
+  Zap, Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+const stagger = {
+  animate: { transition: { staggerChildren: 0.08 } },
+};
+
 const fadeUp = {
-  initial: { opacity: 0, y: 16 },
-  animate: { opacity: 1, y: 0 },
+  initial: { opacity: 0, y: 20, scale: 0.98 },
+  animate: { opacity: 1, y: 0, scale: 1 },
 };
 
 export default function DashboardHome() {
@@ -38,37 +42,81 @@ export default function DashboardHome() {
   const firstName = profile?.name?.split(" ")[0] || "there";
 
   return (
-    <div className="space-y-6 max-w-[1200px]">
+    <motion.div
+      className="space-y-6 max-w-[1200px]"
+      initial="initial"
+      animate="animate"
+      variants={stagger}
+    >
       <ReferralActivationChecker />
 
       {/* ── Hero Header ── */}
       <motion.div
-        {...fadeUp}
-        transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
-        className="relative overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-card via-card to-muted/30 p-6 sm:p-8"
+        variants={fadeUp}
+        transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
+        className="relative overflow-hidden rounded-2xl border border-primary/10 p-6 sm:p-8"
+        style={{
+          background: "linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--card)), hsl(var(--accent) / 0.06))",
+        }}
       >
-        {/* Subtle background pattern */}
-        <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]" style={{
+        {/* Animated gradient orbs */}
+        <motion.div
+          className="absolute -top-20 -right-20 h-60 w-60 rounded-full blur-3xl pointer-events-none"
+          style={{ background: "hsl(var(--primary) / 0.12)" }}
+          animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0.7, 0.4] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full blur-3xl pointer-events-none"
+          style={{ background: "hsl(var(--accent) / 0.1)" }}
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
+
+        {/* Dot grid pattern */}
+        <div className="absolute inset-0 opacity-[0.04] dark:opacity-[0.08]" style={{
           backgroundImage: "radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)",
-          backgroundSize: "24px 24px",
+          backgroundSize: "20px 20px",
         }} />
 
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            <motion.h1
+              className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground"
+              initial={{ opacity: 0, x: -12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
+            >
               {greeting}, {firstName}
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1.5">
-              <Zap className="h-3.5 w-3.5 text-primary" />
+              <motion.span
+                className="inline-block ml-2"
+                animate={{ rotate: [0, 14, -8, 14, 0] }}
+                transition={{ duration: 1.8, delay: 0.8, ease: "easeInOut" }}
+              >
+                👋
+              </motion.span>
+            </motion.h1>
+            <motion.p
+              className="text-sm text-muted-foreground mt-1.5 flex items-center gap-1.5"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              <Zap className="h-3.5 w-3.5 text-primary animate-pulse" />
               Here's how your business is doing today
-            </p>
+            </motion.p>
           </div>
 
           {!isMobile && (
-            <div className="flex flex-wrap gap-2">
+            <motion.div
+              className="flex flex-wrap gap-2"
+              initial={{ opacity: 0, x: 12 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.25 }}
+            >
               <Button
                 size="sm"
-                className="gap-2 rounded-xl h-9 text-[13px] font-medium"
+                className="gap-2 rounded-xl h-9 text-[13px] font-medium shadow-sm shadow-primary/20 hover:shadow-md hover:shadow-primary/30 transition-all hover:scale-[1.02]"
                 onClick={() => navigate("/app/card")}
               >
                 <Pencil className="h-3.5 w-3.5" /> Edit Card
@@ -76,7 +124,7 @@ export default function DashboardHome() {
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-xl h-9 text-[13px] font-medium"
+                className="gap-2 rounded-xl h-9 text-[13px] font-medium hover:scale-[1.02] transition-all backdrop-blur-sm"
                 onClick={() => navigate("/app/contacts?new=1")}
               >
                 <UserPlus className="h-3.5 w-3.5" /> Add Lead
@@ -84,19 +132,19 @@ export default function DashboardHome() {
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 rounded-xl h-9 text-[13px] font-medium"
+                className="gap-2 rounded-xl h-9 text-[13px] font-medium hover:scale-[1.02] transition-all backdrop-blur-sm"
                 onClick={() => navigate("/app/bookings?new=1")}
               >
                 <CalendarPlus className="h-3.5 w-3.5" /> Book
               </Button>
               {profile?.handle && (
-                <Button variant="outline" size="sm" className="gap-2 rounded-xl h-9 text-[13px] font-medium" asChild>
+                <Button variant="outline" size="sm" className="gap-2 rounded-xl h-9 text-[13px] font-medium hover:scale-[1.02] transition-all backdrop-blur-sm" asChild>
                   <a href={`/${profile.handle}`} target="_blank" rel="noreferrer">
                     <ExternalLink className="h-3.5 w-3.5" /> View Card
                   </a>
                 </Button>
               )}
-            </div>
+            </motion.div>
           )}
         </div>
       </motion.div>
@@ -108,22 +156,25 @@ export default function DashboardHome() {
       <EstimateDutyPanel />
 
       {/* ── KPI Cards ── */}
-      <motion.div {...fadeUp} transition={{ delay: 0.08, duration: 0.5 }}>
+      <motion.div
+        variants={fadeUp}
+        transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
+      >
         <RevenueKPICards />
       </motion.div>
 
       {/* ── Main Content: Actions + Activity ── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         <motion.div
-          {...fadeUp}
-          transition={{ delay: 0.14, duration: 0.5 }}
+          variants={fadeUp}
+          transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
           className="lg:col-span-2"
         >
           <NextActionsWidget />
         </motion.div>
         <motion.div
-          {...fadeUp}
-          transition={{ delay: 0.18, duration: 0.5 }}
+          variants={fadeUp}
+          transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
           className="lg:col-span-3"
         >
           <DashboardActivityFeed />
@@ -131,12 +182,15 @@ export default function DashboardHome() {
       </div>
 
       {/* ── Growth Trends ── */}
-      <motion.div {...fadeUp} transition={{ delay: 0.22, duration: 0.5 }}>
+      <motion.div
+        variants={fadeUp}
+        transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
+      >
         <GrowthTrends />
       </motion.div>
 
       {/* Mobile floating quick-create */}
       {isMobile && <MobileQuickCreate />}
-    </div>
+    </motion.div>
   );
 }
