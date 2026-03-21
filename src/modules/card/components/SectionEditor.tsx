@@ -561,7 +561,7 @@ function QuoteCalculatorEditor({ draft, setDraft }: { draft: SectionContent; set
 }
 
 // ─── Video Introduction Editor ──────────────────────────────
-function VideoIntroEditor({ draft, setDraft }: EditorProps) {
+function VideoIntroEditor({ draft, setDraft }: { draft: SectionContent; setDraft: (d: SectionContent) => void }) {
   const getEmbedUrl = (url: string) => {
     if (!url) return "";
     // YouTube
