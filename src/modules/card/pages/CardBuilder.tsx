@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import PhotoImportDialog, { type ImportedProject } from "@/modules/card/components/PhotoImportDialog";
+import ContentImportDialog, { type ImportResult } from "@/modules/card/components/ContentImportDialog";
 import CardPhotoTools from "@/modules/card/components/CardPhotoTools";
 import SectionEditor, { type SectionContent } from "@/modules/card/components/SectionEditor";
 import CardAssistant from "@/modules/card/components/CardAssistant";
