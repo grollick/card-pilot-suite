@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Send, Loader2, Sparkles, Copy, ClipboardPaste } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
