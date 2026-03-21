@@ -54,7 +54,26 @@ export function useIsAdmin() {
         .from("user_roles")
         .select("role")
         .eq("user_id", user!.id)
-        .eq("role", "admin")
+        .in("role", ["admin", "founder"]);
+
+      return !!data && data.length > 0;
+    },
+  });
+}
+
+export function useIsFounder() {
+  const { user } = useAuth();
+  return useQuery<boolean>({
+    queryKey: ["is-founder", user?.id],
+    enabled: !!user,
+    staleTime: 10 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user!.id)
+        .eq("role", "founder")
         .maybeSingle();
 
       return !!data;
