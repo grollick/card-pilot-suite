@@ -57,7 +57,7 @@ export default function EstimateDutyPanel() {
             background: "radial-gradient(ellipse at center, hsl(var(--success) / 0.4), transparent 70%)",
             filter: "blur(50px)",
           }}
-          animate={{ opacity: [0.05, 1, 0.05] }}
+          animate={{ opacity: [0, 1, 0] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
         />
       )}
@@ -87,7 +87,7 @@ export default function EstimateDutyPanel() {
             <motion.div
               className="absolute inset-0 rounded-xl pointer-events-none"
               style={{ boxShadow: "inset 0 0 50px hsl(var(--success) / 0.2)" }}
-              animate={{ opacity: [0.05, 1, 0.05] }}
+              animate={{ opacity: [0, 1, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             />
           </>
