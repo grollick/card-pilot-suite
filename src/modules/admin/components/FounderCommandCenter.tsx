@@ -435,6 +435,10 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
         </CardContent>
       </Card>
 
+      {/* ── SECTION: Cold Outreach ── */}
+      <SectionHeader icon={Mail} title="Cold Outreach Emails" description="Pre-written emails to acquire card holders by profession" />
+      <ColdOutreachTemplates />
+
       {/* ── SECTION: Research Summary ── */}
       <ResearchSummaryWidget onNavigate={() => onNavigateSection?.("research")} />
 

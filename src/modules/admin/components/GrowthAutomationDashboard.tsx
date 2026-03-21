@@ -625,6 +625,11 @@ export default function GrowthAutomationDashboard() {
           <FollowUpSystem />
         </TabsContent>
 
+        {/* ── Cold Emails Tab ── */}
+        <TabsContent value="cold-emails" className="space-y-5 mt-4">
+          <ColdOutreachTemplates />
+        </TabsContent>
+
         {/* ── Activation Tab ── */}
         <TabsContent value="activation" className="space-y-5 mt-4">
           <SH icon={Sparkles} title="Onboarding Automation" desc="Trigger AI card builder, social import, templates" />
