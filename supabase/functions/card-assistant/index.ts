@@ -67,6 +67,22 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    // Fetch AI personality preference
+    const { data: profileData } = await supabase
+      .from("profiles")
+      .select("ai_personality")
+      .eq("id", user.id)
+      .maybeSingle();
+    const personality = (profileData as any)?.ai_personality || "copilot";
+
+    const personalityInstructions: Record<string, string> = {
+      copilot: "Be concise and action-oriented. Short tips, quick fixes, bullet points. Under 3 paragraphs.",
+      chatgpt: "Be thorough and conversational. Detailed explanations, multiple options, rich markdown.",
+      coach: "Be proactive and motivational. Numbered action steps, priorities, encouragement.",
+      minimal: "Be extremely brief. Short sentences, no fluff. Max 2-3 sentences.",
+    };
+    const toneInstruction = personalityInstructions[personality] || personalityInstructions.copilot;
+
     const contextBlock = context
       ? `\n\nUser context:\n- Name: ${context.name || "Unknown"}\n- Profession: ${context.profession || "Unknown"}\n- Company: ${context.company || "N/A"}\n- Sections enabled: ${context.sections || "N/A"}\n- Has avatar: ${context.hasAvatar ? "Yes" : "No"}\n- Has backdrop: ${context.hasBackdrop ? "Yes" : "No"}\n- Card status: ${context.cardStatus || "draft"}`
       : "";
