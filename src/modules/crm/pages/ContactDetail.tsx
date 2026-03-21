@@ -36,6 +36,9 @@ import ContactTasksList from "@/modules/crm/components/ContactTasksList";
 import PendingFollowups from "@/modules/crm/components/PendingFollowups";
 import ContactAutomationPanel from "@/modules/crm/components/ContactAutomationPanel";
 import { supabase } from "@/integrations/supabase/client";
+import AIReplyDraftCopilot from "@/components/ai/AIReplyDraftCopilot";
+import { useAILeadScores } from "@/hooks/useAICopilot";
+import { LeadScoreBadge } from "@/components/ai/LeadScoreBadge";
 
 export default function ContactDetail() {
   const { id } = useParams();

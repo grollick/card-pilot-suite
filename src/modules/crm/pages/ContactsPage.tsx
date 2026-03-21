@@ -18,6 +18,8 @@ import { usePlanLimits } from "@/hooks/usePlanLimits";
 import UpgradePrompt from "@/components/UpgradePrompt";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { useAILeadScores } from "@/hooks/useAICopilot";
+import { LeadScoreBadge, LeadScoreLoading } from "@/components/ai/LeadScoreBadge";
 
 type SavedView = "all" | "new_leads" | "needs_followup" | "booked" | "won" | "lost";
 

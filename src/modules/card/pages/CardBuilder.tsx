@@ -10,6 +10,7 @@ import BlockMarketplaceDialog from "@/modules/card/components/BlockMarketplaceDi
 import { canAccessBlock, type MarketplaceBlock } from "@/lib/blockMarketplace";
 import AIDesignAssistantDialog, { type AICardResult } from "@/modules/card/components/AIDesignAssistantDialog";
 import ConversionTips from "@/modules/card/components/ConversionTips";
+import AICardOptimizerCopilot from "@/components/ai/AICardOptimizerCopilot";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
