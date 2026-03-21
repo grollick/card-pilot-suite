@@ -17,6 +17,8 @@ export const PLAN_TIERS = [
       "Share via QR code or link",
       "Up to 3 services listed",
       "5 AI requests per month",
+      "Basic before/after gallery (3 projects)",
+      "2 review requests per month",
     ],
     limits: {
       contacts: 100,
@@ -33,6 +35,8 @@ export const PLAN_TIERS = [
       gallery_images: 3,
       testimonials: 2,
       ai_requests_monthly: 5,
+      before_after_projects: 3,
+      review_requests_monthly: 2,
       pdf_export: false,
       estimate_approvals: false,
       payments: false,
@@ -40,6 +44,13 @@ export const PLAN_TIERS = [
       recurring_invoices: false,
       advanced_reporting: false,
       premium_templates: false,
+      whatsapp_chat: false,
+      sms_chat: false,
+      loyalty_program: false,
+      team_cards: false,
+      google_business_sync: false,
+      expense_tracker: false,
+      video_intro: false,
     },
   },
   {
@@ -59,6 +70,11 @@ export const PLAN_TIERS = [
       "Promotion banners on your card",
       "Remove guzzl.pro watermark",
       "50 AI requests per month",
+      "Unlimited before/after gallery",
+      "Automated review collection",
+      "WhatsApp & SMS quick chat",
+      "Client loyalty program",
+      "Video introduction on card",
     ],
     limits: {
       contacts: -1,
@@ -75,6 +91,8 @@ export const PLAN_TIERS = [
       gallery_images: -1,
       testimonials: -1,
       ai_requests_monthly: 50,
+      before_after_projects: -1,
+      review_requests_monthly: -1,
       pdf_export: true,
       estimate_approvals: true,
       payments: false,
@@ -82,6 +100,13 @@ export const PLAN_TIERS = [
       recurring_invoices: false,
       advanced_reporting: false,
       premium_templates: true,
+      whatsapp_chat: true,
+      sms_chat: true,
+      loyalty_program: true,
+      team_cards: false,
+      google_business_sync: false,
+      expense_tracker: false,
+      video_intro: true,
     },
   },
   {
@@ -96,7 +121,9 @@ export const PLAN_TIERS = [
       "Accept online payments",
       "AI-powered business assistant",
       "Revenue forecasting & insights",
-      "Team member accounts",
+      "Team member cards",
+      "Google Business Profile sync",
+      "Expense tracker",
       "Custom domain support",
       "White-label branding option",
       "Priority support",
@@ -117,6 +144,8 @@ export const PLAN_TIERS = [
       gallery_images: -1,
       testimonials: -1,
       ai_requests_monthly: 500,
+      before_after_projects: -1,
+      review_requests_monthly: -1,
       pdf_export: true,
       estimate_approvals: true,
       payments: true,
@@ -124,6 +153,13 @@ export const PLAN_TIERS = [
       recurring_invoices: true,
       advanced_reporting: true,
       premium_templates: true,
+      whatsapp_chat: true,
+      sms_chat: true,
+      loyalty_program: true,
+      team_cards: true,
+      google_business_sync: true,
+      expense_tracker: true,
+      video_intro: true,
     },
   },
   {
@@ -134,8 +170,9 @@ export const PLAN_TIERS = [
     tagline: "Manage multiple clients at scale",
     popular: false,
     features: [
-      "Everything in Pro",
+      "Everything in Pro Plus, plus:",
       "Unlimited client workspaces",
+      "Unlimited team cards",
       "White-label branding",
       "Agency command center",
       "Bulk marketing tools",
@@ -159,6 +196,8 @@ export const PLAN_TIERS = [
       gallery_images: -1,
       testimonials: -1,
       ai_requests_monthly: -1,
+      before_after_projects: -1,
+      review_requests_monthly: -1,
       pdf_export: true,
       estimate_approvals: true,
       payments: true,
@@ -166,6 +205,13 @@ export const PLAN_TIERS = [
       recurring_invoices: true,
       advanced_reporting: true,
       premium_templates: true,
+      whatsapp_chat: true,
+      sms_chat: true,
+      loyalty_program: true,
+      team_cards: true,
+      google_business_sync: true,
+      expense_tracker: true,
+      video_intro: true,
     },
   },
 ] as const;
@@ -187,6 +233,8 @@ export interface PlanLimits {
   gallery_images: number;
   testimonials: number;
   ai_requests_monthly: number;
+  before_after_projects: number;
+  review_requests_monthly: number;
   pdf_export: boolean;
   estimate_approvals: boolean;
   payments: boolean;
@@ -194,6 +242,13 @@ export interface PlanLimits {
   recurring_invoices: boolean;
   advanced_reporting: boolean;
   premium_templates: boolean;
+  whatsapp_chat: boolean;
+  sms_chat: boolean;
+  loyalty_program: boolean;
+  team_cards: boolean;
+  google_business_sync: boolean;
+  expense_tracker: boolean;
+  video_intro: boolean;
 }
 
 export function getPlanByKey(key: string): (typeof PLAN_TIERS)[number] | undefined {
