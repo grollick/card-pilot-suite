@@ -15,11 +15,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useAdminStats";
 import { useProfileCache } from "@/hooks/useProfileCache";
 import { useJobRequestStats } from "@/hooks/useJobRequests";
-import { NavLink } from "@/components/NavLink";
-import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate, useLocation } from "react-router-dom";
-import { useIsAdmin } from "@/hooks/useAdminStats";
-import { useProfileCache } from "@/hooks/useProfileCache";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
