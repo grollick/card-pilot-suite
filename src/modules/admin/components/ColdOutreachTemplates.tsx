@@ -430,10 +430,76 @@ export default function ColdOutreachTemplates() {
     setEditedSubject(template.subject);
     setEditedBody(template.body);
     setEditMode(false);
+    setSendChannel("email");
     setShowSendDialog(true);
   };
 
+  const getPersonalizedBody = () => {
+    if (!selectedTemplate) return "";
+    return personalizeText(editMode ? editedBody : getEmailContent(selectedTemplate, emailStep));
+  };
+
+  const handleSocialSend = (channel: string) => {
+    const body = getPersonalizedBody();
+    const logContact = async (via: string) => {
+      await supabase.from("outreach_contacts").insert({
+        name: recipientName || recipientEmail || recipientPhone || "Unknown",
+        business: recipientBusiness || null,
+        status: "contacted",
+        last_contact_at: new Date().toISOString(),
+        notes: `Cold outreach via ${via}: ${selectedTemplate?.name} (${emailStep})`,
+      } as any);
+    };
+
+    switch (channel) {
+      case "whatsapp": {
+        const phone = recipientPhone.replace(/\D/g, "");
+        if (!phone) { toast.error("Phone number is required for WhatsApp"); return; }
+        const url = `https://wa.me/${phone}?text=${encodeURIComponent(body)}`;
+        window.open(url, "_blank");
+        logContact("WhatsApp");
+        toast.success("WhatsApp opened");
+        break;
+      }
+      case "sms": {
+        const phone = recipientPhone.replace(/\D/g, "");
+        if (!phone) { toast.error("Phone number is required for SMS"); return; }
+        const url = `sms:${phone}?body=${encodeURIComponent(body)}`;
+        window.open(url, "_blank");
+        logContact("SMS");
+        toast.success("SMS app opened");
+        break;
+      }
+      case "facebook": {
+        navigator.clipboard.writeText(body);
+        window.open("https://www.facebook.com/messages/", "_blank");
+        logContact("Facebook");
+        toast.success("Message copied — paste it in Facebook Messenger");
+        break;
+      }
+      case "linkedin": {
+        navigator.clipboard.writeText(body);
+        window.open("https://www.linkedin.com/messaging/", "_blank");
+        logContact("LinkedIn");
+        toast.success("Message copied — paste it in LinkedIn Messages");
+        break;
+      }
+      case "instagram": {
+        navigator.clipboard.writeText(body);
+        window.open("https://www.instagram.com/direct/inbox/", "_blank");
+        logContact("Instagram");
+        toast.success("Message copied — paste it in Instagram DMs");
+        break;
+      }
+    }
+  };
+
   const handleSend = async () => {
+    if (sendChannel !== "email") {
+      handleSocialSend(sendChannel);
+      return;
+    }
+
     if (!recipientEmail.trim()) {
       toast.error("Recipient email is required");
       return;
@@ -443,7 +509,7 @@ export default function ColdOutreachTemplates() {
     setSending(true);
     try {
       const subject = personalizeText(editMode ? editedSubject : getSubject(selectedTemplate, emailStep));
-      const bodyText = personalizeText(editMode ? editedBody : getEmailContent(selectedTemplate, emailStep));
+      const bodyText = getPersonalizedBody();
       const html = bodyText.replace(/\n/g, "<br />");
 
       const { error } = await supabase.functions.invoke("send-email", {
@@ -457,7 +523,6 @@ export default function ColdOutreachTemplates() {
 
       if (error) throw error;
 
-      // Log to outreach_contacts
       await supabase.from("outreach_contacts").insert({
         name: recipientName || recipientEmail,
         business: recipientBusiness || null,
@@ -470,6 +535,7 @@ export default function ColdOutreachTemplates() {
       setRecipientEmail("");
       setRecipientName("");
       setRecipientBusiness("");
+      setRecipientPhone("");
       setShowSendDialog(false);
     } catch (err: any) {
       console.error("Cold email send error:", err);
