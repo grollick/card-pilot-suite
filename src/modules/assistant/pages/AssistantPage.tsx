@@ -127,9 +127,9 @@ const mdComponents = {
   h2: ({ children }: any) => {
     const Icon = getScenarioIcon(String(children));
     return (
-      <h2 className="flex items-center gap-2.5 font-semibold mt-5 mb-2.5 pb-1.5 border-b border-border/30 text-foreground">
-        <span className="h-6 w-6 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-          <Icon className="h-3.5 w-3.5 text-primary" />
+      <h2 className="flex items-center gap-2.5 text-base font-bold mt-5 mb-2.5 pb-1.5 border-b border-border/30 text-foreground">
+        <span className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+          <Icon className="h-4 w-4 text-primary" />
         </span>
         {children}
       </h2>
@@ -138,8 +138,8 @@ const mdComponents = {
   h3: ({ children }: any) => {
     const Icon = getScenarioIcon(String(children));
     return (
-      <h3 className="flex items-center gap-2 font-semibold mt-4 mb-1.5 text-foreground">
-        <Icon className="h-3.5 w-3.5 text-primary/70 shrink-0" />
+      <h3 className="flex items-center gap-2 text-[15px] font-semibold mt-4 mb-1.5 text-foreground">
+        <Icon className="h-4 w-4 text-primary/70 shrink-0" />
         {children}
       </h3>
     );
@@ -147,9 +147,9 @@ const mdComponents = {
   li: ({ children }: any) => {
     const Icon = getScenarioIcon(String(children));
     return (
-      <li className="flex items-start gap-2.5 my-2 list-none">
-        <span className="h-5 w-5 rounded-md bg-success/10 flex items-center justify-center shrink-0 mt-0.5">
-          <Icon className="h-3 w-3 text-success" />
+      <li className="flex items-start gap-2.5 my-2 list-none text-[14px] leading-relaxed">
+        <span className="h-5.5 w-5.5 rounded-md bg-success/10 flex items-center justify-center shrink-0 mt-0.5">
+          <Icon className="h-3.5 w-3.5 text-success" />
         </span>
         <span className="flex-1">{children}</span>
       </li>
