@@ -40,7 +40,7 @@ export default function DashboardHome() {
   const { data: guaranteeData } = useLeadGuarantee();
 
   return (
-    <div className="space-y-5 max-w-[1280px]">
+    <div className="space-y-4 max-w-[1280px]">
       <ReferralActivationChecker />
       {/* ── Header ── */}
       <motion.div
