@@ -116,22 +116,29 @@ export function useJobRequestStats() {
     queryKey: ["job-request-stats", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data: matches } = await (supabase as any)
-        .from("estimate_matches")
-        .select("status, estimate_request_id")
-        .eq("user_id", user!.id);
-
-      const { data: responses } = await (supabase as any)
-        .from("job_request_responses")
-        .select("id, status")
-        .eq("user_id", user!.id);
+      const [{ data: matches }, { data: responses }, { data: guarantee }] = await Promise.all([
+        (supabase as any)
+          .from("estimate_matches")
+          .select("status, estimate_request_id")
+          .eq("user_id", user!.id),
+        (supabase as any)
+          .from("job_request_responses")
+          .select("id, status")
+          .eq("user_id", user!.id),
+        (supabase as any)
+          .from("first_lead_guarantee")
+          .select("status")
+          .eq("user_id", user!.id)
+          .maybeSingle(),
+      ]);
 
       const total = matches?.length || 0;
       const newRequests = matches?.filter((m: any) => m.status === "pending").length || 0;
       const responsesSent = responses?.length || 0;
       const won = matches?.filter((m: any) => m.status === "accepted").length || 0;
+      const hasGuaranteeMatch = guarantee?.status === "matched";
 
-      return { total, newRequests, responsesSent, won };
+      return { total, newRequests, responsesSent, won, hasGuaranteeMatch };
     },
   });
 }
