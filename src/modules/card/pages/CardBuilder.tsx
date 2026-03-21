@@ -1027,6 +1027,7 @@ export default function CardBuilder() {
         onImportComplete={handleContentImport}
       />
 
+      <BlockMarketplaceDialog
         open={blockMarketOpen}
         onOpenChange={setBlockMarketOpen}
         installedBlockIds={installedBlockIds}
