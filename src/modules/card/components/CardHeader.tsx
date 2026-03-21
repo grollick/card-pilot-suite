@@ -369,8 +369,63 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
         />
       )}
       {logoEl && <div style={{ position: "relative", zIndex: 2 }}>{logoEl}</div>}
+      {/* Verification & Available badges — bottom right of cover */}
+      {(showVerified || isAvailable) && (
+        <div style={{
+          position: "absolute",
+          bottom: 8,
+          right: 10,
+          zIndex: 3,
+          display: "flex",
+          gap: 4,
+          alignItems: "center",
+        }}>
+          {showVerified && (
+            <span style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 3,
+              padding: "3px 8px",
+              borderRadius: 20,
+              background: "rgba(0,0,0,0.55)",
+              backdropFilter: "blur(8px)",
+              color: "#fff",
+              fontSize: 10,
+              fontWeight: 600,
+              lineHeight: 1,
+            }}>
+              {verificationLevel === "pro_verified"
+                ? <ShieldCheck style={{ width: 12, height: 12, color: "#facc15" }} />
+                : <BadgeCheck style={{ width: 12, height: 12, color: "#60a5fa" }} />
+              }
+              {verificationLevel === "pro_verified" ? "Pro Verified" : "Verified"}
+            </span>
+          )}
+          {isAvailable && (
+            <span style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 3,
+              padding: "3px 8px",
+              borderRadius: 20,
+              background: "rgba(0,0,0,0.55)",
+              backdropFilter: "blur(8px)",
+              color: "#4ade80",
+              fontSize: 10,
+              fontWeight: 600,
+              lineHeight: 1,
+            }}>
+              <Circle style={{ width: 6, height: 6, fill: "#4ade80", color: "#4ade80" }} />
+              Available
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
+
+  const showVerified = verificationLevel && verificationLevel !== "basic";
+
 
   // Shared cover/backdrop banner element for non-cover layouts
   const coverBanner = (coverUrl || logoUrl || heroBackground) ? parallaxCover(120, true) : null;
