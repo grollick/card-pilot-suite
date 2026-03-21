@@ -264,18 +264,42 @@ export default function AssistantPage() {
                       )}
                     </div>
                     {msg.role === "assistant" && !isLoading && (
-                      <div className="flex items-center gap-1 flex-wrap">
+                      <div className="flex items-center gap-0.5 flex-wrap">
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-6 px-2 text-[10px] text-muted-foreground hover:text-foreground"
+                          className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground"
                           onClick={() => {
                             navigator.clipboard.writeText(msg.content);
                             toast.success("Copied to clipboard");
                           }}
                         >
-                          <Copy className="h-3 w-3 mr-1" />
+                          <Copy className="h-3.5 w-3.5 mr-1" />
                           Copy
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 text-muted-foreground hover:text-success"
+                          onClick={() => toast.success("Thanks for the feedback!")}
+                        >
+                          <ThumbsUp className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                          onClick={() => toast("We'll improve — thanks!", { icon: "🙏" })}
+                        >
+                          <ThumbsDown className="h-3.5 w-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 text-muted-foreground hover:text-primary"
+                          onClick={() => toast.success("Saved to bookmarks")}
+                        >
+                          <Bookmark className="h-3.5 w-3.5" />
                         </Button>
                         {/* Quick action buttons after last assistant message */}
                         {i === messages.length - 1 && (
@@ -286,10 +310,10 @@ export default function AssistantPage() {
                                 key={action.route}
                                 variant="ghost"
                                 size="sm"
-                                className="h-6 px-2 text-[10px] text-muted-foreground hover:text-foreground gap-1"
+                                className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground gap-1"
                                 onClick={() => navigate(action.route)}
                               >
-                                <action.icon className="h-3 w-3" />
+                                <action.icon className="h-3.5 w-3.5" />
                                 {action.label}
                               </Button>
                             ))}
