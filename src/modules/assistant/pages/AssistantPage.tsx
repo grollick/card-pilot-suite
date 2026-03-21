@@ -17,6 +17,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { aiMarkdownComponents, getScenarioIcon } from "@/components/AIResponseRenderer";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
