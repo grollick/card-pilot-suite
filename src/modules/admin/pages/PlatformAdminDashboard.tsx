@@ -144,10 +144,10 @@ export default function PlatformAdminDashboard() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => navigate("/app/admin/marketing")}>
+          <Button variant="outline" size="sm" onClick={() => navigate("/app/admin-marketing")}>
             <Mail className="h-3.5 w-3.5 mr-1" /> Marketing
           </Button>
-          <Button variant="outline" size="sm" onClick={() => navigate("/app/settings/admin")}>
+          <Button variant="outline" size="sm" onClick={() => navigate("/app/admin")}>
             <TrendingUp className="h-3.5 w-3.5 mr-1" /> Growth
           </Button>
         </div>
