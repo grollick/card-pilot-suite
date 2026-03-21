@@ -127,9 +127,9 @@ const mdComponents = {
   h2: ({ children }: any) => {
     const Icon = getScenarioIcon(String(children));
     return (
-      <h2 className="flex items-center gap-2.5 text-base font-bold mt-5 mb-2.5 pb-1.5 border-b border-border/30 text-foreground">
-        <span className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-          <Icon className="h-4 w-4 text-primary" />
+      <h2 className="flex items-center gap-3 text-lg font-extrabold mt-6 mb-3 pb-2 border-b border-border/30 text-foreground tracking-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+        <span className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+          <Icon className="h-4.5 w-4.5 text-primary" />
         </span>
         {children}
       </h2>
@@ -138,7 +138,7 @@ const mdComponents = {
   h3: ({ children }: any) => {
     const Icon = getScenarioIcon(String(children));
     return (
-      <h3 className="flex items-center gap-2 text-[15px] font-semibold mt-4 mb-1.5 text-foreground">
+      <h3 className="flex items-center gap-2.5 text-base font-bold mt-5 mb-2 text-foreground tracking-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
         <Icon className="h-4 w-4 text-primary/70 shrink-0" />
         {children}
       </h3>
@@ -147,8 +147,8 @@ const mdComponents = {
   li: ({ children }: any) => {
     const Icon = getScenarioIcon(String(children));
     return (
-      <li className="flex items-start gap-2.5 my-2 list-none text-[14px] leading-relaxed">
-        <span className="h-5.5 w-5.5 rounded-md bg-success/10 flex items-center justify-center shrink-0 mt-0.5">
+      <li className="flex items-start gap-3 my-2.5 list-none text-[15px] leading-[1.7]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+        <span className="h-6 w-6 rounded-lg bg-success/10 flex items-center justify-center shrink-0 mt-0.5">
           <Icon className="h-3.5 w-3.5 text-success" />
         </span>
         <span className="flex-1">{children}</span>
@@ -156,16 +156,16 @@ const mdComponents = {
     );
   },
   blockquote: ({ children }: any) => (
-    <blockquote className="flex items-start gap-3 border-l-2 border-warning/40 bg-warning/5 rounded-r-xl px-4 py-3 my-4 not-italic">
-      <Lightbulb className="h-4 w-4 text-warning shrink-0 mt-0.5" />
+    <blockquote className="flex items-start gap-3 border-l-2 border-warning/40 bg-warning/5 rounded-r-xl px-4 py-3 my-4 not-italic text-[15px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+      <Lightbulb className="h-5 w-5 text-warning shrink-0 mt-0.5" />
       <div className="flex-1">{children}</div>
     </blockquote>
   ),
   strong: ({ children }: any) => (
-    <strong className="font-semibold text-foreground">{children}</strong>
+    <strong className="font-bold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>{children}</strong>
   ),
   p: ({ children }: any) => (
-    <p className="text-muted-foreground leading-[1.8] my-2">{children}</p>
+    <p className="text-muted-foreground leading-[1.8] my-2.5 text-[14px]">{children}</p>
   ),
 };
 
