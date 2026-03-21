@@ -1,25 +1,31 @@
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { TrendingUp, TrendingDown, Minus, UserPlus, CalendarCheck, DollarSign, Eye, Lightbulb } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, UserPlus, CalendarCheck, DollarSign, Eye, Lightbulb, ArrowRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBusinessPerformance } from "@/hooks/useBusinessPerformance";
 
-function TrendRow({ label, icon: Icon, value, trend, prefix = "" }: {
+function TrendRow({ label, icon: Icon, value, trend, prefix = "", route, onClick }: {
   label: string;
   icon: typeof TrendingUp;
   value: number;
   trend: number;
   prefix?: string;
+  route?: string;
+  onClick?: () => void;
 }) {
   const isPositive = trend > 0;
   const isZero = trend === 0;
 
   return (
-    <div className="flex items-center gap-3 py-3">
-      <div className="h-9 w-9 rounded-xl bg-muted/50 flex items-center justify-center shrink-0">
-        <Icon className="h-4 w-4 text-muted-foreground" />
+    <div
+      className={`flex items-center gap-3 py-3 ${onClick ? "cursor-pointer group hover:bg-muted/30 -mx-2 px-2 rounded-xl transition-colors" : ""}`}
+      onClick={onClick}
+    >
+      <div className="h-9 w-9 rounded-xl bg-muted/50 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors">
+        <Icon className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{label}</p>
         <p className="text-[11px] text-muted-foreground tabular-nums">
           {prefix}{value.toLocaleString()} this month
         </p>
@@ -32,6 +38,9 @@ function TrendRow({ label, icon: Icon, value, trend, prefix = "" }: {
          isPositive ? <TrendingUp className="h-2.5 w-2.5" /> : <TrendingDown className="h-2.5 w-2.5" />}
         {isPositive ? "+" : ""}{trend}%
       </div>
+      {onClick && (
+        <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/0 group-hover:text-muted-foreground transition-all group-hover:translate-x-0.5 shrink-0" />
+      )}
     </div>
   );
 }
