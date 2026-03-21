@@ -197,10 +197,55 @@ export function getSectionStyles(
 }
 
 // ─── Fonts ────────────────────────────────────────────────
-export function getFonts(tokens: Record<string, any>) {
+export interface ResolvedFonts {
+  primary: string;
+  secondary: string;
+  nameFont?: string;
+  taglineFont?: string;
+  sectionHeadingFont?: string;
+  buttonFont?: string;
+  nameFontSize?: number;
+  taglineFontSize?: number;
+  sectionHeadingFontSize?: number;
+  bodyFontSize?: number;
+  buttonFontSize?: number;
+  nameFontWeight?: number;
+  taglineFontWeight?: number;
+  sectionHeadingFontWeight?: number;
+  bodyFontWeight?: number;
+  buttonFontWeight?: number;
+  nameLetterSpacing?: number;
+  taglineLetterSpacing?: number;
+  bodyLineHeight?: number;
+  nameTransform?: string;
+  sectionHeadingTransform?: string;
+}
+
+export function getFonts(tokens: Record<string, any>, fontOverrides?: Record<string, any>): ResolvedFonts {
   return {
     primary: tokens?.fontPrimary || "Inter",
     secondary: tokens?.fontSecondary || "Inter",
+    ...(fontOverrides ? {
+      nameFont: fontOverrides.nameFont,
+      taglineFont: fontOverrides.taglineFont,
+      sectionHeadingFont: fontOverrides.sectionHeadingFont,
+      buttonFont: fontOverrides.buttonFont,
+      nameFontSize: fontOverrides.nameFontSize,
+      taglineFontSize: fontOverrides.taglineFontSize,
+      sectionHeadingFontSize: fontOverrides.sectionHeadingFontSize,
+      bodyFontSize: fontOverrides.bodyFontSize,
+      buttonFontSize: fontOverrides.buttonFontSize,
+      nameFontWeight: fontOverrides.nameFontWeight,
+      taglineFontWeight: fontOverrides.taglineFontWeight,
+      sectionHeadingFontWeight: fontOverrides.sectionHeadingFontWeight,
+      bodyFontWeight: fontOverrides.bodyFontWeight,
+      buttonFontWeight: fontOverrides.buttonFontWeight,
+      nameLetterSpacing: fontOverrides.nameLetterSpacing,
+      taglineLetterSpacing: fontOverrides.taglineLetterSpacing,
+      bodyLineHeight: fontOverrides.bodyLineHeight,
+      nameTransform: fontOverrides.nameTransform,
+      sectionHeadingTransform: fontOverrides.sectionHeadingTransform,
+    } : {}),
   };
 }
 
