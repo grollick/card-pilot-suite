@@ -150,8 +150,8 @@ const PERSONAS: Persona[] = [
     stages: [
       { key: "idle", duration: 2200 },
       { key: "tap", duration: 800 },
-      { key: "booking", duration: 2200 },
-      { key: "booked", duration: 1400 },
+      { key: "invoice", duration: 3200 },
+      { key: "paid", duration: 1600 },
     ],
   },
   {
