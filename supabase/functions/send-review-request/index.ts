@@ -23,9 +23,8 @@ serve(async (req) => {
     let callerUserId: string | null = null;
     let isServiceRole = false;
 
-    if (token === serviceKey || token === anonKey) {
-      // Called from DB trigger (notify_review_request uses anon key)
-      // Allow but we'll verify booking ownership isn't needed for internal triggers
+    if (token === serviceKey) {
+      // Called from DB trigger (notify_review_request uses service-role key)
       isServiceRole = true;
     } else if (token) {
       // Validate as user JWT
