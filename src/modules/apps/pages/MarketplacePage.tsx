@@ -175,9 +175,15 @@ export default function MarketplacePage() {
         app={selectedApp}
         isInstalled={selectedApp ? installedIds.has(selectedApp.id) : false}
         onInstall={() => {
-          if (selectedApp) installApp.mutate(selectedApp.id);
+          if (selectedApp) handleInstall(selectedApp);
         }}
         onClose={() => setSelectedApp(null)}
+      />
+
+      <PurchaseAppDialog
+        app={purchaseApp}
+        onClose={() => setPurchaseApp(null)}
+        onPurchaseComplete={() => setPurchaseApp(null)}
       />
 
       <RequestAppDialog open={requestOpen} onOpenChange={setRequestOpen} />
