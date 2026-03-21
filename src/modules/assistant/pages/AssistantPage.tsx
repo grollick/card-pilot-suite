@@ -21,37 +21,7 @@ import { aiMarkdownComponents, getScenarioIcon } from "@/components/AIResponseRe
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-/* ── Scenario icon mapping ── */
-const ICON_KEYWORDS: [RegExp, LucideIcon][] = [
-  [/revenue|money|price|cost|profit|earning|income|\$/i, DollarSign],
-  [/lead|prospect|inquiry|customer|client/i, Users],
-  [/share|social|post|viral|referral/i, Share2],
-  [/message|chat|reply|respond|conversation/i, MessageSquare],
-  [/email|inbox|send|newsletter/i, Mail],
-  [/time|schedule|deadline|fast|quick|hour|minute/i, Clock],
-  [/security|trust|safe|protect|privacy/i, Shield],
-  [/market|advertis|promot|campaign|outreach/i, Megaphone],
-  [/design|brand|style|visual|card|logo/i, Palette],
-  [/estimat|invoice|quote|proposal|document/i, FileText],
-  [/search|find|discover|seo|google/i, Search],
-  [/review|rating|testimon|feedback/i, Star],
-  [/retain|loyal|repeat|engage/i, Heart],
-  [/award|milestone|achiev|badge|goal/i, Award],
-  [/grow|scale|expand|boost|increase|improv/i, TrendingUp],
-  [/launch|start|setup|begin|create/i, Rocket],
-  [/strategy|plan|action|step|tip/i, Target],
-  [/convert|funnel|pipeline|close|win/i, Zap],
-  [/book|appoint|calendar|reserv/i, CalendarPlus],
-  [/warn|risk|danger|avoid|mistake/i, AlertTriangle],
-  [/idea|suggest|recommend|insight/i, Lightbulb],
-];
-
-function getScenarioIcon(text: string): LucideIcon {
-  for (const [pattern, icon] of ICON_KEYWORDS) {
-    if (pattern.test(text)) return icon;
-  }
-  return CheckCircle2;
-}
+/* Icon mapping now imported from AIResponseRenderer */
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/growth-coach`;
 
