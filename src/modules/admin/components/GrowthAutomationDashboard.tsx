@@ -605,8 +605,9 @@ export default function GrowthAutomationDashboard() {
       </div>
 
       <Tabs defaultValue="pipeline" className="w-full">
-        <TabsList className="grid grid-cols-4 w-full">
+        <TabsList className="grid grid-cols-5 w-full">
           <TabsTrigger value="pipeline" className="text-xs gap-1"><Target className="h-3 w-3" /> Pipeline</TabsTrigger>
+          <TabsTrigger value="cold-emails" className="text-xs gap-1"><Mail className="h-3 w-3" /> Cold Emails</TabsTrigger>
           <TabsTrigger value="activation" className="text-xs gap-1"><Zap className="h-3 w-3" /> Activation</TabsTrigger>
           <TabsTrigger value="retention" className="text-xs gap-1"><Heart className="h-3 w-3" /> Retention</TabsTrigger>
           <TabsTrigger value="handoff" className="text-xs gap-1"><Flag className="h-3 w-3" /> Handoff</TabsTrigger>
