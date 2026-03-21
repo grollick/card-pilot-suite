@@ -4033,6 +4033,7 @@ export type Database = {
       profiles: {
         Row: {
           abuse_flags: string[] | null
+          ai_personality: string
           available_for_work: boolean
           avatar_url: string | null
           avg_response_minutes: number | null
@@ -4076,6 +4077,7 @@ export type Database = {
         }
         Insert: {
           abuse_flags?: string[] | null
+          ai_personality?: string
           available_for_work?: boolean
           avatar_url?: string | null
           avg_response_minutes?: number | null
@@ -4119,6 +4121,7 @@ export type Database = {
         }
         Update: {
           abuse_flags?: string[] | null
+          ai_personality?: string
           available_for_work?: boolean
           avatar_url?: string | null
           avg_response_minutes?: number | null
