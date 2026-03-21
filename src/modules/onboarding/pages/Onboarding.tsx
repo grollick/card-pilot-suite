@@ -18,6 +18,7 @@ import StepActionPrompt from "../components/StepActionPrompt";
 import StepSocialLinks from "../components/StepSocialLinks";
 import StepSharing from "../components/StepSharing";
 import StepActivationChecklist from "../components/StepActivationChecklist";
+import StepAIPersonality from "../components/StepAIPersonality";
 
 interface Profession {
   id: string;
