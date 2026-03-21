@@ -96,10 +96,7 @@ serve(async (req) => {
       ip_hash: ip !== "unknown" ? await hashIP(ip) : null,
     };
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    const supabase = supabaseLookup;
 
     // Check if this visitor has been seen before (returning visitor detection)
     let isReturning = false;
