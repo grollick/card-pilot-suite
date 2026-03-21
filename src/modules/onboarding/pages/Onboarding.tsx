@@ -464,10 +464,17 @@ export default function Onboarding() {
                       </div>
                     ))}
                   </div>
-                  <Button onClick={() => setStep(1)} size="lg" className="w-full h-12 text-base font-semibold gap-2">
-                    Get Started <ArrowRight className="h-5 w-5" />
-                  </Button>
-                  <p className="text-[11px] text-muted-foreground">Takes less than 5 minutes · No credit card required</p>
+                    <Button onClick={() => setStep(1)} size="lg" className="w-full h-12 text-base font-semibold gap-2">
+                      Get Started <ArrowRight className="h-5 w-5" />
+                    </Button>
+                    <button
+                      onClick={() => navigate("/app/card/instant")}
+                      className="w-full text-center text-xs text-muted-foreground hover:text-primary transition-colors font-medium"
+                    >
+                      <Sparkles className="inline h-3 w-3 mr-1" />
+                      Or generate my card instantly with AI →
+                    </button>
+                    <p className="text-[11px] text-muted-foreground">Takes less than 5 minutes · No credit card required</p>
                 </motion.div>
               </motion.div>
             )}
