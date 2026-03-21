@@ -1,6 +1,9 @@
 import { showsBranding } from "@/lib/plans";
 import { format } from "date-fns";
 
+const escHtml = (s: string | null | undefined): string =>
+  (s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+
 interface InvoiceLineItem {
   title: string;
   description?: string | null;
@@ -50,8 +53,8 @@ export function exportInvoicePDF({
   const rows = lineItems.map(li => `
     <tr>
       <td style="padding:8px 12px;border-bottom:1px solid #eee;font-size:13px;">
-        <strong>${li.title}</strong>
-        ${li.description ? `<br/><span style="color:#888;font-size:12px;">${li.description}</span>` : ""}
+        <strong>${escHtml(li.title)}</strong>
+        ${li.description ? `<br/><span style="color:#888;font-size:12px;">${escHtml(li.description)}</span>` : ""}
       </td>
       <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;font-size:13px;">${li.quantity}</td>
       <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right;font-size:13px;">${fmt(li.unit_price)}</td>
@@ -63,7 +66,7 @@ export function exportInvoicePDF({
 <html>
 <head>
   <meta charset="utf-8"/>
-  <title>Invoice ${invoice.invoice_number}</title>
+  <title>Invoice ${escHtml(invoice.invoice_number)}</title>
   <style>
     * { box-sizing:border-box; margin:0; padding:0; }
     body { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; color:#1a1a1a; padding:40px; max-width:800px; margin:0 auto; }
@@ -98,14 +101,14 @@ export function exportInvoicePDF({
 <body>
   <div class="header">
     <div>
-      <div class="company">${profile?.company || profile?.name || "Your Business"}</div>
+      <div class="company">${escHtml(profile?.company || profile?.name || "Your Business")}</div>
       <div class="company-details">
-        ${[profile?.phone, profile?.email].filter(Boolean).join(" · ")}
+        ${[profile?.phone, profile?.email].filter(Boolean).map(v => escHtml(v)).join(" · ")}
       </div>
     </div>
     <div class="invoice-meta">
       <h1>INVOICE</h1>
-      <p><strong>${invoice.invoice_number}</strong></p>
+      <p><strong>${escHtml(invoice.invoice_number)}</strong></p>
       <p>Issued: ${invoice.issue_date ? format(new Date(invoice.issue_date + "T00:00:00"), "MMM d, yyyy") : "—"}</p>
       ${invoice.due_date ? `<p>Due: ${format(new Date(invoice.due_date + "T00:00:00"), "MMM d, yyyy")}</p>` : ""}
       ${statusBadge ? `<p style="margin-top:6px;">${statusBadge}</p>` : ""}
@@ -116,17 +119,17 @@ export function exportInvoicePDF({
     <div class="info-box">
       <h3>Bill To</h3>
       <p>
-        ${contact?.name || "—"}<br/>
-        ${contact?.company ? contact.company + "<br/>" : ""}
-        ${[contact?.email, contact?.phone].filter(Boolean).join("<br/>")}
+        ${escHtml(contact?.name) || "—"}<br/>
+        ${contact?.company ? escHtml(contact.company) + "<br/>" : ""}
+        ${[contact?.email, contact?.phone].filter(Boolean).map(v => escHtml(v)).join("<br/>")}
       </p>
     </div>
     ${invoice.jobs ? `
     <div class="info-box">
       <h3>Job Reference</h3>
       <p>
-        <strong>${invoice.jobs.job_number || ""}</strong><br/>
-        ${invoice.jobs.title || ""}
+        <strong>${escHtml(invoice.jobs.job_number)}</strong><br/>
+        ${escHtml(invoice.jobs.title)}
       </p>
     </div>` : `<div></div>`}
   </div>
@@ -154,8 +157,8 @@ export function exportInvoicePDF({
     ${balanceDue > 0 && balanceDue < Number(invoice.grand_total) ? `<div class="balance"><div class="row"><span>Balance Due</span><span>${fmt(balanceDue)}</span></div></div>` : ""}
   </div>
 
-  ${invoice.notes ? `<div class="notes"><h3>Notes</h3><p>${invoice.notes}</p></div>` : ""}
-  ${invoice.terms ? `<div class="terms"><h3>Terms & Conditions</h3><p>${invoice.terms}</p></div>` : ""}
+  ${invoice.notes ? `<div class="notes"><h3>Notes</h3><p>${escHtml(invoice.notes)}</p></div>` : ""}
+  ${invoice.terms ? `<div class="terms"><h3>Terms & Conditions</h3><p>${escHtml(invoice.terms)}</p></div>` : ""}
 
   ${hasBranding ? `<div class="watermark">Powered by guzzl.pro</div>` : ""}
 </body>
