@@ -5,6 +5,7 @@ import {
   BarChart3, UserPlus, Globe, Layers, ChevronRight, ExternalLink,
   Mail, MoreHorizontal, UserCheck, Ban, Gift
 } from "lucide-react";
+import SuccessMetricsPanel from "@/modules/admin/components/SuccessMetricsPanel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
