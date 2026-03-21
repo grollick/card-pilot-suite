@@ -148,7 +148,7 @@ export default function Onboarding() {
   // Generate AI setup and launch card
   const handleGenerateAndLaunch = async () => {
     if (!user || !selectedProfession) return;
-    setStep(3); // Go to card preview/loading
+    setStep(4); // Go to card preview/loading
     setAiLoading(true);
     setSaving(true);
 
