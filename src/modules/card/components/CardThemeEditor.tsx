@@ -35,6 +35,31 @@ export interface CardPalette {
 export interface CardFonts {
   primary: string;
   secondary: string;
+  /** Per-element overrides */
+  nameFont?: string;
+  taglineFont?: string;
+  sectionHeadingFont?: string;
+  buttonFont?: string;
+  /** Sizes */
+  nameFontSize?: number;
+  taglineFontSize?: number;
+  sectionHeadingFontSize?: number;
+  bodyFontSize?: number;
+  buttonFontSize?: number;
+  /** Weights */
+  nameFontWeight?: number;
+  taglineFontWeight?: number;
+  sectionHeadingFontWeight?: number;
+  bodyFontWeight?: number;
+  buttonFontWeight?: number;
+  /** Letter spacing */
+  nameLetterSpacing?: number;
+  taglineLetterSpacing?: number;
+  /** Line height */
+  bodyLineHeight?: number;
+  /** Transform */
+  nameTransform?: "none" | "uppercase" | "lowercase" | "capitalize";
+  sectionHeadingTransform?: "none" | "uppercase" | "lowercase" | "capitalize";
 }
 
 export interface CardStyleTokens {
