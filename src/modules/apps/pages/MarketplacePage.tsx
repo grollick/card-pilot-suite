@@ -115,7 +115,7 @@ export default function MarketplacePage() {
                     key={app.id}
                     app={app}
                     isInstalled={installedIds.has(app.id)}
-                    onInstall={() => installApp.mutate(app.id)}
+                    onInstall={() => handleInstall(app)}
                     onView={() => setSelectedApp(app)}
                   />
                 ))}
