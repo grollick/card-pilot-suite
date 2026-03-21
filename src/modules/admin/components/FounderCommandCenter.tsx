@@ -19,7 +19,7 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminStats } from "@/hooks/useAdminStats";
 import { useAdminGrowthStats } from "@/hooks/useAdminGrowthStats";
-import { useAdminFunnelStats } from "@/hooks/useAdminFunnelStats";
+
 
 // ─── Metric Card ───
 function MetricCard({ icon: Icon, label, value, sub, color = "text-primary", loading }: {
