@@ -575,9 +575,14 @@ export default function CardBuilder() {
             logoVerticalAlign={s.logoVerticalAlign} onLogoVerticalAlignChange={s.handleLogoVerticalAlignChange}
             {...avatarThemeProps}
           />
-          <Button variant="outline" size="sm" className="w-full mt-2 h-7 text-[11px]" onClick={() => setPhotoImportOpen(true)}>
-            <Globe className="h-3 w-3 mr-1.5" /> Import from URL
-          </Button>
+          <div className="flex gap-1.5 mt-2">
+            <Button variant="outline" size="sm" className="flex-1 h-7 text-[11px]" onClick={() => setPhotoImportOpen(true)}>
+              <Camera className="h-3 w-3 mr-1" /> Photos
+            </Button>
+            <Button variant="outline" size="sm" className="flex-1 h-7 text-[11px]" onClick={() => setContentImportOpen(true)}>
+              <Download className="h-3 w-3 mr-1" /> Import Content
+            </Button>
+          </div>
         </PanelSection>
       </TabsContent>
 
