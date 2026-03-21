@@ -77,8 +77,8 @@ serve(async (req) => {
         if (geoRes.ok) {
           const geo = await geoRes.json();
           city = geo.city || "Unknown";
-          region = geo.regionName || "Unknown";
-          country = geo.country || "Unknown";
+          region = geo.region || "Unknown";
+          country = geo.country_name || "Unknown";
         }
       } catch {
         // Geo lookup failed — continue without it
