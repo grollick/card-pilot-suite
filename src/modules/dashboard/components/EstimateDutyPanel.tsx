@@ -293,6 +293,9 @@ export default function EstimateDutyPanel() {
           </div>
         </motion.div>
       </div>
+
+      {/* Go-live celebration overlay */}
+      <DutyGoLiveOverlay show={showGoLive} onComplete={handleGoLiveComplete} />
     </>
   );
 }
