@@ -206,14 +206,23 @@ export function getFonts(tokens: Record<string, any>) {
 
 /**
  * Returns a Google Fonts URL to load required fonts.
+ * Includes per-element font overrides from CardFonts.
  */
-export function getGoogleFontsUrl(tokens: Record<string, any>): string | null {
-  const fonts = getFonts(tokens);
+export function getGoogleFontsUrl(tokens: Record<string, any>, fonts?: Record<string, any>): string | null {
+  const baseFonts = getFonts(tokens);
   const needed = new Set<string>();
-  if (fonts.primary !== "Inter") needed.add(fonts.primary);
-  if (fonts.secondary !== "Inter") needed.add(fonts.secondary);
+  if (baseFonts.primary !== "Inter") needed.add(baseFonts.primary);
+  if (baseFonts.secondary !== "Inter") needed.add(baseFonts.secondary);
+  // Include per-element font overrides
+  if (fonts) {
+    const overrideKeys = ["nameFont", "taglineFont", "sectionHeadingFont", "buttonFont"];
+    for (const key of overrideKeys) {
+      const val = fonts[key];
+      if (val && val !== "Inter") needed.add(val);
+    }
+  }
   if (needed.size === 0) return null;
-  const families = [...needed].map(f => `family=${f.replace(/ /g, "+")}:wght@400;500;600;700;800;900`).join("&");
+  const families = [...needed].map(f => `family=${f.replace(/ /g, "+")}:wght@300;400;500;600;700;800;900`).join("&");
   return `https://fonts.googleapis.com/css2?${families}&display=swap`;
 }
 
