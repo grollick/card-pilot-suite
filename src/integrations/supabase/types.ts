@@ -3989,6 +3989,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          ip_hash: string | null
           is_public: boolean
           lead_id: string | null
           owner_response: string | null
@@ -4006,6 +4007,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          ip_hash?: string | null
           is_public?: boolean
           lead_id?: string | null
           owner_response?: string | null
@@ -4023,6 +4025,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          ip_hash?: string | null
           is_public?: boolean
           lead_id?: string | null
           owner_response?: string | null
