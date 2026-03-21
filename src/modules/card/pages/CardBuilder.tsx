@@ -80,6 +80,7 @@ export default function CardBuilder() {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [showTemplateChooser, setShowTemplateChooser] = useState(false);
   const [photoImportOpen, setPhotoImportOpen] = useState(false);
+  const [contentImportOpen, setContentImportOpen] = useState(false);
   const [rightTab, setRightTab] = useState("content");
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
   const [blockMarketOpen, setBlockMarketOpen] = useState(false);
