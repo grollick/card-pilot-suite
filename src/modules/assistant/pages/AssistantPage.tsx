@@ -391,11 +391,10 @@ export default function AssistantPage() {
                     <div className="space-y-2 min-w-0 flex-1">
                       {/* Title the assistant response with what the user asked */}
                       {msg.role === "assistant" && i > 0 && messages[i - 1]?.role === "user" && (
-                        <div className="flex items-center gap-1.5 px-1 mb-1">
-                          <Search className="h-3 w-3 text-muted-foreground/50" />
-                          <span className="text-xs font-medium text-muted-foreground/70 truncate">
-                            {messages[i - 1].content}
-                          </span>
+                        <div className="px-1 mb-2">
+                          <h2 className="text-lg sm:text-xl font-extrabold text-foreground tracking-tight capitalize" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                            {formatResultTitle(messages[i - 1].content)}
+                          </h2>
                         </div>
                       )}
                       <div
