@@ -66,6 +66,9 @@ export default function AdminPage() {
       {/* Abuse Monitor */}
       {section === "abuse" && <AbuseMonitorDashboard />}
 
+      {/* Research */}
+      {section === "research" && <UserResearchDashboard />}
+
       {/* Content & Professions */}
       {section === "content" && (
         <Tabs defaultValue="professions">
