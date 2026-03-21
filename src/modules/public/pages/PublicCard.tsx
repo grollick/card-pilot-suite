@@ -815,6 +815,44 @@ export default function PublicCard() {
             </CardSectionWrapper>
           )}
 
+          {/* ── Video Introduction ── */}
+          {enabledSections.has("video_intro") && (() => {
+            const vc = sectionContent("video_intro");
+            const videoUrl = vc?.videoUrl;
+            if (!videoUrl) return null;
+
+            const getEmbedUrl = (url: string) => {
+              const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?/]+)/);
+              if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0`;
+              const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+              if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+              const loomMatch = url.match(/loom\.com\/share\/([a-zA-Z0-9]+)/);
+              if (loomMatch) return `https://www.loom.com/embed/${loomMatch[1]}`;
+              return url;
+            };
+
+            return (
+              <div>
+                <SectionTitle id="video_intro" label={vc?.videoHeading || "Watch"} />
+                <CardSectionWrapper theme={theme} index={0.5} metallicEffect={metallicEffect}>
+                  <div style={{ borderRadius: radii.button, overflow: "hidden", aspectRatio: "16/9" }}>
+                    <iframe
+                      src={getEmbedUrl(videoUrl)}
+                      style={{ width: "100%", height: "100%", border: "none" }}
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                  {vc?.videoCaption && (
+                    <p style={{ fontSize: 12, color: palette.secondary, margin: "8px 0 0", lineHeight: 1.5, textAlign: "center" }}>
+                      {vc.videoCaption}
+                    </p>
+                  )}
+                </CardSectionWrapper>
+              </div>
+            );
+          })()}
+
           {/* ── Services ── */}
           {enabledSections.has("services") && (() => {
             const cardServices = sectionContent("services")?.items as { name: string; description?: string; price?: string }[] | undefined;
