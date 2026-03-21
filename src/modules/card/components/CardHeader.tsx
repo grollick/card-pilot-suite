@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { ShieldCheck, BadgeCheck, Circle } from "lucide-react";
 import { type ResolvedCardTheme, getAvatarRadius } from "@/lib/cardTokens";
 import type { HeroBackground } from "@/lib/heroBackgrounds";
 import type { MetallicEffect } from "@/modules/card/components/CardThemeEditor";
@@ -54,6 +55,10 @@ interface CardHeaderProps {
   ctaChildren?: React.ReactNode;
   /** Enable glass container behind identity content in hero layout */
   glassHero?: boolean;
+  /** Verification level for badge overlay on cover */
+  verificationLevel?: "basic" | "verified" | "pro_verified" | null;
+  /** Whether user is available for work */
+  isAvailable?: boolean;
 }
 
 function renderName(name: string, bold?: boolean, uppercase?: boolean, firstNameWeight?: number | null) {
@@ -77,7 +82,7 @@ function renderName(name: string, bold?: boolean, uppercase?: boolean, firstName
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, nameFontSize, nameLineHeight, nameTextStroke, nameTextStrokeWidth = 1, subtitleFontSize, subtitleItalic = false, subtitleSpacing, showCompany = true, companyColor, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4, logoNameGap = 8, logoVerticalAlign = "center", logoCustomPosition, metallicEffect, heroBackground, ctaChildren, glassHero = false }: CardHeaderProps) {
+export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, nameFontSize, nameLineHeight, nameTextStroke, nameTextStrokeWidth = 1, subtitleFontSize, subtitleItalic = false, subtitleSpacing, showCompany = true, companyColor, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4, logoNameGap = 8, logoVerticalAlign = "center", logoCustomPosition, metallicEffect, heroBackground, ctaChildren, glassHero = false, verificationLevel, isAvailable }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -316,6 +321,8 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     ? heroBackground.gradient
     : `linear-gradient(135deg, ${palette.primary}30, ${palette.accent}20)`;
 
+  const showVerified = verificationLevel && verificationLevel !== "basic";
+
   // Parallax cover image element — reused in cover layout and banner
   const parallaxCover = (height: number, borderRadiusTop: boolean) => (
     <div
@@ -364,8 +371,61 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
         />
       )}
       {logoEl && <div style={{ position: "relative", zIndex: 2 }}>{logoEl}</div>}
+      {/* Verification & Available badges — bottom right of cover */}
+      {(showVerified || isAvailable) && (
+        <div style={{
+          position: "absolute",
+          bottom: 8,
+          right: 10,
+          zIndex: 3,
+          display: "flex",
+          gap: 4,
+          alignItems: "center",
+        }}>
+          {showVerified && (
+            <span style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 3,
+              padding: "3px 8px",
+              borderRadius: 20,
+              background: "rgba(0,0,0,0.55)",
+              backdropFilter: "blur(8px)",
+              color: "#fff",
+              fontSize: 10,
+              fontWeight: 600,
+              lineHeight: 1,
+            }}>
+              {verificationLevel === "pro_verified"
+                ? <ShieldCheck style={{ width: 12, height: 12, color: "#facc15" }} />
+                : <BadgeCheck style={{ width: 12, height: 12, color: "#60a5fa" }} />
+              }
+              {verificationLevel === "pro_verified" ? "Pro Verified" : "Verified"}
+            </span>
+          )}
+          {isAvailable && (
+            <span style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 3,
+              padding: "3px 8px",
+              borderRadius: 20,
+              background: "rgba(0,0,0,0.55)",
+              backdropFilter: "blur(8px)",
+              color: "#4ade80",
+              fontSize: 10,
+              fontWeight: 600,
+              lineHeight: 1,
+            }}>
+              <Circle style={{ width: 6, height: 6, fill: "#4ade80", color: "#4ade80" }} />
+              Available
+            </span>
+          )}
+        </div>
+      )}
     </div>
   );
+
 
   // Shared cover/backdrop banner element for non-cover layouts
   const coverBanner = (coverUrl || logoUrl || heroBackground) ? parallaxCover(120, true) : null;
