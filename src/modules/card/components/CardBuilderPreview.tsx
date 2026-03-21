@@ -645,17 +645,23 @@ export default function CardBuilderPreview({
                       );
                     })()}
 
-                    {/* Section Previews */}
-                    {sections.filter((s) => s.enabled).map((section) => (
+                    {/* Section Previews — themed to match public card */}
+                    {sections.filter((s) => s.enabled).map((section, idx) => (
                       <div key={section.id}
-                        className="mt-4 p-3 rounded-lg border border-dashed border-border/60 bg-muted/20 cursor-pointer hover:border-primary/40 hover:bg-primary/5 transition-colors group"
+                        className="mt-4 cursor-pointer group relative"
                         onClick={() => setEditingSection(section.id)}
                       >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{section.label}</span>
-                          <Pencil className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        <div className="absolute top-2 right-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="bg-primary/90 text-primary-foreground rounded-full p-1 shadow-md">
+                            <Pencil className="h-3 w-3" />
+                          </div>
                         </div>
-                        {getSectionPreview(section)}
+                        <ThemedSectionPreview
+                          section={section}
+                          theme={previewTheme}
+                          metallicEffect={currentThemeOverrides.metallicEffect}
+                          index={idx}
+                        />
                       </div>
                     ))}
                   </div>
