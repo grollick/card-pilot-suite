@@ -2245,6 +2245,48 @@ export type Database = {
           },
         ]
       }
+      first_lead_guarantee: {
+        Row: {
+          activated_at: string
+          created_at: string
+          deadline_at: string
+          first_lead_at: string | null
+          first_response_at: string | null
+          id: string
+          matched_request_id: string | null
+          status: string
+          test_lead_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          activated_at?: string
+          created_at?: string
+          deadline_at?: string
+          first_lead_at?: string | null
+          first_response_at?: string | null
+          id?: string
+          matched_request_id?: string | null
+          status?: string
+          test_lead_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          activated_at?: string
+          created_at?: string
+          deadline_at?: string
+          first_lead_at?: string | null
+          first_response_at?: string | null
+          id?: string
+          matched_request_id?: string | null
+          status?: string
+          test_lead_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       followup_steps: {
         Row: {
           body: string
