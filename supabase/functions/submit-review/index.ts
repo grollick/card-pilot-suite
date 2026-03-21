@@ -80,7 +80,26 @@ Deno.serve(async (req) => {
 
     // Rate limit by IP: max 10 reviews per IP per hour
     const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-    // We'll use a simple approach: check recent reviews count (broader rate limit)
+    let ipHash: string | null = null;
+    if (clientIp && clientIp !== "unknown") {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(clientIp + "guzzl-review-salt");
+      const hash = await crypto.subtle.digest("SHA-256", data);
+      ipHash = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, "0")).join("").slice(0, 16);
+
+      const oneHourAgo = new Date(Date.now() - 3600_000).toISOString();
+      const { count } = await supabase
+        .from("reviews")
+        .select("id", { count: "exact", head: true })
+        .eq("ip_hash", ipHash)
+        .gte("created_at", oneHourAgo);
+
+      if ((count ?? 0) >= 10) {
+        return new Response(JSON.stringify({ error: "Too many reviews submitted. Please try again later." }), {
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
 
     // Insert review (always starts as not public - requires moderation)
     const { data: review, error: insertErr } = await supabase
@@ -95,6 +114,7 @@ Deno.serve(async (req) => {
         source: safeSource,
         is_public: false,
         reported: false,
+        ip_hash: ipHash,
       })
       .select()
       .single();
