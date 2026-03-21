@@ -311,9 +311,15 @@ export default function AIBusinessAssistant() {
         }
         case "apply_tagline": {
           const lines = cleanContent.split("\n").filter(l => l.trim() && !l.startsWith("#") && !l.startsWith("<!--"));
-          const tagline = lines[0]?.replace(/^[*_"]+|[*_"]+$/g, "").slice(0, 120) || "";
-          const { error } = await supabase.from("profiles").update({ tagline }).eq("id", user.id);
-          if (error) throw error;
+          const taglineText = lines[0]?.replace(/^[*_"]+|[*_"]+$/g, "").slice(0, 120) || "";
+          // Save tagline to card theme_json
+          const { data: card } = await supabase.from("cards").select("id, theme_json").eq("user_id", user.id).maybeSingle();
+          if (card) {
+            const themeJson = typeof card.theme_json === "object" && card.theme_json ? card.theme_json : {};
+            await supabase.from("cards").update({
+              theme_json: { ...themeJson, tagline: taglineText },
+            }).eq("id", card.id);
+          }
           qc.invalidateQueries({ queryKey: ["profile"] });
           qc.invalidateQueries({ queryKey: ["public-card"] });
           toast.success("Tagline updated!");
