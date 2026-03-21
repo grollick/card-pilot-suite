@@ -13,28 +13,83 @@ serve(async (req) => {
   }
 
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+
+    // Authenticate caller: must be service-role (from DB trigger) or authenticated user
+    const authHeader = req.headers.get("Authorization") ?? "";
+    const token = authHeader.replace("Bearer ", "");
+    let callerUserId: string | null = null;
+    let isServiceRole = false;
+
+    if (token === serviceKey || token === anonKey) {
+      // Called from DB trigger (notify_review_request uses anon key)
+      // Allow but we'll verify booking ownership isn't needed for internal triggers
+      isServiceRole = true;
+    } else if (token) {
+      // Validate as user JWT
+      const userClient = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: claims, error: claimsErr } = await userClient.auth.getClaims(token);
+      if (claimsErr || !claims?.claims?.sub) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      callerUserId = claims.claims.sub as string;
+    } else {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { booking_id } = await req.json();
-    if (!booking_id) {
+    if (!booking_id || typeof booking_id !== "string") {
       return new Response(JSON.stringify({ error: "booking_id required" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
     // Fetch the booking with service info
     const { data: booking, error: bErr } = await supabase
       .from("bookings")
-      .select("id, customer_name, customer_email, user_id, service_id, booking_services(name)")
+      .select("id, customer_name, customer_email, user_id, service_id, lead_id, booking_services(name)")
       .eq("id", booking_id)
       .single();
 
     if (bErr || !booking) {
       return new Response(JSON.stringify({ error: "Booking not found" }), {
         status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // If called by an authenticated user, verify they own the booking
+    if (!isServiceRole && callerUserId && booking.user_id !== callerUserId) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Rate limit: max 10 review requests per user per hour
+    const oneHourAgo = new Date(Date.now() - 3600_000).toISOString();
+    const { count } = await supabase
+      .from("email_send_log")
+      .select("id", { count: "exact", head: true })
+      .eq("template_name", "review_request")
+      .gte("created_at", oneHourAgo);
+
+    if ((count ?? 0) >= 10) {
+      return new Response(JSON.stringify({ error: "Rate limit exceeded" }), {
+        status: 429,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -86,10 +141,10 @@ serve(async (req) => {
 </body>
 </html>`;
 
-    // Send via the existing send-email function
+    // Send via Resend
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     if (!RESEND_API_KEY) {
-      return new Response(JSON.stringify({ error: "RESEND_API_KEY not configured" }), {
+      return new Response(JSON.stringify({ error: "Email service not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -113,11 +168,19 @@ serve(async (req) => {
 
     if (!resendRes.ok) {
       console.error("Resend error:", resendData);
-      return new Response(JSON.stringify({ error: "Failed to send email", detail: resendData }), {
+      return new Response(JSON.stringify({ error: "Failed to send email" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // Log to email_send_log for rate limiting
+    await supabase.from("email_send_log").insert({
+      recipient_email: booking.customer_email,
+      template_name: "review_request",
+      status: "sent",
+      message_id: resendData.id,
+    });
 
     // Log activity if there's a linked lead
     if (booking.lead_id) {

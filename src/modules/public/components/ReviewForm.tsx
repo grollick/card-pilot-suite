@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useSubmitReview } from "@/hooks/useReviews";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface ReviewFormProps {
@@ -22,37 +21,13 @@ export default function ReviewForm({ userId, onSuccess }: ReviewFormProps) {
 
   const handleSubmit = async () => {
     if (!name.trim()) { toast.error("Please enter your name"); return; }
-    const review = await submitReview.mutateAsync({
+    await submitReview.mutateAsync({
       user_id: userId,
       reviewer_name: name.trim(),
       reviewer_email: email.trim() || null,
       rating,
       review_text: text.trim() || null,
-      is_public: false, // requires moderation
     });
-
-    // Log activity event for CRM timeline (fire-and-forget)
-    // Try to match a contact by email
-    if (email.trim()) {
-      supabase
-        .from("leads")
-        .select("id")
-        .eq("user_id", userId)
-        .eq("email", email.trim())
-        .limit(1)
-        .then(({ data: leads }) => {
-          const leadId = leads?.[0]?.id;
-          if (leadId) {
-            supabase.from("contact_activities").insert({
-              user_id: userId,
-              lead_id: leadId,
-              activity_type: "review_submitted",
-              title: `Review submitted (${rating}★)`,
-              description: text.trim() || null,
-            } as any).then();
-          }
-        });
-    }
 
     toast.success("Thank you for your review! It will appear once approved.");
     setName(""); setEmail(""); setRating(5); setText("");

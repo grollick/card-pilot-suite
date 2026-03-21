@@ -52,31 +52,18 @@ export function useClientSubmitReview() {
       rating: number;
       reviewText?: string;
     }) => {
-      const { data, error } = await supabase
-        .from("reviews" as any)
-        .insert({
+      const { data, error } = await supabase.functions.invoke("submit-review", {
+        body: {
           user_id: businessUserId,
-          lead_id: leadId,
           reviewer_name: reviewerName,
           reviewer_email: reviewerEmail || null,
           rating,
           review_text: reviewText || null,
-          is_public: false,
+          lead_id: leadId,
           source: "client_portal",
-        } as any)
-        .select()
-        .single();
-      if (error) throw error;
-
-      // Log CRM activity
-      supabase.from("contact_activities").insert({
-        user_id: businessUserId,
-        lead_id: leadId,
-        activity_type: "review_submitted",
-        title: `Review submitted (${rating}★) via portal`,
-        description: reviewText || null,
-      } as any).then();
-
+        },
+      });
+      if (error || data?.error) throw error || new Error(data.error);
       return data;
     },
     onSuccess: () => {
