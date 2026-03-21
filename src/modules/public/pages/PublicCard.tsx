@@ -317,7 +317,10 @@ export default function PublicCard() {
 
     if (cta === "call" && profile.phone) window.location.href = `tel:${profile.phone}`;
     else if (cta === "text" && profile.phone) window.location.href = `sms:${profile.phone}`;
-    else if (cta === "email" && profile.email) window.location.href = `mailto:${profile.email}`;
+    else if (cta === "whatsapp" && profile.phone) {
+      const cleanPhone = profile.phone.replace(/[^0-9+]/g, "").replace(/^\+/, "");
+      window.open(`https://wa.me/${cleanPhone}`, "_blank");
+    } else if (cta === "email" && profile.email) window.location.href = `mailto:${profile.email}`;
     else if (cta === "book") {
       const bookingSection = document.getElementById("booking-section");
       if (bookingSection) bookingSection.scrollIntoView({ behavior: "smooth" });
