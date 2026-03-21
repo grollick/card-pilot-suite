@@ -3196,6 +3196,131 @@ export type Database = {
           },
         ]
       }
+      loyalty_cards: {
+        Row: {
+          client_email: string | null
+          client_name: string
+          client_phone: string | null
+          created_at: string
+          id: string
+          lead_id: string | null
+          program_id: string
+          redeemed_at: string | null
+          reward_redeemed: boolean
+          stamps_collected: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          client_email?: string | null
+          client_name: string
+          client_phone?: string | null
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          program_id: string
+          redeemed_at?: string | null
+          reward_redeemed?: boolean
+          stamps_collected?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          client_email?: string | null
+          client_name?: string
+          client_phone?: string | null
+          created_at?: string
+          id?: string
+          lead_id?: string | null
+          program_id?: string
+          redeemed_at?: string | null
+          reward_redeemed?: boolean
+          stamps_collected?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_cards_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "loyalty_cards_program_id_fkey"
+            columns: ["program_id"]
+            isOneToOne: false
+            referencedRelation: "loyalty_programs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loyalty_programs: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+          reward_description: string
+          stamps_required: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          reward_description?: string
+          stamps_required?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          reward_description?: string
+          stamps_required?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      loyalty_stamps: {
+        Row: {
+          card_id: string
+          id: string
+          notes: string | null
+          stamped_at: string
+          stamped_by: string | null
+        }
+        Insert: {
+          card_id: string
+          id?: string
+          notes?: string | null
+          stamped_at?: string
+          stamped_by?: string | null
+        }
+        Update: {
+          card_id?: string
+          id?: string
+          notes?: string | null
+          stamped_at?: string
+          stamped_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loyalty_stamps_card_id_fkey"
+            columns: ["card_id"]
+            isOneToOne: false
+            referencedRelation: "loyalty_cards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketplace_apps: {
         Row: {
           avg_rating: number
