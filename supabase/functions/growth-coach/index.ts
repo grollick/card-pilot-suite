@@ -269,7 +269,7 @@ Use markdown formatting. Be concise but thorough.`;
   } catch (err) {
     console.error("growth-coach error:", err);
     return new Response(
-      JSON.stringify({ error: err instanceof Error ? err.message : "Unknown error" }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

@@ -169,7 +169,7 @@ serve(async (req) => {
       });
     } catch (_) { /* best effort */ }
 
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
