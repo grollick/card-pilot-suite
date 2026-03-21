@@ -6,7 +6,7 @@ import {
   UserCircle, Star,
   Mail, Share2, Gift, BarChart3, QrCode, Tag, Zap,
   Bot, Eye, CreditCard, Package, Building2, CheckSquare,
-  Shield, Sparkles, ExternalLink,
+  Shield, Sparkles, ExternalLink, Bell,
 } from "lucide-react";
 import ClientSwitcher from "@/modules/agency/components/ClientSwitcher";
 import { NavLink } from "@/components/NavLink";
@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useAdminStats";
 import { useProfileCache } from "@/hooks/useProfileCache";
+import { useJobRequestStats } from "@/hooks/useJobRequests";
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
   SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
@@ -32,6 +33,7 @@ import {
 const leadsItems = [
   { title: "All Leads", url: "/app/contacts", icon: Inbox },
   { title: "Pipeline", url: "/app/pipeline", icon: Kanban },
+  { title: "Job Requests", url: "/app/job-requests", icon: Bell, glowKey: "job-requests" },
   { title: "Bookings", url: "/app/bookings", icon: Calendar },
   { title: "Estimates", url: "/app/estimates", icon: FileText },
   { title: "Tasks", url: "/app/tasks", icon: CheckSquare },
@@ -85,7 +87,7 @@ const adminOnlyItems = [
   { title: "Admin Marketing", url: "/app/admin-marketing", icon: Megaphone },
 ];
 
-type NavItem = { title: string; url: string; icon: any; end?: boolean };
+type NavItem = { title: string; url: string; icon: any; end?: boolean; glowKey?: string };
 
 export function AppSidebar() {
   const { state, toggleSidebar, isMobile, setOpenMobile } = useSidebar();
@@ -95,6 +97,8 @@ export function AppSidebar() {
   const navigate = useNavigate();
   const { data: isAdmin } = useIsAdmin();
   const { data: profile } = useProfileCache();
+  const { data: jobStats } = useJobRequestStats();
+  const hasPendingOpportunities = (jobStats?.newRequests ?? 0) > 0;
 
   const isActive = (path: string, end?: boolean) => {
     if (end) return location.pathname === path;
@@ -116,6 +120,7 @@ export function AppSidebar() {
 
   const renderItem = (item: NavItem) => {
     const active = isActive(item.url, item.end);
+    const shouldGlow = item.glowKey === "job-requests" && hasPendingOpportunities && !active;
     return (
       <SidebarMenuItem key={item.title}>
         <Tip label={item.title} side="right" delayDuration={collapsed ? 100 : 600}>
@@ -124,15 +129,32 @@ export function AppSidebar() {
               to={item.url}
               end={item.end}
               onClick={closeMobile}
-              className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] transition-all duration-150 ${
+              className={`relative flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] transition-all duration-150 ${
                 active
                   ? "bg-primary/10 text-primary font-semibold shadow-sm"
-                  : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-muted/50"
+                  : shouldGlow
+                    ? "bg-success/10 text-success font-semibold shadow-[0_0_12px_hsl(var(--success)/0.4)] ring-1 ring-success/30 animate-pulse"
+                    : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-muted/50"
               }`}
               activeClassName="bg-primary/10 text-primary font-semibold"
             >
-              <item.icon className={`h-4 w-4 shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`} />
+              <item.icon className={`h-4 w-4 shrink-0 ${active ? "text-primary" : shouldGlow ? "text-success" : "text-muted-foreground"}`} />
               {!collapsed && <span className="truncate">{item.title}</span>}
+              {shouldGlow && !collapsed && (
+                <span className="ml-auto flex items-center gap-1">
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success/60" />
+                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success" />
+                  </span>
+                  <span className="text-[10px] font-bold text-success">{jobStats?.newRequests}</span>
+                </span>
+              )}
+              {shouldGlow && collapsed && (
+                <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success/60" />
+                  <span className="relative inline-flex h-3 w-3 rounded-full bg-success" />
+                </span>
+              )}
             </NavLink>
           </SidebarMenuButton>
         </Tip>
