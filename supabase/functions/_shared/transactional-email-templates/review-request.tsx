@@ -10,6 +10,7 @@ import {
   Heading,
   Html,
   Preview,
+  Section,
   Text,
   Hr,
 } from 'npm:@react-email/components@0.0.22'
