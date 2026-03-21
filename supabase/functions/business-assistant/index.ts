@@ -38,12 +38,13 @@ serve(async (req) => {
     // Fetch user context for personalized responses
     const { data: profile } = await supabase
       .from("profiles")
-      .select("name, profession, plan")
+      .select("name, profession, plan, ai_personality")
       .eq("id", user.id)
       .maybeSingle();
 
     const profession = profile?.profession || "service professional";
     const userName = profile?.name || "there";
+    const personality = (profile as any)?.ai_personality || "copilot";
 
     const actionInstructions = `
 
