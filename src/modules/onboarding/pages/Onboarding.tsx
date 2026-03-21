@@ -64,13 +64,14 @@ const categoryKeyMap: Record<string, string> = {
 // Steps:
 // 0 = Welcome
 // 1 = Profession
-// 2 = Auto-Build (business name + optional URL)
-// 3 = Card Preview (generating / preview)
-// 4 = You're Live (success moment)
-// 5 = Action Prompt
-// 6 = Social Links
-// 7 = Sharing
-// 8 = Activation Checklist
+// 2 = AI Personality
+// 3 = Auto-Build (business name + optional URL)
+// 4 = Card Preview (generating / preview)
+// 5 = You're Live (success moment)
+// 6 = Action Prompt
+// 7 = Social Links
+// 8 = Sharing
+// 9 = Activation Checklist
 
 export default function Onboarding() {
   const navigate = useNavigate();
