@@ -265,7 +265,7 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
                 <span className="text-muted-foreground">Blocked attempts</span>
                 <Badge variant="outline" className="ml-auto text-[10px]">Logged</Badge>
               </div>
-              <Button size="sm" variant="outline" className="text-xs gap-1 w-full mt-2" onClick={() => navigate("/app/admin")}>
+              <Button size="sm" variant="outline" className="text-xs gap-1 w-full mt-2" onClick={() => onNavigateSection?.("abuse")}>
                 <ShieldAlert className="h-3 w-3" /> Abuse Monitor
               </Button>
             </CardContent>
