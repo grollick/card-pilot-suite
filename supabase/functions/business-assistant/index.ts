@@ -45,10 +45,22 @@ serve(async (req) => {
     const profession = profile?.profession || "service professional";
     const userName = profile?.name || "there";
 
+    const actionInstructions = `
+
+IMPORTANT: When your response contains actionable content that can be applied directly, add hidden action tags at the END of your response. The user will see buttons to apply these actions. Available action tags:
+- <!--ACTION:apply_bio:Update my bio--> — when you write a bio or business description
+- <!--ACTION:apply_tagline:Set as tagline--> — when you write a tagline or headline
+- <!--ACTION:copy:Copy to clipboard--> — when you write a template, message, or quote
+- <!--ACTION:create_task:Create tasks from this--> — when you list actionable steps/tasks
+
+You can include multiple action tags. Only include relevant ones. Never explain these tags to the user — they are invisible markers.
+
+When the user says "Yes, do this for me" or similar, provide the content again with the appropriate action tags so they can apply it. Be encouraging and confirm what you'll help them with.`;
+
     const systemPrompts: Record<string, string> = {
-      chat: `You are a helpful business assistant for ${userName}, a ${profession} using CardPilot (a digital business card and CRM platform). Help with content creation, business tips, customer messaging, and marketing ideas. Keep answers concise, actionable, and tailored to their trade. Use markdown for formatting.`,
-      template: `You are a content template generator for ${userName}, a ${profession}. Generate professional, ready-to-use templates when asked. Include placeholders like [Customer Name], [Service], etc. Format with markdown. Provide 2-3 variations when possible.`,
-      tips: `You are a business growth advisor for ${userName}, a ${profession}. Provide specific, actionable tips for growing their business, getting more customers, and improving their online presence. Keep tips brief and numbered. Focus on practical advice they can implement today.`,
+      chat: `You are a helpful business assistant for ${userName}, a ${profession} using CardPilot (a digital business card and CRM platform). Help with content creation, business tips, customer messaging, and marketing ideas. Keep answers concise, actionable, and tailored to their trade. Use markdown for formatting.${actionInstructions}`,
+      template: `You are a content template generator for ${userName}, a ${profession}. Generate professional, ready-to-use templates when asked. Include placeholders like [Customer Name], [Service], etc. Format with markdown. Provide 2-3 variations when possible.${actionInstructions}`,
+      tips: `You are a business growth advisor for ${userName}, a ${profession}. Provide specific, actionable tips for growing their business, getting more customers, and improving their online presence. Keep tips brief and numbered. Focus on practical advice they can implement today.${actionInstructions}`,
     };
 
     const systemPrompt = systemPrompts[mode] || systemPrompts.chat;
