@@ -42,6 +42,7 @@ const jobsItems = [
   { title: "Job Pipeline", url: "/app/job-pipeline", icon: ClipboardList },
   { title: "Recurring", url: "/app/recurring", icon: RefreshCw },
   { title: "Invoices", url: "/app/invoices", icon: DollarSign },
+  { title: "Expenses", url: "/app/expenses", icon: DollarSign },
   { title: "Revenue", url: "/app/revenue", icon: DollarSign },
 ];
 
@@ -73,6 +74,7 @@ const toolsItems = [
 
 const teamItems = [
   { title: "Members", url: "/app/team-management", icon: Users },
+  { title: "Team Cards", url: "/app/team-cards", icon: CreditCard },
   { title: "Lead Routing", url: "/app/lead-routing", icon: Inbox },
   { title: "Agency", url: "/app/agency", icon: Building2 },
 ];

@@ -1093,10 +1093,12 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_team_card: boolean
           org_id: string | null
           published_at: string | null
           sections_json: Json
           status: Database["public"]["Enums"]["card_status"]
+          team_member_id: string | null
           theme_json: Json
           updated_at: string
           user_id: string
@@ -1104,10 +1106,12 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_team_card?: boolean
           org_id?: string | null
           published_at?: string | null
           sections_json?: Json
           status?: Database["public"]["Enums"]["card_status"]
+          team_member_id?: string | null
           theme_json?: Json
           updated_at?: string
           user_id: string
@@ -1115,10 +1119,12 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_team_card?: boolean
           org_id?: string | null
           published_at?: string | null
           sections_json?: Json
           status?: Database["public"]["Enums"]["card_status"]
+          team_member_id?: string | null
           theme_json?: Json
           updated_at?: string
           user_id?: string
@@ -1129,6 +1135,20 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cards_team_member_id_fkey"
+            columns: ["team_member_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cards_team_member_id_fkey"
+            columns: ["team_member_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -2245,6 +2265,72 @@ export type Database = {
           },
         ]
       }
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          date: string
+          description: string
+          id: string
+          is_billable: boolean
+          job_id: string | null
+          notes: string | null
+          org_id: string | null
+          receipt_url: string | null
+          updated_at: string
+          user_id: string
+          vendor: string | null
+        }
+        Insert: {
+          amount?: number
+          category?: string
+          created_at?: string
+          date?: string
+          description: string
+          id?: string
+          is_billable?: boolean
+          job_id?: string | null
+          notes?: string | null
+          org_id?: string | null
+          receipt_url?: string | null
+          updated_at?: string
+          user_id: string
+          vendor?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          date?: string
+          description?: string
+          id?: string
+          is_billable?: boolean
+          job_id?: string | null
+          notes?: string | null
+          org_id?: string | null
+          receipt_url?: string | null
+          updated_at?: string
+          user_id?: string
+          vendor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       first_lead_guarantee: {
         Row: {
           activated_at: string
@@ -2360,6 +2446,59 @@ export type Database = {
             columns: ["step_id"]
             isOneToOne: false
             referencedRelation: "followup_steps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      google_business_sync: {
+        Row: {
+          business_name: string | null
+          created_at: string
+          id: string
+          last_synced_at: string | null
+          org_id: string | null
+          place_id: string | null
+          status: string
+          sync_info: boolean
+          sync_photos: boolean
+          sync_reviews: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_name?: string | null
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          org_id?: string | null
+          place_id?: string | null
+          status?: string
+          sync_info?: boolean
+          sync_photos?: boolean
+          sync_reviews?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_name?: string | null
+          created_at?: string
+          id?: string
+          last_synced_at?: string | null
+          org_id?: string | null
+          place_id?: string | null
+          status?: string
+          sync_info?: boolean
+          sync_photos?: boolean
+          sync_reviews?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "google_business_sync_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]

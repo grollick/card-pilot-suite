@@ -1,8 +1,9 @@
-import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail, Clock, CheckCircle, AlertTriangle, Clock3, TrendingUp, Send, Plus, Trash2, GripVertical, Store, Download } from "lucide-react";
+import { Settings as SettingsIcon, User, Palette, Bell, RotateCw, Loader2, Mail, Clock, CheckCircle, AlertTriangle, Clock3, TrendingUp, Send, Plus, Trash2, GripVertical, Store, Download, Globe } from "lucide-react";
 import MarketplaceSettings from "@/modules/settings/components/MarketplaceSettings";
 import DataExportSection from "@/modules/settings/components/DataExportSection";
 import DataImportSection from "@/modules/settings/components/DataImportSection";
 import BrandKitSettings from "@/modules/settings/components/BrandKitSettings";
+import GoogleBusinessSync from "@/modules/settings/components/GoogleBusinessSync";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -206,8 +207,9 @@ export default function SettingsPage() {
           </motion.div>
         </TabsContent>
 
-        <TabsContent value="marketplace" className="mt-4">
+        <TabsContent value="marketplace" className="mt-4 space-y-4">
           <MarketplaceSettings profile={profile} />
+          <GoogleBusinessSync />
         </TabsContent>
 
         <TabsContent value="brand" className="mt-4">

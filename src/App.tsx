@@ -131,6 +131,10 @@ const MarketplacePage = lazy(() => import("@/modules/apps/pages/MarketplacePage"
 const TeamManagementPage = lazy(() => import("@/modules/team/pages/TeamManagementPage"));
 const TechDashboardPage = lazy(() => import("@/modules/team/pages/TechDashboardPage"));
 const LeadRoutingPage = lazy(() => import("@/modules/team/pages/LeadRoutingPage"));
+const TeamCardsPage = lazy(() => import("@/modules/team/pages/TeamCardsPage"));
+
+// Expenses
+const ExpensesPage = lazy(() => import("@/modules/expenses/pages/ExpensesPage"));
 
 // Settings
 const SettingsPage = lazy(() => import("@/modules/settings/pages/SettingsPage"));
@@ -305,6 +309,8 @@ const App = () => (
               <Route path="team-management" element={<LazyRoute><TeamManagementPage /></LazyRoute>} />
               <Route path="tech-dashboard" element={<LazyRoute><TechDashboardPage /></LazyRoute>} />
               <Route path="lead-routing" element={<LazyRoute><LeadRoutingPage /></LazyRoute>} />
+              <Route path="team-cards" element={<LazyRoute><TeamCardsPage /></LazyRoute>} />
+              <Route path="expenses" element={<LazyRoute><ExpensesPage /></LazyRoute>} />
               <Route path="help" element={<LazyRoute><HelpCenter /></LazyRoute>} />
             </Route>
 
