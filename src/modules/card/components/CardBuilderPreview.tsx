@@ -1,4 +1,4 @@
-import { CreditCard, Eye, Pencil, Smartphone, Tablet, Move } from "lucide-react";
+import { CreditCard, Eye, Pencil, Smartphone, Tablet, Move, Star, Calendar, Send, Globe, Instagram, Facebook, Linkedin, Twitter, Youtube, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useCallback } from "react";
 import { toast } from "sonner";
@@ -7,6 +7,8 @@ import { CTA_ICON_MAP } from "./CtaEditor";
 import type { CtaItem } from "./CtaEditor";
 import type { ResolvedCardTheme } from "@/lib/cardTokens";
 import type { CardSection } from "@/hooks/useCard";
+import CardSectionWrapper from "./CardSectionWrapper";
+import type { MetallicEffect } from "./CardThemeEditor";
 
 interface Props {
   profile: any;
