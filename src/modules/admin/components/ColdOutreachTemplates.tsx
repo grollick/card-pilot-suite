@@ -2,7 +2,8 @@ import { useState } from "react";
 import {
   Mail, Send, Copy, Eye, ChevronDown, ChevronUp, Loader2,
   Hammer, Paintbrush, Wrench, Home, Scissors, Camera, Utensils,
-  Car, Sparkles, Briefcase, Shield, Heart, Zap, Users, Edit3, Check
+  Car, Sparkles, Briefcase, Shield, Heart, Zap, Users, Edit3, Check,
+  MessageCircle, Phone, Share2, ExternalLink, Linkedin, Facebook, Instagram
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -374,6 +375,8 @@ export default function ColdOutreachTemplates() {
   const [sending, setSending] = useState(false);
   const [emailStep, setEmailStep] = useState<"initial" | "followup1" | "followup2">("initial");
   const [searchFilter, setSearchFilter] = useState("");
+  const [sendChannel, setSendChannel] = useState<"email" | "whatsapp" | "sms" | "facebook" | "linkedin" | "instagram">("email");
+  const [recipientPhone, setRecipientPhone] = useState("");
 
   // Fetch sender (logged-in user) name
   const { data: senderName } = useQuery({
@@ -427,10 +430,76 @@ export default function ColdOutreachTemplates() {
     setEditedSubject(template.subject);
     setEditedBody(template.body);
     setEditMode(false);
+    setSendChannel("email");
     setShowSendDialog(true);
   };
 
+  const getPersonalizedBody = () => {
+    if (!selectedTemplate) return "";
+    return personalizeText(editMode ? editedBody : getEmailContent(selectedTemplate, emailStep));
+  };
+
+  const handleSocialSend = (channel: string) => {
+    const body = getPersonalizedBody();
+    const logContact = async (via: string) => {
+      await supabase.from("outreach_contacts").insert({
+        name: recipientName || recipientEmail || recipientPhone || "Unknown",
+        business: recipientBusiness || null,
+        status: "contacted",
+        last_contact_at: new Date().toISOString(),
+        notes: `Cold outreach via ${via}: ${selectedTemplate?.name} (${emailStep})`,
+      } as any);
+    };
+
+    switch (channel) {
+      case "whatsapp": {
+        const phone = recipientPhone.replace(/\D/g, "");
+        if (!phone) { toast.error("Phone number is required for WhatsApp"); return; }
+        const url = `https://wa.me/${phone}?text=${encodeURIComponent(body)}`;
+        window.open(url, "_blank");
+        logContact("WhatsApp");
+        toast.success("WhatsApp opened");
+        break;
+      }
+      case "sms": {
+        const phone = recipientPhone.replace(/\D/g, "");
+        if (!phone) { toast.error("Phone number is required for SMS"); return; }
+        const url = `sms:${phone}?body=${encodeURIComponent(body)}`;
+        window.open(url, "_blank");
+        logContact("SMS");
+        toast.success("SMS app opened");
+        break;
+      }
+      case "facebook": {
+        navigator.clipboard.writeText(body);
+        window.open("https://www.facebook.com/messages/", "_blank");
+        logContact("Facebook");
+        toast.success("Message copied — paste it in Facebook Messenger");
+        break;
+      }
+      case "linkedin": {
+        navigator.clipboard.writeText(body);
+        window.open("https://www.linkedin.com/messaging/", "_blank");
+        logContact("LinkedIn");
+        toast.success("Message copied — paste it in LinkedIn Messages");
+        break;
+      }
+      case "instagram": {
+        navigator.clipboard.writeText(body);
+        window.open("https://www.instagram.com/direct/inbox/", "_blank");
+        logContact("Instagram");
+        toast.success("Message copied — paste it in Instagram DMs");
+        break;
+      }
+    }
+  };
+
   const handleSend = async () => {
+    if (sendChannel !== "email") {
+      handleSocialSend(sendChannel);
+      return;
+    }
+
     if (!recipientEmail.trim()) {
       toast.error("Recipient email is required");
       return;
@@ -440,7 +509,7 @@ export default function ColdOutreachTemplates() {
     setSending(true);
     try {
       const subject = personalizeText(editMode ? editedSubject : getSubject(selectedTemplate, emailStep));
-      const bodyText = personalizeText(editMode ? editedBody : getEmailContent(selectedTemplate, emailStep));
+      const bodyText = getPersonalizedBody();
       const html = bodyText.replace(/\n/g, "<br />");
 
       const { error } = await supabase.functions.invoke("send-email", {
@@ -454,7 +523,6 @@ export default function ColdOutreachTemplates() {
 
       if (error) throw error;
 
-      // Log to outreach_contacts
       await supabase.from("outreach_contacts").insert({
         name: recipientName || recipientEmail,
         business: recipientBusiness || null,
@@ -467,6 +535,7 @@ export default function ColdOutreachTemplates() {
       setRecipientEmail("");
       setRecipientName("");
       setRecipientBusiness("");
+      setRecipientPhone("");
       setShowSendDialog(false);
     } catch (err: any) {
       console.error("Cold email send error:", err);
@@ -615,14 +684,55 @@ export default function ColdOutreachTemplates() {
           </DialogHeader>
           {selectedTemplate && (
             <div className="space-y-4">
+              {/* Channel selector */}
+              <div className="space-y-1.5">
+                <p className="text-xs font-medium text-muted-foreground">Send via</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {([
+                    { id: "email", label: "Email", icon: Mail },
+                    { id: "whatsapp", label: "WhatsApp", icon: MessageCircle },
+                    { id: "sms", label: "SMS", icon: Phone },
+                    { id: "facebook", label: "Facebook", icon: Facebook },
+                    { id: "linkedin", label: "LinkedIn", icon: Linkedin },
+                    { id: "instagram", label: "Instagram", icon: Instagram },
+                  ] as const).map(ch => (
+                    <Button
+                      key={ch.id}
+                      size="sm"
+                      variant={sendChannel === ch.id ? "default" : "outline"}
+                      className="text-xs h-7 gap-1 px-2.5"
+                      onClick={() => setSendChannel(ch.id)}
+                    >
+                      <ch.icon className="h-3 w-3" /> {ch.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
               {/* Recipient info */}
               <div className="space-y-2">
-                <Input
-                  placeholder="Recipient email *"
-                  type="email"
-                  value={recipientEmail}
-                  onChange={e => setRecipientEmail(e.target.value)}
-                />
+                {sendChannel === "email" && (
+                  <Input
+                    placeholder="Recipient email *"
+                    type="email"
+                    value={recipientEmail}
+                    onChange={e => setRecipientEmail(e.target.value)}
+                  />
+                )}
+                {(sendChannel === "whatsapp" || sendChannel === "sms") && (
+                  <Input
+                    placeholder="Phone number with country code *  (e.g. +27821234567)"
+                    type="tel"
+                    value={recipientPhone}
+                    onChange={e => setRecipientPhone(e.target.value)}
+                  />
+                )}
+                {(sendChannel === "facebook" || sendChannel === "linkedin" || sendChannel === "instagram") && (
+                  <div className="rounded-lg bg-muted/40 p-2.5 text-xs text-muted-foreground flex items-start gap-2">
+                    <ExternalLink className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                    <span>The message will be copied to your clipboard and {sendChannel === "facebook" ? "Facebook Messenger" : sendChannel === "linkedin" ? "LinkedIn Messages" : "Instagram DMs"} will open. Just paste and send!</span>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-2">
                   <Input
                     placeholder="Contact name"
@@ -669,15 +779,18 @@ export default function ColdOutreachTemplates() {
                 </Button>
               </div>
 
-              {/* Email preview / edit */}
+              {/* Message preview / edit */}
               <div className="border rounded-lg p-3 space-y-2 bg-muted/20">
                 {editMode ? (
                   <>
-                    <Input
-                      value={editedSubject}
-                      onChange={e => setEditedSubject(e.target.value)}
-                      className="text-sm font-semibold"
-                    />
+                    {sendChannel === "email" && (
+                      <Input
+                        value={editedSubject}
+                        onChange={e => setEditedSubject(e.target.value)}
+                        className="text-sm font-semibold"
+                        placeholder="Subject line"
+                      />
+                    )}
                     <Textarea
                       value={editedBody}
                       onChange={e => setEditedBody(e.target.value)}
@@ -687,11 +800,15 @@ export default function ColdOutreachTemplates() {
                   </>
                 ) : (
                   <>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Subject</p>
-                    <p className="text-sm font-semibold">
-                      {personalizeText(getSubject(selectedTemplate, emailStep))}
-                    </p>
-                    <hr className="border-border" />
+                    {sendChannel === "email" && (
+                      <>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Subject</p>
+                        <p className="text-sm font-semibold">
+                          {personalizeText(getSubject(selectedTemplate, emailStep))}
+                        </p>
+                        <hr className="border-border" />
+                      </>
+                    )}
                     <div className="text-sm whitespace-pre-wrap leading-relaxed">
                       {personalizeText(getEmailContent(selectedTemplate, emailStep))}
                     </div>
@@ -699,13 +816,37 @@ export default function ColdOutreachTemplates() {
                 )}
               </div>
 
+              {/* Send button */}
               <Button
                 className="w-full gap-1"
                 onClick={handleSend}
-                disabled={sending || !recipientEmail.trim()}
+                disabled={
+                  sending ||
+                  (sendChannel === "email" && !recipientEmail.trim()) ||
+                  ((sendChannel === "whatsapp" || sendChannel === "sms") && !recipientPhone.trim())
+                }
               >
-                {sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-                {sending ? "Sending..." : "Send Email"}
+                {sending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : sendChannel === "email" ? (
+                  <Mail className="h-3.5 w-3.5" />
+                ) : sendChannel === "whatsapp" ? (
+                  <MessageCircle className="h-3.5 w-3.5" />
+                ) : sendChannel === "sms" ? (
+                  <Phone className="h-3.5 w-3.5" />
+                ) : (
+                  <ExternalLink className="h-3.5 w-3.5" />
+                )}
+                {sending
+                  ? "Sending..."
+                  : sendChannel === "email"
+                  ? "Send Email"
+                  : sendChannel === "whatsapp"
+                  ? "Open WhatsApp"
+                  : sendChannel === "sms"
+                  ? "Open SMS"
+                  : `Copy & Open ${sendChannel === "facebook" ? "Messenger" : sendChannel === "linkedin" ? "LinkedIn" : "Instagram"}`
+                }
               </Button>
             </div>
           )}
