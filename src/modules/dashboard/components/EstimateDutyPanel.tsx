@@ -18,6 +18,7 @@ import { usePlanLimits } from "@/hooks/usePlanLimits";
 import DutySettingsPanel from "./duty/DutySettingsPanel";
 import DutyAnalyticsPanel from "./duty/DutyAnalyticsPanel";
 import DutyMatchesList from "./duty/DutyMatchesList";
+import DutyGoLiveOverlay from "./duty/DutyGoLiveOverlay";
 
 /* ───────── CSS keyframes injected once ───────── */
 const glowKeyframes = `
