@@ -206,6 +206,8 @@ export default function SettingsPage() {
               Re-run Setup Wizard
             </Button>
           </motion.div>
+
+          <AIPersonalitySettings profile={profile} />
         </TabsContent>
 
         <TabsContent value="marketplace" className="mt-4 space-y-4">
