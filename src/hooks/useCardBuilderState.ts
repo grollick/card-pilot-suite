@@ -383,7 +383,7 @@ export function useCardBuilderState() {
       if (t.shadow) merged = { ...merged, shadow: { ...(merged.shadow ?? {}), ...t.shadow } };
       if (t.radius) merged = { ...merged, radius: { ...(merged.radius ?? {}), ...t.radius } };
     }
-    return resolveCardTheme(merged, palette);
+    return resolveCardTheme(merged, palette, effectiveFonts);
   }, [stylePack, effectiveThemeJson, themePreviewOverrides]);
 
   const handleThemePreview = useCallback((overrides: CardThemeOverrides) => {

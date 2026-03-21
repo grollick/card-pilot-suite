@@ -192,7 +192,7 @@ export default function PublicCard() {
       if (t.shadow) mergedTokens = { ...mergedTokens, shadow: { ...(mergedTokens.shadow ?? {}), ...t.shadow } };
       if (t.radius) mergedTokens = { ...mergedTokens, radius: { ...(mergedTokens.radius ?? {}), ...t.radius } };
     }
-    return resolveCardTheme(mergedTokens, palette);
+    return resolveCardTheme(mergedTokens, palette, themeJson.fonts);
   }, [data?.stylePack, data?.card?.theme_json]);
 
   // ── Load Google Fonts ──
