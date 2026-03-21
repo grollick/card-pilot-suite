@@ -477,6 +477,29 @@ export default function Onboarding() {
                 selectedId={selectedProfessionId}
                 onSelect={setSelectedProfessionId}
                 onNext={() => setStep(2)}
+                onCustomProfession={async (customName) => {
+                  try {
+                    const { data, error } = await supabase
+                      .from("professions")
+                      .insert({
+                        name: customName,
+                        category: "Other",
+                        default_card_sections: [],
+                        default_pipeline_stages: [],
+                        default_booking_services: [],
+                        default_email_templates: [],
+                      } as any)
+                      .select()
+                      .single();
+                    if (error) throw error;
+                    queryClient.invalidateQueries({ queryKey: ["professions"] });
+                    setSelectedProfessionId((data as any).id);
+                    setStep(2);
+                  } catch (err: any) {
+                    console.error("Custom profession error:", err);
+                    toast({ title: "Error", description: "Could not create custom profession. Please try again.", variant: "destructive" });
+                  }
+                }}
               />
             )}
 
