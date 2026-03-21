@@ -220,6 +220,7 @@ const App = () => (
             <Route path="/portal/:token" element={<LazyRoute><ClientPortal /></LazyRoute>} />
             <Route path="/pay/:token" element={<LazyRoute><PublicInvoicePage /></LazyRoute>} />
             <Route path="/ref/:code" element={<ReferralRedirect />} />
+            <Route path="/unsubscribe" element={<LazyRoute><UnsubscribePage /></LazyRoute>} />
 
             {/* Client Portal v2 — authenticated */}
             <Route path="/client/auth" element={<LazyRoute><ClientAuthPage /></LazyRoute>} />
