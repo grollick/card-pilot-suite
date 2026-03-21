@@ -40,7 +40,7 @@ export default function DashboardHome() {
   const { data: guaranteeData } = useLeadGuarantee();
 
   return (
-    <div className="space-y-6 max-w-[1280px]">
+    <div className="space-y-5 max-w-[1280px]">
       <ReferralActivationChecker />
       {/* ── Header ── */}
       <motion.div
@@ -61,29 +61,17 @@ export default function DashboardHome() {
       {/* Mobile Job Dashboard */}
       {isMobile && <MobileJobDashboard />}
 
-      {/* ── You Are Live Banner ── */}
-      <YouAreLiveBanner />
-
-      {/* ── First Lead Celebration ── */}
-      <FirstLeadCelebration />
-
-      {/* ── Milestone Celebration Listener (no UI) ── */}
-      <MilestoneCelebrationListener />
-
-      {/* ── Churn Recovery Banner ── */}
-      <ChurnRecoveryBanner />
-
-      {/* ── Aha Moment Prompt ── */}
-      <AhaPromptBanner />
-
-      {/* ── Post-Lead Share Prompt ── */}
-      <PostLeadSharePrompt />
-
-      {/* ── On Duty for Estimates ── */}
-      <EstimateDutyPanel />
-
-      {/* ── Marketplace Awareness ── */}
-      <MarketplaceAwarenessWidget />
+      {/* ── Contextual banners (grouped to avoid empty gaps) ── */}
+      <div className="flex flex-col gap-4 empty:hidden [&:not(:has(>*))]:hidden">
+        <YouAreLiveBanner />
+        <FirstLeadCelebration />
+        <MilestoneCelebrationListener />
+        <ChurnRecoveryBanner />
+        <AhaPromptBanner />
+        <PostLeadSharePrompt />
+        <EstimateDutyPanel />
+        <MarketplaceAwarenessWidget />
+      </div>
 
       {/* ── SECTION 2: KPI Row ── */}
       <RevenueKPICards />
@@ -98,19 +86,19 @@ export default function DashboardHome() {
       <ReferralWidget />
 
       {/* ── Activation System ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <div className="space-y-5">
           <VerificationChecklist />
           <ActivationChecklist />
         </div>
-        <div className="space-y-6">
+        <div className="space-y-5">
           <ShareMessageCard />
           <ShareCardWidget />
         </div>
       </div>
 
       {/* ── Smart Revenue & Coaching ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <RevenuePipelineWidget />
         <SmartRevenueWidget />
       </div>
@@ -122,39 +110,23 @@ export default function DashboardHome() {
       <NextActionsWidget />
 
       {/* ── Main Grid: 2-column layout ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
         {/* Left Column (3/5) */}
-        <div className="lg:col-span-3 space-y-6">
-          {/* ── SECTION 4: Opportunities ── */}
+        <div className="lg:col-span-3 space-y-5">
           <RevenueOpportunities />
           <MissedOpportunities />
-
-          {/* ── SECTION 5: Activity Feed ── */}
           <DashboardActivityFeed />
         </div>
 
         {/* Right Column (2/5) */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* ── SECTION 3: Funnel ── */}
+        <div className="lg:col-span-2 space-y-5">
           <FunnelView />
-
-
-          {/* ── Lead Guarantee Tracker ── */}
           {guaranteeData && !guaranteeData.targetMet && (
             <LeadGuaranteeBanner variant="dashboard" guaranteeData={guaranteeData} />
           )}
-
-          {/* ── Lead Quality ── */}
           <LeadQualityWidget />
-
-          {/* ── Lead Velocity ── */}
           <LeadVelocityWidget />
-
-          {/* ── Retention Insights ── */}
           <RetentionInsightsWidget />
-
-          {/* ── SECTION 7: Growth & Insights ── */}
           <GrowthTrends />
         </div>
       </div>
