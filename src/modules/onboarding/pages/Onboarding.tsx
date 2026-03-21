@@ -18,6 +18,7 @@ import StepActionPrompt from "../components/StepActionPrompt";
 import StepSocialLinks from "../components/StepSocialLinks";
 import StepSharing from "../components/StepSharing";
 import StepActivationChecklist from "../components/StepActivationChecklist";
+import StepAIPersonality from "../components/StepAIPersonality";
 
 interface Profession {
   id: string;
@@ -63,13 +64,14 @@ const categoryKeyMap: Record<string, string> = {
 // Steps:
 // 0 = Welcome
 // 1 = Profession
-// 2 = Auto-Build (business name + optional URL)
-// 3 = Card Preview (generating / preview)
-// 4 = You're Live (success moment)
-// 5 = Action Prompt
-// 6 = Social Links
-// 7 = Sharing
-// 8 = Activation Checklist
+// 2 = AI Personality
+// 3 = Auto-Build (business name + optional URL)
+// 4 = Card Preview (generating / preview)
+// 5 = You're Live (success moment)
+// 6 = Action Prompt
+// 7 = Social Links
+// 8 = Sharing
+// 9 = Activation Checklist
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -86,6 +88,7 @@ export default function Onboarding() {
   const [saving, setSaving] = useState(false);
   const [launched, setLaunched] = useState(false);
   const [socialLinks, setSocialLinks] = useState<{ platform: string; url: string }[]>([]);
+  const [aiPersonality, setAiPersonality] = useState("copilot");
 
   // AI state
   const [aiSetup, setAiSetup] = useState<AISetup | null>(null);
@@ -145,7 +148,7 @@ export default function Onboarding() {
   // Generate AI setup and launch card
   const handleGenerateAndLaunch = async () => {
     if (!user || !selectedProfession) return;
-    setStep(3); // Go to card preview/loading
+    setStep(4); // Go to card preview/loading
     setAiLoading(true);
     setSaving(true);
 
@@ -204,6 +207,7 @@ export default function Onboarding() {
         bio: instantCard?.bio || setup?.bio || null,
         onboarding_completed: true,
         marketplace_enabled: true,
+        ai_personality: aiPersonality,
       } as any).eq("id", user.id);
       if (profileErr) throw profileErr;
 
@@ -274,17 +278,17 @@ export default function Onboarding() {
       // Move to success screen
       setAiLoading(false);
       setSaving(false);
-      setStep(4);
+      setStep(5);
     } catch (err: any) {
       console.error("Onboarding error:", err);
       toast({ title: "Something went wrong", description: err.message, variant: "destructive" });
       setAiLoading(false);
       setSaving(false);
-      setStep(2); // Go back to auto-build
+      setStep(3); // Go back to auto-build
     }
   };
 
-  const totalSteps = 9;
+  const totalSteps = 10;
   const handle = (company || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
   const cardUrl = `${window.location.origin}/${handle}`;
   const shareMessage = `Hey! I just set up my digital business card — check it out and let me know if you ever need ${selectedProfession?.name?.toLowerCase() || "my"} services: ${cardUrl}`;
@@ -322,7 +326,7 @@ export default function Onboarding() {
         </div>
 
         {/* Progress */}
-        {step > 0 && step < 8 && (
+        {step > 0 && step < 9 && (
           <div className="flex gap-1.5 mb-6">
             {[...Array(totalSteps)].map((_, i) => (
               <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
@@ -332,7 +336,7 @@ export default function Onboarding() {
           </div>
         )}
 
-        <div className={`rounded-2xl border border-border bg-card shadow-lg ${step === 0 || step === 4 || step === 8 ? "p-8" : "p-6"}`}>
+        <div className={`rounded-2xl border border-border bg-card shadow-lg ${step === 0 || step === 5 || step === 9 ? "p-8" : "p-6"}`}>
           <AnimatePresence mode="wait">
             {/* Step 0: Welcome */}
             {step === 0 && (
@@ -375,20 +379,30 @@ export default function Onboarding() {
               />
             )}
 
-            {/* Step 2: Auto-Build */}
+            {/* Step 2: AI Personality */}
             {step === 2 && (
+              <StepAIPersonality
+                selected={aiPersonality}
+                onSelect={setAiPersonality}
+                onNext={() => setStep(3)}
+                onBack={() => setStep(1)}
+              />
+            )}
+
+            {/* Step 3: Auto-Build */}
+            {step === 3 && (
               <StepAutoBuild
                 businessName={company}
                 externalUrl={externalUrl}
                 onBusinessNameChange={setCompany}
                 onExternalUrlChange={setExternalUrl}
                 onGenerate={handleGenerateAndLaunch}
-                onBack={() => setStep(1)}
+                onBack={() => setStep(2)}
               />
             )}
 
-            {/* Step 3: Card Preview / Generating */}
-            {step === 3 && (
+            {/* Step 4: Card Preview / Generating */}
+            {step === 4 && (
               <StepCardPreview
                 name={company}
                 company={company}
@@ -397,30 +411,30 @@ export default function Onboarding() {
                 tagline={aiSetup?.tagline}
                 services={services}
                 aiLoading={aiLoading || saving}
-                onNext={() => setStep(4)}
-                onBack={() => setStep(2)}
+                onNext={() => setStep(5)}
+                onBack={() => setStep(3)}
               />
             )}
 
-            {/* Step 4: You're Live */}
-            {step === 4 && (
+            {/* Step 5: You're Live */}
+            {step === 5 && (
               <StepYoureLive
                 company={company}
-                onNext={() => setStep(5)}
+                onNext={() => setStep(6)}
               />
             )}
 
-            {/* Step 5: Action Prompt */}
-            {step === 5 && (
+            {/* Step 6: Action Prompt */}
+            {step === 6 && (
               <StepActionPrompt
                 onTurnOnDuty={() => navigate("/app/duty")}
-                onShareCard={() => setStep(7)}
+                onShareCard={() => setStep(8)}
                 onSkip={() => navigate("/app")}
               />
             )}
 
-            {/* Step 6: Social Links */}
-            {step === 6 && (
+            {/* Step 7: Social Links */}
+            {step === 7 && (
               <StepSocialLinks
                 onNext={async (links) => {
                   setSocialLinks(links);
@@ -452,23 +466,23 @@ export default function Onboarding() {
                       console.error("Failed to save social links:", err);
                     }
                   }
-                  setStep(7);
+                  setStep(8);
                 }}
-                onBack={() => setStep(5)}
+                onBack={() => setStep(6)}
               />
             )}
 
-            {/* Step 7: Sharing */}
-            {step === 7 && (
+            {/* Step 8: Sharing */}
+            {step === 8 && (
               <StepSharing
                 cardUrl={cardUrl}
                 shareMessage={shareMessage}
-                onNext={() => setStep(8)}
+                onNext={() => setStep(9)}
               />
             )}
 
-            {/* Step 8: Activation Checklist */}
-            {step === 8 && (
+            {/* Step 9: Activation Checklist */}
+            {step === 9 && (
               <StepActivationChecklist
                 items={checklistItems}
                 headline={checklistTemplate.headline}
