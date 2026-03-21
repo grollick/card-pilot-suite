@@ -1,4 +1,4 @@
-import { Shield, Edit, LayoutGrid, Settings2, MessageSquare, TrendingUp, ShieldAlert, Rocket, Flame, ClipboardList } from "lucide-react";
+import { Shield, Edit, LayoutGrid, Settings2, MessageSquare, TrendingUp, ShieldAlert, Rocket, Flame, ClipboardList, Workflow } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { professions, professionCategories, getProfessionsByCategory } from "@/data/professions";
@@ -11,14 +11,16 @@ import AdminGrowthDashboard from "@/modules/settings/components/AdminGrowthDashb
 import AbuseMonitorDashboard from "@/modules/admin/components/AbuseMonitorDashboard";
 import FounderCommandCenter from "@/modules/admin/components/FounderCommandCenter";
 import GrowthEngine from "@/modules/admin/components/GrowthEngine";
+import GrowthAutomationDashboard from "@/modules/admin/components/GrowthAutomationDashboard";
 import UserResearchDashboard from "@/modules/admin/components/UserResearchDashboard";
 import { useState } from "react";
 
-type Section = "command" | "engine" | "growth" | "research" | "content" | "feedback" | "system" | "abuse";
+type Section = "command" | "engine" | "automation" | "growth" | "research" | "content" | "feedback" | "system" | "abuse";
 
 const sections: { id: Section; label: string; icon: typeof Shield }[] = [
   { id: "command", label: "Command Center", icon: Rocket },
   { id: "engine", label: "Growth Engine", icon: Flame },
+  { id: "automation", label: "Automation", icon: Workflow },
   { id: "growth", label: "Growth", icon: TrendingUp },
   { id: "research", label: "Research", icon: ClipboardList },
   { id: "abuse", label: "Abuse Monitor", icon: ShieldAlert },
@@ -59,6 +61,9 @@ export default function AdminPage() {
 
       {/* Growth Engine */}
       {section === "engine" && <GrowthEngine onNavigateSection={(s) => setSection(s as Section)} />}
+
+      {/* Growth Automation */}
+      {section === "automation" && <GrowthAutomationDashboard />}
 
       {/* Growth */}
       {section === "growth" && <AdminGrowthDashboard />}
