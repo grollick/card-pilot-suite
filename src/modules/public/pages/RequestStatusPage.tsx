@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, Clock, MapPin, DollarSign, CalendarCheck, MessageSquare, User, ExternalLink, Send } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
+import { ReviewingIndicator } from "@/components/activity/LiveActivityIndicators";
 
 export default function RequestStatusPage() {
   const { token } = useParams<{ token: string }>();
