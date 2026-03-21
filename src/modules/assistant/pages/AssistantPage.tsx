@@ -493,8 +493,7 @@ export default function AssistantPage() {
     }
   };
 
-  const lastAssistantMsg = [...messages].reverse().find((m) => m.role === "assistant");
-  const followUps = lastAssistantMsg ? getFollowUps(lastAssistantMsg.content) : [];
+  const followUps = messages.length > 0 ? getSmartFollowUps(messages) : [];
 
   return (
     <div className="flex flex-col h-[calc(100dvh-4rem)] max-w-4xl mx-auto">
