@@ -54,12 +54,25 @@ export default function EstimateDutyPanel() {
       transition={{ delay: 0.1, duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
       className={`dash-card relative overflow-hidden transition-all duration-500 ${
         isOnDuty
-          ? "ring-2 ring-success/40 shadow-[0_0_30px_-4px_hsl(var(--success)/0.45),0_0_60px_-8px_hsl(var(--success)/0.2)] -translate-y-0.5"
+          ? "ring-2 ring-success/50 shadow-[0_0_40px_-2px_hsl(var(--success)/0.5),0_0_80px_-4px_hsl(var(--success)/0.3),0_0_120px_-8px_hsl(var(--success)/0.15)] -translate-y-0.5"
           : ""
       }`}
     >
       {isOnDuty && (
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-success via-success/80 to-success/40 rounded-t-xl animate-pulse" />
+        <>
+          {/* Top glow bar */}
+          <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-success via-success/90 to-success/50 rounded-t-xl" />
+          {/* Animated pulsing border glow */}
+          <motion.div
+            className="absolute inset-0 rounded-xl pointer-events-none"
+            style={{ boxShadow: "inset 0 0 20px hsl(var(--success) / 0.08), 0 0 40px hsl(var(--success) / 0.15)" }}
+            animate={{ opacity: [0.6, 1, 0.6] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+          />
+          {/* Corner glow accents */}
+          <div className="absolute -top-8 -right-8 h-24 w-24 rounded-full blur-2xl pointer-events-none" style={{ background: "hsl(var(--success) / 0.2)" }} />
+          <div className="absolute -bottom-6 -left-6 h-20 w-20 rounded-full blur-2xl pointer-events-none" style={{ background: "hsl(var(--success) / 0.12)" }} />
+        </>
       )}
 
       <div className="dash-card-header pt-3">
