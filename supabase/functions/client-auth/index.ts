@@ -35,9 +35,11 @@ Deno.serve(async (req) => {
         .limit(1);
 
       if (!leads || leads.length === 0) {
+        // Return same response to prevent email enumeration
+        console.log("client-auth: no lead found for email, returning generic response");
         return new Response(
-          JSON.stringify({ error: "No account found for this email. Please contact your service provider." }),
-          { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ success: true, message: "If an account exists, a login link has been sent to your email." }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
