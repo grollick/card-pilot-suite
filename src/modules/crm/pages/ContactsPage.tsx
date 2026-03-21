@@ -60,6 +60,15 @@ export default function ContactsPage() {
   const navigate = useNavigate();
   const { data: contacts = [], isLoading } = useContacts();
   const { data: stages = [] } = usePipelineStages();
+
+  // AI lead scoring
+  const leadIds = useMemo(() => contacts.slice(0, 20).map((c: any) => c.id), [contacts]);
+  const { data: leadScores, isLoading: scoresLoading } = useAILeadScores(leadIds);
+  const scoreMap = useMemo(() => {
+    const map = new Map<string, any>();
+    (leadScores ?? []).forEach(s => map.set(s.lead_id, s));
+    return map;
+  }, [leadScores]);
   const { data: tags = [] } = useTags();
   const createContact = useCreateContact();
   const { planKey, checkLimit } = usePlanLimits();
