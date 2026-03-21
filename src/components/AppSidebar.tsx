@@ -42,6 +42,7 @@ const jobsItems = [
   { title: "Job Pipeline", url: "/app/job-pipeline", icon: ClipboardList },
   { title: "Recurring", url: "/app/recurring", icon: RefreshCw },
   { title: "Invoices", url: "/app/invoices", icon: DollarSign },
+  { title: "Expenses", url: "/app/expenses", icon: DollarSign },
   { title: "Revenue", url: "/app/revenue", icon: DollarSign },
 ];
 
