@@ -235,10 +235,10 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
                 {loading ? <Skeleton className="h-4 w-10" /> : <span className="font-medium">{stats?.publishedCards ?? 0}</span>}
               </div>
               <div className="flex flex-wrap gap-2 pt-2">
-                <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => navigate("/app/admin-dashboard")}>
+                <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => navigate("/app/platform-admin")}>
                   <Eye className="h-3 w-3" /> View Users
                 </Button>
-                <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => navigate("/app/admin")}>
+                <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => onNavigateSection?.("system")}>
                   <Gift className="h-3 w-3" /> Beta Access
                 </Button>
               </div>
