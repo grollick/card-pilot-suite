@@ -12,9 +12,9 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Auth guard: only allow calls with service role key or anon key
+  // Auth guard: only allow calls with service role key (cron-only endpoint)
   const token = req.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
-  if (token !== Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") && token !== Deno.env.get("SUPABASE_ANON_KEY")) {
+  if (token !== Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
     return new Response(JSON.stringify({ error: "Forbidden" }), {
       status: 403,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
