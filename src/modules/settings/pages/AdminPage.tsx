@@ -1,4 +1,4 @@
-import { Shield, Edit, LayoutGrid, Settings2, MessageSquare, TrendingUp, ShieldAlert } from "lucide-react";
+import { Shield, Edit, LayoutGrid, Settings2, MessageSquare, TrendingUp, ShieldAlert, Rocket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { professions, professionCategories, getProfessionsByCategory } from "@/data/professions";
@@ -9,11 +9,13 @@ import BugPriorityDashboard from "@/modules/settings/components/BugPriorityDashb
 import RoadmapBoard from "@/modules/settings/components/RoadmapBoard";
 import AdminGrowthDashboard from "@/modules/settings/components/AdminGrowthDashboard";
 import AbuseMonitorDashboard from "@/modules/admin/components/AbuseMonitorDashboard";
+import FounderCommandCenter from "@/modules/admin/components/FounderCommandCenter";
 import { useState } from "react";
 
-type Section = "growth" | "content" | "feedback" | "system" | "abuse";
+type Section = "command" | "growth" | "content" | "feedback" | "system" | "abuse";
 
 const sections: { id: Section; label: string; icon: typeof Shield }[] = [
+  { id: "command", label: "Command Center", icon: Rocket },
   { id: "growth", label: "Growth", icon: TrendingUp },
   { id: "abuse", label: "Abuse Monitor", icon: ShieldAlert },
   { id: "content", label: "Content & Professions", icon: LayoutGrid },
@@ -22,7 +24,7 @@ const sections: { id: Section; label: string; icon: typeof Shield }[] = [
 ];
 
 export default function AdminPage() {
-  const [section, setSection] = useState<Section>("growth");
+  const [section, setSection] = useState<Section>("command");
   const byCategory = getProfessionsByCategory();
 
   return (
@@ -47,6 +49,9 @@ export default function AdminPage() {
           </Button>
         ))}
       </div>
+
+      {/* Command Center */}
+      {section === "command" && <FounderCommandCenter />}
 
       {/* Growth */}
       {section === "growth" && <AdminGrowthDashboard />}
