@@ -2,7 +2,7 @@ import { MarketplaceApp } from "@/hooks/useMarketplaceApps";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Download, Check } from "lucide-react";
+import { Star, Download, Check, DollarSign } from "lucide-react";
 
 const categoryColors: Record<string, string> = {
   payments: "bg-emerald-500/10 text-emerald-600",
