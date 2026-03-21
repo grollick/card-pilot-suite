@@ -50,10 +50,10 @@ export default function BetaFeedbackWidget() {
       setUploading(true);
       const ext = screenshotFile.name.split(".").pop() || "png";
       const path = `feedback/${user.id}/${Date.now()}.${ext}`;
-      const { error } = await supabase.storage.from("card-assets").upload(path, screenshotFile);
+      const { error } = await supabase.storage.from("feedback-screenshots").upload(path, screenshotFile);
       if (!error) {
-        const { data: urlData } = supabase.storage.from("card-assets").getPublicUrl(path);
-        screenshotUrl = urlData.publicUrl;
+        // Store the path only — admins will generate signed URLs to view
+        screenshotUrl = path;
       }
       setUploading(false);
     }

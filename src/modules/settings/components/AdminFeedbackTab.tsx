@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { format } from "date-fns";
 import {
   Search, Bug, Lightbulb, HelpCircle, ThumbsUp, MessageSquare,
@@ -24,6 +24,7 @@ import {
   type FeedbackType,
   type FeedbackStatus,
 } from "@/hooks/useBetaFeedback";
+import { supabase } from "@/integrations/supabase/client";
 
 const TYPE_CONFIG: Record<FeedbackType, { icon: React.ReactNode; label: string; color: string }> = {
   bug: { icon: <Bug className="h-3 w-3" />, label: "Bug", color: "text-destructive" },
@@ -48,6 +49,25 @@ export default function AdminFeedbackTab() {
   const [statusFilter, setStatusFilter] = useState<"all" | FeedbackStatus>("all");
   const [selected, setSelected] = useState<BetaFeedback | null>(null);
   const [adminNotes, setAdminNotes] = useState("");
+  const [signedScreenshotUrl, setSignedScreenshotUrl] = useState<string | null>(null);
+
+  // Generate signed URL when a feedback item with screenshot is selected
+  useEffect(() => {
+    setSignedScreenshotUrl(null);
+    if (!selected?.screenshot_url) return;
+    // If it's already a full URL (legacy), use directly
+    if (selected.screenshot_url.startsWith("http")) {
+      setSignedScreenshotUrl(selected.screenshot_url);
+      return;
+    }
+    // Generate signed URL from private bucket
+    supabase.storage
+      .from("feedback-screenshots")
+      .createSignedUrl(selected.screenshot_url, 3600)
+      .then(({ data }) => {
+        if (data?.signedUrl) setSignedScreenshotUrl(data.signedUrl);
+      });
+  }, [selected]);
 
   // Metrics
   const metrics = useMemo(() => {
@@ -277,12 +297,12 @@ export default function AdminFeedbackTab() {
                 <div className="bg-muted/50 rounded-lg p-3 text-sm">{selected.message}</div>
               </div>
 
-              {selected.screenshot_url && (
+              {selected.screenshot_url && signedScreenshotUrl && (
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Screenshot</p>
-                  <a href={selected.screenshot_url} target="_blank" rel="noreferrer" className="block">
+                  <a href={signedScreenshotUrl} target="_blank" rel="noreferrer" className="block">
                     <img
-                      src={selected.screenshot_url}
+                      src={signedScreenshotUrl}
                       alt="Feedback screenshot"
                       className="rounded-lg border border-border max-h-48 object-contain w-full"
                     />
