@@ -13,6 +13,7 @@ import ReferralActivationChecker from "@/modules/dashboard/components/ReferralAc
 import EstimateDutyPanel from "@/modules/dashboard/components/EstimateDutyPanel";
 import FirstLeadAssistant from "@/modules/dashboard/components/FirstLeadAssistant";
 import BusinessHealthScore from "@/modules/dashboard/components/BusinessHealthScore";
+import AIBusinessCoachWidget from "@/modules/dashboard/components/AIBusinessCoachWidget";
 import AIBusinessAssistant from "@/modules/dashboard/components/AIBusinessAssistant";
 import FirstLeadGuaranteeWidget from "@/modules/dashboard/components/FirstLeadGuaranteeWidget";
 import {
