@@ -11,6 +11,9 @@ import MobileJobDashboard from "@/modules/dashboard/components/MobileJobDashboar
 import MobileQuickCreate from "@/modules/invoices/components/MobileQuickCreate";
 import ReferralActivationChecker from "@/modules/dashboard/components/ReferralActivationChecker";
 import EstimateDutyPanel from "@/modules/dashboard/components/EstimateDutyPanel";
+import FirstLeadAssistant from "@/modules/dashboard/components/FirstLeadAssistant";
+import BusinessHealthScore from "@/modules/dashboard/components/BusinessHealthScore";
+import AIBusinessAssistant from "@/modules/dashboard/components/AIBusinessAssistant";
 import {
   Pencil, UserPlus, CalendarPlus, ExternalLink,
   Zap, Sparkles,
@@ -59,7 +62,6 @@ export default function DashboardHome() {
           background: "linear-gradient(135deg, hsl(var(--primary) / 0.08), hsl(var(--card)), hsl(var(--accent) / 0.06))",
         }}
       >
-        {/* Animated gradient orbs */}
         <motion.div
           className="absolute -top-20 -right-20 h-60 w-60 rounded-full blur-3xl pointer-events-none"
           style={{ background: "hsl(var(--primary) / 0.12)" }}
@@ -73,7 +75,6 @@ export default function DashboardHome() {
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         />
 
-        {/* Dot grid pattern */}
         <div className="absolute inset-0 opacity-[0.04] dark:opacity-[0.08]" style={{
           backgroundImage: "radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)",
           backgroundSize: "20px 20px",
@@ -155,6 +156,14 @@ export default function DashboardHome() {
       {/* Estimate Duty (contextual) */}
       <EstimateDutyPanel />
 
+      {/* ── First Win Experience ── */}
+      <motion.div
+        variants={fadeUp}
+        transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
+      >
+        <FirstLeadAssistant />
+      </motion.div>
+
       {/* ── KPI Cards ── */}
       <motion.div
         variants={fadeUp}
@@ -163,23 +172,31 @@ export default function DashboardHome() {
         <RevenueKPICards />
       </motion.div>
 
-      {/* ── Main Content: Actions + Activity ── */}
+      {/* ── Main Content: Actions + Business Score ── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         <motion.div
           variants={fadeUp}
           transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="lg:col-span-2"
+          className="lg:col-span-3"
         >
           <NextActionsWidget />
         </motion.div>
         <motion.div
           variants={fadeUp}
           transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
-          className="lg:col-span-3"
+          className="lg:col-span-2"
         >
-          <DashboardActivityFeed />
+          <BusinessHealthScore />
         </motion.div>
       </div>
+
+      {/* ── Activity Feed ── */}
+      <motion.div
+        variants={fadeUp}
+        transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
+      >
+        <DashboardActivityFeed />
+      </motion.div>
 
       {/* ── Growth Trends ── */}
       <motion.div
@@ -191,6 +208,9 @@ export default function DashboardHome() {
 
       {/* Mobile floating quick-create */}
       {isMobile && <MobileQuickCreate />}
+
+      {/* AI Business Assistant (floating) */}
+      <AIBusinessAssistant />
     </motion.div>
   );
 }
