@@ -32,6 +32,7 @@ const ReferralRedirect = lazy(() => import("@/modules/public/pages/ReferralRedir
 const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
 const PublicProjectPage = lazy(() => import("@/modules/public/pages/PublicProjectPage"));
 const PublicInvoicePage = lazy(() => import("@/modules/public/pages/PublicInvoicePage"));
+const UnsubscribePage = lazy(() => import("@/pages/UnsubscribePage"));
 
 // Client Portal v2 — authenticated client dashboard
 const ClientAuthPage = lazy(() => import("@/modules/client/pages/ClientAuthPage"));
