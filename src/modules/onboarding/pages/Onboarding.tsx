@@ -207,6 +207,7 @@ export default function Onboarding() {
         bio: instantCard?.bio || setup?.bio || null,
         onboarding_completed: true,
         marketplace_enabled: true,
+        ai_personality: aiPersonality,
       } as any).eq("id", user.id);
       if (profileErr) throw profileErr;
 
