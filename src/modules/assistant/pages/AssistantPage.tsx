@@ -439,8 +439,21 @@ export default function AssistantPage() {
 
   const followUps = messages.length > 0 ? getSmartFollowUps(messages) : [];
 
+  const handleClearChat = () => {
+    setMessages([]);
+    localStorage.removeItem(STORAGE_KEY);
+  };
+
   return (
     <div className="flex flex-col h-[calc(100dvh-4rem)] max-w-4xl mx-auto">
+      {/* Header with clear button */}
+      {messages.length > 0 && (
+        <div className="flex items-center justify-end px-3 sm:px-6 pt-2">
+          <Button variant="ghost" size="sm" className="text-xs gap-1.5 h-7 text-muted-foreground" onClick={handleClearChat}>
+            <RotateCcw className="h-3 w-3" /> New Chat
+          </Button>
+        </div>
+      )}
       {/* Messages area */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 sm:px-6 py-6 space-y-5">
         <AnimatePresence mode="popLayout">
