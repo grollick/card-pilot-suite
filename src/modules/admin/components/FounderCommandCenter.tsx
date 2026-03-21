@@ -73,6 +73,7 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
   const navigate = useNavigate();
   const { data: stats, isLoading: statsLoading } = useAdminStats();
   const { data: growth, isLoading: growthLoading } = useAdminGrowthStats();
+  const { data: funnelData, isLoading: funnelLoading } = useAdminFunnelStats(30);
   const loading = statsLoading || growthLoading;
 
   const kpis = growth?.kpis;
