@@ -256,6 +256,114 @@ export type Database = {
           },
         ]
       }
+      app_developer_profiles: {
+        Row: {
+          business_name: string
+          commission_rate: number
+          contact_email: string
+          created_at: string
+          id: string
+          stripe_connect_id: string | null
+          stripe_onboarded: boolean
+          total_payouts: number
+          total_revenue: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_name?: string
+          commission_rate?: number
+          contact_email?: string
+          created_at?: string
+          id?: string
+          stripe_connect_id?: string | null
+          stripe_onboarded?: boolean
+          total_payouts?: number
+          total_revenue?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_name?: string
+          commission_rate?: number
+          contact_email?: string
+          created_at?: string
+          id?: string
+          stripe_connect_id?: string | null
+          stripe_onboarded?: boolean
+          total_payouts?: number
+          total_revenue?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      app_purchases: {
+        Row: {
+          amount_cents: number
+          app_id: string
+          created_at: string
+          currency: string
+          developer_id: string | null
+          developer_payout_cents: number
+          id: string
+          platform_fee_cents: number
+          purchase_type: string
+          status: string
+          stripe_checkout_session_id: string | null
+          stripe_payment_intent_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents?: number
+          app_id: string
+          created_at?: string
+          currency?: string
+          developer_id?: string | null
+          developer_payout_cents?: number
+          id?: string
+          platform_fee_cents?: number
+          purchase_type?: string
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          app_id?: string
+          created_at?: string
+          currency?: string
+          developer_id?: string | null
+          developer_payout_cents?: number
+          id?: string
+          platform_fee_cents?: number
+          purchase_type?: string
+          status?: string
+          stripe_checkout_session_id?: string | null
+          stripe_payment_intent_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "app_purchases_app_id_fkey"
+            columns: ["app_id"]
+            isOneToOne: false
+            referencedRelation: "marketplace_apps"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "app_purchases_developer_id_fkey"
+            columns: ["developer_id"]
+            isOneToOne: false
+            referencedRelation: "app_developer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       app_reviews: {
         Row: {
           app_id: string
@@ -3054,6 +3162,7 @@ export type Database = {
           created_at: string
           description: string
           developer_name: string
+          developer_profile_id: string | null
           features: string[] | null
           icon_url: string | null
           id: string
@@ -3077,6 +3186,7 @@ export type Database = {
           created_at?: string
           description: string
           developer_name?: string
+          developer_profile_id?: string | null
           features?: string[] | null
           icon_url?: string | null
           id?: string
@@ -3100,6 +3210,7 @@ export type Database = {
           created_at?: string
           description?: string
           developer_name?: string
+          developer_profile_id?: string | null
           features?: string[] | null
           icon_url?: string | null
           id?: string
@@ -3116,7 +3227,15 @@ export type Database = {
           updated_at?: string
           webhook_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_apps_developer_profile_id_fkey"
+            columns: ["developer_profile_id"]
+            isOneToOne: false
+            referencedRelation: "app_developer_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       marketplace_lead_credits: {
         Row: {

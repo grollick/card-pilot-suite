@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useMarketplaceApps, useFeaturedApps, useInstalledApps, useInstallApp, AppCategory, MarketplaceApp } from "@/hooks/useMarketplaceApps";
 import AppCard from "../components/AppCard";
 import AppDetailDialog from "../components/AppDetailDialog";
+import PurchaseAppDialog from "../components/PurchaseAppDialog";
 import InstalledAppsPanel from "../components/InstalledAppsPanel";
 import RequestAppDialog from "../components/RequestAppDialog";
 import { Input } from "@/components/ui/input";
@@ -28,12 +29,21 @@ export default function MarketplacePage() {
   const [selectedApp, setSelectedApp] = useState<MarketplaceApp | null>(null);
   const [tab, setTab] = useState("browse");
   const [requestOpen, setRequestOpen] = useState(false);
+  const [purchaseApp, setPurchaseApp] = useState<MarketplaceApp | null>(null);
   const { data: allApps, isLoading } = useMarketplaceApps(category === "all" ? undefined : category);
   const { data: featured } = useFeaturedApps();
   const { data: installed } = useInstalledApps();
   const installApp = useInstallApp();
 
   const installedIds = useMemo(() => new Set(installed?.map((i) => i.app_id) || []), [installed]);
+
+  const handleInstall = (app: MarketplaceApp) => {
+    if (app.pricing_type !== "free") {
+      setPurchaseApp(app);
+    } else {
+      installApp.mutate(app.id);
+    }
+  };
 
   const filtered = useMemo(() => {
     if (!allApps) return [];
@@ -105,7 +115,7 @@ export default function MarketplacePage() {
                     key={app.id}
                     app={app}
                     isInstalled={installedIds.has(app.id)}
-                    onInstall={() => installApp.mutate(app.id)}
+                    onInstall={() => handleInstall(app)}
                     onView={() => setSelectedApp(app)}
                   />
                 ))}
@@ -132,7 +142,7 @@ export default function MarketplacePage() {
                     key={app.id}
                     app={app}
                     isInstalled={installedIds.has(app.id)}
-                    onInstall={() => installApp.mutate(app.id)}
+                    onInstall={() => handleInstall(app)}
                     onView={() => setSelectedApp(app)}
                   />
                 ))}
@@ -165,9 +175,15 @@ export default function MarketplacePage() {
         app={selectedApp}
         isInstalled={selectedApp ? installedIds.has(selectedApp.id) : false}
         onInstall={() => {
-          if (selectedApp) installApp.mutate(selectedApp.id);
+          if (selectedApp) handleInstall(selectedApp);
         }}
         onClose={() => setSelectedApp(null)}
+      />
+
+      <PurchaseAppDialog
+        app={purchaseApp}
+        onClose={() => setPurchaseApp(null)}
+        onPurchaseComplete={() => setPurchaseApp(null)}
       />
 
       <RequestAppDialog open={requestOpen} onOpenChange={setRequestOpen} />
