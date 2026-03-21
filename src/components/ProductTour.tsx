@@ -57,8 +57,7 @@ export default function ProductTour() {
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
-
-  const { data: profileCache } = useProfileCache();
+  const location = (await import("react-router-dom")).useLocation();
   const tourCompleted = profileCache?.tour_completed ?? false;
 
   const completeTour = useMutation({
