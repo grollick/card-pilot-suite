@@ -12,13 +12,14 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import ResearchSummaryWidget from "@/modules/admin/components/ResearchSummaryWidget";
 import ColdOutreachTemplates from "@/modules/admin/components/ColdOutreachTemplates";
+import FunnelHealthMonitor from "@/modules/admin/components/FunnelHealthMonitor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAdminStats } from "@/hooks/useAdminStats";
 import { useAdminGrowthStats } from "@/hooks/useAdminGrowthStats";
-import { useAdminFunnelStats } from "@/hooks/useAdminFunnelStats";
+
 
 // ─── Metric Card ───
 function MetricCard({ icon: Icon, label, value, sub, color = "text-primary", loading }: {
@@ -73,7 +74,7 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
   const navigate = useNavigate();
   const { data: stats, isLoading: statsLoading } = useAdminStats();
   const { data: growth, isLoading: growthLoading } = useAdminGrowthStats();
-  const { data: funnelData, isLoading: funnelLoading } = useAdminFunnelStats(30);
+  // funnelData now handled by FunnelHealthMonitor component
   const loading = statsLoading || growthLoading;
 
   const kpis = growth?.kpis;
@@ -437,45 +438,12 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
         </CardContent>
       </Card>
 
-      {/* ── SECTION: Funnel Summary ── */}
-      <SectionHeader icon={Target} title="Funnel Overview" description="User journey conversion at a glance" />
-      <Card>
-        <CardContent className="pt-5">
-          {funnelLoading ? (
-            <div className="space-y-2">{[1, 2, 3].map(i => <Skeleton key={i} className="h-8 w-full" />)}</div>
-          ) : funnelData?.stages ? (
-            <div className="space-y-3">
-              <div className="grid grid-cols-7 gap-1">
-                {funnelData.stages.map((stage, idx) => {
-                  const prevCount = idx > 0 ? funnelData.stages[idx - 1].count : 0;
-                  const rate = idx === 0 ? 100 : prevCount > 0 ? (stage.count / prevCount) * 100 : 0;
-                  const rateColor = rate >= 50 ? "text-[hsl(var(--success))]" : rate >= 20 ? "text-[hsl(var(--warning))]" : "text-destructive";
-                  return (
-                    <div key={stage.id} className="text-center">
-                      <p className="text-lg font-bold tabular-nums">{stage.count}</p>
-                      <p className="text-[9px] text-muted-foreground leading-tight">{stage.label}</p>
-                      {idx > 0 && (
-                        <p className={`text-[10px] font-bold tabular-nums mt-0.5 ${rateColor}`}>{rate.toFixed(0)}%</p>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-              {funnelData.insights.filter(i => i.type === "warning").slice(0, 2).map((insight, i) => (
-                <div key={i} className="flex items-start gap-2 text-xs p-2 rounded-lg bg-[hsl(var(--warning))]/5 border border-[hsl(var(--warning))]/10">
-                  <AlertTriangle className="h-3 w-3 text-[hsl(var(--warning))] shrink-0 mt-0.5" />
-                  <span>{insight.message}</span>
-                </div>
-              ))}
-              <Button size="sm" variant="outline" className="text-xs gap-1 w-full" onClick={() => onNavigateSection?.("funnel")}>
-                <Target className="h-3 w-3" /> View Full Funnel
-              </Button>
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground text-center py-4">No funnel data available</p>
-          )}
-        </CardContent>
-      </Card>
+      {/* ── SECTION: Funnel Health ── */}
+      <SectionHeader icon={Target} title="Funnel Health Monitor" description="Threshold alerts and conversion health" />
+      <FunnelHealthMonitor compact />
+      <Button size="sm" variant="outline" className="text-xs gap-1 w-full mt-2" onClick={() => onNavigateSection?.("funnel")}>
+        <Target className="h-3 w-3" /> View Full Funnel Dashboard
+      </Button>
 
       {/* ── SECTION: Cold Outreach ── */}
       <SectionHeader icon={Mail} title="Cold Outreach Emails" description="Pre-written emails to acquire card holders by profession" />
