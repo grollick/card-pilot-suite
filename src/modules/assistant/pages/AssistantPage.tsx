@@ -498,27 +498,31 @@ export default function AssistantPage() {
                   transition={{ duration: 0.25, ease: "easeOut" }}
                   className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
-                  <div className={`${msg.role === "user" ? "max-w-[80%] sm:max-w-[65%]" : "max-w-[95%] sm:max-w-[85%] flex gap-3"}`}>
+                  <div className={`${msg.role === "user" ? "max-w-[80%] sm:max-w-[65%]" : "max-w-[95%] sm:max-w-[88%] flex gap-3.5"}`}>
                     {msg.role === "assistant" && (
-                      <div className="hidden sm:flex h-8 w-8 rounded-xl bg-gradient-to-br from-primary/10 to-success/10 items-center justify-center shrink-0 mt-1 shadow-sm">
-                        <Bot className="h-4 w-4 text-primary" />
+                      <div className="hidden sm:flex h-10 w-10 rounded-2xl bg-gradient-to-br from-primary to-primary/60 items-center justify-center shrink-0 mt-1 shadow-lg shadow-primary/20">
+                        <Bot className="h-5 w-5 text-primary-foreground" />
                       </div>
                     )}
-                    <div className="space-y-2 min-w-0 flex-1">
+                    <div className="space-y-3 min-w-0 flex-1">
                       {/* Premium result title */}
                       {msg.role === "assistant" && i > 0 && messages[i - 1]?.role === "user" && (
-                        <div className="px-1 mb-3">
-                          <h2 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight leading-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                        <div className="px-1 mb-4">
+                          <div className="flex items-center gap-2 mb-1.5">
+                            <Sparkles className="h-4 w-4 text-primary/60" />
+                            <span className="text-[11px] font-semibold uppercase tracking-widest text-primary/50">AI Insight</span>
+                          </div>
+                          <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight leading-[1.15]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                             {formatResultTitle(messages[i - 1].content)}
                           </h2>
-                          <div className="h-0.5 w-12 bg-gradient-to-r from-primary to-primary/30 rounded-full mt-2" />
+                          <div className="h-1 w-16 bg-gradient-to-r from-primary via-primary/60 to-transparent rounded-full mt-3" />
                         </div>
                       )}
                       <div
                         className={`rounded-2xl ${
                           msg.role === "user"
-                            ? "bg-primary text-primary-foreground px-4 py-3 text-sm leading-relaxed shadow-sm"
-                            : "bg-gradient-to-b from-card to-card/80 border border-border/40 px-5 sm:px-7 py-5 sm:py-6 text-[13px] sm:text-sm shadow-md ring-1 ring-white/5"
+                            ? "bg-primary text-primary-foreground px-5 py-3.5 text-sm leading-relaxed shadow-md"
+                            : "bg-gradient-to-b from-card via-card/95 to-card/85 border border-border/30 px-5 sm:px-8 py-6 sm:py-8 shadow-xl ring-1 ring-white/5 backdrop-blur-sm"
                         }`}
                       >
                         {msg.role === "assistant" ? (
