@@ -378,20 +378,30 @@ export default function Onboarding() {
               />
             )}
 
-            {/* Step 2: Auto-Build */}
+            {/* Step 2: AI Personality */}
             {step === 2 && (
+              <StepAIPersonality
+                selected={aiPersonality}
+                onSelect={setAiPersonality}
+                onNext={() => setStep(3)}
+                onBack={() => setStep(1)}
+              />
+            )}
+
+            {/* Step 3: Auto-Build */}
+            {step === 3 && (
               <StepAutoBuild
                 businessName={company}
                 externalUrl={externalUrl}
                 onBusinessNameChange={setCompany}
                 onExternalUrlChange={setExternalUrl}
                 onGenerate={handleGenerateAndLaunch}
-                onBack={() => setStep(1)}
+                onBack={() => setStep(2)}
               />
             )}
 
-            {/* Step 3: Card Preview / Generating */}
-            {step === 3 && (
+            {/* Step 4: Card Preview / Generating */}
+            {step === 4 && (
               <StepCardPreview
                 name={company}
                 company={company}
@@ -400,30 +410,30 @@ export default function Onboarding() {
                 tagline={aiSetup?.tagline}
                 services={services}
                 aiLoading={aiLoading || saving}
-                onNext={() => setStep(4)}
-                onBack={() => setStep(2)}
+                onNext={() => setStep(5)}
+                onBack={() => setStep(3)}
               />
             )}
 
-            {/* Step 4: You're Live */}
-            {step === 4 && (
+            {/* Step 5: You're Live */}
+            {step === 5 && (
               <StepYoureLive
                 company={company}
-                onNext={() => setStep(5)}
+                onNext={() => setStep(6)}
               />
             )}
 
-            {/* Step 5: Action Prompt */}
-            {step === 5 && (
+            {/* Step 6: Action Prompt */}
+            {step === 6 && (
               <StepActionPrompt
                 onTurnOnDuty={() => navigate("/app/duty")}
-                onShareCard={() => setStep(7)}
+                onShareCard={() => setStep(8)}
                 onSkip={() => navigate("/app")}
               />
             )}
 
-            {/* Step 6: Social Links */}
-            {step === 6 && (
+            {/* Step 7: Social Links */}
+            {step === 7 && (
               <StepSocialLinks
                 onNext={async (links) => {
                   setSocialLinks(links);
@@ -455,23 +465,23 @@ export default function Onboarding() {
                       console.error("Failed to save social links:", err);
                     }
                   }
-                  setStep(7);
+                  setStep(8);
                 }}
-                onBack={() => setStep(5)}
+                onBack={() => setStep(6)}
               />
             )}
 
-            {/* Step 7: Sharing */}
-            {step === 7 && (
+            {/* Step 8: Sharing */}
+            {step === 8 && (
               <StepSharing
                 cardUrl={cardUrl}
                 shareMessage={shareMessage}
-                onNext={() => setStep(8)}
+                onNext={() => setStep(9)}
               />
             )}
 
-            {/* Step 8: Activation Checklist */}
-            {step === 8 && (
+            {/* Step 9: Activation Checklist */}
+            {step === 9 && (
               <StepActivationChecklist
                 items={checklistItems}
                 headline={checklistTemplate.headline}
