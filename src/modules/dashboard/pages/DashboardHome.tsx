@@ -13,6 +13,7 @@ import ReferralActivationChecker from "@/modules/dashboard/components/ReferralAc
 import EstimateDutyPanel from "@/modules/dashboard/components/EstimateDutyPanel";
 import FirstLeadAssistant from "@/modules/dashboard/components/FirstLeadAssistant";
 import BusinessHealthScore from "@/modules/dashboard/components/BusinessHealthScore";
+import AIBusinessCoachWidget from "@/modules/dashboard/components/AIBusinessCoachWidget";
 import AIBusinessAssistant from "@/modules/dashboard/components/AIBusinessAssistant";
 import FirstLeadGuaranteeWidget from "@/modules/dashboard/components/FirstLeadGuaranteeWidget";
 import {
@@ -181,14 +182,14 @@ export default function DashboardHome() {
         <RevenueKPICards />
       </motion.div>
 
-      {/* ── Main Content: Actions + Business Score ── */}
+      {/* ── AI Business Coach ── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         <motion.div
           variants={fadeUp}
           transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
           className="lg:col-span-3"
         >
-          <NextActionsWidget />
+          <AIBusinessCoachWidget />
         </motion.div>
         <motion.div
           variants={fadeUp}
@@ -198,6 +199,14 @@ export default function DashboardHome() {
           <BusinessHealthScore />
         </motion.div>
       </div>
+
+      {/* ── Main Content: Actions ── */}
+      <motion.div
+        variants={fadeUp}
+        transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
+      >
+        <NextActionsWidget />
+      </motion.div>
 
       {/* ── Activity Feed ── */}
       <motion.div
