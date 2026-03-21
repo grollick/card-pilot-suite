@@ -59,37 +59,37 @@ export default function EstimateDutyPanel() {
       }`}
       style={isOnDuty ? {
         boxShadow: `
-          0 0 15px hsl(var(--success) / 0.4),
-          0 0 40px hsl(var(--success) / 0.25),
-          0 0 80px hsl(var(--success) / 0.15),
-          0 0 140px hsl(var(--success) / 0.08)
+          0 0 20px hsl(var(--success) / 0.5),
+          0 0 60px hsl(var(--success) / 0.35),
+          0 0 120px hsl(var(--success) / 0.25),
+          0 0 200px hsl(var(--success) / 0.12)
         `,
       } : undefined}
     >
       {isOnDuty && (
         <>
           {/* Top glow bar */}
-          <div className="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-success via-success/90 to-success/50 rounded-t-xl" />
+          <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-success via-success/90 to-success/50 rounded-t-xl" />
           {/* Full-card pulsing ambient glow */}
           <motion.div
             className="absolute -inset-4 rounded-3xl pointer-events-none"
             style={{
-              background: "radial-gradient(ellipse at center, hsl(var(--success) / 0.18), transparent 70%)",
-              filter: "blur(30px)",
+              background: "radial-gradient(ellipse at center, hsl(var(--success) / 0.25), transparent 70%)",
+              filter: "blur(40px)",
             }}
-            animate={{ opacity: [0.4, 1, 0.4], scale: [0.96, 1.04, 0.96] }}
+            animate={{ opacity: [0.5, 1, 0.5], scale: [0.95, 1.05, 0.95] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           />
           {/* Inner edge glow */}
           <motion.div
             className="absolute inset-0 rounded-xl pointer-events-none"
-            style={{ boxShadow: "inset 0 0 30px hsl(var(--success) / 0.1)" }}
+            style={{ boxShadow: "inset 0 0 40px hsl(var(--success) / 0.15)" }}
             animate={{ opacity: [0.3, 1, 0.3] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           />
           {/* Large blurred corner orbs */}
-          <div className="absolute -top-12 -right-12 h-36 w-36 rounded-full pointer-events-none" style={{ background: "hsl(var(--success) / 0.2)", filter: "blur(50px)" }} />
-          <div className="absolute -bottom-10 -left-10 h-28 w-28 rounded-full pointer-events-none" style={{ background: "hsl(var(--success) / 0.15)", filter: "blur(45px)" }} />
+          <div className="absolute -top-16 -right-16 h-44 w-44 rounded-full pointer-events-none" style={{ background: "hsl(var(--success) / 0.25)", filter: "blur(60px)" }} />
+          <div className="absolute -bottom-14 -left-14 h-36 w-36 rounded-full pointer-events-none" style={{ background: "hsl(var(--success) / 0.2)", filter: "blur(55px)" }} />
         </>
       )}
 
