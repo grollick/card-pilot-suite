@@ -256,7 +256,7 @@ export default function HeroPhoneAnimation() {
                   {/* Cover photo */}
                   <div className="h-24 relative">
                     <div className="absolute inset-0 overflow-hidden">
-                      <img src={persona.coverUrl} alt="Cover" className="h-full w-full object-cover" />
+                      {coverSrc && <img src={coverSrc} alt="Cover" className="h-full w-full object-cover" />}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
                     </div>
                     <div className="absolute -bottom-6 left-4">
