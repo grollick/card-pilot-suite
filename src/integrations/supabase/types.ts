@@ -2551,6 +2551,44 @@ export type Database = {
           },
         ]
       }
+      interview_insights: {
+        Row: {
+          action_status: string
+          category: string
+          created_at: string
+          id: string
+          insight_text: string
+          interview_id: string
+          updated_at: string
+        }
+        Insert: {
+          action_status?: string
+          category: string
+          created_at?: string
+          id?: string
+          insight_text: string
+          interview_id: string
+          updated_at?: string
+        }
+        Update: {
+          action_status?: string
+          category?: string
+          created_at?: string
+          id?: string
+          insight_text?: string
+          interview_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_insights_interview_id_fkey"
+            columns: ["interview_id"]
+            isOneToOne: false
+            referencedRelation: "user_interviews"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoice_line_items: {
         Row: {
           created_at: string
@@ -5068,6 +5106,60 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_interviews: {
+        Row: {
+          answers: Json | null
+          candidate_group: string | null
+          candidate_reason: string | null
+          created_at: string
+          follow_up_status: string | null
+          id: string
+          interview_date: string
+          interviewer_name: string
+          notes: string | null
+          pain_points: string[] | null
+          positive_reactions: string[] | null
+          status: string
+          suggested_improvements: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answers?: Json | null
+          candidate_group?: string | null
+          candidate_reason?: string | null
+          created_at?: string
+          follow_up_status?: string | null
+          id?: string
+          interview_date?: string
+          interviewer_name?: string
+          notes?: string | null
+          pain_points?: string[] | null
+          positive_reactions?: string[] | null
+          status?: string
+          suggested_improvements?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answers?: Json | null
+          candidate_group?: string | null
+          candidate_reason?: string | null
+          created_at?: string
+          follow_up_status?: string | null
+          id?: string
+          interview_date?: string
+          interviewer_name?: string
+          notes?: string | null
+          pain_points?: string[] | null
+          positive_reactions?: string[] | null
+          status?: string
+          suggested_improvements?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
