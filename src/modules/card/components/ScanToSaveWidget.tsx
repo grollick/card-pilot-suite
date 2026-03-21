@@ -36,7 +36,8 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
   const processImage = useCallback(async (base64: string) => {
     setStep("scanning");
     try {
-      const { data, error } = await supabase.functions.invoke("scan-business-card", {
+      // Use the public (no-auth) edge function so unauthenticated visitors can scan
+      const { data, error } = await supabase.functions.invoke("scan-business-card-public", {
         body: { image: base64 },
       });
       if (error) throw error;
