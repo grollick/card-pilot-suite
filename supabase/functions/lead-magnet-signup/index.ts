@@ -137,34 +137,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    // 1. Store lead in leads table with tag
-    const { data: existingLeads } = await supabase
-      .from("leads")
-      .select("id")
-      .eq("email", email)
-      .limit(1);
-
-    let leadId: string;
-
-    if (existingLeads && existingLeads.length > 0) {
-      leadId = existingLeads[0].id;
-      // Update tags
-      const { data: lead } = await supabase
-        .from("leads")
-        .select("tags")
-        .eq("id", leadId)
-        .single();
-      const tags = lead?.tags || [];
-      if (!tags.includes("Lead Magnet Subscriber")) {
-        tags.push("Lead Magnet Subscriber");
-        await supabase.from("leads").update({ tags }).eq("id", leadId);
-      }
-    } else {
-      // We need a user_id for the lead — this is a public landing page lead
-      // We'll skip CRM storage if there's no authenticated user context
-      // Instead, store in a lightweight way
-      leadId = "";
-    }
+    // Note: We intentionally do NOT modify existing CRM leads here.
+    // This is a public unauthenticated endpoint, so we cannot safely scope
+    // lead updates to a specific business owner. The signup is recorded
+    // via the email_send_log for rate limiting purposes.
 
     // 2. Send first email immediately via Resend
     if (RESEND_API_KEY) {
