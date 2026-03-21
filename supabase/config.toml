@@ -1,70 +1,51 @@
 project_id = "yxsnqhuilqdvqrmkjxzf"
 
-[functions.incoming-webhook]
-verify_jwt = false
-
-[functions.run-automations]
-verify_jwt = false
-
-[functions.generate-wallet-pass]
-verify_jwt = false
-
-[functions.generate-card-content]
-verify_jwt = false
-
-[functions.check-idle-leads]
-verify_jwt = false
-
-[functions.qr-redirect]
-verify_jwt = false
-
-[functions.send-email]
-verify_jwt = false
-
-[functions.ai-section-writer]
-verify_jwt = false
-
-[functions.track-card-view]
-verify_jwt = false
-
-[functions.process-followups]
-verify_jwt = false
-
-[functions.job-assistant]
-verify_jwt = false
-
-[functions.ai-onboarding-setup]
-verify_jwt = false
-
-[functions.ai-photo-import]
-verify_jwt = false
-
-[functions.tech-assist]
-verify_jwt = false
-
-[functions.process-revenue-automations]
-verify_jwt = false
-
-[functions.admin-stats]
-verify_jwt = false
-
-[functions.client-auth]
-verify_jwt = false
-
-[functions.estimate-assist]
-verify_jwt = false
-
-[functions.purchase-ai-credits]
-verify_jwt = false
-
-[functions.process-estimate-matches]
-verify_jwt = false
-
-[functions.expire-estimate-matches]
-verify_jwt = false
-
-[functions.process-email-sequences]
-verify_jwt = false
-
-[functions.process-email-queue]
-verify_jwt = true
+[functions]
+  [functions.admin-stats]
+    verify_jwt = false
+  [functions.ai-onboarding-setup]
+    verify_jwt = false
+  [functions.ai-photo-import]
+    verify_jwt = false
+  [functions.ai-section-writer]
+    verify_jwt = false
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.check-idle-leads]
+    verify_jwt = false
+  [functions.client-auth]
+    verify_jwt = false
+  [functions.estimate-assist]
+    verify_jwt = false
+  [functions.expire-estimate-matches]
+    verify_jwt = false
+  [functions.generate-card-content]
+    verify_jwt = false
+  [functions.generate-wallet-pass]
+    verify_jwt = false
+  [functions.incoming-webhook]
+    verify_jwt = false
+  [functions.job-assistant]
+    verify_jwt = false
+  [functions.process-email-queue]
+    verify_jwt = true
+  [functions.process-email-sequences]
+    verify_jwt = false
+  [functions.process-estimate-matches]
+    verify_jwt = false
+  [functions.process-followups]
+    verify_jwt = false
+  [functions.process-revenue-automations]
+    verify_jwt = false
+  [functions.purchase-ai-credits]
+    verify_jwt = false
+  [functions.qr-redirect]
+    verify_jwt = false
+  [functions.run-automations]
+    verify_jwt = false
+  [functions.send-email]
+    verify_jwt = false
+  [functions.tech-assist]
+    verify_jwt = false
+  [functions.track-card-view]
+    verify_jwt = false
