@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useMarketplaceApps, useFeaturedApps, useInstalledApps, useInstallApp, AppCategory, MarketplaceApp } from "@/hooks/useMarketplaceApps";
 import AppCard from "../components/AppCard";
 import AppDetailDialog from "../components/AppDetailDialog";
+import PurchaseAppDialog from "../components/PurchaseAppDialog";
 import InstalledAppsPanel from "../components/InstalledAppsPanel";
 import RequestAppDialog from "../components/RequestAppDialog";
 import { Input } from "@/components/ui/input";
