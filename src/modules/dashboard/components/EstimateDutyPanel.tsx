@@ -88,8 +88,8 @@ export default function EstimateDutyPanel() {
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           />
           {/* Large blurred corner orbs */}
-          <div className="absolute -top-12 -right-12 h-36 w-36 rounded-full pointer-events-none" style={{ background: "hsl(var(--success) / 0.2)", filter: "blur(50px)" }} />
-          <div className="absolute -bottom-10 -left-10 h-28 w-28 rounded-full pointer-events-none" style={{ background: "hsl(var(--success) / 0.15)", filter: "blur(45px)" }} />
+          <div className="absolute -top-16 -right-16 h-44 w-44 rounded-full pointer-events-none" style={{ background: "hsl(var(--success) / 0.25)", filter: "blur(60px)" }} />
+          <div className="absolute -bottom-14 -left-14 h-36 w-36 rounded-full pointer-events-none" style={{ background: "hsl(var(--success) / 0.2)", filter: "blur(55px)" }} />
         </>
       )}
 
