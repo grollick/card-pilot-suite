@@ -10,6 +10,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { OrgProvider } from "@/contexts/OrgContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { useIsAdmin } from "@/hooks/useAdminStats";
 import { Loader2 } from "lucide-react";
 
 // ── Public routes — most eagerly loaded for fast render ──
