@@ -320,14 +320,19 @@ export default function InstantCardGenerator() {
                 </div>
 
                 <div>
-                  <label className="text-sm font-medium text-foreground mb-1.5 block">City <span className="text-muted-foreground font-normal">(optional)</span></label>
+                  <label className="text-sm font-medium text-foreground mb-1.5 block">
+                    Website or Social Link <span className="text-muted-foreground font-normal">(optional)</span>
+                  </label>
                   <Input
-                    placeholder="Austin, TX"
+                    placeholder="https://yourbusiness.com or Instagram link"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     className="h-12 text-base"
-                    maxLength={50}
+                    maxLength={200}
                   />
+                  <p className="text-[11px] text-muted-foreground mt-1">
+                    We'll import your content and images automatically
+                  </p>
                 </div>
               </div>
 
