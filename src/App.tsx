@@ -59,6 +59,7 @@ const DashboardLayout = lazy(() => import("@/components/DashboardLayout"));
 
 // Dashboard
 const DashboardHome = lazy(() => import("@/modules/dashboard/pages/DashboardHome"));
+const LoyaltyPage = lazy(() => import("@/modules/dashboard/pages/LoyaltyPage"));
 
 // Card Builder
 const CardBuilder = lazy(() => import("@/modules/card/pages/CardBuilder"));
