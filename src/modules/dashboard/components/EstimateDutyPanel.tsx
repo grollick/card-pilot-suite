@@ -48,50 +48,50 @@ export default function EstimateDutyPanel() {
   const leadsProgress = leadsMax > 0 ? Math.min((leadsUsed / leadsMax) * 100, 100) : 0;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.1, duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
-      className={`dash-card relative overflow-hidden transition-all duration-500 ${
-        isOnDuty
-          ? "ring-2 ring-success/50 -translate-y-0.5"
-          : ""
-      }`}
-      style={isOnDuty ? {
-        boxShadow: `
-          0 0 20px hsl(var(--success) / 0.5),
-          0 0 60px hsl(var(--success) / 0.35),
-          0 0 120px hsl(var(--success) / 0.25),
-          0 0 200px hsl(var(--success) / 0.12)
-        `,
-      } : undefined}
-    >
+    <div className="relative">
+      {/* Outer pulsing glow — lives OUTSIDE overflow-hidden so it's fully visible */}
       {isOnDuty && (
-        <>
-          {/* Top glow bar */}
-          <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-success via-success/90 to-success/50 rounded-t-xl" />
-          {/* Full-card pulsing ambient glow */}
-          <motion.div
-            className="absolute -inset-4 rounded-3xl pointer-events-none"
-            style={{
-              background: "radial-gradient(ellipse at center, hsl(var(--success) / 0.25), transparent 70%)",
-              filter: "blur(40px)",
-            }}
-            animate={{ opacity: [0.05, 1, 0.05], scale: [0.93, 1.06, 0.93] }}
-            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          />
-          {/* Inner edge glow */}
-          <motion.div
-            className="absolute inset-0 rounded-xl pointer-events-none"
-            style={{ boxShadow: "inset 0 0 40px hsl(var(--success) / 0.15)" }}
-            animate={{ opacity: [0.05, 1, 0.05] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          />
-          {/* Large blurred corner orbs */}
-          <div className="absolute -top-16 -right-16 h-44 w-44 rounded-full pointer-events-none" style={{ background: "hsl(var(--success) / 0.25)", filter: "blur(60px)" }} />
-          <div className="absolute -bottom-14 -left-14 h-36 w-36 rounded-full pointer-events-none" style={{ background: "hsl(var(--success) / 0.2)", filter: "blur(55px)" }} />
-        </>
+        <motion.div
+          className="absolute -inset-8 rounded-3xl pointer-events-none z-0"
+          style={{
+            background: "radial-gradient(ellipse at center, hsl(var(--success) / 0.4), transparent 70%)",
+            filter: "blur(50px)",
+          }}
+          animate={{ opacity: [0.05, 1, 0.05] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+        />
       )}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1, duration: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
+        className={`dash-card relative overflow-hidden transition-all duration-500 z-10 ${
+          isOnDuty
+            ? "ring-2 ring-success/50 -translate-y-0.5"
+            : ""
+        }`}
+        style={isOnDuty ? {
+          boxShadow: `
+            0 0 20px hsl(var(--success) / 0.5),
+            0 0 60px hsl(var(--success) / 0.35),
+            0 0 120px hsl(var(--success) / 0.25),
+            0 0 200px hsl(var(--success) / 0.12)
+          `,
+        } : undefined}
+      >
+        {isOnDuty && (
+          <>
+            {/* Top glow bar */}
+            <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-success via-success/90 to-success/50 rounded-t-xl" />
+            {/* Inner edge glow */}
+            <motion.div
+              className="absolute inset-0 rounded-xl pointer-events-none"
+              style={{ boxShadow: "inset 0 0 50px hsl(var(--success) / 0.2)" }}
+              animate={{ opacity: [0.05, 1, 0.05] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </>
+        )}
 
       <div className="dash-card-header pt-3">
         <div className="flex items-center gap-2.5">
