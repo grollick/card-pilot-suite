@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 // ─── Cold Email Template Data ───
 interface ColdTemplate {
@@ -50,7 +51,7 @@ It takes about 2 minutes to set up and it's completely free to start.
 Would you like me to set one up for you? I can have it ready in minutes.
 
 Best,
-The guzzl.pro Team`,
+{{sender}}`,
     followUp1: `Hi {{name}},
 
 Just following up — I'd love to get your digital business card set up for {{business}}. Local homeowners are actively searching for contractors in your area.
@@ -86,7 +87,7 @@ Most plumbers we work with set it up in under 2 minutes and start getting enquir
 Want me to create yours for you?
 
 Best,
-The guzzl.pro Team`,
+{{sender}}`,
     followUp1: `Hi {{name}},
 
 Quick follow-up — plumbers in your area are already using guzzl.pro to get found by local customers. Would love to help {{business}} do the same.
@@ -120,7 +121,7 @@ It's free to start and takes under 2 minutes. Several electricians in your area 
 Want me to create yours?
 
 Best,
-The guzzl.pro Team`,
+{{sender}}`,
     followUp1: `Hi {{name}},
 
 Just circling back — would love to help {{business}} get set up on guzzl.pro. Electricians using the platform are averaging 3-5 new enquiries per week.
@@ -154,7 +155,7 @@ Your work speaks for itself — this just makes it easier for people to see it a
 Takes 2 minutes to set up. Completely free.
 
 Best,
-The guzzl.pro Team`,
+{{sender}}`,
     followUp1: `Hi {{name}},
 
 Following up on my note about guzzl.pro for {{business}}. The before/after gallery feature is perfect for painters — it's your best sales tool.
@@ -186,7 +187,7 @@ Several agents are already using it to stay connected with buyers and sellers.
 Want me to create yours? It takes under 2 minutes.
 
 Best,
-The guzzl.pro Team`,
+{{sender}}`,
     followUp1: `Hi {{name}},
 
 Quick follow-up — agents using guzzl.pro are capturing leads at open houses with a single tap. Would love to help {{business}} do the same.
@@ -218,7 +219,7 @@ Most stylists set it up in about 2 minutes and start getting bookings the same d
 Want me to help create yours?
 
 Best,
-The guzzl.pro Team`,
+{{sender}}`,
     followUp1: `Hi {{name}},
 
 Just following up — would love to help {{business}} get more bookings with a free digital card. Clients can book you directly — no more back-and-forth DMs.
@@ -250,7 +251,7 @@ It's the easiest way to look professional and get hired — no website needed.
 Takes 2 minutes. Want me to set it up for you?
 
 Best,
-The guzzl.pro Team`,
+{{sender}}`,
     followUp1: `Hi {{name}},
 
 Following up — the portfolio gallery feature on guzzl.pro is perfect for photographers. Would love to help {{business}} showcase your best work and get more bookings.
@@ -282,7 +283,7 @@ Most trainers set it up in 2 minutes and see enquiries within the first week.
 Want me to create yours?
 
 Best,
-The guzzl.pro Team`,
+{{sender}}`,
     followUp1: `Hi {{name}},
 
 Quick follow-up — would love to help {{business}} get more fitness clients with a free digital card. Direct booking, reviews, and local visibility — all in one link.
@@ -314,7 +315,7 @@ It's like having a website and booking system in one — but free and takes 2 mi
 Want me to help create yours?
 
 Best,
-The guzzl.pro Team`,
+{{sender}}`,
     followUp1: `Hi {{name}},
 
 Following up — mechanics using guzzl.pro are getting found by more local car owners. Would love to help {{business}} do the same.
@@ -346,7 +347,7 @@ Most cleaning businesses set up in under 2 minutes and start seeing enquiries qu
 Want me to create yours?
 
 Best,
-The guzzl.pro Team`,
+{{sender}}`,
     followUp1: `Hi {{name}},
 
 Quick follow-up — cleaning businesses using guzzl.pro are filling their schedules with local clients. Would love to help {{business}} do the same.
@@ -374,6 +375,22 @@ export default function ColdOutreachTemplates() {
   const [emailStep, setEmailStep] = useState<"initial" | "followup1" | "followup2">("initial");
   const [searchFilter, setSearchFilter] = useState("");
 
+  // Fetch sender (logged-in user) name
+  const { data: senderName } = useQuery({
+    queryKey: ["sender-profile-name"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return "The guzzl.pro Team";
+      const { data } = await supabase
+        .from("profiles")
+        .select("name")
+        .eq("id", user.id)
+        .maybeSingle();
+      return data?.name || "The guzzl.pro Team";
+    },
+    staleTime: 60_000,
+  });
+
   const filtered = searchFilter
     ? COLD_TEMPLATES.filter(t =>
         t.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
@@ -400,7 +417,8 @@ export default function ColdOutreachTemplates() {
   const personalizeText = (text: string) => {
     return text
       .replace(/{{name}}/g, recipientName || "there")
-      .replace(/{{business}}/g, recipientBusiness || "your business");
+      .replace(/{{business}}/g, recipientBusiness || "your business")
+      .replace(/{{sender}}/g, senderName || "The guzzl.pro Team");
   };
 
   const openSendDialog = (template: ColdTemplate) => {
