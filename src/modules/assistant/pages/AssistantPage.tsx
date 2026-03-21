@@ -281,15 +281,36 @@ function formatResultTitle(text: string): string {
 /* Markdown components now imported from AIResponseRenderer as aiMarkdownComponents */
 const mdComponents = aiMarkdownComponents;
 
+const STORAGE_KEY = "cardpilot-assistant-history";
+
+function loadMessages(): Msg[] {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch { return []; }
+}
+
+function saveMessages(msgs: Msg[]) {
+  try {
+    // Keep last 50 messages to avoid storage bloat
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(msgs.slice(-50)));
+  } catch { /* ignore */ }
+}
+
 export default function AssistantPage() {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<Msg[]>([]);
+  const [messages, setMessages] = useState<Msg[]>(loadMessages);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showTopup, setShowTopup] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Persist messages
+  useEffect(() => {
+    if (messages.length > 0) saveMessages(messages);
+  }, [messages]);
 
   useEffect(() => {
     if (scrollRef.current) {
