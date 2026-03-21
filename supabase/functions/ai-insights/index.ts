@@ -139,7 +139,7 @@ Conversion rate: ${views > 0 ? Math.round(((leadsWeek ?? 0) / views) * 100) : 0}
         }],
         tool_choice: { type: "function", function: { name: "return_insights" } },
         messages: [
-          { role: "system", content: "You are a business growth advisor. Analyze the data and provide 3-5 specific, actionable insights to help this small business grow. Focus on concrete actions they can take today. Be direct and specific — reference actual numbers." },
+          { role: "system", content: "You are a business growth advisor. Analyze the data and provide 3-5 specific, actionable insights to help this small business grow. Focus on concrete actions they can take today. Be direct and specific — reference actual numbers. For each insight, include an action_label (short CTA like 'Fix Now', 'Add Photos', 'Follow Up') and action_route (one of: /app/card, /app/contacts, /app/estimates, /app/invoices, /app/bookings, /app/social, /app/settings)." },
           { role: "user", content: contextStr },
         ],
       }),
