@@ -207,8 +207,9 @@ export default function SettingsPage() {
           </motion.div>
         </TabsContent>
 
-        <TabsContent value="marketplace" className="mt-4">
+        <TabsContent value="marketplace" className="mt-4 space-y-4">
           <MarketplaceSettings profile={profile} />
+          <GoogleBusinessSync />
         </TabsContent>
 
         <TabsContent value="brand" className="mt-4">
