@@ -95,13 +95,14 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
   const metallicGrad = hasMetallicName ? METALLIC_GRADIENTS[metallicEffect!.type as Exclude<import("@/modules/card/components/CardThemeEditor").MetallicType, "none">] : undefined;
 
   const titleStyle: React.CSSProperties = {
-    fontFamily: `'${fonts.primary}', sans-serif`,
-    fontWeight: nameFontWeight ?? header.titleWeight,
+    fontFamily: `'${fonts.nameFont || fonts.primary}', sans-serif`,
+    fontWeight: nameFontWeight ?? fonts.nameFontWeight ?? header.titleWeight,
     color: hasMetallicName ? "transparent" : palette.primary,
     margin: 0,
     lineHeight: nameLineHeight ?? 1.2,
-    letterSpacing: nameLetterSpacing ? `${nameLetterSpacing}px` : undefined,
+    letterSpacing: nameLetterSpacing ? `${nameLetterSpacing}px` : fonts.nameLetterSpacing ? `${fonts.nameLetterSpacing}px` : undefined,
     fontStyle: nameItalic ? "italic" : undefined,
+    textTransform: (fonts.nameTransform && fonts.nameTransform !== "none" ? fonts.nameTransform : undefined) as any,
     ...(nameTextStroke ? { WebkitTextStroke: `${nameTextStrokeWidth}px white`, paintOrder: 'stroke fill' as const } : {}),
     ...(hasMetallicName ? {
       background: metallicGrad,
@@ -112,10 +113,12 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
   };
 
   const subtitleStyle: React.CSSProperties = {
-    fontFamily: `'${fonts.secondary}', sans-serif`,
+    fontFamily: `'${fonts.taglineFont || fonts.secondary}', sans-serif`,
     color: palette.secondary,
-    fontSize: subtitleFontSize ?? 14,
+    fontSize: subtitleFontSize ?? fonts.taglineFontSize ?? 14,
+    fontWeight: fonts.taglineFontWeight ?? undefined,
     fontStyle: subtitleItalic ? "italic" : undefined,
+    letterSpacing: fonts.taglineLetterSpacing ? `${fonts.taglineLetterSpacing}px` : undefined,
     margin: 0,
     marginTop: 4,
   };
