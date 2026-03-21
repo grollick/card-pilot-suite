@@ -37,7 +37,8 @@ export default function DashboardHome() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: profile } = useProfileCache();
-
+  const { data: jobStats } = useJobRequestStats();
+  const hasPendingOpportunity = (jobStats?.newRequests ?? 0) > 0 || (jobStats?.hasGuaranteeMatch ?? false);
   const greeting = (() => {
     const h = new Date().getHours();
     if (h < 12) return "Good morning";
