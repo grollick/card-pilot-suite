@@ -80,6 +80,7 @@ export default function Onboarding() {
   const [estimateSaving, setEstimateSaving] = useState(false);
   const [launched, setLaunched] = useState(false);
   const [estimateCreated, setEstimateCreated] = useState(false);
+  const [socialLinks, setSocialLinks] = useState<{ platform: string; url: string }[]>([]);
 
   // AI state
   const [aiSetup, setAiSetup] = useState<AISetup | null>(null);
