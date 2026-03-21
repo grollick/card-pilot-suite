@@ -22,6 +22,7 @@ interface CardHeaderProps {
   subtitleItalic?: boolean;
   subtitleSpacing?: number | null;
   showCompany?: boolean;
+  companyColor?: string | null;
   profession?: string;
   company?: string;
   avatarUrl?: string | null;
