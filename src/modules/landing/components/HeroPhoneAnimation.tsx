@@ -261,7 +261,7 @@ export default function HeroPhoneAnimation() {
                     </div>
                     <div className="absolute -bottom-6 left-4">
                       <div className="h-12 w-12 rounded-full overflow-hidden ring-[3px] ring-card shadow-lg">
-                        <img src={persona.avatarUrl} alt={persona.name} className="h-full w-full object-cover" />
+                        {avatarSrc && <img src={avatarSrc} alt={persona.name} className="h-full w-full object-cover" />}
                       </div>
                     </div>
                     <div className="absolute top-2 right-3">
