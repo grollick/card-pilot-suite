@@ -110,16 +110,13 @@ export default function DashboardHome() {
       <NextActionsWidget />
 
       {/* ── Main Grid: 2-column layout ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
-        {/* Left Column (3/5) */}
-        <div className="lg:col-span-3 space-y-5">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+        <div className="lg:col-span-3 space-y-4">
           <RevenueOpportunities />
           <MissedOpportunities />
           <DashboardActivityFeed />
         </div>
-
-        {/* Right Column (2/5) */}
-        <div className="lg:col-span-2 space-y-5">
+        <div className="lg:col-span-2 space-y-4">
           <FunnelView />
           {guaranteeData && !guaranteeData.targetMet && (
             <LeadGuaranteeBanner variant="dashboard" guaranteeData={guaranteeData} />
