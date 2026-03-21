@@ -58,12 +58,18 @@ export function useSubmitReview() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (review: Partial<Review> & { user_id: string; reviewer_name: string }) => {
-      const { data, error } = await supabase
-        .from("reviews" as any)
-        .insert({ ...review, is_public: false } as any)
-        .select()
-        .single();
-      if (error) throw error;
+      const { data, error } = await supabase.functions.invoke("submit-review", {
+        body: {
+          user_id: review.user_id,
+          reviewer_name: review.reviewer_name,
+          reviewer_email: review.reviewer_email || null,
+          rating: review.rating ?? 5,
+          review_text: review.review_text || null,
+          lead_id: review.lead_id || null,
+          source: review.source || "card_page",
+        },
+      });
+      if (error || data?.error) throw error || new Error(data.error);
       return data as unknown as Review;
     },
     onSuccess: (data) => {
