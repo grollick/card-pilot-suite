@@ -77,8 +77,8 @@ export default function EstimateDutyPanel() {
               background: "radial-gradient(ellipse at center, hsl(var(--success) / 0.18), transparent 70%)",
               filter: "blur(30px)",
             }}
-            animate={{ opacity: [0.5, 1, 0.5], scale: [0.97, 1.03, 0.97] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ opacity: [0.4, 1, 0.4], scale: [0.96, 1.04, 0.96] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           />
           {/* Inner edge glow */}
           <motion.div
