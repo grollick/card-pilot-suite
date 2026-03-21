@@ -59,10 +59,10 @@ export default function EstimateDutyPanel() {
       }`}
       style={isOnDuty ? {
         boxShadow: `
-          0 0 15px hsl(var(--success) / 0.4),
-          0 0 40px hsl(var(--success) / 0.25),
-          0 0 80px hsl(var(--success) / 0.15),
-          0 0 140px hsl(var(--success) / 0.08)
+          0 0 20px hsl(var(--success) / 0.5),
+          0 0 60px hsl(var(--success) / 0.35),
+          0 0 120px hsl(var(--success) / 0.25),
+          0 0 200px hsl(var(--success) / 0.12)
         `,
       } : undefined}
     >
