@@ -72,6 +72,7 @@ export default function CardBuilderIdentity({
   subtitleItalic, setSubtitleItalic,
   subtitleSpacing, setSubtitleSpacing,
   showCompany, setShowCompany,
+  companyColor, setCompanyColor,
   nameLineHeight, setNameLineHeight,
   nameTextStroke, setNameTextStroke,
   nameTextStrokeWidth, setNameTextStrokeWidth,
