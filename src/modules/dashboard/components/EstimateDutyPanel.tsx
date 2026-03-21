@@ -87,10 +87,12 @@ export default function EstimateDutyPanel() {
             <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-success via-success/90 to-success/50 rounded-t-xl" />
             {/* Inner edge glow */}
             <motion.div
+              key="inner-glow"
               className="absolute inset-0 rounded-xl pointer-events-none"
               style={{ boxShadow: "inset 0 0 50px hsl(var(--success) / 0.2)" }}
+              initial={{ opacity: 0 }}
               animate={{ opacity: [0, 1, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", repeatType: "loop" }}
             />
           </>
         )}
