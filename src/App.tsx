@@ -91,6 +91,7 @@ const RecurringPlanDetailPage = lazy(() => import("@/modules/recurring/pages/Rec
 
 // Marketing
 const EmailMarketing = lazy(() => import("@/modules/marketing/pages/EmailMarketing"));
+const EmailDashboardPage = lazy(() => import("@/modules/marketing/pages/EmailDashboardPage"));
 const SocialScheduler = lazy(() => import("@/modules/marketing/pages/SocialScheduler"));
 const PostDesigner = lazy(() => import("@/modules/marketing/pages/PostDesigner"));
 const ContentPage = lazy(() => import("@/modules/marketing/pages/ContentPage"));
@@ -248,6 +249,7 @@ const App = () => (
               <Route path="scan-card" element={<LazyRoute><ScanBusinessCard /></LazyRoute>} />
               <Route path="bookings" element={<LazyRoute><BookingManager /></LazyRoute>} />
               <Route path="email" element={<LazyRoute><EmailMarketing /></LazyRoute>} />
+              <Route path="email-dashboard" element={<LazyRoute><EmailDashboardPage /></LazyRoute>} />
               <Route path="social" element={<LazyRoute><SocialScheduler /></LazyRoute>} />
               <Route path="post-designer" element={<LazyRoute><PostDesigner /></LazyRoute>} />
               <Route path="content" element={<LazyRoute><ContentPage /></LazyRoute>} />
