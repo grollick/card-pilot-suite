@@ -165,6 +165,15 @@ serve(async (req) => {
   }
 });
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 async function hashIP(ip: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(ip + "guzzl-pro-salt");
@@ -236,15 +245,15 @@ async function sendViewNotification(
       subject,
       html: `
         <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#ffffff;">
-          <h2 style="color:#4361ee;margin:0 0 16px;">${headline}</h2>
+          <h2 style="color:#4361ee;margin:0 0 16px;">${escapeHtml(headline)}</h2>
           ${returningBanner}
-          <p style="color:#374151;margin:0 0 20px;">Hey ${profile.name || "there"}, someone just visited your digital card.</p>
+          <p style="color:#374151;margin:0 0 20px;">Hey ${escapeHtml(profile.name || "there")}, someone just visited your digital card.</p>
           <table style="width:100%;border-collapse:collapse;background:#f9fafb;border-radius:8px;overflow:hidden;">
-            <tr><td style="padding:12px 16px;color:#6b7280;font-size:13px;">Device</td><td style="padding:12px 16px;color:#111827;font-weight:600;font-size:13px;">${meta.device_type} · ${meta.os}</td></tr>
-            <tr><td style="padding:12px 16px;color:#6b7280;font-size:13px;">Browser</td><td style="padding:12px 16px;color:#111827;font-weight:600;font-size:13px;">${meta.browser}</td></tr>
-            <tr><td style="padding:12px 16px;color:#6b7280;font-size:13px;">Location</td><td style="padding:12px 16px;color:#111827;font-weight:600;font-size:13px;">${location}</td></tr>
+            <tr><td style="padding:12px 16px;color:#6b7280;font-size:13px;">Device</td><td style="padding:12px 16px;color:#111827;font-weight:600;font-size:13px;">${escapeHtml(String(meta.device_type))} · ${escapeHtml(String(meta.os))}</td></tr>
+            <tr><td style="padding:12px 16px;color:#6b7280;font-size:13px;">Browser</td><td style="padding:12px 16px;color:#111827;font-weight:600;font-size:13px;">${escapeHtml(String(meta.browser))}</td></tr>
+            <tr><td style="padding:12px 16px;color:#6b7280;font-size:13px;">Location</td><td style="padding:12px 16px;color:#111827;font-weight:600;font-size:13px;">${escapeHtml(location)}</td></tr>
             <tr><td style="padding:12px 16px;color:#6b7280;font-size:13px;">Time</td><td style="padding:12px 16px;color:#111827;font-weight:600;font-size:13px;">${new Date().toLocaleString("en-US", { timeZone: "UTC" })} UTC</td></tr>
-            ${meta.referrer ? `<tr><td style="padding:12px 16px;color:#6b7280;font-size:13px;">Source</td><td style="padding:12px 16px;color:#111827;font-weight:600;font-size:13px;">${meta.referrer}</td></tr>` : ""}
+            ${meta.referrer ? `<tr><td style="padding:12px 16px;color:#6b7280;font-size:13px;">Source</td><td style="padding:12px 16px;color:#111827;font-weight:600;font-size:13px;">${escapeHtml(String(meta.referrer).slice(0, 500))}</td></tr>` : ""}
           </table>
           <a href="https://guzzl-pro.com/app/viewers" style="display:inline-block;padding:12px 24px;background:#4361ee;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;margin-top:20px;">View All Visitors</a>
           <p style="color:#9ca3af;font-size:11px;margin:24px 0 0;">guzzl.pro — Your digital business card platform</p>
