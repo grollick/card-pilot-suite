@@ -361,7 +361,7 @@ export default function Onboarding() {
           ? `Sent to ${data.clientName}`
           : "You can send it from the Estimates page",
       });
-      setStep(6); // Go to sharing
+      setStep(7); // Go to sharing
     } catch (err: any) {
       console.error("Estimate error:", err);
       toast({ title: "Error creating estimate", description: err.message, variant: "destructive" });
