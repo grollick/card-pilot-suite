@@ -105,13 +105,14 @@ export default function CardBuilderHeader({
             <>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg" asChild>
+                  <Button size="sm" className="h-8 gap-1.5 rounded-lg text-[11px] font-semibold bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 shadow-sm" asChild>
                     <a href={`/${handle}`} target="_blank" rel="noreferrer">
                       <Eye className="h-3.5 w-3.5" />
+                      <span className="hidden sm:inline">Preview</span>
                     </a>
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom">Preview</TooltipContent>
+                <TooltipContent side="bottom">Preview your live card</TooltipContent>
               </Tooltip>
 
               <Tooltip>
