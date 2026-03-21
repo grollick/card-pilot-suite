@@ -293,11 +293,11 @@ const App = () => (
               <Route path="agency" element={<LazyRoute><AgencyDashboard /></LazyRoute>} />
               <Route path="marketplace" element={<LazyRoute><MarketplacePage /></LazyRoute>} />
               <Route path="admin" element={<LazyRoute><AdminPage /></LazyRoute>} />
-              <Route path="platform-admin" element={<LazyRoute><PlatformAdminDashboard /></LazyRoute>} />
-              <Route path="admin-marketing" element={<LazyRoute><AdminMarketingDashboard /></LazyRoute>} />
-              <Route path="landing-pages" element={<LazyRoute><LandingPageManager /></LazyRoute>} />
+              <Route path="platform-admin" element={<AdminRoute><LazyRoute><PlatformAdminDashboard /></LazyRoute></AdminRoute>} />
+              <Route path="admin-marketing" element={<AdminRoute><LazyRoute><AdminMarketingDashboard /></LazyRoute></AdminRoute>} />
+              <Route path="landing-pages" element={<AdminRoute><LazyRoute><LandingPageManager /></LazyRoute></AdminRoute>} />
               <Route path="page-builder" element={<LazyRoute><UserPageBuilder /></LazyRoute>} />
-              <Route path="sales-crm" element={<LazyRoute><SalesCrmPage /></LazyRoute>} />
+              <Route path="sales-crm" element={<AdminRoute><LazyRoute><SalesCrmPage /></LazyRoute></AdminRoute>} />
               <Route path="team-management" element={<LazyRoute><TeamManagementPage /></LazyRoute>} />
               <Route path="tech-dashboard" element={<LazyRoute><TechDashboardPage /></LazyRoute>} />
               <Route path="lead-routing" element={<LazyRoute><LeadRoutingPage /></LazyRoute>} />
