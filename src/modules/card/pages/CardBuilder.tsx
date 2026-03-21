@@ -418,7 +418,7 @@ export default function CardBuilder() {
     firstNameFontWeight: s.firstNameFontWeight, nameItalic: s.nameItalic,
     nameFontSize: s.nameFontSize, subtitleFontSize: s.subtitleFontSize,
     subtitleItalic: s.subtitleItalic, subtitleSpacing: s.subtitleSpacing,
-    showCompany: s.showCompany, nameLineHeight: s.nameLineHeight,
+    showCompany: s.showCompany, companyColor: s.companyColor, nameLineHeight: s.nameLineHeight,
     nameTextStroke: s.nameTextStroke, nameTextStrokeWidth: s.nameTextStrokeWidth,
     onAvatarChange: s.handleAvatarChange, setEditingSection: s.setEditingSection,
     identityPosition: s.identityPosition,
@@ -537,6 +537,7 @@ export default function CardBuilder() {
             subtitleItalic={s.subtitleItalic} setSubtitleItalic={s.setSubtitleItalic}
             subtitleSpacing={s.subtitleSpacing} setSubtitleSpacing={s.setSubtitleSpacing}
             showCompany={s.showCompany} setShowCompany={s.setShowCompany}
+            companyColor={s.companyColor} setCompanyColor={s.setCompanyColor}
             nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
             nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
             nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}
@@ -880,6 +881,7 @@ export default function CardBuilder() {
                   subtitleItalic={s.subtitleItalic} setSubtitleItalic={s.setSubtitleItalic}
                   subtitleSpacing={s.subtitleSpacing} setSubtitleSpacing={s.setSubtitleSpacing}
                   showCompany={s.showCompany} setShowCompany={s.setShowCompany}
+                  companyColor={s.companyColor} setCompanyColor={s.setCompanyColor}
                   nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
                   nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
                   nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}

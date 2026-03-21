@@ -42,6 +42,7 @@ interface Props {
   subtitleItalic?: boolean;
   subtitleSpacing?: number | null;
   showCompany?: boolean;
+  companyColor?: string | null;
   nameLineHeight?: number | null;
   nameTextStroke?: boolean;
   nameTextStrokeWidth?: number;
@@ -123,7 +124,7 @@ export default function CardBuilderPreview({
   coverUrl, coverOffsetY, avatarUrl, avatarBgColor, avatarRotation,
   logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap = 8, logoVerticalAlign = "center",
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
-  boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, subtitleItalic, subtitleSpacing, showCompany = true, nameLineHeight, nameTextStroke, nameTextStrokeWidth, onAvatarChange, setEditingSection,
+  boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, subtitleItalic, subtitleSpacing, showCompany = true, companyColor, nameLineHeight, nameTextStroke, nameTextStrokeWidth, onAvatarChange, setEditingSection,
   identityPosition, onIdentityPositionChange,
   logoCustomPosition, onLogoCustomPositionChange,
   previewDevice: externalDevice, hideToolbar,
@@ -421,7 +422,7 @@ export default function CardBuilderPreview({
                       </div>
                       <p style={{ color: `${previewTheme.palette.secondary}99`, fontSize: subtitleFontSize ?? 14, fontStyle: subtitleItalic ? "italic" : undefined }}>{displayJobTitle}</p>
                       {showCompany && (editCompany ?? profile?.company) && (
-                        <p className="text-xs" style={{ color: `${previewTheme.palette.secondary}70`, marginTop: subtitleSpacing ?? 2 }}>{editCompany ?? profile?.company}</p>
+                        <p className="text-xs" style={{ color: companyColor || `${previewTheme.palette.secondary}70`, marginTop: subtitleSpacing ?? 2 }}>{editCompany ?? profile?.company}</p>
                       )}
                     </div>
 

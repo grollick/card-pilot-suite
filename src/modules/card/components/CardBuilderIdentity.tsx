@@ -36,6 +36,8 @@ interface Props {
   setSubtitleSpacing: (v: number | null) => void;
   showCompany: boolean;
   setShowCompany: (v: boolean) => void;
+  companyColor: string | null;
+  setCompanyColor: (v: string | null) => void;
   nameLineHeight: number | null;
   setNameLineHeight: (v: number | null) => void;
   nameTextStroke: boolean;
@@ -70,6 +72,7 @@ export default function CardBuilderIdentity({
   subtitleItalic, setSubtitleItalic,
   subtitleSpacing, setSubtitleSpacing,
   showCompany, setShowCompany,
+  companyColor, setCompanyColor,
   nameLineHeight, setNameLineHeight,
   nameTextStroke, setNameTextStroke,
   nameTextStrokeWidth, setNameTextStrokeWidth,
@@ -323,7 +326,28 @@ export default function CardBuilderIdentity({
           </div>
         </div>
         {showCompany && (
-          <Input value={editCompany ?? profile?.company ?? ""} onChange={makeHandler("company", "company", setEditCompany)} placeholder="Your Company" className="text-sm" />
+          <>
+            <Input value={editCompany ?? profile?.company ?? ""} onChange={makeHandler("company", "company", setEditCompany)} placeholder="Your Company" className="text-sm" />
+            <div className="flex items-center justify-between mt-1">
+              <label className="text-[11px] text-muted-foreground">Company color</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={companyColor || "#888888"}
+                  onChange={(e) => { setCompanyColor(e.target.value); saveThemeField({ company_color: e.target.value }); }}
+                  className="w-6 h-6 rounded border border-border cursor-pointer p-0"
+                  style={{ WebkitAppearance: "none", appearance: "none", background: "none" }}
+                />
+                {companyColor && (
+                  <button
+                    type="button"
+                    onClick={() => { setCompanyColor(null); saveThemeField({ company_color: null }); }}
+                    className="text-[10px] text-primary hover:underline"
+                  >Reset</button>
+                )}
+              </div>
+            </div>
+          </>
         )}
       </div>
       <div className="space-y-2">

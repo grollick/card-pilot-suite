@@ -653,6 +653,7 @@ export default function PublicCard() {
                 subtitleItalic={themeJson.subtitle_italic === true}
                 subtitleSpacing={typeof themeJson.subtitle_spacing === "number" ? themeJson.subtitle_spacing : null}
                 showCompany={themeJson.show_company !== false}
+                companyColor={typeof themeJson.company_color === "string" ? themeJson.company_color : null}
                 nameLineHeight={typeof themeJson.name_line_height === "number" ? themeJson.name_line_height : null}
                 nameTextStroke={themeJson.name_text_stroke === true}
                 nameTextStrokeWidth={typeof themeJson.name_text_stroke_width === "number" ? (themeJson.name_text_stroke_width as number) : 1}
