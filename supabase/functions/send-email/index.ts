@@ -60,6 +60,7 @@ serve(async (req) => {
     }
 
     const userId = claimsData?.claims?.sub;
+    const isServiceRole = !userId && token === Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
     const body: EmailRequest = await req.json();
     const { to, subject, html, from, reply_to, email_type, lead_id } = body;
@@ -70,6 +71,51 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // ── Recipient validation: non-service-role callers can only email their own leads ──
+    if (!isServiceRole && userId) {
+      const recipients = Array.isArray(to) ? to : [to];
+      const svcClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+      
+      for (const recipient of recipients) {
+        const { data: lead } = await svcClient
+          .from("leads")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("email", recipient)
+          .limit(1)
+          .maybeSingle();
+        
+        if (!lead) {
+          return new Response(
+            JSON.stringify({ error: "Recipient not found in your contacts" }),
+            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+      }
+
+      // ── Rate limit: max 50 emails per hour per user ──
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const { count } = await svcClient
+        .from("email_send_log")
+        .select("id", { count: "exact", head: true })
+        .gte("created_at", oneHourAgo)
+        .eq("status", "sent")
+        .like("metadata->>user_id", userId);
+      
+      if ((count ?? 0) >= 50) {
+        return new Response(
+          JSON.stringify({ error: "Hourly email limit reached. Please try again later." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // ── HTML sanitization: strip dangerous tags/attributes ──
+    const sanitizedHtml = html
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+      .replace(/\bon\w+\s*=\s*["'][^"']*["']/gi, "")
+      .replace(/javascript\s*:/gi, "");
 
     // Send via Resend
     const resendRes = await fetch("https://api.resend.com/emails", {
