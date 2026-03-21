@@ -84,7 +84,7 @@ export default function EstimateDutyPanel() {
           <motion.div
             className="absolute inset-0 rounded-xl pointer-events-none"
             style={{ boxShadow: "inset 0 0 40px hsl(var(--success) / 0.15)" }}
-            animate={{ opacity: [0.3, 1, 0.3] }}
+            animate={{ opacity: [0.05, 1, 0.05] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           />
           {/* Large blurred corner orbs */}
