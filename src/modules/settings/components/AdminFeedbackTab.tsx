@@ -24,6 +24,7 @@ import {
   type FeedbackType,
   type FeedbackStatus,
 } from "@/hooks/useBetaFeedback";
+import { supabase } from "@/integrations/supabase/client";
 
 const TYPE_CONFIG: Record<FeedbackType, { icon: React.ReactNode; label: string; color: string }> = {
   bug: { icon: <Bug className="h-3 w-3" />, label: "Bug", color: "text-destructive" },
