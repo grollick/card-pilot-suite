@@ -7,6 +7,7 @@ import type { Json } from "@/integrations/supabase/types";
 export const CTA_TYPES = [
   { value: "call", label: "Call", icon: "Phone" },
   { value: "text", label: "Text", icon: "MessageSquare" },
+  { value: "whatsapp", label: "WhatsApp", icon: "MessageCircle" },
   { value: "email", label: "Email", icon: "Mail" },
   { value: "book", label: "Book", icon: "Calendar" },
   { value: "quote", label: "Get Quote", icon: "FileText" },
