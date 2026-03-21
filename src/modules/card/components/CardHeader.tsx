@@ -384,7 +384,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
               {logoPosition === "beside-name-right" && inlineLogoEl}
             </motion.div>
             {profession && <motion.p style={subtitleStyle} {...heroEntrance(0.25)}>{profession}</motion.p>}
-            {showCompany && company && <motion.p style={{ ...subtitleStyle, fontSize: 13, opacity: 0.7, marginTop: subtitleSpacing ?? 4 }} {...heroEntrance(0.3)}>{company}</motion.p>}
+            {showCompany && company && <motion.p style={{ ...subtitleStyle, fontSize: 13, opacity: companyColor ? 1 : 0.7, color: companyColor || undefined, marginTop: subtitleSpacing ?? 4 }} {...heroEntrance(0.3)}>{company}</motion.p>}
           </div>
         </div>
       );
