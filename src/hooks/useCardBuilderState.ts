@@ -132,6 +132,7 @@ export function useCardBuilderState() {
       if (typeof t?.name_line_height === "number") setNameLineHeight(t.name_line_height);
       if (typeof t?.name_text_stroke === "boolean") setNameTextStroke(t.name_text_stroke);
       if (typeof t?.name_text_stroke_width === "number") setNameTextStrokeWidth(t.name_text_stroke_width);
+      if (typeof t?.company_color === "string") setCompanyColor(t.company_color);
       if (typeof t?.section_icons === "boolean") setShowSectionIcons(t.section_icons);
       if (typeof t?.cta_icons_only === "boolean") setCtaIconsOnly(t.cta_icons_only);
       if (typeof t?.social_icons_only === "boolean") setSocialIconsOnly(t.social_icons_only);
