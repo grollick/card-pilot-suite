@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Rocket, ArrowRight, Zap, Users, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import OnboardingStepWrapper from "./OnboardingStepWrapper";
+import SuccessStoryBanner from "@/components/SuccessStoryBanner";
 
 interface Props {
   onStart: () => void;
