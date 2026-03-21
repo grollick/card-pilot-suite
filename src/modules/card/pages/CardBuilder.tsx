@@ -537,6 +537,7 @@ export default function CardBuilder() {
             subtitleItalic={s.subtitleItalic} setSubtitleItalic={s.setSubtitleItalic}
             subtitleSpacing={s.subtitleSpacing} setSubtitleSpacing={s.setSubtitleSpacing}
             showCompany={s.showCompany} setShowCompany={s.setShowCompany}
+            companyColor={s.companyColor} setCompanyColor={s.setCompanyColor}
             nameLineHeight={s.nameLineHeight} setNameLineHeight={s.setNameLineHeight}
             nameTextStroke={s.nameTextStroke} setNameTextStroke={s.setNameTextStroke}
             nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}
