@@ -41,6 +41,11 @@ export interface SectionContent {
   calcHeading?: string;
   calcPresetId?: string;
   calcDisclaimer?: string;
+  // Video Introduction
+  videoUrl?: string;
+  videoHeading?: string;
+  videoCaption?: string;
+  videoAutoplay?: boolean;
 }
 
 interface SectionEditorProps {
