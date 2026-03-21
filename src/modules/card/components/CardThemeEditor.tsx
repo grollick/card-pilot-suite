@@ -128,6 +128,35 @@ const FONT_OPTIONS = [
   "Inter", "DM Sans", "DM Serif Display", "Playfair Display", "Poppins",
   "Montserrat", "Lora", "Space Grotesk", "Sora", "Outfit", "Raleway",
   "Crimson Pro", "Libre Baskerville", "Josefin Sans", "Bebas Neue",
+  "Roboto", "Open Sans", "Lato", "Oswald", "Merriweather", "Nunito",
+  "Rubik", "Work Sans", "Barlow", "Karla", "Manrope", "Bitter",
+  "Cormorant Garamond", "Abril Fatface", "Righteous", "Pacifico",
+  "Caveat", "Archivo", "Plus Jakarta Sans", "Bricolage Grotesque",
+  "Instrument Serif", "Lexend", "Figtree", "Geist",
+];
+
+const FONT_CATEGORIES: { label: string; fonts: string[] }[] = [
+  { label: "Sans Serif", fonts: ["Inter", "DM Sans", "Poppins", "Montserrat", "Outfit", "Raleway", "Space Grotesk", "Sora", "Josefin Sans", "Roboto", "Open Sans", "Lato", "Nunito", "Rubik", "Work Sans", "Barlow", "Karla", "Manrope", "Archivo", "Plus Jakarta Sans", "Bricolage Grotesque", "Lexend", "Figtree", "Geist"] },
+  { label: "Serif", fonts: ["DM Serif Display", "Playfair Display", "Lora", "Crimson Pro", "Libre Baskerville", "Merriweather", "Bitter", "Cormorant Garamond", "Instrument Serif"] },
+  { label: "Display", fonts: ["Bebas Neue", "Oswald", "Abril Fatface", "Righteous"] },
+  { label: "Handwritten", fonts: ["Pacifico", "Caveat"] },
+];
+
+const FONT_WEIGHT_OPTIONS = [
+  { label: "Light", value: 300 },
+  { label: "Regular", value: 400 },
+  { label: "Medium", value: 500 },
+  { label: "Semi Bold", value: 600 },
+  { label: "Bold", value: 700 },
+  { label: "Extra Bold", value: 800 },
+  { label: "Black", value: 900 },
+];
+
+const TEXT_TRANSFORM_OPTIONS = [
+  { label: "None", value: "none" },
+  { label: "UPPERCASE", value: "uppercase" },
+  { label: "lowercase", value: "lowercase" },
+  { label: "Capitalize", value: "capitalize" },
 ];
 
 function getPatternSvg(type: BgPatternType, color: string): string {
