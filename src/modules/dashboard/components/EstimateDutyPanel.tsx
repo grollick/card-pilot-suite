@@ -40,13 +40,19 @@ export default function EstimateDutyPanel() {
   const [showSettings, setShowSettings] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showMatches, setShowMatches] = useState(false);
+  const [showGoLive, setShowGoLive] = useState(false);
 
   const isFreePlan = planKey === "starter";
   const isProPlus = planKey === "pro" || planKey === "agency";
 
   const handleToggle = (on: boolean, settings?: any) => {
-    toggleDuty.mutate({ is_on_duty: on, ...settings });
+    toggleDuty.mutate(
+      { is_on_duty: on, ...settings },
+      { onSuccess: (data) => { if (data?.is_on_duty) setShowGoLive(true); } }
+    );
   };
+
+  const handleGoLiveComplete = useCallback(() => setShowGoLive(false), []);
 
   if (isLoading) {
     return <Skeleton className="h-32 w-full rounded-xl" />;
