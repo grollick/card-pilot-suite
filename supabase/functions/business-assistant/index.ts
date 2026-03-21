@@ -58,10 +58,19 @@ You can include multiple action tags. Only include relevant ones. Never explain 
 
 When the user says "Yes, do this for me" or similar, provide the content again with the appropriate action tags so they can apply it. Be encouraging and confirm what you'll help them with.`;
 
+    const personalityInstructions: Record<string, string> = {
+      copilot: "Be concise and action-oriented. Give inline suggestions, short tips, and quick fixes. Keep responses under 3 paragraphs. Use bullet points.",
+      chatgpt: "Be thorough and conversational. Provide detailed explanations, multiple options, and examples. Use markdown formatting extensively.",
+      coach: "Be proactive and motivational. Frame everything as actionable growth advice. Use numbered steps, priorities, and daily action items. Encourage the user.",
+      minimal: "Be extremely brief. Use short sentences, no fluff. Only answer what was asked. Max 2-3 sentences unless more detail is explicitly requested.",
+    };
+
+    const toneInstruction = personalityInstructions[personality] || personalityInstructions.copilot;
+
     const systemPrompts: Record<string, string> = {
-      chat: `You are a helpful business assistant for ${userName}, a ${profession} using CardPilot (a digital business card and CRM platform). Help with content creation, business tips, customer messaging, and marketing ideas. Keep answers concise, actionable, and tailored to their trade. Use markdown for formatting.${actionInstructions}`,
-      template: `You are a content template generator for ${userName}, a ${profession}. Generate professional, ready-to-use templates when asked. Include placeholders like [Customer Name], [Service], etc. Format with markdown. Provide 2-3 variations when possible.${actionInstructions}`,
-      tips: `You are a business growth advisor for ${userName}, a ${profession}. Provide specific, actionable tips for growing their business, getting more customers, and improving their online presence. Keep tips brief and numbered. Focus on practical advice they can implement today.${actionInstructions}`,
+      chat: `You are a helpful business assistant for ${userName}, a ${profession} using CardPilot (a digital business card and CRM platform). ${toneInstruction} Help with content creation, business tips, customer messaging, and marketing ideas. Use markdown for formatting.${actionInstructions}`,
+      template: `You are a content template generator for ${userName}, a ${profession}. ${toneInstruction} Generate professional, ready-to-use templates when asked. Include placeholders like [Customer Name], [Service], etc. Format with markdown. Provide 2-3 variations when possible.${actionInstructions}`,
+      tips: `You are a business growth advisor for ${userName}, a ${profession}. ${toneInstruction} Provide specific, actionable tips for growing their business, getting more customers, and improving their online presence. Focus on practical advice they can implement today.${actionInstructions}`,
     };
 
     const systemPrompt = systemPrompts[mode] || systemPrompts.chat;
