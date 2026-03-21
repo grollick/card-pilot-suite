@@ -202,7 +202,7 @@ export default function PublicCard() {
     const mergedTokens = themeJson.fonts
       ? { ...tokens, fontPrimary: themeJson.fonts.primary, fontSecondary: themeJson.fonts.secondary }
       : tokens;
-    return getGoogleFontsUrl(mergedTokens);
+    return getGoogleFontsUrl(mergedTokens, themeJson.fonts);
   }, [data?.stylePack, data?.card?.theme_json]);
 
   useEffect(() => {
