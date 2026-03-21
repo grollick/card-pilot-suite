@@ -17,6 +17,7 @@ import {
   CalendarCheck, MessageSquareText, CheckCircle2, Sparkles, ChevronRight, ShieldCheck,
   ArrowRight, Navigation, StarIcon, Send,
 } from "lucide-react";
+import { LiveAvailabilityCounter } from "@/components/activity/LiveActivityIndicators";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
