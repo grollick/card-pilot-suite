@@ -62,7 +62,7 @@ export default function DashboardHome() {
       {isMobile && <MobileJobDashboard />}
 
       {/* ── Contextual banners (grouped to avoid empty gaps) ── */}
-      <div className="flex flex-col gap-4 empty:hidden [&:not(:has(>*))]:hidden">
+      <div className="flex flex-col gap-3 empty:hidden [&:not(:has(>*))]:hidden">
         <YouAreLiveBanner />
         <FirstLeadCelebration />
         <MilestoneCelebrationListener />
