@@ -313,7 +313,14 @@ export default function ContactsPage() {
                           {contact.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-medium text-sm truncate">{contact.name}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="font-medium text-sm truncate">{contact.name}</p>
+                            {scoreMap.has(contact.id) ? (
+                              <LeadScoreBadge score={scoreMap.get(contact.id)!} compact />
+                            ) : scoresLoading ? (
+                              <LeadScoreLoading />
+                            ) : null}
+                          </div>
                           {contact.company && <p className="text-xs text-muted-foreground truncate">{contact.company}</p>}
                         </div>
                       </div>
