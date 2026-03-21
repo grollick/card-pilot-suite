@@ -12,6 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import ResearchSummaryWidget from "@/modules/admin/components/ResearchSummaryWidget";
 import ColdOutreachTemplates from "@/modules/admin/components/ColdOutreachTemplates";
+import SuccessStoriesManager from "@/modules/admin/components/SuccessStoriesManager";
 import FunnelHealthMonitor from "@/modules/admin/components/FunnelHealthMonitor";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -470,6 +471,9 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
           </Button>
         ))}
       </div>
+
+      {/* ── Success Stories ── */}
+      <SuccessStoriesManager />
     </div>
   );
 }

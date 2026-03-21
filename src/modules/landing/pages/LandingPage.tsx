@@ -40,6 +40,7 @@ import { Button } from "@/components/ui/button";
 import FooterSection from "@/modules/landing/components/FooterSection";
 import HeroPhoneAnimation from "@/modules/landing/components/HeroPhoneAnimation";
 import { DEMO_CARDS } from "@/lib/demoCards";
+import SuccessStoryBanner from "@/components/SuccessStoryBanner";
 
 /* ── animations ── */
 const fade = {
@@ -567,6 +568,13 @@ export default function LandingPage() {
               </motion.div>
             ))}
           </motion.div>
+        </div>
+      </section>
+
+      {/* ─── SUCCESS STORIES ─── */}
+      <section className="py-10 md:py-14">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <SuccessStoryBanner location="landing" />
         </div>
       </section>
 

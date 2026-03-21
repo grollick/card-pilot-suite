@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Rocket, ArrowRight, Zap, Users, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import OnboardingStepWrapper from "./OnboardingStepWrapper";
+import SuccessStoryBanner from "@/components/SuccessStoryBanner";
 
 interface Props {
   onStart: () => void;
@@ -79,16 +80,18 @@ export default function StepWelcome({ onStart, onInstant }: Props) {
         </p>
       </motion.div>
 
+      {/* Success story */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="pt-2">
+        <SuccessStoryBanner location="onboarding" compact />
+      </motion.div>
+
       {/* Trust signals */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-        className="space-y-1.5 pt-2"
+        transition={{ delay: 1.2 }}
+        className="space-y-1.5"
       >
-        <p className="text-[11px] text-muted-foreground/70">
-          Local professionals are already getting leads
-        </p>
         <p className="text-[11px] text-muted-foreground/70">
           You can edit everything anytime · No credit card required
         </p>

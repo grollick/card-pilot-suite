@@ -5050,6 +5050,54 @@ export type Database = {
         }
         Relationships: []
       }
+      success_stories: {
+        Row: {
+          business_type: string
+          created_at: string
+          display_locations: string[] | null
+          id: string
+          is_active: boolean | null
+          is_featured: boolean | null
+          metric_label: string | null
+          metric_value: string | null
+          quote: string | null
+          result_text: string
+          timeframe: string
+          updated_at: string
+          user_name: string
+        }
+        Insert: {
+          business_type: string
+          created_at?: string
+          display_locations?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          metric_label?: string | null
+          metric_value?: string | null
+          quote?: string | null
+          result_text: string
+          timeframe?: string
+          updated_at?: string
+          user_name: string
+        }
+        Update: {
+          business_type?: string
+          created_at?: string
+          display_locations?: string[] | null
+          id?: string
+          is_active?: boolean | null
+          is_featured?: boolean | null
+          metric_label?: string | null
+          metric_value?: string | null
+          quote?: string | null
+          result_text?: string
+          timeframe?: string
+          updated_at?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
