@@ -44,10 +44,9 @@ export function usePublicReviews(userId: string | undefined) {
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("reviews" as any)
+        .from("public_reviews" as any)
         .select("*")
         .eq("user_id", userId!)
-        .eq("is_public", true)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as unknown as Review[];
