@@ -25,6 +25,7 @@ const sections: { id: Section; label: string; icon: typeof Shield }[] = [
   { id: "automation", label: "Automation", icon: Workflow },
   { id: "funnel", label: "Funnel", icon: Target },
   { id: "growth", label: "Growth", icon: TrendingUp },
+  { id: "sources", label: "Sources", icon: BarChart3 },
   { id: "research", label: "Research", icon: ClipboardList },
   { id: "abuse", label: "Abuse Monitor", icon: ShieldAlert },
   { id: "content", label: "Content & Professions", icon: LayoutGrid },
