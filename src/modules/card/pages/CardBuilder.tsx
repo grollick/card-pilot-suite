@@ -3,7 +3,7 @@ import StylePresetSelector, { type StylePreset } from "@/modules/card/components
 import {
   Palette, Pencil, Camera, Globe, Layers, Sliders, LayoutTemplate,
   Sparkles, Loader2, MousePointerClick, Crown, Plus, Eye, Smartphone,
-  Type, PaintBucket, LayoutGrid, ChevronDown, Settings2,
+  Type, PaintBucket, LayoutGrid, ChevronDown, Settings2, Download,
 } from "lucide-react";
 import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import BlockMarketplaceDialog from "@/modules/card/components/BlockMarketplaceDialog";
