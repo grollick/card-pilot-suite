@@ -96,40 +96,15 @@ export function useRequestResponses(trackingToken: string | undefined) {
     queryKey: ["request-responses", trackingToken],
     enabled: !!trackingToken,
     queryFn: async () => {
-      // Find the request by token
-      const { data: request, error: reqErr } = await (supabase as any)
-        .from("estimate_requests")
-        .select("*")
-        .eq("tracking_token", trackingToken)
-        .maybeSingle();
-      if (reqErr) throw reqErr;
-      if (!request) return null;
+      // Use edge function for secure token-validated lookup
+      const { data, error } = await supabase.functions.invoke("request-status", {
+        body: { token: trackingToken },
+      });
+      if (error) throw error;
+      if (!data || data.error) return null;
 
-      // Fetch responses
-      const { data: responses, error: resErr } = await (supabase as any)
-        .from("job_request_responses")
-        .select("*")
-        .eq("estimate_request_id", request.id)
-        .order("created_at", { ascending: true });
-      if (resErr) throw resErr;
-
-      // Fetch profiles for each responder
-      const userIds = (responses || []).map((r: any) => r.user_id);
-      let profiles: any[] = [];
-      if (userIds.length > 0) {
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("id, name, company, handle, avatar_url, city")
-          .in("id", userIds);
-        profiles = profileData || [];
-      }
-
-      const enrichedResponses = (responses || []).map((r: any) => ({
-        ...r,
-        profile: profiles.find((p: any) => p.id === r.user_id) || null,
-      })) as JobRequestResponse[];
-
-      return { request: request as JobRequest, responses: enrichedResponses };
+      const enrichedResponses = (data.responses || []) as JobRequestResponse[];
+      return { request: data.request as JobRequest, responses: enrichedResponses };
     },
   });
 }
