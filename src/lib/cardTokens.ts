@@ -279,13 +279,14 @@ export interface ResolvedCardTheme {
   button: ReturnType<typeof getButtonTokens>;
   header: ReturnType<typeof getHeaderTokens>;
   section: ReturnType<typeof getSectionTokens>;
-  fonts: ReturnType<typeof getFonts>;
+  fonts: ResolvedFonts;
   palette: { primary: string; secondary: string; accent: string; background: string };
 }
 
 export function resolveCardTheme(
   tokens: Record<string, any>,
-  palette: { primary: string; secondary: string; accent: string; background: string }
+  palette: { primary: string; secondary: string; accent: string; background: string },
+  fontOverrides?: Record<string, any>
 ): ResolvedCardTheme {
   return {
     radii: getRadii(tokens),
@@ -294,7 +295,7 @@ export function resolveCardTheme(
     button: getButtonTokens(tokens),
     header: getHeaderTokens(tokens),
     section: getSectionTokens(tokens),
-    fonts: getFonts(tokens),
+    fonts: getFonts(tokens, fontOverrides),
     palette,
   };
 }
