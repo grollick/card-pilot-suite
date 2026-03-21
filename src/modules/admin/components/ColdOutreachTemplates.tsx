@@ -383,10 +383,10 @@ export default function ColdOutreachTemplates() {
       if (!user) return "The guzzl.pro Team";
       const { data } = await supabase
         .from("profiles")
-        .select("name, business_name")
+        .select("name")
         .eq("id", user.id)
         .maybeSingle();
-      return data?.name || data?.business_name || "The guzzl.pro Team";
+      return data?.name || "The guzzl.pro Team";
     },
     staleTime: 60_000,
   });
