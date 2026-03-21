@@ -422,7 +422,7 @@ export default function CardBuilderPreview({
                       </div>
                       <p style={{ color: `${previewTheme.palette.secondary}99`, fontSize: subtitleFontSize ?? 14, fontStyle: subtitleItalic ? "italic" : undefined }}>{displayJobTitle}</p>
                       {showCompany && (editCompany ?? profile?.company) && (
-                        <p className="text-xs" style={{ color: `${previewTheme.palette.secondary}70`, marginTop: subtitleSpacing ?? 2 }}>{editCompany ?? profile?.company}</p>
+                        <p className="text-xs" style={{ color: companyColor || `${previewTheme.palette.secondary}70`, marginTop: subtitleSpacing ?? 2 }}>{editCompany ?? profile?.company}</p>
                       )}
                     </div>
 
