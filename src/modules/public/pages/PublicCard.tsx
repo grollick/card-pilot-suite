@@ -481,11 +481,11 @@ export default function PublicCard() {
   };
 
   const sectionTitleStyle: React.CSSProperties = {
-    fontFamily: `'${fonts.primary}', sans-serif`,
-    fontWeight: 600,
-    fontSize: 12,
+    fontFamily: `'${fonts.sectionHeadingFont || fonts.primary}', sans-serif`,
+    fontWeight: fonts.sectionHeadingFontWeight ?? 600,
+    fontSize: fonts.sectionHeadingFontSize ?? 12,
     letterSpacing: "0.08em",
-    textTransform: "uppercase" as const,
+    textTransform: (fonts.sectionHeadingTransform && fonts.sectionHeadingTransform !== "none" ? fonts.sectionHeadingTransform : "uppercase") as any,
     color: palette.secondary,
     marginBottom: 8,
   };
