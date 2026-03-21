@@ -515,7 +515,7 @@ export default function AIBusinessAssistant() {
                         <motion.div
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
-                          className="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-600 font-medium"
+                          className="flex items-center gap-1.5 mt-2 text-[11px] text-[hsl(var(--success))] font-medium"
                         >
                           <Check className="h-3 w-3" />
                           Done! Changes applied.
