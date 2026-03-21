@@ -446,6 +446,7 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
           { label: "Growth", icon: TrendingUp, action: () => onNavigateSection?.("growth") },
           { label: "Abuse", icon: ShieldAlert, action: () => onNavigateSection?.("abuse") },
           { label: "Feedback", icon: MessageSquare, action: () => onNavigateSection?.("feedback") },
+          { label: "Research", icon: BookOpen, action: () => onNavigateSection?.("research") },
           { label: "Settings", icon: Settings, action: () => navigate("/app/settings") },
         ].map(a => (
           <Button key={a.label} variant="outline" size="sm" className="flex flex-col gap-1 h-auto py-3 text-xs" onClick={a.action}>
