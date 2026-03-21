@@ -224,6 +224,11 @@ export default function AssistantPage() {
     setInput("");
     setIsLoading(true);
 
+    // Scroll to top so user sees the new response from the beginning
+    requestAnimationFrame(() => {
+      scrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
     let assistantSoFar = "";
 
     try {
