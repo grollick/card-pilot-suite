@@ -284,7 +284,7 @@ export default function Onboarding() {
       toast({ title: "Something went wrong", description: err.message, variant: "destructive" });
       setAiLoading(false);
       setSaving(false);
-      setStep(2); // Go back to auto-build
+      setStep(3); // Go back to auto-build
     }
   };
 
