@@ -144,7 +144,17 @@ GUIDELINES:
 - Reference the user's actual data when relevant (services, leads, jobs)
 - If asked to generate an estimate, include a structured breakdown
 - For marketing content, make it engaging and profession-appropriate
-- Keep responses focused and practical — this user is busy working in the field`;
+- Keep responses focused and practical — this user is busy working in the field
+
+EXTERNAL RESOURCES:
+Always enrich responses with useful external resources:
+- Link to relevant tools, platforms, and services (e.g., [Google Business Profile](https://business.google.com), [Canva](https://canva.com), [Mailchimp](https://mailchimp.com))
+- Suggest industry-specific directories and review sites (Angi, Thumbtack, Yelp, Nextdoor)
+- Reference educational resources for business growth (SBA.gov, SCORE, YouTube channels)
+- When discussing marketing, point to platforms where they should be active
+- When discussing operations, link to relevant productivity or scheduling tools
+- Format links as markdown: [Resource Name](https://url.com)
+- Include 2-3 external references per response where relevant`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

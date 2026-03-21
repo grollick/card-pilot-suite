@@ -153,7 +153,15 @@ GUIDELINES:
 - Be specific with quantities and measurements
 - Include both labor and materials where applicable
 - Consider industry-standard markup and tax rates
-- Focus on winning the job — professional, thorough, fair pricing`;
+- Focus on winning the job — professional, thorough, fair pricing
+
+EXTERNAL RESOURCES:
+When relevant, include helpful external references:
+- Link to material pricing resources (e.g., [HomeAdvisor Cost Guides](https://www.homeadvisor.com/cost/), [RSMeans](https://www.rsmeans.com))
+- Suggest industry pricing benchmarks or calculators
+- Reference trade-specific best practices from associations (NAHB, NARI, etc.)
+- Point to contract templates or legal resources (e.g., [SBA contract templates](https://www.sba.gov))
+- Format links as markdown: [Resource Name](https://url.com)`;
 
     const useJson = action === "generate_line_items";
 
