@@ -4,34 +4,10 @@ import { Button } from "@/components/ui/button";
 import OnboardingStepWrapper from "./OnboardingStepWrapper";
 
 const AI_STYLES = [
-  {
-    id: "copilot",
-    label: "Co-Pilot",
-    icon: Bot,
-    description: "Inline suggestions that appear where you need them — subtle, smart, embedded.",
-    example: "💡 Tip: Add a gallery section to boost engagement by 40%",
-  },
-  {
-    id: "chatgpt",
-    label: "Chat Assistant",
-    icon: MessageSquare,
-    description: "Full conversational AI — ask anything, get detailed answers and templates.",
-    example: "\"Write me a follow-up email for a landscaping lead...\"",
-  },
-  {
-    id: "coach",
-    label: "Business Coach",
-    icon: Lightbulb,
-    description: "Proactive daily tips, growth strategies, and action plans tailored to your trade.",
-    example: "📊 Today: Focus on responding to 2 pending leads",
-  },
-  {
-    id: "minimal",
-    label: "Minimal",
-    icon: Zap,
-    description: "Quick, short answers only when asked — stays out of your way.",
-    example: "Done. Your bio has been updated.",
-  },
+  { id: "copilot", label: "Quick Tips", icon: Bot, description: "Short suggestions as you go" },
+  { id: "chatgpt", label: "Full Chat", icon: MessageSquare, description: "Ask anything, get detailed help" },
+  { id: "coach", label: "Daily Coach", icon: Lightbulb, description: "Action plans and growth advice" },
+  { id: "minimal", label: "Just the Basics", icon: Zap, description: "Brief answers, no extras" },
 ];
 
 interface Props {
