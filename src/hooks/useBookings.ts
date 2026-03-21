@@ -82,6 +82,41 @@ export function useUpdateBooking() {
     }) => {
       const { error } = await supabase.from("bookings").update(updates).eq("id", id);
       if (error) throw error;
+
+      // Send review request email when booking is completed
+      if (updates.status === "completed") {
+        try {
+          const { data: booking } = await supabase
+            .from("bookings")
+            .select("customer_email, customer_name, user_id, service_id, booking_services(name)")
+            .eq("id", id)
+            .single();
+
+          if (booking?.customer_email) {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("name, handle")
+              .eq("id", booking.user_id)
+              .single();
+
+            supabase.functions.invoke("send-transactional-email", {
+              body: {
+                templateName: "review-request",
+                recipientEmail: booking.customer_email,
+                idempotencyKey: `review-request-${id}`,
+                templateData: {
+                  customerName: booking.customer_name?.split(" ")[0],
+                  providerName: profile?.name || "",
+                  serviceName: (booking.booking_services as any)?.name || "",
+                  handle: profile?.handle || "",
+                },
+              },
+            }).catch(() => {});
+          }
+        } catch {
+          // Non-blocking — don't fail the status update
+        }
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["bookings"] });
