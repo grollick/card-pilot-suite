@@ -542,24 +542,24 @@ export default function AssistantPage() {
                           initial={{ opacity: 0, y: 4 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.2 }}
-                          className="flex items-center gap-0.5 flex-wrap"
+                          className="flex items-center gap-1 flex-wrap pl-1"
                         >
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 px-2 text-[11px] text-muted-foreground hover:text-foreground"
+                            className="h-8 px-3 text-xs text-muted-foreground hover:text-foreground gap-1.5 rounded-lg"
                             onClick={() => {
                               navigator.clipboard.writeText(msg.content);
                               toast.success("Copied to clipboard");
                             }}
                           >
-                            <Copy className="h-3.5 w-3.5 mr-1" />
+                            <Copy className="h-3.5 w-3.5" />
                             Copy
                           </Button>
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 w-7 p-0 text-muted-foreground hover:text-success"
+                            className="h-8 w-8 p-0 text-muted-foreground hover:text-success rounded-lg"
                             onClick={() => toast.success("Thanks for the feedback!")}
                           >
                             <ThumbsUp className="h-3.5 w-3.5" />
@@ -567,7 +567,7 @@ export default function AssistantPage() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                            className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive rounded-lg"
                             onClick={() => toast("We'll improve — thanks!", { icon: "🙏" })}
                           >
                             <ThumbsDown className="h-3.5 w-3.5" />
