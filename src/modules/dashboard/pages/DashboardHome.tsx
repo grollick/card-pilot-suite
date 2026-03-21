@@ -157,6 +157,14 @@ export default function DashboardHome() {
       {/* Estimate Duty (contextual) */}
       <EstimateDutyPanel />
 
+      {/* ── First Lead Guarantee ── */}
+      <motion.div
+        variants={fadeUp}
+        transition={{ duration: 0.55, ease: [0.21, 0.47, 0.32, 0.98] }}
+      >
+        <FirstLeadGuaranteeWidget />
+      </motion.div>
+
       {/* ── First Win Experience ── */}
       <motion.div
         variants={fadeUp}
