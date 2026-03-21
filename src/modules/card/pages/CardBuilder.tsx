@@ -1021,7 +1021,12 @@ export default function CardBuilder() {
         onImportComplete={handlePhotoImport}
       />
 
-      <BlockMarketplaceDialog
+      <ContentImportDialog
+        open={contentImportOpen}
+        onOpenChange={setContentImportOpen}
+        onImportComplete={handleContentImport}
+      />
+
         open={blockMarketOpen}
         onOpenChange={setBlockMarketOpen}
         installedBlockIds={installedBlockIds}
