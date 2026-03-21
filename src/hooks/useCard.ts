@@ -21,6 +21,7 @@ export type CtaType = (typeof CTA_TYPES)[number]["value"];
 export const DEFAULT_SECTIONS = [
   { id: "hero", label: "Hero", enabled: true },
   { id: "about", label: "About", enabled: true },
+  { id: "video_intro", label: "Video Introduction", enabled: false },
   { id: "services", label: "Services", enabled: true },
   { id: "projects", label: "Before / After Projects", enabled: false },
   { id: "quote_calculator", label: "Instant Quote Calculator", enabled: false },
