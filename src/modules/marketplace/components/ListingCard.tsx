@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import VerificationBadge from "@/components/trust/VerificationBadge";
+import { AvailableNowBadge, ResponseSpeedBadge } from "@/components/activity/LiveActivityIndicators";
 import {
   MapPin, Calendar, ArrowRight, Star, Crown, MessageSquare,
   Rocket, Phone, DollarSign, Clock, ShieldCheck, CheckCircle2, Zap, Radio,
@@ -125,9 +126,7 @@ export default function ListingCard({ listing, boosted, variant = "default" }: L
                   </Badge>
                 )}
                 {listing.is_on_duty && (
-                  <Badge className="text-[10px] font-semibold gap-0.5 bg-success/20 text-success border-success/30 shadow-sm shadow-success/10">
-                    <Radio className="h-2.5 w-2.5 animate-pulse" /> On Duty for Estimates
-                  </Badge>
+                  <AvailableNowBadge />
                 )}
                 {listing.available_for_work && !listing.is_on_duty && (
                   <Badge variant="outline" className="text-[10px] font-normal gap-0.5 bg-success/5 text-success border-success/20">
@@ -144,7 +143,7 @@ export default function ListingCard({ listing, boosted, variant = "default" }: L
               <StarRating rating={listing.avg_rating} count={listing.review_count} />
             )}
             {listing.avg_response_minutes !== null && (
-              <ResponseBadge minutes={listing.avg_response_minutes} />
+              <ResponseSpeedBadge minutes={listing.avg_response_minutes} />
             )}
             {listing.city && (
               <span className="flex items-center gap-0.5 text-xs text-muted-foreground">

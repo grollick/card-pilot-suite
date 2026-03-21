@@ -17,6 +17,7 @@ import {
   CalendarCheck, MessageSquareText, CheckCircle2, Sparkles, ChevronRight, ShieldCheck,
   ArrowRight, Navigation, StarIcon, Send,
 } from "lucide-react";
+import { LiveAvailabilityCounter } from "@/components/activity/LiveActivityIndicators";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -346,6 +347,7 @@ export default function DiscoverPage() {
   const onDutyListings = useMemo(() => filteredListings?.filter((l) => l.is_on_duty && !l.featured && !boostedIds.has(l.id)) ?? [], [filteredListings, boostedIds]);
   const allNonFeatured = useMemo(() => filteredListings?.filter((l) => !l.featured && !boostedIds.has(l.id)) ?? [], [filteredListings, boostedIds]);
   const regularListings = useMemo(() => allNonFeatured.slice(3), [allNonFeatured]);
+  const onDutyCount = useMemo(() => filteredListings.filter(l => l.is_on_duty || l.available_for_work).length, [filteredListings]);
 
   const boostedUserIdsArray = useMemo(() => boostedListings.map(l => l.id), [boostedListings]);
   useTrackBoostViews(boostedUserIdsArray);
@@ -615,8 +617,11 @@ export default function DiscoverPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="flex items-center gap-6 mt-6 text-sm text-muted-foreground"
+              className="flex flex-wrap items-center gap-4 md:gap-6 mt-6 text-sm text-muted-foreground"
             >
+              {onDutyCount > 0 && (
+                <LiveAvailabilityCounter count={onDutyCount} />
+              )}
               <span className="flex items-center gap-1.5">
                 <Users className="h-4 w-4" /> {filteredListings.length} professionals
               </span>

@@ -19,8 +19,11 @@ import {
   Briefcase,
   Image,
   Share2,
+  CheckCircle2,
   type LucideIcon,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { AvailableNowBadge, ResponseSpeedBadge, RecentViewsBadge } from "@/components/activity/LiveActivityIndicators";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -250,7 +253,7 @@ export default function PublicCard() {
     );
   }
 
-  const { card, services } = data!;
+  const { card, services, recentViewCount } = data!;
   const isOwner = user?.id === profile.id;
   const isUnpublished = !card || card.status !== "published";
 
@@ -691,6 +694,20 @@ export default function PublicCard() {
             <VerificationBadge level={profile.verification_level as any} size="sm" />
           </div>
         )}
+
+        {/* Activity signals */}
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8, padding: `${spacing.section / 2}px ${spacing.section}px 0` }}>
+          {profile.is_on_duty && <AvailableNowBadge />}
+          {!profile.is_on_duty && profile.available_for_work && (
+            <Badge variant="outline" className="text-[10px] font-normal gap-0.5 bg-success/5 text-success border-success/20">
+              <CheckCircle2 className="h-2.5 w-2.5" /> Available
+            </Badge>
+          )}
+          {profile.avg_response_minutes != null && profile.avg_response_minutes > 0 && (
+            <ResponseSpeedBadge minutes={profile.avg_response_minutes} />
+          )}
+          {recentViewCount > 0 && <RecentViewsBadge count={recentViewCount} />}
+        </div>
 
         <div style={{ padding: `${spacing.section}px`, display: "flex", flexDirection: "column", gap: spacing.section, position: "relative", zIndex: 2 }}>
           {/* ── CTA Buttons (skip if already rendered inside immersive hero) ── */}

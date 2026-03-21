@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Loader2, Clock, MapPin, DollarSign, CalendarCheck, MessageSquare, User, ExternalLink, Send } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { motion } from "framer-motion";
+import { ReviewingIndicator } from "@/components/activity/LiveActivityIndicators";
 
 export default function RequestStatusPage() {
   const { token } = useParams<{ token: string }>();
@@ -89,6 +90,12 @@ export default function RequestStatusPage() {
           </CardContent>
         </Card>
 
+        {/* Live reviewing indicator */}
+        <ReviewingIndicator
+          matchCount={request.status === "pending" ? Math.max(3, responses.length) : responses.length}
+          responseCount={responses.length}
+        />
+
         {/* Responses */}
         <div>
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -100,7 +107,7 @@ export default function RequestStatusPage() {
             <Card className="border-dashed border-border">
               <CardContent className="py-12 text-center">
                 <Clock className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
-                <p className="text-sm text-muted-foreground">No responses yet. Professionals have been notified and will respond soon.</p>
+                <p className="text-sm text-muted-foreground">Professionals have been notified and will respond soon.</p>
                 <p className="text-xs text-muted-foreground mt-1">Most respond within 1 hour.</p>
               </CardContent>
             </Card>
