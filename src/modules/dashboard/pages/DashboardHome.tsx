@@ -40,7 +40,7 @@ export default function DashboardHome() {
   const { data: guaranteeData } = useLeadGuarantee();
 
   return (
-    <div className="space-y-4 max-w-[1280px]">
+    <div className="space-y-3 max-w-[1280px]">
       <ReferralActivationChecker />
       {/* ── Header ── */}
       <motion.div
@@ -61,8 +61,8 @@ export default function DashboardHome() {
       {/* Mobile Job Dashboard */}
       {isMobile && <MobileJobDashboard />}
 
-      {/* ── Contextual banners (grouped to avoid empty gaps) ── */}
-      <div className="flex flex-col gap-3 empty:hidden [&:not(:has(>*))]:hidden">
+      {/* ── Contextual banners ── */}
+      <div className="flex flex-col gap-2 empty:hidden [&:not(:has(>*))]:hidden">
         <YouAreLiveBanner />
         <FirstLeadCelebration />
         <MilestoneCelebrationListener />
@@ -76,64 +76,56 @@ export default function DashboardHome() {
       {/* ── KPI Row ── */}
       <RevenueKPICards />
 
-      {/* ── AI Growth + Next Actions side-by-side ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* ── Row 1: AI Growth + Next Actions ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 [&>*]:min-h-0">
         <AIGrowthAssistantPanel />
         <NextActionsWidget />
       </div>
 
-      {/* ── Business Performance + Lead Performance ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* ── Row 2: Business Performance + Lead Performance ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 [&>*]:min-h-0">
         <BusinessPerformancePanel />
         <LeadPerformanceWidget />
       </div>
 
-      {/* ── Revenue Pipeline + Funnel ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* ── Row 3: Pipeline + Funnel + Smart Revenue ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 [&>*]:min-h-0">
         <RevenuePipelineWidget />
         <FunnelView />
-      </div>
-
-      {/* ── Smart Revenue + Opportunities ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <SmartRevenueWidget />
+      </div>
+
+      {/* ── Row 4: Opportunities + Missed + Referral ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 [&>*]:min-h-0">
         <RevenueOpportunities />
-      </div>
-
-      {/* ── Activation + Sharing ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="space-y-4">
-          <VerificationChecklist />
-          <ActivationChecklist />
-        </div>
-        <div className="space-y-4">
-          <ShareMessageCard />
-          <ShareCardWidget />
-        </div>
-      </div>
-
-      {/* ── Referral + Lead Guarantee ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <ReferralWidget />
         {guaranteeData && !guaranteeData.targetMet ? (
           <LeadGuaranteeBanner variant="dashboard" guaranteeData={guaranteeData} />
         ) : (
           <MissedOpportunities />
         )}
+        <ReferralWidget />
       </div>
 
-      {/* ── Bottom insights row ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* ── Row 5: Activation + Sharing ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 [&>*]:min-h-0">
+        <VerificationChecklist />
+        <ActivationChecklist />
+        <ShareMessageCard />
+        <ShareCardWidget />
+      </div>
+
+      {/* ── Row 6: Insights + Activity + Growth ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 [&>*]:min-h-0">
         <LeadQualityWidget />
         <LeadVelocityWidget />
         <RetentionInsightsWidget />
+        <div className="lg:col-span-2">
+          <DashboardActivityFeed />
+        </div>
       </div>
 
-      {/* ── Activity + Growth ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <DashboardActivityFeed />
-        <GrowthTrends />
-      </div>
+      {/* ── Growth Trends (full width) ── */}
+      <GrowthTrends />
 
       {/* Mobile floating quick-create buttons */}
       {isMobile && <MobileQuickCreate />}
