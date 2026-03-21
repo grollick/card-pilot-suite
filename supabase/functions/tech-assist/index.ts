@@ -186,7 +186,15 @@ GUIDELINES:
 - Use markdown for readability
 - Provide realistic pricing based on the trade
 - Focus on practical, actionable output
-- When analyzing photos, be specific about what you see`;
+- When analyzing photos, be specific about what you see
+
+EXTERNAL RESOURCES:
+When helpful, include external references the user can use in the field:
+- Link to product spec sheets, installation guides, or manufacturer resources
+- Reference safety guidelines (e.g., [OSHA](https://osha.gov)) when relevant
+- Suggest supplier sites for materials (e.g., Home Depot Pro, Ferguson, Grainger)
+- Point to trade-specific troubleshooting resources or forums
+- Format links as markdown: [Resource Name](https://url.com)`;
 
     const model = photo_urls?.length > 0 ? "google/gemini-2.5-flash" : "google/gemini-3-flash-preview";
 

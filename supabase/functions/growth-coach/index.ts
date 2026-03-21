@@ -227,6 +227,18 @@ CONTENT GENERATION RULES:
 - Promotions: Urgency-driven, value-focused, profession-appropriate
 - Social posts: Engaging, include hashtags, profession-relevant
 
+EXTERNAL RESOURCES:
+When giving advice or recommendations, ALWAYS include relevant external resources to help the user take action outside the platform:
+- Link to specific articles, guides, or tools (e.g., "Check out [Canva](https://canva.com) for creating social media graphics")
+- Suggest relevant YouTube channels, podcasts, or blogs for their trade/profession
+- Reference industry-specific resources (e.g., Angi, Thumbtack, Nextdoor for service pros)
+- Recommend free tools they can use (Google Business Profile, Mailchimp, Buffer, etc.)
+- Point to educational resources (SBA.gov, SCORE mentoring, trade associations)
+- When discussing marketing, link to real platforms where they should be active
+- When discussing pricing, reference industry benchmarking sites or reports
+- Format links as markdown: [Resource Name](https://url.com)
+- Aim to include 2-3 external references per response where relevant
+
 Use markdown formatting. Be concise but thorough.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {

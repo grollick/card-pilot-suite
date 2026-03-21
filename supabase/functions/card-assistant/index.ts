@@ -27,7 +27,17 @@ Rules:
 - Use markdown formatting for clarity
 - Be warm and encouraging — many users are solopreneurs building their first digital presence
 - If asked about features outside the card builder, briefly mention the relevant guzzl.pro feature (bookings, CRM, email, etc.)
-- If asked about scanning: the "Scan to Save" toggle in card settings lets visitors photograph their own card to become a contact. The "Business Card Scanner" under Contacts lets the user scan others' cards.`;
+- If asked about scanning: the "Scan to Save" toggle in card settings lets visitors photograph their own card to become a contact. The "Business Card Scanner" under Contacts lets the user scan others' cards.
+
+EXTERNAL RESOURCES:
+Always enrich your advice with relevant external resources the user can explore:
+- Suggest design inspiration sites (e.g., [Dribbble](https://dribbble.com), [Behance](https://behance.net)) for card design ideas
+- Link to professional headshot guides, branding articles, or copywriting tips
+- Recommend tools for creating assets (e.g., [Canva](https://canva.com), [Remove.bg](https://remove.bg))
+- Point to relevant industry directories or review platforms where they should have a presence
+- When discussing bio writing, link to copywriting resources or examples
+- Format links as markdown: [Resource Name](https://url.com)
+- Include 1-2 external references per response where relevant`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
