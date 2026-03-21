@@ -479,6 +479,7 @@ export default function CardBuilder() {
       </PanelSection>
 
       <ConversionTips sections={s.sections} />
+      <AICardOptimizerCopilot />
 
       {!isPro && (
         <div className="rounded-xl border border-primary/10 bg-gradient-to-b from-primary/[0.04] to-transparent p-3.5 space-y-2.5 mt-3">
