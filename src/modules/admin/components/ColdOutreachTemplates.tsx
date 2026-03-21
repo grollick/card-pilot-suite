@@ -2,7 +2,8 @@ import { useState } from "react";
 import {
   Mail, Send, Copy, Eye, ChevronDown, ChevronUp, Loader2,
   Hammer, Paintbrush, Wrench, Home, Scissors, Camera, Utensils,
-  Car, Sparkles, Briefcase, Shield, Heart, Zap, Users, Edit3, Check
+  Car, Sparkles, Briefcase, Shield, Heart, Zap, Users, Edit3, Check,
+  MessageCircle, Phone, Share2, ExternalLink, Linkedin, Facebook, Instagram
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
