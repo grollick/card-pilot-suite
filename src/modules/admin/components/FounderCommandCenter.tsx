@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import ResearchSummaryWidget from "@/modules/admin/components/ResearchSummaryWidget";
+import ColdOutreachTemplates from "@/modules/admin/components/ColdOutreachTemplates";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -433,6 +434,10 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
           )}
         </CardContent>
       </Card>
+
+      {/* ── SECTION: Cold Outreach ── */}
+      <SectionHeader icon={Mail} title="Cold Outreach Emails" description="Pre-written emails to acquire card holders by profession" />
+      <ColdOutreachTemplates />
 
       {/* ── SECTION: Research Summary ── */}
       <ResearchSummaryWidget onNavigate={() => onNavigateSection?.("research")} />

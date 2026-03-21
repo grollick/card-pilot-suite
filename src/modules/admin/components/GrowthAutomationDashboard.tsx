@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ColdOutreachTemplates from "@/modules/admin/components/ColdOutreachTemplates";
 import {
   Rocket, Target, Send, Users, UserPlus, ArrowRight, Clock,
   CheckCircle2, AlertTriangle, MessageSquare, Zap, Bot,
@@ -604,8 +605,9 @@ export default function GrowthAutomationDashboard() {
       </div>
 
       <Tabs defaultValue="pipeline" className="w-full">
-        <TabsList className="grid grid-cols-4 w-full">
+        <TabsList className="grid grid-cols-5 w-full">
           <TabsTrigger value="pipeline" className="text-xs gap-1"><Target className="h-3 w-3" /> Pipeline</TabsTrigger>
+          <TabsTrigger value="cold-emails" className="text-xs gap-1"><Mail className="h-3 w-3" /> Cold Emails</TabsTrigger>
           <TabsTrigger value="activation" className="text-xs gap-1"><Zap className="h-3 w-3" /> Activation</TabsTrigger>
           <TabsTrigger value="retention" className="text-xs gap-1"><Heart className="h-3 w-3" /> Retention</TabsTrigger>
           <TabsTrigger value="handoff" className="text-xs gap-1"><Flag className="h-3 w-3" /> Handoff</TabsTrigger>
@@ -621,6 +623,11 @@ export default function GrowthAutomationDashboard() {
 
           <SH icon={RefreshCw} title="Follow-Up System" desc="Automatic follow-ups on Day 2 and Day 4" />
           <FollowUpSystem />
+        </TabsContent>
+
+        {/* ── Cold Emails Tab ── */}
+        <TabsContent value="cold-emails" className="space-y-5 mt-4">
+          <ColdOutreachTemplates />
         </TabsContent>
 
         {/* ── Activation Tab ── */}
