@@ -200,6 +200,13 @@ export default function PlatformAdminDashboard() {
         ))}
       </div>
 
+      {/* Success Metrics */}
+      <SuccessMetricsPanel
+        metrics={stats?.successMetrics}
+        totalUsers={stats?.totalUsers}
+        isLoading={isLoading}
+      />
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Signups — 2 cols */}
         <motion.div {...anim} transition={{ delay: 0.1 }}
