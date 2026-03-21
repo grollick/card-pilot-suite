@@ -11,6 +11,7 @@ import AdminGrowthDashboard from "@/modules/settings/components/AdminGrowthDashb
 import AbuseMonitorDashboard from "@/modules/admin/components/AbuseMonitorDashboard";
 import FounderCommandCenter from "@/modules/admin/components/FounderCommandCenter";
 import GrowthEngine from "@/modules/admin/components/GrowthEngine";
+import UserResearchDashboard from "@/modules/admin/components/UserResearchDashboard";
 import { useState } from "react";
 
 type Section = "command" | "engine" | "growth" | "content" | "feedback" | "system" | "abuse";
