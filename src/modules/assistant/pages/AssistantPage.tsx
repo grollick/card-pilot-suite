@@ -122,6 +122,20 @@ function getFollowUps(lastMsg: string): string[] {
   return ["What else can I improve?", "Give me a weekly summary", "Write me a follow-up message"];
 }
 
+/** Formats the user's query into a proper title with capitalization and punctuation. */
+function formatResultTitle(text: string): string {
+  let t = text.trim();
+  // Capitalize first letter of each sentence-like segment
+  t = t.replace(/(^|\.\s+)([a-z])/g, (_, pre, char) => pre + char.toUpperCase());
+  // Ensure first char is uppercase
+  t = t.charAt(0).toUpperCase() + t.slice(1);
+  // Remove trailing question marks for a statement-style title
+  t = t.replace(/\?+$/, "");
+  // Add period if no ending punctuation
+  if (!/[.!]$/.test(t)) t += ".";
+  return t;
+}
+
 /* ── Markdown components ── */
 const mdComponents = {
   h2: ({ children }: any) => {
