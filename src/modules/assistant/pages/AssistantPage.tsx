@@ -122,6 +122,20 @@ function getFollowUps(lastMsg: string): string[] {
   return ["What else can I improve?", "Give me a weekly summary", "Write me a follow-up message"];
 }
 
+/** Formats the user's query into a proper title with capitalization and punctuation. */
+function formatResultTitle(text: string): string {
+  let t = text.trim();
+  // Capitalize first letter of each sentence-like segment
+  t = t.replace(/(^|\.\s+)([a-z])/g, (_, pre, char) => pre + char.toUpperCase());
+  // Ensure first char is uppercase
+  t = t.charAt(0).toUpperCase() + t.slice(1);
+  // Remove trailing question marks for a statement-style title
+  t = t.replace(/\?+$/, "");
+  // Add period if no ending punctuation
+  if (!/[.!]$/.test(t)) t += ".";
+  return t;
+}
+
 /* ── Markdown components ── */
 const mdComponents = {
   h2: ({ children }: any) => {
@@ -391,11 +405,10 @@ export default function AssistantPage() {
                     <div className="space-y-2 min-w-0 flex-1">
                       {/* Title the assistant response with what the user asked */}
                       {msg.role === "assistant" && i > 0 && messages[i - 1]?.role === "user" && (
-                        <div className="flex items-center gap-1.5 px-1 mb-1">
-                          <Search className="h-3 w-3 text-muted-foreground/50" />
-                          <span className="text-xs font-medium text-muted-foreground/70 truncate">
-                            {messages[i - 1].content}
-                          </span>
+                        <div className="px-1 mb-2">
+                          <h2 className="text-lg sm:text-xl font-extrabold text-foreground tracking-tight capitalize" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                            {formatResultTitle(messages[i - 1].content)}
+                          </h2>
                         </div>
                       )}
                       <div
