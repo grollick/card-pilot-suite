@@ -290,7 +290,7 @@ export default function CardAssistant({ context, sectionTargets, onCopyToSection
                       className={`rounded-2xl ${
                         msg.role === "user"
                           ? "bg-primary text-primary-foreground px-4 py-3 text-sm leading-relaxed shadow-sm"
-                          : "bg-gradient-to-b from-card to-card/80 border border-border/40 px-5 py-5 text-[13px] sm:text-sm shadow-md ring-1 ring-white/5"
+                          : "bg-gradient-to-b from-card via-card/95 to-card/85 border border-border/30 px-5 py-6 shadow-xl ring-1 ring-white/5 backdrop-blur-sm"
                       }`}
                     >
                       {msg.role === "assistant" ? (
