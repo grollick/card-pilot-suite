@@ -2,7 +2,7 @@ import { MarketplaceApp } from "@/hooks/useMarketplaceApps";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Star, Download, Check } from "lucide-react";
+import { Star, Download, Check, DollarSign } from "lucide-react";
 
 const categoryColors: Record<string, string> = {
   payments: "bg-emerald-500/10 text-emerald-600",
@@ -72,6 +72,12 @@ export default function AppCard({ app, isInstalled, onInstall, onView }: Props) 
         <p className="text-xs text-muted-foreground line-clamp-2 mb-3 leading-relaxed">{app.description}</p>
 
         <div className="flex items-center gap-3 mb-3">
+          {app.pricing_type !== "free" && (
+            <Badge variant="secondary" className="text-2xs gap-0.5 bg-amber-500/10 text-amber-600 border-amber-500/20">
+              <DollarSign className="h-2.5 w-2.5" />
+              {app.pricing_type === "subscription" ? `${app.price_amount}/mo` : `${app.price_amount}`}
+            </Badge>
+          )}
           {app.avg_rating > 0 && (
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
               <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
