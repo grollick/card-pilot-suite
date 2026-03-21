@@ -3,6 +3,7 @@ import MarketplaceSettings from "@/modules/settings/components/MarketplaceSettin
 import DataExportSection from "@/modules/settings/components/DataExportSection";
 import DataImportSection from "@/modules/settings/components/DataImportSection";
 import BrandKitSettings from "@/modules/settings/components/BrandKitSettings";
+import AIPersonalitySettings from "@/components/settings/AIPersonalitySettings";
 import GoogleBusinessSync from "@/modules/settings/components/GoogleBusinessSync";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
