@@ -250,7 +250,7 @@ export default function PublicCard() {
     );
   }
 
-  const { card, services } = data!;
+  const { card, services, recentViewCount } = data!;
   const isOwner = user?.id === profile.id;
   const isUnpublished = !card || card.status !== "published";
 
