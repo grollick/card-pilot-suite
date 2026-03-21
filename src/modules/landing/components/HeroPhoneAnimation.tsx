@@ -8,10 +8,12 @@ import mikeImg from "@/assets/demo/mike-reynolds.jpg";
 import marcusImg from "@/assets/demo/marcus-cole.jpg";
 import sarahImg from "@/assets/demo/sarah-chen.jpg";
 import jessicaImg from "@/assets/demo/jessica-martinez.jpg";
+import tanyaImg from "@/assets/demo/tanya-brooks.jpg";
 import projectKitchen from "@/assets/demo/project-kitchen.jpg";
 import coverBarbershop from "@/assets/demo/cover-barbershop.jpg";
 import coverRealtor from "@/assets/demo/cover-realtor.jpg";
 import coverTrainer from "@/assets/demo/cover-trainer.jpg";
+import coverHairstylist from "@/assets/demo/cover-hairstylist.jpg";
 
 /* ── Persona definitions ── */
 interface Persona {
@@ -111,6 +113,27 @@ const PERSONAS: Persona[] = [
       { key: "form", duration: 1800 },
       { key: "submitted", duration: 1200 },
       { key: "crm", duration: 2600 },
+    ],
+  },
+  {
+    name: "Tanya Brooks",
+    company: "Glow Hair Studio",
+    tagline: "Your best hair day, every day.",
+    city: "Austin, TX",
+    avatarUrl: tanyaImg,
+    coverUrl: coverHairstylist,
+    accentHsl: "330, 70%, 55%",
+    services: [
+      { name: "Cut & Style", price: "$65" },
+      { name: "Color & Highlights", price: "$120+" },
+      { name: "Blowout", price: "$45" },
+    ],
+    cta: "💇‍♀️ Book Appointment",
+    stages: [
+      { key: "idle", duration: 2200 },
+      { key: "tap", duration: 800 },
+      { key: "booking", duration: 2200 },
+      { key: "booked", duration: 1400 },
     ],
   },
 ];
