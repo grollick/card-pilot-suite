@@ -96,7 +96,7 @@ export default function PlatformAdminDashboard() {
       sub: `+${stats?.signups7d ?? 0} this week`,
       icon: Users,
       color: "text-primary bg-primary/10",
-      onClick: () => navigate("/app/admin/marketing"),
+      onClick: () => navigate("/app/admin-marketing"),
     },
     {
       label: "Signups (30d)",
@@ -104,7 +104,7 @@ export default function PlatformAdminDashboard() {
       sub: growthPct !== null ? `${growthPct >= 0 ? "+" : ""}${growthPct}% vs prev 30d` : "—",
       icon: UserPlus,
       color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10",
-      onClick: () => navigate("/app/admin/marketing"),
+      onClick: () => navigate("/app/admin-marketing"),
     },
     {
       label: "Monthly Revenue",
@@ -112,7 +112,7 @@ export default function PlatformAdminDashboard() {
       sub: `${paidUsers} paying customer${paidUsers !== 1 ? "s" : ""}`,
       icon: CreditCard,
       color: "text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10",
-      onClick: () => navigate("/app/settings/admin"),
+      onClick: () => navigate("/app/admin"),
     },
     {
       label: "Card Views (30d)",
@@ -120,14 +120,14 @@ export default function PlatformAdminDashboard() {
       sub: `${stats?.publishedCards ?? 0} published cards`,
       icon: Eye,
       color: "text-accent-foreground bg-accent",
-      onClick: () => navigate("/app/settings/admin"),
+      onClick: () => navigate("/app/analytics"),
     },
   ];
 
   const quickActions = [
-    { label: "Marketing", icon: Mail, to: "/app/admin/marketing", desc: "Campaigns & sequences" },
-    { label: "Growth", icon: TrendingUp, to: "/app/settings/admin", desc: "KPIs & goals" },
-    { label: "Abuse Monitor", icon: Shield, to: "/app/settings/admin", desc: "Flagged accounts" },
+    { label: "Marketing", icon: Mail, to: "/app/admin-marketing", desc: "Campaigns & sequences" },
+    { label: "Growth", icon: TrendingUp, to: "/app/admin", desc: "KPIs & goals" },
+    { label: "Abuse Monitor", icon: Shield, to: "/app/admin", desc: "Flagged accounts" },
   ];
 
   return (
