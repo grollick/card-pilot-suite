@@ -128,7 +128,7 @@ serve(async (req) => {
         from: from ?? "guzzl.pro <onboarding@resend.dev>",
         to: Array.isArray(to) ? to : [to],
         subject,
-        html: html + getMarketplaceSignature(),
+        html: sanitizedHtml + getMarketplaceSignature(),
         ...(reply_to ? { reply_to } : {}),
       }),
     });
