@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import AiCreditTopupDialog from "@/components/AiCreditTopupDialog";
-import { Send, Loader2, Copy, RotateCcw, TrendingUp, Zap, Target, PenTool, BarChart3, Users, CalendarPlus, ThumbsUp, ThumbsDown, Bookmark, Lightbulb, CheckCircle2, ArrowRight, Star, AlertTriangle, Sparkles } from "lucide-react";
+import { Send, Loader2, Copy, RotateCcw, TrendingUp, Zap, Target, PenTool, BarChart3, Users, CalendarPlus, ThumbsUp, ThumbsDown, Bookmark, Lightbulb, CheckCircle2, ArrowRight, Star, AlertTriangle, Sparkles, DollarSign, Share2, MessageSquare, Mail, Clock, Shield, Megaphone, Palette, FileText, Search, Heart, Award, Rocket, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,37 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 
 type Msg = { role: "user" | "assistant"; content: string };
+
+const ICON_KEYWORDS: [RegExp, LucideIcon][] = [
+  [/revenue|money|price|cost|profit|earning|income|\$/i, DollarSign],
+  [/lead|prospect|inquiry|customer|client/i, Users],
+  [/share|social|post|viral|referral/i, Share2],
+  [/message|chat|reply|respond|conversation/i, MessageSquare],
+  [/email|inbox|send|newsletter/i, Mail],
+  [/time|schedule|deadline|fast|quick|hour|minute/i, Clock],
+  [/security|trust|safe|protect|privacy/i, Shield],
+  [/market|advertis|promot|campaign|outreach/i, Megaphone],
+  [/design|brand|style|visual|card|logo/i, Palette],
+  [/estimat|invoice|quote|proposal|document/i, FileText],
+  [/search|find|discover|seo|google/i, Search],
+  [/review|rating|testimon|feedback/i, Star],
+  [/retain|loyal|repeat|engage/i, Heart],
+  [/award|milestone|achiev|badge|goal/i, Award],
+  [/grow|scale|expand|boost|increase|improv/i, TrendingUp],
+  [/launch|start|setup|begin|create/i, Rocket],
+  [/strategy|plan|action|step|tip/i, Target],
+  [/convert|funnel|pipeline|close|win/i, Zap],
+  [/book|appoint|calendar|reserv/i, CalendarPlus],
+  [/warn|risk|danger|avoid|mistake/i, AlertTriangle],
+  [/idea|suggest|recommend|insight/i, Lightbulb],
+];
+
+function getScenarioIcon(text: string): LucideIcon {
+  for (const [pattern, icon] of ICON_KEYWORDS) {
+    if (pattern.test(text)) return icon;
+  }
+  return CheckCircle2;
+}
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/growth-coach`;
 
@@ -259,24 +290,34 @@ export default function AssistantPage() {
                         <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:leading-relaxed [&_li]:leading-relaxed [&_ul]:my-2 [&_ol]:my-2 [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_p+p]:mt-3">
                           <ReactMarkdown
                             components={{
-                              h2: ({ children }) => (
-                                <h2 className="flex items-center gap-2 text-sm font-semibold mt-4 mb-2">
-                                  <Sparkles className="h-3.5 w-3.5 text-primary shrink-0" />
-                                  {children}
-                                </h2>
-                              ),
-                              h3: ({ children }) => (
-                                <h3 className="flex items-center gap-2 text-sm font-semibold mt-3 mb-1.5">
-                                  <ArrowRight className="h-3 w-3 text-primary shrink-0" />
-                                  {children}
-                                </h3>
-                              ),
-                              li: ({ children }) => (
-                                <li className="flex items-start gap-2 my-1">
-                                  <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0 mt-0.5" />
-                                  <span>{children}</span>
-                                </li>
-                              ),
+                              h2: ({ children }) => {
+                                const Icon = getScenarioIcon(String(children));
+                                return (
+                                  <h2 className="flex items-center gap-2 text-sm font-semibold mt-4 mb-2">
+                                    <Icon className="h-4 w-4 text-primary shrink-0" />
+                                    {children}
+                                  </h2>
+                                );
+                              },
+                              h3: ({ children }) => {
+                                const Icon = getScenarioIcon(String(children));
+                                return (
+                                  <h3 className="flex items-center gap-2 text-sm font-semibold mt-3 mb-1.5">
+                                    <Icon className="h-3.5 w-3.5 text-primary shrink-0" />
+                                    {children}
+                                  </h3>
+                                );
+                              },
+                              li: ({ children }) => {
+                                const text = String(children);
+                                const Icon = getScenarioIcon(text);
+                                return (
+                                  <li className="flex items-start gap-2 my-1 list-none">
+                                    <Icon className="h-3.5 w-3.5 text-success shrink-0 mt-0.5" />
+                                    <span>{children}</span>
+                                  </li>
+                                );
+                              },
                               blockquote: ({ children }) => (
                                 <blockquote className="flex items-start gap-2 border-l-2 border-primary/30 bg-primary/5 rounded-r-lg px-3 py-2 my-3 not-italic">
                                   <Lightbulb className="h-4 w-4 text-warning shrink-0 mt-0.5" />
