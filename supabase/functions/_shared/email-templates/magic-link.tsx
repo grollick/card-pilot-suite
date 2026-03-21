@@ -42,6 +42,13 @@ export const MagicLinkEmail = ({
         <Text style={footer}>
           If you didn't request this link, you can safely ignore this email.
         </Text>
+        <Hr style={hr} />
+        <Section style={ctaBanner}>
+          <Text style={ctaText}>Are you a service professional?</Text>
+          <Button style={ctaButton} href="https://guzzl.pro/onboarding">
+            Get Your Free guzzl.pro Business Card →
+          </Button>
+        </Section>
       </Container>
     </Body>
   </Html>
@@ -92,4 +99,29 @@ const footer = {
   color: '#999999',
   margin: '32px 0 0',
   lineHeight: '1.5',
+}
+const hr = {
+  borderColor: '#eaeaea',
+  margin: '24px 0',
+}
+const ctaBanner = {
+  backgroundColor: '#f0f2ff',
+  borderRadius: '10px',
+  padding: '20px 24px',
+  textAlign: 'center' as const,
+}
+const ctaText = {
+  fontSize: '14px',
+  color: 'hsl(222, 47%, 11%)',
+  fontWeight: '600' as const,
+  margin: '0 0 12px',
+}
+const ctaButton = {
+  backgroundColor: 'hsl(230, 76%, 55%)',
+  color: '#ffffff',
+  fontSize: '13px',
+  fontWeight: '600' as const,
+  borderRadius: '8px',
+  padding: '10px 20px',
+  textDecoration: 'none',
 }
