@@ -50,6 +50,9 @@ export default function AdminPage() {
         ))}
       </div>
 
+      {/* Command Center */}
+      {section === "command" && <FounderCommandCenter />}
+
       {/* Growth */}
       {section === "growth" && <AdminGrowthDashboard />}
 
