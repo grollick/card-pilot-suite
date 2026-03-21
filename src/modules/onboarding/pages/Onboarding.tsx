@@ -325,7 +325,7 @@ export default function Onboarding() {
         </div>
 
         {/* Progress */}
-        {step > 0 && step < 8 && (
+        {step > 0 && step < 9 && (
           <div className="flex gap-1.5 mb-6">
             {[...Array(totalSteps)].map((_, i) => (
               <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
