@@ -112,7 +112,7 @@ const adminOnlyItems = [
 type NavItem = { title: string; url: string; icon: any; end?: boolean };
 
 export function AppSidebar() {
-  const { state, toggleSidebar } = useSidebar();
+  const { state, toggleSidebar, isMobile, setOpenMobile } = useSidebar();
   const collapsed = state === "collapsed";
   const location = useLocation();
   const { signOut, user } = useAuth();
