@@ -118,9 +118,11 @@ serve(async (req) => {
     }
 
     // ── Create booking ──
+    const bookingId = crypto.randomUUID();
     const { data: booking, error: bookingError } = await supabase
       .from("bookings")
       .insert({
+        id: bookingId,
         user_id: userId,
         service_id: service_id || null,
         customer_name: customer_name.trim(),
@@ -140,6 +142,64 @@ serve(async (req) => {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // ── Send booking confirmation email (fire-and-forget) ──
+    if (customer_email) {
+      try {
+        // Fetch provider name and service name for the email
+        const { data: providerProfile } = await supabase
+          .from("profiles")
+          .select("name, company, handle")
+          .eq("id", userId)
+          .single();
+
+        let serviceName = "";
+        if (service_id) {
+          const { data: svcData } = await supabase
+            .from("booking_services")
+            .select("name")
+            .eq("id", service_id)
+            .single();
+          serviceName = svcData?.name || "";
+        }
+
+        const providerName = providerProfile?.company || providerProfile?.name || "";
+
+        // Format dates for the email
+        const dateStr = startDt.toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const timeStr = `${startDt.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+        })} – ${endDt.toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+        })}`;
+
+        await supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "booking-confirmation",
+            recipientEmail: customer_email.trim(),
+            idempotencyKey: `booking-confirm-${bookingId}`,
+            templateData: {
+              customerName: customer_name.trim().split(" ")[0],
+              serviceName,
+              date: dateStr,
+              time: timeStr,
+              providerName,
+              handle: providerProfile?.handle || handle,
+            },
+          },
+        });
+      } catch (emailErr) {
+        // Non-fatal — booking was already created
+        console.error("Failed to send booking confirmation email:", emailErr);
+      }
     }
 
     return new Response(JSON.stringify({ success: true, data: booking }), {

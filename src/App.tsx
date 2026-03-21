@@ -32,6 +32,7 @@ const ReferralRedirect = lazy(() => import("@/modules/public/pages/ReferralRedir
 const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
 const PublicProjectPage = lazy(() => import("@/modules/public/pages/PublicProjectPage"));
 const PublicInvoicePage = lazy(() => import("@/modules/public/pages/PublicInvoicePage"));
+const UnsubscribePage = lazy(() => import("@/pages/UnsubscribePage"));
 
 // Client Portal v2 — authenticated client dashboard
 const ClientAuthPage = lazy(() => import("@/modules/client/pages/ClientAuthPage"));
@@ -219,6 +220,7 @@ const App = () => (
             <Route path="/portal/:token" element={<LazyRoute><ClientPortal /></LazyRoute>} />
             <Route path="/pay/:token" element={<LazyRoute><PublicInvoicePage /></LazyRoute>} />
             <Route path="/ref/:code" element={<ReferralRedirect />} />
+            <Route path="/unsubscribe" element={<LazyRoute><UnsubscribePage /></LazyRoute>} />
 
             {/* Client Portal v2 — authenticated */}
             <Route path="/client/auth" element={<LazyRoute><ClientAuthPage /></LazyRoute>} />
