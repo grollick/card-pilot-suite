@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import AiCreditTopupDialog from "@/components/AiCreditTopupDialog";
-import { Send, Loader2, Copy, RotateCcw, TrendingUp, Zap, Target, PenTool, BarChart3, Users, CalendarPlus, ThumbsUp, ThumbsDown, Bookmark } from "lucide-react";
+import { Send, Loader2, Copy, RotateCcw, TrendingUp, Zap, Target, PenTool, BarChart3, Users, CalendarPlus, ThumbsUp, ThumbsDown, Bookmark, Lightbulb, CheckCircle2, ArrowRight, Star, AlertTriangle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -257,7 +257,39 @@ export default function AssistantPage() {
                     >
                       {msg.role === "assistant" ? (
                         <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:leading-relaxed [&_li]:leading-relaxed [&_ul]:my-2 [&_ol]:my-2 [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_p+p]:mt-3">
-                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                          <ReactMarkdown
+                            components={{
+                              h2: ({ children }) => (
+                                <h2 className="flex items-center gap-2 text-sm font-semibold mt-4 mb-2">
+                                  <Sparkles className="h-3.5 w-3.5 text-primary shrink-0" />
+                                  {children}
+                                </h2>
+                              ),
+                              h3: ({ children }) => (
+                                <h3 className="flex items-center gap-2 text-sm font-semibold mt-3 mb-1.5">
+                                  <ArrowRight className="h-3 w-3 text-primary shrink-0" />
+                                  {children}
+                                </h3>
+                              ),
+                              li: ({ children }) => (
+                                <li className="flex items-start gap-2 my-1">
+                                  <CheckCircle2 className="h-3.5 w-3.5 text-success shrink-0 mt-0.5" />
+                                  <span>{children}</span>
+                                </li>
+                              ),
+                              blockquote: ({ children }) => (
+                                <blockquote className="flex items-start gap-2 border-l-2 border-primary/30 bg-primary/5 rounded-r-lg px-3 py-2 my-3 not-italic">
+                                  <Lightbulb className="h-4 w-4 text-warning shrink-0 mt-0.5" />
+                                  <div>{children}</div>
+                                </blockquote>
+                              ),
+                              strong: ({ children }) => (
+                                <strong className="font-semibold text-foreground">{children}</strong>
+                              ),
+                            }}
+                          >
+                            {msg.content}
+                          </ReactMarkdown>
                         </div>
                       ) : (
                         msg.content
