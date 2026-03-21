@@ -183,6 +183,13 @@ Deno.serve(async (req) => {
         }),
       });
 
+      // Log to email_send_log for rate limiting
+      await supabase.from("email_send_log").insert({
+        recipient_email: email,
+        template_name: "lead_magnet",
+        status: "sent",
+      });
+
       // 3. Schedule follow-up emails
       for (let i = 1; i < EMAIL_SEQUENCE.length; i++) {
         const step = EMAIL_SEQUENCE[i];
