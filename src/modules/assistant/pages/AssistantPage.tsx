@@ -270,31 +270,33 @@ export default function AssistantPage() {
           </div>
         ) : (
           <>
-            {messages.map((msg, i) => (
+             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[85%] ${msg.role === "user" ? "" : "flex gap-3"}`}>
+                <div className={`${msg.role === "user" ? "max-w-[80%] sm:max-w-[65%]" : "max-w-[95%] sm:max-w-[85%] flex gap-3"}`}>
                   {msg.role === "assistant" && (
-                    <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-primary/10 to-success/10 flex items-center justify-center shrink-0 mt-1">
-                      <TrendingUp className="h-3.5 w-3.5 text-primary" />
+                    <div className="hidden sm:flex h-8 w-8 rounded-xl bg-gradient-to-br from-primary/10 to-success/10 items-center justify-center shrink-0 mt-1">
+                      <TrendingUp className="h-4 w-4 text-primary" />
                     </div>
                   )}
-                  <div className="space-y-1.5">
+                  <div className="space-y-2 min-w-0 flex-1">
                     <div
-                      className={`rounded-xl text-sm ${
+                      className={`rounded-2xl ${
                         msg.role === "user"
-                          ? "bg-primary text-primary-foreground px-4 py-3"
-                          : "bg-muted/50 px-5 py-4"
+                          ? "bg-primary text-primary-foreground px-4 py-3 text-sm leading-relaxed"
+                          : "bg-muted/40 border border-border/40 px-4 sm:px-6 py-4 sm:py-5 text-[13px] sm:text-sm"
                       }`}
                     >
                       {msg.role === "assistant" ? (
-                        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:leading-relaxed [&_li]:leading-relaxed [&_ul]:my-2 [&_ol]:my-2 [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_p+p]:mt-3">
+                        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:leading-[1.75] [&_li]:leading-[1.7] [&_ul]:my-3 [&_ol]:my-3 [&_ul]:pl-0 [&_ol]:pl-0 [&_h1]:text-base [&_h2]:text-[13px] [&_h2]:sm:text-sm [&_h3]:text-[13px] [&_h3]:sm:text-sm [&_p+p]:mt-3.5 [&_li+li]:mt-1.5">
                           <ReactMarkdown
                             components={{
                               h2: ({ children }) => {
                                 const Icon = getScenarioIcon(String(children));
                                 return (
-                                  <h2 className="flex items-center gap-2 text-sm font-semibold mt-4 mb-2">
-                                    <Icon className="h-4 w-4 text-primary shrink-0" />
+                                  <h2 className="flex items-center gap-2.5 font-semibold mt-5 mb-2.5 pb-1.5 border-b border-border/30">
+                                    <span className="h-6 w-6 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                                      <Icon className="h-3.5 w-3.5 text-primary" />
+                                    </span>
                                     {children}
                                   </h2>
                                 );
@@ -302,8 +304,8 @@ export default function AssistantPage() {
                               h3: ({ children }) => {
                                 const Icon = getScenarioIcon(String(children));
                                 return (
-                                  <h3 className="flex items-center gap-2 text-sm font-semibold mt-3 mb-1.5">
-                                    <Icon className="h-3.5 w-3.5 text-primary shrink-0" />
+                                  <h3 className="flex items-center gap-2 font-semibold mt-4 mb-1.5">
+                                    <Icon className="h-3.5 w-3.5 text-primary/70 shrink-0" />
                                     {children}
                                   </h3>
                                 );
@@ -312,20 +314,25 @@ export default function AssistantPage() {
                                 const text = String(children);
                                 const Icon = getScenarioIcon(text);
                                 return (
-                                  <li className="flex items-start gap-2 my-1 list-none">
-                                    <Icon className="h-3.5 w-3.5 text-success shrink-0 mt-0.5" />
-                                    <span>{children}</span>
+                                  <li className="flex items-start gap-2.5 my-1.5 list-none">
+                                    <span className="h-5 w-5 rounded-md bg-success/10 flex items-center justify-center shrink-0 mt-0.5">
+                                      <Icon className="h-3 w-3 text-success" />
+                                    </span>
+                                    <span className="flex-1">{children}</span>
                                   </li>
                                 );
                               },
                               blockquote: ({ children }) => (
-                                <blockquote className="flex items-start gap-2 border-l-2 border-primary/30 bg-primary/5 rounded-r-lg px-3 py-2 my-3 not-italic">
+                                <blockquote className="flex items-start gap-3 border-l-2 border-warning/40 bg-warning/5 rounded-r-xl px-4 py-3 my-4 not-italic">
                                   <Lightbulb className="h-4 w-4 text-warning shrink-0 mt-0.5" />
-                                  <div>{children}</div>
+                                  <div className="flex-1">{children}</div>
                                 </blockquote>
                               ),
                               strong: ({ children }) => (
                                 <strong className="font-semibold text-foreground">{children}</strong>
+                              ),
+                              p: ({ children }) => (
+                                <p className="text-muted-foreground leading-[1.75]">{children}</p>
                               ),
                             }}
                           >
