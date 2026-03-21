@@ -135,6 +135,10 @@ export function AppSidebar() {
     navigate("/auth");
   };
 
+  const closeMobileSidebar = () => {
+    if (isMobile) setOpenMobile(false);
+  };
+
   const renderItem = (item: NavItem) => (
     <SidebarMenuItem key={item.title}>
       <Tip label={item.title} side="right" delayDuration={collapsed ? 100 : 600}>
@@ -142,6 +146,7 @@ export function AppSidebar() {
           <NavLink
             to={item.url}
             end={item.end}
+            onClick={closeMobileSidebar}
             className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] transition-all hover:bg-muted/60 ${
               isActive(item.url, item.end) ? "bg-primary/8 text-primary font-medium" : "text-sidebar-foreground"
             }`}
