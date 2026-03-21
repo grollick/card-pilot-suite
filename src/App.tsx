@@ -249,6 +249,7 @@ const App = () => (
               <Route path="scan-card" element={<LazyRoute><ScanBusinessCard /></LazyRoute>} />
               <Route path="bookings" element={<LazyRoute><BookingManager /></LazyRoute>} />
               <Route path="email" element={<LazyRoute><EmailMarketing /></LazyRoute>} />
+              <Route path="email-dashboard" element={<LazyRoute><EmailDashboardPage /></LazyRoute>} />
               <Route path="social" element={<LazyRoute><SocialScheduler /></LazyRoute>} />
               <Route path="post-designer" element={<LazyRoute><PostDesigner /></LazyRoute>} />
               <Route path="content" element={<LazyRoute><ContentPage /></LazyRoute>} />
