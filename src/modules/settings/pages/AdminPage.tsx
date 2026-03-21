@@ -1,4 +1,4 @@
-import { Shield, Edit, LayoutGrid, Settings2, MessageSquare, TrendingUp, ShieldAlert, Rocket, Flame, ClipboardList, Workflow, Target } from "lucide-react";
+import { Shield, Edit, LayoutGrid, Settings2, MessageSquare, TrendingUp, ShieldAlert, Rocket, Flame, ClipboardList, Workflow, Target, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { professions, professionCategories, getProfessionsByCategory } from "@/data/professions";
