@@ -157,13 +157,13 @@ export function usePublicCard(handle: string | undefined) {
       // Step 1: Get profile (required for user_id)
       const { data: profile, error: pErr } = await supabase
         .from("profiles")
-        .select("id, name, handle, email, phone, company, avatar_url, primary_cta, style_pack, profession_id, verification_level, professions(name, category)")
+        .select("id, name, handle, email, phone, company, avatar_url, primary_cta, style_pack, profession_id, verification_level, available_for_work, avg_response_minutes, professions(name, category)")
         .eq("handle", handle!)
         .single();
       if (pErr) throw pErr;
 
       // Step 2: Fire all dependent queries in parallel
-      const [cardResult, servicesResult, stylePackResult] = await Promise.all([
+      const [cardResult, servicesResult, stylePackResult, dutyResult, recentViewsResult] = await Promise.all([
         supabase
           .from("cards")
           .select("sections_json, theme_json, status")
@@ -184,13 +184,28 @@ export function usePublicCard(handle: string | undefined) {
               .eq("key", profile.style_pack)
               .maybeSingle()
           : Promise.resolve({ data: null }),
+        supabase
+          .from("estimate_duty_status")
+          .select("is_on_duty")
+          .eq("user_id", profile.id)
+          .maybeSingle(),
+        supabase
+          .from("analytics_events")
+          .select("id", { count: "exact", head: true })
+          .eq("handle", handle!)
+          .eq("event_type", "card_view")
+          .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
       ]);
 
       return {
-        profile,
+        profile: {
+          ...profile,
+          is_on_duty: dutyResult.data?.is_on_duty ?? false,
+        },
         card: cardResult.data,
         stylePack: stylePackResult.data,
         services: servicesResult.data ?? [],
+        recentViewCount: recentViewsResult.count ?? 0,
       };
     },
   });
