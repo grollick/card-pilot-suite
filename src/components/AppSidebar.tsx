@@ -87,7 +87,7 @@ const adminOnlyItems = [
   { title: "Admin Marketing", url: "/app/admin-marketing", icon: Megaphone },
 ];
 
-type NavItem = { title: string; url: string; icon: any; end?: boolean };
+type NavItem = { title: string; url: string; icon: any; end?: boolean; glowKey?: string };
 
 export function AppSidebar() {
   const { state, toggleSidebar, isMobile, setOpenMobile } = useSidebar();
