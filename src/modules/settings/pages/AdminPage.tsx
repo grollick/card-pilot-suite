@@ -17,6 +17,7 @@ type Section = "command" | "engine" | "growth" | "content" | "feedback" | "syste
 
 const sections: { id: Section; label: string; icon: typeof Shield }[] = [
   { id: "command", label: "Command Center", icon: Rocket },
+  { id: "engine", label: "Growth Engine", icon: Flame },
   { id: "growth", label: "Growth", icon: TrendingUp },
   { id: "abuse", label: "Abuse Monitor", icon: ShieldAlert },
   { id: "content", label: "Content & Professions", icon: LayoutGrid },
