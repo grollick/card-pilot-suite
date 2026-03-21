@@ -108,18 +108,175 @@ const QUICK_ACTIONS = [
   { label: "Edit Card", icon: PenTool, route: "/app/card" },
 ];
 
-/* ── Follow-up suggestions based on last message context ── */
-function getFollowUps(lastMsg: string): string[] {
-  const lower = lastMsg.toLowerCase();
-  if (/lead|contact|prospect/i.test(lower))
-    return ["How do I follow up with stale leads?", "Write a follow-up message", "Show my lead funnel"];
-  if (/revenue|money|earn|profit/i.test(lower))
-    return ["How can I increase my average job value?", "Show pricing recommendations", "Create an upsell strategy"];
-  if (/card|design|brand/i.test(lower))
-    return ["What sections should I add to my card?", "Write a better bio for me", "How do top cards convert?"];
-  if (/grow|scale|marketing/i.test(lower))
-    return ["Create a 7-day growth sprint", "What channels should I focus on?", "Draft a promo campaign"];
-  return ["What else can I improve?", "Give me a weekly summary", "Write me a follow-up message"];
+/* ── Topic categories for tracking conversation context ── */
+const TOPIC_MAP: { pattern: RegExp; topic: string }[] = [
+  { pattern: /lead|contact|prospect|inquiry|follow.?up/i, topic: "leads" },
+  { pattern: /revenue|money|earn|profit|price|income|invoice/i, topic: "revenue" },
+  { pattern: /card|design|brand|logo|bio|profile/i, topic: "card" },
+  { pattern: /grow|scale|marketing|promote|campaign|outreach/i, topic: "growth" },
+  { pattern: /book|appoint|schedul|calendar/i, topic: "bookings" },
+  { pattern: /estimat|quote|proposal|scope/i, topic: "estimates" },
+  { pattern: /automat|workflow|trigger|sequence/i, topic: "automation" },
+  { pattern: /review|rating|testimon|reputation/i, topic: "reviews" },
+  { pattern: /social|post|content|caption/i, topic: "social" },
+  { pattern: /convert|funnel|pipeline|close|win/i, topic: "conversion" },
+  { pattern: /retain|churn|inactive|re.?engage/i, topic: "retention" },
+  { pattern: /referral|word.?of.?mouth/i, topic: "referrals" },
+];
+
+/** Detects topics from a message */
+function detectTopics(text: string): Set<string> {
+  const topics = new Set<string>();
+  for (const { pattern, topic } of TOPIC_MAP) {
+    if (pattern.test(text)) topics.add(topic);
+  }
+  return topics;
+}
+
+/** Follow-up map — related insights per topic (not repeating what was already discussed) */
+const FOLLOW_UP_MAP: Record<string, string[]> = {
+  leads: [
+    "How do I follow up with stale leads?",
+    "Write a follow-up message for my top leads",
+    "Show my lead-to-booking conversion funnel",
+  ],
+  revenue: [
+    "How can I increase my average job value?",
+    "Show pricing recommendations for my area",
+    "Create an upsell strategy for my services",
+  ],
+  card: [
+    "What sections convert best on a card?",
+    "Write a better bio for my profile",
+    "How do top-performing cards look?",
+  ],
+  growth: [
+    "Create a 7-day growth sprint plan",
+    "Which channels should I focus on?",
+    "Draft a promo campaign for this month",
+  ],
+  bookings: [
+    "How can I reduce no-shows?",
+    "Set up booking reminders",
+    "What's my busiest day for bookings?",
+  ],
+  estimates: [
+    "How can I close more estimates?",
+    "Write a professional scope of work",
+    "What's a good follow-up cadence for quotes?",
+  ],
+  automation: [
+    "What automations save the most time?",
+    "Set up a lead follow-up sequence",
+    "Automate my review requests",
+  ],
+  reviews: [
+    "How do I get more 5-star reviews?",
+    "Write a review request message",
+    "How do reviews impact my lead conversion?",
+  ],
+  social: [
+    "Write 3 social posts for this week",
+    "What type of content gets the most engagement?",
+    "Create a content calendar for my business",
+  ],
+  conversion: [
+    "What's blocking my conversions?",
+    "Optimize my card for higher conversion",
+    "Show my conversion rate trend",
+  ],
+  retention: [
+    "How do I re-engage inactive customers?",
+    "Write a win-back message",
+    "What's causing customers to leave?",
+  ],
+  referrals: [
+    "How do I set up a referral program?",
+    "Write a referral ask message",
+    "What incentives work best for referrals?",
+  ],
+};
+
+/** Cross-topic discovery — suggest a related but different topic */
+const CROSS_TOPIC: Record<string, { label: string; prompt: string }> = {
+  leads: { label: "💡 Related insight", prompt: "How can I convert more leads into bookings?" },
+  revenue: { label: "💡 Related insight", prompt: "Which services should I promote more?" },
+  card: { label: "💡 Related insight", prompt: "How can I drive more traffic to my card?" },
+  growth: { label: "💡 Related insight", prompt: "What's my biggest untapped opportunity?" },
+  bookings: { label: "💡 Related insight", prompt: "How can I increase repeat bookings?" },
+  estimates: { label: "💡 Related insight", prompt: "How do my estimate prices compare to market?" },
+  automation: { label: "💡 Related insight", prompt: "What manual tasks am I still doing?" },
+  reviews: { label: "💡 Related insight", prompt: "How can I use reviews to get more leads?" },
+  social: { label: "💡 Related insight", prompt: "Which posts drove the most leads?" },
+  conversion: { label: "💡 Related insight", prompt: "What's my strongest service by conversion?" },
+  retention: { label: "💡 Related insight", prompt: "How do I turn one-time customers into regulars?" },
+  referrals: { label: "💡 Related insight", prompt: "Who are my best candidates for referral asks?" },
+};
+
+/**
+ * Smart follow-up engine: uses full conversation history to suggest
+ * relevant next questions without repeating already-discussed topics.
+ */
+function getSmartFollowUps(messages: Msg[]): string[] {
+  // Collect all topics discussed across the conversation
+  const discussedTopics = new Set<string>();
+  const recentTopics: string[] = [];
+
+  for (const msg of messages) {
+    const topics = detectTopics(msg.content);
+    topics.forEach((t) => discussedTopics.add(t));
+  }
+
+  // Get topics from the last assistant message for contextual suggestions
+  const lastAssistant = [...messages].reverse().find((m) => m.role === "assistant");
+  if (lastAssistant) {
+    detectTopics(lastAssistant.content).forEach((t) => recentTopics.push(t));
+  }
+  // Also check last user message
+  const lastUser = [...messages].reverse().find((m) => m.role === "user");
+  if (lastUser) {
+    detectTopics(lastUser.content).forEach((t) => {
+      if (!recentTopics.includes(t)) recentTopics.push(t);
+    });
+  }
+
+  const suggestions: string[] = [];
+  const usedPrompts = new Set(messages.filter((m) => m.role === "user").map((m) => m.content.toLowerCase()));
+
+  // 1. Add deeper follow-ups for current topic
+  for (const topic of recentTopics) {
+    const candidates = FOLLOW_UP_MAP[topic] || [];
+    for (const c of candidates) {
+      if (!usedPrompts.has(c.toLowerCase()) && suggestions.length < 2) {
+        suggestions.push(c);
+      }
+    }
+  }
+
+  // 2. Add a cross-topic discovery suggestion (something they haven't explored)
+  const unexplored = Object.keys(CROSS_TOPIC).filter((t) => !discussedTopics.has(t));
+  if (unexplored.length > 0) {
+    const pick = unexplored[Math.floor(Math.random() * unexplored.length)];
+    const cross = CROSS_TOPIC[pick];
+    if (cross && !usedPrompts.has(cross.prompt.toLowerCase()) && suggestions.length < 3) {
+      suggestions.push(cross.prompt);
+    }
+  }
+
+  // 3. Fill remaining slots with general suggestions not yet asked
+  const generals = [
+    "What else can I improve?",
+    "Give me my weekly performance summary",
+    "What's my biggest opportunity right now?",
+    "Show me quick wins I can do today",
+  ];
+  for (const g of generals) {
+    if (!usedPrompts.has(g.toLowerCase()) && suggestions.length < 3) {
+      suggestions.push(g);
+    }
+  }
+
+  return suggestions.slice(0, 3);
 }
 
 /** Formats the user's query into a clean, title-cased result heading. */
@@ -336,8 +493,7 @@ export default function AssistantPage() {
     }
   };
 
-  const lastAssistantMsg = [...messages].reverse().find((m) => m.role === "assistant");
-  const followUps = lastAssistantMsg ? getFollowUps(lastAssistantMsg.content) : [];
+  const followUps = messages.length > 0 ? getSmartFollowUps(messages) : [];
 
   return (
     <div className="flex flex-col h-[calc(100dvh-4rem)] max-w-4xl mx-auto">
