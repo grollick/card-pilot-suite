@@ -1,9 +1,13 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
+
+// Allowed domains for the download proxy to prevent SSRF
+const ALLOWED_DOWNLOAD_PROTOCOLS = ["https:"];
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -11,6 +15,19 @@ serve(async (req) => {
   }
 
   try {
+    // Auth guard
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     const { url, action } = await req.json();
 
     // ── Step 1: Scan URL for images ──
@@ -32,7 +49,6 @@ serve(async (req) => {
 
       console.log("Scanning URL for images:", formattedUrl);
 
-      // Use Firecrawl to scrape the page
       const scrapeResponse = await fetch("https://api.firecrawl.dev/v1/scrape", {
         method: "POST",
         headers: {
@@ -63,14 +79,12 @@ serve(async (req) => {
       const html = scrapeData.data?.html || scrapeData.html || "";
       const pageTitle = scrapeData.data?.metadata?.title || scrapeData.metadata?.title || "";
 
-      // Extract image URLs from HTML
       const imgRegex = /<img[^>]+src=["']([^"']+)["'][^>]*(?:alt=["']([^"']*)["'])?[^>]*>/gi;
       const ogRegex = /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/gi;
       
       const images: { url: string; alt: string; width?: number }[] = [];
       const seen = new Set<string>();
 
-      // Extract OG images first (usually high quality)
       let ogMatch;
       while ((ogMatch = ogRegex.exec(html)) !== null) {
         const imgUrl = ogMatch[1];
@@ -80,13 +94,11 @@ serve(async (req) => {
         }
       }
 
-      // Extract img tags
       let match;
       while ((match = imgRegex.exec(html)) !== null) {
         const imgUrl = match[1];
         const alt = match[2] || "";
 
-        // Filter out tiny icons, tracking pixels, and common non-content images
         if (
           seen.has(imgUrl) ||
           imgUrl.includes("data:image/svg") ||
@@ -102,18 +114,14 @@ serve(async (req) => {
           continue;
         }
 
-        // Try to extract width from img tag
         const widthMatch = match[0].match(/width=["']?(\d+)/);
         const width = widthMatch ? parseInt(widthMatch[1]) : undefined;
-
-        // Skip very small images (likely icons)
         if (width && width < 100) continue;
 
         seen.add(imgUrl);
         images.push({ url: imgUrl, alt, width });
       }
 
-      // Also check for background images in style attributes
       const bgRegex = /background(?:-image)?:\s*url\(["']?([^"')]+)["']?\)/gi;
       let bgMatch;
       while ((bgMatch = bgRegex.exec(html)) !== null) {
@@ -124,7 +132,6 @@ serve(async (req) => {
         }
       }
 
-      // Resolve relative URLs
       const baseUrl = new URL(formattedUrl);
       const resolvedImages = images.map((img) => {
         let resolvedUrl = img.url;
@@ -138,18 +145,11 @@ serve(async (req) => {
         return { ...img, url: resolvedUrl };
       });
 
-      // Limit to top 30 images
       const finalImages = resolvedImages.slice(0, 30);
-
       console.log(`Found ${finalImages.length} images from ${formattedUrl}`);
 
       return new Response(
-        JSON.stringify({
-          success: true,
-          images: finalImages,
-          pageTitle,
-          sourceUrl: formattedUrl,
-        }),
+        JSON.stringify({ success: true, images: finalImages, pageTitle, sourceUrl: formattedUrl }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -269,6 +269,31 @@ serve(async (req) => {
       const { imageUrl } = await req.json();
       if (!imageUrl) throw new Error("imageUrl is required");
 
+      // SSRF protection: only allow HTTPS URLs
+      let parsedUrl: URL;
+      try {
+        parsedUrl = new URL(imageUrl);
+      } catch {
+        throw new Error("Invalid URL");
+      }
+      if (!ALLOWED_DOWNLOAD_PROTOCOLS.includes(parsedUrl.protocol)) {
+        throw new Error("Only HTTPS URLs are allowed");
+      }
+      // Block private/internal IPs
+      const hostname = parsedUrl.hostname.toLowerCase();
+      if (
+        hostname === "localhost" ||
+        hostname === "127.0.0.1" ||
+        hostname === "0.0.0.0" ||
+        hostname.startsWith("10.") ||
+        hostname.startsWith("172.") ||
+        hostname.startsWith("192.168.") ||
+        hostname.endsWith(".internal") ||
+        hostname.endsWith(".local")
+      ) {
+        throw new Error("Internal URLs are not allowed");
+      }
+
       const imgResp = await fetch(imageUrl, {
         headers: {
           "User-Agent": "Mozilla/5.0 (compatible; guzzl.pro/1.0)",
@@ -280,7 +305,12 @@ serve(async (req) => {
         throw new Error(`Failed to download image (${imgResp.status})`);
       }
 
-      const contentType = imgResp.headers.get("content-type") || "image/jpeg";
+      // Verify content-type is an image
+      const contentType = imgResp.headers.get("content-type") || "";
+      if (!contentType.startsWith("image/")) {
+        throw new Error("URL did not return an image");
+      }
+
       const buffer = await imgResp.arrayBuffer();
       const base64 = btoa(String.fromCharCode(...new Uint8Array(buffer)));
 

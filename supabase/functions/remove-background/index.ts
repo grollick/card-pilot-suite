@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,6 +12,19 @@ serve(async (req) => {
   }
 
   try {
+    // Auth guard
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     const { image_url } = await req.json();
     if (!image_url) throw new Error("image_url is required");
 
@@ -47,14 +61,12 @@ serve(async (req) => {
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "AI credits exhausted." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const text = await response.text();
@@ -63,13 +75,9 @@ serve(async (req) => {
     }
 
     const result = await response.json();
-    console.log("AI response keys:", JSON.stringify(Object.keys(result)));
-
-    // Try multiple response formats
     const choice = result.choices?.[0]?.message;
     let imageData: string | undefined;
 
-    // Format 1: inline_data in parts
     if (choice?.content && Array.isArray(choice.content)) {
       for (const part of choice.content) {
         if (part.type === "image_url" && part.image_url?.url) {
@@ -83,7 +91,6 @@ serve(async (req) => {
       }
     }
 
-    // Format 2: images array
     if (!imageData && choice?.images?.[0]) {
       const img = choice.images[0];
       imageData = img.image_url?.url || img.url || (img.data ? `data:image/png;base64,${img.data}` : undefined);
