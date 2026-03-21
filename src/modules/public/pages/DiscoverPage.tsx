@@ -615,8 +615,11 @@ export default function DiscoverPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              className="flex items-center gap-6 mt-6 text-sm text-muted-foreground"
+              className="flex flex-wrap items-center gap-4 md:gap-6 mt-6 text-sm text-muted-foreground"
             >
+              {onDutyCount > 0 && (
+                <LiveAvailabilityCounter count={onDutyCount} />
+              )}
               <span className="flex items-center gap-1.5">
                 <Users className="h-4 w-4" /> {filteredListings.length} professionals
               </span>
