@@ -684,14 +684,55 @@ export default function ColdOutreachTemplates() {
           </DialogHeader>
           {selectedTemplate && (
             <div className="space-y-4">
+              {/* Channel selector */}
+              <div className="space-y-1.5">
+                <p className="text-xs font-medium text-muted-foreground">Send via</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {([
+                    { id: "email", label: "Email", icon: Mail },
+                    { id: "whatsapp", label: "WhatsApp", icon: MessageCircle },
+                    { id: "sms", label: "SMS", icon: Phone },
+                    { id: "facebook", label: "Facebook", icon: Facebook },
+                    { id: "linkedin", label: "LinkedIn", icon: Linkedin },
+                    { id: "instagram", label: "Instagram", icon: Instagram },
+                  ] as const).map(ch => (
+                    <Button
+                      key={ch.id}
+                      size="sm"
+                      variant={sendChannel === ch.id ? "default" : "outline"}
+                      className="text-xs h-7 gap-1 px-2.5"
+                      onClick={() => setSendChannel(ch.id)}
+                    >
+                      <ch.icon className="h-3 w-3" /> {ch.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
               {/* Recipient info */}
               <div className="space-y-2">
-                <Input
-                  placeholder="Recipient email *"
-                  type="email"
-                  value={recipientEmail}
-                  onChange={e => setRecipientEmail(e.target.value)}
-                />
+                {sendChannel === "email" && (
+                  <Input
+                    placeholder="Recipient email *"
+                    type="email"
+                    value={recipientEmail}
+                    onChange={e => setRecipientEmail(e.target.value)}
+                  />
+                )}
+                {(sendChannel === "whatsapp" || sendChannel === "sms") && (
+                  <Input
+                    placeholder="Phone number with country code *  (e.g. +27821234567)"
+                    type="tel"
+                    value={recipientPhone}
+                    onChange={e => setRecipientPhone(e.target.value)}
+                  />
+                )}
+                {(sendChannel === "facebook" || sendChannel === "linkedin" || sendChannel === "instagram") && (
+                  <div className="rounded-lg bg-muted/40 p-2.5 text-xs text-muted-foreground flex items-start gap-2">
+                    <ExternalLink className="h-3.5 w-3.5 shrink-0 mt-0.5" />
+                    <span>The message will be copied to your clipboard and {sendChannel === "facebook" ? "Facebook Messenger" : sendChannel === "linkedin" ? "LinkedIn Messages" : "Instagram DMs"} will open. Just paste and send!</span>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-2">
                   <Input
                     placeholder="Contact name"
@@ -738,15 +779,18 @@ export default function ColdOutreachTemplates() {
                 </Button>
               </div>
 
-              {/* Email preview / edit */}
+              {/* Message preview / edit */}
               <div className="border rounded-lg p-3 space-y-2 bg-muted/20">
                 {editMode ? (
                   <>
-                    <Input
-                      value={editedSubject}
-                      onChange={e => setEditedSubject(e.target.value)}
-                      className="text-sm font-semibold"
-                    />
+                    {sendChannel === "email" && (
+                      <Input
+                        value={editedSubject}
+                        onChange={e => setEditedSubject(e.target.value)}
+                        className="text-sm font-semibold"
+                        placeholder="Subject line"
+                      />
+                    )}
                     <Textarea
                       value={editedBody}
                       onChange={e => setEditedBody(e.target.value)}
@@ -756,11 +800,15 @@ export default function ColdOutreachTemplates() {
                   </>
                 ) : (
                   <>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Subject</p>
-                    <p className="text-sm font-semibold">
-                      {personalizeText(getSubject(selectedTemplate, emailStep))}
-                    </p>
-                    <hr className="border-border" />
+                    {sendChannel === "email" && (
+                      <>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Subject</p>
+                        <p className="text-sm font-semibold">
+                          {personalizeText(getSubject(selectedTemplate, emailStep))}
+                        </p>
+                        <hr className="border-border" />
+                      </>
+                    )}
                     <div className="text-sm whitespace-pre-wrap leading-relaxed">
                       {personalizeText(getEmailContent(selectedTemplate, emailStep))}
                     </div>
@@ -768,13 +816,37 @@ export default function ColdOutreachTemplates() {
                 )}
               </div>
 
+              {/* Send button */}
               <Button
                 className="w-full gap-1"
                 onClick={handleSend}
-                disabled={sending || !recipientEmail.trim()}
+                disabled={
+                  sending ||
+                  (sendChannel === "email" && !recipientEmail.trim()) ||
+                  ((sendChannel === "whatsapp" || sendChannel === "sms") && !recipientPhone.trim())
+                }
               >
-                {sending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
-                {sending ? "Sending..." : "Send Email"}
+                {sending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : sendChannel === "email" ? (
+                  <Mail className="h-3.5 w-3.5" />
+                ) : sendChannel === "whatsapp" ? (
+                  <MessageCircle className="h-3.5 w-3.5" />
+                ) : sendChannel === "sms" ? (
+                  <Phone className="h-3.5 w-3.5" />
+                ) : (
+                  <ExternalLink className="h-3.5 w-3.5" />
+                )}
+                {sending
+                  ? "Sending..."
+                  : sendChannel === "email"
+                  ? "Send Email"
+                  : sendChannel === "whatsapp"
+                  ? "Open WhatsApp"
+                  : sendChannel === "sms"
+                  ? "Open SMS"
+                  : `Copy & Open ${sendChannel === "facebook" ? "Messenger" : sendChannel === "linkedin" ? "LinkedIn" : "Instagram"}`
+                }
               </Button>
             </div>
           )}
