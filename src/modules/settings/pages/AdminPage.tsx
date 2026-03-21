@@ -14,9 +14,10 @@ import GrowthEngine from "@/modules/admin/components/GrowthEngine";
 import GrowthAutomationDashboard from "@/modules/admin/components/GrowthAutomationDashboard";
 import UserResearchDashboard from "@/modules/admin/components/UserResearchDashboard";
 import FunnelVisualizationDashboard from "@/modules/admin/components/FunnelVisualizationDashboard";
+import SourceAttributionDashboard from "@/modules/admin/components/SourceAttributionDashboard";
 import { useState } from "react";
 
-type Section = "command" | "engine" | "automation" | "funnel" | "growth" | "research" | "content" | "feedback" | "system" | "abuse";
+type Section = "command" | "engine" | "automation" | "funnel" | "growth" | "sources" | "research" | "content" | "feedback" | "system" | "abuse";
 
 const sections: { id: Section; label: string; icon: typeof Shield }[] = [
   { id: "command", label: "Command Center", icon: Rocket },
