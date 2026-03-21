@@ -37,6 +37,14 @@ export default function MarketplacePage() {
 
   const installedIds = useMemo(() => new Set(installed?.map((i) => i.app_id) || []), [installed]);
 
+  const handleInstall = (app: MarketplaceApp) => {
+    if (app.pricing_type !== "free") {
+      setPurchaseApp(app);
+    } else {
+      installApp.mutate(app.id);
+    }
+  };
+
   const filtered = useMemo(() => {
     if (!allApps) return [];
     if (!search.trim()) return allApps;
