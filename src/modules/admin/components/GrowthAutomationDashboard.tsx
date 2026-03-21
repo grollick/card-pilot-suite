@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ColdOutreachTemplates from "@/modules/admin/components/ColdOutreachTemplates";
 import {
   Rocket, Target, Send, Users, UserPlus, ArrowRight, Clock,
   CheckCircle2, AlertTriangle, MessageSquare, Zap, Bot,
