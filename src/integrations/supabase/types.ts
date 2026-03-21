@@ -2503,6 +2503,93 @@ export type Database = {
           },
         ]
       }
+      growth_automation_log: {
+        Row: {
+          action_type: string
+          created_at: string
+          id: string
+          result_json: Json | null
+          status: string
+          target_contact_id: string | null
+          target_user_id: string | null
+          workflow_id: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          id?: string
+          result_json?: Json | null
+          status?: string
+          target_contact_id?: string | null
+          target_user_id?: string | null
+          workflow_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          id?: string
+          result_json?: Json | null
+          status?: string
+          target_contact_id?: string | null
+          target_user_id?: string | null
+          workflow_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "growth_automation_log_target_contact_id_fkey"
+            columns: ["target_contact_id"]
+            isOneToOne: false
+            referencedRelation: "outreach_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "growth_automation_log_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "growth_automation_workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      growth_automation_workflows: {
+        Row: {
+          action_config: Json
+          created_at: string
+          created_by: string
+          id: string
+          name: string
+          stats_json: Json
+          status: string
+          trigger_config: Json
+          updated_at: string
+          workflow_type: string
+        }
+        Insert: {
+          action_config?: Json
+          created_at?: string
+          created_by: string
+          id?: string
+          name: string
+          stats_json?: Json
+          status?: string
+          trigger_config?: Json
+          updated_at?: string
+          workflow_type?: string
+        }
+        Update: {
+          action_config?: Json
+          created_at?: string
+          created_by?: string
+          id?: string
+          name?: string
+          stats_json?: Json
+          status?: string
+          trigger_config?: Json
+          updated_at?: string
+          workflow_type?: string
+        }
+        Relationships: []
+      }
       installed_apps: {
         Row: {
           app_id: string
@@ -3809,34 +3896,61 @@ export type Database = {
       outreach_contacts: {
         Row: {
           business: string | null
+          city: string | null
           created_at: string
           created_by: string
+          email: string | null
+          flagged_for_handoff: boolean | null
+          followup_count: number | null
+          handoff_reason: string | null
           id: string
           last_contact_at: string | null
           name: string
+          next_followup_at: string | null
           notes: string | null
+          phone: string | null
+          profession: string | null
+          source: string | null
           status: string
           updated_at: string
         }
         Insert: {
           business?: string | null
+          city?: string | null
           created_at?: string
           created_by: string
+          email?: string | null
+          flagged_for_handoff?: boolean | null
+          followup_count?: number | null
+          handoff_reason?: string | null
           id?: string
           last_contact_at?: string | null
           name: string
+          next_followup_at?: string | null
           notes?: string | null
+          phone?: string | null
+          profession?: string | null
+          source?: string | null
           status?: string
           updated_at?: string
         }
         Update: {
           business?: string | null
+          city?: string | null
           created_at?: string
           created_by?: string
+          email?: string | null
+          flagged_for_handoff?: boolean | null
+          followup_count?: number | null
+          handoff_reason?: string | null
           id?: string
           last_contact_at?: string | null
           name?: string
+          next_followup_at?: string | null
           notes?: string | null
+          phone?: string | null
+          profession?: string | null
+          source?: string | null
           status?: string
           updated_at?: string
         }
