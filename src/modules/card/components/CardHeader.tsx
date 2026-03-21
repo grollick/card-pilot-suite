@@ -321,6 +321,8 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     ? heroBackground.gradient
     : `linear-gradient(135deg, ${palette.primary}30, ${palette.accent}20)`;
 
+  const showVerified = verificationLevel && verificationLevel !== "basic";
+
   // Parallax cover image element — reused in cover layout and banner
   const parallaxCover = (height: number, borderRadiusTop: boolean) => (
     <div
