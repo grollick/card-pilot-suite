@@ -67,6 +67,9 @@ export default function AdminPage() {
       {/* Growth Automation */}
       {section === "automation" && <GrowthAutomationDashboard />}
 
+      {/* Funnel Visualization */}
+      {section === "funnel" && <FunnelVisualizationDashboard />}
+
       {/* Growth */}
       {section === "growth" && <AdminGrowthDashboard />}
 
