@@ -1,19 +1,37 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Phone, MessageSquare, Calendar, MapPin, ChevronRight,
   Bell, UserPlus, CheckCircle2, Star, Scissors, Dumbbell, Home,
 } from "lucide-react";
-import mikeImg from "@/assets/demo/mike-reynolds.jpg";
-import marcusImg from "@/assets/demo/marcus-cole.jpg";
-import sarahImg from "@/assets/demo/sarah-chen.jpg";
-import jessicaImg from "@/assets/demo/jessica-martinez.jpg";
-import tanyaImg from "@/assets/demo/tanya-brooks.jpg";
-import projectKitchen from "@/assets/demo/project-kitchen.jpg";
-import coverBarbershop from "@/assets/demo/cover-barbershop.jpg";
-import coverRealtor from "@/assets/demo/cover-realtor.jpg";
-import coverTrainer from "@/assets/demo/cover-trainer.jpg";
-import coverHairstylist from "@/assets/demo/cover-hairstylist.jpg";
+
+/* ── Lazy image loader — only loads assets for current + next persona ── */
+const imageModules: Record<string, () => Promise<{ default: string }>> = {
+  "mike-avatar": () => import("@/assets/demo/mike-reynolds.jpg"),
+  "mike-cover": () => import("@/assets/demo/project-kitchen.jpg"),
+  "marcus-avatar": () => import("@/assets/demo/marcus-cole.jpg"),
+  "marcus-cover": () => import("@/assets/demo/cover-barbershop.jpg"),
+  "sarah-avatar": () => import("@/assets/demo/sarah-chen.jpg"),
+  "sarah-cover": () => import("@/assets/demo/cover-realtor.jpg"),
+  "jessica-avatar": () => import("@/assets/demo/jessica-martinez.jpg"),
+  "jessica-cover": () => import("@/assets/demo/cover-trainer.jpg"),
+  "tanya-avatar": () => import("@/assets/demo/tanya-brooks.jpg"),
+  "tanya-cover": () => import("@/assets/demo/cover-hairstylist.jpg"),
+  "david-avatar": () => import("@/assets/demo/david-nguyen.jpg"),
+  "david-cover": () => import("@/assets/demo/cover-landscaper.jpg"),
+};
+
+const imageCache = new Map<string, string>();
+
+async function preloadImages(keys: string[]) {
+  await Promise.all(
+    keys.map(async (k) => {
+      if (imageCache.has(k)) return;
+      const mod = await imageModules[k]?.();
+      if (mod) imageCache.set(k, mod.default);
+    })
+  );
+}
 
 /* ── Persona definitions ── */
 interface Persona {
@@ -21,8 +39,8 @@ interface Persona {
   company: string;
   tagline: string;
   city: string;
-  avatarUrl: string;
-  coverUrl: string;
+  avatarKey: string;
+  coverKey: string;
   accentHsl: string;
   services: { name: string; price: string }[];
   cta: string;
@@ -35,8 +53,8 @@ const PERSONAS: Persona[] = [
     company: "Reynolds Construction",
     tagline: "Quality builds. On time. On budget.",
     city: "Toronto, ON",
-    avatarUrl: mikeImg,
-    coverUrl: projectKitchen,
+    avatarKey: "mike-avatar",
+    coverKey: "mike-cover",
     accentHsl: "25, 95%, 53%",
     services: [
       { name: "Kitchen Remodel", price: "$15,000+" },
@@ -57,8 +75,8 @@ const PERSONAS: Persona[] = [
     company: "Fresh Cuts Studio",
     tagline: "Sharp looks. Sharp confidence.",
     city: "Vancouver, BC",
-    avatarUrl: marcusImg,
-    coverUrl: coverBarbershop,
+    avatarKey: "marcus-avatar",
+    coverKey: "marcus-cover",
     accentHsl: "262, 83%, 58%",
     services: [
       { name: "Classic Haircut", price: "$35" },
@@ -78,8 +96,8 @@ const PERSONAS: Persona[] = [
     company: "Chen Realty Group",
     tagline: "Your home journey starts here.",
     city: "San Diego, CA",
-    avatarUrl: sarahImg,
-    coverUrl: coverRealtor,
+    avatarKey: "sarah-avatar",
+    coverKey: "sarah-cover",
     accentHsl: "152, 69%, 40%",
     services: [
       { name: "Home Buying Consultation", price: "Free" },
@@ -98,8 +116,8 @@ const PERSONAS: Persona[] = [
     company: "FitLife Coaching",
     tagline: "Stronger every day.",
     city: "Montreal, QC",
-    avatarUrl: jessicaImg,
-    coverUrl: coverTrainer,
+    avatarKey: "jessica-avatar",
+    coverKey: "jessica-cover",
     accentHsl: "199, 89%, 48%",
     services: [
       { name: "1-on-1 Training", price: "$85/ses" },
@@ -120,8 +138,8 @@ const PERSONAS: Persona[] = [
     company: "Glow Hair Studio",
     tagline: "Your best hair day, every day.",
     city: "Austin, TX",
-    avatarUrl: tanyaImg,
-    coverUrl: coverHairstylist,
+    avatarKey: "tanya-avatar",
+    coverKey: "tanya-cover",
     accentHsl: "330, 70%, 55%",
     services: [
       { name: "Cut & Style", price: "$65" },
@@ -134,6 +152,28 @@ const PERSONAS: Persona[] = [
       { key: "tap", duration: 800 },
       { key: "booking", duration: 2200 },
       { key: "booked", duration: 1400 },
+    ],
+  },
+  {
+    name: "David Nguyen",
+    company: "GreenScape Pro",
+    tagline: "Lawns that make neighbors jealous.",
+    city: "Denver, CO",
+    avatarKey: "david-avatar",
+    coverKey: "david-cover",
+    accentHsl: "142, 76%, 36%",
+    services: [
+      { name: "Lawn Care Package", price: "$150/mo" },
+      { name: "Landscape Design", price: "$2,500+" },
+      { name: "Seasonal Cleanup", price: "$250" },
+    ],
+    cta: "🌿 Get Free Quote",
+    stages: [
+      { key: "idle", duration: 2200 },
+      { key: "tap", duration: 800 },
+      { key: "form", duration: 1800 },
+      { key: "submitted", duration: 1200 },
+      { key: "crm", duration: 2600 },
     ],
   },
 ];
