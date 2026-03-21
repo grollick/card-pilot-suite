@@ -77,15 +77,15 @@ export default function EstimateDutyPanel() {
               background: "radial-gradient(ellipse at center, hsl(var(--success) / 0.18), transparent 70%)",
               filter: "blur(30px)",
             }}
-            animate={{ opacity: [0.5, 1, 0.5], scale: [0.97, 1.03, 0.97] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ opacity: [0.4, 1, 0.4], scale: [0.96, 1.04, 0.96] }}
+            transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           />
           {/* Inner edge glow */}
           <motion.div
             className="absolute inset-0 rounded-xl pointer-events-none"
             style={{ boxShadow: "inset 0 0 30px hsl(var(--success) / 0.1)" }}
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ opacity: [0.3, 1, 0.3] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           />
           {/* Large blurred corner orbs */}
           <div className="absolute -top-12 -right-12 h-36 w-36 rounded-full pointer-events-none" style={{ background: "hsl(var(--success) / 0.2)", filter: "blur(50px)" }} />
