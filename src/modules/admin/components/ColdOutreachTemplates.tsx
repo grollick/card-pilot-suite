@@ -375,6 +375,22 @@ export default function ColdOutreachTemplates() {
   const [emailStep, setEmailStep] = useState<"initial" | "followup1" | "followup2">("initial");
   const [searchFilter, setSearchFilter] = useState("");
 
+  // Fetch sender (logged-in user) name
+  const { data: senderName } = useQuery({
+    queryKey: ["sender-profile-name"],
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return "The guzzl.pro Team";
+      const { data } = await supabase
+        .from("profiles")
+        .select("name, business_name")
+        .eq("id", user.id)
+        .maybeSingle();
+      return data?.name || data?.business_name || "The guzzl.pro Team";
+    },
+    staleTime: 60_000,
+  });
+
   const filtered = searchFilter
     ? COLD_TEMPLATES.filter(t =>
         t.name.toLowerCase().includes(searchFilter.toLowerCase()) ||
@@ -401,7 +417,8 @@ export default function ColdOutreachTemplates() {
   const personalizeText = (text: string) => {
     return text
       .replace(/{{name}}/g, recipientName || "there")
-      .replace(/{{business}}/g, recipientBusiness || "your business");
+      .replace(/{{business}}/g, recipientBusiness || "your business")
+      .replace(/{{sender}}/g, senderName || "The guzzl.pro Team");
   };
 
   const openSendDialog = (template: ColdTemplate) => {
