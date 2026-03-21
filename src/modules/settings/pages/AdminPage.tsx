@@ -24,7 +24,7 @@ const sections: { id: Section; label: string; icon: typeof Shield }[] = [
 ];
 
 export default function AdminPage() {
-  const [section, setSection] = useState<Section>("growth");
+  const [section, setSection] = useState<Section>("command");
   const byCategory = getProfessionsByCategory();
 
   return (
