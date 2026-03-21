@@ -443,7 +443,7 @@ function DailyTasks({ kpis, contacts }: { kpis: any; contacts: any[] }) {
 }
 
 // ─── Main Growth Engine ───
-export default function GrowthEngine() {
+export default function GrowthEngine({ onNavigateSection }: { onNavigateSection?: (section: string) => void }) {
   const navigate = useNavigate();
   const { data: stats, isLoading: statsLoading } = useAdminStats();
   const { data: growth, isLoading: growthLoading } = useAdminGrowthStats();
@@ -532,14 +532,14 @@ export default function GrowthEngine() {
       <SectionHeader icon={Rocket} title="Quick Actions" desc="Fast access to growth tools" />
       <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2">
         {[
-          { label: "Marketing", icon: Megaphone, route: "/app/admin-marketing" },
-          { label: "Sequences", icon: Workflow, route: "/app/admin-marketing" },
-          { label: "Users", icon: Users, route: "/app/admin-dashboard" },
-          { label: "Analytics", icon: BarChart3, route: "/app/analytics" },
-          { label: "Referrals", icon: Gift, route: "/app/referrals" },
-          { label: "Marketplace", icon: Globe, route: "/app/marketplace" },
+          { label: "Marketing", icon: Megaphone, action: () => navigate("/app/admin-marketing") },
+          { label: "Sequences", icon: Workflow, action: () => navigate("/app/admin-marketing") },
+          { label: "Users", icon: Users, action: () => navigate("/app/platform-admin") },
+          { label: "Analytics", icon: BarChart3, action: () => navigate("/app/analytics") },
+          { label: "Referrals", icon: Gift, action: () => navigate("/app/referrals") },
+          { label: "Marketplace", icon: Globe, action: () => navigate("/app/marketplace") },
         ].map(a => (
-          <Button key={a.label} variant="outline" size="sm" className="flex flex-col gap-1 h-auto py-3 text-xs" onClick={() => navigate(a.route)}>
+          <Button key={a.label} variant="outline" size="sm" className="flex flex-col gap-1 h-auto py-3 text-xs" onClick={a.action}>
             <a.icon className="h-4 w-4" />
             {a.label}
           </Button>

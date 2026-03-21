@@ -66,7 +66,7 @@ function FunnelStep({ label, value, pct, loading }: { label: string; value: numb
   );
 }
 
-export default function FounderCommandCenter() {
+export default function FounderCommandCenter({ onNavigateSection }: { onNavigateSection?: (section: string) => void }) {
   const navigate = useNavigate();
   const { data: stats, isLoading: statsLoading } = useAdminStats();
   const { data: growth, isLoading: growthLoading } = useAdminGrowthStats();
@@ -235,10 +235,10 @@ export default function FounderCommandCenter() {
                 {loading ? <Skeleton className="h-4 w-10" /> : <span className="font-medium">{stats?.publishedCards ?? 0}</span>}
               </div>
               <div className="flex flex-wrap gap-2 pt-2">
-                <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => navigate("/app/admin-dashboard")}>
+                <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => navigate("/app/platform-admin")}>
                   <Eye className="h-3 w-3" /> View Users
                 </Button>
-                <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => navigate("/app/admin")}>
+                <Button size="sm" variant="outline" className="text-xs gap-1" onClick={() => onNavigateSection?.("system")}>
                   <Gift className="h-3 w-3" /> Beta Access
                 </Button>
               </div>
@@ -265,7 +265,7 @@ export default function FounderCommandCenter() {
                 <span className="text-muted-foreground">Blocked attempts</span>
                 <Badge variant="outline" className="ml-auto text-[10px]">Logged</Badge>
               </div>
-              <Button size="sm" variant="outline" className="text-xs gap-1 w-full mt-2" onClick={() => navigate("/app/admin")}>
+              <Button size="sm" variant="outline" className="text-xs gap-1 w-full mt-2" onClick={() => onNavigateSection?.("abuse")}>
                 <ShieldAlert className="h-3 w-3" /> Abuse Monitor
               </Button>
             </CardContent>
@@ -437,14 +437,14 @@ export default function FounderCommandCenter() {
       <SectionHeader icon={Rocket} title="Quick Actions" description="Common admin tasks" />
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
         {[
-          { label: "Users", icon: Users, route: "/app/admin-dashboard" },
-          { label: "Marketing", icon: Megaphone, route: "/app/admin-marketing" },
-          { label: "Growth", icon: TrendingUp, route: "/app/admin" },
-          { label: "Abuse", icon: ShieldAlert, route: "/app/admin" },
-          { label: "Feedback", icon: MessageSquare, route: "/app/admin" },
-          { label: "Settings", icon: Settings, route: "/app/settings" },
+          { label: "Users", icon: Users, action: () => navigate("/app/platform-admin") },
+          { label: "Marketing", icon: Megaphone, action: () => navigate("/app/admin-marketing") },
+          { label: "Growth", icon: TrendingUp, action: () => onNavigateSection?.("growth") },
+          { label: "Abuse", icon: ShieldAlert, action: () => onNavigateSection?.("abuse") },
+          { label: "Feedback", icon: MessageSquare, action: () => onNavigateSection?.("feedback") },
+          { label: "Settings", icon: Settings, action: () => navigate("/app/settings") },
         ].map(a => (
-          <Button key={a.label} variant="outline" size="sm" className="flex flex-col gap-1 h-auto py-3 text-xs" onClick={() => navigate(a.route)}>
+          <Button key={a.label} variant="outline" size="sm" className="flex flex-col gap-1 h-auto py-3 text-xs" onClick={a.action}>
             <a.icon className="h-4 w-4" />
             {a.label}
           </Button>
