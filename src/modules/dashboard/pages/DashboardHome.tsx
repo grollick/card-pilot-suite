@@ -14,6 +14,7 @@ import EstimateDutyPanel from "@/modules/dashboard/components/EstimateDutyPanel"
 import FirstLeadAssistant from "@/modules/dashboard/components/FirstLeadAssistant";
 import BusinessHealthScore from "@/modules/dashboard/components/BusinessHealthScore";
 import AIBusinessAssistant from "@/modules/dashboard/components/AIBusinessAssistant";
+import FirstLeadGuaranteeWidget from "@/modules/dashboard/components/FirstLeadGuaranteeWidget";
 import {
   Pencil, UserPlus, CalendarPlus, ExternalLink,
   Zap, Sparkles,
