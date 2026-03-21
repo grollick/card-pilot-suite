@@ -71,7 +71,7 @@ serve(async (req) => {
 
     if (ip && ip !== "unknown" && ip !== "127.0.0.1") {
       try {
-        const geoRes = await fetch(`http://ip-api.com/json/${ip}?fields=city,regionName,country`, {
+        const geoRes = await fetch(`https://ipapi.co/${ip}/json/`, {
           signal: AbortSignal.timeout(2000),
         });
         if (geoRes.ok) {
