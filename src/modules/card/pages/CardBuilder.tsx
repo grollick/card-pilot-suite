@@ -175,6 +175,109 @@ export default function CardBuilder() {
     }
   };
 
+  const handleContentImport = async (result: ImportResult) => {
+    if (!user) return;
+    try {
+      // Update profile with imported business info
+      const profileUpdates: Record<string, any> = {};
+      if (result.businessName) profileUpdates.company = result.businessName;
+      if (result.phone) profileUpdates.phone = result.phone;
+      if (result.location) profileUpdates.city = result.location;
+      if (Object.keys(profileUpdates).length > 0) {
+        await supabase.from("profiles").update(profileUpdates).eq("id", user.id);
+        s.qc.invalidateQueries({ queryKey: ["profile"] });
+      }
+
+      // Update card sections
+      const updatedSections = [...s.sections];
+
+      // Map description to hero/about
+      if (result.tagline || result.description) {
+        const heroIdx = updatedSections.findIndex(sec => sec.id === "hero");
+        if (heroIdx >= 0) {
+          const existing = (updatedSections[heroIdx].content || {}) as Record<string, any>;
+          updatedSections[heroIdx] = {
+            ...updatedSections[heroIdx],
+            enabled: true,
+            content: {
+              ...existing,
+              ...(result.tagline ? { tagline: result.tagline } : {}),
+              ...(result.description ? { subtitle: result.description } : {}),
+            },
+          };
+        }
+        const aboutIdx = updatedSections.findIndex(sec => sec.id === "about");
+        if (aboutIdx >= 0 && result.description) {
+          const existing = (updatedSections[aboutIdx].content || {}) as Record<string, any>;
+          updatedSections[aboutIdx] = {
+            ...updatedSections[aboutIdx],
+            enabled: true,
+            content: { ...existing, text: result.description },
+          };
+        }
+      }
+
+      // Map services
+      if (result.services?.length) {
+        const svcIdx = updatedSections.findIndex(sec => sec.id === "services");
+        if (svcIdx >= 0) {
+          const existing = (updatedSections[svcIdx].content || {}) as Record<string, any>;
+          updatedSections[svcIdx] = {
+            ...updatedSections[svcIdx],
+            enabled: true,
+            content: {
+              ...existing,
+              items: result.services.map(s => ({ name: s.name, description: s.description || "", price: "" })),
+            },
+          };
+        }
+      }
+
+      // Map social links
+      if (result.socialLinks?.length) {
+        const socialIdx = updatedSections.findIndex(sec => sec.id === "social");
+        if (socialIdx >= 0) {
+          updatedSections[socialIdx] = {
+            ...updatedSections[socialIdx],
+            enabled: true,
+            content: { links: result.socialLinks },
+          };
+        } else {
+          updatedSections.push({
+            id: "social",
+            label: "Social",
+            enabled: true,
+            content: { links: result.socialLinks },
+          } as any);
+        }
+      }
+
+      s.setSections(updatedSections);
+      s.saveSections(updatedSections, true);
+
+      // Import gallery images as projects
+      if (result.galleryImages?.length) {
+        const inserts = result.galleryImages.map((url, i) => ({
+          user_id: user.id,
+          title: `Imported Photo ${i + 1}`,
+          after_image_url: url,
+          is_public: true,
+        }));
+        await supabase.from("projects").insert(inserts);
+      }
+
+      // Update cover/avatar if found
+      if (result.coverImageUrl) {
+        s.handleCoverChange(result.coverImageUrl);
+      }
+
+      toast.success("Content imported to your card!");
+    } catch (err: any) {
+      console.error("Content import handler error:", err);
+      toast.error("Some content failed to import");
+    }
+  };
+
   const handleApplyTemplate = (templateId: string) => {
     setSelectedTemplateId(templateId);
     const template = getTemplate(templateId);
