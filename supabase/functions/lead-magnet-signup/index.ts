@@ -103,7 +103,39 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email) || email.length > 255) {
+      return new Response(JSON.stringify({ error: "Invalid email" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Validate input lengths
+    if (name.length > 100 || profession.length > 100) {
+      return new Response(JSON.stringify({ error: "Input too long" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    // Rate limit: max 1 lead-magnet signup per email per 24 hours
+    const { count: recentCount } = await supabase
+      .from("email_send_log")
+      .select("*", { count: "exact", head: true })
+      .eq("recipient_email", email)
+      .eq("template_name", "lead_magnet")
+      .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
+
+    if ((recentCount ?? 0) >= 1) {
+      // Silently succeed to avoid leaking info
+      return new Response(JSON.stringify({ success: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // 1. Store lead in leads table with tag
     const { data: existingLeads } = await supabase
