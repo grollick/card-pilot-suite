@@ -14,16 +14,20 @@ export type PortalFeature =
   | "invoices"
   | "messaging"
   | "payments"
-  | "file_sharing";
+  | "file_sharing"
+  | "loyalty"
+  | "whatsapp_chat";
 
 const FEATURE_TIERS: Record<PortalFeature, string[]> = {
-  cancel: ["starter", "growth", "scale", "agency"],      // All plans
-  reschedule: ["growth", "scale", "agency"],              // Pro+
-  review: ["growth", "scale", "agency"],                  // Pro+
-  invoices: ["scale", "agency"],                          // Pro Plus+
-  messaging: ["scale", "agency"],                         // Pro Plus+
-  payments: ["scale", "agency"],                          // Pro Plus+
-  file_sharing: ["scale", "agency"],                      // Pro Plus+
+  cancel: ["starter", "growth", "pro", "agency"],         // All plans
+  reschedule: ["growth", "pro", "agency"],                // Pro+
+  review: ["growth", "pro", "agency"],                    // Pro+
+  loyalty: ["growth", "pro", "agency"],                   // Pro+
+  whatsapp_chat: ["growth", "pro", "agency"],             // Pro+
+  invoices: ["pro", "agency"],                            // Pro Plus+
+  messaging: ["pro", "agency"],                           // Pro Plus+
+  payments: ["pro", "agency"],                            // Pro Plus+
+  file_sharing: ["pro", "agency"],                        // Pro Plus+
 };
 
 export function isPortalFeatureEnabled(businessPlan: string, feature: PortalFeature): boolean {
