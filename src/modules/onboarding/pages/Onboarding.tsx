@@ -87,6 +87,7 @@ export default function Onboarding() {
   const [saving, setSaving] = useState(false);
   const [launched, setLaunched] = useState(false);
   const [socialLinks, setSocialLinks] = useState<{ platform: string; url: string }[]>([]);
+  const [aiPersonality, setAiPersonality] = useState("copilot");
 
   // AI state
   const [aiSetup, setAiSetup] = useState<AISetup | null>(null);
