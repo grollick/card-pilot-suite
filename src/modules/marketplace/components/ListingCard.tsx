@@ -125,9 +125,7 @@ export default function ListingCard({ listing, boosted, variant = "default" }: L
                   </Badge>
                 )}
                 {listing.is_on_duty && (
-                  <Badge className="text-[10px] font-semibold gap-0.5 bg-success/20 text-success border-success/30 shadow-sm shadow-success/10">
-                    <Radio className="h-2.5 w-2.5 animate-pulse" /> On Duty for Estimates
-                  </Badge>
+                  <AvailableNowBadge />
                 )}
                 {listing.available_for_work && !listing.is_on_duty && (
                   <Badge variant="outline" className="text-[10px] font-normal gap-0.5 bg-success/5 text-success border-success/20">
