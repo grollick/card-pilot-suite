@@ -52,13 +52,15 @@ export default function EstimateDutyPanel() {
       {/* Outer pulsing glow — lives OUTSIDE overflow-hidden so it's fully visible */}
       {isOnDuty && (
         <motion.div
+          key="outer-glow"
           className="absolute -inset-8 rounded-3xl pointer-events-none z-0"
           style={{
             background: "radial-gradient(ellipse at center, hsl(var(--success) / 0.4), transparent 70%)",
             filter: "blur(50px)",
           }}
+          initial={{ opacity: 0 }}
           animate={{ opacity: [0, 1, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", repeatType: "loop" }}
         />
       )}
       <motion.div
