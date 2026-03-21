@@ -17,6 +17,7 @@ import StepBusinessInfo from "../components/StepBusinessInfo";
 import StepServices from "../components/StepServices";
 import StepCardPreview from "../components/StepCardPreview";
 import StepFirstEstimate from "../components/StepFirstEstimate";
+import StepSocialLinks from "../components/StepSocialLinks";
 import StepSharing from "../components/StepSharing";
 import StepActivationChecklist from "../components/StepActivationChecklist";
 
