@@ -144,6 +144,24 @@ export default function SettingsPage() {
                   <div className="space-y-2">
                     <Label htmlFor="settings-email">Email</Label>
                     <Input id="settings-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
+                    {email && email !== (profile?.email ?? "") && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-1 text-xs"
+                        onClick={async () => {
+                          try {
+                            const { error } = await supabase.auth.updateUser({ email: email.trim() });
+                            if (error) throw error;
+                            toast.success("Confirmation email sent to your new address. Please check your inbox.");
+                          } catch (err: any) {
+                            toast.error(err.message || "Failed to update email");
+                          }
+                        }}
+                      >
+                        <Mail className="h-3 w-3 mr-1" /> Change Login Email
+                      </Button>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="settings-phone">Phone</Label>

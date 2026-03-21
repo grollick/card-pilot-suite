@@ -4920,7 +4920,7 @@ export type Database = {
         | "communication"
         | "productivity"
       app_pricing_type: "free" | "paid_once" | "subscription"
-      app_role: "admin" | "user" | "client"
+      app_role: "admin" | "user" | "client" | "founder"
       booking_status:
         | "pending"
         | "confirmed"
@@ -5146,7 +5146,7 @@ export const Constants = {
         "productivity",
       ],
       app_pricing_type: ["free", "paid_once", "subscription"],
-      app_role: ["admin", "user", "client"],
+      app_role: ["admin", "user", "client", "founder"],
       booking_status: [
         "pending",
         "confirmed",
