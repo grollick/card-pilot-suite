@@ -407,19 +407,20 @@ export default function AssistantPage() {
                       </div>
                     )}
                     <div className="space-y-2 min-w-0 flex-1">
-                      {/* Title the assistant response with what the user asked */}
+                      {/* Premium result title */}
                       {msg.role === "assistant" && i > 0 && messages[i - 1]?.role === "user" && (
-                        <div className="px-1 mb-2">
-                          <h2 className="text-lg sm:text-xl font-extrabold text-foreground tracking-tight capitalize" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                        <div className="px-1 mb-3">
+                          <h2 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight leading-tight" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                             {formatResultTitle(messages[i - 1].content)}
                           </h2>
+                          <div className="h-0.5 w-12 bg-gradient-to-r from-primary to-primary/30 rounded-full mt-2" />
                         </div>
                       )}
                       <div
                         className={`rounded-2xl ${
                           msg.role === "user"
                             ? "bg-primary text-primary-foreground px-4 py-3 text-sm leading-relaxed shadow-sm"
-                            : "bg-card border border-border/50 px-4 sm:px-6 py-4 sm:py-5 text-[13px] sm:text-sm shadow-sm"
+                            : "bg-gradient-to-b from-card to-card/80 border border-border/40 px-5 sm:px-7 py-5 sm:py-6 text-[13px] sm:text-sm shadow-md ring-1 ring-white/5"
                         }`}
                       >
                         {msg.role === "assistant" ? (
