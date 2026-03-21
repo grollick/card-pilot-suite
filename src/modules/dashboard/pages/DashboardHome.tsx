@@ -86,12 +86,12 @@ export default function DashboardHome() {
       <ReferralWidget />
 
       {/* ── Activation System ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        <div className="space-y-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="space-y-4">
           <VerificationChecklist />
           <ActivationChecklist />
         </div>
-        <div className="space-y-5">
+        <div className="space-y-4">
           <ShareMessageCard />
           <ShareCardWidget />
         </div>
