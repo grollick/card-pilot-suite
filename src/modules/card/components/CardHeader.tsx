@@ -426,8 +426,6 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     </div>
   );
 
-  const showVerified = verificationLevel && verificationLevel !== "basic";
-
 
   // Shared cover/backdrop banner element for non-cover layouts
   const coverBanner = (coverUrl || logoUrl || heroBackground) ? parallaxCover(120, true) : null;
