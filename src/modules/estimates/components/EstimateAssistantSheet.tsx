@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import ReactMarkdown from "react-markdown";
+import { aiMarkdownComponents } from "@/components/AIResponseRenderer";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -372,9 +373,9 @@ export default function EstimateAssistantSheet({
           {/* Text Result */}
           {result && !parsedItems && (
             <div className="space-y-3">
-              <div className="rounded-xl bg-muted/40 border border-border p-4">
-                <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
-                  <ReactMarkdown>{result}</ReactMarkdown>
+              <div className="rounded-2xl bg-gradient-to-b from-card to-card/80 border border-border/40 px-5 sm:px-7 py-5 sm:py-6 text-[13px] sm:text-sm shadow-md ring-1 ring-white/5">
+                <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_ul]:pl-0 [&_ol]:pl-0 [&_li+li]:mt-1">
+                  <ReactMarkdown components={aiMarkdownComponents}>{result}</ReactMarkdown>
                 </div>
               </div>
               {isLoading && (

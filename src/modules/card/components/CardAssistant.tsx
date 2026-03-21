@@ -5,6 +5,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import { aiMarkdownComponents } from "@/components/AIResponseRenderer";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -286,15 +287,15 @@ export default function CardAssistant({ context, sectionTargets, onCopyToSection
                 <div key={i} className="space-y-1">
                   <div className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                     <div
-                      className={`max-w-[85%] rounded-xl px-3 py-2 text-sm ${
+                      className={`rounded-2xl ${
                         msg.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted"
+                          ? "bg-primary text-primary-foreground px-4 py-3 text-sm leading-relaxed shadow-sm"
+                          : "bg-gradient-to-b from-card to-card/80 border border-border/40 px-5 py-5 text-[13px] sm:text-sm shadow-md ring-1 ring-white/5"
                       }`}
                     >
                       {msg.role === "assistant" ? (
-                        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
-                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_ul]:pl-0 [&_ol]:pl-0 [&_li+li]:mt-1">
+                          <ReactMarkdown components={aiMarkdownComponents}>{msg.content}</ReactMarkdown>
                         </div>
                       ) : (
                         msg.content
