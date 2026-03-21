@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Phone, MessageSquare, Calendar, MapPin, ChevronRight,
-  Bell, UserPlus, CheckCircle2, Star, Scissors, Dumbbell, Home,
+  Bell, UserPlus, CheckCircle2, Star, Scissors, Dumbbell, Home, FileText, DollarSign, CreditCard,
 } from "lucide-react";
 
 /* ── Lazy image loader — only loads assets for current + next persona ── */
@@ -150,8 +150,8 @@ const PERSONAS: Persona[] = [
     stages: [
       { key: "idle", duration: 2200 },
       { key: "tap", duration: 800 },
-      { key: "booking", duration: 2200 },
-      { key: "booked", duration: 1400 },
+      { key: "invoice", duration: 3200 },
+      { key: "paid", duration: 1600 },
     ],
   },
   {
@@ -171,9 +171,8 @@ const PERSONAS: Persona[] = [
     stages: [
       { key: "idle", duration: 2200 },
       { key: "tap", duration: 800 },
-      { key: "form", duration: 1800 },
-      { key: "submitted", duration: 1200 },
-      { key: "crm", duration: 2600 },
+      { key: "invoice", duration: 3200 },
+      { key: "paid", duration: 1600 },
     ],
   },
 ];
@@ -559,6 +558,99 @@ export default function HeroPhoneAnimation() {
                       <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="text-[10px] text-muted-foreground mt-4 text-center">
                         Zero effort. Every lead captured.
                       </motion.p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* ── Invoice overlay (Hairstylist & Landscaper) ── */}
+                <AnimatePresence>
+                  {(stage === "invoice" || stage === "paid") && (
+                    <motion.div
+                      initial={{ y: "100%" }}
+                      animate={{ y: 0 }}
+                      exit={{ y: "100%" }}
+                      transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                      className="absolute inset-x-0 bottom-0 bg-card border-t border-border rounded-t-2xl p-4 z-20 shadow-xl"
+                    >
+                      <div className="w-8 h-1 rounded-full bg-border mx-auto mb-3" />
+                      {stage === "invoice" ? (
+                        <div className="space-y-2.5">
+                          <div className="flex items-center justify-between">
+                            <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                              <FileText className="h-3.5 w-3.5" style={{ color: accentColor }} />
+                              Invoice
+                            </p>
+                            <span className="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-warning/10 text-warning">
+                              Due Today
+                            </span>
+                          </div>
+
+                          {/* Line items */}
+                          <div className="space-y-1.5 border border-border rounded-lg p-2.5">
+                            {persona.services.slice(0, 2).map((s, i) => (
+                              <motion.div
+                                key={s.name}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.3 + i * 0.2 }}
+                                className="flex items-center justify-between text-[10px]"
+                              >
+                                <span className="text-foreground">{s.name}</span>
+                                <span className="text-muted-foreground font-medium">{s.price}</span>
+                              </motion.div>
+                            ))}
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.8 }}
+                              className="border-t border-border pt-1.5 flex items-center justify-between text-[10px] font-bold"
+                            >
+                              <span className="text-foreground">Total</span>
+                              <span className="text-foreground">{persona.services[0]?.price}</span>
+                            </motion.div>
+                          </div>
+
+                          {/* Pay button */}
+                          <motion.div
+                            initial={{ opacity: 0, y: 5 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 1.2 }}
+                            className="w-full flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-[10px] font-semibold text-white"
+                            style={{ backgroundColor: accentColor }}
+                          >
+                            <CreditCard className="h-3 w-3" /> Pay Now
+                          </motion.div>
+
+                          <motion.div
+                            initial={{ scaleX: 0 }}
+                            animate={{ scaleX: 1 }}
+                            transition={{ delay: 1.6, duration: 1.4, ease: "easeInOut" }}
+                            className="h-1 rounded-full origin-left"
+                            style={{ backgroundColor: accentColor, opacity: 0.3 }}
+                          />
+                        </div>
+                      ) : (
+                        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center py-3">
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: [0, 1.2, 1] }}
+                            transition={{ duration: 0.5, times: [0, 0.6, 1] }}
+                            className="h-10 w-10 mx-auto rounded-full bg-success/10 flex items-center justify-center mb-2"
+                          >
+                            <DollarSign className="h-5 w-5 text-success" />
+                          </motion.div>
+                          <p className="text-xs font-bold text-foreground">Payment Received!</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">{persona.services[0]?.price} · Paid via card</p>
+                          <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5 }}
+                            className="text-[9px] text-success font-medium mt-1"
+                          >
+                            ✓ Receipt sent automatically
+                          </motion.p>
+                        </motion.div>
+                      )}
                     </motion.div>
                   )}
                 </AnimatePresence>
