@@ -4,11 +4,14 @@ import ReactMarkdown from "react-markdown";
 import {
   Sparkles, Send, MessageSquare, FileText, Lightbulb,
   Loader2, X, Minimize2, Maximize2, RotateCcw, Copy, Check,
+  Wand2, ClipboardCheck, ListTodo,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Mode = "chat" | "template" | "tips";
@@ -42,6 +45,31 @@ const quickPrompts: { label: string; prompt: string; mode: Mode }[] = [
   { label: "Get more leads", prompt: "Give me 5 actionable tips to get more leads this week.", mode: "tips" },
   { label: "Quote template", prompt: "Create a professional quote/estimate message template I can send to customers.", mode: "template" },
 ];
+
+// Parse action blocks from AI responses: <!--ACTION:type:label-->
+interface ParsedAction {
+  type: "apply_bio" | "apply_tagline" | "copy" | "create_task";
+  label: string;
+  content: string; // the AI response content to act on
+}
+
+function parseActions(content: string): ParsedAction[] {
+  const actions: ParsedAction[] = [];
+  const regex = /<!--ACTION:(\w+):(.+?)-->/g;
+  let match;
+  while ((match = regex.exec(content)) !== null) {
+    actions.push({
+      type: match[1] as ParsedAction["type"],
+      label: match[2],
+      content,
+    });
+  }
+  return actions;
+}
+
+function stripActionTags(content: string): string {
+  return content.replace(/<!--ACTION:\w+:.+?-->/g, "").trim();
+}
 
 async function streamChat({
   messages,
@@ -130,6 +158,80 @@ function CopyButton({ text }: { text: string }) {
   );
 }
 
+function ActionButtons({
+  actions,
+  content,
+  onAction,
+  isExecuting,
+}: {
+  actions: ParsedAction[];
+  content: string;
+  onAction: (action: ParsedAction) => void;
+  isExecuting: string | null;
+}) {
+  if (actions.length === 0) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex flex-wrap gap-1.5 mt-2"
+    >
+      {actions.map((action, i) => {
+        const isRunning = isExecuting === `${action.type}-${i}`;
+        const Icon = action.type === "apply_bio" || action.type === "apply_tagline"
+          ? Wand2
+          : action.type === "copy"
+          ? ClipboardCheck
+          : ListTodo;
+
+        return (
+          <button
+            key={i}
+            onClick={() => onAction({ ...action, content })}
+            disabled={!!isExecuting}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-[11px] font-medium hover:bg-primary/20 transition-all disabled:opacity-50 border border-primary/20"
+          >
+            {isRunning ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <Icon className="h-3 w-3" />
+            )}
+            {action.label}
+          </button>
+        );
+      })}
+    </motion.div>
+  );
+}
+
+// "Do this for me" generic button when no structured actions are detected
+function DoThisForMeButton({
+  onDoThis,
+  isLoading,
+}: {
+  onDoThis: () => void;
+  isLoading: boolean;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3 }}
+      className="mt-2"
+    >
+      <button
+        onClick={onDoThis}
+        disabled={isLoading}
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-[11px] font-medium hover:bg-primary/20 transition-all disabled:opacity-50 border border-primary/20"
+      >
+        <Wand2 className="h-3 w-3" />
+        Want me to do this for you?
+      </button>
+    </motion.div>
+  );
+}
+
 export default function AIBusinessAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -137,7 +239,11 @@ export default function AIBusinessAssistant() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState<Mode>("chat");
+  const [executingAction, setExecutingAction] = useState<string | null>(null);
+  const [completedActions, setCompletedActions] = useState<Set<number>>(new Set());
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
+  const qc = useQueryClient();
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -183,6 +289,87 @@ export default function AIBusinessAssistant() {
     }
   };
 
+  const handleAction = async (action: ParsedAction, msgIndex: number) => {
+    if (!user) return;
+    const key = `${action.type}-${msgIndex}`;
+    setExecutingAction(key);
+
+    try {
+      const cleanContent = stripActionTags(action.content);
+
+      switch (action.type) {
+        case "apply_bio": {
+          // Extract the bio text — take the first substantial paragraph
+          const lines = cleanContent.split("\n").filter(l => l.trim() && !l.startsWith("#") && !l.startsWith("<!--"));
+          const bioText = lines.join("\n").slice(0, 500);
+          const { error } = await supabase.from("profiles").update({ bio: bioText }).eq("id", user.id);
+          if (error) throw error;
+          qc.invalidateQueries({ queryKey: ["profile"] });
+          qc.invalidateQueries({ queryKey: ["public-card"] });
+          toast.success("Bio updated! Check your card.");
+          break;
+        }
+        case "apply_tagline": {
+          const lines = cleanContent.split("\n").filter(l => l.trim() && !l.startsWith("#") && !l.startsWith("<!--"));
+          const taglineText = lines[0]?.replace(/^[*_"]+|[*_"]+$/g, "").slice(0, 120) || "";
+          // Save tagline to card theme_json
+          const { data: card } = await supabase.from("cards").select("id, theme_json").eq("user_id", user.id).maybeSingle();
+          if (card) {
+            const themeJson = typeof card.theme_json === "object" && card.theme_json ? card.theme_json : {};
+            await supabase.from("cards").update({
+              theme_json: { ...themeJson, tagline: taglineText },
+            }).eq("id", card.id);
+          }
+          qc.invalidateQueries({ queryKey: ["profile"] });
+          qc.invalidateQueries({ queryKey: ["public-card"] });
+          toast.success("Tagline updated!");
+          break;
+        }
+        case "copy": {
+          await navigator.clipboard.writeText(cleanContent);
+          toast.success("Copied to clipboard!");
+          break;
+        }
+        case "create_task": {
+          // Extract task items from the content
+          const taskLines = cleanContent.split("\n")
+            .filter(l => /^\d+[\.\)]\s/.test(l.trim()) || /^[-*]\s/.test(l.trim()))
+            .map(l => l.replace(/^[\d\.\)\-*\s]+/, "").trim())
+            .filter(Boolean)
+            .slice(0, 5);
+
+          if (taskLines.length === 0) {
+            toast.info("No actionable items found to create tasks from.");
+            break;
+          }
+
+          for (const title of taskLines) {
+            await supabase.from("contact_activities").insert({
+              user_id: user.id,
+              lead_id: null as any,
+              activity_type: "task",
+              title: title.slice(0, 200),
+              description: "Created by AI Assistant",
+              occurred_at: new Date().toISOString(),
+            });
+          }
+          toast.success(`${taskLines.length} task${taskLines.length > 1 ? "s" : ""} created!`);
+          break;
+        }
+      }
+
+      setCompletedActions(prev => new Set([...prev, msgIndex]));
+    } catch (err: any) {
+      toast.error(err.message || "Failed to apply action");
+    } finally {
+      setExecutingAction(null);
+    }
+  };
+
+  const handleDoThisForMe = (msgIndex: number) => {
+    handleSend("Yes, please do this for me. Apply the changes you suggested.");
+  };
+
   const handleQuickPrompt = (qp: typeof quickPrompts[0]) => {
     setMode(qp.mode);
     handleSend(qp.prompt);
@@ -191,6 +378,7 @@ export default function AIBusinessAssistant() {
   const handleReset = () => {
     setMessages([]);
     setInput("");
+    setCompletedActions(new Set());
   };
 
   // Floating button when closed
@@ -295,29 +483,61 @@ export default function AIBusinessAssistant() {
               </div>
             </div>
           ) : (
-            messages.map((msg, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`group ${msg.role === "user" ? "flex justify-end" : ""}`}
-              >
-                {msg.role === "user" ? (
-                  <div className="max-w-[85%] bg-primary text-primary-foreground rounded-2xl rounded-br-md px-3.5 py-2 text-sm">
-                    {msg.content}
-                  </div>
-                ) : (
-                  <div className="max-w-[95%] relative">
-                    <div className="absolute -top-1 right-0">
-                      <CopyButton text={msg.content} />
+            messages.map((msg, i) => {
+              const actions = msg.role === "assistant" ? parseActions(msg.content) : [];
+              const displayContent = msg.role === "assistant" ? stripActionTags(msg.content) : msg.content;
+              const isLastAssistant = msg.role === "assistant" && !isLoading && i === messages.length - 1;
+              const hasActions = actions.length > 0;
+              const isCompleted = completedActions.has(i);
+
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`group ${msg.role === "user" ? "flex justify-end" : ""}`}
+                >
+                  {msg.role === "user" ? (
+                    <div className="max-w-[85%] bg-primary text-primary-foreground rounded-2xl rounded-br-md px-3.5 py-2 text-sm">
+                      {msg.content}
                     </div>
-                    <div className="prose prose-sm dark:prose-invert max-w-none text-sm [&_p]:mb-1.5 [&_li]:mb-0.5 [&_ul]:mb-1.5 [&_ol]:mb-1.5 [&_h3]:text-sm [&_h3]:mt-2">
-                      <ReactMarkdown>{msg.content}</ReactMarkdown>
+                  ) : (
+                    <div className="max-w-[95%] relative">
+                      <div className="absolute -top-1 right-0">
+                        <CopyButton text={displayContent} />
+                      </div>
+                      <div className="prose prose-sm dark:prose-invert max-w-none text-sm [&_p]:mb-1.5 [&_li]:mb-0.5 [&_ul]:mb-1.5 [&_ol]:mb-1.5 [&_h3]:text-sm [&_h3]:mt-2">
+                        <ReactMarkdown>{displayContent}</ReactMarkdown>
+                      </div>
+
+                      {/* Action buttons */}
+                      {isCompleted ? (
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="flex items-center gap-1.5 mt-2 text-[11px] text-[hsl(var(--success))] font-medium"
+                        >
+                          <Check className="h-3 w-3" />
+                          Done! Changes applied.
+                        </motion.div>
+                      ) : hasActions ? (
+                        <ActionButtons
+                          actions={actions}
+                          content={msg.content}
+                          onAction={(action) => handleAction(action, i)}
+                          isExecuting={executingAction}
+                        />
+                      ) : isLastAssistant && displayContent.length > 50 ? (
+                        <DoThisForMeButton
+                          onDoThis={() => handleDoThisForMe(i)}
+                          isLoading={isLoading}
+                        />
+                      ) : null}
                     </div>
-                  </div>
-                )}
-              </motion.div>
-            ))
+                  )}
+                </motion.div>
+              );
+            })
           )}
           {isLoading && messages[messages.length - 1]?.role === "user" && (
             <div className="flex items-center gap-2 text-muted-foreground">
