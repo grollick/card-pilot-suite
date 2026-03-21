@@ -14,6 +14,13 @@ serve(async (req) => {
     const { image } = await req.json();
     if (!image) throw new Error("image (base64 data URL) is required");
 
+    // Validate image payload size (max ~2MB base64)
+    if (typeof image !== "string" || image.length > 2_800_000) {
+      return new Response(JSON.stringify({ error: "Image too large. Max 2MB." }), {
+        status: 413, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
