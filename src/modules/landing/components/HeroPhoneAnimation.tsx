@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Phone, MessageSquare, Calendar, MapPin, ChevronRight,
-  Bell, UserPlus, CheckCircle2, Star, Scissors, Dumbbell, Home, FileText, DollarSign, CreditCard,
+  Bell, UserPlus, CheckCircle2, Star, Scissors, Dumbbell, Home, FileText, DollarSign, CreditCard, Zap, Clock, Navigation,
 } from "lucide-react";
 
 /* ── Lazy image loader — only loads assets for current + next persona ── */
@@ -171,8 +171,8 @@ const PERSONAS: Persona[] = [
     stages: [
       { key: "idle", duration: 2200 },
       { key: "tap", duration: 800 },
-      { key: "invoice", duration: 3200 },
-      { key: "paid", duration: 1600 },
+      { key: "job-request", duration: 3400 },
+      { key: "job-accepted", duration: 1800 },
     ],
   },
 ];
@@ -249,7 +249,7 @@ export default function HeroPhoneAnimation() {
               >
                 {/* Card content — dims during overlay stages */}
                 <motion.div
-                  animate={{ opacity: ["crm", "testimonial"].includes(stage) ? 0.15 : 1 }}
+                  animate={{ opacity: ["crm", "testimonial", "job-request", "job-accepted"].includes(stage) ? 0.15 : 1 }}
                   transition={{ duration: 0.4 }}
                 >
                   {/* Cover photo */}
@@ -649,6 +649,122 @@ export default function HeroPhoneAnimation() {
                           >
                             ✓ Receipt sent automatically
                           </motion.p>
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* ── Marketplace Job Request overlay (Landscaper) ── */}
+                <AnimatePresence>
+                  {(stage === "job-request" || stage === "job-accepted") && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.4 }}
+                      className="absolute inset-0 z-30 flex flex-col items-center justify-center px-5"
+                    >
+                      {stage === "job-request" ? (
+                        <>
+                          {/* Incoming alert */}
+                          <motion.div
+                            initial={{ y: -40, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ type: "spring", damping: 12, stiffness: 200 }}
+                            className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-4"
+                          >
+                            <Zap className="h-3.5 w-3.5 text-primary" />
+                            <span className="text-xs font-semibold text-primary">New Job Request!</span>
+                          </motion.div>
+
+                          {/* Request card */}
+                          <motion.div
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.4 }}
+                            className="w-full rounded-2xl border border-border bg-card p-4 shadow-xl"
+                          >
+                            <div className="flex items-center gap-2 mb-2.5">
+                              <div className="h-8 w-8 rounded-full bg-accent/10 flex items-center justify-center">
+                                <Navigation className="h-3.5 w-3.5 text-accent" />
+                              </div>
+                              <div>
+                                <p className="text-[11px] font-bold text-foreground">Marketplace Match</p>
+                                <p className="text-[9px] text-muted-foreground">1.2 mi away · Just now</p>
+                              </div>
+                            </div>
+
+                            <div className="rounded-lg border border-border bg-background p-2.5 mb-2.5">
+                              <p className="text-[10px] font-semibold text-foreground mb-1">Backyard Redesign</p>
+                              <p className="text-[9px] text-muted-foreground leading-relaxed">
+                                "Looking for a landscaper to redesign my backyard — new sod, flower beds, and a stone path."
+                              </p>
+                              <div className="flex items-center gap-2 mt-1.5">
+                                <span className="text-[8px] font-medium px-1.5 py-0.5 rounded-full bg-success/10 text-success flex items-center gap-0.5">
+                                  <Clock className="h-2 w-2" /> ASAP
+                                </span>
+                                <span className="text-[8px] font-medium px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
+                                  $2k–$4k budget
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-1.5 text-[9px] text-muted-foreground mb-3">
+                              <div className="h-1.5 w-1.5 rounded-full bg-warning animate-pulse" />
+                              2 other pros notified · respond first!
+                            </div>
+
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 1.4 }}
+                              className="grid grid-cols-2 gap-2"
+                            >
+                              <div className="rounded-xl py-2 text-[10px] font-semibold text-center border border-border text-muted-foreground">
+                                Pass
+                              </div>
+                              <div
+                                className="rounded-xl py-2 text-[10px] font-semibold text-white text-center"
+                                style={{ backgroundColor: accentColor }}
+                              >
+                                Accept & Quote →
+                              </div>
+                            </motion.div>
+                          </motion.div>
+
+                          <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 2.0 }}
+                            className="text-[10px] text-muted-foreground mt-3 text-center"
+                          >
+                            Matched by location, skills & rating
+                          </motion.p>
+                        </>
+                      ) : (
+                        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="w-full">
+                          <div className="w-full rounded-2xl border border-border bg-card p-5 shadow-xl text-center">
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: [0, 1.3, 1] }}
+                              transition={{ duration: 0.5, times: [0, 0.6, 1] }}
+                              className="h-12 w-12 mx-auto rounded-full bg-success/10 flex items-center justify-center mb-3"
+                            >
+                              <CheckCircle2 className="h-6 w-6 text-success" />
+                            </motion.div>
+                            <p className="text-sm font-bold text-foreground">Job Accepted!</p>
+                            <p className="text-[10px] text-muted-foreground mt-1">Backyard Redesign · Est. $3,200</p>
+                            <motion.div
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.5 }}
+                              className="mt-3 flex items-center justify-center gap-1.5 text-[9px] text-success font-medium"
+                            >
+                              <UserPlus className="h-3 w-3" />
+                              Client added to your CRM
+                            </motion.div>
+                          </div>
                         </motion.div>
                       )}
                     </motion.div>
