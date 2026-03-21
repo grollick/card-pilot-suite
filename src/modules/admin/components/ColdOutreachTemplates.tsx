@@ -375,6 +375,8 @@ export default function ColdOutreachTemplates() {
   const [sending, setSending] = useState(false);
   const [emailStep, setEmailStep] = useState<"initial" | "followup1" | "followup2">("initial");
   const [searchFilter, setSearchFilter] = useState("");
+  const [sendChannel, setSendChannel] = useState<"email" | "whatsapp" | "sms" | "facebook" | "linkedin" | "instagram">("email");
+  const [recipientPhone, setRecipientPhone] = useState("");
 
   // Fetch sender (logged-in user) name
   const { data: senderName } = useQuery({
