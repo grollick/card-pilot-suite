@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Phone, MessageSquare, Calendar, MapPin, ChevronRight,
-  Bell, UserPlus, CheckCircle2, Star, Scissors, Dumbbell, Home,
+  Bell, UserPlus, CheckCircle2, Star, Scissors, Dumbbell, Home, FileText, DollarSign, CreditCard,
 } from "lucide-react";
 
 /* ── Lazy image loader — only loads assets for current + next persona ── */
