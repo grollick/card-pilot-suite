@@ -19,8 +19,11 @@ import {
   Briefcase,
   Image,
   Share2,
+  CheckCircle2,
   type LucideIcon,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { AvailableNowBadge, ResponseSpeedBadge, RecentViewsBadge } from "@/components/activity/LiveActivityIndicators";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
