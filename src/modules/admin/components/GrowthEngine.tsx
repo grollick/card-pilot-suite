@@ -443,7 +443,7 @@ function DailyTasks({ kpis, contacts }: { kpis: any; contacts: any[] }) {
 }
 
 // ─── Main Growth Engine ───
-export default function GrowthEngine() {
+export default function GrowthEngine({ onNavigateSection }: { onNavigateSection?: (section: string) => void }) {
   const navigate = useNavigate();
   const { data: stats, isLoading: statsLoading } = useAdminStats();
   const { data: growth, isLoading: growthLoading } = useAdminGrowthStats();

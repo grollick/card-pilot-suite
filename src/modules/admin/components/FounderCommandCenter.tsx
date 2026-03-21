@@ -66,7 +66,7 @@ function FunnelStep({ label, value, pct, loading }: { label: string; value: numb
   );
 }
 
-export default function FounderCommandCenter() {
+export default function FounderCommandCenter({ onNavigateSection }: { onNavigateSection?: (section: string) => void }) {
   const navigate = useNavigate();
   const { data: stats, isLoading: statsLoading } = useAdminStats();
   const { data: growth, isLoading: growthLoading } = useAdminGrowthStats();
