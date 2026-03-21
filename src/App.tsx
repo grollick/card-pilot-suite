@@ -158,6 +158,15 @@ function LazyRoute({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** Wrap admin-only routes — redirects non-admins */
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { data: isAdmin, isLoading } = useIsAdmin();
+  if (isLoading) return <LazyFallback />;
+  if (!isAdmin) return <Navigate to="/app" replace />;
+  return <>{children}</>;
+}
+
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
