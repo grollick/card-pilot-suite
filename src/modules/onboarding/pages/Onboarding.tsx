@@ -335,7 +335,7 @@ export default function Onboarding() {
           </div>
         )}
 
-        <div className={`rounded-2xl border border-border bg-card shadow-lg ${step === 0 || step === 4 || step === 8 ? "p-8" : "p-6"}`}>
+        <div className={`rounded-2xl border border-border bg-card shadow-lg ${step === 0 || step === 5 || step === 9 ? "p-8" : "p-6"}`}>
           <AnimatePresence mode="wait">
             {/* Step 0: Welcome */}
             {step === 0 && (
