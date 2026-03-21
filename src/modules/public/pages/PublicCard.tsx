@@ -81,6 +81,7 @@ function getVisitorMeta() {
 const CTA_ICONS: Record<string, React.ReactNode> = {
   call: <Phone className="h-4 w-4" />,
   text: <MessageSquare className="h-4 w-4" />,
+  whatsapp: <MessageCircle className="h-4 w-4" />,
   email: <Mail className="h-4 w-4" />,
   book: <Calendar className="h-4 w-4" />,
   quote: <FileText className="h-4 w-4" />,
