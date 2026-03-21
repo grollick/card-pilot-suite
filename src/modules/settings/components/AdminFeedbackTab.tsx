@@ -297,12 +297,12 @@ export default function AdminFeedbackTab() {
                 <div className="bg-muted/50 rounded-lg p-3 text-sm">{selected.message}</div>
               </div>
 
-              {selected.screenshot_url && (
+              {selected.screenshot_url && signedScreenshotUrl && (
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Screenshot</p>
-                  <a href={selected.screenshot_url} target="_blank" rel="noreferrer" className="block">
+                  <a href={signedScreenshotUrl} target="_blank" rel="noreferrer" className="block">
                     <img
-                      src={selected.screenshot_url}
+                      src={signedScreenshotUrl}
                       alt="Feedback screenshot"
                       className="rounded-lg border border-border max-h-48 object-contain w-full"
                     />
