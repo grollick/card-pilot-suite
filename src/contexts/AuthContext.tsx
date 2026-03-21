@@ -73,12 +73,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: new Error("Please use a permanent email address. Temporary emails are not accepted.") };
     }
 
+    // Capture source attribution from URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const signupSource = urlParams.get("src") || urlParams.get("utm_source") || (referralCode ? "referral" : "direct");
+    const utmCampaign = urlParams.get("utm_campaign") || "";
+    const utmMedium = urlParams.get("utm_medium") || "";
+
     const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: window.location.origin,
-        data: { name: name || "", referred_by: referralCode || "" },
+        data: { name: name || "", referred_by: referralCode || "", signup_source: signupSource, signup_utm_campaign: utmCampaign, signup_utm_medium: utmMedium },
       },
     });
 

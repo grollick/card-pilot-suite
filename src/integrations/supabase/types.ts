@@ -4062,6 +4062,9 @@ export type Database = {
           referral_code: string | null
           referred_by: string | null
           service_area: string | null
+          signup_source: string | null
+          signup_utm_campaign: string | null
+          signup_utm_medium: string | null
           style_pack: string | null
           suspended_reason: string | null
           tour_completed: boolean
@@ -4102,6 +4105,9 @@ export type Database = {
           referral_code?: string | null
           referred_by?: string | null
           service_area?: string | null
+          signup_source?: string | null
+          signup_utm_campaign?: string | null
+          signup_utm_medium?: string | null
           style_pack?: string | null
           suspended_reason?: string | null
           tour_completed?: boolean
@@ -4142,6 +4148,9 @@ export type Database = {
           referral_code?: string | null
           referred_by?: string | null
           service_area?: string | null
+          signup_source?: string | null
+          signup_utm_campaign?: string | null
+          signup_utm_medium?: string | null
           style_pack?: string | null
           suspended_reason?: string | null
           tour_completed?: boolean
