@@ -45,9 +45,17 @@ export default function AppCard({ app, isInstalled, onInstall, onView }: Props) 
     <Card className="group hover:shadow-md transition-all cursor-pointer border-border/60" onClick={onView}>
       <CardContent className="p-5">
         <div className="flex items-start gap-3.5 mb-3">
-          <div className="h-11 w-11 rounded-xl bg-muted flex items-center justify-center text-xl shrink-0">
+          <div className="h-11 w-11 rounded-xl bg-muted flex items-center justify-center text-xl shrink-0 overflow-hidden">
             {app.icon_url ? (
-              <img src={app.icon_url} alt="" className="h-8 w-8 rounded-lg object-cover" />
+              <img
+                src={app.icon_url}
+                alt={app.name}
+                className="h-8 w-8 rounded-lg object-contain"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                  (e.target as HTMLImageElement).parentElement!.textContent = categoryIcons[app.category] || "📦";
+                }}
+              />
             ) : (
               categoryIcons[app.category] || "📦"
             )}
