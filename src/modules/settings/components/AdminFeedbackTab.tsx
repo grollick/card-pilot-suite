@@ -61,11 +61,10 @@ export default function AdminFeedbackTab() {
       return;
     }
     // Generate signed URL from private bucket
-    const { supabase } = require("@/integrations/supabase/client");
     supabase.storage
       .from("feedback-screenshots")
       .createSignedUrl(selected.screenshot_url, 3600)
-      .then(({ data }: any) => {
+      .then(({ data }) => {
         if (data?.signedUrl) setSignedScreenshotUrl(data.signedUrl);
       });
   }, [selected]);
