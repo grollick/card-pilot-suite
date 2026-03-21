@@ -3,10 +3,12 @@ import { useMarketplaceApps, useFeaturedApps, useInstalledApps, useInstallApp, A
 import AppCard from "../components/AppCard";
 import AppDetailDialog from "../components/AppDetailDialog";
 import InstalledAppsPanel from "../components/InstalledAppsPanel";
+import RequestAppDialog from "../components/RequestAppDialog";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Search, Sparkles, Package } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Search, Sparkles, Package, MessageSquarePlus } from "lucide-react";
 
 const categories: { value: AppCategory | "all"; label: string; icon: string }[] = [
   { value: "all", label: "All", icon: "🏪" },
