@@ -197,23 +197,77 @@ export function getSectionStyles(
 }
 
 // ─── Fonts ────────────────────────────────────────────────
-export function getFonts(tokens: Record<string, any>) {
+export interface ResolvedFonts {
+  primary: string;
+  secondary: string;
+  nameFont?: string;
+  taglineFont?: string;
+  sectionHeadingFont?: string;
+  buttonFont?: string;
+  nameFontSize?: number;
+  taglineFontSize?: number;
+  sectionHeadingFontSize?: number;
+  bodyFontSize?: number;
+  buttonFontSize?: number;
+  nameFontWeight?: number;
+  taglineFontWeight?: number;
+  sectionHeadingFontWeight?: number;
+  bodyFontWeight?: number;
+  buttonFontWeight?: number;
+  nameLetterSpacing?: number;
+  taglineLetterSpacing?: number;
+  bodyLineHeight?: number;
+  nameTransform?: string;
+  sectionHeadingTransform?: string;
+}
+
+export function getFonts(tokens: Record<string, any>, fontOverrides?: Record<string, any>): ResolvedFonts {
   return {
     primary: tokens?.fontPrimary || "Inter",
     secondary: tokens?.fontSecondary || "Inter",
+    ...(fontOverrides ? {
+      nameFont: fontOverrides.nameFont,
+      taglineFont: fontOverrides.taglineFont,
+      sectionHeadingFont: fontOverrides.sectionHeadingFont,
+      buttonFont: fontOverrides.buttonFont,
+      nameFontSize: fontOverrides.nameFontSize,
+      taglineFontSize: fontOverrides.taglineFontSize,
+      sectionHeadingFontSize: fontOverrides.sectionHeadingFontSize,
+      bodyFontSize: fontOverrides.bodyFontSize,
+      buttonFontSize: fontOverrides.buttonFontSize,
+      nameFontWeight: fontOverrides.nameFontWeight,
+      taglineFontWeight: fontOverrides.taglineFontWeight,
+      sectionHeadingFontWeight: fontOverrides.sectionHeadingFontWeight,
+      bodyFontWeight: fontOverrides.bodyFontWeight,
+      buttonFontWeight: fontOverrides.buttonFontWeight,
+      nameLetterSpacing: fontOverrides.nameLetterSpacing,
+      taglineLetterSpacing: fontOverrides.taglineLetterSpacing,
+      bodyLineHeight: fontOverrides.bodyLineHeight,
+      nameTransform: fontOverrides.nameTransform,
+      sectionHeadingTransform: fontOverrides.sectionHeadingTransform,
+    } : {}),
   };
 }
 
 /**
  * Returns a Google Fonts URL to load required fonts.
+ * Includes per-element font overrides from CardFonts.
  */
-export function getGoogleFontsUrl(tokens: Record<string, any>): string | null {
-  const fonts = getFonts(tokens);
+export function getGoogleFontsUrl(tokens: Record<string, any>, fonts?: Record<string, any>): string | null {
+  const baseFonts = getFonts(tokens);
   const needed = new Set<string>();
-  if (fonts.primary !== "Inter") needed.add(fonts.primary);
-  if (fonts.secondary !== "Inter") needed.add(fonts.secondary);
+  if (baseFonts.primary !== "Inter") needed.add(baseFonts.primary);
+  if (baseFonts.secondary !== "Inter") needed.add(baseFonts.secondary);
+  // Include per-element font overrides
+  if (fonts) {
+    const overrideKeys = ["nameFont", "taglineFont", "sectionHeadingFont", "buttonFont"];
+    for (const key of overrideKeys) {
+      const val = fonts[key];
+      if (val && val !== "Inter") needed.add(val);
+    }
+  }
   if (needed.size === 0) return null;
-  const families = [...needed].map(f => `family=${f.replace(/ /g, "+")}:wght@400;500;600;700;800;900`).join("&");
+  const families = [...needed].map(f => `family=${f.replace(/ /g, "+")}:wght@300;400;500;600;700;800;900`).join("&");
   return `https://fonts.googleapis.com/css2?${families}&display=swap`;
 }
 
@@ -225,13 +279,14 @@ export interface ResolvedCardTheme {
   button: ReturnType<typeof getButtonTokens>;
   header: ReturnType<typeof getHeaderTokens>;
   section: ReturnType<typeof getSectionTokens>;
-  fonts: ReturnType<typeof getFonts>;
+  fonts: ResolvedFonts;
   palette: { primary: string; secondary: string; accent: string; background: string };
 }
 
 export function resolveCardTheme(
   tokens: Record<string, any>,
-  palette: { primary: string; secondary: string; accent: string; background: string }
+  palette: { primary: string; secondary: string; accent: string; background: string },
+  fontOverrides?: Record<string, any>
 ): ResolvedCardTheme {
   return {
     radii: getRadii(tokens),
@@ -240,7 +295,7 @@ export function resolveCardTheme(
     button: getButtonTokens(tokens),
     header: getHeaderTokens(tokens),
     section: getSectionTokens(tokens),
-    fonts: getFonts(tokens),
+    fonts: getFonts(tokens, fontOverrides),
     palette,
   };
 }

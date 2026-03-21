@@ -29,7 +29,9 @@ export default function CardButton({ theme, children, onClick, href, className =
     justifyContent: "center",
     gap: 8,
     textDecoration: "none",
-    fontFamily: `'${theme.fonts.secondary}', sans-serif`,
+    fontFamily: `'${theme.fonts.buttonFont || theme.fonts.secondary}', sans-serif`,
+    fontSize: theme.fonts.buttonFontSize ?? undefined,
+    fontWeight: theme.fonts.buttonFontWeight ?? undefined,
     cursor: "pointer",
     ...(fullWidth ? { width: "100%" } : {}),
   };

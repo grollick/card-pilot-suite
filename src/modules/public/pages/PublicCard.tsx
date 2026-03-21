@@ -192,7 +192,7 @@ export default function PublicCard() {
       if (t.shadow) mergedTokens = { ...mergedTokens, shadow: { ...(mergedTokens.shadow ?? {}), ...t.shadow } };
       if (t.radius) mergedTokens = { ...mergedTokens, radius: { ...(mergedTokens.radius ?? {}), ...t.radius } };
     }
-    return resolveCardTheme(mergedTokens, palette);
+    return resolveCardTheme(mergedTokens, palette, themeJson.fonts);
   }, [data?.stylePack, data?.card?.theme_json]);
 
   // ── Load Google Fonts ──
@@ -202,7 +202,7 @@ export default function PublicCard() {
     const mergedTokens = themeJson.fonts
       ? { ...tokens, fontPrimary: themeJson.fonts.primary, fontSecondary: themeJson.fonts.secondary }
       : tokens;
-    return getGoogleFontsUrl(mergedTokens);
+    return getGoogleFontsUrl(mergedTokens, themeJson.fonts);
   }, [data?.stylePack, data?.card?.theme_json]);
 
   useEffect(() => {
@@ -481,11 +481,11 @@ export default function PublicCard() {
   };
 
   const sectionTitleStyle: React.CSSProperties = {
-    fontFamily: `'${fonts.primary}', sans-serif`,
-    fontWeight: 600,
-    fontSize: 12,
+    fontFamily: `'${fonts.sectionHeadingFont || fonts.primary}', sans-serif`,
+    fontWeight: fonts.sectionHeadingFontWeight ?? 600,
+    fontSize: fonts.sectionHeadingFontSize ?? 12,
     letterSpacing: "0.08em",
-    textTransform: "uppercase" as const,
+    textTransform: (fonts.sectionHeadingTransform && fonts.sectionHeadingTransform !== "none" ? fonts.sectionHeadingTransform : "uppercase") as any,
     color: palette.secondary,
     marginBottom: 8,
   };

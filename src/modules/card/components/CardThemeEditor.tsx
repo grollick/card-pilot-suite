@@ -35,6 +35,31 @@ export interface CardPalette {
 export interface CardFonts {
   primary: string;
   secondary: string;
+  /** Per-element overrides */
+  nameFont?: string;
+  taglineFont?: string;
+  sectionHeadingFont?: string;
+  buttonFont?: string;
+  /** Sizes */
+  nameFontSize?: number;
+  taglineFontSize?: number;
+  sectionHeadingFontSize?: number;
+  bodyFontSize?: number;
+  buttonFontSize?: number;
+  /** Weights */
+  nameFontWeight?: number;
+  taglineFontWeight?: number;
+  sectionHeadingFontWeight?: number;
+  bodyFontWeight?: number;
+  buttonFontWeight?: number;
+  /** Letter spacing */
+  nameLetterSpacing?: number;
+  taglineLetterSpacing?: number;
+  /** Line height */
+  bodyLineHeight?: number;
+  /** Transform */
+  nameTransform?: "none" | "uppercase" | "lowercase" | "capitalize";
+  sectionHeadingTransform?: "none" | "uppercase" | "lowercase" | "capitalize";
 }
 
 export interface CardStyleTokens {
@@ -103,6 +128,35 @@ const FONT_OPTIONS = [
   "Inter", "DM Sans", "DM Serif Display", "Playfair Display", "Poppins",
   "Montserrat", "Lora", "Space Grotesk", "Sora", "Outfit", "Raleway",
   "Crimson Pro", "Libre Baskerville", "Josefin Sans", "Bebas Neue",
+  "Roboto", "Open Sans", "Lato", "Oswald", "Merriweather", "Nunito",
+  "Rubik", "Work Sans", "Barlow", "Karla", "Manrope", "Bitter",
+  "Cormorant Garamond", "Abril Fatface", "Righteous", "Pacifico",
+  "Caveat", "Archivo", "Plus Jakarta Sans", "Bricolage Grotesque",
+  "Instrument Serif", "Lexend", "Figtree", "Geist",
+];
+
+const FONT_CATEGORIES: { label: string; fonts: string[] }[] = [
+  { label: "Sans Serif", fonts: ["Inter", "DM Sans", "Poppins", "Montserrat", "Outfit", "Raleway", "Space Grotesk", "Sora", "Josefin Sans", "Roboto", "Open Sans", "Lato", "Nunito", "Rubik", "Work Sans", "Barlow", "Karla", "Manrope", "Archivo", "Plus Jakarta Sans", "Bricolage Grotesque", "Lexend", "Figtree", "Geist"] },
+  { label: "Serif", fonts: ["DM Serif Display", "Playfair Display", "Lora", "Crimson Pro", "Libre Baskerville", "Merriweather", "Bitter", "Cormorant Garamond", "Instrument Serif"] },
+  { label: "Display", fonts: ["Bebas Neue", "Oswald", "Abril Fatface", "Righteous"] },
+  { label: "Handwritten", fonts: ["Pacifico", "Caveat"] },
+];
+
+const FONT_WEIGHT_OPTIONS = [
+  { label: "Light", value: 300 },
+  { label: "Regular", value: 400 },
+  { label: "Medium", value: 500 },
+  { label: "Semi Bold", value: 600 },
+  { label: "Bold", value: 700 },
+  { label: "Extra Bold", value: 800 },
+  { label: "Black", value: 900 },
+];
+
+const TEXT_TRANSFORM_OPTIONS = [
+  { label: "None", value: "none" },
+  { label: "UPPERCASE", value: "uppercase" },
+  { label: "lowercase", value: "lowercase" },
+  { label: "Capitalize", value: "capitalize" },
 ];
 
 function getPatternSvg(type: BgPatternType, color: string): string {
@@ -972,42 +1026,339 @@ export default function CardThemeEditor({
             </TabsContent>
 
             {/* ── Typography Tab ── */}
-            <TabsContent value="type" className="mt-3 space-y-4">
-              <div className="space-y-1.5">
-                <SectionLabel>Heading Font</SectionLabel>
-                <Select value={fonts.primary} onValueChange={(v) => setFonts((f) => ({ ...f, primary: v }))}>
-                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {FONT_OPTIONS.map((font) => (
-                      <SelectItem key={font} value={font}>
-                        <span style={{ fontFamily: `'${font}', sans-serif` }}>{font}</span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <SectionLabel>Body Font</SectionLabel>
-                <Select value={fonts.secondary} onValueChange={(v) => setFonts((f) => ({ ...f, secondary: v }))}>
-                  <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {FONT_OPTIONS.map((font) => (
-                      <SelectItem key={font} value={font}>
-                        <span style={{ fontFamily: `'${font}', sans-serif` }}>{font}</span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <TabsContent value="type" className="mt-3 space-y-5 max-h-[65vh] overflow-y-auto pr-1">
+
+              {/* ── Global Fonts ── */}
+              <div className="space-y-3">
+                <SectionLabel>Global Fonts</SectionLabel>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Heading</label>
+                    <Select value={fonts.primary} onValueChange={(v) => setFonts((f) => ({ ...f, primary: v }))}>
+                      <SelectTrigger className="h-8 text-[11px]"><SelectValue /></SelectTrigger>
+                      <SelectContent className="max-h-64">
+                        {FONT_CATEGORIES.map((cat) => (
+                          <div key={cat.label}>
+                            <div className="px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50">{cat.label}</div>
+                            {cat.fonts.map((font) => (
+                              <SelectItem key={font} value={font}>
+                                <span style={{ fontFamily: `'${font}', sans-serif` }} className="text-[11px]">{font}</span>
+                              </SelectItem>
+                            ))}
+                          </div>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Body</label>
+                    <Select value={fonts.secondary} onValueChange={(v) => setFonts((f) => ({ ...f, secondary: v }))}>
+                      <SelectTrigger className="h-8 text-[11px]"><SelectValue /></SelectTrigger>
+                      <SelectContent className="max-h-64">
+                        {FONT_CATEGORIES.map((cat) => (
+                          <div key={cat.label}>
+                            <div className="px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50">{cat.label}</div>
+                            {cat.fonts.map((font) => (
+                              <SelectItem key={font} value={font}>
+                                <span style={{ fontFamily: `'${font}', sans-serif` }} className="text-[11px]">{font}</span>
+                              </SelectItem>
+                            ))}
+                          </div>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
 
+              <div className="h-px bg-border/30" />
+
+              {/* ── Name / Title ── */}
+              <div className="space-y-2">
+                <SectionLabel>Name / Title</SectionLabel>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Font Override</label>
+                  <Select value={fonts.nameFont || "__inherit__"} onValueChange={(v) => setFonts((f) => ({ ...f, nameFont: v === "__inherit__" ? undefined : v }))}>
+                    <SelectTrigger className="h-8 text-[11px]"><SelectValue placeholder="Inherit from heading" /></SelectTrigger>
+                    <SelectContent className="max-h-64">
+                      <SelectItem value="__inherit__"><span className="text-muted-foreground text-[11px]">Inherit from heading</span></SelectItem>
+                      {FONT_OPTIONS.map((font) => (
+                        <SelectItem key={font} value={font}>
+                          <span style={{ fontFamily: `'${font}', sans-serif` }} className="text-[11px]">{font}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Size</label>
+                    <div className="flex items-center gap-1">
+                      <Slider value={[fonts.nameFontSize ?? 18]} onValueChange={([v]) => setFonts((f) => ({ ...f, nameFontSize: v }))} min={12} max={48} step={1} className="flex-1" />
+                      <span className="text-[9px] text-muted-foreground tabular-nums w-6 text-right">{fonts.nameFontSize ?? 18}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Weight</label>
+                    <Select value={String(fonts.nameFontWeight ?? 700)} onValueChange={(v) => setFonts((f) => ({ ...f, nameFontWeight: Number(v) }))}>
+                      <SelectTrigger className="h-7 text-[10px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {FONT_WEIGHT_OPTIONS.map((w) => (
+                          <SelectItem key={w.value} value={String(w.value)}><span className="text-[10px]">{w.label}</span></SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Case</label>
+                    <Select value={fonts.nameTransform ?? "none"} onValueChange={(v) => setFonts((f) => ({ ...f, nameTransform: v as any }))}>
+                      <SelectTrigger className="h-7 text-[10px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {TEXT_TRANSFORM_OPTIONS.map((o) => (
+                          <SelectItem key={o.value} value={o.value}><span className="text-[10px]">{o.label}</span></SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Letter Spacing</label>
+                    <span className="text-[9px] text-muted-foreground tabular-nums">{fonts.nameLetterSpacing ?? 0}px</span>
+                  </div>
+                  <Slider value={[fonts.nameLetterSpacing ?? 0]} onValueChange={([v]) => setFonts((f) => ({ ...f, nameLetterSpacing: v }))} min={-2} max={12} step={0.5} />
+                </div>
+              </div>
+
+              <div className="h-px bg-border/30" />
+
+              {/* ── Tagline / Subtitle ── */}
+              <div className="space-y-2">
+                <SectionLabel>Tagline / Subtitle</SectionLabel>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Font Override</label>
+                  <Select value={fonts.taglineFont || "__inherit__"} onValueChange={(v) => setFonts((f) => ({ ...f, taglineFont: v === "__inherit__" ? undefined : v }))}>
+                    <SelectTrigger className="h-8 text-[11px]"><SelectValue placeholder="Inherit from body" /></SelectTrigger>
+                    <SelectContent className="max-h-64">
+                      <SelectItem value="__inherit__"><span className="text-muted-foreground text-[11px]">Inherit from body</span></SelectItem>
+                      {FONT_OPTIONS.map((font) => (
+                        <SelectItem key={font} value={font}>
+                          <span style={{ fontFamily: `'${font}', sans-serif` }} className="text-[11px]">{font}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Size</label>
+                    <div className="flex items-center gap-1">
+                      <Slider value={[fonts.taglineFontSize ?? 14]} onValueChange={([v]) => setFonts((f) => ({ ...f, taglineFontSize: v }))} min={10} max={32} step={1} className="flex-1" />
+                      <span className="text-[9px] text-muted-foreground tabular-nums w-6 text-right">{fonts.taglineFontSize ?? 14}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Weight</label>
+                    <Select value={String(fonts.taglineFontWeight ?? 400)} onValueChange={(v) => setFonts((f) => ({ ...f, taglineFontWeight: Number(v) }))}>
+                      <SelectTrigger className="h-7 text-[10px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {FONT_WEIGHT_OPTIONS.map((w) => (
+                          <SelectItem key={w.value} value={String(w.value)}><span className="text-[10px]">{w.label}</span></SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Spacing</label>
+                    <div className="flex items-center gap-1">
+                      <Slider value={[fonts.taglineLetterSpacing ?? 0]} onValueChange={([v]) => setFonts((f) => ({ ...f, taglineLetterSpacing: v }))} min={-1} max={8} step={0.5} className="flex-1" />
+                      <span className="text-[9px] text-muted-foreground tabular-nums w-6 text-right">{fonts.taglineLetterSpacing ?? 0}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-px bg-border/30" />
+
+              {/* ── Section Headings ── */}
+              <div className="space-y-2">
+                <SectionLabel>Section Headings</SectionLabel>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Font Override</label>
+                  <Select value={fonts.sectionHeadingFont || "__inherit__"} onValueChange={(v) => setFonts((f) => ({ ...f, sectionHeadingFont: v === "__inherit__" ? undefined : v }))}>
+                    <SelectTrigger className="h-8 text-[11px]"><SelectValue placeholder="Inherit from heading" /></SelectTrigger>
+                    <SelectContent className="max-h-64">
+                      <SelectItem value="__inherit__"><span className="text-muted-foreground text-[11px]">Inherit from heading</span></SelectItem>
+                      {FONT_OPTIONS.map((font) => (
+                        <SelectItem key={font} value={font}>
+                          <span style={{ fontFamily: `'${font}', sans-serif` }} className="text-[11px]">{font}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Size</label>
+                    <div className="flex items-center gap-1">
+                      <Slider value={[fonts.sectionHeadingFontSize ?? 16]} onValueChange={([v]) => setFonts((f) => ({ ...f, sectionHeadingFontSize: v }))} min={12} max={32} step={1} className="flex-1" />
+                      <span className="text-[9px] text-muted-foreground tabular-nums w-6 text-right">{fonts.sectionHeadingFontSize ?? 16}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Weight</label>
+                    <Select value={String(fonts.sectionHeadingFontWeight ?? 600)} onValueChange={(v) => setFonts((f) => ({ ...f, sectionHeadingFontWeight: Number(v) }))}>
+                      <SelectTrigger className="h-7 text-[10px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {FONT_WEIGHT_OPTIONS.map((w) => (
+                          <SelectItem key={w.value} value={String(w.value)}><span className="text-[10px]">{w.label}</span></SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Case</label>
+                    <Select value={fonts.sectionHeadingTransform ?? "none"} onValueChange={(v) => setFonts((f) => ({ ...f, sectionHeadingTransform: v as any }))}>
+                      <SelectTrigger className="h-7 text-[10px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {TEXT_TRANSFORM_OPTIONS.map((o) => (
+                          <SelectItem key={o.value} value={o.value}><span className="text-[10px]">{o.label}</span></SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-px bg-border/30" />
+
+              {/* ── Body Text ── */}
+              <div className="space-y-2">
+                <SectionLabel>Body Text</SectionLabel>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Size</label>
+                    <div className="flex items-center gap-1">
+                      <Slider value={[fonts.bodyFontSize ?? 14]} onValueChange={([v]) => setFonts((f) => ({ ...f, bodyFontSize: v }))} min={10} max={22} step={1} className="flex-1" />
+                      <span className="text-[9px] text-muted-foreground tabular-nums w-6 text-right">{fonts.bodyFontSize ?? 14}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Weight</label>
+                    <Select value={String(fonts.bodyFontWeight ?? 400)} onValueChange={(v) => setFonts((f) => ({ ...f, bodyFontWeight: Number(v) }))}>
+                      <SelectTrigger className="h-7 text-[10px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {FONT_WEIGHT_OPTIONS.map((w) => (
+                          <SelectItem key={w.value} value={String(w.value)}><span className="text-[10px]">{w.label}</span></SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Line Height</label>
+                    <div className="flex items-center gap-1">
+                      <Slider value={[fonts.bodyLineHeight ?? 1.6]} onValueChange={([v]) => setFonts((f) => ({ ...f, bodyLineHeight: v }))} min={1} max={2.5} step={0.1} className="flex-1" />
+                      <span className="text-[9px] text-muted-foreground tabular-nums w-6 text-right">{(fonts.bodyLineHeight ?? 1.6).toFixed(1)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-px bg-border/30" />
+
+              {/* ── Buttons ── */}
+              <div className="space-y-2">
+                <SectionLabel>Buttons</SectionLabel>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Font Override</label>
+                  <Select value={fonts.buttonFont || "__inherit__"} onValueChange={(v) => setFonts((f) => ({ ...f, buttonFont: v === "__inherit__" ? undefined : v }))}>
+                    <SelectTrigger className="h-8 text-[11px]"><SelectValue placeholder="Inherit from body" /></SelectTrigger>
+                    <SelectContent className="max-h-64">
+                      <SelectItem value="__inherit__"><span className="text-muted-foreground text-[11px]">Inherit from body</span></SelectItem>
+                      {FONT_OPTIONS.map((font) => (
+                        <SelectItem key={font} value={font}>
+                          <span style={{ fontFamily: `'${font}', sans-serif` }} className="text-[11px]">{font}</span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Size</label>
+                    <div className="flex items-center gap-1">
+                      <Slider value={[fonts.buttonFontSize ?? 14]} onValueChange={([v]) => setFonts((f) => ({ ...f, buttonFontSize: v }))} min={10} max={22} step={1} className="flex-1" />
+                      <span className="text-[9px] text-muted-foreground tabular-nums w-6 text-right">{fonts.buttonFontSize ?? 14}</span>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-wider">Weight</label>
+                    <Select value={String(fonts.buttonFontWeight ?? 600)} onValueChange={(v) => setFonts((f) => ({ ...f, buttonFontWeight: Number(v) }))}>
+                      <SelectTrigger className="h-7 text-[10px]"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {FONT_WEIGHT_OPTIONS.map((w) => (
+                          <SelectItem key={w.value} value={String(w.value)}><span className="text-[10px]">{w.label}</span></SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="h-px bg-border/30" />
+
               {/* Font Preview */}
-              <div className="rounded-lg border border-border/40 p-3 space-y-1.5">
-                <p className="text-sm font-semibold" style={{ fontFamily: `'${fonts.primary}', sans-serif` }}>
-                  Heading Preview
+              <div className="rounded-lg border border-border/40 p-4 space-y-2 bg-muted/20">
+                <p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground/50 mb-2">Live Preview</p>
+                <p style={{
+                  fontFamily: `'${fonts.nameFont || fonts.primary}', sans-serif`,
+                  fontWeight: fonts.nameFontWeight ?? 700,
+                  fontSize: fonts.nameFontSize ?? 18,
+                  letterSpacing: fonts.nameLetterSpacing ? `${fonts.nameLetterSpacing}px` : undefined,
+                  textTransform: (fonts.nameTransform ?? "none") as any,
+                }}>
+                  Your Business Name
                 </p>
-                <p className="text-xs text-muted-foreground" style={{ fontFamily: `'${fonts.secondary}', sans-serif` }}>
+                <p style={{
+                  fontFamily: `'${fonts.taglineFont || fonts.secondary}', sans-serif`,
+                  fontWeight: fonts.taglineFontWeight ?? 400,
+                  fontSize: fonts.taglineFontSize ?? 14,
+                  letterSpacing: fonts.taglineLetterSpacing ? `${fonts.taglineLetterSpacing}px` : undefined,
+                  color: "var(--muted-foreground)",
+                }}>
+                  Professional tagline goes here
+                </p>
+                <p style={{
+                  fontFamily: `'${fonts.sectionHeadingFont || fonts.primary}', sans-serif`,
+                  fontWeight: fonts.sectionHeadingFontWeight ?? 600,
+                  fontSize: fonts.sectionHeadingFontSize ?? 16,
+                  textTransform: (fonts.sectionHeadingTransform ?? "none") as any,
+                  marginTop: 8,
+                }}>
+                  Section Heading
+                </p>
+                <p style={{
+                  fontFamily: `'${fonts.secondary}', sans-serif`,
+                  fontWeight: fonts.bodyFontWeight ?? 400,
+                  fontSize: fonts.bodyFontSize ?? 14,
+                  lineHeight: fonts.bodyLineHeight ?? 1.6,
+                  color: "var(--muted-foreground)",
+                }}>
                   Body text preview — The quick brown fox jumps over the lazy dog.
                 </p>
+                <div style={{
+                  display: "inline-block",
+                  padding: "6px 16px",
+                  borderRadius: 8,
+                  background: "var(--primary)",
+                  color: "white",
+                  fontFamily: `'${fonts.buttonFont || fonts.secondary}', sans-serif`,
+                  fontWeight: fonts.buttonFontWeight ?? 600,
+                  fontSize: fonts.buttonFontSize ?? 14,
+                  marginTop: 4,
+                }}>
+                  Button Text
+                </div>
               </div>
             </TabsContent>
           </div>
