@@ -465,6 +465,7 @@ export function useCardBuilderState() {
     nameLineHeight, setNameLineHeight,
     nameTextStroke, setNameTextStroke,
     nameTextStrokeWidth, setNameTextStrokeWidth,
+    companyColor, setCompanyColor,
     identitySaveTimers, identitySaveState, setIdentitySaveState,
     // Photos / Logo
     avatarUrl, coverUrl, avatarBgColor, avatarRotation, coverOffsetY,
