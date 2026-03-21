@@ -10,6 +10,16 @@ const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY") ?? "";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") ?? "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
+/** HTML-encode user-supplied values to prevent injection */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 interface LeadMagnetBody {
   name: string;
   email: string;
@@ -21,7 +31,7 @@ const EMAIL_SEQUENCE = [
     delayMinutes: 0,
     subject: "Your Free Business Growth Toolkit 🎯",
     body: (name: string) => `
-      <h2>Hi ${name},</h2>
+      <h2>Hi ${escapeHtml(name)},</h2>
       <p>Welcome! Here's your free toolkit for growing your service business.</p>
       <h3>Inside your toolkit:</h3>
       <ul>
@@ -39,7 +49,7 @@ const EMAIL_SEQUENCE = [
     delayMinutes: 2880, // Day 2
     subject: "How guzzl.pro captures leads automatically",
     body: (name: string) => `
-      <h2>Hi ${name},</h2>
+      <h2>Hi ${escapeHtml(name)},</h2>
       <p>Did you know that most service businesses lose leads because they don't have a fast way to capture contact information?</p>
       <p>With guzzl.pro, every visitor who views your smart business card can:</p>
       <ul>
@@ -55,7 +65,7 @@ const EMAIL_SEQUENCE = [
     delayMinutes: 5760, // Day 4
     subject: "Real businesses growing with guzzl.pro",
     body: (name: string) => `
-      <h2>Hi ${name},</h2>
+      <h2>Hi ${escapeHtml(name)},</h2>
       <p>Here's how service professionals are using guzzl.pro every day:</p>
       <ul>
         <li><strong>Landscapers</strong> share their card at job sites — customers book seasonal cleanups online</li>
@@ -70,7 +80,7 @@ const EMAIL_SEQUENCE = [
     delayMinutes: 10080, // Day 7
     subject: "Ready to grow? Your card is waiting ✨",
     body: (name: string) => `
-      <h2>Hi ${name},</h2>
+      <h2>Hi ${escapeHtml(name)},</h2>
       <p>It's been a week since you downloaded the toolkit. Have you had a chance to try any of the strategies?</p>
       <p>Creating your guzzl.pro smart business card takes less than 2 minutes — and it's completely free to start.</p>
       <p>Here's what you'll get:</p>

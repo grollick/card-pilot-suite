@@ -52,6 +52,16 @@ function getQualityTier(score: number): string {
   return "low";
 }
 
+/** HTML-encode user-supplied values to prevent injection */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -253,7 +263,7 @@ serve(async (req) => {
           await supabase.functions.invoke("send-email", {
             body: {
               to: business.email,
-              subject: `${qualityLabel} ${quoteReq.customer_name} needs ${quoteReq.service_needed || "your services"}`,
+              subject: `${qualityLabel} ${escapeHtml(quoteReq.customer_name)} needs ${escapeHtml(quoteReq.service_needed || "your services")}`,
               html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                   <h2 style="color: #1a1a1a;">New Lead from guzzl.pro Marketplace</h2>
@@ -261,13 +271,13 @@ serve(async (req) => {
                     Quality Score: ${leadQualityScore}/100 — ${qualityTier.toUpperCase()}
                   </div>
                   <div style="background: #f5f5f5; border-radius: 8px; padding: 20px; margin: 16px 0;">
-                    <p><strong>Name:</strong> ${quoteReq.customer_name}</p>
-                    ${quoteReq.customer_email ? `<p><strong>Email:</strong> ${quoteReq.customer_email}</p>` : ""}
-                    ${quoteReq.customer_phone ? `<p><strong>Phone:</strong> ${quoteReq.customer_phone}</p>` : ""}
-                    ${quoteReq.service_needed ? `<p><strong>Service:</strong> ${quoteReq.service_needed}</p>` : ""}
-                    ${quoteReq.budget ? `<p><strong>Budget:</strong> ${quoteReq.budget}</p>` : ""}
-                    ${quoteReq.timeline ? `<p><strong>Timeline:</strong> ${quoteReq.timeline}</p>` : ""}
-                    ${quoteReq.notes ? `<p><strong>Details:</strong> ${quoteReq.notes}</p>` : ""}
+                    <p><strong>Name:</strong> ${escapeHtml(quoteReq.customer_name)}</p>
+                    ${quoteReq.customer_email ? `<p><strong>Email:</strong> ${escapeHtml(quoteReq.customer_email)}</p>` : ""}
+                    ${quoteReq.customer_phone ? `<p><strong>Phone:</strong> ${escapeHtml(quoteReq.customer_phone)}</p>` : ""}
+                    ${quoteReq.service_needed ? `<p><strong>Service:</strong> ${escapeHtml(quoteReq.service_needed)}</p>` : ""}
+                    ${quoteReq.budget ? `<p><strong>Budget:</strong> ${escapeHtml(quoteReq.budget)}</p>` : ""}
+                    ${quoteReq.timeline ? `<p><strong>Timeline:</strong> ${escapeHtml(quoteReq.timeline)}</p>` : ""}
+                    ${quoteReq.notes ? `<p><strong>Details:</strong> ${escapeHtml(quoteReq.notes)}</p>` : ""}
                   </div>
                   <p style="color: #666;">${urgencyNote}</p>
                   <p><a href="https://guzzl.pro/app/contacts" style="background: #6366f1; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">View in Dashboard</a></p>
