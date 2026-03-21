@@ -1,4 +1,4 @@
-import { Shield, Edit, LayoutGrid, Settings2, MessageSquare, TrendingUp, ShieldAlert, Rocket } from "lucide-react";
+import { Shield, Edit, LayoutGrid, Settings2, MessageSquare, TrendingUp, ShieldAlert, Rocket, Flame } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { professions, professionCategories, getProfessionsByCategory } from "@/data/professions";
@@ -10,12 +10,14 @@ import RoadmapBoard from "@/modules/settings/components/RoadmapBoard";
 import AdminGrowthDashboard from "@/modules/settings/components/AdminGrowthDashboard";
 import AbuseMonitorDashboard from "@/modules/admin/components/AbuseMonitorDashboard";
 import FounderCommandCenter from "@/modules/admin/components/FounderCommandCenter";
+import GrowthEngine from "@/modules/admin/components/GrowthEngine";
 import { useState } from "react";
 
-type Section = "command" | "growth" | "content" | "feedback" | "system" | "abuse";
+type Section = "command" | "engine" | "growth" | "content" | "feedback" | "system" | "abuse";
 
 const sections: { id: Section; label: string; icon: typeof Shield }[] = [
   { id: "command", label: "Command Center", icon: Rocket },
+  { id: "engine", label: "Growth Engine", icon: Flame },
   { id: "growth", label: "Growth", icon: TrendingUp },
   { id: "abuse", label: "Abuse Monitor", icon: ShieldAlert },
   { id: "content", label: "Content & Professions", icon: LayoutGrid },
@@ -52,6 +54,9 @@ export default function AdminPage() {
 
       {/* Command Center */}
       {section === "command" && <FounderCommandCenter />}
+
+      {/* Growth Engine */}
+      {section === "engine" && <GrowthEngine />}
 
       {/* Growth */}
       {section === "growth" && <AdminGrowthDashboard />}
