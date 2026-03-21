@@ -14,14 +14,33 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { user_id, handle, meta } = body;
+    const { handle, meta } = body;
 
-    if (!user_id || !handle) {
+    if (!handle) {
       return new Response(
-        JSON.stringify({ error: "Missing user_id or handle" }),
+        JSON.stringify({ error: "Missing handle" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Resolve user_id server-side from handle — never trust client-supplied user_id
+    const supabaseLookup = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+    const { data: profile } = await supabaseLookup
+      .from("profiles")
+      .select("id")
+      .eq("handle", handle)
+      .single();
+
+    if (!profile?.id) {
+      return new Response(
+        JSON.stringify({ error: "Invalid handle" }),
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    const user_id = profile.id;
 
     // Parse device info from user agent
     const ua = (meta?.user_agent || "").toLowerCase();
@@ -77,10 +96,7 @@ serve(async (req) => {
       ip_hash: ip !== "unknown" ? await hashIP(ip) : null,
     };
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    const supabase = supabaseLookup;
 
     // Check if this visitor has been seen before (returning visitor detection)
     let isReturning = false;

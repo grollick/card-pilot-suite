@@ -219,21 +219,11 @@ export default function PublicCard() {
     const track = () => {
       supabase.functions.invoke("track-card-view", {
         body: {
-          user_id: profile.id,
           handle,
           meta: getVisitorMeta(),
         },
       }).catch(() => {
-        // Fallback: direct insert if edge function fails
-        supabase
-          .from("analytics_events")
-          .insert({
-            user_id: profile.id,
-            handle,
-            event_type: "card_view" as const,
-            meta_json: getVisitorMeta(),
-          })
-          .then();
+        // Silent fail — analytics is non-critical
       });
     };
     if ("requestIdleCallback" in window) {
