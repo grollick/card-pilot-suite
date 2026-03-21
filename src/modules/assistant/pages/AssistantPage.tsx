@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import AiCreditTopupDialog from "@/components/AiCreditTopupDialog";
-import { Send, Loader2, Copy, RotateCcw, TrendingUp, Zap, Target, PenTool, BarChart3, Users, CalendarPlus } from "lucide-react";
+import { Send, Loader2, Copy, RotateCcw, TrendingUp, Zap, Target, PenTool, BarChart3, Users, CalendarPlus, ThumbsUp, ThumbsDown, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
