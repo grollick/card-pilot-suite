@@ -1565,6 +1565,49 @@ export default function PublicCard() {
         </div>
       </motion.div>
 
+      {/* Floating WhatsApp button */}
+      {!isOwner && profile.phone && enabledCtas.some(c => c.id === "whatsapp") && (() => {
+        const cleanPhone = profile.phone!.replace(/[^0-9+]/g, "").replace(/^\+/, "");
+        return (
+          <motion.a
+            href={`https://wa.me/${cleanPhone}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 2, type: "spring", stiffness: 300, damping: 20 }}
+            onClick={() => {
+              supabase.from("analytics_events").insert({
+                user_id: profile.id,
+                handle: handle!,
+                event_type: "button_click" as const,
+                meta_json: { cta: "whatsapp_floating" },
+              }).then();
+            }}
+            style={{
+              position: "fixed",
+              bottom: 80,
+              right: 20,
+              width: 56,
+              height: 56,
+              borderRadius: "50%",
+              background: "#25D366",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 4px 20px rgba(37,211,102,0.4)",
+              zIndex: 40,
+              cursor: "pointer",
+            }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <MessageCircle className="h-6 w-6" />
+          </motion.a>
+        );
+      })()}
+
       {/* Smart engagement popup after delay */}
       {!isOwner && (
         <SmartEngagementPopup
