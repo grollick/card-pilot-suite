@@ -33,6 +33,7 @@ import {
 const leadsItems = [
   { title: "All Leads", url: "/app/contacts", icon: Inbox },
   { title: "Pipeline", url: "/app/pipeline", icon: Kanban },
+  { title: "Job Requests", url: "/app/job-requests", icon: Bell, glowKey: "job-requests" },
   { title: "Bookings", url: "/app/bookings", icon: Calendar },
   { title: "Estimates", url: "/app/estimates", icon: FileText },
   { title: "Tasks", url: "/app/tasks", icon: CheckSquare },
