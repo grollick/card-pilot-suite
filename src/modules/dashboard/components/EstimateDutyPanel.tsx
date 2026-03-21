@@ -269,6 +269,7 @@ export default function EstimateDutyPanel() {
           )}
         </AnimatePresence>
       </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
