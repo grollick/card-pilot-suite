@@ -190,6 +190,7 @@ export default function SectionEditor({
           {sectionId === "contact" && <ContactEditor draft={draft} setDraft={setDraft} />}
           {sectionId === "booking" && <BookingEditor draft={draft} setDraft={setDraft} />}
           {sectionId === "projects" && <ProjectsEditor draft={draft} setDraft={setDraft} />}
+          {sectionId === "video_intro" && <VideoIntroEditor draft={draft} setDraft={setDraft} />}
           {sectionId === "quote_calculator" && <QuoteCalculatorEditor draft={draft} setDraft={setDraft} />}
           <div className="flex gap-2 pt-4 border-t border-border">
             <Button onClick={handleSave} className="flex-1">Save Changes</Button>
