@@ -62,6 +62,9 @@ export default function AdminPage() {
       {/* Growth Engine */}
       {section === "engine" && <GrowthEngine onNavigateSection={(s) => setSection(s as Section)} />}
 
+      {/* Growth Automation */}
+      {section === "automation" && <GrowthAutomationDashboard />}
+
       {/* Growth */}
       {section === "growth" && <AdminGrowthDashboard />}
 
