@@ -74,6 +74,7 @@ export function useCardBuilderState() {
   const [nameLineHeight, setNameLineHeight] = useState<number | null>(null);
   const [nameTextStroke, setNameTextStroke] = useState(false);
   const [nameTextStrokeWidth, setNameTextStrokeWidth] = useState(1);
+  const [companyColor, setCompanyColor] = useState<string | null>(null);
   const identitySaveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const [identitySaveState, setIdentitySaveState] = useState<Record<string, "saving" | "saved" | null>>({});
   const [globalSaveState, setGlobalSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
