@@ -10,6 +10,7 @@ import {
   Loader2, ShieldAlert, Flame, Heart, Star, Ban
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import ResearchSummaryWidget from "@/modules/admin/components/ResearchSummaryWidget";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
