@@ -55,6 +55,9 @@ export default function AdminPage() {
       {/* Command Center */}
       {section === "command" && <FounderCommandCenter />}
 
+      {/* Growth Engine */}
+      {section === "engine" && <GrowthEngine />}
+
       {/* Growth */}
       {section === "growth" && <AdminGrowthDashboard />}
 
