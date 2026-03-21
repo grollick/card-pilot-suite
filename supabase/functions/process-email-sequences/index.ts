@@ -199,7 +199,7 @@ serve(async (req) => {
     return jsonRes({ processed: enrollments.length, sent, skipped, completed });
   } catch (err) {
     console.error("process-email-sequences error:", err);
-    return jsonRes({ error: err.message }, 500);
+    return jsonRes({ error: "Internal server error" }, 500);
   }
 });
 
