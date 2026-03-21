@@ -42,6 +42,7 @@ interface Props {
   subtitleItalic?: boolean;
   subtitleSpacing?: number | null;
   showCompany?: boolean;
+  companyColor?: string | null;
   nameLineHeight?: number | null;
   nameTextStroke?: boolean;
   nameTextStrokeWidth?: number;
