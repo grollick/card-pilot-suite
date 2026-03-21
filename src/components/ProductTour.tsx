@@ -79,11 +79,15 @@ export default function ProductTour() {
   });
 
   useEffect(() => {
+    if (isAdminPage) {
+      setIsVisible(false);
+      return;
+    }
     if (tourCompleted === false) {
       const timer = setTimeout(() => setIsVisible(true), 1500);
       return () => clearTimeout(timer);
     }
-  }, [tourCompleted]);
+  }, [tourCompleted, isAdminPage]);
 
   const handleNext = useCallback(() => {
     if (currentStep < TOUR_STEPS.length - 1) {
