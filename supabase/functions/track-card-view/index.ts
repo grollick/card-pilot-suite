@@ -71,14 +71,14 @@ serve(async (req) => {
 
     if (ip && ip !== "unknown" && ip !== "127.0.0.1") {
       try {
-        const geoRes = await fetch(`http://ip-api.com/json/${ip}?fields=city,regionName,country`, {
+        const geoRes = await fetch(`https://ipapi.co/${ip}/json/`, {
           signal: AbortSignal.timeout(2000),
         });
         if (geoRes.ok) {
           const geo = await geoRes.json();
           city = geo.city || "Unknown";
-          region = geo.regionName || "Unknown";
-          country = geo.country || "Unknown";
+          region = geo.region || "Unknown";
+          country = geo.country_name || "Unknown";
         }
       } catch {
         // Geo lookup failed — continue without it
