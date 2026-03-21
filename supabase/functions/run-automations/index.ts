@@ -12,6 +12,15 @@ serve(async (req) => {
   }
 
   try {
+    // Only allow calls from service role (internal use)
+    const authHeader = req.headers.get("Authorization")?.replace("Bearer ", "") ?? "";
+    if (authHeader !== Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { userId, triggerType, context } = await req.json();
 
     if (!userId || !triggerType || !context?.contactId) {
