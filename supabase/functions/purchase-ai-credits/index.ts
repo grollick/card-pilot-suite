@@ -44,7 +44,8 @@ serve(async (req) => {
       });
     }
 
-    const { action, pack_id } = await req.json();
+    const body = await req.json();
+    const { action, pack_id } = body;
 
     // GET available packs
     if (action === "get_packs") {
@@ -77,8 +78,6 @@ serve(async (req) => {
         );
       }
 
-      // TODO: Integrate Stripe payment here
-      // For now, check for STRIPE_SECRET_KEY and create a checkout session
       const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
       if (!stripeKey) {
         return new Response(
@@ -90,9 +89,6 @@ serve(async (req) => {
         );
       }
 
-      // When Stripe is configured, create a checkout session here
-      // and return the checkout URL. On webhook success, insert the credits.
-      // For now return a placeholder:
       return new Response(
         JSON.stringify({ 
           error: "Stripe checkout not yet implemented",
@@ -102,51 +98,9 @@ serve(async (req) => {
       );
     }
 
-    // FULFILL — called by webhook after successful payment
-    if (action === "fulfill") {
-      // This will be called internally by a Stripe webhook handler
-      const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
-      const { credits, payment_intent_id, amount_paid } = await req.json();
-
-      if (!credits || !payment_intent_id) {
-        return new Response(
-          JSON.stringify({ error: "Missing fields" }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      // Idempotency: check if already fulfilled
-      const { data: existing } = await supabaseAdmin
-        .from("ai_credit_purchases")
-        .select("id")
-        .eq("stripe_payment_intent_id", payment_intent_id)
-        .maybeSingle();
-
-      if (existing) {
-        return new Response(
-          JSON.stringify({ status: "already_fulfilled" }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-
-      const { error: insertError } = await supabaseAdmin
-        .from("ai_credit_purchases")
-        .insert({
-          user_id: user.id,
-          credits_purchased: credits,
-          credits_remaining: credits,
-          purchase_type: "topup",
-          stripe_payment_intent_id: payment_intent_id,
-          amount_paid: amount_paid || 0,
-        });
-
-      if (insertError) throw insertError;
-
-      return new Response(
-        JSON.stringify({ status: "fulfilled", credits }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    // NOTE: The "fulfill" action has been removed from this user-facing endpoint.
+    // Credit fulfillment must be handled by a dedicated Stripe webhook endpoint
+    // that verifies the webhook signature before granting credits.
 
     return new Response(
       JSON.stringify({ error: "Invalid action" }),
