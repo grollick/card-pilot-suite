@@ -54,6 +54,10 @@ interface CardHeaderProps {
   ctaChildren?: React.ReactNode;
   /** Enable glass container behind identity content in hero layout */
   glassHero?: boolean;
+  /** Verification level for badge overlay on cover */
+  verificationLevel?: "basic" | "verified" | "pro_verified" | null;
+  /** Whether user is available for work */
+  isAvailable?: boolean;
 }
 
 function renderName(name: string, bold?: boolean, uppercase?: boolean, firstNameWeight?: number | null) {
