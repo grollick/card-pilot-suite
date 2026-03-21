@@ -169,6 +169,8 @@ export default function MarketplacePage() {
         }}
         onClose={() => setSelectedApp(null)}
       />
+
+      <RequestAppDialog open={requestOpen} onOpenChange={setRequestOpen} />
     </div>
   );
 }
