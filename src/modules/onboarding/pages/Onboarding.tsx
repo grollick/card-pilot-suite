@@ -278,7 +278,7 @@ export default function Onboarding() {
       // Move to success screen
       setAiLoading(false);
       setSaving(false);
-      setStep(4);
+      setStep(5);
     } catch (err: any) {
       console.error("Onboarding error:", err);
       toast({ title: "Something went wrong", description: err.message, variant: "destructive" });
