@@ -18,6 +18,8 @@ import { usePlanLimits } from "@/hooks/usePlanLimits";
 import UpgradePrompt from "@/components/UpgradePrompt";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { useAILeadScores } from "@/hooks/useAICopilot";
+import { LeadScoreBadge, LeadScoreLoading } from "@/components/ai/LeadScoreBadge";
 
 type SavedView = "all" | "new_leads" | "needs_followup" | "booked" | "won" | "lost";
 
@@ -58,6 +60,15 @@ export default function ContactsPage() {
   const navigate = useNavigate();
   const { data: contacts = [], isLoading } = useContacts();
   const { data: stages = [] } = usePipelineStages();
+
+  // AI lead scoring
+  const leadIds = useMemo(() => contacts.slice(0, 20).map((c: any) => c.id), [contacts]);
+  const { data: leadScores, isLoading: scoresLoading } = useAILeadScores(leadIds);
+  const scoreMap = useMemo(() => {
+    const map = new Map<string, any>();
+    (leadScores ?? []).forEach(s => map.set(s.lead_id, s));
+    return map;
+  }, [leadScores]);
   const { data: tags = [] } = useTags();
   const createContact = useCreateContact();
   const { planKey, checkLimit } = usePlanLimits();
@@ -302,7 +313,14 @@ export default function ContactsPage() {
                           {contact.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2)}
                         </div>
                         <div className="min-w-0">
-                          <p className="font-medium text-sm truncate">{contact.name}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="font-medium text-sm truncate">{contact.name}</p>
+                            {scoreMap.has(contact.id) ? (
+                              <LeadScoreBadge score={scoreMap.get(contact.id)!} compact />
+                            ) : scoresLoading ? (
+                              <LeadScoreLoading />
+                            ) : null}
+                          </div>
                           {contact.company && <p className="text-xs text-muted-foreground truncate">{contact.company}</p>}
                         </div>
                       </div>

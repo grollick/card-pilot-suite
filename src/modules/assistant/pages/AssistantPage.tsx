@@ -281,15 +281,36 @@ function formatResultTitle(text: string): string {
 /* Markdown components now imported from AIResponseRenderer as aiMarkdownComponents */
 const mdComponents = aiMarkdownComponents;
 
+const STORAGE_KEY = "cardpilot-assistant-history";
+
+function loadMessages(): Msg[] {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch { return []; }
+}
+
+function saveMessages(msgs: Msg[]) {
+  try {
+    // Keep last 50 messages to avoid storage bloat
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(msgs.slice(-50)));
+  } catch { /* ignore */ }
+}
+
 export default function AssistantPage() {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const [messages, setMessages] = useState<Msg[]>([]);
+  const [messages, setMessages] = useState<Msg[]>(loadMessages);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showTopup, setShowTopup] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+
+  // Persist messages
+  useEffect(() => {
+    if (messages.length > 0) saveMessages(messages);
+  }, [messages]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -418,8 +439,21 @@ export default function AssistantPage() {
 
   const followUps = messages.length > 0 ? getSmartFollowUps(messages) : [];
 
+  const handleClearChat = () => {
+    setMessages([]);
+    localStorage.removeItem(STORAGE_KEY);
+  };
+
   return (
     <div className="flex flex-col h-[calc(100dvh-4rem)] max-w-4xl mx-auto">
+      {/* Header with clear button */}
+      {messages.length > 0 && (
+        <div className="flex items-center justify-end px-3 sm:px-6 pt-2">
+          <Button variant="ghost" size="sm" className="text-xs gap-1.5 h-7 text-muted-foreground" onClick={handleClearChat}>
+            <RotateCcw className="h-3 w-3" /> New Chat
+          </Button>
+        </div>
+      )}
       {/* Messages area */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-3 sm:px-6 py-6 space-y-5">
         <AnimatePresence mode="popLayout">

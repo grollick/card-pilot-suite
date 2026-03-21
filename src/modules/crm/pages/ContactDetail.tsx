@@ -36,6 +36,9 @@ import ContactTasksList from "@/modules/crm/components/ContactTasksList";
 import PendingFollowups from "@/modules/crm/components/PendingFollowups";
 import ContactAutomationPanel from "@/modules/crm/components/ContactAutomationPanel";
 import { supabase } from "@/integrations/supabase/client";
+import AIReplyDraftCopilot from "@/components/ai/AIReplyDraftCopilot";
+import { useAILeadScores } from "@/hooks/useAICopilot";
+import { LeadScoreBadge } from "@/components/ai/LeadScoreBadge";
 
 export default function ContactDetail() {
   const { id } = useParams();
@@ -170,6 +173,11 @@ export default function ContactDetail() {
         {/* LEFT COLUMN */}
         <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} className="lg:col-span-4 space-y-4">
           <ContactSummaryCard contact={contact} />
+
+          {/* AI Copilot: Reply Draft */}
+          {contact.status === "open" && (
+            <AIReplyDraftCopilot leadId={contact.id} leadName={contact.name} />
+          )}
 
           {/* Quick Actions */}
           <div className="rounded-xl border border-border bg-card p-3">

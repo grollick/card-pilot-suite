@@ -10,6 +10,7 @@ import BlockMarketplaceDialog from "@/modules/card/components/BlockMarketplaceDi
 import { canAccessBlock, type MarketplaceBlock } from "@/lib/blockMarketplace";
 import AIDesignAssistantDialog, { type AICardResult } from "@/modules/card/components/AIDesignAssistantDialog";
 import ConversionTips from "@/modules/card/components/ConversionTips";
+import AICardOptimizerCopilot from "@/components/ai/AICardOptimizerCopilot";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -478,6 +479,7 @@ export default function CardBuilder() {
       </PanelSection>
 
       <ConversionTips sections={s.sections} />
+      <AICardOptimizerCopilot />
 
       {!isPro && (
         <div className="rounded-xl border border-primary/10 bg-gradient-to-b from-primary/[0.04] to-transparent p-3.5 space-y-2.5 mt-3">
