@@ -249,14 +249,14 @@ export default function AssistantPage() {
                   )}
                   <div className="space-y-1.5">
                     <div
-                      className={`rounded-xl px-4 py-3 text-sm ${
+                      className={`rounded-xl text-sm ${
                         msg.role === "user"
-                          ? "bg-primary text-primary-foreground"
-                          : "bg-muted/50"
+                          ? "bg-primary text-primary-foreground px-4 py-3"
+                          : "bg-muted/50 px-5 py-4"
                       }`}
                     >
                       {msg.role === "assistant" ? (
-                        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+                        <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:leading-relaxed [&_li]:leading-relaxed [&_ul]:my-2 [&_ol]:my-2 [&_h1]:text-base [&_h2]:text-sm [&_h3]:text-sm [&_p+p]:mt-3">
                           <ReactMarkdown>{msg.content}</ReactMarkdown>
                         </div>
                       ) : (
