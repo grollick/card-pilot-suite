@@ -120,7 +120,7 @@ export default function DashboardHome() {
                 className="gap-2 rounded-xl h-9 text-[13px] font-medium shadow-sm shadow-primary/20 hover:shadow-md hover:shadow-primary/30 transition-all hover:scale-[1.02]"
                 onClick={() => navigate("/app/card")}
               >
-                <Pencil className="h-3.5 w-3.5" /> Edit Card
+                <Pencil className="h-3.5 w-3.5" /> Tweak Card
               </Button>
               <Button
                 variant="outline"
