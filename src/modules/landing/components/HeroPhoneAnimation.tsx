@@ -183,9 +183,25 @@ export default function HeroPhoneAnimation() {
   const [personaIdx, setPersonaIdx] = useState(0);
   const [stageIdx, setStageIdx] = useState(0);
   const [transitioning, setTransitioning] = useState(false);
+  const [loadedImages, setLoadedImages] = useState<Record<string, string>>({});
 
   const persona = PERSONAS[personaIdx];
   const stage = persona.stages[stageIdx].key;
+
+  // Preload current + next persona images
+  useEffect(() => {
+    const current = PERSONAS[personaIdx];
+    const next = PERSONAS[(personaIdx + 1) % PERSONAS.length];
+    const keys = [current.avatarKey, current.coverKey, next.avatarKey, next.coverKey];
+    preloadImages(keys).then(() => {
+      const updated: Record<string, string> = {};
+      for (const k of keys) {
+        const v = imageCache.get(k);
+        if (v) updated[k] = v;
+      }
+      setLoadedImages((prev) => ({ ...prev, ...updated }));
+    });
+  }, [personaIdx]);
 
   const advanceToNextPersona = useCallback(() => {
     setTransitioning(true);
@@ -209,6 +225,8 @@ export default function HeroPhoneAnimation() {
   }, [stageIdx, personaIdx, persona, advanceToNextPersona]);
 
   const accentColor = `hsl(${persona.accentHsl})`;
+  const avatarSrc = loadedImages[persona.avatarKey] || "";
+  const coverSrc = loadedImages[persona.coverKey] || "";
 
   return (
     <div className="w-full max-w-[300px] mx-auto">
