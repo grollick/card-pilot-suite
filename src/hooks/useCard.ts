@@ -7,6 +7,7 @@ import type { Json } from "@/integrations/supabase/types";
 export const CTA_TYPES = [
   { value: "call", label: "Call", icon: "Phone" },
   { value: "text", label: "Text", icon: "MessageSquare" },
+  { value: "whatsapp", label: "WhatsApp", icon: "MessageCircle" },
   { value: "email", label: "Email", icon: "Mail" },
   { value: "book", label: "Book", icon: "Calendar" },
   { value: "quote", label: "Get Quote", icon: "FileText" },
@@ -20,6 +21,7 @@ export type CtaType = (typeof CTA_TYPES)[number]["value"];
 export const DEFAULT_SECTIONS = [
   { id: "hero", label: "Hero", enabled: true },
   { id: "about", label: "About", enabled: true },
+  { id: "video_intro", label: "Video Introduction", enabled: false },
   { id: "services", label: "Services", enabled: true },
   { id: "projects", label: "Before / After Projects", enabled: false },
   { id: "quote_calculator", label: "Instant Quote Calculator", enabled: false },

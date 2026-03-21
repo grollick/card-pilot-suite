@@ -1,6 +1,7 @@
 import {
   Phone,
   MessageSquare,
+  MessageCircle,
   Mail,
   Download,
   Star,
@@ -20,6 +21,7 @@ import {
   Image,
   Share2,
   CheckCircle2,
+  Play,
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -79,6 +81,7 @@ function getVisitorMeta() {
 const CTA_ICONS: Record<string, React.ReactNode> = {
   call: <Phone className="h-4 w-4" />,
   text: <MessageSquare className="h-4 w-4" />,
+  whatsapp: <MessageCircle className="h-4 w-4" />,
   email: <Mail className="h-4 w-4" />,
   book: <Calendar className="h-4 w-4" />,
   quote: <FileText className="h-4 w-4" />,
@@ -314,7 +317,10 @@ export default function PublicCard() {
 
     if (cta === "call" && profile.phone) window.location.href = `tel:${profile.phone}`;
     else if (cta === "text" && profile.phone) window.location.href = `sms:${profile.phone}`;
-    else if (cta === "email" && profile.email) window.location.href = `mailto:${profile.email}`;
+    else if (cta === "whatsapp" && profile.phone) {
+      const cleanPhone = profile.phone.replace(/[^0-9+]/g, "").replace(/^\+/, "");
+      window.open(`https://wa.me/${cleanPhone}`, "_blank");
+    } else if (cta === "email" && profile.email) window.location.href = `mailto:${profile.email}`;
     else if (cta === "book") {
       const bookingSection = document.getElementById("booking-section");
       if (bookingSection) bookingSection.scrollIntoView({ behavior: "smooth" });
@@ -469,6 +475,7 @@ export default function PublicCard() {
 
   const SECTION_ICONS: Record<string, LucideIcon> = {
     about: User,
+    video_intro: Play,
     services: Briefcase,
     projects: Image,
     quote_calculator: FileText,
@@ -807,6 +814,44 @@ export default function PublicCard() {
               </p>
             </CardSectionWrapper>
           )}
+
+          {/* ── Video Introduction ── */}
+          {enabledSections.has("video_intro") && (() => {
+            const vc = sectionContent("video_intro");
+            const videoUrl = vc?.videoUrl;
+            if (!videoUrl) return null;
+
+            const getEmbedUrl = (url: string) => {
+              const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?/]+)/);
+              if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0`;
+              const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+              if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+              const loomMatch = url.match(/loom\.com\/share\/([a-zA-Z0-9]+)/);
+              if (loomMatch) return `https://www.loom.com/embed/${loomMatch[1]}`;
+              return url;
+            };
+
+            return (
+              <div>
+                <SectionTitle id="video_intro" label={vc?.videoHeading || "Watch"} />
+                <CardSectionWrapper theme={theme} index={0.5} metallicEffect={metallicEffect}>
+                  <div style={{ borderRadius: radii.button, overflow: "hidden", aspectRatio: "16/9" }}>
+                    <iframe
+                      src={getEmbedUrl(videoUrl)}
+                      style={{ width: "100%", height: "100%", border: "none" }}
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                  {vc?.videoCaption && (
+                    <p style={{ fontSize: 12, color: palette.secondary, margin: "8px 0 0", lineHeight: 1.5, textAlign: "center" }}>
+                      {vc.videoCaption}
+                    </p>
+                  )}
+                </CardSectionWrapper>
+              </div>
+            );
+          })()}
 
           {/* ── Services ── */}
           {enabledSections.has("services") && (() => {
@@ -1519,6 +1564,49 @@ export default function PublicCard() {
           )}
         </div>
       </motion.div>
+
+      {/* Floating WhatsApp button */}
+      {!isOwner && profile.phone && enabledCtas.some(c => c.id === "whatsapp") && (() => {
+        const cleanPhone = profile.phone!.replace(/[^0-9+]/g, "").replace(/^\+/, "");
+        return (
+          <motion.a
+            href={`https://wa.me/${cleanPhone}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 2, type: "spring", stiffness: 300, damping: 20 }}
+            onClick={() => {
+              supabase.from("analytics_events").insert({
+                user_id: profile.id,
+                handle: handle!,
+                event_type: "button_click" as const,
+                meta_json: { cta: "whatsapp_floating" },
+              }).then();
+            }}
+            style={{
+              position: "fixed",
+              bottom: 80,
+              right: 20,
+              width: 56,
+              height: 56,
+              borderRadius: "50%",
+              background: "#25D366",
+              color: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 4px 20px rgba(37,211,102,0.4)",
+              zIndex: 40,
+              cursor: "pointer",
+            }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <MessageCircle className="h-6 w-6" />
+          </motion.a>
+        );
+      })()}
 
       {/* Smart engagement popup after delay */}
       {!isOwner && (

@@ -41,6 +41,11 @@ export interface SectionContent {
   calcHeading?: string;
   calcPresetId?: string;
   calcDisclaimer?: string;
+  // Video Introduction
+  videoUrl?: string;
+  videoHeading?: string;
+  videoCaption?: string;
+  videoAutoplay?: boolean;
 }
 
 interface SectionEditorProps {
@@ -185,6 +190,7 @@ export default function SectionEditor({
           {sectionId === "contact" && <ContactEditor draft={draft} setDraft={setDraft} />}
           {sectionId === "booking" && <BookingEditor draft={draft} setDraft={setDraft} />}
           {sectionId === "projects" && <ProjectsEditor draft={draft} setDraft={setDraft} />}
+          {sectionId === "video_intro" && <VideoIntroEditor draft={draft} setDraft={setDraft} />}
           {sectionId === "quote_calculator" && <QuoteCalculatorEditor draft={draft} setDraft={setDraft} />}
           <div className="flex gap-2 pt-4 border-t border-border">
             <Button onClick={handleSave} className="flex-1">Save Changes</Button>
@@ -550,6 +556,66 @@ function QuoteCalculatorEditor({ draft, setDraft }: { draft: SectionContent; set
       <p className="text-xs text-muted-foreground">
         The calculator lets visitors estimate costs and submit their info as a lead automatically.
       </p>
+    </div>
+  );
+}
+
+// ─── Video Introduction Editor ──────────────────────────────
+function VideoIntroEditor({ draft, setDraft }: { draft: SectionContent; setDraft: (d: SectionContent) => void }) {
+  const getEmbedUrl = (url: string) => {
+    if (!url) return "";
+    // YouTube
+    const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&?/]+)/);
+    if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}?rel=0`;
+    // Vimeo
+    const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+    if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+    // Loom
+    const loomMatch = url.match(/loom\.com\/share\/([a-zA-Z0-9]+)/);
+    if (loomMatch) return `https://www.loom.com/embed/${loomMatch[1]}`;
+    return url;
+  };
+
+  const previewUrl = getEmbedUrl(draft.videoUrl || "");
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label className="text-xs">Video URL</Label>
+        <Input
+          placeholder="Paste YouTube, Vimeo, or Loom URL"
+          value={draft.videoUrl || ""}
+          onChange={(e) => setDraft({ ...draft, videoUrl: e.target.value })}
+        />
+        <p className="text-[10px] text-muted-foreground mt-1">Supports YouTube, Vimeo, and Loom links</p>
+      </div>
+      {previewUrl && (
+        <div className="rounded-lg overflow-hidden border border-border aspect-video">
+          <iframe
+            src={previewUrl}
+            className="w-full h-full"
+            allow="autoplay; fullscreen"
+            allowFullScreen
+          />
+        </div>
+      )}
+      <div>
+        <Label className="text-xs">Section Heading</Label>
+        <Input
+          placeholder="e.g. Watch Our Story"
+          value={draft.videoHeading || ""}
+          onChange={(e) => setDraft({ ...draft, videoHeading: e.target.value })}
+        />
+      </div>
+      <div>
+        <Label className="text-xs">Caption (optional)</Label>
+        <Textarea
+          placeholder="Brief description under the video"
+          value={draft.videoCaption || ""}
+          onChange={(e) => setDraft({ ...draft, videoCaption: e.target.value })}
+          rows={2}
+        />
+      </div>
     </div>
   );
 }
