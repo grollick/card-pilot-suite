@@ -547,29 +547,69 @@ export default function Onboarding() {
               />
             )}
 
-            {/* Step 5: First Estimate */}
+            {/* Step 5: Social Links */}
             {step === 5 && (
+              <StepSocialLinks
+                onNext={async (links) => {
+                  setSocialLinks(links);
+                  // Save social links to card sections
+                  if (links.length > 0 && user) {
+                    try {
+                      const { data: card } = await supabase
+                        .from("cards")
+                        .select("sections_json")
+                        .eq("user_id", user.id)
+                        .single();
+                      if (card) {
+                        const sections = (card.sections_json as any[]) || [];
+                        const socialIdx = sections.findIndex((s: any) => s.id === "social");
+                        const socialSection = {
+                          id: "social",
+                          label: "Social",
+                          enabled: true,
+                          content: { links },
+                        };
+                        const updatedSections = socialIdx >= 0
+                          ? sections.map((s: any, i: number) => i === socialIdx ? socialSection : s)
+                          : [...sections, socialSection];
+                        await supabase
+                          .from("cards")
+                          .update({ sections_json: updatedSections as any })
+                          .eq("user_id", user.id);
+                      }
+                    } catch (err) {
+                      console.error("Failed to save social links:", err);
+                    }
+                  }
+                  setStep(6);
+                }}
+                onBack={() => setStep(4)}
+              />
+            )}
+
+            {/* Step 6: First Estimate */}
+            {step === 6 && (
               <StepFirstEstimate
                 services={services}
                 aiServices={aiSetup?.services}
                 onCreateEstimate={handleCreateEstimate}
-                onSkip={() => setStep(6)}
-                onBack={() => setStep(4)}
+                onSkip={() => setStep(7)}
+                onBack={() => setStep(5)}
                 saving={estimateSaving}
               />
             )}
 
-            {/* Step 6: Sharing */}
-            {step === 6 && (
+            {/* Step 7: Sharing */}
+            {step === 7 && (
               <StepSharing
                 cardUrl={cardUrl}
                 shareMessage={shareMessage}
-                onNext={() => setStep(7)}
+                onNext={() => setStep(8)}
               />
             )}
 
-            {/* Step 7: Activation Checklist */}
-            {step === 7 && (
+            {/* Step 8: Activation Checklist */}
+            {step === 8 && (
               <StepActivationChecklist
                 items={checklistItems}
                 headline={checklistTemplate.headline}
