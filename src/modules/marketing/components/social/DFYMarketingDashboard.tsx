@@ -2,7 +2,7 @@ import { useState } from "react";
 import DFYActivityLog from "./DFYActivityLog";
 import {
   Rocket, Pause, Play, Settings2, BarChart3, Eye, MousePointer,
-  Users, CalendarCheck, TrendingUp, Sparkles, Crown, ChevronRight,
+  Users, CalendarCheck, TrendingUp, Sparkles, Crown, ChevronRight, Wand2, Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,8 @@ import { useSocialPosts } from "@/hooks/useSocialPosts";
 import { useAutoCampaigns, useUpdateCampaign, CONTENT_TYPE_LABELS } from "@/hooks/useAutoCampaigns";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 const GOAL_LABELS: Record<string, string> = {
   leads: "Generate Leads",
@@ -29,6 +31,8 @@ export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }:
   const { data: posts = [] } = useSocialPosts();
   const { data: campaigns = [] } = useAutoCampaigns();
   const updateCampaign = useUpdateCampaign();
+  const qc = useQueryClient();
+  const [generating, setGenerating] = useState(false);
 
   // Find the DFY campaign
   const dfyCampaign = campaigns.find(c => c.campaign_type === "dfy_marketing");
@@ -47,6 +51,28 @@ export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }:
     const newStatus = isActive ? "paused" : "active";
     await updateCampaign.mutateAsync({ id: dfyCampaign.id, status: newStatus });
     toast.success(isActive ? "Marketing paused" : "Marketing resumed");
+  };
+
+  const handleGeneratePosts = async () => {
+    if (!dfyCampaign) return;
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-dfy-posts", {
+        body: { campaign_id: dfyCampaign.id, count: dfyCampaign.posts_per_week || 3 },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`${data.posts_generated} posts generated and scheduled! 🎉`);
+      // Refresh posts and campaigns
+      qc.invalidateQueries({ queryKey: ["social-posts"] });
+      qc.invalidateQueries({ queryKey: ["auto-campaigns"] });
+      qc.invalidateQueries({ queryKey: ["dfy-activity-log"] });
+    } catch (e: any) {
+      console.error("Generate error:", e);
+      toast.error(e.message || "Failed to generate posts");
+    } finally {
+      setGenerating(false);
+    }
   };
 
   const stats = [
@@ -104,6 +130,10 @@ export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }:
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button size="sm" className="gap-1.5" onClick={handleGeneratePosts} disabled={generating || !isActive}>
+            {generating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
+            {generating ? "Generating..." : "Generate Posts Now"}
+          </Button>
           <Button variant="outline" size="sm" className="gap-1.5" onClick={toggleActive}>
             {isActive ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
             {isActive ? "Pause" : "Resume"}
@@ -114,7 +144,23 @@ export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }:
         </div>
       </div>
 
-      {/* KPIs */}
+      {/* Generate CTA for empty state */}
+      {scheduledPosts.length === 0 && publishedPosts.length === 0 && isActive && (
+        <Card className="border-2 border-dashed border-primary/30 bg-primary/5">
+          <CardContent className="p-6 text-center">
+            <Wand2 className="h-8 w-8 text-primary mx-auto mb-3" />
+            <h3 className="text-sm font-bold mb-1">Ready to generate your first posts!</h3>
+            <p className="text-xs text-muted-foreground mb-4 max-w-sm mx-auto">
+              Click the button below to have AI create {dfyCampaign?.posts_per_week || 3} posts 
+              tailored to your business and scheduled across the week.
+            </p>
+            <Button onClick={handleGeneratePosts} disabled={generating} className="gap-2">
+              {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              {generating ? "Generating posts..." : "Generate My Posts"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {stats.map((s, i) => (
           <motion.div
