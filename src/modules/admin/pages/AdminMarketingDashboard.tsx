@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Megaphone, Mail, FileText, BookOpen, BarChart3, Users, UserCheck, Target, Send, Workflow, ShieldAlert, Loader2, FlaskConical, Globe } from "lucide-react";
+import { Megaphone, Mail, FileText, BookOpen, BarChart3, Users, UserCheck, Target, Send, Workflow, ShieldAlert, Loader2, FlaskConical, Globe, Funnel, Gift, Search, UserX, Library } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,12 @@ import AdminMarketingAnalytics from "@/modules/admin/components/AdminMarketingAn
 import AdminEmailSequences from "@/modules/admin/components/AdminEmailSequences";
 import ABTestDashboard from "@/modules/admin/components/ABTestDashboard";
 import LandingPageManager from "@/modules/admin/pages/LandingPageManager";
+import AdminEmailPerformance from "@/modules/admin/components/AdminEmailPerformance";
+import AdminOnboardingFunnel from "@/modules/admin/components/AdminOnboardingFunnel";
+import AdminReferralAnalytics from "@/modules/admin/components/AdminReferralAnalytics";
+import AdminSeoPerformance from "@/modules/admin/components/AdminSeoPerformance";
+import AdminReengagement from "@/modules/admin/components/AdminReengagement";
+import AdminContentLibrary from "@/modules/admin/components/AdminContentLibrary";
 
 export default function AdminMarketingDashboard() {
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
@@ -52,42 +58,59 @@ export default function AdminMarketingDashboard() {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex-wrap h-auto gap-1">
           <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="email-perf">Email Perf</TabsTrigger>
+          <TabsTrigger value="funnel">Funnel</TabsTrigger>
           <TabsTrigger value="campaigns">Campaigns</TabsTrigger>
           <TabsTrigger value="sequences">Sequences</TabsTrigger>
           <TabsTrigger value="templates">Templates</TabsTrigger>
           <TabsTrigger value="playbooks">Playbooks</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="ab-tests">A/B Tests</TabsTrigger>
-          <TabsTrigger value="landing-pages">Landing Pages</TabsTrigger>
+          <TabsTrigger value="referrals">Referrals</TabsTrigger>
+          <TabsTrigger value="seo">SEO</TabsTrigger>
+          <TabsTrigger value="reengagement">Re-engage</TabsTrigger>
+          <TabsTrigger value="content-lib">Content</TabsTrigger>
+          <TabsTrigger value="landing-pages">Pages</TabsTrigger>
         </TabsList>
 
         {/* ── Overview ── */}
         <TabsContent value="overview" className="mt-4 space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <MetricCard
-              icon={Users}
-              label="Total Users"
-              value={stats?.totalUsers ?? 0}
-              loading={isLoading}
-            />
-            <MetricCard
-              icon={UserCheck}
-              label="Active Users (est.)"
-              value={activeUsers}
-              loading={isLoading}
-            />
-            <MetricCard
-              icon={Target}
-              label="Leads (30d)"
-              value={stats?.leads30d ?? 0}
-              loading={isLoading}
-            />
-            <MetricCard
-              icon={Mail}
-              label="Signups (7d)"
-              value={stats?.signups7d ?? 0}
-              loading={isLoading}
-            />
+            <MetricCard icon={Users} label="Total Users" value={stats?.totalUsers ?? 0} loading={isLoading} />
+            <MetricCard icon={UserCheck} label="Active Users (est.)" value={activeUsers} loading={isLoading} />
+            <MetricCard icon={Target} label="Leads (30d)" value={stats?.leads30d ?? 0} loading={isLoading} />
+            <MetricCard icon={Mail} label="Signups (7d)" value={stats?.signups7d ?? 0} loading={isLoading} />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card className="cursor-pointer hover:shadow-card transition-shadow" onClick={() => setActiveTab("email-perf")}>
+              <CardHeader className="pb-2">
+                <Mail className="h-8 w-8 text-primary mb-2" />
+                <CardTitle className="text-base">Email Performance</CardTitle>
+                <CardDescription>Delivery rates, bounces, errors</CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="cursor-pointer hover:shadow-card transition-shadow" onClick={() => setActiveTab("funnel")}>
+              <CardHeader className="pb-2">
+                <BarChart3 className="h-8 w-8 text-primary mb-2" />
+                <CardTitle className="text-base">Onboarding Funnel</CardTitle>
+                <CardDescription>Track user activation journey</CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="cursor-pointer hover:shadow-card transition-shadow" onClick={() => setActiveTab("reengagement")}>
+              <CardHeader className="pb-2">
+                <UserX className="h-8 w-8 text-primary mb-2" />
+                <CardTitle className="text-base">Re-engagement</CardTitle>
+                <CardDescription>Win back inactive users</CardDescription>
+              </CardHeader>
+            </Card>
+            <Card className="cursor-pointer hover:shadow-card transition-shadow" onClick={() => setActiveTab("referrals")}>
+              <CardHeader className="pb-2">
+                <Gift className="h-8 w-8 text-primary mb-2" />
+                <CardTitle className="text-base">Referral Analytics</CardTitle>
+                <CardDescription>Track invite performance</CardDescription>
+              </CardHeader>
+            </Card>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -105,21 +128,29 @@ export default function AdminMarketingDashboard() {
                 <CardDescription>Manage pre-built email templates</CardDescription>
               </CardHeader>
             </Card>
-            <Card className="cursor-pointer hover:shadow-card transition-shadow" onClick={() => setActiveTab("playbooks")}>
+            <Card className="cursor-pointer hover:shadow-card transition-shadow" onClick={() => setActiveTab("seo")}>
               <CardHeader className="pb-2">
-                <BookOpen className="h-8 w-8 text-primary mb-2" />
-                <CardTitle className="text-base">View Playbooks</CardTitle>
-                <CardDescription>Profession-specific success guides</CardDescription>
+                <Search className="h-8 w-8 text-primary mb-2" />
+                <CardTitle className="text-base">SEO Performance</CardTitle>
+                <CardDescription>Landing page & request analytics</CardDescription>
               </CardHeader>
             </Card>
-            <Card className="cursor-pointer hover:shadow-card transition-shadow" onClick={() => setActiveTab("sequences")}>
+            <Card className="cursor-pointer hover:shadow-card transition-shadow" onClick={() => setActiveTab("content-lib")}>
               <CardHeader className="pb-2">
-                <Workflow className="h-8 w-8 text-primary mb-2" />
-                <CardTitle className="text-base">Email Sequences</CardTitle>
-                <CardDescription>Automated onboarding & engagement flows</CardDescription>
+                <BookOpen className="h-8 w-8 text-primary mb-2" />
+                <CardTitle className="text-base">Content Library</CardTitle>
+                <CardDescription>Reviews, templates, social proof</CardDescription>
               </CardHeader>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="email-perf" className="mt-4">
+          <AdminEmailPerformance />
+        </TabsContent>
+
+        <TabsContent value="funnel" className="mt-4">
+          <AdminOnboardingFunnel />
         </TabsContent>
 
         <TabsContent value="campaigns" className="mt-4">
@@ -144,6 +175,22 @@ export default function AdminMarketingDashboard() {
 
         <TabsContent value="ab-tests" className="mt-4">
           <ABTestDashboard />
+        </TabsContent>
+
+        <TabsContent value="referrals" className="mt-4">
+          <AdminReferralAnalytics />
+        </TabsContent>
+
+        <TabsContent value="seo" className="mt-4">
+          <AdminSeoPerformance />
+        </TabsContent>
+
+        <TabsContent value="reengagement" className="mt-4">
+          <AdminReengagement />
+        </TabsContent>
+
+        <TabsContent value="content-lib" className="mt-4">
+          <AdminContentLibrary />
         </TabsContent>
 
         <TabsContent value="landing-pages" className="mt-4">

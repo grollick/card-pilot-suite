@@ -39,7 +39,7 @@ export default function AdminReferralAnalytics() {
           .select("id, name")
           .in("id", topReferrerIds.map((r) => r.id));
         const nameMap = new Map((profiles || []).map((p: any) => [p.id, p.name || "Unknown"]));
-        topReferrers = topReferrerIds.map((r) => ({ name: nameMap.get(r.id) || "Unknown", count: r.count }));
+        topReferrers = topReferrerIds.map((r) => ({ name: (nameMap.get(r.id) as string) || "Unknown", count: r.count }));
       }
 
       return {
