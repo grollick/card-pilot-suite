@@ -113,13 +113,13 @@ export default function ProductTour() {
   return (
     <AnimatePresence>
       {isVisible && (
-        <>
+        <div className="pointer-events-none">
           {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm pointer-events-auto"
             onClick={handleSkip}
           />
 
@@ -129,7 +129,7 @@ export default function ProductTour() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed z-[101] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md"
+            className="fixed z-[101] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-md pointer-events-auto"
           >
             <div className="rounded-2xl border border-border bg-card shadow-2xl overflow-hidden">
               {/* Progress bar */}
@@ -222,7 +222,7 @@ export default function ProductTour() {
               </div>
             </div>
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   );

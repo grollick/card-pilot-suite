@@ -139,7 +139,7 @@ export default function FloatingHelpButton() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setOpen(!open)}
-        className="h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 flex items-center justify-center transition-colors hover:bg-primary/90"
+        className="h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 flex items-center justify-center transition-colors hover:bg-primary/90 pointer-events-auto"
       >
         <AnimatePresence mode="wait">
           {open ? (
