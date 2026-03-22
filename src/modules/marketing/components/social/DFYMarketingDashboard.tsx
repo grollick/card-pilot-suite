@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DFYActivityLog from "./DFYActivityLog";
 import {
   Rocket, Pause, Play, Settings2, BarChart3, Eye, MousePointer,
   Users, CalendarCheck, TrendingUp, Sparkles, Crown, ChevronRight,
