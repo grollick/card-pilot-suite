@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,7 +33,7 @@ const COLOR_MAP: Record<ActivityItem["type"], string> = {
   autopilot: "text-violet-500",
 };
 
-export default function DFYActivityLog() {
+const DFYActivityLog = forwardRef<HTMLDivElement>(function DFYActivityLog(_props, ref) {
   const { user } = useAuth();
 
   const { data: activities = [], isLoading } = useQuery({
@@ -41,7 +42,7 @@ export default function DFYActivityLog() {
     queryFn: async () => {
       const items: ActivityItem[] = [];
 
-      // Fetch recent social posts created by DFY (campaign_id present)
+      // Fetch recent social posts created by DFY
       const { data: posts } = await supabase
         .from("social_posts")
         .select("id, content, status, created_at, scheduled_at, content_type, content_label")
@@ -71,7 +72,7 @@ export default function DFYActivityLog() {
             timestamp: p.created_at,
           });
         }
-        // Always show generation event
+
         items.push({
           id: `gen-${p.id}`,
           type: "post_generated",
@@ -81,7 +82,6 @@ export default function DFYActivityLog() {
         });
       }
 
-      // Fetch autopilot log entries related to social
       const { data: logs } = await supabase
         .from("autopilot_log")
         .select("id, action_type, title, description, status, created_at")
@@ -100,7 +100,6 @@ export default function DFYActivityLog() {
         });
       }
 
-      // Sort all by timestamp desc
       items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       return items.slice(0, 25);
     },
@@ -108,11 +107,11 @@ export default function DFYActivityLog() {
 
   if (isLoading) {
     return (
-      <Card className="border">
+      <Card ref={ref} className="border">
         <CardContent className="p-5">
           <h3 className="text-sm font-semibold mb-4">Activity Log</h3>
           <div className="space-y-3">
-            {[1, 2, 3].map(i => (
+            {[1, 2, 3].map((i) => (
               <div key={i} className="h-10 rounded-lg bg-muted animate-pulse" />
             ))}
           </div>
@@ -122,7 +121,7 @@ export default function DFYActivityLog() {
   }
 
   return (
-    <Card className="border">
+    <Card ref={ref} className="border">
       <CardContent className="p-5">
         <div className="flex items-center gap-2 mb-4">
           <Clock className="h-4 w-4 text-muted-foreground" />
@@ -137,8 +136,7 @@ export default function DFYActivityLog() {
           </div>
         ) : (
           <div className="relative">
-            {/* Timeline line */}
-            <div className="absolute left-[15px] top-2 bottom-2 w-px bg-border" />
+            <div className="absolute left-[15px] top-2 bottom-2 w-px bg-border pointer-events-none" />
 
             <div className="space-y-1">
               {activities.map((item) => {
@@ -147,7 +145,12 @@ export default function DFYActivityLog() {
 
                 return (
                   <div key={item.id} className="flex items-start gap-3 py-2 pl-0 relative">
-                    <div className={cn("h-[30px] w-[30px] rounded-full bg-background border flex items-center justify-center shrink-0 z-10", color)}>
+                    <div
+                      className={cn(
+                        "h-[30px] w-[30px] rounded-full bg-background border flex items-center justify-center shrink-0 z-10",
+                        color
+                      )}
+                    >
                       <Icon className="h-3.5 w-3.5" />
                     </div>
                     <div className="flex-1 min-w-0 pt-0.5">
@@ -168,4 +171,6 @@ export default function DFYActivityLog() {
       </CardContent>
     </Card>
   );
-}
+});
+
+export default DFYActivityLog;
