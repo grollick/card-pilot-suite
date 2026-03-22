@@ -5416,43 +5416,15 @@ export type Database = {
           id: string | null
           is_public: boolean | null
           lead_id: string | null
+          owner_response: string | null
+          owner_response_at: string | null
           rating: number | null
           review_text: string | null
           reviewer_name: string | null
           source: string | null
           user_id: string | null
         }
-        Insert: {
-          created_at?: string | null
-          id?: string | null
-          is_public?: boolean | null
-          lead_id?: string | null
-          rating?: number | null
-          review_text?: string | null
-          reviewer_name?: string | null
-          source?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string | null
-          is_public?: boolean | null
-          lead_id?: string | null
-          rating?: number | null
-          review_text?: string | null
-          reviewer_name?: string | null
-          source?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reviews_lead_id_fkey"
-            columns: ["lead_id"]
-            isOneToOne: false
-            referencedRelation: "leads"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Functions: {
@@ -5493,6 +5465,15 @@ export type Database = {
         Returns: number
       }
       expire_beta_access: { Args: never; Returns: number }
+      get_active_boosts: {
+        Args: never
+        Returns: {
+          expires_at: string
+          radius_km: number
+          status: string
+          target_city: string
+        }[]
+      }
       get_effective_plan: { Args: { p_user_id: string }; Returns: Json }
       get_public_profiles: {
         Args: { p_handle?: string }
@@ -5514,6 +5495,22 @@ export type Database = {
           service_area: string
           style_pack: string
           verification_level: string
+        }[]
+      }
+      get_public_reviews: {
+        Args: { p_user_id?: string }
+        Returns: {
+          created_at: string
+          id: string
+          is_public: boolean
+          lead_id: string
+          owner_response: string
+          owner_response_at: string
+          rating: number
+          review_text: string
+          reviewer_name: string
+          source: string
+          user_id: string
         }[]
       }
       get_services_by_handle: {
