@@ -134,8 +134,9 @@ Rules:
 - ${GOAL_PROMPTS[goal] || GOAL_PROMPTS.awareness}
 - Do NOT use generic filler — be specific and actionable
 - Make each post unique and different from the others
+- For each post, also include a short stock photo search query (3-5 words) that would pair well with the post
 
-Return ONLY valid JSON: an array of objects with "content" (string with hashtags included), "content_type" (string), and "platforms" (array of platform names like "Facebook", "Instagram").`;
+Return ONLY valid JSON: an array of objects with "content" (string with hashtags included), "content_type" (string), "platforms" (array of platform names like "Facebook", "Instagram"), and "image_query" (string for stock photo search).`;
 
     const userPrompt = `${businessContext}
 
