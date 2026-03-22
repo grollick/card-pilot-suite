@@ -63,23 +63,14 @@ export default function ProductTour() {
   const { data: profileCache } = useProfileCache();
   const tourCompleted = profileCache?.tour_completed ?? false;
 
-  // Never show tour on admin pages
+  // Never show tour on admin pages; keep it limited to dashboard home so it never blocks feature pages
   const isAdminPage = location.pathname.includes("/admin");
+  const isDashboardHome = location.pathname === "/app" || location.pathname === "/app/dashboard";
 
   const completeTour = useMutation({
-    mutationFn: async () => {
-      await supabase
-        .from("profiles")
-        .update({ tour_completed: true } as any)
-        .eq("id", user!.id);
-    },
-    onSuccess: () => {
-      queryClient.setQueryData(["tour-completed", user?.id], true);
-    },
-  });
-
+...
   useEffect(() => {
-    if (isAdminPage) {
+    if (isAdminPage || !isDashboardHome) {
       setIsVisible(false);
       return;
     }
@@ -87,7 +78,7 @@ export default function ProductTour() {
       const timer = setTimeout(() => setIsVisible(true), 1500);
       return () => clearTimeout(timer);
     }
-  }, [tourCompleted, isAdminPage]);
+  }, [tourCompleted, isAdminPage, isDashboardHome]);
 
   const handleNext = useCallback(() => {
     if (currentStep < TOUR_STEPS.length - 1) {
