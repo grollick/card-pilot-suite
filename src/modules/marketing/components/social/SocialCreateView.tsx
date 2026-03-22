@@ -111,6 +111,12 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
     if (!content.trim()) { toast.error("Post content is required"); return; }
     if (selectedPlatforms.length === 0) { toast.error("Select at least one platform"); return; }
 
+    // Enforce monthly post limit (only for new posts)
+    if (!editPost && socialLimits.isAtLimit) {
+      toast.error(`Monthly post limit reached (${socialLimits.monthlyLimit}). Upgrade your plan to post more.`);
+      return;
+    }
+
     let scheduled_at: string | null = null;
     if (scheduledDate) {
       const [h, m] = scheduledTime.split(":").map(Number);
