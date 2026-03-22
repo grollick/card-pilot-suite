@@ -272,7 +272,7 @@ export default function HeroPhoneAnimation() {
               >
                 {/* Card content — dims during overlay stages */}
                 <motion.div
-                  animate={{ opacity: ["crm", "testimonial", "job-request", "job-accepted"].includes(stage) ? 0.15 : 1 }}
+                  animate={{ opacity: ["crm", "testimonial", "job-request", "job-accepted", "test-drive-booked"].includes(stage) ? 0.15 : 1 }}
                   transition={{ duration: 0.4 }}
                 >
                   {/* Cover photo */}
