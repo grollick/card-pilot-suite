@@ -432,26 +432,37 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
           </div>
 
           {/* Schedule */}
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <Label className="text-[10px] text-muted-foreground">Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-8 text-xs mt-1", !scheduledDate && "text-muted-foreground")}>
-                    <CalendarIcon className="h-3.5 w-3.5 mr-1" />
-                    {scheduledDate ? format(scheduledDate, "MMM d") : "Pick"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={scheduledDate} onSelect={setScheduledDate} initialFocus className="p-3 pointer-events-auto" />
-                </PopoverContent>
-              </Popover>
+          {socialLimits.canSchedule ? (
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-[10px] text-muted-foreground">Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-8 text-xs mt-1", !scheduledDate && "text-muted-foreground")}>
+                      <CalendarIcon className="h-3.5 w-3.5 mr-1" />
+                      {scheduledDate ? format(scheduledDate, "MMM d") : "Pick"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={scheduledDate} onSelect={setScheduledDate} initialFocus className="p-3 pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div>
+                <Label className="text-[10px] text-muted-foreground">Time</Label>
+                <Input type="time" value={scheduledTime} onChange={e => setScheduledTime(e.target.value)} className="h-8 text-xs mt-1" />
+              </div>
             </div>
-            <div>
-              <Label className="text-[10px] text-muted-foreground">Time</Label>
-              <Input type="time" value={scheduledTime} onChange={e => setScheduledTime(e.target.value)} className="h-8 text-xs mt-1" />
+          ) : (
+            <div className="p-3 rounded-lg border border-dashed border-border bg-muted/30 text-center">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-medium text-muted-foreground">Scheduling</span>
+                <ProBadge />
+              </div>
+              <p className="text-[10px] text-muted-foreground">Upgrade to Pro to schedule posts in advance.</p>
             </div>
-          </div>
+          )}
 
           <Separator />
 
