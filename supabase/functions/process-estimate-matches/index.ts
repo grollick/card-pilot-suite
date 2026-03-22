@@ -10,6 +10,20 @@ const corsHeaders = {
 const RESPONSE_WINDOW_MINUTES = 60;
 const MAX_MATCHES = 3;
 
+function escHtml(s: string): string {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function sanitizePhone(phone: string): string | null {
+  const cleaned = String(phone ?? "").trim();
+  return /^[+\d\s()\-]+$/.test(cleaned) ? cleaned : null;
+}
+
 function calculateLeadQuality(req: any): number {
   let score = 0;
   if (req.requester_name) score += 5;
@@ -301,11 +315,20 @@ serve(async (req) => {
       // Send email notification
       if (match.email) {
         try {
-          const firstName = estReq.requester_name.split(" ")[0];
+          const safeName = escHtml(estReq.requester_name);
+          const firstName = escHtml(estReq.requester_name.split(" ")[0]);
+          const safeService = estReq.service_needed ? escHtml(estReq.service_needed) : "";
+          const safeEmail = estReq.requester_email ? escHtml(estReq.requester_email) : "";
+          const safePhone = estReq.requester_phone ? escHtml(estReq.requester_phone) : "";
+          const safeBudget = estReq.budget ? escHtml(estReq.budget) : "";
+          const safeTimeline = estReq.timeline ? escHtml(estReq.timeline) : "";
+          const safeDetails = estReq.request_details ? escHtml(estReq.request_details) : "";
+          const validPhone = estReq.requester_phone ? sanitizePhone(estReq.requester_phone) : null;
+
           await supabase.functions.invoke("send-email", {
             body: {
               to: match.email,
-              subject: `⚡ New lead matched: ${firstName} needs ${estReq.service_needed || "your help"}`,
+              subject: `⚡ New lead matched: ${firstName} needs ${safeService || "your help"}`,
               html: `
                 <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;color:#1a1a1a">
                   <div style="background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:24px;border-radius:12px 12px 0 0;text-align:center">
@@ -314,13 +337,13 @@ serve(async (req) => {
                   </div>
                   <div style="background:#ffffff;padding:24px;border:1px solid #e5e7eb;border-top:none">
                     <div style="background:#f8fafc;border-radius:8px;padding:16px;margin-bottom:16px">
-                      <p style="margin:0 0 8px;font-weight:600;font-size:16px">${estReq.requester_name}</p>
-                      ${estReq.service_needed ? `<p style="margin:0 0 6px"><strong>Service:</strong> ${estReq.service_needed}</p>` : ""}
-                      ${estReq.requester_email ? `<p style="margin:0 0 6px"><strong>Email:</strong> ${estReq.requester_email}</p>` : ""}
-                      ${estReq.requester_phone ? `<p style="margin:0 0 6px"><strong>Phone:</strong> ${estReq.requester_phone}</p>` : ""}
-                      ${estReq.budget ? `<p style="margin:0 0 6px"><strong>Budget:</strong> ${estReq.budget}</p>` : ""}
-                      ${estReq.timeline ? `<p style="margin:0 0 6px"><strong>Timeline:</strong> ${estReq.timeline}</p>` : ""}
-                      ${estReq.request_details ? `<p style="margin:0"><strong>Details:</strong> ${estReq.request_details}</p>` : ""}
+                      <p style="margin:0 0 8px;font-weight:600;font-size:16px">${safeName}</p>
+                      ${safeService ? `<p style="margin:0 0 6px"><strong>Service:</strong> ${safeService}</p>` : ""}
+                      ${safeEmail ? `<p style="margin:0 0 6px"><strong>Email:</strong> ${safeEmail}</p>` : ""}
+                      ${safePhone ? `<p style="margin:0 0 6px"><strong>Phone:</strong> ${safePhone}</p>` : ""}
+                      ${safeBudget ? `<p style="margin:0 0 6px"><strong>Budget:</strong> ${safeBudget}</p>` : ""}
+                      ${safeTimeline ? `<p style="margin:0 0 6px"><strong>Timeline:</strong> ${safeTimeline}</p>` : ""}
+                      ${safeDetails ? `<p style="margin:0"><strong>Details:</strong> ${safeDetails}</p>` : ""}
                     </div>
                     <div style="background:#fef3c7;border-radius:8px;padding:12px;margin-bottom:16px;text-align:center">
                       <p style="margin:0;color:#92400e;font-weight:600;font-size:14px">⏱ Respond within ${RESPONSE_WINDOW_MINUTES} minutes to win this lead</p>
@@ -328,9 +351,9 @@ serve(async (req) => {
                     <div style="text-align:center">
                       <a href="https://guzzl.pro/app/contacts" style="background:#6366f1;color:white;padding:14px 32px;border-radius:8px;text-decoration:none;display:inline-block;font-weight:600;font-size:15px">View Lead & Respond</a>
                     </div>
-                    ${estReq.requester_phone ? `
+                    ${validPhone ? `
                     <div style="text-align:center;margin-top:12px">
-                      <a href="tel:${estReq.requester_phone}" style="background:#22c55e;color:white;padding:10px 24px;border-radius:8px;text-decoration:none;display:inline-block;font-size:14px">📞 Call Now</a>
+                      <a href="tel:${validPhone}" style="background:#22c55e;color:white;padding:10px 24px;border-radius:8px;text-decoration:none;display:inline-block;font-size:14px">📞 Call Now</a>
                     </div>
                     ` : ""}
                   </div>
