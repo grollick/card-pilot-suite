@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from "react";
+import html2canvas from "html2canvas";
 import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import { ArrowLeft, Download, Send, Sparkles, Wand2, PanelRightOpen, PanelRightClose } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -7,21 +8,24 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import TemplatePicker from "../components/postdesigner/TemplatePicker";
 import CanvasRenderer from "../components/postdesigner/CanvasRenderer";
+import type { CanvasRendererHandle } from "../components/postdesigner/CanvasRenderer";
 import StyleControls from "../components/postdesigner/StyleControls";
 import AiSuggestionsPanel from "../components/postdesigner/AiSuggestionsPanel";
 import type { CanvasElement, PostFormat, PostTemplate } from "../data/postTemplates";
-import { POST_TEMPLATES } from "../data/postTemplates";
+import { POST_TEMPLATES, FORMAT_DIMENSIONS } from "../data/postTemplates";
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 export default function PostDesigner() {
   const navigate = useNavigate();
+  const canvasRendererRef = useRef<CanvasRendererHandle>(null);
   const [elements, setElements] = useState<CanvasElement[]>(POST_TEMPLATES[0].elements);
   const [bgColor, setBgColor] = useState(POST_TEMPLATES[0].bgColor);
   const [format, setFormat] = useState<PostFormat>(POST_TEMPLATES[0].format);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [currentTemplate, setCurrentTemplate] = useState<PostTemplate | null>(POST_TEMPLATES[0]);
   const [showAi, setShowAi] = useState(true);
+  const [exporting, setExporting] = useState(false);
 
   const selectedElement = elements.find((e) => e.id === selectedId) ?? null;
 
@@ -85,6 +89,34 @@ export default function PostDesigner() {
   const sendBackward = useCallback((id: string) => {
     setElements((prev) => prev.map((el) => (el.id === id ? { ...el, zIndex: Math.max(0, el.zIndex - 1) } : el)));
   }, []);
+
+  const handleExport = useCallback(async () => {
+    const el = canvasRendererRef.current?.getCanvasElement();
+    if (!el) { toast.error("Canvas not ready"); return; }
+    setExporting(true);
+    try {
+      // Deselect before capturing
+      setSelectedId(null);
+      await new Promise((r) => setTimeout(r, 100));
+      const dim = FORMAT_DIMENSIONS[format];
+      const canvas = await html2canvas(el, {
+        backgroundColor: null,
+        scale: dim.w / el.offsetWidth,
+        useCORS: true,
+        allowTaint: true,
+      });
+      const link = document.createElement("a");
+      link.download = `post-${format}-${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      toast.success("PNG downloaded! You can now paste it into Canva.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Export failed");
+    } finally {
+      setExporting(false);
+    }
+  }, [format]);
 
   // AI application handlers
   const applyHeadline = useCallback((text: string) => {
@@ -163,8 +195,8 @@ export default function PostDesigner() {
           >
             <Sparkles className="h-3 w-3" /> AI Assist
           </Button>
-          <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5">
-            <Download className="h-3 w-3" /> Export
+          <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={handleExport} disabled={exporting}>
+            <Download className="h-3 w-3" /> {exporting ? "Exporting…" : "Export PNG"}
           </Button>
           <Button size="sm" className="h-8 text-xs gap-1.5 shadow-glow">
             <Send className="h-3 w-3" /> Publish
@@ -193,6 +225,7 @@ export default function PostDesigner() {
             onSelect={setSelectedId}
             onMoveElement={moveElement}
             onResizeElement={resizeElement}
+            ref={canvasRendererRef}
           />
         </div>
 

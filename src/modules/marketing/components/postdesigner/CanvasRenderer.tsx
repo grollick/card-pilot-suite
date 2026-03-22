@@ -1,5 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useRef, useState, useCallback, forwardRef, useImperativeHandle } from "react";
 import type { CanvasElement, PostFormat } from "../../data/postTemplates";
 import { FORMAT_DIMENSIONS } from "../../data/postTemplates";
 
@@ -13,12 +12,20 @@ interface Props {
   onResizeElement: (id: string, w: number, h: number) => void;
 }
 
-export default function CanvasRenderer({
+export interface CanvasRendererHandle {
+  getCanvasElement: () => HTMLDivElement | null;
+}
+
+const CanvasRenderer = forwardRef<CanvasRendererHandle, Props>(function CanvasRenderer({
   elements, format, bgColor, selectedId, onSelect, onMoveElement, onResizeElement,
-}: Props) {
+}, ref) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState<string | null>(null);
   const dragStart = useRef<{ x: number; y: number; elX: number; elY: number }>({ x: 0, y: 0, elX: 0, elY: 0 });
+
+  useImperativeHandle(ref, () => ({
+    getCanvasElement: () => canvasRef.current,
+  }));
 
   const dim = FORMAT_DIMENSIONS[format];
   const aspect = dim.w / dim.h;
@@ -76,7 +83,9 @@ export default function CanvasRenderer({
       </div>
     </div>
   );
-}
+});
+
+export default CanvasRenderer;
 
 function CanvasItem({ el, selected, onPointerDown }: {
   el: CanvasElement; selected: boolean; onPointerDown: (e: React.PointerEvent) => void;
