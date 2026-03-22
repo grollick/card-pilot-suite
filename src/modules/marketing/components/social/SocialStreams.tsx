@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Plus, X, GripVertical, FileText, CalendarDays, Send, MessageCircle, Hash, Bell, AlertCircle, CheckCircle } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Plus, X, GripVertical, FileText, CalendarDays, Send, MessageCircle, Hash, Bell, AlertCircle, CheckCircle, Sparkles, Loader2, RefreshCw, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -8,6 +8,8 @@ import { format } from "date-fns";
 import { useSocialPosts } from "@/hooks/useSocialPosts";
 import type { SocialPost } from "@/hooks/useSocialPosts";
 import { getPlatformConfig, STREAM_TYPES } from "./constants";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface StreamConfig {
   id: string;
@@ -29,9 +31,19 @@ const STREAM_ICONS: Record<string, any> = {
 
 interface Props {
   onViewPost: (post: SocialPost) => void;
+  onCompose?: (data: { content: string; hashtags: string[]; imageUrl?: string }) => void;
 }
 
-export default function SocialStreams({ onViewPost }: Props) {
+interface SuggestedPost {
+  title: string;
+  caption: string;
+  hashtags: string[];
+  cta: string;
+  image_url: string;
+  style: string;
+}
+
+export default function SocialStreams({ onViewPost, onCompose }: Props) {
   const { data: posts = [] } = useSocialPosts();
   const [streams, setStreams] = useState<StreamConfig[]>([
     { id: "1", type: "drafts", label: "Drafts" },
@@ -39,6 +51,46 @@ export default function SocialStreams({ onViewPost }: Props) {
     { id: "3", type: "scheduled", label: "Scheduled" },
     { id: "4", type: "published", label: "Published" },
   ]);
+
+  // Auto-generate a suggested post on mount
+  const [suggestedPost, setSuggestedPost] = useState<SuggestedPost | null>(null);
+  const [suggestedLoading, setSuggestedLoading] = useState(false);
+  const [suggestedDismissed, setSuggestedDismissed] = useState(false);
+  const hasFetched = useRef(false);
+
+  const fetchSuggestion = async () => {
+    setSuggestedLoading(true);
+    setSuggestedPost(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-post-ideas", {
+        body: { platforms: ["Instagram", "Facebook"] },
+      });
+      if (error) throw error;
+      const posts = data?.posts ?? [];
+      if (posts.length > 0) {
+        setSuggestedPost(posts[0]);
+      }
+    } catch (err) {
+      console.error("Auto-suggestion error:", err);
+    } finally {
+      setSuggestedLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      fetchSuggestion();
+    }
+  }, []);
+
+  const handleUseSuggestion = () => {
+    if (!suggestedPost || !onCompose) return;
+    const hashtagStr = suggestedPost.hashtags.map(h => `#${h}`).join(" ");
+    const fullContent = `${suggestedPost.caption}\n\n${suggestedPost.cta}\n\n${hashtagStr}`;
+    onCompose({ content: fullContent, hashtags: suggestedPost.hashtags, imageUrl: suggestedPost.image_url });
+    toast.success("Post loaded into Compose — edit and publish!");
+  };
 
   const addStream = () => {
     setStreams(prev => [...prev, { id: String(Date.now()), type: "drafts", label: "New Stream" }]);
@@ -59,6 +111,58 @@ export default function SocialStreams({ onViewPost }: Props) {
 
   return (
     <div className="space-y-3">
+      {/* AI Suggested Post Card */}
+      {!suggestedDismissed && (suggestedLoading || suggestedPost) && (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <span className="text-sm font-semibold text-foreground">Today's Suggested Post</span>
+              <Badge variant="secondary" className="text-[9px] h-4">AI</Badge>
+            </div>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => fetchSuggestion()} disabled={suggestedLoading}>
+                <RefreshCw className={`h-3 w-3 ${suggestedLoading ? "animate-spin" : ""}`} />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setSuggestedDismissed(true)}>
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          </div>
+          {suggestedLoading ? (
+            <div className="flex items-center gap-2 py-4 justify-center text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span className="text-xs">Crafting a post idea for you…</span>
+            </div>
+          ) : suggestedPost ? (
+            <div className="flex gap-3">
+              {suggestedPost.image_url && (
+                <img
+                  src={suggestedPost.image_url}
+                  alt=""
+                  className="w-24 h-24 rounded-lg object-cover shrink-0"
+                  loading="lazy"
+                />
+              )}
+              <div className="flex-1 min-w-0 space-y-1.5">
+                <p className="text-xs font-medium text-foreground">{suggestedPost.title}</p>
+                <p className="text-[11px] text-muted-foreground line-clamp-2">{suggestedPost.caption}</p>
+                <div className="flex flex-wrap gap-1">
+                  {suggestedPost.hashtags.slice(0, 4).map(h => (
+                    <span key={h} className="text-[9px] text-primary/70">#{h}</span>
+                  ))}
+                </div>
+                {onCompose && (
+                  <Button size="sm" className="h-7 text-xs gap-1 mt-1" onClick={handleUseSuggestion}>
+                    <ArrowRight className="h-3 w-3" /> Use & Edit in Compose
+                  </Button>
+                )}
+              </div>
+            </div>
+          ) : null}
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground">Monitor different content streams. Add columns for each feed.</p>
         <Button variant="outline" size="sm" className="h-7 text-xs gap-1" onClick={addStream}>

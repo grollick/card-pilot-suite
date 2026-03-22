@@ -46,7 +46,7 @@ export default function SocialScheduler() {
   const renderView = () => {
     switch (activeView) {
       case "streams":
-        return <SocialStreams onViewPost={setDetailPost} />;
+        return <SocialStreams onViewPost={setDetailPost} onCompose={(data) => { setPendingContent(data); setActiveView("compose"); }} />;
       case "compose":
         return (
           <SocialCreateView
