@@ -224,6 +224,7 @@ export interface PlanLimits {
   estimates: number;
   invoices: number;
   social_posts: number;
+  social_posts_monthly: number;
   booking_services: number;
   bookings_monthly: number;
   team_members: number;
@@ -235,6 +236,7 @@ export interface PlanLimits {
   ai_requests_monthly: number;
   before_after_projects: number;
   review_requests_monthly: number;
+  social_platforms_max: number;
   pdf_export: boolean;
   estimate_approvals: boolean;
   payments: boolean;
@@ -249,6 +251,11 @@ export interface PlanLimits {
   google_business_sync: boolean;
   expense_tracker: boolean;
   video_intro: boolean;
+  social_scheduling: boolean;
+  social_ai_tools: boolean;
+  social_analytics: boolean;
+  social_content_feed: boolean;
+  social_dfy: boolean;
 }
 
 export function getPlanByKey(key: string): (typeof PLAN_TIERS)[number] | undefined {
