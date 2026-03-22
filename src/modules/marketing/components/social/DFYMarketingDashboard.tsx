@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
 import { useSocialPosts } from "@/hooks/useSocialPosts";
 import { useAutoCampaigns, useUpdateCampaign, CONTENT_TYPE_LABELS } from "@/hooks/useAutoCampaigns";
 import { toast } from "sonner";
