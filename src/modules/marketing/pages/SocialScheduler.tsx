@@ -102,7 +102,7 @@ export default function SocialScheduler() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] -m-4 md:-m-6 relative">
+    <div className="flex h-[calc(100vh-4rem)] -m-4 md:-m-6" style={{ position: 'relative', pointerEvents: 'auto' }}>
       {/* Sidebar */}
       <SocialSidebar
         activeView={activeView}
