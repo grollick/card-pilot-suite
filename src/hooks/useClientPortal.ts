@@ -99,9 +99,9 @@ export function usePortalSession(token?: string) {
         .eq("id", leadId)
         .single();
 
-      // Fetch business profile
+      // Fetch business profile via restricted view (excludes internal fields)
       const { data: profile } = await supabase
-        .from("profiles")
+        .from("client_safe_profiles" as any)
         .select("name, company, phone, email, handle, avatar_url")
         .eq("id", userId)
         .single();
