@@ -320,14 +320,14 @@ function QuotesTab({ userId, leadId }: { userId: string; leadId: string }) {
 }
 
 // ── Messages Tab ──
-function MessagesTab({ userId, leadId }: { userId: string; leadId: string }) {
+function MessagesTab({ userId, leadId, portalToken }: { userId: string; leadId: string; portalToken?: string }) {
   const { data: messages, isLoading } = usePortalMessages(userId, leadId);
   const sendMessage = useSendPortalMessage();
   const [newMessage, setNewMessage] = useState("");
 
   const handleSend = () => {
     if (!newMessage.trim()) return;
-    sendMessage.mutate({ userId, leadId, message: newMessage.trim() });
+    sendMessage.mutate({ userId, leadId, message: newMessage.trim(), portalToken });
     setNewMessage("");
   };
 
