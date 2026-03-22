@@ -5581,6 +5581,16 @@ export type Database = {
       }
       expire_beta_access: { Args: never; Returns: number }
       get_effective_plan: { Args: { p_user_id: string }; Returns: Json }
+      get_services_by_handle: {
+        Args: { p_handle: string }
+        Returns: {
+          description: string
+          duration_min: number
+          id: string
+          name: string
+          price: number
+        }[]
+      }
       has_org_role: {
         Args: {
           _org_id: string
