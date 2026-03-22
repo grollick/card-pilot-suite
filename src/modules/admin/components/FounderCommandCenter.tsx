@@ -23,17 +23,16 @@ import { useAdminGrowthStats } from "@/hooks/useAdminGrowthStats";
 
 
 // ─── Metric Card ───
-function MetricCard({ icon: Icon, label, value, sub, color = "text-primary", loading, href }: {
-  icon: any; label: string; value: string | number; sub?: string; color?: string; loading: boolean; href?: string;
+function MetricCard({ icon: Icon, label, value, sub, color = "text-primary", loading, onClick }: {
+  icon: any; label: string; value: string | number; sub?: string; color?: string; loading: boolean; onClick?: () => void;
 }) {
-  const navigate = useNavigate();
   return (
     <div
-      className={`rounded-xl border border-border bg-card p-4 transition-all ${href ? "cursor-pointer hover:border-primary/30 hover:shadow-md active:scale-[0.98]" : ""}`}
-      onClick={href ? () => navigate(href) : undefined}
-      role={href ? "button" : undefined}
-      tabIndex={href ? 0 : undefined}
-      onKeyDown={href ? (e) => { if (e.key === "Enter") navigate(href); } : undefined}
+      className={`rounded-xl border border-border bg-card p-4 transition-all ${onClick ? "cursor-pointer hover:border-primary/30 hover:shadow-md active:scale-[0.98]" : ""}`}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? (e) => { if (e.key === "Enter") onClick(); } : undefined}
     >
       <div className="flex items-center gap-2 mb-2">
         <div className="h-8 w-8 rounded-lg bg-muted/60 flex items-center justify-center">
@@ -133,11 +132,11 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
       {/* ── SECTION 2: KPI Overview ── */}
       <SectionHeader icon={BarChart3} title="KPI Overview" description="Core platform metrics at a glance" />
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        <MetricCard icon={Users} label="Total Users" value={stats?.totalUsers ?? 0} loading={loading} href="/app/admin/users" />
-        <MetricCard icon={UserCheck} label="Active Users" value={kpis?.activatedUsers ?? 0} color="text-[hsl(var(--success))]" loading={loading} href="/app/admin/users" />
-        <MetricCard icon={Zap} label="Leads Today" value={kpis?.leads30d ?? 0} sub="Last 30 days" color="text-[hsl(var(--warning))]" loading={loading} href="/app/contacts" />
-        <MetricCard icon={Briefcase} label="Job Requests" value={kpis?.jobRequests30d ?? 0} color="text-[hsl(var(--accent-foreground))]" loading={loading} href="/app/job-requests" />
-        <MetricCard icon={Target} label="Conversion Rate" value={`${conversionRate}%`} sub="Free → Paid" loading={loading} href="/app/analytics" />
+        <MetricCard icon={Users} label="Total Users" value={stats?.totalUsers ?? 0} loading={loading} onClick={() => onNavigateSection?.("growth")} />
+        <MetricCard icon={UserCheck} label="Active Users" value={kpis?.activatedUsers ?? 0} color="text-[hsl(var(--success))]" loading={loading} onClick={() => onNavigateSection?.("growth")} />
+        <MetricCard icon={Zap} label="Leads Today" value={kpis?.leads30d ?? 0} sub="Last 30 days" color="text-[hsl(var(--warning))]" loading={loading} onClick={() => navigate("/app/contacts")} />
+        <MetricCard icon={Briefcase} label="Job Requests" value={kpis?.jobRequests30d ?? 0} color="text-[hsl(var(--accent-foreground))]" loading={loading} onClick={() => navigate("/app/job-requests")} />
+        <MetricCard icon={Target} label="Conversion Rate" value={`${conversionRate}%`} sub="Free → Paid" loading={loading} onClick={() => onNavigateSection?.("funnel")} />
       </div>
 
       {/* ── SECTION 3: Growth Funnel ── */}
