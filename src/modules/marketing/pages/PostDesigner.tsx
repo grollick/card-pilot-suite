@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from "react";
+import html2canvas from "html2canvas";
 import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import { ArrowLeft, Download, Send, Sparkles, Wand2, PanelRightOpen, PanelRightClose } from "lucide-react";
 import { useNavigate } from "react-router-dom";

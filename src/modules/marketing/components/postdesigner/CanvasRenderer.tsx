@@ -85,6 +85,8 @@ const CanvasRenderer = forwardRef<CanvasRendererHandle, Props>(function CanvasRe
   );
 });
 
+export default CanvasRenderer;
+
 function CanvasItem({ el, selected, onPointerDown }: {
   el: CanvasElement; selected: boolean; onPointerDown: (e: React.PointerEvent) => void;
 }) {
