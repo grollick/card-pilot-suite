@@ -190,6 +190,9 @@ export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }:
         </CardContent>
       </Card>
 
+      {/* Activity Log */}
+      <DFYActivityLog />
+
       {/* Content types active */}
       {dfyCampaign && (
         <div>
