@@ -20,12 +20,12 @@ export function useSocialCampaigns() {
   return useQuery({
     queryKey: KEY,
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("social_campaigns")
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as SocialCampaign[];
+      return (data ?? []) as unknown as SocialCampaign[];
     },
   });
 }
