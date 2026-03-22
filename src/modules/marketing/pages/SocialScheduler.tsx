@@ -136,7 +136,7 @@ export default function SocialScheduler() {
         </div>
 
         {/* View content */}
-        <div className="flex-1 overflow-auto p-4 md:p-6">
+        <div className="flex-1 overflow-auto p-4 md:p-6 relative z-0">
           {renderView()}
         </div>
       </div>
