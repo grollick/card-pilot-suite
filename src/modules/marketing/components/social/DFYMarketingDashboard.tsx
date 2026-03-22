@@ -2,7 +2,7 @@ import { useState } from "react";
 import DFYActivityLog from "./DFYActivityLog";
 import {
   Rocket, Pause, Play, Settings2, BarChart3, Eye, MousePointer,
-  Users, CalendarCheck, TrendingUp, Sparkles, Crown, ChevronRight,
+  Users, CalendarCheck, TrendingUp, Sparkles, Crown, ChevronRight, Wand2, Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,8 @@ import { useSocialPosts } from "@/hooks/useSocialPosts";
 import { useAutoCampaigns, useUpdateCampaign, CONTENT_TYPE_LABELS } from "@/hooks/useAutoCampaigns";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 const GOAL_LABELS: Record<string, string> = {
   leads: "Generate Leads",
