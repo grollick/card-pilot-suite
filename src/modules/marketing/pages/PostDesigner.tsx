@@ -195,8 +195,8 @@ export default function PostDesigner() {
           >
             <Sparkles className="h-3 w-3" /> AI Assist
           </Button>
-          <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5">
-            <Download className="h-3 w-3" /> Export
+          <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={handleExport} disabled={exporting}>
+            <Download className="h-3 w-3" /> {exporting ? "Exporting…" : "Export PNG"}
           </Button>
           <Button size="sm" className="h-8 text-xs gap-1.5 shadow-glow">
             <Send className="h-3 w-3" /> Publish
