@@ -793,6 +793,87 @@ export default function HeroPhoneAnimation() {
                     </motion.div>
                   )}
                 </AnimatePresence>
+
+                {/* ── Test Drive overlay (Car Sales) ── */}
+                <AnimatePresence>
+                  {(stage === "test-drive-form" || stage === "test-drive-booked") && (
+                    <motion.div
+                      initial={{ y: "100%" }}
+                      animate={{ y: 0 }}
+                      exit={{ y: "100%" }}
+                      transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                      className="absolute inset-x-0 bottom-0 bg-card border-t border-border rounded-t-2xl p-4 z-20 shadow-xl"
+                    >
+                      <div className="w-8 h-1 rounded-full bg-border mx-auto mb-3" />
+                      {stage === "test-drive-form" ? (
+                        <div className="space-y-2.5">
+                          <p className="text-xs font-bold text-foreground flex items-center gap-1.5">
+                            <Car className="h-3.5 w-3.5" style={{ color: accentColor }} />
+                            Schedule Test Drive
+                          </p>
+
+                          {/* Vehicle selection */}
+                          <motion.div
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="rounded-lg border border-border bg-background p-2.5"
+                          >
+                            <p className="text-[10px] font-semibold text-foreground">2025 Sport Sedan</p>
+                            <p className="text-[9px] text-muted-foreground">Pearl White · All-Wheel Drive</p>
+                          </motion.div>
+
+                          {/* Time slots */}
+                          <div className="grid grid-cols-3 gap-1.5">
+                            {["Sat 10 AM", "Sat 2 PM", "Sun 11 AM"].map((t, i) => (
+                              <motion.div
+                                key={t}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5 + i * 0.15 }}
+                                className={`text-center py-1.5 rounded-lg text-[9px] font-medium border ${i === 1 ? "border-primary bg-primary/10 text-primary" : "border-border text-foreground"}`}
+                              >
+                                {t}
+                              </motion.div>
+                            ))}
+                          </div>
+
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 1.2 }}
+                            className="w-full rounded-xl py-2 text-[10px] font-semibold text-white text-center"
+                            style={{ backgroundColor: accentColor }}
+                          >
+                            Confirm Test Drive →
+                          </motion.div>
+                        </div>
+                      ) : (
+                        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center py-3">
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: [0, 1.2, 1] }}
+                            transition={{ duration: 0.5, times: [0, 0.6, 1] }}
+                            className="h-10 w-10 mx-auto rounded-full bg-success/10 flex items-center justify-center mb-2"
+                          >
+                            <Car className="h-5 w-5 text-success" />
+                          </motion.div>
+                          <p className="text-xs font-bold text-foreground">Test Drive Booked! 🎉</p>
+                          <p className="text-[10px] text-muted-foreground mt-0.5">Sat, Mar 29 · 2:00 PM</p>
+                          <p className="text-[9px] text-muted-foreground">2025 Sport Sedan · Pearl White</p>
+                          <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.5 }}
+                            className="text-[9px] text-success font-medium mt-1.5"
+                          >
+                            ✓ Confirmation sent to your phone
+                          </motion.p>
+                        </motion.div>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </motion.div>
             )}
           </AnimatePresence>
