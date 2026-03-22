@@ -90,6 +90,34 @@ export default function PostDesigner() {
     setElements((prev) => prev.map((el) => (el.id === id ? { ...el, zIndex: Math.max(0, el.zIndex - 1) } : el)));
   }, []);
 
+  const handleExport = useCallback(async () => {
+    const el = canvasRendererRef.current?.getCanvasElement();
+    if (!el) { toast.error("Canvas not ready"); return; }
+    setExporting(true);
+    try {
+      // Deselect before capturing
+      setSelectedId(null);
+      await new Promise((r) => setTimeout(r, 100));
+      const dim = FORMAT_DIMENSIONS[format];
+      const canvas = await html2canvas(el, {
+        backgroundColor: null,
+        scale: dim.w / el.offsetWidth,
+        useCORS: true,
+        allowTaint: true,
+      });
+      const link = document.createElement("a");
+      link.download = `post-${format}-${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      toast.success("PNG downloaded! You can now paste it into Canva.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Export failed");
+    } finally {
+      setExporting(false);
+    }
+  }, [format]);
+
   // AI application handlers
   const applyHeadline = useCallback((text: string) => {
     setElements((prev) => {
