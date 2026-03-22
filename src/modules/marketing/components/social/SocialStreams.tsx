@@ -52,6 +52,46 @@ export default function SocialStreams({ onViewPost, onCompose }: Props) {
     { id: "4", type: "published", label: "Published" },
   ]);
 
+  // Auto-generate a suggested post on mount
+  const [suggestedPost, setSuggestedPost] = useState<SuggestedPost | null>(null);
+  const [suggestedLoading, setSuggestedLoading] = useState(false);
+  const [suggestedDismissed, setSuggestedDismissed] = useState(false);
+  const hasFetched = useRef(false);
+
+  const fetchSuggestion = async () => {
+    setSuggestedLoading(true);
+    setSuggestedPost(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-post-ideas", {
+        body: { platforms: ["Instagram", "Facebook"] },
+      });
+      if (error) throw error;
+      const posts = data?.posts ?? [];
+      if (posts.length > 0) {
+        setSuggestedPost(posts[0]);
+      }
+    } catch (err) {
+      console.error("Auto-suggestion error:", err);
+    } finally {
+      setSuggestedLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      fetchSuggestion();
+    }
+  }, []);
+
+  const handleUseSuggestion = () => {
+    if (!suggestedPost || !onCompose) return;
+    const hashtagStr = suggestedPost.hashtags.map(h => `#${h}`).join(" ");
+    const fullContent = `${suggestedPost.caption}\n\n${suggestedPost.cta}\n\n${hashtagStr}`;
+    onCompose({ content: fullContent, hashtags: suggestedPost.hashtags, imageUrl: suggestedPost.image_url });
+    toast.success("Post loaded into Compose — edit and publish!");
+  };
+
   const addStream = () => {
     setStreams(prev => [...prev, { id: String(Date.now()), type: "drafts", label: "New Stream" }]);
   };
