@@ -110,7 +110,7 @@ function PortalDashboard({ session, portalToken }: { session: { lead: any; profi
             <QuotesTab userId={userId} leadId={leadId} />
           </TabsContent>
           <TabsContent value="messages">
-            <MessagesTab userId={userId} leadId={leadId} portalToken={token} />
+            <MessagesTab userId={userId} leadId={leadId} portalToken={portalToken} />
           </TabsContent>
           <TabsContent value="history">
             <HistoryTab userId={userId} leadId={leadId} />
