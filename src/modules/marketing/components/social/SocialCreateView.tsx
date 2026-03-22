@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Wand2, Sparkles, Hash, Image, Link2, Send, Save, Clock, RefreshCw, Loader2, Megaphone, BookOpen, Camera, MessageSquare } from "lucide-react";
+import { Wand2, Sparkles, Hash, Image, Link2, Send, Save, Clock, RefreshCw, Loader2, Megaphone, BookOpen, Camera, MessageSquare, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ import type { PostStatus } from "./constants";
 import PlatformPreview from "./PlatformPreview";
 import AIPostGenerator from "./AIPostGenerator";
 import ContentSpinner from "./ContentSpinner";
+import { useSocialPostLimits, ProBadge } from "./SocialPlanGate";
 
 // Trade-specific quick templates
 const TRADE_TEMPLATES = [
