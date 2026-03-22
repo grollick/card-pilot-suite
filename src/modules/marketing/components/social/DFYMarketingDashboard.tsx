@@ -130,6 +130,10 @@ export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }:
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button size="sm" className="gap-1.5" onClick={handleGeneratePosts} disabled={generating || !isActive}>
+            {generating ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
+            {generating ? "Generating..." : "Generate Posts Now"}
+          </Button>
           <Button variant="outline" size="sm" className="gap-1.5" onClick={toggleActive}>
             {isActive ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5" />}
             {isActive ? "Pause" : "Resume"}
@@ -140,7 +144,23 @@ export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }:
         </div>
       </div>
 
-      {/* KPIs */}
+      {/* Generate CTA for empty state */}
+      {scheduledPosts.length === 0 && publishedPosts.length === 0 && isActive && (
+        <Card className="border-2 border-dashed border-primary/30 bg-primary/5">
+          <CardContent className="p-6 text-center">
+            <Wand2 className="h-8 w-8 text-primary mx-auto mb-3" />
+            <h3 className="text-sm font-bold mb-1">Ready to generate your first posts!</h3>
+            <p className="text-xs text-muted-foreground mb-4 max-w-sm mx-auto">
+              Click the button below to have AI create {dfyCampaign?.posts_per_week || 3} posts 
+              tailored to your business and scheduled across the week.
+            </p>
+            <Button onClick={handleGeneratePosts} disabled={generating} className="gap-2">
+              {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              {generating ? "Generating posts..." : "Generate My Posts"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {stats.map((s, i) => (
           <motion.div
