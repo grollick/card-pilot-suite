@@ -63,10 +63,10 @@ export default function ClientPortal() {
     );
   }
 
-  return <PortalDashboard session={session} />;
+  return <PortalDashboard session={session} portalToken={token} />;
 }
 
-function PortalDashboard({ session }: { session: { lead: any; profile: any; userId: string; leadId: string } }) {
+function PortalDashboard({ session, portalToken }: { session: { lead: any; profile: any; userId: string; leadId: string }; portalToken?: string }) {
   const { lead, profile, userId, leadId } = session;
 
   return (
@@ -110,7 +110,7 @@ function PortalDashboard({ session }: { session: { lead: any; profile: any; user
             <QuotesTab userId={userId} leadId={leadId} />
           </TabsContent>
           <TabsContent value="messages">
-            <MessagesTab userId={userId} leadId={leadId} />
+            <MessagesTab userId={userId} leadId={leadId} portalToken={portalToken} />
           </TabsContent>
           <TabsContent value="history">
             <HistoryTab userId={userId} leadId={leadId} />
@@ -320,14 +320,14 @@ function QuotesTab({ userId, leadId }: { userId: string; leadId: string }) {
 }
 
 // ── Messages Tab ──
-function MessagesTab({ userId, leadId }: { userId: string; leadId: string }) {
+function MessagesTab({ userId, leadId, portalToken }: { userId: string; leadId: string; portalToken?: string }) {
   const { data: messages, isLoading } = usePortalMessages(userId, leadId);
   const sendMessage = useSendPortalMessage();
   const [newMessage, setNewMessage] = useState("");
 
   const handleSend = () => {
     if (!newMessage.trim()) return;
-    sendMessage.mutate({ userId, leadId, message: newMessage.trim() });
+    sendMessage.mutate({ userId, leadId, message: newMessage.trim(), portalToken });
     setNewMessage("");
   };
 
