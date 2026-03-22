@@ -134,8 +134,9 @@ Rules:
 - ${GOAL_PROMPTS[goal] || GOAL_PROMPTS.awareness}
 - Do NOT use generic filler — be specific and actionable
 - Make each post unique and different from the others
+- For each post, also include a short stock photo search query (3-5 words) that would pair well with the post
 
-Return ONLY valid JSON: an array of objects with "content" (string with hashtags included), "content_type" (string), and "platforms" (array of platform names like "Facebook", "Instagram").`;
+Return ONLY valid JSON: an array of objects with "content" (string with hashtags included), "content_type" (string), "platforms" (array of platform names like "Facebook", "Instagram"), and "image_query" (string for stock photo search).`;
 
     const userPrompt = `${businessContext}
 
@@ -183,6 +184,7 @@ ${postsPrompt}`;
       content: string;
       content_type: string;
       platforms: string[];
+      image_query?: string;
     }> = [];
     try {
       // Extract JSON array from response (handle markdown code blocks)
@@ -223,6 +225,10 @@ ${postsPrompt}`;
       // Set to 10am local-ish time
       scheduledDate.setHours(10 + (i % 3), 0, 0, 0);
 
+      // Generate image URL from query
+      const imgSeed = encodeURIComponent(post.image_query || post.content_type || "business").slice(0, 50) + i;
+      const imageUrl = `https://picsum.photos/seed/${imgSeed}/800/600`;
+
       return {
         user_id: user.id,
         content: post.content,
@@ -233,6 +239,7 @@ ${postsPrompt}`;
         scheduled_at: scheduledDate.toISOString(),
         platform_overrides: {},
         content_label: `dfy:${campaign_id}`,
+        media_urls: [imageUrl],
       };
     });
 

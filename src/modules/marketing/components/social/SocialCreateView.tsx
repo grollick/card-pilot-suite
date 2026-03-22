@@ -75,6 +75,9 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
       setPlatformOverrides(editPost.platform_overrides || {});
       setCampaignId(editPost.campaign_id || "");
       setContentLabel(editPost.content_label || "");
+      if (editPost.media_urls && editPost.media_urls.length > 0) {
+        setImageUrl(editPost.media_urls[0]);
+      }
       if (editPost.scheduled_at) {
         const d = new Date(editPost.scheduled_at);
         setScheduledDate(d);
@@ -149,6 +152,7 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
         content_label: contentLabel || null,
         platform_overrides: finalOverrides,
         approval_status: approvalStatus,
+        media_urls: imageUrl ? [imageUrl] : null,
       };
 
       if (editPost) {
@@ -394,6 +398,62 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
               placeholder="e.g. Book now at yoursite.com"
               className="mt-2 text-xs h-9"
             />
+          </div>
+
+          {/* Image */}
+          <div>
+            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+              <Image className="h-3 w-3" /> Post Image
+            </Label>
+            {imageUrl ? (
+              <div className="mt-2 space-y-2">
+                <div className="relative rounded-lg overflow-hidden border border-border aspect-video bg-muted group">
+                  <img
+                    src={imageUrl}
+                    alt="Post image"
+                    className="w-full h-full object-cover"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="h-7 text-[10px]"
+                      onClick={() => {
+                        const seed = `change-${Date.now()}`;
+                        setImageUrl(`https://picsum.photos/seed/${seed}/800/600`);
+                        toast.success("New image loaded!");
+                      }}
+                    >
+                      <RefreshCw className="h-3 w-3 mr-1" /> Shuffle
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="h-7 text-[10px]"
+                      onClick={() => { setImageUrl(""); toast.success("Image removed"); }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+                <Input
+                  value={imageUrl}
+                  onChange={e => setImageUrl(e.target.value)}
+                  placeholder="Paste image URL..."
+                  className="text-[10px] h-7"
+                />
+              </div>
+            ) : (
+              <div className="mt-2">
+                <Input
+                  value={imageUrl}
+                  onChange={e => setImageUrl(e.target.value)}
+                  placeholder="Paste image URL or use AI to generate..."
+                  className="text-xs h-9"
+                />
+              </div>
+            )}
           </div>
 
           <Separator />
