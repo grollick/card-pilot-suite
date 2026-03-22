@@ -20,12 +20,12 @@ export function useSocialCampaigns() {
   return useQuery({
     queryKey: KEY,
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("social_campaigns")
         .select("*")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as SocialCampaign[];
+      return (data ?? []) as unknown as SocialCampaign[];
     },
   });
 }
@@ -35,13 +35,13 @@ export function useCreateCampaign() {
   const { user } = useAuth();
   return useMutation({
     mutationFn: async (campaign: { name: string; description?: string; color?: string }) => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("social_campaigns")
-        .insert({ ...campaign, user_id: user!.id })
+        .insert({ ...campaign, user_id: user!.id } as any)
         .select()
         .single();
       if (error) throw error;
-      return data as SocialCampaign;
+      return data as unknown as SocialCampaign;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: KEY }),
   });
@@ -51,7 +51,7 @@ export function useDeleteCampaign() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await (supabase as any).from("social_campaigns").delete().eq("id", id);
+      const { error } = await supabase.from("social_campaigns").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: KEY }),
