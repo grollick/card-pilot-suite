@@ -44,9 +44,9 @@ export default function DFYActivityLog() {
       // Fetch recent social posts created by DFY (campaign_id present)
       const { data: posts } = await supabase
         .from("social_posts")
-        .select("id, content, status, created_at, scheduled_at, content_type, campaign_id")
+        .select("id, content, status, created_at, scheduled_at, content_type, content_label")
         .eq("user_id", user!.id)
-        .not("campaign_id", "is", null)
+        .like("content_label", "dfy:%")
         .order("created_at", { ascending: false })
         .limit(30);
 

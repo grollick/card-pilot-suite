@@ -144,7 +144,7 @@ ${postsPrompt}`;
 
     // Call Lovable AI
     const aiResponse = await fetch(
-      "https://api.lovable.dev/v1/chat/completions",
+      "https://ai.gateway.lovable.dev/v1/chat/completions",
       {
         method: "POST",
         headers: {
@@ -229,10 +229,10 @@ ${postsPrompt}`;
         platforms_json: post.platforms || ["Facebook", "Instagram"],
         status: "scheduled",
         approval_status: "pending",
-        campaign_id: campaign_id,
         content_type: post.content_type,
         scheduled_at: scheduledDate.toISOString(),
         platform_overrides: {},
+        content_label: `dfy:${campaign_id}`,
       };
     });
 
