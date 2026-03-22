@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { Wand2, Sparkles, Hash, Image, Link2, Send, Save, Clock, RefreshCw, Loader2, Megaphone, BookOpen, Camera, MessageSquare } from "lucide-react";
+import { Wand2, Sparkles, Hash, Image, Link2, Send, Save, Clock, RefreshCw, Loader2, Megaphone, BookOpen, Camera, MessageSquare, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -23,6 +23,7 @@ import type { PostStatus } from "./constants";
 import PlatformPreview from "./PlatformPreview";
 import AIPostGenerator from "./AIPostGenerator";
 import ContentSpinner from "./ContentSpinner";
+import { useSocialPostLimits, ProBadge } from "./SocialPlanGate";
 
 // Trade-specific quick templates
 const TRADE_TEMPLATES = [
@@ -43,6 +44,7 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
   const createPost = useCreatePost();
   const updatePost = useUpdatePost();
   const { data: campaigns = [] } = useSocialCampaigns();
+  const socialLimits = useSocialPostLimits();
 
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -90,13 +92,30 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
     }
   }, [pendingContent, onPendingConsumed]);
 
-  const togglePlatform = (p: string) => setSelectedPlatforms(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
+  const togglePlatform = (p: string) => {
+    if (selectedPlatforms.includes(p)) {
+      setSelectedPlatforms(prev => prev.filter(x => x !== p));
+    } else {
+      // Enforce platform limit
+      if (socialLimits.platformsMax !== -1 && selectedPlatforms.length >= socialLimits.platformsMax) {
+        toast.error(`Your plan allows ${socialLimits.platformsMax} platform${socialLimits.platformsMax === 1 ? "" : "s"}. Upgrade for more.`);
+        return;
+      }
+      setSelectedPlatforms(prev => [...prev, p]);
+    }
+  };
 
   const getContentForPlatform = (platform: string) => platformOverrides[platform]?.content || content;
 
   const handleSave = async (targetStatus?: PostStatus) => {
     if (!content.trim()) { toast.error("Post content is required"); return; }
     if (selectedPlatforms.length === 0) { toast.error("Select at least one platform"); return; }
+
+    // Enforce monthly post limit (only for new posts)
+    if (!editPost && socialLimits.isAtLimit) {
+      toast.error(`Monthly post limit reached (${socialLimits.monthlyLimit}). Upgrade your plan to post more.`);
+      return;
+    }
 
     let scheduled_at: string | null = null;
     if (scheduledDate) {
@@ -178,28 +197,37 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
           <Separator />
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">AI Tools</h3>
-            <div className="space-y-2">
-              <Button
-                variant={showAiGenerator ? "default" : "outline"}
-                size="sm"
-                className="w-full justify-start gap-2 h-10"
-                onClick={() => { setShowAiGenerator(!showAiGenerator); setShowSpinner(false); }}
-              >
-                <Wand2 className="h-4 w-4" />
-                <span className="text-xs">Generate Post</span>
-              </Button>
-              <Button
-                variant={showSpinner ? "default" : "outline"}
-                size="sm"
-                className="w-full justify-start gap-2 h-10"
-                onClick={() => { setShowSpinner(!showSpinner); setShowAiGenerator(false); }}
-                disabled={!content.trim()}
-              >
-                <RefreshCw className="h-4 w-4" />
-                <span className="text-xs">Spin Content</span>
-              </Button>
-            </div>
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
+              AI Tools
+              {!socialLimits.canUseAI && <ProBadge />}
+            </h3>
+            {socialLimits.canUseAI ? (
+              <div className="space-y-2">
+                <Button
+                  variant={showAiGenerator ? "default" : "outline"}
+                  size="sm"
+                  className="w-full justify-start gap-2 h-10"
+                  onClick={() => { setShowAiGenerator(!showAiGenerator); setShowSpinner(false); }}
+                >
+                  <Wand2 className="h-4 w-4" />
+                  <span className="text-xs">Generate Post</span>
+                </Button>
+                <Button
+                  variant={showSpinner ? "default" : "outline"}
+                  size="sm"
+                  className="w-full justify-start gap-2 h-10"
+                  onClick={() => { setShowSpinner(!showSpinner); setShowAiGenerator(false); }}
+                  disabled={!content.trim()}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  <span className="text-xs">Spin Content</span>
+                </Button>
+              </div>
+            ) : (
+              <div className="p-3 rounded-lg border border-border bg-muted/30 text-center">
+                <p className="text-[10px] text-muted-foreground">AI post generation, content spinning, and tone control require Pro.</p>
+              </div>
+            )}
           </div>
 
           <Separator />
@@ -302,7 +330,12 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
         <div className="p-4 space-y-4">
           {/* Platforms */}
           <div>
-            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Platforms</Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Platforms</Label>
+              {socialLimits.platformsMax !== -1 && (
+                <span className="text-[10px] text-muted-foreground">{selectedPlatforms.length}/{socialLimits.platformsMax}</span>
+              )}
+            </div>
             <div className="flex gap-1.5 mt-2 flex-wrap">
               {PLATFORMS.map(p => (
                 <button
@@ -404,26 +437,37 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
           </div>
 
           {/* Schedule */}
-          <div className="grid grid-cols-2 gap-2">
-            <div>
-              <Label className="text-[10px] text-muted-foreground">Date</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-8 text-xs mt-1", !scheduledDate && "text-muted-foreground")}>
-                    <CalendarIcon className="h-3.5 w-3.5 mr-1" />
-                    {scheduledDate ? format(scheduledDate, "MMM d") : "Pick"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={scheduledDate} onSelect={setScheduledDate} initialFocus className="p-3 pointer-events-auto" />
-                </PopoverContent>
-              </Popover>
+          {socialLimits.canSchedule ? (
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-[10px] text-muted-foreground">Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className={cn("w-full justify-start text-left font-normal h-8 text-xs mt-1", !scheduledDate && "text-muted-foreground")}>
+                      <CalendarIcon className="h-3.5 w-3.5 mr-1" />
+                      {scheduledDate ? format(scheduledDate, "MMM d") : "Pick"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar mode="single" selected={scheduledDate} onSelect={setScheduledDate} initialFocus className="p-3 pointer-events-auto" />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              <div>
+                <Label className="text-[10px] text-muted-foreground">Time</Label>
+                <Input type="time" value={scheduledTime} onChange={e => setScheduledTime(e.target.value)} className="h-8 text-xs mt-1" />
+              </div>
             </div>
-            <div>
-              <Label className="text-[10px] text-muted-foreground">Time</Label>
-              <Input type="time" value={scheduledTime} onChange={e => setScheduledTime(e.target.value)} className="h-8 text-xs mt-1" />
+          ) : (
+            <div className="p-3 rounded-lg border border-dashed border-border bg-muted/30 text-center">
+              <div className="flex items-center justify-center gap-1 mb-1">
+                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-xs font-medium text-muted-foreground">Scheduling</span>
+                <ProBadge />
+              </div>
+              <p className="text-[10px] text-muted-foreground">Upgrade to Pro to schedule posts in advance.</p>
             </div>
-          </div>
+          )}
 
           <Separator />
 

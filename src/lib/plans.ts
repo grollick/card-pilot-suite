@@ -26,6 +26,7 @@ export const PLAN_TIERS = [
       estimates: 3,
       invoices: 3,
       social_posts: 5,
+      social_posts_monthly: 3,
       booking_services: 3,
       bookings_monthly: 200,
       team_members: 1,
@@ -37,6 +38,7 @@ export const PLAN_TIERS = [
       ai_requests_monthly: 5,
       before_after_projects: 3,
       review_requests_monthly: 2,
+      social_platforms_max: 1,
       pdf_export: false,
       estimate_approvals: false,
       payments: false,
@@ -51,6 +53,11 @@ export const PLAN_TIERS = [
       google_business_sync: false,
       expense_tracker: false,
       video_intro: false,
+      social_scheduling: false,
+      social_ai_tools: false,
+      social_analytics: false,
+      social_content_feed: false,
+      social_dfy: false,
     },
   },
   {
@@ -82,6 +89,7 @@ export const PLAN_TIERS = [
       estimates: -1,
       invoices: -1,
       social_posts: -1,
+      social_posts_monthly: 30,
       booking_services: -1,
       bookings_monthly: -1,
       team_members: 1,
@@ -93,6 +101,7 @@ export const PLAN_TIERS = [
       ai_requests_monthly: 50,
       before_after_projects: -1,
       review_requests_monthly: -1,
+      social_platforms_max: -1,
       pdf_export: true,
       estimate_approvals: true,
       payments: false,
@@ -107,6 +116,11 @@ export const PLAN_TIERS = [
       google_business_sync: false,
       expense_tracker: false,
       video_intro: true,
+      social_scheduling: true,
+      social_ai_tools: true,
+      social_analytics: true,
+      social_content_feed: true,
+      social_dfy: false,
     },
   },
   {
@@ -135,6 +149,7 @@ export const PLAN_TIERS = [
       estimates: -1,
       invoices: -1,
       social_posts: -1,
+      social_posts_monthly: -1,
       booking_services: -1,
       bookings_monthly: -1,
       team_members: 3,
@@ -146,6 +161,7 @@ export const PLAN_TIERS = [
       ai_requests_monthly: 500,
       before_after_projects: -1,
       review_requests_monthly: -1,
+      social_platforms_max: -1,
       pdf_export: true,
       estimate_approvals: true,
       payments: true,
@@ -160,6 +176,11 @@ export const PLAN_TIERS = [
       google_business_sync: true,
       expense_tracker: true,
       video_intro: true,
+      social_scheduling: true,
+      social_ai_tools: true,
+      social_analytics: true,
+      social_content_feed: true,
+      social_dfy: true,
     },
   },
   {
@@ -187,6 +208,7 @@ export const PLAN_TIERS = [
       estimates: -1,
       invoices: -1,
       social_posts: -1,
+      social_posts_monthly: -1,
       booking_services: -1,
       bookings_monthly: -1,
       team_members: -1,
@@ -198,6 +220,7 @@ export const PLAN_TIERS = [
       ai_requests_monthly: -1,
       before_after_projects: -1,
       review_requests_monthly: -1,
+      social_platforms_max: -1,
       pdf_export: true,
       estimate_approvals: true,
       payments: true,
@@ -212,6 +235,11 @@ export const PLAN_TIERS = [
       google_business_sync: true,
       expense_tracker: true,
       video_intro: true,
+      social_scheduling: true,
+      social_ai_tools: true,
+      social_analytics: true,
+      social_content_feed: true,
+      social_dfy: true,
     },
   },
 ] as const;
@@ -224,6 +252,7 @@ export interface PlanLimits {
   estimates: number;
   invoices: number;
   social_posts: number;
+  social_posts_monthly: number;
   booking_services: number;
   bookings_monthly: number;
   team_members: number;
@@ -235,6 +264,7 @@ export interface PlanLimits {
   ai_requests_monthly: number;
   before_after_projects: number;
   review_requests_monthly: number;
+  social_platforms_max: number;
   pdf_export: boolean;
   estimate_approvals: boolean;
   payments: boolean;
@@ -249,6 +279,11 @@ export interface PlanLimits {
   google_business_sync: boolean;
   expense_tracker: boolean;
   video_intro: boolean;
+  social_scheduling: boolean;
+  social_ai_tools: boolean;
+  social_analytics: boolean;
+  social_content_feed: boolean;
+  social_dfy: boolean;
 }
 
 export function getPlanByKey(key: string): (typeof PLAN_TIERS)[number] | undefined {
