@@ -171,6 +171,8 @@ export default function ScreenshotTool() {
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
+          onPointerCancel={cancel}
+          onContextMenu={(e) => e.preventDefault()}
         >
           {/* Instructions */}
           <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-card text-foreground px-4 py-2 rounded-lg shadow-lg text-sm font-medium flex items-center gap-3">

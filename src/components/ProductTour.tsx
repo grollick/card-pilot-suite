@@ -68,7 +68,17 @@ export default function ProductTour() {
   const isDashboardHome = location.pathname === "/app" || location.pathname === "/app/dashboard";
 
   const completeTour = useMutation({
-...
+    mutationFn: async () => {
+      await supabase
+        .from("profiles")
+        .update({ tour_completed: true } as any)
+        .eq("id", user!.id);
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(["tour-completed", user?.id], true);
+    },
+  });
+
   useEffect(() => {
     if (isAdminPage || !isDashboardHome) {
       setIsVisible(false);
