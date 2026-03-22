@@ -161,7 +161,7 @@ serve(async (req) => {
     // 4. Get profiles for candidates
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("id, name, handle, email, city, plan, avg_response_minutes, professions(name)")
+      .select("id, name, handle, email, city, service_area, plan, avg_response_minutes, professions(name)")
       .in("id", dutyUserIds);
 
     // 5. Get duty services for service matching
