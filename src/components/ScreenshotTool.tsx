@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Camera, X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -30,6 +30,26 @@ export default function ScreenshotTool() {
     setRect(null);
     setPreview(null);
   }, []);
+
+  useEffect(() => {
+    if (!active && !preview) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") cancel();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [active, preview, cancel]);
+
+  useEffect(() => {
+    if (!active) return;
+    const timeout = window.setTimeout(() => {
+      setActive(false);
+      setSelecting(false);
+      setRect(null);
+      toast.info("Capture mode closed automatically.");
+    }, 30000);
+    return () => window.clearTimeout(timeout);
+  }, [active]);
 
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     e.preventDefault();
