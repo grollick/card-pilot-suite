@@ -1141,6 +1141,13 @@ export type Database = {
             foreignKeyName: "cards_team_member_id_fkey"
             columns: ["team_member_id"]
             isOneToOne: false
+            referencedRelation: "client_safe_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cards_team_member_id_fkey"
+            columns: ["team_member_id"]
+            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -5355,6 +5362,45 @@ export type Database = {
       }
     }
     Views: {
+      client_safe_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          city: string | null
+          company: string | null
+          email: string | null
+          handle: string | null
+          id: string | null
+          name: string | null
+          phone: string | null
+          service_area: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          company?: string | null
+          email?: string | null
+          handle?: string | null
+          id?: string | null
+          name?: string | null
+          phone?: string | null
+          service_area?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          city?: string | null
+          company?: string | null
+          email?: string | null
+          handle?: string | null
+          id?: string | null
+          name?: string | null
+          phone?: string | null
+          service_area?: string | null
+        }
+        Relationships: []
+      }
       public_profiles: {
         Row: {
           available_for_work: boolean | null
