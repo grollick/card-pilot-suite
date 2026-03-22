@@ -193,9 +193,24 @@ serve(async (req) => {
       perfMap.set(m.user_id, perf);
     });
 
-    // 7. Score candidates
+    // 7. Score candidates — enforce location filter when request has a city
     const dutyMap = new Map(eligibleDuty.map((d: any) => [d.user_id, d]));
-    const scored = (profiles ?? []).map((p: any) => {
+
+    // Helper: check if a professional serves the requested area
+    const isInServiceArea = (p: any): boolean => {
+      if (!requestCity) return true; // No location filter needed
+      const pCity = (p.city || "").toLowerCase();
+      const pArea = (p.service_area || "").toLowerCase();
+      return (
+        pCity.includes(requestCity) ||
+        requestCity.includes(pCity) ||
+        pArea.includes(requestCity)
+      );
+    };
+
+    const scored = (profiles ?? [])
+      .filter((p: any) => isInServiceArea(p)) // HARD FILTER: must be in service area
+      .map((p: any) => {
       let score = 0;
       const duty = dutyMap.get(p.id);
 
@@ -227,11 +242,13 @@ serve(async (req) => {
         }
       }
 
-      // Location match
-      if ((estReq.city || estReq.location) && p.city) {
-        const loc = (estReq.city || estReq.location || "").toLowerCase();
-        if (p.city.toLowerCase().includes(loc) || loc.includes(p.city.toLowerCase())) {
-          score += 25;
+      // Location proximity bonus (exact city match vs service_area match)
+      if (requestCity && p.city) {
+        const pCity = p.city.toLowerCase();
+        if (pCity === requestCity || pCity.includes(requestCity) || requestCity.includes(pCity)) {
+          score += 25; // Exact city match
+        } else {
+          score += 10; // service_area match (already passed hard filter)
         }
       }
 
@@ -246,7 +263,6 @@ serve(async (req) => {
       if (perf && perf.total >= 3) {
         const responseRate = perf.responded / perf.total;
         const winRate = perf.total > 0 ? perf.won / perf.total : 0;
-        // Up to 20 points for response rate, 15 for win rate
         score += Math.round(responseRate * 20);
         score += Math.round(winRate * 15);
       }
