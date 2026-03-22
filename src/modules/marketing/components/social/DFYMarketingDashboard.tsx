@@ -162,23 +162,16 @@ export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }:
         </Card>
       )}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {stats.map((s, i) => (
-          <motion.div
-            key={s.label}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
-          >
-            <Card className="border">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <s.icon className={cn("h-4 w-4", s.color)} />
-                  <span className="text-xs text-muted-foreground">{s.label}</span>
-                </div>
-                <p className="text-2xl font-bold">{s.value}</p>
-              </CardContent>
-            </Card>
-          </motion.div>
+        {stats.map((s) => (
+          <Card key={s.label} className="border">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <s.icon className={cn("h-4 w-4", s.color)} />
+                <span className="text-xs text-muted-foreground">{s.label}</span>
+              </div>
+              <p className="text-2xl font-bold">{s.value}</p>
+            </CardContent>
+          </Card>
         ))}
       </div>
 
