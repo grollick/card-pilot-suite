@@ -19,6 +19,8 @@ const imageModules: Record<string, () => Promise<{ default: string }>> = {
   "tanya-cover": () => import("@/assets/demo/cover-hairstylist.jpg"),
   "david-avatar": () => import("@/assets/demo/david-nguyen.jpg"),
   "david-cover": () => import("@/assets/demo/cover-landscaper.jpg"),
+  "ryan-avatar": () => import("@/assets/demo/ryan-carter.jpg"),
+  "ryan-cover": () => import("@/assets/demo/cover-cardealership.jpg"),
 };
 
 const imageCache = new Map<string, string>();
