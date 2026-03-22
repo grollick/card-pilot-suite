@@ -41,10 +41,10 @@ export default function DFYActivityLog() {
     queryFn: async () => {
       const items: ActivityItem[] = [];
 
-      // Fetch recent social posts created by DFY (campaign_id present or auto-generated)
+      // Fetch recent social posts created by DFY (campaign_id present)
       const { data: posts } = await supabase
         .from("social_posts")
-        .select("id, content, status, created_at, scheduled_at, published_at, content_type, campaign_id")
+        .select("id, content, status, created_at, scheduled_at, content_type, campaign_id")
         .eq("user_id", user!.id)
         .not("campaign_id", "is", null)
         .order("created_at", { ascending: false })
@@ -53,13 +53,13 @@ export default function DFYActivityLog() {
       for (const p of posts ?? []) {
         const snippet = (p.content || "").slice(0, 60);
 
-        if (p.status === "published" && p.published_at) {
+        if (p.status === "published") {
           items.push({
             id: `pub-${p.id}`,
             type: "post_published",
             title: "Post published",
             description: snippet,
-            timestamp: p.published_at,
+            timestamp: p.created_at,
           });
         }
         if (p.status === "scheduled" && p.scheduled_at) {
