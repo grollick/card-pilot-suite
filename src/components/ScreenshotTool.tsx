@@ -61,7 +61,7 @@ export default function ScreenshotTool() {
     setActive(false);
 
     try {
-      await new Promise((r) => setTimeout(r, 150));
+      await new Promise((r) => setTimeout(r, 250));
 
       const dpr = window.devicePixelRatio || 1;
       const canvas = await html2canvas(document.body, {
@@ -70,13 +70,43 @@ export default function ScreenshotTool() {
         useCORS: true,
         allowTaint: true,
         backgroundColor: null,
+        logging: false,
+        ignoreElements: (el) => {
+          if (el.tagName === 'CANVAS' && (el as HTMLCanvasElement).width === 0) return true;
+          if (el.tagName === 'VIDEO' || el.tagName === 'IFRAME') return true;
+          return false;
+        },
+        onclone: (clonedDoc) => {
+          const style = clonedDoc.createElement('style');
+          style.textContent = '*, *::before, *::after { animation: none !important; transition: none !important; }';
+          clonedDoc.head.appendChild(style);
+        },
       });
 
       const dataUrl = canvas.toDataURL("image/png");
       setPreview(dataUrl);
     } catch (err) {
-      console.error("Screenshot capture failed:", err);
-      toast.error("Capture failed");
+      console.error("Screenshot capture failed, trying fallback:", err);
+      try {
+        const canvas = await html2canvas(document.body, {
+          x, y, width: w, height: h,
+          scale: 1,
+          useCORS: false,
+          allowTaint: true,
+          backgroundColor: "#ffffff",
+          logging: false,
+          ignoreElements: (el) => el.tagName === 'CANVAS' || el.tagName === 'VIDEO' || el.tagName === 'IFRAME',
+          onclone: (clonedDoc) => {
+            const style = clonedDoc.createElement('style');
+            style.textContent = '*, *::before, *::after { animation: none !important; transition: none !important; background-image: none !important; }';
+            clonedDoc.head.appendChild(style);
+          },
+        });
+        setPreview(canvas.toDataURL("image/png"));
+        toast.info("Captured in simplified mode");
+      } catch {
+        toast.error("Capture failed — try a different area");
+      }
       setRect(null);
     }
   }, [selecting, rect]);
