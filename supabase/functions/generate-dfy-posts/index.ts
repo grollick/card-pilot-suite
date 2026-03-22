@@ -225,6 +225,10 @@ ${postsPrompt}`;
       // Set to 10am local-ish time
       scheduledDate.setHours(10 + (i % 3), 0, 0, 0);
 
+      // Generate image URL from query
+      const imgSeed = encodeURIComponent(post.image_query || post.content_type || "business").slice(0, 50) + i;
+      const imageUrl = `https://picsum.photos/seed/${imgSeed}/800/600`;
+
       return {
         user_id: user.id,
         content: post.content,
@@ -235,6 +239,7 @@ ${postsPrompt}`;
         scheduled_at: scheduledDate.toISOString(),
         platform_overrides: {},
         content_label: `dfy:${campaign_id}`,
+        media_urls: [imageUrl],
       };
     });
 
