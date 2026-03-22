@@ -8,6 +8,7 @@ import UpgradeTriggers from "@/components/UpgradeTriggers";
 import BetaStatusBanner from "@/components/BetaStatusBanner";
 import BetaFeedbackWidget from "@/components/BetaFeedbackWidget";
 import PullToRefresh from "@/components/PullToRefresh";
+import ScreenshotTool from "@/components/ScreenshotTool";
 
 export default function DashboardLayout() {
   return (
@@ -28,6 +29,7 @@ export default function DashboardLayout() {
       <FloatingHelpButton />
       <UpgradeTriggers />
       <BetaFeedbackWidget />
+      <ScreenshotTool />
     </SidebarProvider>
   );
 }
