@@ -12,6 +12,8 @@ import ScreenshotTool from "@/components/ScreenshotTool";
 import { useIsAdmin } from "@/hooks/useAdminStats";
 
 export default function DashboardLayout() {
+  const { data: isAdmin } = useIsAdmin();
+
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -30,7 +32,9 @@ export default function DashboardLayout() {
       <FloatingHelpButton />
       <UpgradeTriggers />
       <BetaFeedbackWidget />
-      <ScreenshotTool />
+      {isAdmin && <ScreenshotTool />}
     </SidebarProvider>
+  );
+}
   );
 }
