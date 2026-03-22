@@ -132,11 +132,11 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
       {/* ── SECTION 2: KPI Overview ── */}
       <SectionHeader icon={BarChart3} title="KPI Overview" description="Core platform metrics at a glance" />
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-        <MetricCard icon={Users} label="Total Users" value={stats?.totalUsers ?? 0} loading={loading} href="/app/admin/users" />
-        <MetricCard icon={UserCheck} label="Active Users" value={kpis?.activatedUsers ?? 0} color="text-[hsl(var(--success))]" loading={loading} href="/app/admin/users" />
-        <MetricCard icon={Zap} label="Leads Today" value={kpis?.leads30d ?? 0} sub="Last 30 days" color="text-[hsl(var(--warning))]" loading={loading} href="/app/contacts" />
-        <MetricCard icon={Briefcase} label="Job Requests" value={kpis?.jobRequests30d ?? 0} color="text-[hsl(var(--accent-foreground))]" loading={loading} href="/app/job-requests" />
-        <MetricCard icon={Target} label="Conversion Rate" value={`${conversionRate}%`} sub="Free → Paid" loading={loading} href="/app/analytics" />
+        <MetricCard icon={Users} label="Total Users" value={stats?.totalUsers ?? 0} loading={loading} onClick={() => onNavigateSection?.("growth")} />
+        <MetricCard icon={UserCheck} label="Active Users" value={kpis?.activatedUsers ?? 0} color="text-[hsl(var(--success))]" loading={loading} onClick={() => onNavigateSection?.("growth")} />
+        <MetricCard icon={Zap} label="Leads Today" value={kpis?.leads30d ?? 0} sub="Last 30 days" color="text-[hsl(var(--warning))]" loading={loading} onClick={() => navigate("/app/contacts")} />
+        <MetricCard icon={Briefcase} label="Job Requests" value={kpis?.jobRequests30d ?? 0} color="text-[hsl(var(--accent-foreground))]" loading={loading} onClick={() => navigate("/app/job-requests")} />
+        <MetricCard icon={Target} label="Conversion Rate" value={`${conversionRate}%`} sub="Free → Paid" loading={loading} onClick={() => onNavigateSection?.("funnel")} />
       </div>
 
       {/* ── SECTION 3: Growth Funnel ── */}
