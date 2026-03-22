@@ -69,7 +69,7 @@ export default function DFYSetupWizard({ onComplete, loading }: Props) {
         ))}
       </div>
 
-      <AnimatePresence mode="wait">
+      <AnimatePresence mode="wait" initial={false}>
         {step === 0 && (
           <motion.div key="goal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
             <h2 className="text-lg font-bold mb-1">What's your primary goal?</h2>
