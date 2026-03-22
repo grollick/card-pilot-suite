@@ -8,21 +8,24 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import TemplatePicker from "../components/postdesigner/TemplatePicker";
 import CanvasRenderer from "../components/postdesigner/CanvasRenderer";
+import type { CanvasRendererHandle } from "../components/postdesigner/CanvasRenderer";
 import StyleControls from "../components/postdesigner/StyleControls";
 import AiSuggestionsPanel from "../components/postdesigner/AiSuggestionsPanel";
 import type { CanvasElement, PostFormat, PostTemplate } from "../data/postTemplates";
-import { POST_TEMPLATES } from "../data/postTemplates";
+import { POST_TEMPLATES, FORMAT_DIMENSIONS } from "../data/postTemplates";
 
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 export default function PostDesigner() {
   const navigate = useNavigate();
+  const canvasRendererRef = useRef<CanvasRendererHandle>(null);
   const [elements, setElements] = useState<CanvasElement[]>(POST_TEMPLATES[0].elements);
   const [bgColor, setBgColor] = useState(POST_TEMPLATES[0].bgColor);
   const [format, setFormat] = useState<PostFormat>(POST_TEMPLATES[0].format);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [currentTemplate, setCurrentTemplate] = useState<PostTemplate | null>(POST_TEMPLATES[0]);
   const [showAi, setShowAi] = useState(true);
+  const [exporting, setExporting] = useState(false);
 
   const selectedElement = elements.find((e) => e.id === selectedId) ?? null;
 
