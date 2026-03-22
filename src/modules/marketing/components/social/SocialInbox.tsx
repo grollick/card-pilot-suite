@@ -51,7 +51,8 @@ export default function SocialInbox() {
   const [engagements, setEngagements] = useState(MOCK_ENGAGEMENTS);
   const [selected, setSelected] = useState<string | null>(null);
 
-  const filtered = engagements.filter(e => filter === "all" || e.type === filter);
+  const filterMap: Record<InboxFilter, string | null> = { all: null, comments: "comment", mentions: "mention", likes: "like", shares: "share" };
+  const filtered = engagements.filter(e => !filterMap[filter] || e.type === filterMap[filter]);
   const unreadCount = engagements.filter(e => !e.read).length;
   const selectedItem = engagements.find(e => e.id === selected);
 
