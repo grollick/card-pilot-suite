@@ -22,38 +22,18 @@ export default function BetaStatusBanner() {
     const isUrgent = daysLeft <= 7;
 
     return (
-      <div
-        className={`relative flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm border ${
+      <div className="flex items-center gap-2 mb-2">
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
           isUrgent
-            ? "bg-destructive/10 border-destructive/20 text-destructive"
-            : "bg-primary/10 border-primary/20 text-primary"
-        }`}
-      >
-        <FlaskConical className="h-4 w-4 shrink-0" />
-        <div className="flex-1">
-          <span className="font-medium">Beta Access — {planLabel}</span>
-          <span className="ml-2 text-xs opacity-80">
-            {daysLeft <= 0
-              ? "Expires today"
-              : `${daysLeft} day${daysLeft !== 1 ? "s" : ""} remaining (until ${format(
-                  new Date(beta.expiry_date),
-                  "MMM d, yyyy"
-                )})`}
-          </span>
-          {isUrgent && (
-            <span className="ml-2 text-xs">
-              · Your data will be preserved when beta ends
-            </span>
-          )}
-        </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 shrink-0"
-          onClick={() => setDismissed(true)}
-        >
+            ? "bg-destructive/10 text-destructive"
+            : "bg-primary/10 text-primary"
+        }`}>
+          <FlaskConical className="h-3 w-3" />
+          Beta · {daysLeft <= 0 ? "Expires today" : `${daysLeft}d left`}
+        </span>
+        <button onClick={() => setDismissed(true)} className="text-muted-foreground hover:text-foreground">
           <X className="h-3 w-3" />
-        </Button>
+        </button>
       </div>
     );
   }
