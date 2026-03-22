@@ -31,9 +31,19 @@ const STREAM_ICONS: Record<string, any> = {
 
 interface Props {
   onViewPost: (post: SocialPost) => void;
+  onCompose?: (data: { content: string; hashtags: string[]; imageUrl?: string }) => void;
 }
 
-export default function SocialStreams({ onViewPost }: Props) {
+interface SuggestedPost {
+  title: string;
+  caption: string;
+  hashtags: string[];
+  cta: string;
+  image_url: string;
+  style: string;
+}
+
+export default function SocialStreams({ onViewPost, onCompose }: Props) {
   const { data: posts = [] } = useSocialPosts();
   const [streams, setStreams] = useState<StreamConfig[]>([
     { id: "1", type: "drafts", label: "Drafts" },
