@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Plus, X, GripVertical, FileText, CalendarDays, Send, MessageCircle, Hash, Bell, AlertCircle, CheckCircle } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Plus, X, GripVertical, FileText, CalendarDays, Send, MessageCircle, Hash, Bell, AlertCircle, CheckCircle, Sparkles, Loader2, RefreshCw, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
@@ -8,6 +8,8 @@ import { format } from "date-fns";
 import { useSocialPosts } from "@/hooks/useSocialPosts";
 import type { SocialPost } from "@/hooks/useSocialPosts";
 import { getPlatformConfig, STREAM_TYPES } from "./constants";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface StreamConfig {
   id: string;
