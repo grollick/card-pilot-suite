@@ -96,6 +96,7 @@ serve(async (req) => {
 
     // 3. Find on-duty users first, then recently active as fallback
     const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+    const requestCity = (estReq.city || estReq.location || "").toLowerCase().trim();
 
     const { data: dutyUsers } = await supabase
       .from("estimate_duty_status")
@@ -110,25 +111,41 @@ serve(async (req) => {
     const dutyUserIds = eligibleDuty.map((d: any) => d.user_id);
     if (dutyUserIds.length === 0) {
       // Fallback: find marketplace-enabled profiles
-      const { data: fallbackProfiles } = await supabase
+      // If request has a city, only pull profiles from the same area
+      let fallbackQuery = supabase
         .from("profiles")
-        .select("id")
+        .select("id, city, service_area")
         .eq("marketplace_enabled", true)
         .eq("available_for_work", true)
-        .limit(10);
+        .limit(20);
 
-      if (!fallbackProfiles?.length) {
+      const { data: fallbackProfiles } = await fallbackQuery;
+
+      // Filter fallback profiles by location if request specifies a city
+      const locationFiltered = requestCity
+        ? (fallbackProfiles ?? []).filter((p: any) => {
+            const pCity = (p.city || "").toLowerCase();
+            const pArea = (p.service_area || "").toLowerCase();
+            return (
+              pCity.includes(requestCity) ||
+              requestCity.includes(pCity) ||
+              pArea.includes(requestCity)
+            );
+          })
+        : (fallbackProfiles ?? []);
+
+      if (!locationFiltered.length) {
         await supabase
           .from("estimate_requests")
           .update({ status: "no_matches" })
           .eq("id", estimateRequestId);
-        return new Response(JSON.stringify({ matched: 0, reason: "no_available_users" }), {
+        return new Response(JSON.stringify({ matched: 0, reason: requestCity ? "no_available_users_in_area" : "no_available_users" }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
       // Use fallback IDs with empty duty records
-      for (const p of fallbackProfiles) {
+      for (const p of locationFiltered) {
         if (!dutyUserIds.includes(p.id)) {
           dutyUserIds.push(p.id);
           eligibleDuty.push({
