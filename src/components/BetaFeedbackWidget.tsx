@@ -71,7 +71,7 @@ export default function BetaFeedbackWidget() {
   };
 
   return (
-    <>
+    <div className="pointer-events-none">
       {/* Floating Button */}
       <AnimatePresence>
         {!open && (
@@ -79,7 +79,7 @@ export default function BetaFeedbackWidget() {
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
-            className="fixed bottom-20 right-4 z-50"
+            className="fixed bottom-20 right-4 z-50 pointer-events-auto"
           >
             <Button
               onClick={() => setOpen(true)}
@@ -101,102 +101,12 @@ export default function BetaFeedbackWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-20 right-4 z-50 w-[340px] max-w-[calc(100vw-2rem)] bg-card border border-border rounded-xl shadow-xl"
+            className="fixed bottom-20 right-4 z-50 w-[340px] max-w-[calc(100vw-2rem)] bg-card border border-border rounded-xl shadow-xl pointer-events-auto"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-              <div className="flex items-center gap-2">
-                <MessageSquarePlus className="h-4 w-4 text-primary" />
-                <h3 className="text-sm font-semibold">Beta Feedback</h3>
-              </div>
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setOpen(false)}>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="p-4 space-y-3">
-              {/* Type Selector */}
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">Type</Label>
-                <div className="grid grid-cols-4 gap-1.5">
-                  {TYPES.map((t) => (
-                    <button
-                      key={t.value}
-                      onClick={() => setType(t.value)}
-                      className={cn(
-                        "flex flex-col items-center gap-1 rounded-lg border px-2 py-2 text-xs transition-colors",
-                        type === t.value
-                          ? "border-primary bg-primary/10 font-medium"
-                          : "border-border hover:bg-muted"
-                      )}
-                    >
-                      <span className={t.color}>{t.icon}</span>
-                      {t.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Message */}
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">Your feedback</Label>
-                <Textarea
-                  placeholder="Tell us what you think…"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  rows={3}
-                  maxLength={2000}
-                  className="text-sm resize-none"
-                />
-              </div>
-
-              {/* Screenshot */}
-              <div className="flex items-center gap-2">
-                <input
-                  ref={fileRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleScreenshot}
-                />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-xs gap-1"
-                  onClick={() => fileRef.current?.click()}
-                >
-                  <ImagePlus className="h-3.5 w-3.5" />
-                  {screenshotFile ? screenshotFile.name.slice(0, 20) : "Screenshot"}
-                </Button>
-                {screenshotFile && (
-                  <button
-                    className="text-xs text-muted-foreground hover:text-foreground"
-                    onClick={() => setScreenshotFile(null)}
-                  >
-                    Remove
-                  </button>
-                )}
-              </div>
-
-              {/* Context info */}
-              <p className="text-[10px] text-muted-foreground">
-                Page: {location.pathname} · {new Date().toLocaleDateString()}
-              </p>
-
-              {/* Submit */}
-              <Button
-                className="w-full gap-1.5"
-                size="sm"
-                onClick={handleSubmit}
-                disabled={!message.trim() || submit.isPending || uploading}
-              >
-                <Send className="h-3.5 w-3.5" />
-                {submit.isPending || uploading ? "Sending…" : "Send Feedback"}
-              </Button>
-            </div>
+...
           </motion.div>
         )}
       </AnimatePresence>
-    </>
+    </div>
   );
 }

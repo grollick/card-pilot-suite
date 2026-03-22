@@ -130,13 +130,13 @@ export default function ScreenshotTool() {
   } : null;
 
   return (
-    <>
+    <div className="pointer-events-none">
       {/* Floating trigger button */}
       <Button
         onClick={startCapture}
         size="icon"
         variant="outline"
-        className="fixed bottom-20 right-4 z-[998] h-10 w-10 rounded-full shadow-lg bg-card border-border hover:bg-primary hover:text-primary-foreground transition-colors"
+        className="fixed bottom-20 right-4 z-[998] h-10 w-10 rounded-full shadow-lg bg-card border-border hover:bg-primary hover:text-primary-foreground transition-colors pointer-events-auto"
         title="Screenshot capture"
       >
         <Camera className="h-4 w-4" />
@@ -146,7 +146,7 @@ export default function ScreenshotTool() {
       {active && (
         <div
           ref={overlayRef}
-          className="fixed inset-0 z-[9999] cursor-crosshair"
+          className="fixed inset-0 z-[9999] cursor-crosshair pointer-events-auto"
           style={{ backgroundColor: "rgba(0,0,0,0.3)" }}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
@@ -178,7 +178,7 @@ export default function ScreenshotTool() {
 
       {/* Preview dialog */}
       {preview && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm pointer-events-auto">
           <div className="bg-card rounded-xl shadow-2xl p-4 max-w-[80vw] max-h-[80vh] flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-sm text-foreground">Screenshot Preview</h3>
@@ -200,6 +200,6 @@ export default function ScreenshotTool() {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }

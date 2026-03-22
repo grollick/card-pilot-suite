@@ -84,7 +84,7 @@ export default function FloatingHelpButton() {
   ];
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-50 pointer-events-none">
       <AnimatePresence>
         {open && (
           <motion.div
@@ -92,7 +92,7 @@ export default function FloatingHelpButton() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="absolute bottom-14 right-0 w-72 rounded-xl border border-border bg-card shadow-xl overflow-hidden mb-2"
+            className="absolute bottom-14 right-0 w-72 rounded-xl border border-border bg-card shadow-xl overflow-hidden mb-2 pointer-events-auto"
           >
             {/* Header */}
             <div className="bg-primary/5 border-b border-border px-4 py-3">
@@ -139,7 +139,7 @@ export default function FloatingHelpButton() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setOpen(!open)}
-        className="h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 flex items-center justify-center transition-colors hover:bg-primary/90"
+        className="h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 flex items-center justify-center transition-colors hover:bg-primary/90 pointer-events-auto"
       >
         <AnimatePresence mode="wait">
           {open ? (
