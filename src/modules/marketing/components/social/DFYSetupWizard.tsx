@@ -127,7 +127,7 @@ export default function DFYSetupWizard({ onComplete, loading }: Props) {
         )}
 
         {step === 2 && (
-          <motion.div key="freq" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+          <motion.div key="freq" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={{ position: "relative" }}>
             <h2 className="text-lg font-bold mb-1">Posting Frequency</h2>
             <p className="text-sm text-muted-foreground mb-6">How often should we post for you?</p>
             <div className="space-y-3">
