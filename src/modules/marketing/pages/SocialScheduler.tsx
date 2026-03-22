@@ -65,7 +65,7 @@ export default function SocialScheduler() {
       case "planner":
         return (
           <SocialFeatureGate feature="social_scheduling" label="Content Planner" description="Drag-and-drop Kanban board for your content pipeline.">
-            <SocialPlanner />
+            <SocialPlanner onEdit={openCompose} onViewDetail={setDetailPost} />
           </SocialFeatureGate>
         );
       case "bulk":
