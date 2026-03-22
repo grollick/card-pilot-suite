@@ -63,10 +63,10 @@ export default function ClientPortal() {
     );
   }
 
-  return <PortalDashboard session={session} />;
+  return <PortalDashboard session={session} portalToken={token} />;
 }
 
-function PortalDashboard({ session }: { session: { lead: any; profile: any; userId: string; leadId: string } }) {
+function PortalDashboard({ session, portalToken }: { session: { lead: any; profile: any; userId: string; leadId: string }; portalToken?: string }) {
   const { lead, profile, userId, leadId } = session;
 
   return (
