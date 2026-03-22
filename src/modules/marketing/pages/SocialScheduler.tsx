@@ -1,133 +1,150 @@
 import { useState } from "react";
-import { PenLine, CalendarDays, Megaphone, Newspaper, BarChart3, Rocket, Crown } from "lucide-react";
+import { PanelLeftClose, PanelLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import SocialSidebar from "../components/social/SocialSidebar";
+import type { SocialView } from "../components/social/SocialSidebar";
 import SocialCreateView from "../components/social/SocialCreateView";
 import SocialCalendar from "../components/social/SocialCalendar";
 import SocialCampaignsTab from "../components/social/SocialCampaignsTab";
 import ContentFeedTab from "../components/social/ContentFeedTab";
 import SocialAnalyticsTab from "../components/social/SocialAnalyticsTab";
 import DFYMarketingTab from "../components/social/DFYMarketingTab";
+import SocialStreams from "../components/social/SocialStreams";
+import SocialPlanner from "../components/social/SocialPlanner";
+import SocialBulkImport from "../components/social/SocialBulkImport";
+import SocialInbox from "../components/social/SocialInbox";
 import PostDetailDrawer from "../components/social/PostDetailDrawer";
-import { SocialFeatureGate, useSocialPostLimits, ProBadge } from "../components/social/SocialPlanGate";
+import { SocialFeatureGate, useSocialPostLimits } from "../components/social/SocialPlanGate";
 import type { SocialPost } from "@/hooks/useSocialPosts";
 import { cn } from "@/lib/utils";
 
-const TABS = [
-  { id: "create", label: "Create", icon: PenLine, feature: null },
-  { id: "calendar", label: "Calendar", icon: CalendarDays, feature: "social_scheduling" as const },
-  { id: "campaigns", label: "Campaigns", icon: Megaphone, feature: "social_scheduling" as const },
-  { id: "feed", label: "Content Feed", icon: Newspaper, feature: "social_content_feed" as const },
-  { id: "analytics", label: "Analytics", icon: BarChart3, feature: "social_analytics" as const },
-  { id: "dfy", label: "Done-For-You", icon: Rocket, feature: "social_dfy" as const },
-];
-
 export default function SocialScheduler() {
-  const [activeTab, setActiveTab] = useState("create");
+  const [activeView, setActiveView] = useState<SocialView>("streams");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [detailPost, setDetailPost] = useState<SocialPost | null>(null);
   const [editPost, setEditPost] = useState<SocialPost | null>(null);
   const [pendingContent, setPendingContent] = useState<{ content: string; hashtags: string[]; imageUrl?: string } | null>(null);
   const socialLimits = useSocialPostLimits();
 
-  const openCreate = (post?: SocialPost) => {
+  const openCompose = (post?: SocialPost) => {
     setEditPost(post ?? null);
-    setActiveTab("create");
+    setActiveView("compose");
   };
 
   const handleUseFeedPost = (data: { content: string; hashtags: string[]; imageUrl?: string }) => {
     setPendingContent(data);
-    setActiveTab("create");
+    setActiveView("compose");
   };
 
-  const isFeatureLocked = (feature: string | null) => {
-    if (!feature) return false;
-    if (feature === "social_scheduling") return !socialLimits.canSchedule;
-    if (feature === "social_content_feed") return !socialLimits.canUseFeed;
-    if (feature === "social_analytics") return !socialLimits.canViewAnalytics;
-    if (feature === "social_dfy") return !socialLimits.canUseDFY;
-    return false;
-  };
+  // Determine which features are locked
+  const lockedFeatures = new Set<string>();
+  if (!socialLimits.canSchedule) { lockedFeatures.add("calendar"); lockedFeatures.add("planner"); lockedFeatures.add("campaigns"); }
+  if (!socialLimits.canUseFeed) lockedFeatures.add("feed");
+  if (!socialLimits.canViewAnalytics) lockedFeatures.add("analytics");
+  if (!socialLimits.canUseDFY) lockedFeatures.add("dfy");
 
-  return (
-    <div className="space-y-4 max-w-7xl">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Social</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">Create, schedule, and grow with AI-powered social content</p>
-        </div>
-        {socialLimits.monthlyLimit !== -1 && (
-          <div className="text-right">
-            <p className="text-xs text-muted-foreground">Posts this month</p>
-            <p className={cn("text-sm font-semibold", socialLimits.isAtLimit && "text-destructive")}>
-              {socialLimits.postsThisMonth}/{socialLimits.monthlyLimit}
-            </p>
-          </div>
-        )}
-      </div>
-
-      {/* Top Navigation */}
-      <div className="flex items-center gap-1 border-b border-border overflow-x-auto">
-        {TABS.map(tab => {
-          const locked = isFeatureLocked(tab.feature);
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors -mb-px whitespace-nowrap",
-                activeTab === tab.id
-                  ? "border-primary text-foreground"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border",
-                tab.id === "dfy" && activeTab !== "dfy" && "text-primary"
-              )}
-            >
-              <tab.icon className="h-4 w-4" />
-              {tab.label}
-              {locked && <ProBadge tier={tab.feature === "social_dfy" ? "Pro Plus" : "Pro"} />}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Content */}
-      <div className="mt-2">
-        {activeTab === "create" && (
+  const renderView = () => {
+    switch (activeView) {
+      case "streams":
+        return <SocialStreams onViewPost={setDetailPost} />;
+      case "compose":
+        return (
           <SocialCreateView
             editPost={editPost}
             onDone={() => setEditPost(null)}
             pendingContent={pendingContent}
             onPendingConsumed={() => setPendingContent(null)}
           />
-        )}
-        {activeTab === "calendar" && (
-          <SocialFeatureGate feature="social_scheduling" label="Post Scheduling" description="Schedule and queue posts to publish at the perfect time. Upgrade to Pro to unlock the content calendar.">
-            <SocialCalendar
-              onNewPost={() => openCreate()}
-              onViewPost={setDetailPost}
-            />
+        );
+      case "calendar":
+        return (
+          <SocialFeatureGate feature="social_scheduling" label="Content Calendar" description="Schedule and queue posts to publish at the perfect time.">
+            <SocialCalendar onNewPost={() => openCompose()} onViewPost={setDetailPost} />
           </SocialFeatureGate>
-        )}
-        {activeTab === "campaigns" && (
-          <SocialFeatureGate feature="social_scheduling" label="Campaigns" description="Organize posts into campaigns for focused marketing efforts. Available on Pro and above.">
+        );
+      case "planner":
+        return (
+          <SocialFeatureGate feature="social_scheduling" label="Content Planner" description="Drag-and-drop Kanban board for your content pipeline.">
+            <SocialPlanner onEdit={openCompose} onViewDetail={setDetailPost} />
+          </SocialFeatureGate>
+        );
+      case "bulk":
+        return (
+          <SocialFeatureGate feature="social_scheduling" label="Bulk Import" description="Upload a CSV to schedule dozens of posts at once.">
+            <SocialBulkImport />
+          </SocialFeatureGate>
+        );
+      case "inbox":
+        return <SocialInbox />;
+      case "campaigns":
+        return (
+          <SocialFeatureGate feature="social_scheduling" label="Campaigns" description="Organize posts into campaigns for focused marketing efforts.">
             <SocialCampaignsTab />
           </SocialFeatureGate>
-        )}
-        {activeTab === "feed" && (
-          <SocialFeatureGate feature="social_content_feed" label="Content Feed" description="Get AI-generated trending content ideas tailored to your industry. Available on Pro and above.">
+        );
+      case "feed":
+        return (
+          <SocialFeatureGate feature="social_content_feed" label="Content Feed" description="Get AI-generated trending content ideas tailored to your industry.">
             <ContentFeedTab onUsePost={handleUseFeedPost} />
           </SocialFeatureGate>
-        )}
-        {activeTab === "analytics" && (
-          <SocialFeatureGate feature="social_analytics" label="Social Analytics" description="Track post performance, engagement, leads generated, and get AI insights. Available on Pro and above.">
+        );
+      case "analytics":
+        return (
+          <SocialFeatureGate feature="social_analytics" label="Social Analytics" description="Track post performance, engagement, and get AI insights.">
             <SocialAnalyticsTab />
           </SocialFeatureGate>
-        )}
-        {activeTab === "dfy" && <DFYMarketingTab onSwitchToCalendar={() => setActiveTab("calendar")} />}
+        );
+      case "dfy":
+        return <DFYMarketingTab onSwitchToCalendar={() => setActiveView("calendar")} />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="flex h-[calc(100vh-4rem)] -m-4 md:-m-6">
+      {/* Sidebar */}
+      <SocialSidebar
+        activeView={activeView}
+        onChangeView={setActiveView}
+        lockedFeatures={lockedFeatures}
+        collapsed={sidebarCollapsed}
+      />
+
+      {/* Main content */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Top bar */}
+        <div className="flex items-center justify-between h-12 px-4 border-b border-border shrink-0 bg-background">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            >
+              {sidebarCollapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
+            </Button>
+            <h1 className="text-sm font-bold capitalize">{activeView === "dfy" ? "Done-For-You" : activeView}</h1>
+          </div>
+          {socialLimits.monthlyLimit !== -1 && (
+            <div className="text-right">
+              <p className={cn("text-xs font-medium", socialLimits.isAtLimit ? "text-destructive" : "text-muted-foreground")}>
+                {socialLimits.postsThisMonth}/{socialLimits.monthlyLimit} posts this month
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* View content */}
+        <div className="flex-1 overflow-auto p-4 md:p-6">
+          {renderView()}
+        </div>
       </div>
 
       <PostDetailDrawer
         post={detailPost}
         onClose={() => setDetailPost(null)}
-        onEdit={openCreate}
+        onEdit={openCompose}
       />
     </div>
   );
