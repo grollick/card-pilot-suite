@@ -321,6 +321,7 @@ const App = () => (
 
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <AdminScreenshotTool />
           </OrgProvider>
         </AuthProvider>
       </BrowserRouter>

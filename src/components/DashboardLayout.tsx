@@ -10,10 +10,6 @@ import BetaFeedbackWidget from "@/components/BetaFeedbackWidget";
 import PullToRefresh from "@/components/PullToRefresh";
 
 export default function DashboardLayout() {
-
-export default function DashboardLayout() {
-  const { data: isAdmin } = useIsAdmin();
-
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -32,7 +28,6 @@ export default function DashboardLayout() {
       <FloatingHelpButton />
       <UpgradeTriggers />
       <BetaFeedbackWidget />
-      {isAdmin && <ScreenshotTool />}
     </SidebarProvider>
   );
 }
