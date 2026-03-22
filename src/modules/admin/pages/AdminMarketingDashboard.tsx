@@ -10,6 +10,7 @@ import AdminSuccessPlaybooks from "@/modules/admin/components/AdminSuccessPlaybo
 import AdminMarketingAnalytics from "@/modules/admin/components/AdminMarketingAnalytics";
 import AdminEmailSequences from "@/modules/admin/components/AdminEmailSequences";
 import ABTestDashboard from "@/modules/admin/components/ABTestDashboard";
+import LandingPageManager from "@/modules/admin/pages/LandingPageManager";
 
 export default function AdminMarketingDashboard() {
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
