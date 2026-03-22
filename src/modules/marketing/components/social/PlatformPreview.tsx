@@ -43,7 +43,7 @@ function InstagramPreview({ content, hashtags, imageUrl }: { content: string; ha
   );
 }
 
-function FacebookPreview({ content }: { content: string }) {
+function FacebookPreview({ content, imageUrl }: { content: string; imageUrl?: string }) {
   return (
     <div className="rounded-lg border border-border bg-card overflow-hidden">
       <div className="flex items-center gap-2 p-2.5">
@@ -56,6 +56,11 @@ function FacebookPreview({ content }: { content: string }) {
       <div className="px-2.5 pb-2">
         <p className="text-[10px] leading-relaxed line-clamp-4">{content || "Your post content..."}</p>
       </div>
+      {imageUrl && (
+        <div className="h-32 bg-muted overflow-hidden">
+          <img src={imageUrl} alt="Post" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+        </div>
+      )}
       <div className="border-t border-border flex">
         <button className="flex-1 flex items-center justify-center gap-1 py-1.5 text-[10px] text-muted-foreground hover:bg-accent/50">
           <ThumbsUp className="h-3 w-3" /> Like
