@@ -45,11 +45,7 @@ export function useSiteData(handle: string | undefined) {
           .limit(1)
           .maybeSingle(),
         supabase
-          .from("booking_services")
-          .select("id, name, price, duration_min, description")
-          .eq("user_id", profile.id)
-          .eq("active", true)
-          .order("name"),
+          .rpc("get_services_by_handle", { p_handle: handle! }),
       ]);
 
       // Extract card section content

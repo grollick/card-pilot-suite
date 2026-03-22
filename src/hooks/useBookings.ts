@@ -184,11 +184,7 @@ export function usePublicBookingData(handle: string | undefined) {
       // Fire all queries in parallel
       const [servicesResult, availabilityResult, bookingsResult] = await Promise.all([
         supabase
-          .from("booking_services")
-          .select("id, name, description, duration_min, price")
-          .eq("user_id", profile.id)
-          .eq("active", true)
-          .order("name"),
+          .rpc("get_services_by_handle", { p_handle: handle! }),
         supabase
           .from("availability_rules")
           .select("day_of_week, start_time, end_time, buffer_min")
