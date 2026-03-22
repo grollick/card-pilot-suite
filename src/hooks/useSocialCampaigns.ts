@@ -35,13 +35,13 @@ export function useCreateCampaign() {
   const { user } = useAuth();
   return useMutation({
     mutationFn: async (campaign: { name: string; description?: string; color?: string }) => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("social_campaigns")
-        .insert({ ...campaign, user_id: user!.id })
+        .insert({ ...campaign, user_id: user!.id } as any)
         .select()
         .single();
       if (error) throw error;
-      return data as SocialCampaign;
+      return data as unknown as SocialCampaign;
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: KEY }),
   });
