@@ -23,11 +23,18 @@ import { useAdminGrowthStats } from "@/hooks/useAdminGrowthStats";
 
 
 // ─── Metric Card ───
-function MetricCard({ icon: Icon, label, value, sub, color = "text-primary", loading }: {
-  icon: any; label: string; value: string | number; sub?: string; color?: string; loading: boolean;
+function MetricCard({ icon: Icon, label, value, sub, color = "text-primary", loading, href }: {
+  icon: any; label: string; value: string | number; sub?: string; color?: string; loading: boolean; href?: string;
 }) {
+  const navigate = useNavigate();
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
+    <div
+      className={`rounded-xl border border-border bg-card p-4 transition-all ${href ? "cursor-pointer hover:border-primary/30 hover:shadow-md active:scale-[0.98]" : ""}`}
+      onClick={href ? () => navigate(href) : undefined}
+      role={href ? "button" : undefined}
+      tabIndex={href ? 0 : undefined}
+      onKeyDown={href ? (e) => { if (e.key === "Enter") navigate(href); } : undefined}
+    >
       <div className="flex items-center gap-2 mb-2">
         <div className="h-8 w-8 rounded-lg bg-muted/60 flex items-center justify-center">
           <Icon className={`h-4 w-4 ${color}`} />
