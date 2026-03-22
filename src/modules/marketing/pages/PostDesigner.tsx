@@ -193,6 +193,7 @@ export default function PostDesigner() {
             onSelect={setSelectedId}
             onMoveElement={moveElement}
             onResizeElement={resizeElement}
+            ref={canvasRendererRef}
           />
         </div>
 

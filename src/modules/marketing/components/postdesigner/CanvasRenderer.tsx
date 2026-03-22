@@ -23,6 +23,10 @@ const CanvasRenderer = forwardRef<CanvasRendererHandle, Props>(function CanvasRe
   const [dragging, setDragging] = useState<string | null>(null);
   const dragStart = useRef<{ x: number; y: number; elX: number; elY: number }>({ x: 0, y: 0, elX: 0, elY: 0 });
 
+  useImperativeHandle(ref, () => ({
+    getCanvasElement: () => canvasRef.current,
+  }));
+
   const dim = FORMAT_DIMENSIONS[format];
   const aspect = dim.w / dim.h;
 
@@ -79,7 +83,7 @@ const CanvasRenderer = forwardRef<CanvasRendererHandle, Props>(function CanvasRe
       </div>
     </div>
   );
-}
+});
 
 function CanvasItem({ el, selected, onPointerDown }: {
   el: CanvasElement; selected: boolean; onPointerDown: (e: React.PointerEvent) => void;
