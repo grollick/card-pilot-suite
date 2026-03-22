@@ -10,6 +10,20 @@ const corsHeaders = {
 const RESPONSE_WINDOW_MINUTES = 60;
 const MAX_MATCHES = 3;
 
+function escHtml(s: string): string {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function sanitizePhone(phone: string): string | null {
+  const cleaned = String(phone ?? "").trim();
+  return /^[+\d\s()\-]+$/.test(cleaned) ? cleaned : null;
+}
+
 function calculateLeadQuality(req: any): number {
   let score = 0;
   if (req.requester_name) score += 5;
