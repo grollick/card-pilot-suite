@@ -177,6 +177,27 @@ const PERSONAS: Persona[] = [
       { key: "job-accepted", duration: 1800 },
     ],
   },
+  {
+    name: "Ryan Carter",
+    company: "Carter Auto Group",
+    tagline: "Your dream ride awaits.",
+    city: "Miami, FL",
+    avatarKey: "ryan-avatar",
+    coverKey: "ryan-cover",
+    accentHsl: "215, 80%, 50%",
+    services: [
+      { name: "New Vehicles", price: "From $28K" },
+      { name: "Certified Pre-Owned", price: "From $15K" },
+      { name: "Trade-In Appraisal", price: "Free" },
+    ],
+    cta: "🚗 Book Test Drive",
+    stages: [
+      { key: "idle", duration: 2200 },
+      { key: "tap", duration: 800 },
+      { key: "test-drive-form", duration: 2400 },
+      { key: "test-drive-booked", duration: 2000 },
+    ],
+  },
 ];
 
 /* ── Component ── */
