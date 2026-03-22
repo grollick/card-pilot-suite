@@ -201,8 +201,9 @@ export function usePortalMessages(userId?: string, leadId?: string) {
 export function useSendPortalMessage() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ userId, leadId, message }: { userId: string; leadId: string; message: string }) => {
-      const { error } = await supabase
+    mutationFn: async ({ userId, leadId, message, portalToken }: { userId: string; leadId: string; message: string; portalToken?: string }) => {
+      const client = portalToken ? createPortalClient(portalToken) : supabase;
+      const { error } = await client
         .from("client_portal_messages")
         .insert({ user_id: userId, lead_id: leadId, message, sender: "client" });
       if (error) throw error;
