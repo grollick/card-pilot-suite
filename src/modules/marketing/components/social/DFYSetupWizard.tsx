@@ -103,7 +103,7 @@ export default function DFYSetupWizard({ onComplete, loading }: Props) {
         )}
 
         {step === 1 && (
-          <motion.div key="content" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+          <motion.div key="content" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} style={{ position: "relative" }}>
             <h2 className="text-lg font-bold mb-1">Content Strategy</h2>
             <p className="text-sm text-muted-foreground mb-6">Select the types of content to rotate</p>
             <div className="grid grid-cols-2 gap-3">
