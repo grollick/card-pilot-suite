@@ -149,6 +149,7 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
         content_label: contentLabel || null,
         platform_overrides: finalOverrides,
         approval_status: approvalStatus,
+        media_urls: imageUrl ? [imageUrl] : null,
       };
 
       if (editPost) {

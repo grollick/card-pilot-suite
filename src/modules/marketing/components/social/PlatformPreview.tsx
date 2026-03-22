@@ -139,7 +139,7 @@ export default function PlatformPreview({ platform, content, hashtags, imageUrl 
         <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-medium ${cfg?.color ?? "bg-muted"}`}>{platform}</span>
       </div>
       {platform === "Instagram" && <InstagramPreview content={content} hashtags={hashtags} imageUrl={imageUrl} />}
-      {platform === "Facebook" && <FacebookPreview content={content} />}
+      {platform === "Facebook" && <FacebookPreview content={content} imageUrl={imageUrl} />}
       {platform === "LinkedIn" && <LinkedInPreview content={content} />}
       {(platform === "Twitter" || platform === "X") && <TwitterPreview content={content} />}
       {!["Instagram", "Facebook", "LinkedIn", "Twitter", "X"].includes(platform) && (
