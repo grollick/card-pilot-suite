@@ -229,10 +229,10 @@ ${postsPrompt}`;
         platforms_json: post.platforms || ["Facebook", "Instagram"],
         status: "scheduled",
         approval_status: "pending",
-        campaign_id: campaign_id,
         content_type: post.content_type,
         scheduled_at: scheduledDate.toISOString(),
         platform_overrides: {},
+        content_label: `dfy:${campaign_id}`,
       };
     });
 
