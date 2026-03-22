@@ -105,14 +105,7 @@ export default function ProductTour() {
     <AnimatePresence>
       {isVisible && (
         <div className="pointer-events-none">
-          {/* Overlay */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm pointer-events-auto"
-            onClick={handleSkip}
-          />
+          {/* Non-blocking mode: no full-screen overlay so page interactions stay clickable */}
 
           {/* Tour Card */}
           <motion.div
