@@ -145,6 +145,10 @@ export default function AdminMarketingDashboard() {
         <TabsContent value="ab-tests" className="mt-4">
           <ABTestDashboard />
         </TabsContent>
+
+        <TabsContent value="landing-pages" className="mt-4">
+          <LandingPageManager adminOnly={true} />
+        </TabsContent>
       </Tabs>
     </div>
   );
