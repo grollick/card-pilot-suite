@@ -31,6 +31,8 @@ export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }:
   const { data: posts = [] } = useSocialPosts();
   const { data: campaigns = [] } = useAutoCampaigns();
   const updateCampaign = useUpdateCampaign();
+  const qc = useQueryClient();
+  const [generating, setGenerating] = useState(false);
 
   // Find the DFY campaign
   const dfyCampaign = campaigns.find(c => c.campaign_type === "dfy_marketing");
@@ -49,6 +51,28 @@ export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }:
     const newStatus = isActive ? "paused" : "active";
     await updateCampaign.mutateAsync({ id: dfyCampaign.id, status: newStatus });
     toast.success(isActive ? "Marketing paused" : "Marketing resumed");
+  };
+
+  const handleGeneratePosts = async () => {
+    if (!dfyCampaign) return;
+    setGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-dfy-posts", {
+        body: { campaign_id: dfyCampaign.id, count: dfyCampaign.posts_per_week || 3 },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      toast.success(`${data.posts_generated} posts generated and scheduled! 🎉`);
+      // Refresh posts and campaigns
+      qc.invalidateQueries({ queryKey: ["social-posts"] });
+      qc.invalidateQueries({ queryKey: ["auto-campaigns"] });
+      qc.invalidateQueries({ queryKey: ["dfy-activity-log"] });
+    } catch (e: any) {
+      console.error("Generate error:", e);
+      toast.error(e.message || "Failed to generate posts");
+    } finally {
+      setGenerating(false);
+    }
   };
 
   const stats = [
