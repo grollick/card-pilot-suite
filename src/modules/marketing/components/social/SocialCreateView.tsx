@@ -44,6 +44,7 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
   const createPost = useCreatePost();
   const updatePost = useUpdatePost();
   const { data: campaigns = [] } = useSocialCampaigns();
+  const socialLimits = useSocialPostLimits();
 
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
