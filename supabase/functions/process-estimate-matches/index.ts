@@ -96,6 +96,7 @@ serve(async (req) => {
 
     // 3. Find on-duty users first, then recently active as fallback
     const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
+    const requestCity = (estReq.city || estReq.location || "").toLowerCase().trim();
 
     const { data: dutyUsers } = await supabase
       .from("estimate_duty_status")
@@ -110,25 +111,41 @@ serve(async (req) => {
     const dutyUserIds = eligibleDuty.map((d: any) => d.user_id);
     if (dutyUserIds.length === 0) {
       // Fallback: find marketplace-enabled profiles
-      const { data: fallbackProfiles } = await supabase
+      // If request has a city, only pull profiles from the same area
+      let fallbackQuery = supabase
         .from("profiles")
-        .select("id")
+        .select("id, city, service_area")
         .eq("marketplace_enabled", true)
         .eq("available_for_work", true)
-        .limit(10);
+        .limit(20);
 
-      if (!fallbackProfiles?.length) {
+      const { data: fallbackProfiles } = await fallbackQuery;
+
+      // Filter fallback profiles by location if request specifies a city
+      const locationFiltered = requestCity
+        ? (fallbackProfiles ?? []).filter((p: any) => {
+            const pCity = (p.city || "").toLowerCase();
+            const pArea = (p.service_area || "").toLowerCase();
+            return (
+              pCity.includes(requestCity) ||
+              requestCity.includes(pCity) ||
+              pArea.includes(requestCity)
+            );
+          })
+        : (fallbackProfiles ?? []);
+
+      if (!locationFiltered.length) {
         await supabase
           .from("estimate_requests")
           .update({ status: "no_matches" })
           .eq("id", estimateRequestId);
-        return new Response(JSON.stringify({ matched: 0, reason: "no_available_users" }), {
+        return new Response(JSON.stringify({ matched: 0, reason: requestCity ? "no_available_users_in_area" : "no_available_users" }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
       // Use fallback IDs with empty duty records
-      for (const p of fallbackProfiles) {
+      for (const p of locationFiltered) {
         if (!dutyUserIds.includes(p.id)) {
           dutyUserIds.push(p.id);
           eligibleDuty.push({
@@ -144,7 +161,7 @@ serve(async (req) => {
     // 4. Get profiles for candidates
     const { data: profiles } = await supabase
       .from("profiles")
-      .select("id, name, handle, email, city, plan, avg_response_minutes, professions(name)")
+      .select("id, name, handle, email, city, service_area, plan, avg_response_minutes, professions(name)")
       .in("id", dutyUserIds);
 
     // 5. Get duty services for service matching
@@ -176,9 +193,24 @@ serve(async (req) => {
       perfMap.set(m.user_id, perf);
     });
 
-    // 7. Score candidates
+    // 7. Score candidates — enforce location filter when request has a city
     const dutyMap = new Map(eligibleDuty.map((d: any) => [d.user_id, d]));
-    const scored = (profiles ?? []).map((p: any) => {
+
+    // Helper: check if a professional serves the requested area
+    const isInServiceArea = (p: any): boolean => {
+      if (!requestCity) return true; // No location filter needed
+      const pCity = (p.city || "").toLowerCase();
+      const pArea = (p.service_area || "").toLowerCase();
+      return (
+        pCity.includes(requestCity) ||
+        requestCity.includes(pCity) ||
+        pArea.includes(requestCity)
+      );
+    };
+
+    const scored = (profiles ?? [])
+      .filter((p: any) => isInServiceArea(p)) // HARD FILTER: must be in service area
+      .map((p: any) => {
       let score = 0;
       const duty = dutyMap.get(p.id);
 
@@ -210,11 +242,13 @@ serve(async (req) => {
         }
       }
 
-      // Location match
-      if ((estReq.city || estReq.location) && p.city) {
-        const loc = (estReq.city || estReq.location || "").toLowerCase();
-        if (p.city.toLowerCase().includes(loc) || loc.includes(p.city.toLowerCase())) {
-          score += 25;
+      // Location proximity bonus (exact city match vs service_area match)
+      if (requestCity && p.city) {
+        const pCity = p.city.toLowerCase();
+        if (pCity === requestCity || pCity.includes(requestCity) || requestCity.includes(pCity)) {
+          score += 25; // Exact city match
+        } else {
+          score += 10; // service_area match (already passed hard filter)
         }
       }
 
@@ -229,7 +263,6 @@ serve(async (req) => {
       if (perf && perf.total >= 3) {
         const responseRate = perf.responded / perf.total;
         const winRate = perf.total > 0 ? perf.won / perf.total : 0;
-        // Up to 20 points for response rate, 15 for win rate
         score += Math.round(responseRate * 20);
         score += Math.round(winRate * 15);
       }
