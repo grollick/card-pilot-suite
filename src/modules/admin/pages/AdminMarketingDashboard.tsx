@@ -58,6 +58,7 @@ export default function AdminMarketingDashboard() {
           <TabsTrigger value="playbooks">Playbooks</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="ab-tests">A/B Tests</TabsTrigger>
+          <TabsTrigger value="landing-pages">Landing Pages</TabsTrigger>
         </TabsList>
 
         {/* ── Overview ── */}
