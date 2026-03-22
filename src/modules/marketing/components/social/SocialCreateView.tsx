@@ -330,7 +330,12 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
         <div className="p-4 space-y-4">
           {/* Platforms */}
           <div>
-            <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Platforms</Label>
+            <div className="flex items-center justify-between">
+              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Platforms</Label>
+              {socialLimits.platformsMax !== -1 && (
+                <span className="text-[10px] text-muted-foreground">{selectedPlatforms.length}/{socialLimits.platformsMax}</span>
+              )}
+            </div>
             <div className="flex gap-1.5 mt-2 flex-wrap">
               {PLATFORMS.map(p => (
                 <button
