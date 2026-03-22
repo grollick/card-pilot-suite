@@ -184,6 +184,7 @@ ${postsPrompt}`;
       content: string;
       content_type: string;
       platforms: string[];
+      image_query?: string;
     }> = [];
     try {
       // Extract JSON array from response (handle markdown code blocks)
