@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DFYActivityLog from "./DFYActivityLog";
 import {
   Rocket, Pause, Play, Settings2, BarChart3, Eye, MousePointer,
   Users, CalendarCheck, TrendingUp, Sparkles, Crown, ChevronRight,
@@ -188,6 +189,9 @@ export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }:
           </div>
         </CardContent>
       </Card>
+
+      {/* Activity Log */}
+      <DFYActivityLog />
 
       {/* Content types active */}
       {dfyCampaign && (
