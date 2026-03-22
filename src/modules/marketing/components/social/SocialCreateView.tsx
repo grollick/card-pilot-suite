@@ -197,28 +197,37 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
           <Separator />
 
           <div>
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">AI Tools</h3>
-            <div className="space-y-2">
-              <Button
-                variant={showAiGenerator ? "default" : "outline"}
-                size="sm"
-                className="w-full justify-start gap-2 h-10"
-                onClick={() => { setShowAiGenerator(!showAiGenerator); setShowSpinner(false); }}
-              >
-                <Wand2 className="h-4 w-4" />
-                <span className="text-xs">Generate Post</span>
-              </Button>
-              <Button
-                variant={showSpinner ? "default" : "outline"}
-                size="sm"
-                className="w-full justify-start gap-2 h-10"
-                onClick={() => { setShowSpinner(!showSpinner); setShowAiGenerator(false); }}
-                disabled={!content.trim()}
-              >
-                <RefreshCw className="h-4 w-4" />
-                <span className="text-xs">Spin Content</span>
-              </Button>
-            </div>
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
+              AI Tools
+              {!socialLimits.canUseAI && <ProBadge />}
+            </h3>
+            {socialLimits.canUseAI ? (
+              <div className="space-y-2">
+                <Button
+                  variant={showAiGenerator ? "default" : "outline"}
+                  size="sm"
+                  className="w-full justify-start gap-2 h-10"
+                  onClick={() => { setShowAiGenerator(!showAiGenerator); setShowSpinner(false); }}
+                >
+                  <Wand2 className="h-4 w-4" />
+                  <span className="text-xs">Generate Post</span>
+                </Button>
+                <Button
+                  variant={showSpinner ? "default" : "outline"}
+                  size="sm"
+                  className="w-full justify-start gap-2 h-10"
+                  onClick={() => { setShowSpinner(!showSpinner); setShowAiGenerator(false); }}
+                  disabled={!content.trim()}
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  <span className="text-xs">Spin Content</span>
+                </Button>
+              </div>
+            ) : (
+              <div className="p-3 rounded-lg border border-border bg-muted/30 text-center">
+                <p className="text-[10px] text-muted-foreground">AI post generation, content spinning, and tone control require Pro.</p>
+              </div>
+            )}
           </div>
 
           <Separator />
