@@ -92,7 +92,18 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
     }
   }, [pendingContent, onPendingConsumed]);
 
-  const togglePlatform = (p: string) => setSelectedPlatforms(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p]);
+  const togglePlatform = (p: string) => {
+    if (selectedPlatforms.includes(p)) {
+      setSelectedPlatforms(prev => prev.filter(x => x !== p));
+    } else {
+      // Enforce platform limit
+      if (socialLimits.platformsMax !== -1 && selectedPlatforms.length >= socialLimits.platformsMax) {
+        toast.error(`Your plan allows ${socialLimits.platformsMax} platform${socialLimits.platformsMax === 1 ? "" : "s"}. Upgrade for more.`);
+        return;
+      }
+      setSelectedPlatforms(prev => [...prev, p]);
+    }
+  };
 
   const getContentForPlatform = (platform: string) => platformOverrides[platform]?.content || content;
 
