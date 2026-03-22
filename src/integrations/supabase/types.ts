@@ -1151,13 +1151,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "cards_team_member_id_fkey"
-            columns: ["team_member_id"]
-            isOneToOne: false
-            referencedRelation: "public_profiles"
-            referencedColumns: ["id"]
-          },
         ]
       }
       client_portal_messages: {
@@ -5368,11 +5361,9 @@ export type Database = {
           bio: string | null
           city: string | null
           company: string | null
-          email: string | null
           handle: string | null
           id: string | null
           name: string | null
-          phone: string | null
           service_area: string | null
         }
         Insert: {
@@ -5380,11 +5371,9 @@ export type Database = {
           bio?: string | null
           city?: string | null
           company?: string | null
-          email?: string | null
           handle?: string | null
           id?: string | null
           name?: string | null
-          phone?: string | null
           service_area?: string | null
         }
         Update: {
@@ -5392,11 +5381,9 @@ export type Database = {
           bio?: string | null
           city?: string | null
           company?: string | null
-          email?: string | null
           handle?: string | null
           id?: string | null
           name?: string | null
-          phone?: string | null
           service_area?: string | null
         }
         Relationships: []
@@ -5419,61 +5406,9 @@ export type Database = {
           profession_id: string | null
           service_area: string | null
           style_pack: string | null
-          verification_level:
-            | Database["public"]["Enums"]["verification_level"]
-            | null
+          verification_level: string | null
         }
-        Insert: {
-          available_for_work?: boolean | null
-          avatar_url?: string | null
-          avg_response_minutes?: number | null
-          bio?: string | null
-          city?: string | null
-          company?: string | null
-          featured?: boolean | null
-          featured_until?: string | null
-          handle?: string | null
-          id?: string | null
-          marketplace_enabled?: boolean | null
-          name?: string | null
-          primary_cta?: string | null
-          profession_id?: string | null
-          service_area?: string | null
-          style_pack?: string | null
-          verification_level?:
-            | Database["public"]["Enums"]["verification_level"]
-            | null
-        }
-        Update: {
-          available_for_work?: boolean | null
-          avatar_url?: string | null
-          avg_response_minutes?: number | null
-          bio?: string | null
-          city?: string | null
-          company?: string | null
-          featured?: boolean | null
-          featured_until?: string | null
-          handle?: string | null
-          id?: string | null
-          marketplace_enabled?: boolean | null
-          name?: string | null
-          primary_cta?: string | null
-          profession_id?: string | null
-          service_area?: string | null
-          style_pack?: string | null
-          verification_level?:
-            | Database["public"]["Enums"]["verification_level"]
-            | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_profession_id_fkey"
-            columns: ["profession_id"]
-            isOneToOne: false
-            referencedRelation: "professions"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       public_reviews: {
         Row: {
@@ -5481,12 +5416,7 @@ export type Database = {
           id: string | null
           is_public: boolean | null
           lead_id: string | null
-          owner_response: string | null
-          owner_response_at: string | null
-          project_id: string | null
           rating: number | null
-          reported: boolean | null
-          reported_reason: string | null
           review_text: string | null
           reviewer_name: string | null
           source: string | null
@@ -5497,12 +5427,7 @@ export type Database = {
           id?: string | null
           is_public?: boolean | null
           lead_id?: string | null
-          owner_response?: string | null
-          owner_response_at?: string | null
-          project_id?: string | null
           rating?: number | null
-          reported?: boolean | null
-          reported_reason?: string | null
           review_text?: string | null
           reviewer_name?: string | null
           source?: string | null
@@ -5513,12 +5438,7 @@ export type Database = {
           id?: string | null
           is_public?: boolean | null
           lead_id?: string | null
-          owner_response?: string | null
-          owner_response_at?: string | null
-          project_id?: string | null
           rating?: number | null
-          reported?: boolean | null
-          reported_reason?: string | null
           review_text?: string | null
           reviewer_name?: string | null
           source?: string | null
@@ -5530,13 +5450,6 @@ export type Database = {
             columns: ["lead_id"]
             isOneToOne: false
             referencedRelation: "leads"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reviews_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -5581,6 +5494,28 @@ export type Database = {
       }
       expire_beta_access: { Args: never; Returns: number }
       get_effective_plan: { Args: { p_user_id: string }; Returns: Json }
+      get_public_profiles: {
+        Args: { p_handle?: string }
+        Returns: {
+          available_for_work: boolean
+          avatar_url: string
+          avg_response_minutes: number
+          bio: string
+          city: string
+          company: string
+          featured: boolean
+          featured_until: string
+          handle: string
+          id: string
+          marketplace_enabled: boolean
+          name: string
+          primary_cta: string
+          profession_id: string
+          service_area: string
+          style_pack: string
+          verification_level: string
+        }[]
+      }
       get_services_by_handle: {
         Args: { p_handle: string }
         Returns: {
