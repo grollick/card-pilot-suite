@@ -75,6 +75,9 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
       setPlatformOverrides(editPost.platform_overrides || {});
       setCampaignId(editPost.campaign_id || "");
       setContentLabel(editPost.content_label || "");
+      if (editPost.media_urls && editPost.media_urls.length > 0) {
+        setImageUrl(editPost.media_urls[0]);
+      }
       if (editPost.scheduled_at) {
         const d = new Date(editPost.scheduled_at);
         setScheduledDate(d);
