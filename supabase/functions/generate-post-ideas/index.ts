@@ -144,7 +144,7 @@ For each post, also suggest a specific stock photo search query that would pair 
   } catch (e) {
     console.error("generate-post-ideas error:", e);
     return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

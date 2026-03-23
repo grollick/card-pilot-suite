@@ -140,7 +140,7 @@ Each should be a complete, ready-to-post piece with image suggestions.`;
   } catch (e) {
     console.error("generate-content-feed error:", e);
     return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
+      JSON.stringify({ error: "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
