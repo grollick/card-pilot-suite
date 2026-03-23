@@ -3,10 +3,20 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { clearPointerLocksSoon } from "@/lib/pointerLocks";
 
-const Dialog = ({ modal = false, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Root>) => (
-  <DialogPrimitive.Root modal={modal} {...props} />
-);
+const Dialog = ({ modal = true, onOpenChange, ...props }: React.ComponentPropsWithoutRef<typeof DialogPrimitive.Root>) => {
+  const handleOpenChange = React.useCallback((open: boolean) => {
+    onOpenChange?.(open);
+    if (!open) clearPointerLocksSoon();
+  }, [onOpenChange]);
+
+  React.useEffect(() => {
+    return () => clearPointerLocksSoon();
+  }, []);
+
+  return <DialogPrimitive.Root modal={modal} onOpenChange={handleOpenChange} {...props} />;
+};
 
 const DialogTrigger = DialogPrimitive.Trigger;
 
