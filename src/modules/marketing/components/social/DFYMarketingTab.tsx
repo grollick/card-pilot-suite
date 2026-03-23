@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Rocket, Crown, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
@@ -18,6 +18,22 @@ export default function DFYMarketingTab({ onSwitchToCalendar }: Props) {
   const deleteCampaign = useDeleteCampaign();
   const { planKey } = usePlanLimits();
   const [activating, setActivating] = useState(false);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    const unlockPointerState = () => {
+      document.body.style.pointerEvents = "";
+      document.documentElement.style.pointerEvents = "";
+    };
+
+    unlockPointerState();
+    const raf = typeof window !== "undefined" ? window.requestAnimationFrame(unlockPointerState) : 0;
+
+    return () => {
+      if (typeof window !== "undefined") window.cancelAnimationFrame(raf);
+    };
+  }, [isLoading, campaigns.length]);
 
   const dfyCampaign = campaigns.find(c => c.campaign_type === "dfy_marketing");
   const isSetUp = !!dfyCampaign;
