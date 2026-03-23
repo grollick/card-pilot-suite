@@ -253,6 +253,21 @@ export default function ExpensesPage() {
                 <div><Label>Vendor</Label><Input value={form.vendor} onChange={(e) => setForm({ ...form, vendor: e.target.value })} placeholder="Store name..." /></div>
               </div>
               <div><Label>Notes</Label><Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Optional notes..." /></div>
+              {/* Tie to Job */}
+              <div>
+                <Label>Tie to Job</Label>
+                <Select value={form.job_id} onValueChange={(v) => setForm({ ...form, job_id: v === "none" ? "" : v })}>
+                  <SelectTrigger><SelectValue placeholder="No job selected" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No job</SelectItem>
+                    {jobs.map((job: any) => (
+                      <SelectItem key={job.id} value={job.id}>
+                        {job.job_number || "Job"} — {job.title || job.leads?.name || "Untitled"}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="flex items-center gap-2">
                 <Switch checked={form.is_billable} onCheckedChange={(v) => setForm({ ...form, is_billable: v })} />
                 <Label>Billable to client</Label>
