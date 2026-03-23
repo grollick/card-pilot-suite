@@ -66,7 +66,7 @@ export default function ExpensesPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Receipt className="h-6 w-6 text-primary" /> <span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal">Expense Tracker</span>
+            <Receipt className="h-6 w-6 text-primary" /> <span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Expense Tracker</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">Track costs, maximize profits</p>
         </div>
