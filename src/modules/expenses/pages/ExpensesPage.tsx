@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { useExpenses, useCreateExpense, useDeleteExpense, useExpenseSummary, EXPENSE_CATEGORIES } from "@/hooks/useExpenses";
+import { useJobs } from "@/hooks/useJobs";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -21,6 +22,7 @@ export default function ExpensesPage() {
   const deleteExpense = useDeleteExpense();
   const summary = useExpenseSummary();
   const { user } = useAuth();
+  const { data: jobs = [] } = useJobs();
   const [open, setOpen] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
@@ -35,10 +37,11 @@ export default function ExpensesPage() {
     date: new Date().toISOString().split("T")[0],
     is_billable: true,
     notes: "",
+    job_id: "",
   });
 
   const resetForm = () => {
-    setForm({ description: "", amount: "", category: "materials", vendor: "", date: new Date().toISOString().split("T")[0], is_billable: true, notes: "" });
+    setForm({ description: "", amount: "", category: "materials", vendor: "", date: new Date().toISOString().split("T")[0], is_billable: true, notes: "", job_id: "" });
     setReceiptPreview(null);
     setReceiptFile(null);
   };
@@ -129,6 +132,7 @@ export default function ExpensesPage() {
         is_billable: form.is_billable,
         notes: form.notes || null,
         receipt_url: receiptUrl,
+        job_id: form.job_id || null,
       },
       {
         onSuccess: () => {
@@ -249,6 +253,21 @@ export default function ExpensesPage() {
                 <div><Label>Vendor</Label><Input value={form.vendor} onChange={(e) => setForm({ ...form, vendor: e.target.value })} placeholder="Store name..." /></div>
               </div>
               <div><Label>Notes</Label><Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="Optional notes..." /></div>
+              {/* Tie to Job */}
+              <div>
+                <Label>Tie to Job</Label>
+                <Select value={form.job_id} onValueChange={(v) => setForm({ ...form, job_id: v === "none" ? "" : v })}>
+                  <SelectTrigger><SelectValue placeholder="No job selected" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No job</SelectItem>
+                    {jobs.map((job: any) => (
+                      <SelectItem key={job.id} value={job.id}>
+                        {job.job_number || "Job"} — {job.title || job.leads?.name || "Untitled"}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="flex items-center gap-2">
                 <Switch checked={form.is_billable} onCheckedChange={(v) => setForm({ ...form, is_billable: v })} />
                 <Label>Billable to client</Label>
