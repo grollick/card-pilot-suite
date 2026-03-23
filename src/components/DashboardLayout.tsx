@@ -3,6 +3,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { Outlet } from "react-router-dom";
 import TopBar from "@/components/TopBar";
 import ProductTour from "@/components/ProductTour";
+import FirstFiveMinutes from "@/components/FirstFiveMinutes";
 import FloatingHelpButton from "@/components/FloatingHelpButton";
 import UpgradeTriggers from "@/components/UpgradeTriggers";
 import BetaStatusBanner from "@/components/BetaStatusBanner";
