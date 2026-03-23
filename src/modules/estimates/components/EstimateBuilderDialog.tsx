@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import { Plus, Trash2, Loader2, Download, ChevronDown, ChevronRight, Calculator, Bookmark, Sparkles } from "lucide-react";
 import EstimateAssistantSheet from "./EstimateAssistantSheet";
+import EstimatePhotoUpload from "./EstimatePhotoUpload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -244,6 +245,10 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
 
               <div><Label className="text-xs text-muted-foreground">Scope of Work</Label><Textarea value={scope} onChange={e => setScope(e.target.value)} rows={2} placeholder="Describe the work…" /></div>
 
+              {isEdit && editId && (
+                <EstimatePhotoUpload estimateId={editId} />
+              )}
+
               <Separator />
 
               <div>
@@ -256,7 +261,7 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
                     <SectionBlock key={section._tempId ?? si} section={section} sectionIdx={si} canRemove={sections.length > 1}
                       onUpdateField={updateSectionField} onRemoveSection={() => removeSection(si)}
                       onUpdateLineItem={updateLineItem} onAddLineItem={() => addLineItem(si)}
-                      onRemoveLineItem={(ii) => removeLineItem(si, ii)} presets={allPresets} />
+                      onRemoveLineItem={(ii) => removeLineItem(si, ii)} presets={allPresets} estimateId={isEdit ? editId : undefined} />
                   ))}
                 </div>
               </div>
@@ -334,11 +339,11 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
   );
 }
 
-function SectionBlock({ section, sectionIdx, canRemove, onUpdateField, onRemoveSection, onUpdateLineItem, onAddLineItem, onRemoveLineItem, presets }: {
+function SectionBlock({ section, sectionIdx, canRemove, onUpdateField, onRemoveSection, onUpdateLineItem, onAddLineItem, onRemoveLineItem, presets, estimateId }: {
   section: EstimateSection; sectionIdx: number; canRemove: boolean;
   onUpdateField: (idx: number, field: string, value: string) => void; onRemoveSection: () => void;
   onUpdateLineItem: (si: number, ii: number, field: string, value: any) => void;
-  onAddLineItem: () => void; onRemoveLineItem: (ii: number) => void; presets: any[];
+  onAddLineItem: () => void; onRemoveLineItem: (ii: number) => void; presets: any[]; estimateId?: string;
 }) {
   const [open, setOpen] = useState(true);
   const sectionTotal = section.items.reduce((sum, li) => sum + (li.is_optional ? 0 : li.line_total), 0);
@@ -361,7 +366,7 @@ function SectionBlock({ section, sectionIdx, canRemove, onUpdateField, onRemoveS
           <div className="px-3 pb-3 space-y-2">
             <Input value={section.notes ?? ""} onChange={e => onUpdateField(sectionIdx, "notes", e.target.value)} placeholder="Section notes (optional)" className="h-7 text-xs" />
             {section.items.map((item, ii) => (
-              <LineItemRow key={ii} item={item} onUpdate={(field, value) => onUpdateLineItem(sectionIdx, ii, field, value)} onRemove={() => onRemoveLineItem(ii)} canRemove={section.items.length > 1} presets={presets} />
+              <LineItemRow key={ii} item={item} onUpdate={(field, value) => onUpdateLineItem(sectionIdx, ii, field, value)} onRemove={() => onRemoveLineItem(ii)} canRemove={section.items.length > 1} presets={presets} estimateId={estimateId} />
             ))}
             <Button variant="ghost" size="sm" onClick={onAddLineItem} className="text-xs gap-1"><Plus className="h-3 w-3" /> Add Item</Button>
           </div>
@@ -371,8 +376,8 @@ function SectionBlock({ section, sectionIdx, canRemove, onUpdateField, onRemoveS
   );
 }
 
-function LineItemRow({ item, onUpdate, onRemove, canRemove, presets }: {
-  item: EstimateLineItem; onUpdate: (field: string, value: any) => void; onRemove: () => void; canRemove: boolean; presets: any[];
+function LineItemRow({ item, onUpdate, onRemove, canRemove, presets, estimateId }: {
+  item: EstimateLineItem; onUpdate: (field: string, value: any) => void; onRemove: () => void; canRemove: boolean; presets: any[]; estimateId?: string;
 }) {
   const dimFields = dimensionFieldsForMode(item.calc_mode);
   return (
@@ -403,6 +408,9 @@ function LineItemRow({ item, onUpdate, onRemove, canRemove, presets }: {
         <div><Label className="text-[10px] text-muted-foreground">Tax %</Label><div className="flex gap-0.5"><Input type="number" value={item.tax_percent} onChange={e => onUpdate("tax_percent", +e.target.value)} min={0} className="h-7 text-xs" /><PresetButton presets={presets} type="tax" onSelect={v => onUpdate("tax_percent", v)} /></div></div>
         <div><Label className="text-[10px] text-muted-foreground">Total</Label><Input value={`$${item.line_total.toFixed(2)}`} readOnly className="h-7 text-xs bg-muted/40 tabular-nums font-medium" /></div>
       </div>
+      {estimateId && item.id && (
+        <EstimatePhotoUpload estimateId={estimateId} lineItemId={item.id} compact />
+      )}
     </div>
   );
 }

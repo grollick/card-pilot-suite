@@ -2039,6 +2039,57 @@ export type Database = {
           },
         ]
       }
+      estimate_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          estimate_id: string
+          file_name: string
+          file_path: string
+          id: string
+          line_item_id: string | null
+          sort_order: number | null
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          estimate_id: string
+          file_name: string
+          file_path: string
+          id?: string
+          line_item_id?: string | null
+          sort_order?: number | null
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          estimate_id?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          line_item_id?: string | null
+          sort_order?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estimate_photos_estimate_id_fkey"
+            columns: ["estimate_id"]
+            isOneToOne: false
+            referencedRelation: "estimates"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "estimate_photos_line_item_id_fkey"
+            columns: ["line_item_id"]
+            isOneToOne: false
+            referencedRelation: "estimate_line_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       estimate_presets: {
         Row: {
           created_at: string
