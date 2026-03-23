@@ -196,7 +196,7 @@ export default function SalesCrmPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold tracking-tight">Sales Pipeline</h1>
+        <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Sales Pipeline</span></h1>
         <div className="flex justify-center py-12">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
@@ -208,7 +208,7 @@ export default function SalesCrmPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Sales Pipeline</h1>
+          <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Sales Pipeline</span></h1>
           <p className="text-muted-foreground text-sm mt-1">
             Track outreach, conversions, and upsells
           </p>

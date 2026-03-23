@@ -80,7 +80,7 @@ export default function PipelinePage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div><h1 className="text-2xl font-bold tracking-tight">Pipeline</h1></div>
+        <div><h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Pipeline</span></h1>
         <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
       </div>
     );
@@ -90,7 +90,7 @@ export default function PipelinePage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Pipeline</h1>
+          <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Pipeline</span></h1>
           <p className="text-muted-foreground text-sm mt-1">Drag contacts between stages</p>
         </div>
         <Button className="shadow-glow" onClick={() => navigate("/app/contacts")}>

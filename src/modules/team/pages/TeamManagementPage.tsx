@@ -75,7 +75,7 @@ export default function TeamManagementPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Users className="h-6 w-6 text-primary" /> Team
+            <Users className="h-6 w-6 text-primary" /> <span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Team</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             {currentOrg.name} · {teamMembers.length} member{teamMembers.length !== 1 ? "s" : ""}

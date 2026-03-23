@@ -85,7 +85,7 @@ export default function JobsPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Jobs</h1>
+          <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Jobs</span></h1>
           <p className="text-muted-foreground text-sm mt-1">Manage and track your active jobs</p>
         </div>
         <div className="flex gap-2">
