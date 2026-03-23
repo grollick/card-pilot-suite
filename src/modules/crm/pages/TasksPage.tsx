@@ -101,7 +101,7 @@ export default function TasksPage() {
     <div className="space-y-6 max-w-3xl">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Tasks</h1>
+          <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Tasks</span></h1>
           <p className="text-muted-foreground text-sm mt-1">{openCount} open · {overdueCount > 0 && <span className="text-destructive">{overdueCount} overdue · </span>}{doneCount} done</p>
         </div>
         <Dialog open={newOpen} onOpenChange={setNewOpen}>

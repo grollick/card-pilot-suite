@@ -71,7 +71,7 @@ export default function MarketplacePerformancePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Marketplace Performance</h1>
+          <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Marketplace Performance</span></h1>
           <p className="text-muted-foreground text-sm">See how your marketplace presence generates views, leads, and bookings.</p>
         </div>
         <div className="flex items-center gap-2">

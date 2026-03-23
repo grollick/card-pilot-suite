@@ -164,7 +164,7 @@ export default function BookingManager() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold tracking-tight">Booking</h1>
+        <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Booking</span></h1>
         <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
       </div>
     );
@@ -180,7 +180,7 @@ export default function BookingManager() {
       />
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Booking</h1>
+          <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Booking</span></h1>
           <p className="text-muted-foreground text-sm mt-1">
             {bookings.length} total bookings · {services.filter((s) => s.active).length} active services
           </p>

@@ -93,7 +93,7 @@ export default function InvoicesPage() {
         className="flex items-center justify-between flex-wrap gap-3"
       >
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Invoices</h1>
+          <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Invoices</span></h1>
           <p className="text-muted-foreground text-sm mt-1">
             Manage billing and track payments
           </p>
