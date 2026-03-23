@@ -87,7 +87,7 @@ export default function AutopilotPage() {
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <Bot className="h-6 w-6 text-primary" />
-              <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">AI Autopilot</span></h1>
+              <h1 className="text-3xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">AI Autopilot</span></h1>
               {isEnabled && (
                 <Badge variant="default" className="bg-success text-success-foreground text-[10px] uppercase tracking-wider">
                   Active

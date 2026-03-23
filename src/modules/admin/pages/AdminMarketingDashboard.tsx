@@ -49,7 +49,7 @@ export default function AdminMarketingDashboard() {
         <div className="flex items-center gap-2">
           <Megaphone className="h-5 w-5 text-primary" />
           <div>
-            <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Admin Marketing</span></h1>
+            <h1 className="text-3xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Admin Marketing</span></h1>
             <p className="text-muted-foreground text-sm mt-1">Manage campaigns, templates, and user growth</p>
           </div>
         </div>
