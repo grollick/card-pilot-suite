@@ -45,7 +45,7 @@ export default function IndustryLandingPage() {
         {/* ── Nav ── */}
         <nav className="border-b border-border/40 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-            <Link to="/" className="text-lg font-bold text-primary"><span className="font-extrabold text-primary">guzzl</span>.pro</Link>
+            <Link to="/" className="text-lg font-bold text-primary"><span className="font-black text-primary">guzzl</span>.pro</Link>
             <div className="flex items-center gap-3">
               <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline">Pricing</Link>
               <Button asChild size="sm">
@@ -452,7 +452,7 @@ export default function IndustryLandingPage() {
         <footer className="border-t border-border/40 py-8 text-center">
           <p className="text-xs text-muted-foreground">
             {page.footerNote && <span className="block mb-1">{page.footerNote}</span>}
-            © {new Date().getFullYear()} <Link to="/" className="text-primary hover:underline"><span className="font-extrabold text-primary">guzzl</span>.pro</Link> — The smart business card platform for local professionals.
+            © {new Date().getFullYear()} <Link to="/" className="text-primary hover:underline"><span className="font-black text-primary">guzzl</span>.pro</Link> — The smart business card platform for local professionals.
           </p>
         </footer>
       </div>

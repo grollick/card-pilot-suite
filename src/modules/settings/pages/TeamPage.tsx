@@ -60,7 +60,7 @@ export default function TeamPage() {
         <div className="flex items-center gap-2">
           <Building2 className="h-5 w-5 text-primary" />
           <div>
-            <h1 className="text-3xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Team & Organization</span></h1>
+            <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary">guzzl</span> <span className="font-normal">Team & Organization</span></h1>
             <p className="text-muted-foreground text-sm mt-1">Manage your team and organization settings</p>
           </div>
         </div>

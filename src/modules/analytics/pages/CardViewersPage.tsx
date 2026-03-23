@@ -50,7 +50,7 @@ export default function CardViewersPage() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
               <Eye className="h-6 w-6 text-primary" />
-              <span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Card Viewers</span>
+              <span className="font-black text-primary">guzzl</span> <span className="font-normal">Card Viewers</span>
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
               Real-time visitor tracking with device & location data.
