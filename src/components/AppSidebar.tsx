@@ -182,7 +182,7 @@ export function AppSidebar() {
           <CollapsibleTrigger asChild>
             <SidebarGroupLabel className="h-8 text-[11px] uppercase tracking-wider px-3 cursor-pointer hover:bg-muted/30 rounded-md flex items-center gap-2 font-semibold text-muted-foreground/70 transition-colors select-none mb-0.5">
               <Icon className={`h-3.5 w-3.5 shrink-0 ${active ? "text-primary" : "text-muted-foreground/50"}`} />
-              <span className={`flex-1 ${active ? "text-primary/80" : ""}`}><span className="font-extrabold text-primary normal-case">guzzl</span> {label}</span>
+              <span className={`flex-1 ${active ? "text-primary/80" : ""}`}>{label}</span>
               <ChevronRight className="h-3 w-3 text-muted-foreground/40 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
             </SidebarGroupLabel>
           </CollapsibleTrigger>
