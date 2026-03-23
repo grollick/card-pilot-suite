@@ -186,7 +186,7 @@ export default function SecondSessionBanner() {
             {/* Missed Opportunities (FOMO) */}
             {stats.missedOpportunities > 0 && stats.pendingOpportunities === 0 && (
               <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border border-border">
-                <AlertTriangle className="h-3.5 w-3.5 text-yellow-500 shrink-0" />
+                <AlertTriangle className="h-3.5 w-3.5 text-destructive/70 shrink-0" />
                 <p className="text-xs text-muted-foreground">
                   You missed {stats.missedOpportunities} {stats.missedOpportunities === 1 ? "opportunity" : "opportunities"} — stay on duty to catch the next one.
                 </p>

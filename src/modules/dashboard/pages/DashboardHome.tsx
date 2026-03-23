@@ -18,6 +18,7 @@ import AIBusinessCoachWidget from "@/modules/dashboard/components/AIBusinessCoac
 import AIBusinessAssistant from "@/modules/dashboard/components/AIBusinessAssistant";
 import FirstLeadGuaranteeWidget from "@/modules/dashboard/components/FirstLeadGuaranteeWidget";
 import DailyNotesWidget from "@/modules/dashboard/components/DailyNotesWidget";
+import SecondSessionBanner from "@/modules/dashboard/components/SecondSessionBanner";
 import {
   Pencil, UserPlus, CalendarPlus, ExternalLink,
   Zap, Sparkles, Bell, Store, Globe,
