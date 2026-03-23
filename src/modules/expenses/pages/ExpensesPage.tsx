@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { useExpenses, useCreateExpense, useDeleteExpense, useExpenseSummary, EXPENSE_CATEGORIES } from "@/hooks/useExpenses";
+import { useJobs } from "@/hooks/useJobs";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
