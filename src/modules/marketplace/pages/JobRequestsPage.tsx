@@ -76,7 +76,7 @@ export default function JobRequestsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <Briefcase className="h-6 w-6 text-primary" /> <span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Job Requests</span>
+          <Briefcase className="h-6 w-6 text-primary" /> <span className="font-black text-primary">guzzl</span> <span className="font-normal">Job Requests</span>
         </h1>
         <p className="text-muted-foreground text-sm mt-1">Service requests from customers looking for your expertise.</p>
       </div>

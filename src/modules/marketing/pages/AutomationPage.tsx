@@ -111,7 +111,7 @@ export default function AutomationPage() {
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Automations</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary">guzzl</span> <span className="font-normal">Automations</span></h1>
           <p className="text-muted-foreground text-sm mt-1">Set triggers to automate follow-ups, emails, and tasks</p>
         </div>
         <Button className="shadow-glow" onClick={() => { resetForm(); setOpen(true); }}>

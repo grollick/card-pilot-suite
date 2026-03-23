@@ -82,7 +82,7 @@ export default function PromotionsPage() {
     <div className="space-y-6 max-w-3xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Promotions & Offers</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary">guzzl</span> <span className="font-normal">Promotions & Offers</span></h1>
           <p className="text-muted-foreground text-sm mt-1">Create time-limited offers that appear on your public card</p>
         </div>
         <Button onClick={() => setShowForm(true)} className="shadow-glow gap-1.5">

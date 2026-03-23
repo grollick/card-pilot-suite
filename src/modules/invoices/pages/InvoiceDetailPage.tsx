@@ -200,7 +200,7 @@ export default function InvoiceDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-             <h1 className="text-xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">{isNew ? "New Invoice" : invoice?.invoice_number}</span></h1>
+             <h1 className="text-xl font-bold tracking-tight"><span className="font-black text-primary">guzzl</span> <span className="font-normal">{isNew ? "New Invoice" : invoice?.invoice_number}</span></h1>
             {!isNew && invoice && (
               <DocumentStatusBadge status={invoice.status} size="sm" />
             )}

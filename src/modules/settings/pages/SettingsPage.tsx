@@ -98,7 +98,7 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Settings</span></h1>
+        <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary">guzzl</span> <span className="font-normal">Settings</span></h1>
         <p className="text-muted-foreground text-sm mt-1">Manage your account and preferences</p>
       </div>
 

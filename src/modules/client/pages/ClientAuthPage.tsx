@@ -107,7 +107,7 @@ export default function ClientAuthPage() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-4">
-          Powered by <span className="font-medium text-foreground"><span className="font-extrabold text-primary">guzzl</span>.pro</span>
+          Powered by <span className="font-medium text-foreground"><span className="font-black text-primary">guzzl</span>.pro</span>
         </p>
       </motion.div>
     </div>

@@ -124,7 +124,7 @@ export default function InstantCardPage() {
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold">
-            <span className="font-extrabold text-primary">guzzl</span>
+            <span className="font-black text-primary">guzzl</span>
             <span className="text-foreground">.pro</span>
           </h1>
         </div>
