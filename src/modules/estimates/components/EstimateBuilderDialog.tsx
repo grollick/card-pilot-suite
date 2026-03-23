@@ -261,7 +261,7 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
                     <SectionBlock key={section._tempId ?? si} section={section} sectionIdx={si} canRemove={sections.length > 1}
                       onUpdateField={updateSectionField} onRemoveSection={() => removeSection(si)}
                       onUpdateLineItem={updateLineItem} onAddLineItem={() => addLineItem(si)}
-                      onRemoveLineItem={(ii) => removeLineItem(si, ii)} presets={allPresets} />
+                      onRemoveLineItem={(ii) => removeLineItem(si, ii)} presets={allPresets} estimateId={isEdit ? editId : undefined} />
                   ))}
                 </div>
               </div>
