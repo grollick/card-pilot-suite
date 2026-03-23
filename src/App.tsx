@@ -13,6 +13,7 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import { useIsAdmin } from "@/hooks/useAdminStats";
 import { Loader2 } from "lucide-react";
 import AdminScreenshotTool from "@/components/AdminScreenshotTool";
+import PointerEventsRecovery from "@/components/PointerEventsRecovery";
 
 // ── Public routes — most eagerly loaded for fast render ──
 import LegalPage from "@/modules/public/pages/LegalPage";
@@ -202,6 +203,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <PointerEventsRecovery />
         <AuthProvider>
           <OrgProvider>
           <Routes>
