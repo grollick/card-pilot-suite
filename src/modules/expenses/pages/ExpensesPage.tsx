@@ -22,6 +22,7 @@ export default function ExpensesPage() {
   const deleteExpense = useDeleteExpense();
   const summary = useExpenseSummary();
   const { user } = useAuth();
+  const { data: jobs = [] } = useJobs();
   const [open, setOpen] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
