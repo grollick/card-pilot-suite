@@ -6,6 +6,7 @@ import { subDays, format, eachDayOfInterval, startOfMonth, endOfMonth, subMonths
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function useRevenueData(months = 3) {
   return useQuery({
@@ -73,6 +74,7 @@ function useRevenueData(months = 3) {
 const anim = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 } };
 
 export default function RevenueForecast() {
+  const navigate = useNavigate();
   const [period, setPeriod] = useState("6");
   const { data, isLoading } = useRevenueData(parseInt(period));
 
@@ -100,13 +102,20 @@ export default function RevenueForecast() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Leads This Month", value: data?.thisMonth.leads ?? 0, icon: Users, color: "text-primary bg-primary/10" },
-          { label: "Bookings This Month", value: data?.thisMonth.bookings ?? 0, icon: Calendar, color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10" },
-          { label: "Conversion Rate", value: `${data?.conversionRate ?? 0}%`, icon: TrendingUp, color: "text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10" },
-          { label: "Projected Revenue", value: `$${(data?.projectedRevenue ?? 0).toLocaleString()}`, icon: DollarSign, color: "text-accent-foreground bg-accent" },
+          { label: "Leads This Month", value: data?.thisMonth.leads ?? 0, icon: Users, color: "text-primary bg-primary/10", route: "/app/contacts" },
+          { label: "Bookings This Month", value: data?.thisMonth.bookings ?? 0, icon: Calendar, color: "text-success bg-success/10", route: "/app/bookings" },
+          { label: "Conversion Rate", value: `${data?.conversionRate ?? 0}%`, icon: TrendingUp, color: "text-warning bg-warning/10", route: "/app/analytics" },
+          { label: "Projected Revenue", value: `$${(data?.projectedRevenue ?? 0).toLocaleString()}`, icon: DollarSign, color: "text-accent-foreground bg-accent", route: "/app/invoices" },
         ].map((kpi, i) => (
-          <motion.div key={kpi.label} {...anim} transition={{ delay: i * 0.05 }}
-            className="rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-card-hover transition-shadow">
+          <motion.button
+            key={kpi.label}
+            type="button"
+            {...anim}
+            transition={{ delay: i * 0.05 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => navigate(kpi.route)}
+            className="rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-card-hover transition-all text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
             <div className="flex items-start justify-between">
               <div className="space-y-1.5">
                 <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">{kpi.label}</p>
@@ -118,7 +127,7 @@ export default function RevenueForecast() {
                 <kpi.icon className="h-5 w-5" />
               </div>
             </div>
-          </motion.div>
+          </motion.button>
         ))}
       </div>
 
