@@ -25,6 +25,7 @@ export default function DashboardLayout() {
           </PullToRefresh>
         </div>
       </div>
+      <FirstFiveMinutes />
       <ProductTour />
       <FloatingHelpButton />
       <UpgradeTriggers />
