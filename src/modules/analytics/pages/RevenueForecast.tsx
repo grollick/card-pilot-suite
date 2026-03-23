@@ -144,7 +144,12 @@ export default function RevenueForecast() {
           ) : (
             <div className="space-y-3">
               {(data?.monthlyData ?? []).map(m => (
-                <div key={m.month}>
+                <button
+                  key={m.month}
+                  type="button"
+                  onClick={() => navigate("/app/invoices")}
+                  className="w-full text-left rounded-lg p-2 -m-2 cursor-pointer transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
                   <div className="flex items-center justify-between text-sm mb-1">
                     <span className="font-medium">{m.month}</span>
                     <span className="text-muted-foreground">${m.revenue.toLocaleString()}</span>
@@ -157,7 +162,7 @@ export default function RevenueForecast() {
                       transition={{ duration: 0.6, ease: "easeOut" }}
                     />
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           )}
@@ -172,11 +177,16 @@ export default function RevenueForecast() {
           ) : (
             <div className="space-y-4">
               {[
-                { label: "Total Leads", value: data?.totalLeads ?? 0, width: "100%" },
-                { label: "Total Bookings", value: data?.totalBookings ?? 0, width: `${((data?.totalBookings ?? 0) / Math.max(data?.totalLeads ?? 1, 1)) * 100}%` },
-                { label: "Total Revenue", value: `$${(data?.totalRevenue ?? 0).toLocaleString()}`, width: `${Math.min(((data?.totalBookings ?? 0) / Math.max(data?.totalLeads ?? 1, 1)) * 100, 100)}%` },
+                { label: "Total Leads", value: data?.totalLeads ?? 0, width: "100%", route: "/app/contacts" },
+                { label: "Total Bookings", value: data?.totalBookings ?? 0, width: `${((data?.totalBookings ?? 0) / Math.max(data?.totalLeads ?? 1, 1)) * 100}%`, route: "/app/bookings" },
+                { label: "Total Revenue", value: `$${(data?.totalRevenue ?? 0).toLocaleString()}`, width: `${Math.min(((data?.totalBookings ?? 0) / Math.max(data?.totalLeads ?? 1, 1)) * 100, 100)}%`, route: "/app/invoices" },
               ].map((item, i) => (
-                <div key={item.label}>
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => navigate(item.route)}
+                  className="w-full text-left rounded-lg p-2 -m-2 cursor-pointer transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
                   <div className="flex items-center justify-between text-sm mb-1.5">
                     <span className="text-muted-foreground">{item.label}</span>
                     <span className="font-semibold">{item.value}</span>
@@ -189,13 +199,17 @@ export default function RevenueForecast() {
                       transition={{ duration: 0.8, delay: i * 0.1 }}
                     />
                   </div>
-                </div>
+                </button>
               ))}
               {(data?.conversionRate ?? 0) > 0 && (
-                <div className="text-center pt-2">
+                <button
+                  type="button"
+                  onClick={() => navigate("/app/analytics")}
+                  className="w-full text-center pt-2 rounded-lg cursor-pointer transition-colors hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
                   <p className="text-3xl font-bold text-primary">{data?.conversionRate}%</p>
                   <p className="text-xs text-muted-foreground mt-1">Lead → Booking Rate</p>
-                </div>
+                </button>
               )}
             </div>
           )}
@@ -219,7 +233,19 @@ export default function RevenueForecast() {
             </thead>
             <tbody>
               {(data?.monthlyData ?? []).map(m => (
-                <tr key={m.month} className="border-b border-border/50 hover:bg-muted/30">
+                <tr
+                  key={m.month}
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => navigate("/app/analytics")}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      navigate("/app/analytics");
+                    }
+                  }}
+                  className="border-b border-border/50 hover:bg-muted/30 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
                   <td className="p-2 font-medium">{m.month}</td>
                   <td className="p-2 text-right">{m.leads}</td>
                   <td className="p-2 text-right">{m.bookings}</td>
