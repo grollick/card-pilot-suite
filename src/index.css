@@ -423,3 +423,10 @@
     transform: translateY(0);
   }
 }
+
+/* Global safety net: prevent stale body/html pointer locks from freezing the UI */
+html,
+body,
+#root {
+  pointer-events: auto !important;
+}
