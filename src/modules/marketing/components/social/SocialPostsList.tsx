@@ -8,7 +8,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import EmptyState from "@/components/EmptyState";
-import { useSocialPosts, useDeletePost, useBulkDeletePosts, useBulkUpdatePosts } from "@/hooks/useSocialPosts";
+import { useSocialPosts, useDeletePost, useBulkDeletePosts, useBulkUpdatePosts, useCreatePost } from "@/hooks/useSocialPosts";
 import type { SocialPost } from "@/hooks/useSocialPosts";
 import { getPlatformConfig, getStatusConfig, POST_STATUSES, CONTENT_LABELS, deriveDbStatus } from "./constants";
 import type { PostStatus } from "./constants";
@@ -21,6 +21,7 @@ interface Props {
 export default function SocialPostsList({ onEdit, onViewDetail }: Props) {
   const { data: posts = [], isLoading } = useSocialPosts();
   const deletePost = useDeletePost();
+  const createPost = useCreatePost();
   const bulkDelete = useBulkDeletePosts();
   const bulkUpdate = useBulkUpdatePosts();
   const [statusFilter, setStatusFilter] = useState("all");
@@ -151,7 +152,30 @@ export default function SocialPostsList({ onEdit, onViewDetail }: Props) {
                     <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onEdit(post); }}>
                       <Edit2 className="h-3.5 w-3.5 mr-2" /> Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenuItem
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        try {
+                          await createPost.mutateAsync({
+                            content: post.content,
+                            platforms_json: (post.platforms_json as any) || [],
+                            scheduled_at: null,
+                            status: "draft",
+                            approval_status: "draft",
+                            media_urls: post.media_urls,
+                            org_id: post.org_id,
+                            lead_id: post.lead_id,
+                            campaign_id: post.campaign_id,
+                            content_label: post.content_label,
+                            platform_overrides: post.platform_overrides as any,
+                            queue_position: null,
+                          });
+                          toast.success("Post duplicated");
+                        } catch (err: any) {
+                          toast.error(err.message || "Failed to duplicate post");
+                        }
+                      }}
+                    >
                       <Copy className="h-3.5 w-3.5 mr-2" /> Duplicate
                     </DropdownMenuItem>
                     <DropdownMenuItem
