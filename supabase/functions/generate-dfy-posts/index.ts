@@ -251,7 +251,7 @@ ${postsPrompt}`;
     if (insertErr) {
       console.error("Insert error:", insertErr);
       return new Response(
-        JSON.stringify({ error: insertErr.message }),
+        JSON.stringify({ error: "Internal server error" }),
         {
           status: 500,
           headers: { ...corsHeaders, "Content-Type": "application/json" },

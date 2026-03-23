@@ -114,7 +114,7 @@ When the user says "Yes, do this for me" or similar, provide the content again w
     });
   } catch (e) {
     console.error("business-assistant error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
