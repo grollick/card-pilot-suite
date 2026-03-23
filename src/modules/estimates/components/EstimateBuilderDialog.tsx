@@ -245,6 +245,10 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
 
               <div><Label className="text-xs text-muted-foreground">Scope of Work</Label><Textarea value={scope} onChange={e => setScope(e.target.value)} rows={2} placeholder="Describe the work…" /></div>
 
+              {isEdit && editId && (
+                <EstimatePhotoUpload estimateId={editId} />
+              )}
+
               <Separator />
 
               <div>
