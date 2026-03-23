@@ -1,5 +1,7 @@
-import { useState, useCallback, useEffect } from "react";
-import { Wand2, Sparkles, Hash, Image, Link2, Send, Save, Clock, RefreshCw, Loader2, Megaphone, BookOpen, Camera, MessageSquare, Crown } from "lucide-react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { Wand2, Sparkles, Hash, Image, Link2, Send, Save, Clock, RefreshCw, Loader2, Megaphone, BookOpen, Camera, MessageSquare, Crown, Upload } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -45,9 +47,33 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
   const updatePost = useUpdatePost();
   const { data: campaigns = [] } = useSocialCampaigns();
   const socialLimits = useSocialPostLimits();
+  const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+
+  const handleFileUpload = useCallback(async (file: File) => {
+    if (!user) { toast.error("Please sign in first"); return; }
+    if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${user.id}/social/${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("card-assets").upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data: urlData } = supabase.storage.from("card-assets").getPublicUrl(path);
+      setImageUrl(urlData.publicUrl);
+      toast.success("Image uploaded!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }, [user]);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["Instagram", "Facebook"]);
   const [platformOverrides, setPlatformOverrides] = useState<Record<string, { content?: string; hashtags?: string[] }>>({});
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
@@ -405,6 +431,17 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
             <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
               <Image className="h-3 w-3" /> Post Image
             </Label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFileUpload(file);
+                e.target.value = "";
+              }}
+            />
             {imageUrl ? (
               <div className="mt-2 space-y-2">
                 <div className="relative rounded-lg overflow-hidden border border-border aspect-video bg-muted group">
@@ -415,6 +452,15 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="h-7 text-[10px]"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                    >
+                      <Upload className="h-3 w-3 mr-1" /> {uploading ? "Uploading…" : "Replace"}
+                    </Button>
                     <Button
                       variant="secondary"
                       size="sm"
@@ -445,11 +491,21 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
                 />
               </div>
             ) : (
-              <div className="mt-2">
+              <div className="mt-2 space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full h-20 border-dashed flex flex-col gap-1 text-xs text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                >
+                  <Upload className="h-5 w-5" />
+                  {uploading ? "Uploading…" : "Upload Image"}
+                </Button>
                 <Input
                   value={imageUrl}
                   onChange={e => setImageUrl(e.target.value)}
-                  placeholder="Paste image URL or use AI to generate..."
+                  placeholder="Or paste image URL..."
                   className="text-xs h-9"
                 />
               </div>
