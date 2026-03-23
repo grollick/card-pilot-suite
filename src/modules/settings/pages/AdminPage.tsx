@@ -41,7 +41,7 @@ export default function AdminPage() {
     <div className="space-y-5 max-w-6xl">
       <div className="flex items-center gap-2">
         <Shield className="h-5 w-5 text-primary" />
-        <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Admin</span></h1>
+        <h1 className="text-3xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Admin</span></h1>
       </div>
 
       {/* Section nav */}

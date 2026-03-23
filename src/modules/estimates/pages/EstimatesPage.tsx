@@ -211,7 +211,7 @@ export default function EstimatesPage() {
         className="flex items-center justify-between flex-wrap gap-3"
       >
         <div>
-          <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Estimates</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Estimates</span></h1>
           <p className="text-muted-foreground text-sm mt-1">
             Create, send, and track customer estimates
           </p>

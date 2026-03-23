@@ -82,7 +82,7 @@ export default function RevenueForecast() {
     <div className="space-y-8 max-w-6xl">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Revenue Forecast</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Revenue Forecast</span></h1>
           <p className="text-muted-foreground text-sm mt-1">Track conversions and project monthly revenue</p>
         </div>
         <Select value={period} onValueChange={setPeriod}>
