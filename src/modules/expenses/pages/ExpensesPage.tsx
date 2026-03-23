@@ -37,10 +37,11 @@ export default function ExpensesPage() {
     date: new Date().toISOString().split("T")[0],
     is_billable: true,
     notes: "",
+    job_id: "",
   });
 
   const resetForm = () => {
-    setForm({ description: "", amount: "", category: "materials", vendor: "", date: new Date().toISOString().split("T")[0], is_billable: true, notes: "" });
+    setForm({ description: "", amount: "", category: "materials", vendor: "", date: new Date().toISOString().split("T")[0], is_billable: true, notes: "", job_id: "" });
     setReceiptPreview(null);
     setReceiptFile(null);
   };
