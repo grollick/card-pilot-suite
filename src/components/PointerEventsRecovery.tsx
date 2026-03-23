@@ -11,6 +11,15 @@ export default function PointerEventsRecovery() {
     if (document.documentElement.style.pointerEvents === "none") {
       document.documentElement.style.pointerEvents = "";
     }
+
+    const root = document.getElementById("root");
+    if (root && (root as HTMLElement).style.pointerEvents === "none") {
+      (root as HTMLElement).style.pointerEvents = "";
+    }
+
+    if (root?.hasAttribute("inert")) {
+      root.removeAttribute("inert");
+    }
   }, []);
 
   // Run on every route change
