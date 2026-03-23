@@ -62,6 +62,18 @@ export default function PostDetailDrawer({ post, onClose, onEdit }: Props) {
 
           <Separator />
 
+          {/* Post image */}
+          {post.media_urls && post.media_urls.length > 0 && (
+            <div className="rounded-lg overflow-hidden border border-border aspect-video bg-muted">
+              <img
+                src={post.media_urls[0]}
+                alt="Post image"
+                className="w-full h-full object-cover"
+                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+              />
+            </div>
+          )}
+
           <div>
             <p className="text-xs text-muted-foreground mb-1">Content</p>
             <p className="text-sm whitespace-pre-wrap">{post.content}</p>
