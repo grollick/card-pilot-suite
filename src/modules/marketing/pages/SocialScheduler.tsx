@@ -132,7 +132,7 @@ export default function SocialScheduler() {
             >
               {sidebarCollapsed ? <PanelLeft className="h-4 w-4" /> : <PanelLeftClose className="h-4 w-4" />}
             </Button>
-            <h1 className="text-sm font-bold capitalize"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal">{activeView === "dfy" ? "Done-For-You" : "Social"}</span></h1>
+            <h1 className="text-sm font-bold capitalize"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">{activeView === "dfy" ? "Done-For-You" : "Social"}</span></h1>
           </div>
           {socialLimits.monthlyLimit !== -1 && (
             <div className="text-right">

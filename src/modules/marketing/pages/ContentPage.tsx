@@ -97,7 +97,7 @@ export default function ContentPage() {
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal">Content</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Content</span></h1>
           <p className="text-muted-foreground text-sm mt-1">Reusable content blocks for cards, emails & social</p>
         </div>
         <Button className="shadow-glow" onClick={openCreate}>

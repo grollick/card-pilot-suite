@@ -86,7 +86,7 @@ export default function ProjectsPage() {
     <div className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal">Projects</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Projects</span></h1>
           <p className="text-muted-foreground text-sm mt-1">Showcase your work with before/after project cards</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

@@ -128,7 +128,7 @@ export default function ReferralsPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal">Referral Program</span></h1>
+        <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Referral Program</span></h1>
         <p className="text-muted-foreground text-sm mt-1">
           Invite professionals to guzzl.pro — you both earn rewards
         </p>
