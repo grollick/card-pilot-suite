@@ -339,11 +339,11 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
   );
 }
 
-function SectionBlock({ section, sectionIdx, canRemove, onUpdateField, onRemoveSection, onUpdateLineItem, onAddLineItem, onRemoveLineItem, presets }: {
+function SectionBlock({ section, sectionIdx, canRemove, onUpdateField, onRemoveSection, onUpdateLineItem, onAddLineItem, onRemoveLineItem, presets, estimateId }: {
   section: EstimateSection; sectionIdx: number; canRemove: boolean;
   onUpdateField: (idx: number, field: string, value: string) => void; onRemoveSection: () => void;
   onUpdateLineItem: (si: number, ii: number, field: string, value: any) => void;
-  onAddLineItem: () => void; onRemoveLineItem: (ii: number) => void; presets: any[];
+  onAddLineItem: () => void; onRemoveLineItem: (ii: number) => void; presets: any[]; estimateId?: string;
 }) {
   const [open, setOpen] = useState(true);
   const sectionTotal = section.items.reduce((sum, li) => sum + (li.is_optional ? 0 : li.line_total), 0);
@@ -366,7 +366,7 @@ function SectionBlock({ section, sectionIdx, canRemove, onUpdateField, onRemoveS
           <div className="px-3 pb-3 space-y-2">
             <Input value={section.notes ?? ""} onChange={e => onUpdateField(sectionIdx, "notes", e.target.value)} placeholder="Section notes (optional)" className="h-7 text-xs" />
             {section.items.map((item, ii) => (
-              <LineItemRow key={ii} item={item} onUpdate={(field, value) => onUpdateLineItem(sectionIdx, ii, field, value)} onRemove={() => onRemoveLineItem(ii)} canRemove={section.items.length > 1} presets={presets} />
+              <LineItemRow key={ii} item={item} onUpdate={(field, value) => onUpdateLineItem(sectionIdx, ii, field, value)} onRemove={() => onRemoveLineItem(ii)} canRemove={section.items.length > 1} presets={presets} estimateId={estimateId} />
             ))}
             <Button variant="ghost" size="sm" onClick={onAddLineItem} className="text-xs gap-1"><Plus className="h-3 w-3" /> Add Item</Button>
           </div>
