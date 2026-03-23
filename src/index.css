@@ -291,15 +291,22 @@
 
   /* ── Dashboard card system ── */
   .dash-card {
-    @apply rounded-xl border border-border bg-card transition-all;
+    @apply rounded-xl border border-border bg-card;
     box-shadow: var(--shadow-sm);
-    transition-duration: var(--duration-base);
-    transition-timing-function: var(--ease-out);
+    transition: box-shadow var(--duration-base) var(--ease-out),
+                border-color var(--duration-base) var(--ease-out),
+                transform var(--duration-fast) var(--ease-out);
   }
 
   .dash-card:hover {
     box-shadow: var(--shadow-md);
     border-color: hsl(var(--border) / 0.8);
+    transform: translateY(-1px);
+  }
+
+  .dash-card:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
   }
 
   .dash-card-header {
@@ -322,19 +329,22 @@
 
   /* ── Interactive card ── */
   .interactive-card {
-    @apply rounded-xl border border-border bg-card cursor-pointer transition-all;
-    transition-duration: var(--duration-base);
-    transition-timing-function: var(--ease-out);
+    @apply rounded-xl border border-border bg-card cursor-pointer;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--duration-base) var(--ease-out),
+                border-color var(--duration-base) var(--ease-out),
+                transform var(--duration-fast) var(--ease-out);
   }
 
   .interactive-card:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
+    transform: translateY(-1px) scale(1.005);
     border-color: hsl(var(--primary) / 0.2);
   }
 
   .interactive-card:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(0.995);
+    box-shadow: var(--shadow-xs);
   }
 
   /* ── Landing page feature card ── */
@@ -350,12 +360,27 @@
   }
 
   /* ── Table refinements ── */
+  .table-row-hover {
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
   .table-row-hover:hover {
-    @apply bg-muted/40;
+    @apply bg-muted/50;
   }
 
   .table-header-sticky {
     @apply sticky top-0 z-10 bg-card/95 backdrop-blur-sm;
+  }
+
+  /* ── Row interaction (tables, lists) ── */
+  :where(tr[data-clickable], [role="row"][data-clickable], li.clickable-row) {
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+  :where(tr[data-clickable], [role="row"][data-clickable], li.clickable-row):hover {
+    @apply bg-muted/40;
+  }
+  :where(tr[data-clickable], [role="row"][data-clickable], li.clickable-row):active {
+    @apply bg-muted/60;
   }
 
   /* ── Drag states ── */
@@ -419,7 +444,9 @@
 
   /* ── Press feedback ── */
   .press-scale {
-    @apply transition-transform duration-100;
+    @apply transition-transform;
+    transition-duration: var(--duration-fast);
+    transition-timing-function: var(--ease-out);
   }
   .press-scale:active {
     transform: scale(0.97);
@@ -427,16 +454,101 @@
 
   /* ── Lift on hover ── */
   .hover-lift {
-    @apply transition-all;
-    transition-duration: var(--duration-fast);
-    transition-timing-function: var(--ease-out);
+    transition: transform var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-base) var(--ease-out);
   }
   .hover-lift:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
     box-shadow: var(--shadow-md);
   }
   .hover-lift:active {
     transform: translateY(0);
+    box-shadow: var(--shadow-xs);
+  }
+
+  /* ── Premium button micro-interaction ── */
+  .btn-premium {
+    transition: transform var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-base) var(--ease-out),
+                background-color var(--duration-fast) var(--ease-out);
+  }
+  .btn-premium:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  .btn-premium:active {
+    transform: translateY(0) scale(0.97);
+    box-shadow: var(--shadow-xs);
+  }
+
+  /* ── Input focus glow ── */
+  .input-glow:focus-within {
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: 0 0 0 3px hsl(var(--primary) / 0.08), var(--shadow-xs);
+  }
+
+  /* ── Icon button hover ── */
+  .icon-btn-hover {
+    @apply rounded-md;
+    transition: background-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-out);
+  }
+  .icon-btn-hover:hover {
+    @apply bg-muted text-foreground;
+  }
+  .icon-btn-hover:active {
+    transform: scale(0.92);
+  }
+
+  /* ── Toggle smooth ── */
+  .toggle-smooth {
+    transition: background-color var(--duration-base) var(--ease-out),
+                box-shadow var(--duration-base) var(--ease-out);
+  }
+  .toggle-smooth[data-state="checked"] {
+    box-shadow: 0 0 8px -2px hsl(var(--primary) / 0.4);
+  }
+
+  /* ── Badge / chip interaction ── */
+  .badge-interactive {
+    @apply cursor-pointer select-none;
+    transition: background-color var(--duration-fast) var(--ease-out),
+                transform var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-fast) var(--ease-out);
+  }
+  .badge-interactive:hover {
+    filter: brightness(1.08);
+    transform: scale(1.03);
+  }
+  .badge-interactive:active {
+    transform: scale(0.97);
+  }
+
+  /* ── Map pin interaction ── */
+  .map-pin-interactive {
+    transition: transform var(--duration-fast) var(--ease-spring),
+                filter var(--duration-fast) var(--ease-out);
+  }
+  .map-pin-interactive:hover {
+    transform: scale(1.2) translateY(-2px);
+    filter: drop-shadow(0 4px 8px hsl(var(--primary) / 0.3));
+  }
+
+  /* ── Notification slide ── */
+  @keyframes notification-slide-in {
+    from { opacity: 0; transform: translateX(100%); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes notification-slide-out {
+    from { opacity: 1; transform: translateX(0); }
+    to   { opacity: 0; transform: translateX(100%); }
+  }
+  .notification-enter {
+    animation: notification-slide-in var(--duration-slow) var(--ease-out);
+  }
+  .notification-exit {
+    animation: notification-slide-out var(--duration-base) var(--ease-out);
   }
 }
 
