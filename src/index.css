@@ -291,15 +291,22 @@
 
   /* ── Dashboard card system ── */
   .dash-card {
-    @apply rounded-xl border border-border bg-card transition-all;
+    @apply rounded-xl border border-border bg-card;
     box-shadow: var(--shadow-sm);
-    transition-duration: var(--duration-base);
-    transition-timing-function: var(--ease-out);
+    transition: box-shadow var(--duration-base) var(--ease-out),
+                border-color var(--duration-base) var(--ease-out),
+                transform var(--duration-fast) var(--ease-out);
   }
 
   .dash-card:hover {
     box-shadow: var(--shadow-md);
     border-color: hsl(var(--border) / 0.8);
+    transform: translateY(-1px);
+  }
+
+  .dash-card:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
   }
 
   .dash-card-header {
@@ -322,19 +329,22 @@
 
   /* ── Interactive card ── */
   .interactive-card {
-    @apply rounded-xl border border-border bg-card cursor-pointer transition-all;
-    transition-duration: var(--duration-base);
-    transition-timing-function: var(--ease-out);
+    @apply rounded-xl border border-border bg-card cursor-pointer;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow var(--duration-base) var(--ease-out),
+                border-color var(--duration-base) var(--ease-out),
+                transform var(--duration-fast) var(--ease-out);
   }
 
   .interactive-card:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
+    transform: translateY(-1px) scale(1.005);
     border-color: hsl(var(--primary) / 0.2);
   }
 
   .interactive-card:active {
-    transform: translateY(0);
+    transform: translateY(0) scale(0.995);
+    box-shadow: var(--shadow-xs);
   }
 
   /* ── Landing page feature card ── */
