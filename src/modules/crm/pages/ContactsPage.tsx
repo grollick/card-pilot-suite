@@ -182,7 +182,7 @@ export default function ContactsPage() {
       />
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary">guzzl</span> <span className="font-normal">Contacts</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal">Contacts</span></h1>
           <p className="text-muted-foreground text-sm mt-1">{contacts.length} total · {filtered.length} shown</p>
         </div>
         <Dialog open={newOpen} onOpenChange={setNewOpen}>

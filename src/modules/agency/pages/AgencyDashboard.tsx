@@ -94,7 +94,7 @@ export default function AgencyDashboard() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <Building2 className="h-6 w-6 text-primary" />
-            <span className="font-black text-primary">guzzl</span> <span className="font-normal">Agency Command Center</span>
+            <span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal">Agency Command Center</span>
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
             Manage all your client workspaces from one place
