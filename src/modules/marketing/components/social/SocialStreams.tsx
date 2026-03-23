@@ -213,6 +213,17 @@ export default function SocialStreams({ onViewPost, onCompose }: Props) {
                           onClick={() => onViewPost(post)}
                           className="w-full text-left rounded-lg border border-border p-2.5 hover:bg-accent/50 transition-colors"
                         >
+                          {post.media_urls && post.media_urls.length > 0 && (
+                            <div className="rounded-md overflow-hidden mb-2 aspect-video bg-muted">
+                              <img
+                                src={post.media_urls[0]}
+                                alt=""
+                                className="w-full h-full object-cover"
+                                loading="lazy"
+                                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                              />
+                            </div>
+                          )}
                           <p className="text-[11px] line-clamp-2">{post.content}</p>
                           <div className="flex items-center gap-1 mt-1.5">
                             {platforms.slice(0, 2).map(p => {
