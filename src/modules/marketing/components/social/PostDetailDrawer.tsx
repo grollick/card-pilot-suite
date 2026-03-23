@@ -126,6 +126,7 @@ export default function PostDetailDrawer({ post, onClose, onEdit }: Props) {
                   platform={p}
                   content={post.platform_overrides?.[p]?.content || post.content}
                   hashtags={post.platform_overrides?.[p]?.hashtags}
+                  imageUrl={post.media_urls?.[0] ?? undefined}
                 />
               ))}
             </div>
