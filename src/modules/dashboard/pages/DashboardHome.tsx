@@ -58,6 +58,7 @@ export default function DashboardHome() {
       variants={stagger}
     >
       <ReferralActivationChecker />
+      <SecondSessionBanner />
 
       {/* ── Incoming Opportunity Alert ── */}
       {hasPendingOpportunity && (
