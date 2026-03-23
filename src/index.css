@@ -138,6 +138,22 @@
     @apply border-border;
   }
 
+  :where(
+    button:not(:disabled),
+    [role="button"]:not([aria-disabled="true"]),
+    a[href],
+    summary,
+    [data-radix-collection-item]
+  ) {
+    cursor: pointer;
+    -webkit-tap-highlight-color: hsl(var(--primary) / 0.16);
+  }
+
+  [data-radix-portal] [data-state="closed"],
+  [data-vaul-overlay][data-state="closed"] {
+    pointer-events: none !important;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;

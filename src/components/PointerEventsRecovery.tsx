@@ -1,8 +1,18 @@
 import { useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 
+const CLOSED_OVERLAY_SELECTOR = '[data-radix-portal] [data-state="closed"], [data-vaul-overlay][data-state="closed"]';
+
 export default function PointerEventsRecovery() {
   const location = useLocation();
+
+  const neutralizeClosedOverlays = useCallback(() => {
+    document.querySelectorAll<HTMLElement>(CLOSED_OVERLAY_SELECTOR).forEach((el) => {
+      if (el.style.pointerEvents !== "none") {
+        el.style.pointerEvents = "none";
+      }
+    });
+  }, []);
 
   const unlock = useCallback(() => {
     if (document.body.style.pointerEvents === "none") {
@@ -20,7 +30,9 @@ export default function PointerEventsRecovery() {
     if (root?.hasAttribute("inert")) {
       root.removeAttribute("inert");
     }
-  }, []);
+
+    neutralizeClosedOverlays();
+  }, [neutralizeClosedOverlays]);
 
   // Run on every route change
   useEffect(() => {
@@ -38,13 +50,28 @@ export default function PointerEventsRecovery() {
     let timeoutId: number | undefined;
 
     const observer = new MutationObserver(() => {
-      if (document.body.style.pointerEvents === "none") {
+      const root = document.getElementById("root");
+      const isLocked =
+        document.body.style.pointerEvents === "none" ||
+        document.documentElement.style.pointerEvents === "none" ||
+        (root ? (root as HTMLElement).style.pointerEvents === "none" : false) ||
+        !!root?.hasAttribute("inert");
+
+      if (isLocked) {
         if (timeoutId) window.clearTimeout(timeoutId);
-        timeoutId = window.setTimeout(unlock, 200);
+        timeoutId = window.setTimeout(unlock, 120);
+      } else {
+        neutralizeClosedOverlays();
       }
     });
 
-    observer.observe(document.body, { attributes: true, attributeFilter: ["style"] });
+    observer.observe(document.body, {
+      attributes: true,
+      childList: true,
+      subtree: true,
+      attributeFilter: ["style", "inert", "data-state"],
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["style", "inert"] });
 
     const onWindowFocus = () => unlock();
     const onVisibilityChange = () => {
@@ -59,7 +86,7 @@ export default function PointerEventsRecovery() {
       document.removeEventListener("visibilitychange", onVisibilityChange);
       observer.disconnect();
     };
-  }, [unlock]);
+  }, [unlock, neutralizeClosedOverlays]);
 
   // Periodic safety net — every 2s clear stale pointer-events
   useEffect(() => {
