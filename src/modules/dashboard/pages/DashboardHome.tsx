@@ -17,6 +17,7 @@ import BusinessHealthScore from "@/modules/dashboard/components/BusinessHealthSc
 import AIBusinessCoachWidget from "@/modules/dashboard/components/AIBusinessCoachWidget";
 import AIBusinessAssistant from "@/modules/dashboard/components/AIBusinessAssistant";
 import FirstLeadGuaranteeWidget from "@/modules/dashboard/components/FirstLeadGuaranteeWidget";
+import DailyNotesWidget from "@/modules/dashboard/components/DailyNotesWidget";
 import {
   Pencil, UserPlus, CalendarPlus, ExternalLink,
   Zap, Sparkles, Bell, Store, Globe,
