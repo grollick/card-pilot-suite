@@ -80,8 +80,10 @@ export default function PipelinePage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div><h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Pipeline</span></h1>
-        <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight"><span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Pipeline</span></h1>
+          <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+        </div>
       </div>
     );
   }
