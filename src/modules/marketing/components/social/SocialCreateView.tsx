@@ -47,9 +47,33 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
   const updatePost = useUpdatePost();
   const { data: campaigns = [] } = useSocialCampaigns();
   const socialLimits = useSocialPostLimits();
+  const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
   const [content, setContent] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+
+  const handleFileUpload = useCallback(async (file: File) => {
+    if (!user) { toast.error("Please sign in first"); return; }
+    if (!file.type.startsWith("image/")) { toast.error("Please select an image file"); return; }
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop() || "jpg";
+      const path = `${user.id}/social/${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("card-assets").upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data: urlData } = supabase.storage.from("card-assets").getPublicUrl(path);
+      setImageUrl(urlData.publicUrl);
+      toast.success("Image uploaded!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }, [user]);
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>(["Instagram", "Facebook"]);
   const [platformOverrides, setPlatformOverrides] = useState<Record<string, { content?: string; hashtags?: string[] }>>({});
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
