@@ -19,7 +19,7 @@ import AIBusinessAssistant from "@/modules/dashboard/components/AIBusinessAssist
 import FirstLeadGuaranteeWidget from "@/modules/dashboard/components/FirstLeadGuaranteeWidget";
 import {
   Pencil, UserPlus, CalendarPlus, ExternalLink,
-  Zap, Sparkles, Bell,
+  Zap, Sparkles, Bell, Store,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
