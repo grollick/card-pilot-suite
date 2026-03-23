@@ -205,6 +205,14 @@ export default function DashboardHome() {
               >
                 <Store className="h-3.5 w-3.5" /> App Store
               </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-2 rounded-xl h-9 text-[13px] font-medium hover:scale-[1.02] transition-all backdrop-blur-sm border-primary/30 text-primary hover:bg-primary/10"
+                onClick={() => navigate("/discover")}
+              >
+                <Globe className="h-3.5 w-3.5" /> Discover
+              </Button>
             </motion.div>
           )}
         </div>
