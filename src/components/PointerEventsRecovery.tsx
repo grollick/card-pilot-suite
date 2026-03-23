@@ -11,7 +11,7 @@ export default function PointerEventsRecovery() {
 
   useEffect(() => {
     clearPointerLocksSoon();
-  }, [location.pathname]);
+  }, [location.pathname, location.search, location.hash, location.key]);
 
   useEffect(() => {
     let timeoutId: number | undefined;
@@ -20,7 +20,7 @@ export default function PointerEventsRecovery() {
       if (timeoutId) window.clearTimeout(timeoutId);
       timeoutId = window.setTimeout(() => {
         clearPointerLocksSoon();
-      }, 80);
+      }, 40);
     });
 
     observer.observe(document.body, {
@@ -36,26 +36,36 @@ export default function PointerEventsRecovery() {
     });
 
     const onWindowFocus = () => unlock();
+    const onPageShow = () => unlock();
+    const onPopState = () => unlock();
     const onVisibilityChange = () => {
       if (!document.hidden) unlock();
     };
     const onPointerDown = () => unlock();
+    const onClickCapture = () => unlock();
 
     window.addEventListener("focus", onWindowFocus);
+    window.addEventListener("pageshow", onPageShow);
+    window.addEventListener("popstate", onPopState);
     document.addEventListener("visibilitychange", onVisibilityChange);
     document.addEventListener("pointerdown", onPointerDown, true);
+    document.addEventListener("click", onClickCapture, true);
 
     return () => {
       if (timeoutId) window.clearTimeout(timeoutId);
       window.removeEventListener("focus", onWindowFocus);
+      window.removeEventListener("pageshow", onPageShow);
+      window.removeEventListener("popstate", onPopState);
       document.removeEventListener("visibilitychange", onVisibilityChange);
       document.removeEventListener("pointerdown", onPointerDown, true);
+      document.removeEventListener("click", onClickCapture, true);
       observer.disconnect();
     };
   }, [unlock]);
 
   useEffect(() => {
-    const interval = setInterval(unlock, 1500);
+    unlock();
+    const interval = setInterval(unlock, 500);
     return () => clearInterval(interval);
   }, [unlock]);
 
