@@ -1,5 +1,7 @@
-import { useState, useCallback, useEffect } from "react";
-import { Wand2, Sparkles, Hash, Image, Link2, Send, Save, Clock, RefreshCw, Loader2, Megaphone, BookOpen, Camera, MessageSquare, Crown } from "lucide-react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { Wand2, Sparkles, Hash, Image, Link2, Send, Save, Clock, RefreshCw, Loader2, Megaphone, BookOpen, Camera, MessageSquare, Crown, Upload } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
