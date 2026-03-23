@@ -19,6 +19,7 @@ import AIBusinessAssistant from "@/modules/dashboard/components/AIBusinessAssist
 import FirstLeadGuaranteeWidget from "@/modules/dashboard/components/FirstLeadGuaranteeWidget";
 import DailyNotesWidget from "@/modules/dashboard/components/DailyNotesWidget";
 import SecondSessionBanner from "@/modules/dashboard/components/SecondSessionBanner";
+import Week1RetentionWidget from "@/modules/dashboard/components/Week1RetentionWidget";
 import {
   Pencil, UserPlus, CalendarPlus, ExternalLink,
   Zap, Sparkles, Bell, Store, Globe,
@@ -59,6 +60,7 @@ export default function DashboardHome() {
     >
       <ReferralActivationChecker />
       <SecondSessionBanner />
+      <Week1RetentionWidget />
 
       {/* ── Incoming Opportunity Alert ── */}
       {hasPendingOpportunity && (
