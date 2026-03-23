@@ -431,6 +431,17 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
             <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
               <Image className="h-3 w-3" /> Post Image
             </Label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFileUpload(file);
+                e.target.value = "";
+              }}
+            />
             {imageUrl ? (
               <div className="mt-2 space-y-2">
                 <div className="relative rounded-lg overflow-hidden border border-border aspect-video bg-muted group">
@@ -441,6 +452,15 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
                     onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="h-7 text-[10px]"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                    >
+                      <Upload className="h-3 w-3 mr-1" /> {uploading ? "Uploading…" : "Replace"}
+                    </Button>
                     <Button
                       variant="secondary"
                       size="sm"
@@ -471,11 +491,21 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
                 />
               </div>
             ) : (
-              <div className="mt-2">
+              <div className="mt-2 space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full h-20 border-dashed flex flex-col gap-1 text-xs text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                >
+                  <Upload className="h-5 w-5" />
+                  {uploading ? "Uploading…" : "Upload Image"}
+                </Button>
                 <Input
                   value={imageUrl}
                   onChange={e => setImageUrl(e.target.value)}
-                  placeholder="Paste image URL or use AI to generate..."
+                  placeholder="Or paste image URL..."
                   className="text-xs h-9"
                 />
               </div>
