@@ -43,8 +43,8 @@ export default function PostDetailDrawer({ post, onClose, onEdit }: Props) {
   };
 
   return (
-    <Sheet open={!!post} onOpenChange={(v) => !v && onClose()}>
-      <SheetContent className="w-full sm:max-w-md overflow-y-auto">
+    <Sheet modal={false} open={!!post} onOpenChange={(v) => !v && onClose()}>
+      <SheetContent hideOverlay className="w-full sm:max-w-md overflow-y-auto pointer-events-auto">
         <SheetHeader className="pb-4">
           <SheetTitle className="text-base">Post Details</SheetTitle>
         </SheetHeader>
