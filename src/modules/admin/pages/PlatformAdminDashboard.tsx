@@ -138,7 +138,7 @@ export default function PlatformAdminDashboard() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <Shield className="h-6 w-6 text-primary" />
-            <span className="font-black text-primary">guzzl</span> <span className="font-normal">Platform Admin</span>
+            <span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal">Platform Admin</span>
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
             Overview of all platform users, plans, revenue, and activity.

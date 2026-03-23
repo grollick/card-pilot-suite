@@ -56,7 +56,7 @@ export default function MarketplacePage() {
     <div className="space-y-6 max-w-6xl">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary">guzzl</span> <span className="font-normal">Apps & Integrations</span></h1>
+        <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal">Apps & Integrations</span></h1>
         <p className="text-sm text-muted-foreground mt-1">Discover and install apps to extend your guzzl.pro workspace.</p>
       </div>
 

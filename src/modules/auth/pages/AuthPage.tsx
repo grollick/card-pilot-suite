@@ -162,7 +162,7 @@ export default function Auth() {
               {/* Mobile logo */}
               <div className="lg:hidden text-center mb-6">
                 <Link to="/">
-                  <h1 className="text-2xl font-bold"><span className="font-black text-primary">guzzl</span><span className="text-foreground">.pro</span></h1>
+                  <h1 className="text-2xl font-bold"><span className="font-black text-primary text-4xl">guzzl</span><span className="text-foreground">.pro</span></h1>
                 </Link>
               </div>
 
