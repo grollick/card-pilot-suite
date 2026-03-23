@@ -376,8 +376,8 @@ function SectionBlock({ section, sectionIdx, canRemove, onUpdateField, onRemoveS
   );
 }
 
-function LineItemRow({ item, onUpdate, onRemove, canRemove, presets }: {
-  item: EstimateLineItem; onUpdate: (field: string, value: any) => void; onRemove: () => void; canRemove: boolean; presets: any[];
+function LineItemRow({ item, onUpdate, onRemove, canRemove, presets, estimateId }: {
+  item: EstimateLineItem; onUpdate: (field: string, value: any) => void; onRemove: () => void; canRemove: boolean; presets: any[]; estimateId?: string;
 }) {
   const dimFields = dimensionFieldsForMode(item.calc_mode);
   return (
@@ -408,6 +408,9 @@ function LineItemRow({ item, onUpdate, onRemove, canRemove, presets }: {
         <div><Label className="text-[10px] text-muted-foreground">Tax %</Label><div className="flex gap-0.5"><Input type="number" value={item.tax_percent} onChange={e => onUpdate("tax_percent", +e.target.value)} min={0} className="h-7 text-xs" /><PresetButton presets={presets} type="tax" onSelect={v => onUpdate("tax_percent", v)} /></div></div>
         <div><Label className="text-[10px] text-muted-foreground">Total</Label><Input value={`$${item.line_total.toFixed(2)}`} readOnly className="h-7 text-xs bg-muted/40 tabular-nums font-medium" /></div>
       </div>
+      {estimateId && item.id && (
+        <EstimatePhotoUpload estimateId={estimateId} lineItemId={item.id} compact />
+      )}
     </div>
   );
 }
