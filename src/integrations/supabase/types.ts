@@ -1432,6 +1432,39 @@ export type Database = {
           },
         ]
       }
+      daily_notes: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_completed: boolean
+          note_date: string
+          note_type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          note_date?: string
+          note_type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_completed?: boolean
+          note_date?: string
+          note_type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
