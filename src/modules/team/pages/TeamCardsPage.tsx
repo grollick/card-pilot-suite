@@ -76,7 +76,7 @@ export default function TeamCardsPage() {
     <div className="space-y-6 max-w-5xl">
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <CreditCard className="h-6 w-6 text-primary" /> Team Cards
+          <CreditCard className="h-6 w-6 text-primary" /> <span className="font-extrabold text-primary">guzzl</span> <span className="font-normal">Team Cards</span>
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           Create individual digital cards for each team member
