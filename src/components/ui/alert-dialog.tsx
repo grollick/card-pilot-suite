@@ -3,8 +3,20 @@ import * as AlertDialogPrimitive from "@radix-ui/react-alert-dialog";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
+import { clearPointerLocksSoon } from "@/lib/pointerLocks";
 
-const AlertDialog = AlertDialogPrimitive.Root;
+const AlertDialog = ({ onOpenChange, ...props }: React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Root>) => {
+  const handleOpenChange = React.useCallback((open: boolean) => {
+    onOpenChange?.(open);
+    if (!open) clearPointerLocksSoon();
+  }, [onOpenChange]);
+
+  React.useEffect(() => {
+    return () => clearPointerLocksSoon();
+  }, []);
+
+  return <AlertDialogPrimitive.Root onOpenChange={handleOpenChange} {...props} />;
+};
 
 const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
 

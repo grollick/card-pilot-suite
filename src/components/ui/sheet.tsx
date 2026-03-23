@@ -4,10 +4,20 @@ import { X } from "lucide-react";
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
+import { clearPointerLocksSoon } from "@/lib/pointerLocks";
 
-const Sheet = ({ modal = false, ...props }: React.ComponentPropsWithoutRef<typeof SheetPrimitive.Root>) => (
-  <SheetPrimitive.Root modal={modal} {...props} />
-);
+const Sheet = ({ modal = true, onOpenChange, ...props }: React.ComponentPropsWithoutRef<typeof SheetPrimitive.Root>) => {
+  const handleOpenChange = React.useCallback((open: boolean) => {
+    onOpenChange?.(open);
+    if (!open) clearPointerLocksSoon();
+  }, [onOpenChange]);
+
+  React.useEffect(() => {
+    return () => clearPointerLocksSoon();
+  }, []);
+
+  return <SheetPrimitive.Root modal={modal} onOpenChange={handleOpenChange} {...props} />;
+};
 
 const SheetTrigger = SheetPrimitive.Trigger;
 
