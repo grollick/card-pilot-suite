@@ -5,12 +5,6 @@ export default function PointerEventsRecovery() {
   const location = useLocation();
 
   const unlock = useCallback(() => {
-    // Don't clear if a Radix dialog/popover is legitimately open
-    const hasOpen =
-      document.querySelector('[role="dialog"][data-state="open"]') ||
-      document.querySelector('[data-radix-popper-content-wrapper]');
-    if (hasOpen) return;
-
     if (document.body.style.pointerEvents === "none") {
       document.body.style.pointerEvents = "";
     }
@@ -32,24 +26,31 @@ export default function PointerEventsRecovery() {
 
   // MutationObserver: watch for stuck pointer-events on body
   useEffect(() => {
+    let timeoutId: number | undefined;
+
     const observer = new MutationObserver(() => {
       if (document.body.style.pointerEvents === "none") {
-        // Give Radix 300ms to finish its work, then force-clear if stale
-        setTimeout(() => {
-          const hasOpen =
-            document.querySelector('[role="dialog"][data-state="open"]') ||
-            document.querySelector('[data-radix-popper-content-wrapper]');
-          if (!hasOpen && document.body.style.pointerEvents === "none") {
-            document.body.style.pointerEvents = "";
-          }
-        }, 300);
+        if (timeoutId) window.clearTimeout(timeoutId);
+        timeoutId = window.setTimeout(unlock, 200);
       }
     });
+
     observer.observe(document.body, { attributes: true, attributeFilter: ["style"] });
+
+    const onWindowFocus = () => unlock();
+    const onVisibilityChange = () => {
+      if (!document.hidden) unlock();
+    };
+    window.addEventListener("focus", onWindowFocus);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
     return () => {
+      if (timeoutId) window.clearTimeout(timeoutId);
+      window.removeEventListener("focus", onWindowFocus);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       observer.disconnect();
     };
-  }, []);
+  }, [unlock]);
 
   // Periodic safety net — every 2s clear stale pointer-events
   useEffect(() => {
