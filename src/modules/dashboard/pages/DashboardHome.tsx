@@ -60,6 +60,7 @@ export default function DashboardHome() {
     >
       <ReferralActivationChecker />
       <SecondSessionBanner />
+      <Week1RetentionWidget />
 
       {/* ── Incoming Opportunity Alert ── */}
       {hasPendingOpportunity && (
