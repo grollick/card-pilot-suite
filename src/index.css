@@ -360,12 +360,27 @@
   }
 
   /* ── Table refinements ── */
+  .table-row-hover {
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
   .table-row-hover:hover {
-    @apply bg-muted/40;
+    @apply bg-muted/50;
   }
 
   .table-header-sticky {
     @apply sticky top-0 z-10 bg-card/95 backdrop-blur-sm;
+  }
+
+  /* ── Row interaction (tables, lists) ── */
+  :where(tr[data-clickable], [role="row"][data-clickable], li.clickable-row) {
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+  :where(tr[data-clickable], [role="row"][data-clickable], li.clickable-row):hover {
+    @apply bg-muted/40;
+  }
+  :where(tr[data-clickable], [role="row"][data-clickable], li.clickable-row):active {
+    @apply bg-muted/60;
   }
 
   /* ── Drag states ── */
