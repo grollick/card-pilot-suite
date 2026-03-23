@@ -132,6 +132,7 @@ export default function ExpensesPage() {
         is_billable: form.is_billable,
         notes: form.notes || null,
         receipt_url: receiptUrl,
+        job_id: form.job_id || null,
       },
       {
         onSuccess: () => {
