@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { DollarSign, Plus, Trash2, Receipt, TrendingUp } from "lucide-react";
+import { useState, useRef } from "react";
+import { DollarSign, Plus, Trash2, Receipt, TrendingUp, Camera, Upload, Loader2, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,14 +10,23 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { useExpenses, useCreateExpense, useDeleteExpense, useExpenseSummary, EXPENSE_CATEGORIES } from "@/hooks/useExpenses";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 export default function ExpensesPage() {
   const { data: expenses = [], isLoading } = useExpenses();
   const createExpense = useCreateExpense();
   const deleteExpense = useDeleteExpense();
   const summary = useExpenseSummary();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
+  const [scanning, setScanning] = useState(false);
+  const [receiptPreview, setReceiptPreview] = useState<string | null>(null);
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState({
     description: "",
     amount: "",
@@ -28,8 +37,88 @@ export default function ExpensesPage() {
     notes: "",
   });
 
-  const handleSubmit = () => {
+  const resetForm = () => {
+    setForm({ description: "", amount: "", category: "materials", vendor: "", date: new Date().toISOString().split("T")[0], is_billable: true, notes: "" });
+    setReceiptPreview(null);
+    setReceiptFile(null);
+  };
+
+  const handleFileSelected = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file");
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("Image must be under 10MB");
+      return;
+    }
+
+    setReceiptFile(file);
+    const preview = URL.createObjectURL(file);
+    setReceiptPreview(preview);
+
+    // OCR scan
+    setScanning(true);
+    try {
+      const base64 = await fileToBase64(file);
+      const { data, error } = await supabase.functions.invoke("scan-receipt", {
+        body: { image_base64: base64 },
+      });
+
+      if (error || data?.error) {
+        toast.error(data?.error || "Failed to scan receipt");
+        return;
+      }
+
+      // Auto-fill form with extracted data
+      setForm((prev) => ({
+        ...prev,
+        description: data.description || prev.description,
+        amount: data.amount?.toString() || prev.amount,
+        vendor: data.vendor || prev.vendor,
+        date: data.date || prev.date,
+        category: data.category || prev.category,
+      }));
+      toast.success("Receipt scanned! Review the details below.");
+    } catch (err) {
+      toast.error("Failed to scan receipt. You can still fill in manually.");
+    } finally {
+      setScanning(false);
+    }
+  };
+
+  const fileToBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.split(",")[1]);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  const uploadReceipt = async (): Promise<string | null> => {
+    if (!receiptFile || !user) return null;
+    const ext = receiptFile.name.split(".").pop() || "jpg";
+    const path = `${user.id}/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("receipts").upload(path, receiptFile);
+    if (error) {
+      console.error("Upload error:", error);
+      return null;
+    }
+    const { data: urlData } = supabase.storage.from("receipts").getPublicUrl(path);
+    return urlData.publicUrl;
+  };
+
+  const handleSubmit = async () => {
     if (!form.description || !form.amount) return;
+
+    let receiptUrl: string | null = null;
+    if (receiptFile) {
+      receiptUrl = await uploadReceipt();
+    }
+
     createExpense.mutate(
       {
         description: form.description,
@@ -39,11 +128,12 @@ export default function ExpensesPage() {
         date: form.date,
         is_billable: form.is_billable,
         notes: form.notes || null,
+        receipt_url: receiptUrl,
       },
       {
         onSuccess: () => {
           setOpen(false);
-          setForm({ description: "", amount: "", category: "materials", vendor: "", date: new Date().toISOString().split("T")[0], is_billable: true, notes: "" });
+          resetForm();
         },
       }
     );
@@ -65,18 +155,84 @@ export default function ExpensesPage() {
     <div className="space-y-6 max-w-5xl">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
             <Receipt className="h-6 w-6 text-primary" /> <span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Expense Tracker</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">Track costs, maximize profits</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) resetForm(); }}>
           <DialogTrigger asChild>
             <Button className="gap-2"><Plus className="h-4 w-4" /> Add Expense</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-lg">
             <DialogHeader><DialogTitle>Add Expense</DialogTitle></DialogHeader>
             <div className="space-y-4 pt-2">
+              {/* Receipt Scanner */}
+              <div className="rounded-xl border-2 border-dashed border-border p-4 text-center space-y-3">
+                {receiptPreview ? (
+                  <div className="relative">
+                    <img src={receiptPreview} alt="Receipt" className="max-h-40 mx-auto rounded-lg object-contain" />
+                    {scanning && (
+                      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                        <div className="flex items-center gap-2 text-sm text-primary">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Scanning receipt...
+                        </div>
+                      </div>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute top-1 right-1 h-7"
+                      onClick={() => { setReceiptPreview(null); setReceiptFile(null); }}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-center gap-1 text-muted-foreground">
+                      <Camera className="h-5 w-5" />
+                      <span className="text-sm font-medium">Scan a Receipt</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">Take a photo or upload an image — AI will auto-fill the details</p>
+                    <div className="flex items-center justify-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={() => cameraInputRef.current?.click()}
+                      >
+                        <Camera className="h-3.5 w-3.5" /> Camera
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="gap-1.5"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <Upload className="h-3.5 w-3.5" /> Upload
+                      </Button>
+                    </div>
+                  </>
+                )}
+                <input
+                  ref={cameraInputRef}
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={(e) => e.target.files?.[0] && handleFileSelected(e.target.files[0])}
+                />
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => e.target.files?.[0] && handleFileSelected(e.target.files[0])}
+                />
+              </div>
+
               <div><Label>Description *</Label><Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Materials for job..." /></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>Amount *</Label><Input type="number" step="0.01" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} placeholder="0.00" /></div>
@@ -97,7 +253,7 @@ export default function ExpensesPage() {
                 <Switch checked={form.is_billable} onCheckedChange={(v) => setForm({ ...form, is_billable: v })} />
                 <Label>Billable to client</Label>
               </div>
-              <Button onClick={handleSubmit} disabled={createExpense.isPending} className="w-full">
+              <Button onClick={handleSubmit} disabled={createExpense.isPending || scanning} className="w-full">
                 {createExpense.isPending ? "Adding..." : "Add Expense"}
               </Button>
             </div>
@@ -149,6 +305,11 @@ export default function ExpensesPage() {
                   className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/30 transition-colors"
                 >
                   <div className="flex items-center gap-3 min-w-0">
+                    {exp.receipt_url ? (
+                      <a href={exp.receipt_url} target="_blank" rel="noreferrer" className="shrink-0">
+                        <img src={exp.receipt_url} alt="Receipt" className="h-10 w-10 rounded-md object-cover border border-border" />
+                      </a>
+                    ) : null}
                     <div>
                       <p className="text-sm font-medium truncate">{exp.description}</p>
                       <div className="flex items-center gap-2 mt-0.5">
