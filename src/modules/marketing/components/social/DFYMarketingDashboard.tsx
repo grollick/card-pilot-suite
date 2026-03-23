@@ -1,13 +1,12 @@
-import { useState } from "react";
+import { forwardRef, useState } from "react";
 import DFYActivityLog from "./DFYActivityLog";
 import {
-  Rocket, Pause, Play, Settings2, BarChart3, Eye, MousePointer,
-  Users, CalendarCheck, TrendingUp, Sparkles, Crown, ChevronRight, Wand2, Loader2,
+  Rocket, Pause, Play, BarChart3, MousePointer,
+  Users, CalendarCheck, TrendingUp, Sparkles, ChevronRight, Wand2, Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
 import { useSocialPosts } from "@/hooks/useSocialPosts";
 import { useAutoCampaigns, useUpdateCampaign, CONTENT_TYPE_LABELS } from "@/hooks/useAutoCampaigns";
 import { toast } from "sonner";
@@ -26,7 +25,10 @@ interface Props {
   onViewScheduled: () => void;
 }
 
-export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }: Props) {
+const DFYMarketingDashboard = forwardRef<HTMLDivElement, Props>(function DFYMarketingDashboard(
+  { onDeactivate, onViewScheduled },
+  ref,
+) {
   const { data: posts = [] } = useSocialPosts();
   const { data: campaigns = [] } = useAutoCampaigns();
   const updateCampaign = useUpdateCampaign();
@@ -106,7 +108,7 @@ export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }:
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div ref={ref} className="space-y-6 max-w-4xl relative pointer-events-auto">
       {/* Status header */}
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3">
@@ -150,7 +152,7 @@ export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }:
             <Wand2 className="h-8 w-8 text-primary mx-auto mb-3" />
             <h3 className="text-sm font-bold mb-1">Ready to generate your first posts!</h3>
             <p className="text-xs text-muted-foreground mb-4 max-w-sm mx-auto">
-              Click the button below to have AI create {dfyCampaign?.posts_per_week || 3} posts 
+              Click the button below to have AI create {dfyCampaign?.posts_per_week || 3} posts
               tailored to your business and scheduled across the week.
             </p>
             <Button onClick={handleGeneratePosts} disabled={generating} className="gap-2">
@@ -246,4 +248,8 @@ export default function DFYMarketingDashboard({ onDeactivate, onViewScheduled }:
       )}
     </div>
   );
-}
+});
+
+DFYMarketingDashboard.displayName = "DFYMarketingDashboard";
+
+export default DFYMarketingDashboard;

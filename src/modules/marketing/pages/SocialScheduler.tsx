@@ -26,12 +26,20 @@ export default function SocialScheduler() {
   const [pendingContent, setPendingContent] = useState<{ content: string; hashtags: string[]; imageUrl?: string } | null>(null);
   const socialLimits = useSocialPostLimits();
 
+  const handleChangeView = (view: SocialView) => {
+    setDetailPost(null);
+    if (view !== "compose") setEditPost(null);
+    setActiveView(view);
+  };
+
   const openCompose = (post?: SocialPost) => {
+    setDetailPost(null);
     setEditPost(post ?? null);
     setActiveView("compose");
   };
 
   const handleUseFeedPost = (data: { content: string; hashtags: string[]; imageUrl?: string }) => {
+    setDetailPost(null);
     setPendingContent(data);
     setActiveView("compose");
   };
@@ -46,7 +54,7 @@ export default function SocialScheduler() {
   const renderView = () => {
     switch (activeView) {
       case "streams":
-        return <SocialStreams onViewPost={setDetailPost} onCompose={(data) => { setPendingContent(data); setActiveView("compose"); }} />;
+        return <SocialStreams onViewPost={setDetailPost} onCompose={(data) => { setDetailPost(null); setPendingContent(data); setActiveView("compose"); }} />;
       case "compose":
         return (
           <SocialCreateView
@@ -95,7 +103,7 @@ export default function SocialScheduler() {
           </SocialFeatureGate>
         );
       case "dfy":
-        return <DFYMarketingTab onSwitchToCalendar={() => setActiveView("calendar")} />;
+        return <DFYMarketingTab onSwitchToCalendar={() => handleChangeView("calendar")} />;
       default:
         return null;
     }
@@ -106,7 +114,7 @@ export default function SocialScheduler() {
       {/* Sidebar */}
       <SocialSidebar
         activeView={activeView}
-        onChangeView={setActiveView}
+        onChangeView={handleChangeView}
         lockedFeatures={lockedFeatures}
         collapsed={sidebarCollapsed}
       />
