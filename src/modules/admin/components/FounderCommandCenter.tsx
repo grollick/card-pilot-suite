@@ -7,11 +7,12 @@ import {
   AlertTriangle, Clock, Eye, Globe, Layers, CreditCard,
   MessageSquare, CheckCircle2, XCircle, ArrowUpRight, ArrowDown,
   Send, FileText, BookOpen, Settings, RefreshCw, UserPlus,
-  Loader2, ShieldAlert, Flame, Heart, Star, Ban
+  Loader2, ShieldAlert, Flame, Heart, Star, Ban, Share2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import ResearchSummaryWidget from "@/modules/admin/components/ResearchSummaryWidget";
 import ColdOutreachTemplates from "@/modules/admin/components/ColdOutreachTemplates";
+import GuzzlPromoToolkit from "@/modules/admin/components/GuzzlPromoToolkit";
 import SuccessStoriesManager from "@/modules/admin/components/SuccessStoriesManager";
 import FunnelHealthMonitor from "@/modules/admin/components/FunnelHealthMonitor";
 import { Badge } from "@/components/ui/badge";
@@ -451,6 +452,10 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
       <Button size="sm" variant="outline" className="text-xs gap-1 w-full mt-2" onClick={() => onNavigateSection?.("funnel")}>
         <Target className="h-3 w-3" /> View Full Funnel Dashboard
       </Button>
+
+      {/* ── SECTION: Promote guzzl.pro ── */}
+      <SectionHeader icon={Share2} title="Promote guzzl.pro" description="Share, invite, and create social content to grow the platform" />
+      <GuzzlPromoToolkit />
 
       {/* ── SECTION: Cold Outreach ── */}
       <SectionHeader icon={Mail} title="Cold Outreach Emails" description="Pre-written emails to acquire card holders by profession" />
