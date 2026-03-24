@@ -509,11 +509,6 @@ export default function OnDutyMapPage() {
             center={[center.lat, center.lng]}
             zoom={userLocation ? 11 : 4}
             className="z-0"
-            whenReady={(event) => {
-              const map = event.target;
-              requestAnimationFrame(() => map.invalidateSize({ pan: false }));
-              setTimeout(() => map.invalidateSize({ pan: false }), 250);
-            }}
             style={{
               height: "100%",
               width: "100%",
