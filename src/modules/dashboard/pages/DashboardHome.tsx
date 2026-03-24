@@ -217,8 +217,7 @@ export default function DashboardHome() {
               >
                 <Globe className="h-3.5 w-3.5" /> Discover
               </Button>
-            </motion.div>
-          )}
+          </motion.div>
         </div>
       </motion.div>
 
