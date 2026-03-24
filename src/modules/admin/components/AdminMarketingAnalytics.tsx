@@ -39,24 +39,28 @@ export default function AdminMarketingAnalytics({ stats, isLoading }: Props) {
           value={stats?.signups30d ?? 0}
           trend={growthRate}
           loading={isLoading}
+          onClick={() => navigate("/app/admin")}
         />
         <AnalyticCard
           icon={UserCheck}
           label="Active Users (est.)"
           value={activeUsers}
           loading={isLoading}
+          onClick={() => navigate("/app/admin")}
         />
         <AnalyticCard
           icon={Target}
           label="Leads Generated (30d)"
           value={stats?.leads30d ?? 0}
           loading={isLoading}
+          onClick={() => navigate("/app/contacts")}
         />
         <AnalyticCard
           icon={Mail}
           label="Bookings (30d)"
           value={stats?.bookings30d ?? 0}
           loading={isLoading}
+          onClick={() => navigate("/app/bookings")}
         />
       </div>
 
