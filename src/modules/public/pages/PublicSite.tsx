@@ -71,6 +71,7 @@ function ContactRevealBlock({ phone, email, city }: { phone?: string | null; ema
   );
 }
 
+export default function PublicSite() {
   const { handle } = useParams<{ handle: string }>();
   const { data, isLoading, error } = useSiteData(handle);
   const [mobileNav, setMobileNav] = useState(false);
