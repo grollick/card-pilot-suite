@@ -10,6 +10,7 @@ interface Props {
 }
 
 export default function AdminMarketingAnalytics({ stats, isLoading }: Props) {
+  const navigate = useNavigate();
   const signupTrend = stats?.signupsByDate
     ? Object.entries(stats.signupsByDate)
         .sort(([a], [b]) => a.localeCompare(b))
