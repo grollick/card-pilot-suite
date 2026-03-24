@@ -1330,6 +1330,17 @@ export default function PublicCard() {
               ) : (
                 <CardSectionWrapper theme={theme} index={4} metallicEffect={metallicEffect}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {/* Honeypot field — hidden from real users, catches bots */}
+                    <input
+                      type="text"
+                      name="website_url"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                      autoComplete="off"
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, width: 0 }}
+                    />
                     <input
                       placeholder="Your name *"
                       value={formData.name}
