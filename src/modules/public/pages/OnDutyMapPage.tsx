@@ -42,6 +42,12 @@ const TILE_PROVIDERS: TileProvider[] = [
     attribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
   },
+  {
+    name: "OpenStreetMap HOT",
+    url: "https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+    subdomains: ["a", "b", "c"],
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  },
 ];
 
 // ── Leaflet icon factories ──
@@ -169,69 +175,74 @@ function LiveActivityToast({
 }
 
 // ── Professional card (list view) ──
-function ProfessionalListCard({ pro, onSelect }: { pro: OnDutyProfessional; onSelect: (p: OnDutyProfessional) => void }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="flex items-start gap-3 p-3 rounded-xl border border-border bg-card hover:bg-accent/30 transition-colors cursor-pointer"
-      onClick={() => onSelect(pro)}
-    >
-      <Avatar className="h-11 w-11 ring-2 ring-offset-1 ring-offset-background ring-success/40 shrink-0">
-        <AvatarImage src={pro.avatar_url ?? undefined} />
-        <AvatarFallback className="text-xs font-semibold bg-muted">
-          {pro.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
-        </AvatarFallback>
-      </Avatar>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <p className="font-semibold text-sm truncate">{pro.name}</p>
-          {pro.status === "available" && (
-            <span className="h-2 w-2 rounded-full bg-success animate-pulse shrink-0" />
+const ProfessionalListCard = forwardRef<HTMLDivElement, { pro: OnDutyProfessional; onSelect: (p: OnDutyProfessional) => void }>(
+  function ProfessionalListCard({ pro, onSelect }, ref) {
+    return (
+      <motion.div
+        ref={ref}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-start gap-3 p-3 rounded-xl border border-border bg-card hover:bg-accent/30 transition-colors cursor-pointer"
+        onClick={() => onSelect(pro)}
+      >
+        <Avatar className="h-11 w-11 ring-2 ring-offset-1 ring-offset-background ring-success/40 shrink-0">
+          <AvatarImage src={pro.avatar_url ?? undefined} />
+          <AvatarFallback className="text-xs font-semibold bg-muted">
+            {pro.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <p className="font-semibold text-sm truncate">{pro.name}</p>
+            {pro.status === "available" && (
+              <span className="h-2 w-2 rounded-full bg-success animate-pulse shrink-0" />
+            )}
+            {pro.status === "recent" && (
+              <span className="h-2 w-2 rounded-full bg-warning shrink-0" />
+            )}
+          </div>
+          {pro.profession_name && (
+            <p className="text-xs text-muted-foreground truncate">{pro.profession_name}</p>
           )}
-          {pro.status === "recent" && (
-            <span className="h-2 w-2 rounded-full bg-warning shrink-0" />
-          )}
+          <div className="flex flex-wrap gap-1 mt-1.5">
+            {pro.badges.map(b => (
+              <Badge key={b} variant="outline" className="text-[9px] h-4 px-1.5 gap-0.5 font-normal">
+                {b === "Fast Responder" && <Zap className="h-2 w-2 text-warning" />}
+                {b === "Highly Rated" && <Star className="h-2 w-2 text-warning" />}
+                {b === "On Duty" && <Radio className="h-2 w-2 text-success" />}
+                {b}
+              </Badge>
+            ))}
+            {pro.avg_rating && (
+              <Badge variant="outline" className="text-[9px] h-4 px-1.5 gap-0.5 font-normal">
+                <Star className="h-2 w-2 text-warning fill-warning" />
+                {pro.avg_rating} ({pro.review_count})
+              </Badge>
+            )}
+            {pro.avg_response_minutes && (
+              <Badge variant="outline" className="text-[9px] h-4 px-1.5 gap-0.5 font-normal">
+                <Clock className="h-2 w-2" />
+                {formatResponseTime(pro.avg_response_minutes)} avg
+              </Badge>
+            )}
+          </div>
+          <div className="flex gap-1.5 mt-2">
+            <Button asChild size="sm" variant="outline" className="h-7 text-xs gap-1">
+              <Link to={`/${pro.handle}`}>
+                <Eye className="h-3 w-3" /> Profile
+              </Link>
+            </Button>
+            <Button size="sm" className="h-7 text-xs gap-1" onClick={(e) => { e.stopPropagation(); onSelect(pro); }}>
+              <MessageSquare className="h-3 w-3" /> Connect
+            </Button>
+          </div>
         </div>
-        {pro.profession_name && (
-          <p className="text-xs text-muted-foreground truncate">{pro.profession_name}</p>
-        )}
-        <div className="flex flex-wrap gap-1 mt-1.5">
-          {pro.badges.map(b => (
-            <Badge key={b} variant="outline" className="text-[9px] h-4 px-1.5 gap-0.5 font-normal">
-              {b === "Fast Responder" && <Zap className="h-2 w-2 text-warning" />}
-              {b === "Highly Rated" && <Star className="h-2 w-2 text-warning" />}
-              {b === "On Duty" && <Radio className="h-2 w-2 text-success" />}
-              {b}
-            </Badge>
-          ))}
-          {pro.avg_rating && (
-            <Badge variant="outline" className="text-[9px] h-4 px-1.5 gap-0.5 font-normal">
-              <Star className="h-2 w-2 text-warning fill-warning" />
-              {pro.avg_rating} ({pro.review_count})
-            </Badge>
-          )}
-          {pro.avg_response_minutes && (
-            <Badge variant="outline" className="text-[9px] h-4 px-1.5 gap-0.5 font-normal">
-              <Clock className="h-2 w-2" />
-              {formatResponseTime(pro.avg_response_minutes)} avg
-            </Badge>
-          )}
-        </div>
-        <div className="flex gap-1.5 mt-2">
-          <Button asChild size="sm" variant="outline" className="h-7 text-xs gap-1">
-            <Link to={`/${pro.handle}`}>
-              <Eye className="h-3 w-3" /> Profile
-            </Link>
-          </Button>
-          <Button size="sm" className="h-7 text-xs gap-1" onClick={(e) => { e.stopPropagation(); onSelect(pro); }}>
-            <MessageSquare className="h-3 w-3" /> Connect
-          </Button>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
+      </motion.div>
+    );
+  }
+);
+
+ProfessionalListCard.displayName = "ProfessionalListCard";
 
 const MapViewportController = forwardRef<HTMLDivElement, {
   view: "map" | "list";
@@ -307,6 +318,7 @@ export default function OnDutyMapPage() {
   const [burstingIds, setBurstingIds] = useState<Set<string>>(new Set());
   const [toastPro, setToastPro] = useState<OnDutyProfessional | null>(null);
   const tileErrorCountRef = useRef(0);
+  const tileLoadedCountRef = useRef(0);
   const prevIdsRef = useRef<Set<string>>(new Set());
 
   // When realtime event fires and data refreshes, detect new arrivals
@@ -348,6 +360,7 @@ export default function OnDutyMapPage() {
   const handleClose = useCallback(() => setSelectedPro(null), []);
   const handleToastClose = useCallback(() => setToastPro(null), []);
   const handleTileLoad = useCallback(() => {
+    tileLoadedCountRef.current += 1;
     tileErrorCountRef.current = 0;
     setTileStatus("ready");
   }, []);
@@ -373,9 +386,22 @@ export default function OnDutyMapPage() {
   useEffect(() => {
     if (view === "map") {
       tileErrorCountRef.current = 0;
+      tileLoadedCountRef.current = 0;
       setTileStatus("loading");
     }
   }, [view, tileProviderIndex]);
+
+  useEffect(() => {
+    if (view !== "map" || tileStatus === "ready") return;
+
+    const timeout = setTimeout(() => {
+      if (tileLoadedCountRef.current === 0) {
+        handleRetryTiles();
+      }
+    }, 4500);
+
+    return () => clearTimeout(timeout);
+  }, [view, tileStatus, tileProviderIndex, handleRetryTiles]);
 
   useEffect(() => {
     let raf = 0;
@@ -483,6 +509,11 @@ export default function OnDutyMapPage() {
             center={[center.lat, center.lng]}
             zoom={userLocation ? 11 : 4}
             className="z-0"
+            whenReady={(event) => {
+              const map = event.target;
+              requestAnimationFrame(() => map.invalidateSize({ pan: false }));
+              setTimeout(() => map.invalidateSize({ pan: false }), 250);
+            }}
             style={{
               height: "100%",
               width: "100%",
@@ -500,7 +531,7 @@ export default function OnDutyMapPage() {
               url={activeTile.url}
               subdomains={activeTile.subdomains}
               eventHandlers={{
-                load: handleTileLoad,
+                tileload: handleTileLoad,
                 tileerror: handleTileError,
               }}
             />
