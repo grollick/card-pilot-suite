@@ -12,6 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import ResearchSummaryWidget from "@/modules/admin/components/ResearchSummaryWidget";
 import ColdOutreachTemplates from "@/modules/admin/components/ColdOutreachTemplates";
+import GuzzlPromoToolkit from "@/modules/admin/components/GuzzlPromoToolkit";
 import SuccessStoriesManager from "@/modules/admin/components/SuccessStoriesManager";
 import FunnelHealthMonitor from "@/modules/admin/components/FunnelHealthMonitor";
 import { Badge } from "@/components/ui/badge";
