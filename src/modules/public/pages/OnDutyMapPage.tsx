@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import MapGL, { Marker, NavigationControl } from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
+import maplibregl from "maplibre-gl";
 import { useOnDutyProfessionals, useUserLocation, type OnDutyProfessional } from "@/hooks/useOnDutyMap";
 import { useOnDutyRealtime } from "@/hooks/useOnDutyRealtime";
 import { Badge } from "@/components/ui/badge";
@@ -251,6 +252,7 @@ export default function OnDutyMapPage() {
   const [mapReady, setMapReady] = useState(false);
   const [mapInstanceKey, setMapInstanceKey] = useState(0);
   const [mapStyleIndex, setMapStyleIndex] = useState(0);
+  const [useEmbedFallback, setUseEmbedFallback] = useState(false);
   const { data: professionals, isLoading } = useOnDutyProfessionals();
   const { location: userLocation } = useUserLocation();
   const { latestEvent, clearEvent } = useOnDutyRealtime();
@@ -272,17 +274,25 @@ export default function OnDutyMapPage() {
   }, [mapReady]);
 
   useEffect(() => {
+    if (view !== "map" || useEmbedFallback) return;
+    if (maplibregl.supported()) return;
+    console.warn("[OnDutyMap] WebGL unavailable, switching to embed fallback map");
+    setUseEmbedFallback(true);
+  }, [view, useEmbedFallback]);
+
+  useEffect(() => {
     if (view !== "map" || mapReady || mapError) return;
+    if (useEmbedFallback) return;
 
     const timeout = setTimeout(() => {
       if (!mapReadyRef.current) {
         console.error(`[OnDutyMap] Map did not become ready within ${MAP_LOAD_TIMEOUT_MS}ms`);
-        setMapError(true);
+        setUseEmbedFallback(true);
       }
     }, MAP_LOAD_TIMEOUT_MS);
 
     return () => clearTimeout(timeout);
-  }, [view, mapReady, mapError, mapInstanceKey]);
+  }, [view, mapReady, mapError, mapInstanceKey, useEmbedFallback]);
 
   // Debug logging
   useEffect(() => {
@@ -347,9 +357,12 @@ export default function OnDutyMapPage() {
     setMapError(false);
     setMapReady(false);
     setMapStyleIndex(0);
+    setUseEmbedFallback(false);
     mapErrorCountRef.current = 0;
     setMapInstanceKey((prev) => prev + 1);
   }, []);
+
+  const embedSrc = `https://maps.google.com/maps?q=${center.lat},${center.lng}&z=${userLocation ? 11 : 4}&output=embed`;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -428,7 +441,15 @@ export default function OnDutyMapPage() {
         </div>
       ) : view === "map" ? (
         <div className="flex-1 relative" style={{ minHeight: "420px", height: "calc(100vh - 120px)" }}>
-          {mapError ? (
+          {useEmbedFallback ? (
+            <iframe
+              title="On-duty professionals map"
+              src={embedSrc}
+              style={{ width: "100%", height: "100%", border: 0 }}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          ) : mapError ? (
             <div className="absolute inset-0 flex items-center justify-center bg-muted/50 z-10">
               <div className="text-center p-6 bg-card rounded-xl border border-border shadow-lg max-w-xs">
                 <AlertTriangle className="h-8 w-8 text-warning mx-auto mb-3" />
@@ -491,7 +512,7 @@ export default function OnDutyMapPage() {
                 }
 
                 if (!mapReadyRef.current && mapErrorCountRef.current >= 3) {
-                  setMapError(true);
+                  setUseEmbedFallback(true);
                 }
               }}
             >
