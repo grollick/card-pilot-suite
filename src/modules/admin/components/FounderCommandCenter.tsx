@@ -7,7 +7,7 @@ import {
   AlertTriangle, Clock, Eye, Globe, Layers, CreditCard,
   MessageSquare, CheckCircle2, XCircle, ArrowUpRight, ArrowDown,
   Send, FileText, BookOpen, Settings, RefreshCw, UserPlus,
-  Loader2, ShieldAlert, Flame, Heart, Star, Ban
+  Loader2, ShieldAlert, Flame, Heart, Star, Ban, Share2
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import ResearchSummaryWidget from "@/modules/admin/components/ResearchSummaryWidget";
