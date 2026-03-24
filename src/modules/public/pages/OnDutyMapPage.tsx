@@ -467,21 +467,14 @@ export default function OnDutyMapPage() {
           {mapError ? (
             <div className="absolute inset-0 flex items-center justify-center bg-muted/50 z-10">
               <div className="text-center p-6 bg-card rounded-xl border border-border shadow-lg max-w-xs">
-                <AlertTriangle className="h-8 w-8 text-warning mx-auto mb-3" />
-                <p className="text-sm font-medium mb-1">Map failed to load</p>
+                <MapIcon className="h-10 w-10 text-primary mx-auto mb-3" />
+                <p className="text-base font-semibold mb-1">Map View — Coming Soon</p>
                 <p className="text-xs text-muted-foreground mb-4">
-                  {visibleProfessionals.length > 0
-                    ? `${visibleProfessionals.length} professionals are on duty. Try the list view.`
-                    : "No active users yet. Check back later."}
+                  We're working on an interactive map experience. In the meantime, browse available professionals in list mode.
                 </p>
-                <div className="flex gap-2 justify-center">
-                  <Button size="sm" variant="outline" onClick={handleRetryMap}>
-                    Retry
-                  </Button>
-                  <Button size="sm" onClick={() => setView("list")}>
-                    <List className="h-3 w-3 mr-1" /> List View
-                  </Button>
-                </div>
+                <Button size="sm" className="w-full" onClick={() => setView("list")}>
+                  <List className="h-3.5 w-3.5 mr-1.5" /> View Available Professionals
+                </Button>
               </div>
             </div>
           ) : (
