@@ -453,6 +453,10 @@ export default function FounderCommandCenter({ onNavigateSection }: { onNavigate
         <Target className="h-3 w-3" /> View Full Funnel Dashboard
       </Button>
 
+      {/* ── SECTION: Promote guzzl.pro ── */}
+      <SectionHeader icon={Share2} title="Promote guzzl.pro" description="Share, invite, and create social content to grow the platform" />
+      <GuzzlPromoToolkit />
+
       {/* ── SECTION: Cold Outreach ── */}
       <SectionHeader icon={Mail} title="Cold Outreach Emails" description="Pre-written emails to acquire card holders by profession" />
       <ColdOutreachTemplates />
