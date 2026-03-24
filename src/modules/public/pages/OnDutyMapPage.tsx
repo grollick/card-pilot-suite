@@ -16,6 +16,11 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import InstantConnectPanel from "@/modules/public/components/InstantConnectPanel";
 
+function getViewportHeight() {
+  if (typeof window === "undefined") return 800;
+  return window.innerHeight || document.documentElement.clientHeight || 800;
+}
+
 type TileProvider = {
   name: string;
   url: string;
@@ -293,6 +298,7 @@ export default function OnDutyMapPage() {
   const [selectedPro, setSelectedPro] = useState<OnDutyProfessional | null>(null);
   const [tileProviderIndex, setTileProviderIndex] = useState(0);
   const [tileStatus, setTileStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [viewportHeight, setViewportHeight] = useState<number>(() => getViewportHeight());
   const { data: professionals, isLoading } = useOnDutyProfessionals();
   const { location: userLocation } = useUserLocation();
   const { latestEvent, clearEvent } = useOnDutyRealtime();
@@ -371,6 +377,31 @@ export default function OnDutyMapPage() {
     }
   }, [view, tileProviderIndex]);
 
+  useEffect(() => {
+    let raf = 0;
+
+    const updateViewportHeight = () => {
+      setViewportHeight(getViewportHeight());
+    };
+
+    const onViewportChange = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(updateViewportHeight);
+    };
+
+    updateViewportHeight();
+    window.addEventListener("resize", onViewportChange);
+    window.addEventListener("orientationchange", onViewportChange);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", onViewportChange);
+      window.removeEventListener("orientationchange", onViewportChange);
+    };
+  }, []);
+
+  const mapPanelHeight = Math.max(420, viewportHeight - 120);
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Helmet>
@@ -447,7 +478,7 @@ export default function OnDutyMapPage() {
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       ) : view === "map" ? (
-        <div className="flex-1 relative" style={{ minHeight: "420px", height: "calc(100svh - 120px)" }}>
+        <div className="flex-1 relative" style={{ minHeight: "420px", height: `${mapPanelHeight}px` }}>
           <MapContainer
             center={[center.lat, center.lng]}
             zoom={userLocation ? 11 : 4}
