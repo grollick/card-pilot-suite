@@ -6,7 +6,7 @@ import {
   UserCircle, Star,
   Mail, Share2, Gift, BarChart3, QrCode, Tag, Zap,
   Bot, Eye, CreditCard, Package, Building2, CheckSquare,
-  Shield, Sparkles, ExternalLink, Bell,
+  Shield, Sparkles, ExternalLink, Bell, MapPin,
 } from "lucide-react";
 import ClientSwitcher from "@/modules/agency/components/ClientSwitcher";
 import { NavLink } from "@/components/NavLink";
