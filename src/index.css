@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
-@import "leaflet/dist/leaflet.css";
+
 
 @tailwind base;
 @tailwind components;
@@ -553,16 +553,6 @@
   }
 }
 
-/* Leaflet styling comes from the official leaflet.css import at the top of this file. */
-
-/* Leaflet rendering fix (mobile Chrome can over-brighten tiles to a blank canvas) */
-.leaflet-container img.leaflet-tile {
-  mix-blend-mode: normal !important;
-}
-
-.leaflet-container {
-  background: hsl(var(--muted));
-}
 
 /* Global safety net: prevent stale body/html pointer locks from freezing the UI */
 html,
