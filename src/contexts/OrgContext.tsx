@@ -105,17 +105,23 @@ export function OrgProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
 
     // Add self as owner
-    await supabase.from("organization_members").insert({
+    const { error: memberErr } = await supabase.from("organization_members").insert({
       org_id: data.id,
       user_id: user.id,
       role: "owner",
     });
+    if (memberErr) console.error("[createOrg] member insert failed:", memberErr);
 
-    // Set as current
-    await supabase.from("profiles").update({ current_org_id: data.id }).eq("id", user.id);
+    // Set as current org
+    const { error: switchErr } = await supabase.from("profiles").update({ current_org_id: data.id }).eq("id", user.id);
+    if (switchErr) console.error("[createOrg] profile switch failed:", switchErr);
 
-    queryClient.invalidateQueries({ queryKey: ["orgs"] });
-    queryClient.invalidateQueries({ queryKey: ["profile-cache"] });
+    // Wait for cache to fully refresh so UI reflects the new org
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["orgs"] }),
+      queryClient.invalidateQueries({ queryKey: ["profile-cache"] }),
+      queryClient.invalidateQueries({ queryKey: ["org-members"] }),
+    ]);
     return data as Organization;
   }, [user, queryClient]);
 
