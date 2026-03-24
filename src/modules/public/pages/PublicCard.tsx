@@ -40,6 +40,7 @@ import { usePublicProjects } from "@/hooks/useProjects";
 import ReviewForm from "@/modules/public/components/ReviewForm";
 import { supabase } from "@/integrations/supabase/client";
 import { captureLead } from "@/lib/captureLead";
+import { obfuscateEmail, maskPhone, detectBot } from "@/lib/contactProtection";
 import { toast } from "sonner";
 import { downloadVCard } from "@/lib/vcard";
 import {
