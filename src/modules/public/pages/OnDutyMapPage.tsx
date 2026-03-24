@@ -447,7 +447,7 @@ export default function OnDutyMapPage() {
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       ) : view === "map" ? (
-        <div className="flex-1 relative" style={{ height: "max(420px, calc(100dvh - 120px))" }}>
+        <div className="flex-1 relative" style={{ minHeight: "420px", height: "calc(100svh - 120px)" }}>
           <MapContainer
             center={[center.lat, center.lng]}
             zoom={userLocation ? 11 : 4}
