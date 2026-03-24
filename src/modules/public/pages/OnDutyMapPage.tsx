@@ -374,7 +374,7 @@ export default function OnDutyMapPage() {
               }}
               style={{ width: "100%", height: "100%" }}
               mapStyle={MAP_STYLE}
-              attributionControl={true}
+              attributionControl={true as any}
               onError={() => {
                 console.error("[OnDutyMap] MapLibre GL error");
                 setMapError(true);
