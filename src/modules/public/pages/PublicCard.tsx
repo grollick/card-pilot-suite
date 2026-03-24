@@ -43,6 +43,7 @@ import { captureLead } from "@/lib/captureLead";
 import { obfuscateEmail, maskPhone, detectBot } from "@/lib/contactProtection";
 import { toast } from "sonner";
 import { downloadVCard } from "@/lib/vcard";
+import { clearPointerLocksSoon } from "@/lib/pointerLocks";
 import {
   resolveCardTheme,
   getGoogleFontsUrl,
