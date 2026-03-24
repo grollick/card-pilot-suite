@@ -28,7 +28,49 @@ function initials(name: string | null) {
   return (name ?? "?").split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
 }
 
-export default function PublicSite() {
+function ContactRevealBlock({ phone, email, city }: { phone?: string | null; email?: string | null; city?: string | null }) {
+  const [revealed, setRevealed] = useState(false);
+  const reveal = () => setRevealed(true);
+  return (
+    <div className="space-y-4">
+      {phone && (
+        <a
+          href={revealed ? `tel:${phone}` : "#"}
+          onClick={(e) => { if (!revealed) { e.preventDefault(); reveal(); } }}
+          className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
+          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Phone className="h-4 w-4 text-primary" />
+          </div>
+          {revealed ? phone : maskPhone(phone)}
+          {!revealed && <span className="text-xs text-primary font-medium">Tap to reveal</span>}
+        </a>
+      )}
+      {email && (
+        <a
+          href={revealed ? `mailto:${email}` : "#"}
+          onClick={(e) => { if (!revealed) { e.preventDefault(); reveal(); } }}
+          className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+        >
+          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Mail className="h-4 w-4 text-primary" />
+          </div>
+          {revealed ? email : obfuscateEmail(email)}
+          {!revealed && <span className="text-xs text-primary font-medium">Tap to reveal</span>}
+        </a>
+      )}
+      {city && (
+        <div className="flex items-center gap-3 text-muted-foreground">
+          <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+            <MapPin className="h-4 w-4 text-primary" />
+          </div>
+          {city}
+        </div>
+      )}
+    </div>
+  );
+}
+
   const { handle } = useParams<{ handle: string }>();
   const { data, isLoading, error } = useSiteData(handle);
   const [mobileNav, setMobileNav] = useState(false);
