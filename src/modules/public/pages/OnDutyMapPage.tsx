@@ -363,11 +363,11 @@ export default function OnDutyMapPage() {
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       ) : view === "map" ? (
-        <div className="flex-1 relative" style={{ minHeight: "calc(100vh - 120px)" }}>
+        <div className="flex-1 relative" style={{ height: "calc(100vh - 120px)" }}>
           <MapContainer
             center={[center.lat, center.lng]}
             zoom={userLocation ? 11 : 4}
-            className="h-full w-full z-0"
+            className="z-0"
             style={{ height: "100%", width: "100%" }}
           >
             <TileLayer
