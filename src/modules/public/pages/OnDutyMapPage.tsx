@@ -384,8 +384,9 @@ export default function OnDutyMapPage() {
           >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+            <MapResizer />
             {userLocation && <RecenterMap lat={userLocation.lat} lng={userLocation.lng} />}
             {professionals?.map(pro => (
               <ClickableMarker
