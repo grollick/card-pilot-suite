@@ -270,7 +270,14 @@ export function useCardBuilderState() {
         status: val ? "published" : "draft",
       });
       qc.invalidateQueries({ queryKey: ["public-card"] });
-      toast.success(val ? "Card published!" : "Card unpublished");
+      if (val) {
+        toast.success("Card published!", {
+          description: "🔒 Your card is protected with email obfuscation, phone masking, bot detection, and spam filtering to keep your info safe.",
+          duration: 6000,
+        });
+      } else {
+        toast.success("Card unpublished");
+      }
     } catch { toast.error("Failed to update status"); }
   }, [upsertCard, qc]);
 
