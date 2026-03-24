@@ -16,6 +16,29 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import InstantConnectPanel from "@/modules/public/components/InstantConnectPanel";
 
+type TileProvider = {
+  name: string;
+  url: string;
+  attribution: string;
+  subdomains?: string[];
+};
+
+const TILE_PROVIDERS: TileProvider[] = [
+  {
+    name: "OpenStreetMap",
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    subdomains: ["a", "b", "c"],
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  },
+  {
+    name: "CARTO",
+    url: "https://{s}.basemaps.cartocdn.com/voyager/{z}/{x}/{y}{r}.png",
+    subdomains: ["a", "b", "c", "d"],
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  },
+];
+
 // ── Leaflet icon factories ──
 function createIcon(color: string, isAvailable: boolean) {
   const pulseRings = isAvailable ? `
@@ -87,7 +110,9 @@ function formatResponseTime(min: number | null) {
 // ── Recenter map helper ──
 function RecenterMap({ lat, lng }: { lat: number; lng: number }) {
   const map = useMap();
-  useMemo(() => map.setView([lat, lng], 11), [lat, lng, map]);
+  useEffect(() => {
+    map.setView([lat, lng], 11);
+  }, [lat, lng, map]);
   return null;
 }
 
@@ -95,10 +120,35 @@ function RecenterMap({ lat, lng }: { lat: number; lng: number }) {
 function MapResizer() {
   const map = useMap();
   useEffect(() => {
-    // Leaflet needs invalidateSize when container dimensions change after mount
-    const timer = setTimeout(() => map.invalidateSize(), 100);
-    const timer2 = setTimeout(() => map.invalidateSize(), 500);
-    return () => { clearTimeout(timer); clearTimeout(timer2); };
+    const invalidate = () => map.invalidateSize({ pan: false });
+    const raf = requestAnimationFrame(invalidate);
+    const timer = setTimeout(invalidate, 120);
+    const timer2 = setTimeout(invalidate, 500);
+
+    const handleViewportChange = () => invalidate();
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") invalidate();
+    };
+
+    window.addEventListener("resize", handleViewportChange);
+    window.addEventListener("orientationchange", handleViewportChange);
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    const container = map.getContainer();
+    const observer = typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(() => invalidate())
+      : null;
+    observer?.observe(container);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+      clearTimeout(timer2);
+      window.removeEventListener("resize", handleViewportChange);
+      window.removeEventListener("orientationchange", handleViewportChange);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      observer?.disconnect();
+    };
   }, [map]);
   return null;
 }
@@ -252,6 +302,8 @@ function ProfessionalListCard({ pro, onSelect }: { pro: OnDutyProfessional; onSe
 export default function OnDutyMapPage() {
   const [view, setView] = useState<"map" | "list">("map");
   const [selectedPro, setSelectedPro] = useState<OnDutyProfessional | null>(null);
+  const [tileProviderIndex, setTileProviderIndex] = useState(0);
+  const [tileStatus, setTileStatus] = useState<"loading" | "ready" | "error">("loading");
   const { data: professionals, isLoading } = useOnDutyProfessionals();
   const { location: userLocation } = useUserLocation();
   const { latestEvent, clearEvent } = useOnDutyRealtime();
@@ -259,6 +311,7 @@ export default function OnDutyMapPage() {
   // Track which user IDs are "bursting" (just came online)
   const [burstingIds, setBurstingIds] = useState<Set<string>>(new Set());
   const [toastPro, setToastPro] = useState<OnDutyProfessional | null>(null);
+  const tileErrorCountRef = useRef(0);
   const prevIdsRef = useRef<Set<string>>(new Set());
 
   // When realtime event fires and data refreshes, detect new arrivals
@@ -289,6 +342,7 @@ export default function OnDutyMapPage() {
   }, [professionals, latestEvent, clearEvent]);
 
   const center = userLocation ?? { lat: 39.8283, lng: -98.5795 };
+  const activeTile = TILE_PROVIDERS[tileProviderIndex];
   const availableCount = professionals?.filter(p => p.status === "available").length ?? 0;
   const recentCount = professionals?.filter(p => p.status === "recent").length ?? 0;
 
@@ -298,6 +352,35 @@ export default function OnDutyMapPage() {
   }, []);
   const handleClose = useCallback(() => setSelectedPro(null), []);
   const handleToastClose = useCallback(() => setToastPro(null), []);
+  const handleTileLoad = useCallback(() => {
+    tileErrorCountRef.current = 0;
+    setTileStatus("ready");
+  }, []);
+
+  const handleTileError = useCallback(() => {
+    tileErrorCountRef.current += 1;
+
+    setTileStatus((prev) => (prev === "ready" ? prev : "error"));
+
+    if (tileErrorCountRef.current >= 4) {
+      tileErrorCountRef.current = 0;
+      setTileStatus("loading");
+      setTileProviderIndex((prev) => (prev < TILE_PROVIDERS.length - 1 ? prev + 1 : prev));
+    }
+  }, []);
+
+  const handleRetryTiles = useCallback(() => {
+    tileErrorCountRef.current = 0;
+    setTileStatus("loading");
+    setTileProviderIndex((prev) => (prev + 1) % TILE_PROVIDERS.length);
+  }, []);
+
+  useEffect(() => {
+    if (view === "map") {
+      tileErrorCountRef.current = 0;
+      setTileStatus("loading");
+    }
+  }, [view, tileProviderIndex]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -380,11 +463,21 @@ export default function OnDutyMapPage() {
             center={[center.lat, center.lng]}
             zoom={userLocation ? 11 : 4}
             className="z-0"
-            style={{ height: "100%", width: "100%", background: "hsl(var(--muted))" }}
+            style={{
+              height: "100%",
+              width: "100%",
+              background: "linear-gradient(135deg, hsl(var(--muted)), hsl(var(--secondary)))",
+            }}
           >
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+              key={activeTile.name}
+              attribution={activeTile.attribution}
+              url={activeTile.url}
+              subdomains={activeTile.subdomains}
+              eventHandlers={{
+                load: handleTileLoad,
+                tileerror: handleTileError,
+              }}
             />
             <MapResizer />
             {userLocation && <RecenterMap lat={userLocation.lat} lng={userLocation.lng} />}
@@ -404,6 +497,40 @@ export default function OnDutyMapPage() {
             onClose={handleToastClose}
             onSelect={handleSelect}
           />
+
+          {tileStatus !== "ready" && (
+            <div className="absolute inset-0 z-[550] pointer-events-none flex items-center justify-center p-4">
+              <div className="pointer-events-auto w-full max-w-xs rounded-xl border border-border bg-card/95 backdrop-blur-sm shadow-lg p-3">
+                <div className="flex items-start gap-2.5">
+                  {tileStatus === "loading" ? (
+                    <Loader2 className="h-4 w-4 mt-0.5 animate-spin text-muted-foreground shrink-0" />
+                  ) : (
+                    <MapPin className="h-4 w-4 mt-0.5 text-warning shrink-0" />
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium">
+                      {tileStatus === "loading" ? "Loading map…" : "Having trouble loading map tiles"}
+                    </p>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      {tileStatus === "loading"
+                        ? `Connecting to ${activeTile.name}`
+                        : `Switched to ${activeTile.name}. Retry if it still appears blank.`}
+                    </p>
+                  </div>
+                </div>
+                {tileStatus === "error" && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="mt-3 h-7 w-full text-xs"
+                    onClick={handleRetryTiles}
+                  >
+                    Retry map tiles
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
 
           {!professionals?.length && (
             <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[500] bg-card border border-border rounded-xl p-4 shadow-lg text-center max-w-xs">
