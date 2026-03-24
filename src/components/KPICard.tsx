@@ -1,6 +1,7 @@
 import { LucideIcon } from "lucide-react";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { KeyboardEvent } from "react";
 
 interface KPICardProps {
   title: string;
@@ -10,6 +11,7 @@ interface KPICardProps {
   icon: LucideIcon;
   sparklineData?: number[];
   isLoading?: boolean;
+  onClick?: () => void;
 }
 
 function Sparkline({ data }: { data: number[] }) {
@@ -69,8 +71,16 @@ function KPICardSkeleton() {
   );
 }
 
-export default function KPICard({ title, value, change, changeType = "neutral", icon: Icon, sparklineData, isLoading }: KPICardProps) {
+export default function KPICard({ title, value, change, changeType = "neutral", icon: Icon, sparklineData, isLoading, onClick }: KPICardProps) {
   if (isLoading) return <KPICardSkeleton />;
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!onClick) return;
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onClick();
+    }
+  };
 
   return (
     <motion.div
@@ -78,7 +88,11 @@ export default function KPICard({ title, value, change, changeType = "neutral", 
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
       whileHover={{ y: -2, transition: { duration: 0.2 } }}
-      className="dash-card p-5 group"
+      onClick={onClick}
+      onKeyDown={onClick ? handleKeyDown : undefined}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      className={`dash-card p-5 group ${onClick ? "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" : ""}`}
     >
       <div className="flex items-start justify-between">
         <div className="space-y-1.5">
