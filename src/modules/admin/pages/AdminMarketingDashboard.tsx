@@ -76,10 +76,10 @@ export default function AdminMarketingDashboard() {
         {/* ── Overview ── */}
         <TabsContent value="overview" className="mt-4 space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <MetricCard icon={Users} label="Total Users" value={stats?.totalUsers ?? 0} loading={isLoading} />
-            <MetricCard icon={UserCheck} label="Active Users (est.)" value={activeUsers} loading={isLoading} />
-            <MetricCard icon={Target} label="Leads (30d)" value={stats?.leads30d ?? 0} loading={isLoading} />
-            <MetricCard icon={Mail} label="Signups (7d)" value={stats?.signups7d ?? 0} loading={isLoading} />
+            <MetricCard icon={Users} label="Total Users" value={stats?.totalUsers ?? 0} loading={isLoading} onClick={() => setActiveTab("analytics")} />
+            <MetricCard icon={UserCheck} label="Active Users (est.)" value={activeUsers} loading={isLoading} onClick={() => setActiveTab("funnel")} />
+            <MetricCard icon={Target} label="Leads (30d)" value={stats?.leads30d ?? 0} loading={isLoading} onClick={() => setActiveTab("campaigns")} />
+            <MetricCard icon={Mail} label="Signups (7d)" value={stats?.signups7d ?? 0} loading={isLoading} onClick={() => setActiveTab("email-perf")} />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
