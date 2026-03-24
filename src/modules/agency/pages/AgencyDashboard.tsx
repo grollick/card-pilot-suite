@@ -38,11 +38,15 @@ export default function AgencyDashboard() {
     if (!newName.trim() || !newSlug.trim()) return;
     setCreating(true);
     try {
-      await createOrg(newName.trim(), newSlug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-"));
-      toast.success(`Workspace "${newName}" created!`);
+      const org = await createOrg(newName.trim(), newSlug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-"));
+      toast.success(`Workspace "${newName}" created! Switching now…`);
       setShowCreate(false);
       setNewName("");
       setNewSlug("");
+      // Automatically switch to the new workspace
+      if (org) {
+        navigate("/app");
+      }
     } catch (err: any) {
       toast.error(err.message || "Failed to create workspace");
     } finally {
