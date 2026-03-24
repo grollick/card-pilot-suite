@@ -171,6 +171,10 @@ export default function PublicCard() {
   const [showReviewForm, setShowReviewForm] = useState(() => new URLSearchParams(window.location.search).get("review") === "1");
   const viewTracked = useRef(false);
 
+  useEffect(() => {
+    clearPointerLocksSoon();
+  }, []);
+
   const profile = data?.profile;
   const { data: publicReviews = [] } = usePublicReviews(profile?.id);
   const { data: dbProjects = [] } = usePublicProjects(profile?.id);
