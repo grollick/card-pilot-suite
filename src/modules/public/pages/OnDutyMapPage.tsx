@@ -383,8 +383,9 @@ export default function OnDutyMapPage() {
             style={{ height: "100%", width: "100%" }}
           >
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+              subdomains={["a", "b", "c", "d"]}
             />
             <MapResizer />
             {userLocation && <RecenterMap lat={userLocation.lat} lng={userLocation.lng} />}
