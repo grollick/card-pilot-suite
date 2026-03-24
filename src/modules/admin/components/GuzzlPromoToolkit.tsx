@@ -3,6 +3,8 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfileCache } from "@/hooks/useProfileCache";
+import { useQuery } from "@tanstack/react-query";
+import { useProfileCache } from "@/hooks/useProfileCache";
 import {
   Share2, Send, Copy, MessageSquare, Linkedin, Twitter,
   Mail, Phone, ExternalLink, Sparkles, CheckCircle2
