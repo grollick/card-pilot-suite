@@ -15,8 +15,16 @@ import {
 import { motion } from "framer-motion";
 import InstantConnectPanel from "@/modules/public/components/InstantConnectPanel";
 
-const MAP_STYLE = "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
+const MAP_STYLE = "https://demotiles.maplibre.org/style.json";
 const MAX_PINS = 50;
+const MAP_LOAD_TIMEOUT_MS = 12000;
+
+function hasValidCoordinates(pro: OnDutyProfessional) {
+  return Number.isFinite(pro.lat)
+    && Number.isFinite(pro.lng)
+    && Math.abs(pro.lat) <= 90
+    && Math.abs(pro.lng) <= 180;
+}
 
 function formatResponseTime(min: number | null) {
   if (!min) return null;
@@ -58,7 +66,7 @@ function LiveActivityToast({
           <Avatar className="h-10 w-10 ring-2 ring-success/40 ring-offset-1 ring-offset-background">
             <AvatarImage src={professional.avatar_url ?? undefined} />
             <AvatarFallback className="text-xs font-semibold bg-success/10 text-success">
-              {professional.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+              {professional.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
             </AvatarFallback>
           </Avatar>
           <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
@@ -98,7 +106,6 @@ function DutyPin({
       style={{ width: size, height: size, transform: "translate(-50%, -50%)" }}
       aria-label={`${pro.name} - ${pro.status}`}
     >
-      {/* Glow effect */}
       {isAvailable && (
         <span
           className="absolute inset-0 rounded-full animate-ping"
@@ -109,7 +116,6 @@ function DutyPin({
           }}
         />
       )}
-      {/* Pin circle */}
       <span
         className="absolute inset-0 rounded-full border-2 border-background shadow-lg"
         style={{
@@ -137,7 +143,7 @@ const ProfessionalListCard = forwardRef<HTMLDivElement, { pro: OnDutyProfessiona
         <Avatar className="h-11 w-11 ring-2 ring-offset-1 ring-offset-background ring-success/40 shrink-0">
           <AvatarImage src={pro.avatar_url ?? undefined} />
           <AvatarFallback className="text-xs font-semibold bg-muted">
-            {pro.name.split(" ").map(n => n[0]).join("").slice(0, 2)}
+            {pro.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
@@ -154,7 +160,7 @@ const ProfessionalListCard = forwardRef<HTMLDivElement, { pro: OnDutyProfessiona
             <p className="text-xs text-muted-foreground truncate">{pro.profession_name}</p>
           )}
           <div className="flex flex-wrap gap-1 mt-1.5">
-            {pro.badges.map(b => (
+            {pro.badges.map((b) => (
               <Badge key={b} variant="outline" className="text-[9px] h-4 px-1.5 gap-0.5 font-normal">
                 {b === "Fast Responder" && <Zap className="h-2 w-2 text-warning" />}
                 {b === "Highly Rated" && <Star className="h-2 w-2 text-warning" />}
@@ -197,22 +203,43 @@ export default function OnDutyMapPage() {
   const [view, setView] = useState<"map" | "list">("map");
   const [selectedPro, setSelectedPro] = useState<OnDutyProfessional | null>(null);
   const [mapError, setMapError] = useState(false);
-  const { data: professionals, isLoading, error: dataError } = useOnDutyProfessionals();
+  const [mapReady, setMapReady] = useState(false);
+  const [mapInstanceKey, setMapInstanceKey] = useState(0);
+  const { data: professionals, isLoading } = useOnDutyProfessionals();
   const { location: userLocation } = useUserLocation();
   const { latestEvent, clearEvent } = useOnDutyRealtime();
 
   const [burstingIds, setBurstingIds] = useState<Set<string>>(new Set());
   const [toastPro, setToastPro] = useState<OnDutyProfessional | null>(null);
   const prevIdsRef = useRef<Set<string>>(new Set());
+  const mapErrorCountRef = useRef(0);
+  const mapReadyRef = useRef(false);
+
+  useEffect(() => {
+    mapReadyRef.current = mapReady;
+  }, [mapReady]);
+
+  useEffect(() => {
+    if (view !== "map" || mapReady || mapError) return;
+
+    const timeout = setTimeout(() => {
+      if (!mapReadyRef.current) {
+        console.error(`[OnDutyMap] Map did not become ready within ${MAP_LOAD_TIMEOUT_MS}ms`);
+        setMapError(true);
+      }
+    }, MAP_LOAD_TIMEOUT_MS);
+
+    return () => clearTimeout(timeout);
+  }, [view, mapReady, mapError, mapInstanceKey]);
 
   // Debug logging
   useEffect(() => {
     if (professionals) {
-      const withCoords = professionals.filter(p => p.lat && p.lng);
-      const withoutCoords = professionals.filter(p => !p.lat || !p.lng);
+      const withCoords = professionals.filter((p) => hasValidCoordinates(p));
+      const withoutCoords = professionals.filter((p) => !hasValidCoordinates(p));
       console.log(`[OnDutyMap] Fetched: ${professionals.length} users, ${withCoords.length} with coords, ${withoutCoords.length} missing coords`);
       if (withoutCoords.length > 0) {
-        console.warn("[OnDutyMap] Users missing coordinates:", withoutCoords.map(p => p.id));
+        console.warn("[OnDutyMap] Users missing coordinates:", withoutCoords.map((p) => p.id));
       }
     }
   }, [professionals]);
@@ -220,9 +247,8 @@ export default function OnDutyMapPage() {
   // Limit pins for performance
   const visibleProfessionals = useMemo(() => {
     if (!professionals) return [];
-    const valid = professionals.filter(p => p.lat && p.lng);
-    // Sort: available first, then recent
-    const sorted = valid.sort((a, b) => {
+    const valid = professionals.filter((p) => hasValidCoordinates(p));
+    const sorted = [...valid].sort((a, b) => {
       if (a.status === "available" && b.status !== "available") return -1;
       if (a.status !== "available" && b.status === "available") return 1;
       return 0;
@@ -237,12 +263,12 @@ export default function OnDutyMapPage() {
     if (!professionals || !latestEvent) return;
     if (!latestEvent.isOnDuty) return;
 
-    const newPro = professionals.find(p => p.id === latestEvent.userId);
+    const newPro = professionals.find((p) => p.id === latestEvent.userId);
     if (newPro) {
-      setBurstingIds(prev => new Set(prev).add(newPro.id));
+      setBurstingIds((prev) => new Set(prev).add(newPro.id));
       setToastPro(newPro);
       setTimeout(() => {
-        setBurstingIds(prev => {
+        setBurstingIds((prev) => {
           const next = new Set(prev);
           next.delete(newPro.id);
           return next;
@@ -250,20 +276,27 @@ export default function OnDutyMapPage() {
       }, 4000);
     }
 
-    prevIdsRef.current = new Set(professionals.map(p => p.id));
+    prevIdsRef.current = new Set(professionals.map((p) => p.id));
     clearEvent();
   }, [professionals, latestEvent, clearEvent]);
 
   const center = userLocation ?? { lat: 39.8283, lng: -98.5795 };
-  const availableCount = professionals?.filter(p => p.status === "available").length ?? 0;
-  const recentCount = professionals?.filter(p => p.status === "recent").length ?? 0;
+  const availableCount = professionals?.filter((p) => p.status === "available").length ?? 0;
+  const recentCount = professionals?.filter((p) => p.status === "recent").length ?? 0;
 
   const handleSelect = useCallback((pro: OnDutyProfessional) => {
     setSelectedPro(pro);
     setToastPro(null);
   }, []);
+
   const handleClose = useCallback(() => setSelectedPro(null), []);
   const handleToastClose = useCallback(() => setToastPro(null), []);
+  const handleRetryMap = useCallback(() => {
+    setMapError(false);
+    setMapReady(false);
+    mapErrorCountRef.current = 0;
+    setMapInstanceKey((prev) => prev + 1);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -272,7 +305,6 @@ export default function OnDutyMapPage() {
         <meta name="description" content="Find available professionals near you right now. See who's on duty and ready to help." />
       </Helmet>
 
-      {/* Header */}
       <header className="border-b border-border bg-card/80 backdrop-blur-sm sticky top-0 z-[1000]">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -320,7 +352,6 @@ export default function OnDutyMapPage() {
         </div>
       </header>
 
-      {/* Legend */}
       <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
@@ -335,7 +366,6 @@ export default function OnDutyMapPage() {
         </div>
       </div>
 
-      {/* Content */}
       {isLoading ? (
         <div className="flex-1 flex items-center justify-center py-20">
           <div className="text-center">
@@ -356,7 +386,7 @@ export default function OnDutyMapPage() {
                     : "No active users yet. Check back later."}
                 </p>
                 <div className="flex gap-2 justify-center">
-                  <Button size="sm" variant="outline" onClick={() => { setMapError(false); }}>
+                  <Button size="sm" variant="outline" onClick={handleRetryMap}>
                     Retry
                   </Button>
                   <Button size="sm" onClick={() => setView("list")}>
@@ -367,6 +397,7 @@ export default function OnDutyMapPage() {
             </div>
           ) : (
             <MapGL
+              key={mapInstanceKey}
               initialViewState={{
                 longitude: center.lng,
                 latitude: center.lat,
@@ -375,9 +406,23 @@ export default function OnDutyMapPage() {
               style={{ width: "100%", height: "100%" }}
               mapStyle={MAP_STYLE}
               attributionControl={true as any}
-              onError={() => {
-                console.error("[OnDutyMap] MapLibre GL error");
-                setMapError(true);
+              onLoad={() => {
+                setMapReady(true);
+                mapErrorCountRef.current = 0;
+                console.log("[OnDutyMap] Map became ready");
+              }}
+              onError={(event: any) => {
+                mapErrorCountRef.current += 1;
+                console.error("[OnDutyMap] MapLibre event error", {
+                  count: mapErrorCountRef.current,
+                  message: event?.error?.message ?? null,
+                  sourceId: event?.sourceId ?? null,
+                  type: event?.type ?? null,
+                });
+
+                if (!mapReadyRef.current && mapErrorCountRef.current >= 3) {
+                  setMapError(true);
+                }
               }}
             >
               <NavigationControl position="top-right" />
@@ -399,7 +444,13 @@ export default function OnDutyMapPage() {
             </MapGL>
           )}
 
-          {/* Live activity toast */}
+          {!mapReady && !mapError && (
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-4 z-[500] rounded-lg bg-card/95 border border-border px-3 py-2 shadow-sm flex items-center gap-2 text-xs text-muted-foreground">
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              Loading map tiles…
+            </div>
+          )}
+
           <LiveActivityToast
             professional={toastPro}
             onClose={handleToastClose}
@@ -468,7 +519,7 @@ export default function OnDutyMapPage() {
             </div>
           ) : (
             <div className="space-y-2">
-              {professionals?.map(pro => (
+              {professionals?.map((pro) => (
                 <ProfessionalListCard key={pro.id} pro={pro} onSelect={handleSelect} />
               ))}
             </div>
@@ -476,7 +527,6 @@ export default function OnDutyMapPage() {
         </div>
       )}
 
-      {/* Instant Connect Panel */}
       <InstantConnectPanel professional={selectedPro} onClose={handleClose} />
     </div>
   );
