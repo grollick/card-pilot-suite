@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useOnDutyProfessionals, useUserLocation, type OnDutyProfessional } from "@/hooks/useOnDutyMap";
@@ -228,12 +228,57 @@ function ProfessionalListCard({ pro, onSelect }: { pro: OnDutyProfessional; onSe
   );
 }
 
+function MapViewportController({
+  view,
+  tileProviderIndex,
+  userLocation,
+}: {
+  view: "map" | "list";
+  tileProviderIndex: number;
+  userLocation: { lat: number; lng: number } | null;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (view !== "map") return;
+
+    const invalidate = () => map.invalidateSize({ pan: false });
+    const raf = requestAnimationFrame(invalidate);
+    const timer = setTimeout(invalidate, 120);
+    const timer2 = setTimeout(invalidate, 420);
+
+    const handleViewportChange = () => invalidate();
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") invalidate();
+    };
+
+    window.addEventListener("resize", handleViewportChange);
+    window.addEventListener("orientationchange", handleViewportChange);
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+      clearTimeout(timer2);
+      window.removeEventListener("resize", handleViewportChange);
+      window.removeEventListener("orientationchange", handleViewportChange);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [map, view, tileProviderIndex]);
+
+  useEffect(() => {
+    if (!userLocation || view !== "map") return;
+    map.setView([userLocation.lat, userLocation.lng], 11, { animate: false });
+  }, [map, view, userLocation?.lat, userLocation?.lng]);
+
+  return null;
+}
+
 export default function OnDutyMapPage() {
   const [view, setView] = useState<"map" | "list">("map");
   const [selectedPro, setSelectedPro] = useState<OnDutyProfessional | null>(null);
   const [tileProviderIndex, setTileProviderIndex] = useState(0);
   const [tileStatus, setTileStatus] = useState<"loading" | "ready" | "error">("loading");
-  const mapRef = useRef<L.Map | null>(null);
   const { data: professionals, isLoading } = useOnDutyProfessionals();
   const { location: userLocation } = useUserLocation();
   const { latestEvent, clearEvent } = useOnDutyRealtime();
@@ -311,42 +356,6 @@ export default function OnDutyMapPage() {
       setTileStatus("loading");
     }
   }, [view, tileProviderIndex]);
-
-  useEffect(() => {
-    if (view !== "map") return;
-    const map = mapRef.current;
-    if (!map) return;
-
-    const invalidate = () => map.invalidateSize({ pan: false });
-    const raf = requestAnimationFrame(invalidate);
-    const timer = setTimeout(invalidate, 120);
-    const timer2 = setTimeout(invalidate, 420);
-
-    const handleViewportChange = () => invalidate();
-    const handleVisibility = () => {
-      if (document.visibilityState === "visible") invalidate();
-    };
-
-    window.addEventListener("resize", handleViewportChange);
-    window.addEventListener("orientationchange", handleViewportChange);
-    document.addEventListener("visibilitychange", handleVisibility);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      clearTimeout(timer);
-      clearTimeout(timer2);
-      window.removeEventListener("resize", handleViewportChange);
-      window.removeEventListener("orientationchange", handleViewportChange);
-      document.removeEventListener("visibilitychange", handleVisibility);
-    };
-  }, [view, tileProviderIndex]);
-
-  useEffect(() => {
-    if (!userLocation) return;
-    const map = mapRef.current;
-    if (!map) return;
-    map.setView([userLocation.lat, userLocation.lng], 11);
-  }, [userLocation?.lat, userLocation?.lng]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -426,7 +435,6 @@ export default function OnDutyMapPage() {
       ) : view === "map" ? (
         <div className="flex-1 relative" style={{ height: "max(420px, calc(100dvh - 120px))" }}>
           <MapContainer
-            ref={mapRef}
             center={[center.lat, center.lng]}
             zoom={userLocation ? 11 : 4}
             className="z-0"
@@ -436,6 +444,11 @@ export default function OnDutyMapPage() {
               background: "linear-gradient(135deg, hsl(var(--muted)), hsl(var(--secondary)))",
             }}
           >
+            <MapViewportController
+              view={view}
+              tileProviderIndex={tileProviderIndex}
+              userLocation={userLocation}
+            />
             <TileLayer
               key={activeTile.name}
               attribution={activeTile.attribution}
