@@ -93,7 +93,8 @@ export function useUserLocation() {
 export function useOnDutyProfessionals() {
   return useQuery({
     queryKey: ["on-duty-map"],
-    staleTime: 60_000,
+    staleTime: 15_000,
+    refetchInterval: 30_000,
     queryFn: async (): Promise<OnDutyProfessional[]> => {
       // Get all marketplace-enabled profiles
       const { data: profiles } = await supabase
