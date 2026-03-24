@@ -1,7 +1,7 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useOnDutyProfessionals, useUserLocation, type OnDutyProfessional } from "@/hooks/useOnDutyMap";
@@ -105,77 +105,6 @@ function formatResponseTime(min: number | null) {
   if (!min) return null;
   if (min < 60) return `${Math.round(min)}m`;
   return `${Math.round(min / 60)}h`;
-}
-
-// ── Recenter map helper ──
-function RecenterMap({ lat, lng }: { lat: number; lng: number }) {
-  const map = useMap();
-  useEffect(() => {
-    map.setView([lat, lng], 11);
-  }, [lat, lng, map]);
-  return null;
-}
-
-// ── Force map resize after render ──
-function MapResizer() {
-  const map = useMap();
-  useEffect(() => {
-    const invalidate = () => map.invalidateSize({ pan: false });
-    const raf = requestAnimationFrame(invalidate);
-    const timer = setTimeout(invalidate, 120);
-    const timer2 = setTimeout(invalidate, 500);
-
-    const handleViewportChange = () => invalidate();
-    const handleVisibility = () => {
-      if (document.visibilityState === "visible") invalidate();
-    };
-
-    window.addEventListener("resize", handleViewportChange);
-    window.addEventListener("orientationchange", handleViewportChange);
-    document.addEventListener("visibilitychange", handleVisibility);
-
-    const container = map.getContainer();
-    const observer = typeof ResizeObserver !== "undefined"
-      ? new ResizeObserver(() => invalidate())
-      : null;
-    observer?.observe(container);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      clearTimeout(timer);
-      clearTimeout(timer2);
-      window.removeEventListener("resize", handleViewportChange);
-      window.removeEventListener("orientationchange", handleViewportChange);
-      document.removeEventListener("visibilitychange", handleVisibility);
-      observer?.disconnect();
-    };
-  }, [map]);
-  return null;
-}
-
-// ── Clickable marker with burst animation support ──
-function ClickableMarker({
-  pro,
-  onSelect,
-  isBursting,
-}: {
-  pro: OnDutyProfessional;
-  onSelect: (p: OnDutyProfessional) => void;
-  isBursting?: boolean;
-}) {
-  const icon = isBursting
-    ? burstGreenIcon
-    : pro.status === "available"
-      ? greenIcon
-      : yellowIcon;
-
-  return (
-    <Marker
-      position={[pro.lat, pro.lng]}
-      icon={icon}
-      eventHandlers={{ click: () => onSelect(pro) }}
-    />
-  );
 }
 
 // ── Live activity toast ──
@@ -304,6 +233,7 @@ export default function OnDutyMapPage() {
   const [selectedPro, setSelectedPro] = useState<OnDutyProfessional | null>(null);
   const [tileProviderIndex, setTileProviderIndex] = useState(0);
   const [tileStatus, setTileStatus] = useState<"loading" | "ready" | "error">("loading");
+  const mapRef = useRef<L.Map | null>(null);
   const { data: professionals, isLoading } = useOnDutyProfessionals();
   const { location: userLocation } = useUserLocation();
   const { latestEvent, clearEvent } = useOnDutyRealtime();
@@ -381,6 +311,42 @@ export default function OnDutyMapPage() {
       setTileStatus("loading");
     }
   }, [view, tileProviderIndex]);
+
+  useEffect(() => {
+    if (view !== "map") return;
+    const map = mapRef.current;
+    if (!map) return;
+
+    const invalidate = () => map.invalidateSize({ pan: false });
+    const raf = requestAnimationFrame(invalidate);
+    const timer = setTimeout(invalidate, 120);
+    const timer2 = setTimeout(invalidate, 420);
+
+    const handleViewportChange = () => invalidate();
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") invalidate();
+    };
+
+    window.addEventListener("resize", handleViewportChange);
+    window.addEventListener("orientationchange", handleViewportChange);
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(timer);
+      clearTimeout(timer2);
+      window.removeEventListener("resize", handleViewportChange);
+      window.removeEventListener("orientationchange", handleViewportChange);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, [view, tileProviderIndex]);
+
+  useEffect(() => {
+    if (!userLocation) return;
+    const map = mapRef.current;
+    if (!map) return;
+    map.setView([userLocation.lat, userLocation.lng], 11);
+  }, [userLocation?.lat, userLocation?.lng]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -460,6 +426,7 @@ export default function OnDutyMapPage() {
       ) : view === "map" ? (
         <div className="flex-1 relative" style={{ height: "max(420px, calc(100dvh - 120px))" }}>
           <MapContainer
+            ref={mapRef}
             center={[center.lat, center.lng]}
             zoom={userLocation ? 11 : 4}
             className="z-0"
@@ -479,16 +446,22 @@ export default function OnDutyMapPage() {
                 tileerror: handleTileError,
               }}
             />
-            <MapResizer />
-            {userLocation && <RecenterMap lat={userLocation.lat} lng={userLocation.lng} />}
-            {professionals?.map(pro => (
-              <ClickableMarker
-                key={pro.id}
-                pro={pro}
-                onSelect={handleSelect}
-                isBursting={burstingIds.has(pro.id)}
-              />
-            ))}
+            {professionals?.map((pro) => {
+              const icon = burstingIds.has(pro.id)
+                ? burstGreenIcon
+                : pro.status === "available"
+                  ? greenIcon
+                  : yellowIcon;
+
+              return (
+                <Marker
+                  key={pro.id}
+                  position={[pro.lat, pro.lng]}
+                  icon={icon}
+                  eventHandlers={{ click: () => handleSelect(pro) }}
+                />
+              );
+            })}
           </MapContainer>
 
           {/* Live activity toast */}
