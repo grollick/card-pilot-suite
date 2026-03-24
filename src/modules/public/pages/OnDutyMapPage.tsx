@@ -15,7 +15,52 @@ import {
 import { motion } from "framer-motion";
 import InstantConnectPanel from "@/modules/public/components/InstantConnectPanel";
 
-const MAP_STYLE = "https://demotiles.maplibre.org/style.json";
+const MAPBOX_TOKEN =
+  (import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string | undefined)
+  ?? (import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN as string | undefined)
+  ?? "";
+
+const FALLBACK_RASTER_STYLE = {
+  version: 8,
+  sources: {
+    osm: {
+      type: "raster",
+      tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+      tileSize: 256,
+      attribution: "© OpenStreetMap contributors",
+    },
+  },
+  layers: [
+    {
+      id: "osm",
+      type: "raster",
+      source: "osm",
+    },
+  ],
+} as const;
+
+type MapStyleCandidate = {
+  id: string;
+  style: string | Record<string, unknown>;
+};
+
+const MAP_STYLE_CANDIDATES: MapStyleCandidate[] = [
+  ...(MAPBOX_TOKEN
+    ? [{
+      id: "mapbox-streets",
+      style: `https://api.mapbox.com/styles/v1/mapbox/streets-v12?access_token=${MAPBOX_TOKEN}`,
+    }]
+    : []),
+  {
+    id: "carto-positron",
+    style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+  },
+  {
+    id: "osm-raster-fallback",
+    style: FALLBACK_RASTER_STYLE,
+  },
+];
+
 const MAX_PINS = 50;
 const MAP_LOAD_TIMEOUT_MS = 12000;
 
@@ -205,6 +250,7 @@ export default function OnDutyMapPage() {
   const [mapError, setMapError] = useState(false);
   const [mapReady, setMapReady] = useState(false);
   const [mapInstanceKey, setMapInstanceKey] = useState(0);
+  const [mapStyleIndex, setMapStyleIndex] = useState(0);
   const { data: professionals, isLoading } = useOnDutyProfessionals();
   const { location: userLocation } = useUserLocation();
   const { latestEvent, clearEvent } = useOnDutyRealtime();
@@ -214,6 +260,12 @@ export default function OnDutyMapPage() {
   const prevIdsRef = useRef<Set<string>>(new Set());
   const mapErrorCountRef = useRef(0);
   const mapReadyRef = useRef(false);
+  const activeMapStyle = MAP_STYLE_CANDIDATES[mapStyleIndex] ?? MAP_STYLE_CANDIDATES[0];
+
+  useEffect(() => {
+    if (MAPBOX_TOKEN) return;
+    console.warn("[OnDutyMap] Missing Mapbox token, starting with non-Mapbox fallback styles");
+  }, []);
 
   useEffect(() => {
     mapReadyRef.current = mapReady;
@@ -294,6 +346,7 @@ export default function OnDutyMapPage() {
   const handleRetryMap = useCallback(() => {
     setMapError(false);
     setMapReady(false);
+    setMapStyleIndex(0);
     mapErrorCountRef.current = 0;
     setMapInstanceKey((prev) => prev + 1);
   }, []);
@@ -409,7 +462,7 @@ export default function OnDutyMapPage() {
               onLoad={() => {
                 setMapReady(true);
                 mapErrorCountRef.current = 0;
-                console.log("[OnDutyMap] Map became ready");
+                console.log("[OnDutyMap] Map became ready", { style: activeMapStyle.id });
               }}
               onError={(event: any) => {
                 mapErrorCountRef.current += 1;
@@ -418,7 +471,24 @@ export default function OnDutyMapPage() {
                   message: event?.error?.message ?? null,
                   sourceId: event?.sourceId ?? null,
                   type: event?.type ?? null,
+                  style: activeMapStyle.id,
                 });
+
+                const message = String(event?.error?.message ?? "").toLowerCase();
+                const looksLikeFetchFailure = message.includes("failed to fetch") || message.includes("network");
+
+                if (!mapReadyRef.current && looksLikeFetchFailure && mapStyleIndex < MAP_STYLE_CANDIDATES.length - 1) {
+                  const nextIndex = mapStyleIndex + 1;
+                  console.warn("[OnDutyMap] Switching map style fallback", {
+                    from: activeMapStyle.id,
+                    to: MAP_STYLE_CANDIDATES[nextIndex]?.id,
+                  });
+                  mapErrorCountRef.current = 0;
+                  setMapReady(false);
+                  setMapStyleIndex(nextIndex);
+                  setMapInstanceKey((prev) => prev + 1);
+                  return;
+                }
 
                 if (!mapReadyRef.current && mapErrorCountRef.current >= 3) {
                   setMapError(true);
