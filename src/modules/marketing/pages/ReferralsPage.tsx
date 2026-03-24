@@ -13,6 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import ReferralShareToolkit from "@/modules/marketing/components/ReferralShareToolkit";
 
 const REWARD_TIERS = [
   { count: 1, reward: "14 days Pro free (both!)", days: 14, icon: "🎁" },
