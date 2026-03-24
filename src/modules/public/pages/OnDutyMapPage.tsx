@@ -375,17 +375,16 @@ export default function OnDutyMapPage() {
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       ) : view === "map" ? (
-        <div className="flex-1 relative" style={{ height: "calc(100vh - 120px)" }}>
+        <div className="flex-1 relative" style={{ height: "max(420px, calc(100dvh - 120px))" }}>
           <MapContainer
             center={[center.lat, center.lng]}
             zoom={userLocation ? 11 : 4}
             className="z-0"
-            style={{ height: "100%", width: "100%" }}
+            style={{ height: "100%", width: "100%", background: "hsl(var(--muted))" }}
           >
             <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-              url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-              subdomains={["a", "b", "c", "d"]}
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <MapResizer />
             {userLocation && <RecenterMap lat={userLocation.lat} lng={userLocation.lng} />}
