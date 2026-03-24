@@ -345,6 +345,15 @@ export default function PublicCard() {
 
   const handleFormSubmit = async () => {
     if (!formData.name) return;
+
+    // Bot detection
+    const botCheck = detectBot(honeypot, formLoadTime);
+    if (botCheck.isBot) {
+      // Silently pretend success to not reveal detection
+      setFormSent(true);
+      return;
+    }
+
     setSubmitting(true);
     try {
       const visitorMeta = getVisitorMeta();
