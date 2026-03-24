@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   MapPin, List, Map as MapIcon, Star, Clock, Zap, Shield,
-  MessageSquare, Eye, Radio, Loader2, ArrowLeft, AlertTriangle,
+  MessageSquare, Eye, Radio, Loader2, ArrowLeft,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import InstantConnectPanel from "@/modules/public/components/InstantConnectPanel";
@@ -265,6 +265,7 @@ export default function OnDutyMapPage() {
   const [mapIdle, setMapIdle] = useState(false);
   const [mapInstanceKey, setMapInstanceKey] = useState(0);
   const [mapStyleIndex, setMapStyleIndex] = useState(0);
+  const [mapFetchErrorCount, setMapFetchErrorCount] = useState(0);
   const { data: professionals, isLoading } = useOnDutyProfessionals();
   const { location: userLocation } = useUserLocation();
   const { latestEvent, clearEvent } = useOnDutyRealtime();
@@ -383,6 +384,7 @@ export default function OnDutyMapPage() {
     setMapReady(false);
     setMapIdle(false);
     setMapStyleIndex(0);
+    setMapFetchErrorCount(0);
     mapErrorCountRef.current = 0;
     setMapInstanceKey((prev) => prev + 1);
   }, []);
@@ -470,7 +472,7 @@ export default function OnDutyMapPage() {
                 <MapIcon className="h-10 w-10 text-primary mx-auto mb-3" />
                 <p className="text-base font-semibold mb-1">Map View — Coming Soon</p>
                 <p className="text-xs text-muted-foreground mb-4">
-                  We're working on an interactive map experience. In the meantime, browse available professionals in list mode.
+                  Coming soon — please use list mode.
                 </p>
                 <Button size="sm" className="w-full" onClick={() => setView("list")}>
                   <List className="h-3.5 w-3.5 mr-1.5" /> View Available Professionals
@@ -491,6 +493,7 @@ export default function OnDutyMapPage() {
               onLoad={() => {
                 setMapReady(true);
                 setMapIdle(false);
+                setMapFetchErrorCount(0);
                 mapErrorCountRef.current = 0;
                 console.log("[OnDutyMap] Map became ready", { style: activeMapStyle.id });
               }}
@@ -499,6 +502,7 @@ export default function OnDutyMapPage() {
               }}
               onError={(event: any) => {
                 mapErrorCountRef.current += 1;
+                setMapFetchErrorCount(mapErrorCountRef.current);
                 console.error("[OnDutyMap] MapLibre event error", {
                   count: mapErrorCountRef.current,
                   message: event?.error?.message ?? null,
@@ -509,6 +513,11 @@ export default function OnDutyMapPage() {
 
                 const message = String(event?.error?.message ?? "").toLowerCase();
                 const looksLikeFetchFailure = message.includes("failed to fetch") || message.includes("network");
+
+                if (looksLikeFetchFailure && mapErrorCountRef.current >= 5) {
+                  setMapError(true);
+                  return;
+                }
 
                 if (!mapReadyRef.current && looksLikeFetchFailure && mapStyleIndex < MAP_STYLE_CANDIDATES.length - 1) {
                   const nextIndex = mapStyleIndex + 1;
@@ -552,6 +561,12 @@ export default function OnDutyMapPage() {
             <div className="absolute left-1/2 -translate-x-1/2 bottom-4 z-[500] rounded-lg bg-card/95 border border-border px-3 py-2 shadow-sm flex items-center gap-2 text-xs text-muted-foreground">
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
               Loading map tiles…
+            </div>
+          )}
+
+          {mapReady && !mapError && mapFetchErrorCount >= 3 && (
+            <div className="absolute left-1/2 -translate-x-1/2 top-4 z-[500] rounded-lg bg-card/95 border border-border px-3 py-2 shadow-sm text-xs text-muted-foreground">
+              Having trouble loading map tiles…
             </div>
           )}
 
