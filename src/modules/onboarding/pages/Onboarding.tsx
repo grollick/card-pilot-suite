@@ -321,7 +321,7 @@ export default function Onboarding() {
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold">
-            <span className="font-black text-primary text-4xl">guzzl</span><span className="text-foreground">.pro</span>
+            <span className="font-black text-primary text-4xl">guzzl</span><span className="text-foreground font-normal">.pro</span>
           </h1>
         </div>
 

@@ -376,7 +376,7 @@ export default function ClientDashboard() {
       {/* Footer */}
       <footer className="border-t border-border mt-12 py-4 text-center">
         <p className="text-xs text-muted-foreground">
-          Powered by <span className="font-medium text-foreground"><span className="font-black text-primary text-4xl">guzzl</span>.pro</span>
+          Powered by <span className="font-medium text-foreground"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></span>
         </p>
       </footer>
     </div>

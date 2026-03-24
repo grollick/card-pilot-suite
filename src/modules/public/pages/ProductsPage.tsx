@@ -20,7 +20,7 @@ export default function ProductsPage() {
       <nav className="border-b border-border/50 bg-card/80 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
           <Link to="/" className="text-lg font-extrabold tracking-tight">
-            <span className="gradient-text"><span className="font-black text-primary text-4xl">guzzl</span>.pro</span>
+            <span className="gradient-text"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></span>
           </Link>
           <div className="flex items-center gap-2">
             <Link to="/">
