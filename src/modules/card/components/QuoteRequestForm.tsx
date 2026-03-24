@@ -26,6 +26,8 @@ export default function QuoteRequestForm({
 }: QuoteRequestFormProps) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
+  const [formLoadTime] = useState(() => Date.now());
   const [form, setForm] = useState({
     name: "",
     email: "",
