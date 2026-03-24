@@ -1,6 +1,7 @@
 import { Users, UserCheck, Target, Mail, TrendingUp, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { useNavigate } from "react-router-dom";
 import type { AdminStats } from "@/hooks/useAdminStats";
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function AdminMarketingAnalytics({ stats, isLoading }: Props) {
+  const navigate = useNavigate();
   const signupTrend = stats?.signupsByDate
     ? Object.entries(stats.signupsByDate)
         .sort(([a], [b]) => a.localeCompare(b))
@@ -37,24 +39,28 @@ export default function AdminMarketingAnalytics({ stats, isLoading }: Props) {
           value={stats?.signups30d ?? 0}
           trend={growthRate}
           loading={isLoading}
+          onClick={() => navigate("/app/admin")}
         />
         <AnalyticCard
           icon={UserCheck}
           label="Active Users (est.)"
           value={activeUsers}
           loading={isLoading}
+          onClick={() => navigate("/app/admin")}
         />
         <AnalyticCard
           icon={Target}
           label="Leads Generated (30d)"
           value={stats?.leads30d ?? 0}
           loading={isLoading}
+          onClick={() => navigate("/app/contacts")}
         />
         <AnalyticCard
           icon={Mail}
           label="Bookings (30d)"
           value={stats?.bookings30d ?? 0}
           loading={isLoading}
+          onClick={() => navigate("/app/bookings")}
         />
       </div>
 
@@ -116,15 +122,16 @@ export default function AdminMarketingAnalytics({ stats, isLoading }: Props) {
   );
 }
 
-function AnalyticCard({ icon: Icon, label, value, trend, loading }: {
+function AnalyticCard({ icon: Icon, label, value, trend, loading, onClick }: {
   icon: any;
   label: string;
   value: number;
   trend?: number;
   loading: boolean;
+  onClick?: () => void;
 }) {
   return (
-    <Card>
+    <Card className={onClick ? "cursor-pointer hover:shadow-card transition-shadow" : ""} onClick={onClick}>
       <CardContent className="pt-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
