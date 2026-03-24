@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { obfuscateEmail, maskPhone } from "@/lib/contactProtection";
 import { useParams, Link, useLocation } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useSiteData } from "@/hooks/useSiteData";
