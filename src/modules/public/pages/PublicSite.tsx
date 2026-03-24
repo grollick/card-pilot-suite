@@ -461,7 +461,7 @@ export default function PublicSite() {
               <span className="text-sm font-medium text-foreground">{profile.company || profile.name}</span>
             </div>
             <p className="text-xs text-muted-foreground">
-              Powered by <Link to="/" className="text-primary hover:underline"><span className="font-black text-primary text-4xl">guzzl</span>.pro</Link>
+              Powered by <Link to="/" className="text-primary hover:underline"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></Link>
             </p>
           </div>
         </footer>

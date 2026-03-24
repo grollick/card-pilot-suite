@@ -244,7 +244,7 @@ export default function DemoCardPreview() {
         {/* Powered by */}
         <div className="text-center mt-8">
           <Link to="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-            Powered by <span className="font-semibold"><span className="font-black text-primary text-4xl">guzzl</span>.pro</span>
+            Powered by <span className="font-semibold"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></span>
           </Link>
         </div>
       </div>

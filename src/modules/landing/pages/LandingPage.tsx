@@ -201,7 +201,7 @@ export default function LandingPage() {
       <nav className="border-b border-border/40 bg-background/70 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link to="/" className="text-xl font-extrabold tracking-tight shrink-0">
-            <span className="text-primary font-extrabold">guzzl</span><span className="text-foreground">.pro</span>
+            <span className="text-primary font-extrabold">guzzl</span><span className="text-foreground font-normal">.pro</span>
           </Link>
           <div className="hidden md:flex items-center gap-8">
             {NAV_LINKS.map((l) => (
