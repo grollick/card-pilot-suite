@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { detectBot } from "@/lib/contactProtection";
 import { FileText, Upload, X, Send, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { captureLead, getVisitorMeta } from "@/lib/captureLead";
@@ -25,6 +26,8 @@ export default function QuoteRequestForm({
 }: QuoteRequestFormProps) {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
+  const [formLoadTime] = useState(() => Date.now());
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -91,6 +94,12 @@ export default function QuoteRequestForm({
   const handleSubmit = async () => {
     if (!form.name.trim()) {
       toast.error("Please enter your name");
+      return;
+    }
+    // Bot detection
+    const botCheck = detectBot(honeypot, formLoadTime);
+    if (botCheck.isBot) {
+      setSubmitted(true); // Silently pretend success
       return;
     }
     setSubmitting(true);
@@ -178,6 +187,17 @@ export default function QuoteRequestForm({
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <p style={{ fontSize: 13, color: palette.secondary, margin: 0, lineHeight: 1.5 }}>{subtitle}</p>
 
+        {/* Honeypot */}
+        <input
+          type="text"
+          name="company_website"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          autoComplete="off"
+          tabIndex={-1}
+          aria-hidden="true"
+          style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, width: 0 }}
+        />
         {/* Name */}
         <div>
           <label style={labelStyle}>Name *</label>

@@ -40,6 +40,7 @@ import { usePublicProjects } from "@/hooks/useProjects";
 import ReviewForm from "@/modules/public/components/ReviewForm";
 import { supabase } from "@/integrations/supabase/client";
 import { captureLead } from "@/lib/captureLead";
+import { obfuscateEmail, maskPhone, detectBot } from "@/lib/contactProtection";
 import { toast } from "sonner";
 import { downloadVCard } from "@/lib/vcard";
 import {
@@ -162,7 +163,10 @@ export default function PublicCard() {
   const { data, isLoading, isError } = usePublicCard(handle);
   const [formSent, setFormSent] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
+  const [honeypot, setHoneypot] = useState("");
+  const [formLoadTime] = useState(() => Date.now());
   const [submitting, setSubmitting] = useState(false);
+  const [contactRevealed, setContactRevealed] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(() => new URLSearchParams(window.location.search).get("review") === "1");
   const viewTracked = useRef(false);
 
@@ -341,6 +345,15 @@ export default function PublicCard() {
 
   const handleFormSubmit = async () => {
     if (!formData.name) return;
+
+    // Bot detection
+    const botCheck = detectBot(honeypot, formLoadTime);
+    if (botCheck.isBot) {
+      // Silently pretend success to not reveal detection
+      setFormSent(true);
+      return;
+    }
+
     setSubmitting(true);
     try {
       const visitorMeta = getVisitorMeta();
@@ -1317,6 +1330,17 @@ export default function PublicCard() {
               ) : (
                 <CardSectionWrapper theme={theme} index={4} metallicEffect={metallicEffect}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {/* Honeypot field — hidden from real users, catches bots */}
+                    <input
+                      type="text"
+                      name="website_url"
+                      value={honeypot}
+                      onChange={(e) => setHoneypot(e.target.value)}
+                      autoComplete="off"
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, width: 0 }}
+                    />
                     <input
                       placeholder="Your name *"
                       value={formData.name}
@@ -1424,11 +1448,24 @@ export default function PublicCard() {
             </div>
           )}
 
-          {/* ── Contact Info ── */}
+          {/* ── Contact Info (protected against scrapers) ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {profile.phone && (
               <a
-                href={`tel:${profile.phone}`}
+                href={contactRevealed ? `tel:${profile.phone}` : "#"}
+                onClick={(e) => {
+                  if (!contactRevealed) {
+                    e.preventDefault();
+                    setContactRevealed(true);
+                    // Log reveal event
+                    supabase.from("analytics_events").insert({
+                      user_id: profile.id,
+                      handle: handle!,
+                      event_type: "button_click" as const,
+                      meta_json: { action: "reveal_contact" },
+                    }).then();
+                  }
+                }}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -1436,15 +1473,31 @@ export default function PublicCard() {
                   fontSize: 13,
                   color: palette.secondary,
                   textDecoration: "none",
+                  cursor: "pointer",
                 }}
               >
                 <Phone className="h-3.5 w-3.5" style={{ color: palette.primary }} />
-                {profile.phone}
+                {contactRevealed ? profile.phone : maskPhone(profile.phone)}
+                {!contactRevealed && (
+                  <span style={{ fontSize: 11, color: palette.primary, fontWeight: 500 }}>Tap to reveal</span>
+                )}
               </a>
             )}
             {profile.email && (
               <a
-                href={`mailto:${profile.email}`}
+                href={contactRevealed ? `mailto:${profile.email}` : "#"}
+                onClick={(e) => {
+                  if (!contactRevealed) {
+                    e.preventDefault();
+                    setContactRevealed(true);
+                    supabase.from("analytics_events").insert({
+                      user_id: profile.id,
+                      handle: handle!,
+                      event_type: "button_click" as const,
+                      meta_json: { action: "reveal_contact" },
+                    }).then();
+                  }
+                }}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -1452,10 +1505,14 @@ export default function PublicCard() {
                   fontSize: 13,
                   color: palette.secondary,
                   textDecoration: "none",
+                  cursor: "pointer",
                 }}
               >
                 <Mail className="h-3.5 w-3.5" style={{ color: palette.primary }} />
-                {profile.email}
+                {contactRevealed ? profile.email : obfuscateEmail(profile.email)}
+                {!contactRevealed && (
+                  <span style={{ fontSize: 11, color: palette.primary, fontWeight: 500 }}>Tap to reveal</span>
+                )}
               </a>
             )}
           </div>
