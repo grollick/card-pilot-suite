@@ -221,11 +221,11 @@ export default function DashboardHome() {
         </div>
       </motion.div>
 
+      {/* Estimate Duty — prominent position */}
+      <EstimateDutyPanel />
+
       {/* Mobile Job Dashboard */}
       {isMobile && <MobileJobDashboard />}
-
-      {/* Estimate Duty (contextual) */}
-      <EstimateDutyPanel />
 
       {/* ── First Lead Guarantee ── */}
       <motion.div
