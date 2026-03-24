@@ -109,13 +109,15 @@ export default function TopBar() {
 
         {/* Avatar */}
         <Tip label={profile?.name || "Your profile"}>
-          {profile?.avatar_url ? (
-            <img src={profile.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover ring-2 ring-border cursor-pointer" />
-          ) : (
-            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary ring-2 ring-border cursor-pointer">
-              {initials}
-            </div>
-          )}
+          <button onClick={() => navigate("/app/settings")} className="focus:outline-none">
+            {profile?.avatar_url ? (
+              <img src={profile.avatar_url} alt="" className="h-8 w-8 rounded-full object-cover ring-2 ring-border cursor-pointer hover:ring-primary transition-colors" />
+            ) : (
+              <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary ring-2 ring-border cursor-pointer hover:ring-primary transition-colors">
+                {initials}
+              </div>
+            )}
+          </button>
         </Tip>
       </header>
     </TooltipProvider>
