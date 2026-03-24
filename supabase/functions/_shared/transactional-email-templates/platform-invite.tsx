@@ -108,7 +108,7 @@ export const template = {
   previewData: {
     recipientName: 'Marcus',
     senderName: 'Jordan',
-    personalMessage: 'Hey Marcus, I set up my card on guzzl.pro and it's been awesome for getting new clients. You should check it out!',
+    personalMessage: "Hey Marcus, I set up my card on guzzl.pro and it has been awesome for getting new clients. You should check it out!",
     referralCode: 'JORDAN2024',
   },
 } satisfies TemplateEntry
