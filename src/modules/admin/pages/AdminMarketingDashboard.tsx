@@ -201,9 +201,9 @@ export default function AdminMarketingDashboard() {
   );
 }
 
-function MetricCard({ icon: Icon, label, value, loading }: { icon: any; label: string; value: number; loading: boolean }) {
+function MetricCard({ icon: Icon, label, value, loading, onClick }: { icon: any; label: string; value: number; loading: boolean; onClick?: () => void }) {
   return (
-    <Card>
+    <Card className={onClick ? "cursor-pointer hover:shadow-card transition-shadow" : ""} onClick={onClick}>
       <CardContent className="pt-6">
         <div className="flex items-center gap-3">
           <div className="rounded-lg bg-primary/10 p-2">
