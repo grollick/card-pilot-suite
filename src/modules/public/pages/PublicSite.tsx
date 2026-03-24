@@ -370,32 +370,7 @@ export default function PublicSite() {
                 <p className="text-muted-foreground mb-8 leading-relaxed">
                   Have a question or ready to get started? Reach out and we'll get back to you promptly.
                 </p>
-                <div className="space-y-4">
-                  {profile.phone && (
-                    <a href={`tel:${profile.phone}`} className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
-                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <Phone className="h-4 w-4 text-primary" />
-                      </div>
-                      {profile.phone}
-                    </a>
-                  )}
-                  {profile.email && (
-                    <a href={`mailto:${profile.email}`} className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
-                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <Mail className="h-4 w-4 text-primary" />
-                      </div>
-                      {profile.email}
-                    </a>
-                  )}
-                  {profile.city && (
-                    <div className="flex items-center gap-3 text-muted-foreground">
-                      <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <MapPin className="h-4 w-4 text-primary" />
-                      </div>
-                      {profile.city}
-                    </div>
-                  )}
-                </div>
+                <ContactRevealBlock phone={profile.phone} email={profile.email} city={profile.city} />
               </div>
 
               <Card className="border-border/60">
