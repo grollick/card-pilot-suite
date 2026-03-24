@@ -96,6 +96,12 @@ export default function QuoteRequestForm({
       toast.error("Please enter your name");
       return;
     }
+    // Bot detection
+    const botCheck = detectBot(honeypot, formLoadTime);
+    if (botCheck.isBot) {
+      setSubmitted(true); // Silently pretend success
+      return;
+    }
     setSubmitting(true);
     try {
       const visitorMeta = getVisitorMeta();
