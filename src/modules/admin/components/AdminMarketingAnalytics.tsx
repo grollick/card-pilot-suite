@@ -1,6 +1,7 @@
 import { Users, UserCheck, Target, Mail, TrendingUp, TrendingDown } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+import { useNavigate } from "react-router-dom";
 import type { AdminStats } from "@/hooks/useAdminStats";
 
 interface Props {
