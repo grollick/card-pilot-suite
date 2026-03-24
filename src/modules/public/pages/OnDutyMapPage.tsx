@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import MapGL, { Marker, NavigationControl } from "react-map-gl/maplibre";
 import "maplibre-gl/dist/maplibre-gl.css";
-import maplibregl from "maplibre-gl";
 import { useOnDutyProfessionals, useUserLocation, type OnDutyProfessional } from "@/hooks/useOnDutyMap";
 import { useOnDutyRealtime } from "@/hooks/useOnDutyRealtime";
 import { Badge } from "@/components/ui/badge";
@@ -76,6 +75,19 @@ function formatResponseTime(min: number | null) {
   if (!min) return null;
   if (min < 60) return `${Math.round(min)}m`;
   return `${Math.round(min / 60)}h`;
+}
+
+function hasWebGLSupport() {
+  if (typeof window === "undefined") return true;
+  try {
+    const canvas = document.createElement("canvas");
+    return Boolean(
+      window.WebGLRenderingContext
+      && (canvas.getContext("webgl2") || canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+    );
+  } catch {
+    return false;
+  }
 }
 
 // ── Live activity toast ──
@@ -275,7 +287,7 @@ export default function OnDutyMapPage() {
 
   useEffect(() => {
     if (view !== "map" || useEmbedFallback) return;
-    if (maplibregl.supported()) return;
+    if (hasWebGLSupport()) return;
     console.warn("[OnDutyMap] WebGL unavailable, switching to embed fallback map");
     setUseEmbedFallback(true);
   }, [view, useEmbedFallback]);
