@@ -165,13 +165,12 @@ export default function DashboardHome() {
             </motion.p>
           </div>
 
-          {!isMobile && (
-            <motion.div
-              className="flex flex-wrap gap-2"
-              initial={{ opacity: 0, x: 12 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.25 }}
-            >
+          <motion.div
+            className="flex flex-wrap gap-2"
+            initial={{ opacity: 0, x: 12 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.25 }}
+          >
               <Button
                 size="sm"
                 className="gap-2 rounded-xl h-9 text-[13px] font-medium shadow-sm shadow-primary/20 hover:shadow-md hover:shadow-primary/30 transition-all hover:scale-[1.02]"
@@ -218,8 +217,7 @@ export default function DashboardHome() {
               >
                 <Globe className="h-3.5 w-3.5" /> Discover
               </Button>
-            </motion.div>
-          )}
+          </motion.div>
         </div>
       </motion.div>
 
