@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect, useRef, forwardRef } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { MapContainer, TileLayer, CircleMarker, useMap } from "react-leaflet";
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useOnDutyProfessionals, useUserLocation, type OnDutyProfessional } from "@/hooks/useOnDutyMap";
 import { useOnDutyRealtime } from "@/hooks/useOnDutyRealtime";
@@ -13,7 +12,7 @@ import {
   MapPin, List, Map as MapIcon, Star, Clock, Zap, Shield,
   MessageSquare, Eye, Radio, Loader2, ArrowLeft,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import InstantConnectPanel from "@/modules/public/components/InstantConnectPanel";
 
 function getViewportHeight() {
