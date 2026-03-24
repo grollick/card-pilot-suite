@@ -4,6 +4,7 @@ import KPICard from "@/components/KPICard";
 import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAnalyticsStats, useCtaBreakdown, useEmailStats, useReferrerBreakdown, useDeviceBreakdown, useConversionFunnel, useLeadResponseTime, useRepeatCustomers } from "@/hooks/useAnalytics";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,7 @@ const DEVICE_ICONS: Record<string, React.ReactNode> = {
 
 export default function Analytics() {
   const [period, setPeriod] = useState("7");
+  const navigate = useNavigate();
   const days = parseInt(period);
   const { data: stats, isLoading } = useAnalyticsStats(days);
   const { data: ctaData = [] } = useCtaBreakdown(days);
@@ -33,6 +35,21 @@ export default function Analytics() {
   };
 
   const maxViews = Math.max(...(stats?.dailyData?.map(d => d.views) ?? [1]), 1);
+
+  const periodSummary = [
+    { label: "Card Views", value: stats?.views ?? 0, route: "/app/viewers" },
+    { label: "Contact Saves", value: stats?.contactSaves ?? 0, route: "/app/viewers" },
+    { label: "Form Submits", value: stats?.formSubmits ?? 0, route: "/app/contacts" },
+    { label: "Bookings", value: stats?.bookings ?? 0, route: "/app/bookings" },
+    { label: "Booking Events", value: stats?.bookingEvents ?? 0, route: "/app/bookings" },
+  ];
+
+  const emailSummary = [
+    { label: "Total Sent", value: emailStats?.sent ?? 0, route: "/app/email-dashboard" },
+    { label: "Pending", value: emailStats?.pending ?? 0, route: "/app/email-dashboard" },
+    { label: "Failed", value: emailStats?.failed ?? 0, route: "/app/email-dashboard" },
+    { label: "Bounced", value: emailStats?.bounced ?? 0, route: "/app/email-dashboard" },
+  ];
 
   return (
     <div className="space-y-8 max-w-6xl">
@@ -63,19 +80,20 @@ export default function Analytics() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
           <KPICard icon={Eye} title="Card Views" value={stats?.views ?? 0}
-            change={fmtChange(stats?.viewsChange).text} changeType={fmtChange(stats?.viewsChange).type} />
+            change={fmtChange(stats?.viewsChange).text} changeType={fmtChange(stats?.viewsChange).type} onClick={() => navigate("/app/viewers")} />
           <KPICard icon={MousePointer} title="CTA Clicks" value={stats?.clicks ?? 0}
-            change={fmtChange(stats?.clicksChange).text} changeType={fmtChange(stats?.clicksChange).type} />
+            change={fmtChange(stats?.clicksChange).text} changeType={fmtChange(stats?.clicksChange).type} onClick={() => navigate("/app/analytics")} />
           <KPICard icon={Users} title="Leads Captured" value={stats?.contacts ?? 0}
-            change={fmtChange(stats?.contactsChange).text} changeType={fmtChange(stats?.contactsChange).type} />
+            change={fmtChange(stats?.contactsChange).text} changeType={fmtChange(stats?.contactsChange).type} onClick={() => navigate("/app/contacts")} />
           <KPICard icon={Download} title="Contact Saves" value={stats?.contactSaves ?? 0}
             sparklineData={stats?.dailyData?.map(d => d.contactSaves)}
-            change={fmtChange(stats?.contactSavesChange).text} changeType={fmtChange(stats?.contactSavesChange).type} />
+            change={fmtChange(stats?.contactSavesChange).text} changeType={fmtChange(stats?.contactSavesChange).type} onClick={() => navigate("/app/viewers")} />
           <KPICard icon={Calendar} title="Bookings" value={stats?.bookings ?? 0}
-            change={fmtChange(stats?.bookingsChange).text} changeType={fmtChange(stats?.bookingsChange).type} />
+            change={fmtChange(stats?.bookingsChange).text} changeType={fmtChange(stats?.bookingsChange).type} onClick={() => navigate("/app/bookings")} />
           <KPICard icon={TrendingUp} title="Conversion Rate" value={`${stats?.conversionRate ?? 0}%`}
             change={`${(stats?.conversionChange ?? 0) >= 0 ? "+" : ""}${stats?.conversionChange ?? 0}% vs prev`}
-            changeType={(stats?.conversionChange ?? 0) > 0 ? "positive" : (stats?.conversionChange ?? 0) < 0 ? "negative" : "neutral"} />
+            changeType={(stats?.conversionChange ?? 0) > 0 ? "positive" : (stats?.conversionChange ?? 0) < 0 ? "negative" : "neutral"}
+            onClick={() => navigate("/app/revenue")} />
         </div>
       )}
 
@@ -309,16 +327,16 @@ export default function Analytics() {
           </div>
           {emailStats ? (
             <div className="grid grid-cols-2 gap-4">
-              {[
-                { label: "Total Sent", value: emailStats.sent },
-                { label: "Pending", value: emailStats.pending },
-                { label: "Failed", value: emailStats.failed },
-                { label: "Bounced", value: emailStats.bounced },
-              ].map(s => (
-                <div key={s.label} className="text-center p-3 rounded-lg bg-muted/30">
+              {emailSummary.map(s => (
+                <button
+                  key={s.label}
+                  type="button"
+                  onClick={() => navigate(s.route)}
+                  className="text-center p-3 rounded-lg bg-muted/30 transition-colors hover:bg-muted/50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
                   <p className="text-2xl font-semibold">{s.value}</p>
                   <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
-                </div>
+                </button>
               ))}
             </div>
           ) : (
@@ -333,17 +351,16 @@ export default function Analytics() {
             <h2 className="font-semibold">Period Summary</h2>
           </div>
           <div className="grid grid-cols-2 gap-4">
-            {[
-              { label: "Card Views", value: stats?.views ?? 0 },
-              { label: "Contact Saves", value: stats?.contactSaves ?? 0 },
-              { label: "Form Submits", value: stats?.formSubmits ?? 0 },
-              { label: "Bookings", value: stats?.bookings ?? 0 },
-              { label: "Booking Events", value: stats?.bookingEvents ?? 0 },
-            ].map(s => (
-              <div key={s.label} className="text-center p-3 rounded-lg bg-muted/30">
+            {periodSummary.map(s => (
+              <button
+                key={s.label}
+                type="button"
+                onClick={() => navigate(s.route)}
+                className="text-center p-3 rounded-lg bg-muted/30 transition-colors hover:bg-muted/50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
                 <p className="text-2xl font-semibold">{s.value}</p>
                 <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
-              </div>
+              </button>
             ))}
           </div>
         </motion.div>
