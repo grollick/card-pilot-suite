@@ -15,7 +15,52 @@ import {
 import { motion } from "framer-motion";
 import InstantConnectPanel from "@/modules/public/components/InstantConnectPanel";
 
-const MAP_STYLE = "https://demotiles.maplibre.org/style.json";
+const MAPBOX_TOKEN =
+  (import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string | undefined)
+  ?? (import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN as string | undefined)
+  ?? "";
+
+const FALLBACK_RASTER_STYLE = {
+  version: 8,
+  sources: {
+    osm: {
+      type: "raster",
+      tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+      tileSize: 256,
+      attribution: "© OpenStreetMap contributors",
+    },
+  },
+  layers: [
+    {
+      id: "osm",
+      type: "raster",
+      source: "osm",
+    },
+  ],
+} as const;
+
+type MapStyleCandidate = {
+  id: string;
+  style: string | Record<string, unknown>;
+};
+
+const MAP_STYLE_CANDIDATES: MapStyleCandidate[] = [
+  ...(MAPBOX_TOKEN
+    ? [{
+      id: "mapbox-streets",
+      style: `https://api.mapbox.com/styles/v1/mapbox/streets-v12?access_token=${MAPBOX_TOKEN}`,
+    }]
+    : []),
+  {
+    id: "carto-positron",
+    style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+  },
+  {
+    id: "osm-raster-fallback",
+    style: FALLBACK_RASTER_STYLE,
+  },
+];
+
 const MAX_PINS = 50;
 const MAP_LOAD_TIMEOUT_MS = 12000;
 
@@ -30,6 +75,19 @@ function formatResponseTime(min: number | null) {
   if (!min) return null;
   if (min < 60) return `${Math.round(min)}m`;
   return `${Math.round(min / 60)}h`;
+}
+
+function hasWebGLSupport() {
+  if (typeof window === "undefined") return true;
+  try {
+    const canvas = document.createElement("canvas");
+    return Boolean(
+      window.WebGLRenderingContext
+      && (canvas.getContext("webgl2") || canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+    );
+  } catch {
+    return false;
+  }
 }
 
 // ── Live activity toast ──
@@ -204,7 +262,10 @@ export default function OnDutyMapPage() {
   const [selectedPro, setSelectedPro] = useState<OnDutyProfessional | null>(null);
   const [mapError, setMapError] = useState(false);
   const [mapReady, setMapReady] = useState(false);
+  const [mapIdle, setMapIdle] = useState(false);
   const [mapInstanceKey, setMapInstanceKey] = useState(0);
+  const [mapStyleIndex, setMapStyleIndex] = useState(0);
+  const [useEmbedFallback, setUseEmbedFallback] = useState(false);
   const { data: professionals, isLoading } = useOnDutyProfessionals();
   const { location: userLocation } = useUserLocation();
   const { latestEvent, clearEvent } = useOnDutyRealtime();
@@ -214,23 +275,51 @@ export default function OnDutyMapPage() {
   const prevIdsRef = useRef<Set<string>>(new Set());
   const mapErrorCountRef = useRef(0);
   const mapReadyRef = useRef(false);
+  const activeMapStyle = MAP_STYLE_CANDIDATES[mapStyleIndex] ?? MAP_STYLE_CANDIDATES[0];
+
+  useEffect(() => {
+    if (MAPBOX_TOKEN) return;
+    console.warn("[OnDutyMap] Missing Mapbox token, starting with non-Mapbox fallback styles");
+  }, []);
 
   useEffect(() => {
     mapReadyRef.current = mapReady;
   }, [mapReady]);
 
   useEffect(() => {
+    if (view !== "map" || useEmbedFallback) return;
+    if (hasWebGLSupport()) return;
+    console.warn("[OnDutyMap] WebGL unavailable, switching to embed fallback map");
+    setUseEmbedFallback(true);
+  }, [view, useEmbedFallback]);
+
+  useEffect(() => {
     if (view !== "map" || mapReady || mapError) return;
+    if (useEmbedFallback) return;
 
     const timeout = setTimeout(() => {
       if (!mapReadyRef.current) {
         console.error(`[OnDutyMap] Map did not become ready within ${MAP_LOAD_TIMEOUT_MS}ms`);
-        setMapError(true);
+        setUseEmbedFallback(true);
       }
     }, MAP_LOAD_TIMEOUT_MS);
 
     return () => clearTimeout(timeout);
-  }, [view, mapReady, mapError, mapInstanceKey]);
+  }, [view, mapReady, mapError, mapInstanceKey, useEmbedFallback]);
+
+  useEffect(() => {
+    if (view !== "map" || !mapReady || mapIdle) return;
+    if (mapError || useEmbedFallback) return;
+
+    const timeout = setTimeout(() => {
+      if (!mapIdle) {
+        console.warn("[OnDutyMap] Tiles never became ready after map load, using embed fallback");
+        setUseEmbedFallback(true);
+      }
+    }, 7000);
+
+    return () => clearTimeout(timeout);
+  }, [view, mapReady, mapIdle, mapError, useEmbedFallback, mapInstanceKey, mapStyleIndex]);
 
   // Debug logging
   useEffect(() => {
@@ -294,9 +383,14 @@ export default function OnDutyMapPage() {
   const handleRetryMap = useCallback(() => {
     setMapError(false);
     setMapReady(false);
+    setMapIdle(false);
+    setMapStyleIndex(0);
+    setUseEmbedFallback(false);
     mapErrorCountRef.current = 0;
     setMapInstanceKey((prev) => prev + 1);
   }, []);
+
+  const embedSrc = `https://maps.google.com/maps?q=${center.lat},${center.lng}&z=${userLocation ? 11 : 4}&output=embed`;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -375,7 +469,15 @@ export default function OnDutyMapPage() {
         </div>
       ) : view === "map" ? (
         <div className="flex-1 relative" style={{ minHeight: "420px", height: "calc(100vh - 120px)" }}>
-          {mapError ? (
+          {useEmbedFallback ? (
+            <iframe
+              title="On-duty professionals map"
+              src={embedSrc}
+              style={{ width: "100%", height: "100%", border: 0 }}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          ) : mapError ? (
             <div className="absolute inset-0 flex items-center justify-center bg-muted/50 z-10">
               <div className="text-center p-6 bg-card rounded-xl border border-border shadow-lg max-w-xs">
                 <AlertTriangle className="h-8 w-8 text-warning mx-auto mb-3" />
@@ -404,12 +506,16 @@ export default function OnDutyMapPage() {
                 zoom: userLocation ? 11 : 4,
               }}
               style={{ width: "100%", height: "100%" }}
-              mapStyle={MAP_STYLE}
+              mapStyle={activeMapStyle.style as any}
               attributionControl={true as any}
               onLoad={() => {
                 setMapReady(true);
+                setMapIdle(false);
                 mapErrorCountRef.current = 0;
-                console.log("[OnDutyMap] Map became ready");
+                console.log("[OnDutyMap] Map became ready", { style: activeMapStyle.id });
+              }}
+              onIdle={() => {
+                setMapIdle(true);
               }}
               onError={(event: any) => {
                 mapErrorCountRef.current += 1;
@@ -418,10 +524,27 @@ export default function OnDutyMapPage() {
                   message: event?.error?.message ?? null,
                   sourceId: event?.sourceId ?? null,
                   type: event?.type ?? null,
+                  style: activeMapStyle.id,
                 });
 
+                const message = String(event?.error?.message ?? "").toLowerCase();
+                const looksLikeFetchFailure = message.includes("failed to fetch") || message.includes("network");
+
+                if (!mapReadyRef.current && looksLikeFetchFailure && mapStyleIndex < MAP_STYLE_CANDIDATES.length - 1) {
+                  const nextIndex = mapStyleIndex + 1;
+                  console.warn("[OnDutyMap] Switching map style fallback", {
+                    from: activeMapStyle.id,
+                    to: MAP_STYLE_CANDIDATES[nextIndex]?.id,
+                  });
+                  mapErrorCountRef.current = 0;
+                  setMapReady(false);
+                  setMapStyleIndex(nextIndex);
+                  setMapInstanceKey((prev) => prev + 1);
+                  return;
+                }
+
                 if (!mapReadyRef.current && mapErrorCountRef.current >= 3) {
-                  setMapError(true);
+                  setUseEmbedFallback(true);
                 }
               }}
             >
