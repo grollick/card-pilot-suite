@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, forwardRef } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
@@ -228,24 +228,37 @@ function ProfessionalListCard({ pro, onSelect }: { pro: OnDutyProfessional; onSe
   );
 }
 
-function MapViewportController({
-  view,
-  tileProviderIndex,
-  userLocation,
-}: {
+const MapViewportController = forwardRef<HTMLDivElement, {
   view: "map" | "list";
   tileProviderIndex: number;
   userLocation: { lat: number; lng: number } | null;
-}) {
+}>(function MapViewportController({ view, tileProviderIndex, userLocation }, _ref) {
   const map = useMap();
 
   useEffect(() => {
     if (view !== "map") return;
 
-    const invalidate = () => map.invalidateSize({ pan: false });
-    const raf = requestAnimationFrame(invalidate);
-    const timer = setTimeout(invalidate, 120);
-    const timer2 = setTimeout(invalidate, 420);
+    const container = map.getContainer();
+    const timers: Array<ReturnType<typeof setTimeout>> = [];
+    let raf = 0;
+
+    const invalidate = () => {
+      if (container.clientWidth > 0 && container.clientHeight > 0) {
+        map.invalidateSize({ pan: false });
+      }
+    };
+
+    raf = requestAnimationFrame(invalidate);
+    timers.push(setTimeout(invalidate, 120));
+    timers.push(setTimeout(invalidate, 360));
+    timers.push(setTimeout(invalidate, 720));
+
+    const observer = typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(() => invalidate())
+      : null;
+
+    observer?.observe(container);
+    if (container.parentElement) observer?.observe(container.parentElement);
 
     const handleViewportChange = () => invalidate();
     const handleVisibility = () => {
@@ -258,8 +271,8 @@ function MapViewportController({
 
     return () => {
       cancelAnimationFrame(raf);
-      clearTimeout(timer);
-      clearTimeout(timer2);
+      timers.forEach(clearTimeout);
+      observer?.disconnect();
       window.removeEventListener("resize", handleViewportChange);
       window.removeEventListener("orientationchange", handleViewportChange);
       document.removeEventListener("visibilitychange", handleVisibility);
@@ -269,10 +282,11 @@ function MapViewportController({
   useEffect(() => {
     if (!userLocation || view !== "map") return;
     map.setView([userLocation.lat, userLocation.lng], 11, { animate: false });
+    requestAnimationFrame(() => map.invalidateSize({ pan: false }));
   }, [map, view, userLocation?.lat, userLocation?.lng]);
 
   return null;
-}
+});
 
 export default function OnDutyMapPage() {
   const [view, setView] = useState<"map" | "list">("map");
@@ -433,7 +447,7 @@ export default function OnDutyMapPage() {
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
       ) : view === "map" ? (
-        <div className="flex-1 relative" style={{ height: "max(420px, calc(100dvh - 120px))" }}>
+        <div className="flex-1 relative" style={{ minHeight: "420px", height: "calc(100svh - 120px)" }}>
           <MapContainer
             center={[center.lat, center.lng]}
             zoom={userLocation ? 11 : 4}
