@@ -239,8 +239,22 @@ function SocialTemplatesPanel({ referralCode }: { referralCode?: string }) {
 
 // ─── Main Component ───
 export default function GuzzlPromoToolkit() {
+  const { user } = useAuth();
   const { data: profile } = useProfileCache();
-  const referralCode = profile?.referral_code;
+
+  const { data: referralCode } = useQuery({
+    queryKey: ["admin-referral-code", user?.id],
+    enabled: !!user,
+    staleTime: 10 * 60 * 1000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("referral_code")
+        .eq("id", user!.id)
+        .maybeSingle();
+      return data?.referral_code as string | null;
+    },
+  });
 
   return (
     <Card>
