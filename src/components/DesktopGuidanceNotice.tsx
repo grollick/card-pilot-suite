@@ -52,9 +52,9 @@ export default function DesktopGuidanceNotice({ toolKey, reason }: DesktopGuidan
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: "spring", damping: 25, stiffness: 300 }}
-          className="fixed bottom-4 left-3 right-3 z-[9999] max-w-md mx-auto rounded-xl border border-border bg-card p-4 shadow-lg"
+          className="fixed bottom-4 left-3 right-3 z-[9999] max-w-md mx-auto rounded-xl border border-border bg-card p-4 shadow-lg pointer-events-none"
         >
-          <button onClick={dismiss} className="absolute top-3 right-3 text-muted-foreground hover:text-foreground">
+          <button onClick={dismiss} className="absolute top-3 right-3 text-muted-foreground hover:text-foreground pointer-events-auto">
             <X className="h-4 w-4" />
           </button>
 
@@ -74,10 +74,10 @@ export default function DesktopGuidanceNotice({ toolKey, reason }: DesktopGuidan
           </div>
 
           <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
-            <Button size="sm" variant="outline" className="flex-1 h-8 text-xs" onClick={dismiss}>
+            <Button size="sm" variant="outline" className="flex-1 h-8 text-xs pointer-events-auto" onClick={dismiss}>
               Continue on Mobile
             </Button>
-            <Button size="sm" variant="ghost" className="text-xs text-muted-foreground h-8" onClick={neverShow}>
+            <Button size="sm" variant="ghost" className="text-xs text-muted-foreground h-8 pointer-events-auto" onClick={neverShow}>
               Don't show again
             </Button>
           </div>
