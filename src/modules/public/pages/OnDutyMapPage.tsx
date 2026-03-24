@@ -381,10 +381,6 @@ export default function OnDutyMapPage() {
             zoom={userLocation ? 11 : 4}
             className="z-0"
             style={{ height: "100%", width: "100%", background: "hsl(var(--muted))" }}
-            whenReady={(event) => {
-              setTimeout(() => event.target.invalidateSize(), 0);
-              setTimeout(() => event.target.invalidateSize(), 350);
-            }}
           >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
