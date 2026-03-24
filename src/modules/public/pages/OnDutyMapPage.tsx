@@ -91,6 +91,18 @@ function RecenterMap({ lat, lng }: { lat: number; lng: number }) {
   return null;
 }
 
+// ── Force map resize after render ──
+function MapResizer() {
+  const map = useMap();
+  useEffect(() => {
+    // Leaflet needs invalidateSize when container dimensions change after mount
+    const timer = setTimeout(() => map.invalidateSize(), 100);
+    const timer2 = setTimeout(() => map.invalidateSize(), 500);
+    return () => { clearTimeout(timer); clearTimeout(timer2); };
+  }, [map]);
+  return null;
+}
+
 // ── Clickable marker with burst animation support ──
 function ClickableMarker({
   pro,
