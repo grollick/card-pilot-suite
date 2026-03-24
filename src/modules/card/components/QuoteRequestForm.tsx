@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { detectBot } from "@/lib/contactProtection";
 import { FileText, Upload, X, Send, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { captureLead, getVisitorMeta } from "@/lib/captureLead";
