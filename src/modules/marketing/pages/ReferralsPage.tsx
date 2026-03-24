@@ -221,6 +221,17 @@ export default function ReferralsPage() {
         )}
       </motion.div>
 
+      {/* Share & Promote Toolkit */}
+      {referralCode && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.03 }}
+        >
+          <ReferralShareToolkit referralCode={referralCode} />
+        </motion.div>
+      )}
+
       {/* How it works */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
