@@ -187,6 +187,17 @@ export default function QuoteRequestForm({
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <p style={{ fontSize: 13, color: palette.secondary, margin: 0, lineHeight: 1.5 }}>{subtitle}</p>
 
+        {/* Honeypot */}
+        <input
+          type="text"
+          name="company_website"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+          autoComplete="off"
+          tabIndex={-1}
+          aria-hidden="true"
+          style={{ position: "absolute", left: "-9999px", opacity: 0, height: 0, width: 0 }}
+        />
         {/* Name */}
         <div>
           <label style={labelStyle}>Name *</label>
