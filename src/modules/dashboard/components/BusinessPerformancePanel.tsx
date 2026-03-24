@@ -5,6 +5,7 @@ import { useBusinessPerformance } from "@/hooks/useBusinessPerformance";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
 
 /* Animated number counter */
 function AnimatedNumber({ value, prefix = "", duration = 800 }: { value: number; prefix?: string; duration?: number }) {
@@ -74,11 +75,18 @@ export default function BusinessPerformancePanel() {
   const navigate = useNavigate();
 
   const metrics = [
-    { label: "Card Views", value: data?.views ?? 0, icon: Eye, color: "text-primary bg-primary/10", trend: data?.trends?.views, prefix: "" },
-    { label: "Leads Captured", value: data?.leads ?? 0, icon: UserPlus, color: "text-success bg-success/10", trend: data?.trends?.leads, prefix: "" },
-    { label: "Bookings", value: data?.bookings ?? 0, icon: CalendarCheck, color: "text-warning bg-warning/10", trend: data?.trends?.bookings, prefix: "" },
-    { label: "Est. Revenue", value: data?.estimatedRevenue ?? 0, icon: DollarSign, color: "text-primary bg-primary/10", trend: data?.trends?.revenue, prefix: "$" },
+    { label: "Card Views", value: data?.views ?? 0, icon: Eye, color: "text-primary bg-primary/10", trend: data?.trends?.views, prefix: "", route: "/app/viewers" },
+    { label: "Leads Captured", value: data?.leads ?? 0, icon: UserPlus, color: "text-success bg-success/10", trend: data?.trends?.leads, prefix: "", route: "/app/contacts" },
+    { label: "Bookings", value: data?.bookings ?? 0, icon: CalendarCheck, color: "text-warning bg-warning/10", trend: data?.trends?.bookings, prefix: "", route: "/app/bookings" },
+    { label: "Est. Revenue", value: data?.estimatedRevenue ?? 0, icon: DollarSign, color: "text-primary bg-primary/10", trend: data?.trends?.revenue, prefix: "$", route: "/app/invoices" },
   ];
+
+  const onMetricKeyDown = (event: KeyboardEvent<HTMLDivElement>, route: string) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      navigate(route);
+    }
+  };
 
   return (
     <motion.div
@@ -113,7 +121,11 @@ export default function BusinessPerformancePanel() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05, duration: 0.3 }}
-              className="rounded-xl bg-muted/40 p-3.5 transition-all hover:bg-muted/60 hover:shadow-sm group"
+              role="button"
+              tabIndex={0}
+              onClick={() => navigate(m.route)}
+              onKeyDown={(event) => onMetricKeyDown(event, m.route)}
+              className="rounded-xl bg-muted/40 p-3.5 transition-all hover:bg-muted/60 hover:shadow-sm group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
