@@ -216,7 +216,7 @@ export function AppSidebar() {
                 <div>
                   <span className="text-sm font-bold tracking-tight">
                     <span className="font-black text-primary">guzzl</span>
-                    <span className="text-foreground/60">.pro</span>
+                    <span className="text-foreground/60 font-normal">.pro</span>
                   </span>
                 </div>
               </div>
