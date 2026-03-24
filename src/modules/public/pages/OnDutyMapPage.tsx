@@ -262,6 +262,7 @@ export default function OnDutyMapPage() {
   const [selectedPro, setSelectedPro] = useState<OnDutyProfessional | null>(null);
   const [mapError, setMapError] = useState(false);
   const [mapReady, setMapReady] = useState(false);
+  const [mapIdle, setMapIdle] = useState(false);
   const [mapInstanceKey, setMapInstanceKey] = useState(0);
   const [mapStyleIndex, setMapStyleIndex] = useState(0);
   const [useEmbedFallback, setUseEmbedFallback] = useState(false);
@@ -305,6 +306,20 @@ export default function OnDutyMapPage() {
 
     return () => clearTimeout(timeout);
   }, [view, mapReady, mapError, mapInstanceKey, useEmbedFallback]);
+
+  useEffect(() => {
+    if (view !== "map" || !mapReady || mapIdle) return;
+    if (mapError || useEmbedFallback) return;
+
+    const timeout = setTimeout(() => {
+      if (!mapIdle) {
+        console.warn("[OnDutyMap] Tiles never became ready after map load, using embed fallback");
+        setUseEmbedFallback(true);
+      }
+    }, 7000);
+
+    return () => clearTimeout(timeout);
+  }, [view, mapReady, mapIdle, mapError, useEmbedFallback, mapInstanceKey, mapStyleIndex]);
 
   // Debug logging
   useEffect(() => {
@@ -368,6 +383,7 @@ export default function OnDutyMapPage() {
   const handleRetryMap = useCallback(() => {
     setMapError(false);
     setMapReady(false);
+    setMapIdle(false);
     setMapStyleIndex(0);
     setUseEmbedFallback(false);
     mapErrorCountRef.current = 0;
@@ -494,8 +510,12 @@ export default function OnDutyMapPage() {
               attributionControl={true as any}
               onLoad={() => {
                 setMapReady(true);
+                setMapIdle(false);
                 mapErrorCountRef.current = 0;
                 console.log("[OnDutyMap] Map became ready", { style: activeMapStyle.id });
+              }}
+              onIdle={() => {
+                setMapIdle(true);
               }}
               onError={(event: any) => {
                 mapErrorCountRef.current += 1;
