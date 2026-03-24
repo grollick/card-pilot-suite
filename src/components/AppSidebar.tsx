@@ -70,6 +70,7 @@ const toolsItems = [
   { title: "Page Builder", url: "/app/page-builder", icon: Globe },
   { title: "QR Campaigns", url: "/app/qr-campaigns", icon: QrCode },
   { title: "Card Viewers", url: "/app/viewers", icon: Eye },
+  { title: "Marketplace", url: "/discover", icon: Globe },
   { title: "App Store", url: "/app/marketplace", icon: Package },
   { title: "Boost", url: "/app/boost", icon: Zap },
 ];
