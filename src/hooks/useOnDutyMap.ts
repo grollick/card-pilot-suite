@@ -21,9 +21,10 @@ export interface OnDutyProfessional {
   lng: number;
 }
 
-// Approximate geocoding from city name — deterministic hash-based offset from a base
-function cityToCoords(city: string | null, userId: string): { lat: number; lng: number } | null {
-  if (!city) return null;
+// Approximate geocoding from city/service area — deterministic hash-based offset from a base
+function cityToCoords(city: string | null, userId: string, serviceArea?: string | null): { lat: number; lng: number } | null {
+  const searchText = [city, serviceArea].filter(Boolean).join(" ").trim();
+  if (!searchText) return null;
   // Simple hash for consistent offset per user
   let hash = 0;
   for (let i = 0; i < userId.length; i++) {
@@ -31,7 +32,7 @@ function cityToCoords(city: string | null, userId: string): { lat: number; lng: 
     hash |= 0;
   }
   // Base coords for common cities (very rough), otherwise use generic US center
-  const cityLower = city.toLowerCase().trim();
+  const cityLower = searchText.toLowerCase();
   const cityBases: Record<string, [number, number]> = {
     "new york": [40.7128, -74.006],
     "los angeles": [34.0522, -118.2437],
@@ -45,7 +46,14 @@ function cityToCoords(city: string | null, userId: string): { lat: number; lng: 
     "san francisco": [37.7749, -122.4194],
     "boston": [42.3601, -71.0589],
     "phoenix": [33.4484, -112.074],
+    "vancouver": [49.2827, -123.1207],
+    "calgary": [51.0447, -114.0719],
+    "edmonton": [53.5461, -113.4938],
+    "winnipeg": [49.8951, -97.1384],
+    "ottawa": [45.4215, -75.6972],
+    "montreal": [45.5017, -73.5673],
     "toronto": [43.6532, -79.3832],
+    "thunder bay": [48.3809, -89.2477],
     "london": [51.5074, -0.1278],
   };
   const base = Object.entries(cityBases).find(([k]) => cityLower.includes(k))?.[1] ?? [39.8283, -98.5795];
@@ -130,7 +138,7 @@ export function useOnDutyProfessionals() {
       return enabled
         .map((p: any) => {
           const duty = dutyMap.get(p.id);
-          const coords = cityToCoords(p.city, p.id);
+          const coords = cityToCoords(p.city, p.id, p.service_area);
           if (!coords) return null;
 
           let status: "available" | "recent" | "offline" = "offline";
