@@ -163,7 +163,10 @@ export default function PublicCard() {
   const { data, isLoading, isError } = usePublicCard(handle);
   const [formSent, setFormSent] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
+  const [honeypot, setHoneypot] = useState("");
+  const [formLoadTime] = useState(() => Date.now());
   const [submitting, setSubmitting] = useState(false);
+  const [contactRevealed, setContactRevealed] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(() => new URLSearchParams(window.location.search).get("review") === "1");
   const viewTracked = useRef(false);
 
