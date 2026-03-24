@@ -91,6 +91,18 @@ function RecenterMap({ lat, lng }: { lat: number; lng: number }) {
   return null;
 }
 
+// ── Force map resize after render ──
+function MapResizer() {
+  const map = useMap();
+  useEffect(() => {
+    // Leaflet needs invalidateSize when container dimensions change after mount
+    const timer = setTimeout(() => map.invalidateSize(), 100);
+    const timer2 = setTimeout(() => map.invalidateSize(), 500);
+    return () => { clearTimeout(timer); clearTimeout(timer2); };
+  }, [map]);
+  return null;
+}
+
 // ── Clickable marker with burst animation support ──
 function ClickableMarker({
   pro,
@@ -372,8 +384,9 @@ export default function OnDutyMapPage() {
           >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
+            <MapResizer />
             {userLocation && <RecenterMap lat={userLocation.lat} lng={userLocation.lng} />}
             {professionals?.map(pro => (
               <ClickableMarker
