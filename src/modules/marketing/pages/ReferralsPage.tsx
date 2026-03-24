@@ -13,6 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import ReferralShareToolkit from "@/modules/marketing/components/ReferralShareToolkit";
 
 const REWARD_TIERS = [
   { count: 1, reward: "14 days Pro free (both!)", days: 14, icon: "🎁" },
@@ -219,6 +220,17 @@ export default function ReferralsPage() {
           </div>
         )}
       </motion.div>
+
+      {/* Share & Promote Toolkit */}
+      {referralCode && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.03 }}
+        >
+          <ReferralShareToolkit referralCode={referralCode} />
+        </motion.div>
+      )}
 
       {/* How it works */}
       <motion.div
