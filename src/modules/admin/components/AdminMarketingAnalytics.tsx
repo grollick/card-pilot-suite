@@ -122,15 +122,16 @@ export default function AdminMarketingAnalytics({ stats, isLoading }: Props) {
   );
 }
 
-function AnalyticCard({ icon: Icon, label, value, trend, loading }: {
+function AnalyticCard({ icon: Icon, label, value, trend, loading, onClick }: {
   icon: any;
   label: string;
   value: number;
   trend?: number;
   loading: boolean;
+  onClick?: () => void;
 }) {
   return (
-    <Card>
+    <Card className={onClick ? "cursor-pointer hover:shadow-card transition-shadow" : ""} onClick={onClick}>
       <CardContent className="pt-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
