@@ -6,7 +6,7 @@ import {
   UserCircle, Star,
   Mail, Share2, Gift, BarChart3, QrCode, Tag, Zap,
   Bot, Eye, CreditCard, Package, Building2, CheckSquare,
-  Shield, Sparkles, ExternalLink, Bell,
+  Shield, Sparkles, ExternalLink, Bell, MapPin,
 } from "lucide-react";
 import ClientSwitcher from "@/modules/agency/components/ClientSwitcher";
 import { NavLink } from "@/components/NavLink";
@@ -70,6 +70,7 @@ const toolsItems = [
   { title: "Page Builder", url: "/app/page-builder", icon: Globe },
   { title: "QR Campaigns", url: "/app/qr-campaigns", icon: QrCode },
   { title: "Card Viewers", url: "/app/viewers", icon: Eye },
+  { title: "Marketplace", url: "/discover", icon: MapPin },
   { title: "App Store", url: "/app/marketplace", icon: Package },
   { title: "Boost", url: "/app/boost", icon: Zap },
 ];
