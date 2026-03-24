@@ -272,7 +272,22 @@ export default function OnDutyMapPage() {
 
   const [burstingIds, setBurstingIds] = useState<Set<string>>(new Set());
   const [toastPro, setToastPro] = useState<OnDutyProfessional | null>(null);
+  const [professionFilter, setProfessionFilter] = useState<string | null>(null);
   const prevIdsRef = useRef<Set<string>>(new Set());
+  // Unique profession names for filter chips
+  const professionNames = useMemo(() => {
+    if (!professionals) return [];
+    const names = new Set(professionals.map((p) => p.profession_name).filter(Boolean) as string[]);
+    return [...names].sort();
+  }, [professionals]);
+
+  // Filtered list for the list view
+  const filteredProfessionals = useMemo(() => {
+    if (!professionals) return [];
+    if (!professionFilter) return professionals;
+    return professionals.filter((p) => p.profession_name === professionFilter);
+  }, [professionals, professionFilter]);
+
   const mapErrorCountRef = useRef(0);
   const mapReadyRef = useRef(false);
   const activeMapStyle = MAP_STYLE_CANDIDATES[mapStyleIndex] ?? MAP_STYLE_CANDIDATES[0];
@@ -596,6 +611,26 @@ export default function OnDutyMapPage() {
             </p>
           </div>
 
+          {professionNames.length > 1 && (
+            <div className="flex flex-wrap gap-1.5 mb-4">
+              <button
+                onClick={() => setProfessionFilter(null)}
+                className={`filter-chip ${!professionFilter ? "filter-chip-active" : ""}`}
+              >
+                All
+              </button>
+              {professionNames.map((name) => (
+                <button
+                  key={name}
+                  onClick={() => setProfessionFilter(professionFilter === name ? null : name)}
+                  className={`filter-chip ${professionFilter === name ? "filter-chip-active" : ""}`}
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="rounded-xl border border-success/20 bg-success/5 p-3 mb-4 flex items-start gap-2.5">
             <Zap className="h-4 w-4 text-success shrink-0 mt-0.5" />
             <div>
@@ -627,18 +662,28 @@ export default function OnDutyMapPage() {
             </motion.div>
           )}
 
-          {professionals?.length === 0 ? (
+          {filteredProfessionals.length === 0 ? (
             <div className="text-center py-12">
               <MapPin className="h-8 w-8 text-muted-foreground mx-auto mb-3" />
-              <p className="text-sm font-medium">No active users yet</p>
-              <p className="text-xs text-muted-foreground mt-1">Check back later or browse all professionals.</p>
-              <Button asChild className="mt-4" variant="outline">
-                <Link to="/discover">Browse Directory</Link>
-              </Button>
+              <p className="text-sm font-medium">
+                {professionFilter ? `No ${professionFilter}s on duty` : "No active users yet"}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {professionFilter ? "Try removing the filter or check back later." : "Check back later or browse all professionals."}
+              </p>
+              {professionFilter ? (
+                <Button className="mt-4" variant="outline" size="sm" onClick={() => setProfessionFilter(null)}>
+                  Clear Filter
+                </Button>
+              ) : (
+                <Button asChild className="mt-4" variant="outline">
+                  <Link to="/discover">Browse Directory</Link>
+                </Button>
+              )}
             </div>
           ) : (
             <div className="space-y-2">
-              {professionals?.map((pro) => (
+              {filteredProfessionals.map((pro) => (
                 <ProfessionalListCard key={pro.id} pro={pro} onSelect={handleSelect} />
               ))}
             </div>

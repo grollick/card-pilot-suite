@@ -106,8 +106,9 @@ export function useOnDutyProfessionals() {
       if (enabled.length === 0) return [];
 
       const userIds = enabled.map((p: any) => p.id);
+      const professionIds = [...new Set(enabled.map((p: any) => p.profession_id).filter(Boolean))];
 
-      const [dutyRes, ratingsRes] = await Promise.all([
+      const [dutyRes, ratingsRes, professionsRes] = await Promise.all([
         supabase
           .from("estimate_duty_status")
           .select("user_id, is_on_duty, went_on_duty_at, updated_at")
@@ -117,7 +118,13 @@ export function useOnDutyProfessionals() {
           .select("user_id, rating")
           .eq("is_public", true)
           .in("user_id", userIds),
+        professionIds.length > 0
+          ? supabase.from("professions").select("id, name").in("id", professionIds)
+          : Promise.resolve({ data: [] }),
       ]);
+
+      const professionMap = new Map<string, string>();
+      (professionsRes.data ?? []).forEach((p: any) => professionMap.set(p.id, p.name));
 
       const dutyMap = new Map<string, any>();
       (dutyRes.data ?? []).forEach((d: any) => dutyMap.set(d.user_id, d));
@@ -168,7 +175,7 @@ export function useOnDutyProfessionals() {
             avatar_url: p.avatar_url,
             company: p.company,
             city: p.city,
-            profession_name: p.professions?.name ?? null,
+            profession_name: professionMap.get(p.profession_id) ?? null,
             service_area: p.service_area,
             avg_rating: rd?.avg ?? null,
             review_count: rd?.count ?? 0,
