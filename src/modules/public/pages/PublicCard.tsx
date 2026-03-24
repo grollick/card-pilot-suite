@@ -1448,11 +1448,24 @@ export default function PublicCard() {
             </div>
           )}
 
-          {/* ── Contact Info ── */}
+          {/* ── Contact Info (protected against scrapers) ── */}
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {profile.phone && (
               <a
-                href={`tel:${profile.phone}`}
+                href={contactRevealed ? `tel:${profile.phone}` : "#"}
+                onClick={(e) => {
+                  if (!contactRevealed) {
+                    e.preventDefault();
+                    setContactRevealed(true);
+                    // Log reveal event
+                    supabase.from("analytics_events").insert({
+                      user_id: profile.id,
+                      handle: handle!,
+                      event_type: "button_click" as const,
+                      meta_json: { action: "reveal_contact" },
+                    }).then();
+                  }
+                }}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -1460,15 +1473,31 @@ export default function PublicCard() {
                   fontSize: 13,
                   color: palette.secondary,
                   textDecoration: "none",
+                  cursor: "pointer",
                 }}
               >
                 <Phone className="h-3.5 w-3.5" style={{ color: palette.primary }} />
-                {profile.phone}
+                {contactRevealed ? profile.phone : maskPhone(profile.phone)}
+                {!contactRevealed && (
+                  <span style={{ fontSize: 11, color: palette.primary, fontWeight: 500 }}>Tap to reveal</span>
+                )}
               </a>
             )}
             {profile.email && (
               <a
-                href={`mailto:${profile.email}`}
+                href={contactRevealed ? `mailto:${profile.email}` : "#"}
+                onClick={(e) => {
+                  if (!contactRevealed) {
+                    e.preventDefault();
+                    setContactRevealed(true);
+                    supabase.from("analytics_events").insert({
+                      user_id: profile.id,
+                      handle: handle!,
+                      event_type: "button_click" as const,
+                      meta_json: { action: "reveal_contact" },
+                    }).then();
+                  }
+                }}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -1476,10 +1505,14 @@ export default function PublicCard() {
                   fontSize: 13,
                   color: palette.secondary,
                   textDecoration: "none",
+                  cursor: "pointer",
                 }}
               >
                 <Mail className="h-3.5 w-3.5" style={{ color: palette.primary }} />
-                {profile.email}
+                {contactRevealed ? profile.email : obfuscateEmail(profile.email)}
+                {!contactRevealed && (
+                  <span style={{ fontSize: 11, color: palette.primary, fontWeight: 500 }}>Tap to reveal</span>
+                )}
               </a>
             )}
           </div>
