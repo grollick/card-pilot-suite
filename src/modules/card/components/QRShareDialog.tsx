@@ -50,7 +50,7 @@ export default function QRShareDialog({ url, name = "Card", size = 200 }: QRShar
   }, [name, url]);
 
   return (
-    <Dialog>
+    <Dialog modal={false}>
       <DialogTrigger asChild>
         <Button variant="outline" size="icon" className="h-8 w-8" title="QR Code">
           <QrCode className="h-4 w-4" />

@@ -43,6 +43,7 @@ import { captureLead } from "@/lib/captureLead";
 import { obfuscateEmail, maskPhone, detectBot } from "@/lib/contactProtection";
 import { toast } from "sonner";
 import { downloadVCard } from "@/lib/vcard";
+import { clearPointerLocksSoon } from "@/lib/pointerLocks";
 import {
   resolveCardTheme,
   getGoogleFontsUrl,
@@ -169,6 +170,10 @@ export default function PublicCard() {
   const [contactRevealed, setContactRevealed] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(() => new URLSearchParams(window.location.search).get("review") === "1");
   const viewTracked = useRef(false);
+
+  useEffect(() => {
+    clearPointerLocksSoon();
+  }, []);
 
   const profile = data?.profile;
   const { data: publicReviews = [] } = usePublicReviews(profile?.id);
