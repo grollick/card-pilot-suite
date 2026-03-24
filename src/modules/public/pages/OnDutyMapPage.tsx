@@ -457,7 +457,7 @@ export default function OnDutyMapPage() {
                 zoom: userLocation ? 11 : 4,
               }}
               style={{ width: "100%", height: "100%" }}
-              mapStyle={MAP_STYLE}
+              mapStyle={activeMapStyle.style as any}
               attributionControl={true as any}
               onLoad={() => {
                 setMapReady(true);
