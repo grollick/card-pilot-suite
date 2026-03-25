@@ -3,6 +3,7 @@ import { useLandingPage, type LandingPageSection } from "@/hooks/useLandingPages
 import { Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Link } from "react-router-dom";
+import PublicTopBar from "@/modules/public/components/PublicTopBar";
 
 const PRIVACY_POLICY = `
 ## 1. Introduction
