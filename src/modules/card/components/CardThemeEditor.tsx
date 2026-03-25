@@ -493,6 +493,7 @@ export default function CardThemeEditor({
       bgPattern: bgPattern.type !== "none" ? bgPattern : undefined,
       metallicEffect: metallicEffect.type !== "none" ? metallicEffect : undefined,
       heroBackgroundId: heroBackgroundId || undefined,
+      cardLayout,
     });
   }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId, open, onPreview]);
 
