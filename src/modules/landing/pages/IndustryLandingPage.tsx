@@ -452,7 +452,7 @@ export default function IndustryLandingPage() {
         <footer className="border-t border-border/40 py-8 text-center">
           <p className="text-xs text-muted-foreground">
             {page.footerNote && <span className="block mb-1">{page.footerNote}</span>}
-            © {new Date().getFullYear()} <Link to="/" className="text-primary hover:underline"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></Link> — The smart business card platform for local professionals.
+            © {new Date().getFullYear()} <Link to="/" className="text-primary hover:underline"><span className="text-primary font-extrabold">guzzl</span><span className="text-foreground font-normal">.pro</span></Link> — The smart business card platform for local professionals.
           </p>
         </footer>
       </div>

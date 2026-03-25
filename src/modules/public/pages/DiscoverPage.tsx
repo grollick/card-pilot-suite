@@ -862,7 +862,7 @@ export default function DiscoverPage() {
             Trusted local professionals on a secure platform
           </p>
           <p className="text-xs text-muted-foreground">
-            Powered by <Link to="/" className="text-primary hover:underline"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></Link> — the smart business card platform that helps local businesses get more customers.
+            Powered by <Link to="/" className="text-primary hover:underline"><span className="text-primary font-extrabold">guzzl</span><span className="text-foreground font-normal">.pro</span></Link> — the smart business card platform that helps local businesses get more customers.
           </p>
         </div>
       </div>
