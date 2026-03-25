@@ -515,9 +515,10 @@ export default function CardThemeEditor({
       bgPattern: bgPattern.type !== "none" ? bgPattern : undefined,
       metallicEffect: metallicEffect.type !== "none" ? metallicEffect : undefined,
       heroBackgroundId: heroBackgroundId || undefined,
+      cardLayout,
     });
     onOpenChange(false);
-  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId, onSave, onOpenChange]);
+  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId, cardLayout, onSave, onOpenChange]);
 
   const updateToken = useCallback(<K extends keyof CardStyleTokens>(key: K, value: CardStyleTokens[K]) => {
     setTokens((prev) => ({ ...prev, [key]: value }));
