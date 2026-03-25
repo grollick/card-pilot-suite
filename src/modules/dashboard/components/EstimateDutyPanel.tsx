@@ -12,9 +12,11 @@ import { Progress } from "@/components/ui/progress";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 import { useEstimateDuty } from "@/hooks/useEstimateDuty";
 import { useEstimateMatches } from "@/hooks/useEstimateRequests";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
+import { useProfile } from "@/hooks/useCard";
 import DutySettingsPanel from "./duty/DutySettingsPanel";
 import DutyAnalyticsPanel from "./duty/DutyAnalyticsPanel";
 import DutyMatchesList from "./duty/DutyMatchesList";
@@ -37,6 +39,7 @@ export default function EstimateDutyPanel() {
   const { status, isOnDuty, isLoading, analytics, toggleDuty } = useEstimateDuty();
   const { pendingCount } = useEstimateMatches();
   const { planKey } = usePlanLimits();
+  const { data: profile } = useProfile();
   const [showSettings, setShowSettings] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showMatches, setShowMatches] = useState(false);
@@ -44,8 +47,17 @@ export default function EstimateDutyPanel() {
 
   const isFreePlan = planKey === "starter";
   const isProPlus = planKey === "pro" || planKey === "agency";
+  const hasLocation = !!(profile as any)?.city;
 
   const handleToggle = (on: boolean, settings?: any) => {
+    // Block going ON duty if no location is set
+    if (on && !hasLocation) {
+      toast.error("Add your location to go On Duty", {
+        description: "Go to Settings and add your city so customers can find you.",
+        action: { label: "Settings", onClick: () => navigate("/app/settings") },
+      });
+      return;
+    }
     toggleDuty.mutate(
       { is_on_duty: on, ...settings },
       { onSuccess: (data) => { if (data?.is_on_duty) setShowGoLive(true); } }
@@ -213,6 +225,32 @@ export default function EstimateDutyPanel() {
                   </Button>
                 </div>
               </div>
+            )}
+
+            {!isFreePlan && !hasLocation && (
+              <div className="rounded-lg border border-warning/20 bg-warning/5 p-3 flex items-start gap-2.5">
+                <MapPin className="h-4 w-4 text-warning shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-medium">Add your location to go On Duty</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    Set your city in Settings so customers in your area can find you.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 h-7 text-xs gap-1 border-warning/30 text-warning hover:bg-warning/10"
+                    onClick={() => navigate("/app/settings")}
+                  >
+                    <MapPin className="h-3 w-3" /> Add Location
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {!isOnDuty && !isFreePlan && hasLocation && (
+              <p className="text-xs text-muted-foreground">
+                You are not visible right now. Toggle on to receive estimate requests.
+              </p>
             )}
 
             {isOnDuty && !isFreePlan && (

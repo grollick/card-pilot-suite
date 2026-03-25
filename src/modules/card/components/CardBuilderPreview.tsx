@@ -2,6 +2,7 @@ import { CreditCard, Eye, Pencil, Smartphone, Tablet, Move, Star, Calendar, Send
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useCallback } from "react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import { getPatternSvg, type CardThemeOverrides, METALLIC_GRADIENTS, type MetallicType } from "./CardThemeEditor";
 import { CTA_ICON_MAP } from "./CtaEditor";
 import type { CtaItem } from "./CtaEditor";
@@ -308,6 +309,11 @@ export default function CardBuilderPreview({
   const [internalDevice, setInternalDevice] = useState<"phone" | "tablet">("phone");
   const previewDevice = externalDevice ?? internalDevice;
   const setPreviewDevice = setInternalDevice;
+
+  // Read live duty status from the canonical query cache
+  const qc = useQueryClient();
+  const dutyData = qc.getQueryData<any>(["estimate-duty-status"]);
+  const liveIsOnDuty = dutyData?.is_on_duty ?? false;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -493,14 +499,14 @@ export default function CardBuilderPreview({
                       </div>
                     )}
                     {/* Trust badges in cover */}
-                    {(profile?.is_on_duty || profile?.is_verified) && (
+                    {(liveIsOnDuty || profile?.is_verified) && (
                       <div className="absolute bottom-2 right-2 flex items-center gap-1.5 z-10">
                         {profile.is_verified && (
                           <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-semibold text-white bg-black/50 backdrop-blur-md border border-white/20">
                             ✓ Verified
                           </span>
                         )}
-                        {profile.is_on_duty && (
+                        {liveIsOnDuty && (
                           <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[9px] font-semibold text-white bg-black/50 backdrop-blur-md border border-white/20">
                             <span className="relative flex h-2.5 w-2.5">
                               <span className="absolute inline-flex h-full w-full rounded-full border-[1.5px] border-red-500 opacity-0" style={{ animation: 'ping-ring 2s cubic-bezier(0, 0, 0.2, 1) infinite' }} />

@@ -202,7 +202,7 @@ export function useCardBuilderState() {
           setGlobalSaveState("error");
           clearTimeout(globalSaveTimer.current);
           globalSaveTimer.current = setTimeout(() => setGlobalSaveState("idle"), 4000);
-          toast.error("Failed to save");
+          toast.error("Could not save changes. Please try again.");
         }
       };
       if (immediate) await doSave();
@@ -278,7 +278,11 @@ export function useCardBuilderState() {
       } else {
         toast.success("Card unpublished");
       }
-    } catch { toast.error("Failed to update status"); }
+    } catch {
+      // Revert optimistic state
+      setPublished(!val);
+      toast.error(val ? "Publish failed. Please try again." : "Failed to unpublish. Please try again.");
+    }
   }, [upsertCard, qc]);
 
   const handleAvatarChange = useCallback((url: string) => {
