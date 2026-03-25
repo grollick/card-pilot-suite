@@ -24,7 +24,7 @@ export const DEFAULT_WIDGETS: WidgetConfig[] = [
   { id: "kpi-cards", label: "Revenue KPIs", icon: "TrendingUp", visible: true, size: "full", order: 5 },
   { id: "ai-coach", label: "AI Business Coach", icon: "Brain", visible: true, size: "three-fifths", order: 6 },
   { id: "health-score", label: "Business Health", icon: "Heart", visible: true, size: "two-fifths", order: 7 },
-  { id: "quick-actions", label: "Quick Actions", icon: "Zap", visible: true, size: "full", order: 8 },
+  { id: "quick-actions", label: "Jobs & Photo Quick Actions", icon: "Zap", visible: true, size: "full", order: 8 },
   { id: "next-actions", label: "Next Actions", icon: "ListChecks", visible: true, size: "full", order: 9 },
   { id: "daily-notes", label: "Daily Notes", icon: "StickyNote", visible: true, size: "half", order: 10 },
   { id: "activity-feed", label: "Activity Feed", icon: "Activity", visible: true, size: "half", order: 11 },
@@ -52,6 +52,17 @@ export function useDashboardLayout() {
   });
 
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    setWidgets(prev => {
+      const existingIds = new Set(prev.map(w => w.id));
+      const missing = DEFAULT_WIDGETS.filter(d => !existingIds.has(d.id));
+      if (missing.length === 0) return prev;
+
+      const next = [...prev, ...missing];
+      return next.map((w, i) => ({ ...w, order: i }));
+    });
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(widgets));
