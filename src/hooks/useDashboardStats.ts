@@ -61,6 +61,7 @@ export function useDashboardStats() {
         stageCounts,
       };
     },
+    staleTime: 30_000,
     refetchInterval: 60_000,
   });
 }

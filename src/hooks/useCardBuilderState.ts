@@ -439,8 +439,10 @@ export function useCardBuilderState() {
     setSections((prev) => {
       const oldIndex = prev.findIndex((s) => s.id === active);
       const newIndex = prev.findIndex((s) => s.id === over);
-      const { arrayMove } = require("@dnd-kit/sortable");
-      const next = arrayMove(prev, oldIndex, newIndex);
+      if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(oldIndex, 1);
+      next.splice(newIndex, 0, moved);
       saveSections(next);
       return next;
     });

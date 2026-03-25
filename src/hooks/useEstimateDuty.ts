@@ -59,13 +59,21 @@ export function useEstimateDuty() {
     queryFn: async (): Promise<DutyAnalytics> => {
       const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
 
-      const { data: logs } = await supabase
-        .from("estimate_duty_log")
-        .select("event_type, response_time_minutes, created_at")
-        .eq("user_id", user!.id)
-        .gte("created_at", thirtyDaysAgo);
+      // Fetch logs and current status in parallel to avoid stale closure
+      const [logsResult, statusResult] = await Promise.all([
+        supabase
+          .from("estimate_duty_log")
+          .select("event_type, response_time_minutes, created_at")
+          .eq("user_id", user!.id)
+          .gte("created_at", thirtyDaysAgo),
+        supabase
+          .from("estimate_duty_status")
+          .select("accepted_leads_count, completed_estimates_count")
+          .eq("user_id", user!.id)
+          .maybeSingle(),
+      ]);
 
-      const entries = logs ?? [];
+      const entries = logsResult.data ?? [];
       const received = entries.filter((l: any) => l.event_type === "lead_received").length;
       const responded = entries.filter((l: any) => l.event_type === "responded");
       const missed = entries.filter((l: any) => l.event_type === "missed").length;
@@ -81,8 +89,7 @@ export function useEstimateDuty() {
         ? Math.round((responded.length / received) * 100)
         : 0;
 
-      // Get counters from status
-      const status = statusQuery.data;
+      const dutyStatus = statusResult.data as any;
 
       return {
         leadsReceived: received,
@@ -90,8 +97,8 @@ export function useEstimateDuty() {
         responseRate,
         missedLeads: missed,
         bookingsFromDuty: booked,
-        acceptedLeads: status?.accepted_leads_count ?? 0,
-        completedEstimates: status?.completed_estimates_count ?? 0,
+        acceptedLeads: dutyStatus?.accepted_leads_count ?? 0,
+        completedEstimates: dutyStatus?.completed_estimates_count ?? 0,
       };
     },
   });
