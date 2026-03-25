@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import InteractiveCardShowcase from "@/components/InteractiveCardShowcase";
 import {
   CreditCard, Star, Phone, MessageSquare, Calendar,
   FileText, QrCode, Zap, Shield, Users, MapPin
@@ -276,6 +277,13 @@ export default function NewHeroPage() {
           </div>
         </div>
       </section>
+
+      <InteractiveCardShowcase
+        headline="See It In Action"
+        subheadline="Hover, click, and flip — see how your digital card looks and feels."
+        showThemePicker
+        showProfessionFilter
+      />
     </>
   );
 }

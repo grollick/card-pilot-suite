@@ -40,6 +40,7 @@ import { Button } from "@/components/ui/button";
 import FooterSection from "@/modules/landing/components/FooterSection";
 import HeroPhoneAnimation from "@/modules/landing/components/HeroPhoneAnimation";
 import { DEMO_CARDS } from "@/lib/demoCards";
+import InteractiveCardShowcase from "@/components/InteractiveCardShowcase";
 import SuccessStoryBanner from "@/components/SuccessStoryBanner";
 
 /* ── animations ── */
@@ -528,6 +529,15 @@ export default function LandingPage() {
           </motion.div>
         </div>
       </section>
+
+      {/* ─── 5b. INTERACTIVE CARD SHOWCASE ─── */}
+      <InteractiveCardShowcase
+        headline="Try It Yourself"
+        subheadline="Hover, click, and flip — experience what your clients will see."
+        showThemePicker
+        showProfessionFilter
+        className="bg-muted/30"
+      />
 
       {/* ─── 6. RESULTS ─── */}
       <section className="py-20 md:py-28 relative">
