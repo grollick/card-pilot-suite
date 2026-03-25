@@ -52,19 +52,7 @@ export default function SecurityPage() {
       </Helmet>
 
       <div className="min-h-screen bg-background">
-        {/* Nav */}
-        <nav className="border-b border-border/40 bg-background/80 backdrop-blur-sm sticky top-0 z-30">
-          <div className="max-w-3xl mx-auto px-4 h-14 flex items-center gap-3">
-            <Link to="/" className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-              <ArrowLeft className="h-4 w-4" />
-              Back
-            </Link>
-            <span className="text-sm font-semibold text-foreground ml-auto flex items-center gap-1.5">
-              <Shield className="h-4 w-4 text-primary" />
-              Security
-            </span>
-          </div>
-        </nav>
+        <PublicTopBar backTo="/" backLabel="Home" title="Security" icon={<Shield className="h-4 w-4 text-primary" />} />
 
         <main className="max-w-3xl mx-auto px-4 py-16">
           {/* Hero */}
