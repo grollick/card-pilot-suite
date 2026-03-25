@@ -886,6 +886,23 @@ export default function CardThemeEditor({
 
             {/* ── Layout Tab ── */}
             <TabsContent value="layout" className="mt-3 space-y-4">
+              {/* Card Layout Mode */}
+              <div className="space-y-1.5">
+                <SectionLabel>Card Layout</SectionLabel>
+                <OptionGrid
+                  cols={2}
+                  options={[
+                    { value: "classic", label: "Classic" },
+                    { value: "modern", label: "Modern" },
+                  ]}
+                  value={cardLayout}
+                  onChange={(v) => setCardLayout(v as "classic" | "modern")}
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  {cardLayout === "modern" ? "Full-width layout matching demo cards" : "Traditional centered card layout"}
+                </p>
+              </div>
+
               <div className="space-y-1.5">
                 <SectionLabel>Header Layout</SectionLabel>
                 <OptionGrid
