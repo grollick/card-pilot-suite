@@ -20,12 +20,9 @@ import {
   Briefcase,
   Image,
   Share2,
-  CheckCircle2,
   Play,
   type LucideIcon,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { AvailableNowBadge, ResponseSpeedBadge, RecentViewsBadge } from "@/components/activity/LiveActivityIndicators";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -33,7 +30,6 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { Link, useParams } from "react-router-dom";
-import VerificationBadge from "@/components/trust/VerificationBadge";
 import { usePublicCard, CTA_TYPES, type CardSection } from "@/hooks/useCard";
 import { usePublicReviews } from "@/hooks/useReviews";
 import { usePublicProjects } from "@/hooks/useProjects";
