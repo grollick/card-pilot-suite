@@ -202,7 +202,7 @@ export function useCardBuilderState() {
           setGlobalSaveState("error");
           clearTimeout(globalSaveTimer.current);
           globalSaveTimer.current = setTimeout(() => setGlobalSaveState("idle"), 4000);
-          toast.error("Failed to save");
+          toast.error("Could not save changes. Please try again.");
         }
       };
       if (immediate) await doSave();
