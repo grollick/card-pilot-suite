@@ -276,6 +276,13 @@ export default function NewHeroPage() {
           </div>
         </div>
       </section>
+
+      <InteractiveCardShowcase
+        headline="See It In Action"
+        subheadline="Hover, click, and flip — see how your digital card looks and feels."
+        showThemePicker
+        showProfessionFilter
+      />
     </>
   );
 }
