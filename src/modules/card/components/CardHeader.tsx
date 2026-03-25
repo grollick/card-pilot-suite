@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ShieldCheck, BadgeCheck, Circle } from "lucide-react";
+import { ShieldCheck, BadgeCheck } from "lucide-react";
 import { type ResolvedCardTheme, getAvatarRadius } from "@/lib/cardTokens";
 import type { HeroBackground } from "@/lib/heroBackgrounds";
 import type { MetallicEffect } from "@/modules/card/components/CardThemeEditor";
