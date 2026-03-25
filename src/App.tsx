@@ -31,6 +31,7 @@ const DemoCardPreview = lazy(() => import("@/modules/public/pages/DemoCardPrevie
 const SecurityPage = lazy(() => import("@/modules/public/pages/SecurityPage"));
 const ReferralRedirect = lazy(() => import("@/modules/public/pages/ReferralRedirect"));
 const SimpleLandingPage = lazy(() => import("@/modules/landing/pages/SimpleLandingPage"));
+const NewHeroPage = lazy(() => import("@/modules/landing/pages/NewHeroPage"));
 
 // Client Portal — loaded eagerly (public, token-based)
 const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
