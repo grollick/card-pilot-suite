@@ -145,12 +145,27 @@ export function useEstimateDuty() {
 
       return data;
     },
+    onMutate: async (params) => {
+      // Optimistic update — snapshot previous state for rollback
+      await qc.cancelQueries({ queryKey: ["estimate-duty-status"] });
+      const previous = qc.getQueryData<DutyStatus | null>(["estimate-duty-status"]);
+      qc.setQueryData<DutyStatus | null>(["estimate-duty-status"], (old) =>
+        old ? { ...old, is_on_duty: params.is_on_duty } : old
+      );
+      return { previous };
+    },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["estimate-duty-status"] });
       qc.invalidateQueries({ queryKey: ["estimate-duty-analytics"] });
       toast.success(data.is_on_duty ? "You're now On Duty for Estimates!" : "You're now Off Duty");
     },
-    onError: () => toast.error("Failed to update duty status"),
+    onError: (_err, _vars, context) => {
+      // Revert optimistic update
+      if (context?.previous !== undefined) {
+        qc.setQueryData(["estimate-duty-status"], context.previous);
+      }
+      toast.error("Failed to update duty status. Please try again.");
+    },
   });
 
   return {

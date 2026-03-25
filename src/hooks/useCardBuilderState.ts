@@ -278,7 +278,11 @@ export function useCardBuilderState() {
       } else {
         toast.success("Card unpublished");
       }
-    } catch { toast.error("Failed to update status"); }
+    } catch {
+      // Revert optimistic state
+      setPublished(!val);
+      toast.error(val ? "Publish failed. Please try again." : "Failed to unpublish. Please try again.");
+    }
   }, [upsertCard, qc]);
 
   const handleAvatarChange = useCallback((url: string) => {
