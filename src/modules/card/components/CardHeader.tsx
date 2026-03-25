@@ -417,9 +417,9 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
               fontWeight: 600,
               lineHeight: 1,
             }}>
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-60" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-60" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 ring-2 ring-red-500/30" />
               </span>
               Available
             </span>
