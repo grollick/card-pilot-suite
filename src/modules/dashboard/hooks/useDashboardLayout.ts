@@ -13,7 +13,7 @@ export interface WidgetConfig {
   locked?: boolean;
 }
 
-const STORAGE_KEY = "guzzl-dashboard-layout";
+const STORAGE_KEY = "guzzl-dashboard-layout-v2";
 
 export const DEFAULT_WIDGETS: WidgetConfig[] = [
   { id: "opportunity-alert", label: "Opportunity Alert", icon: "Bell", visible: true, size: "full", order: 0, locked: true },
