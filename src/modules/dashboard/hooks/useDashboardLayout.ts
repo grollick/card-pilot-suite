@@ -54,6 +54,17 @@ export function useDashboardLayout() {
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
+    setWidgets(prev => {
+      const existingIds = new Set(prev.map(w => w.id));
+      const missing = DEFAULT_WIDGETS.filter(d => !existingIds.has(d.id));
+      if (missing.length === 0) return prev;
+
+      const next = [...prev, ...missing];
+      return next.map((w, i) => ({ ...w, order: i }));
+    });
+  }, []);
+
+  useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(widgets));
   }, [widgets]);
 
