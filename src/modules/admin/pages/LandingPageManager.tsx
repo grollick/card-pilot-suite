@@ -728,6 +728,13 @@ export default function LandingPageManager({ adminOnly = true }: LandingPageMana
   const currentDef = MAIN_PAGE_DEFAULTS.find((p) => p.key === editData?.page_key);
 
   // ─── Page List ───
+  const PAGE_GROUPS: { label: string; description: string; keys: string[] }[] = [
+    { label: "Core Pages", description: "Your main website pages", keys: ["main"] },
+    { label: "Industry Pages", description: "Targeted landing pages for specific professions", keys: ["for/contractors", "for/barbers", "for/realtors", "for/photographers", "for/landscapers"] },
+    { label: "A/B Tests", description: "Experimental page variants for conversion testing", keys: ["new-hero"] },
+    { label: "Legal", description: "Privacy policy, terms of service, and compliance pages", keys: ["privacy", "terms"] },
+  ];
+
   if (!editingPage || !editData) {
     return (
       <div className="space-y-6 max-w-5xl">
@@ -737,56 +744,68 @@ export default function LandingPageManager({ adminOnly = true }: LandingPageMana
           </h1>
           <p className="text-muted-foreground text-sm mt-1">Create and edit pages with the visual drag-and-drop editor.</p>
         </div>
-        <div className="space-y-3">
-          {pages.map((page, i) => (
-            <motion.div
-              key={page.key}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.04 }}
-              className="rounded-xl border border-border bg-card p-5 flex items-center gap-4 hover:shadow-card-hover transition-all group cursor-pointer"
-              onClick={() => startEditing(page.key)}
-            >
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                {page.key === "privacy" || page.key === "terms" ? (
-                  <Scale className="h-5 w-5 text-primary" />
-                ) : page.key === "main" ? (
-                  <Globe className="h-5 w-5 text-primary" />
-                ) : page.key === "new-hero" ? (
-                  <FlaskConical className="h-5 w-5 text-primary" />
-                ) : (
-                  <FileText className="h-5 w-5 text-primary" />
-                )}
+        {PAGE_GROUPS.map((group) => {
+          const groupPages = group.keys.map((k) => pages.find((p) => p.key === k)).filter(Boolean) as typeof pages;
+          if (groupPages.length === 0) return null;
+          return (
+            <div key={group.label} className="space-y-2.5">
+              <div>
+                <h2 className="text-sm font-semibold text-foreground">{group.label}</h2>
+                <p className="text-2xs text-muted-foreground">{group.description}</p>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold truncate">{page.title}</p>
-                  <Badge variant={page.is_published ? "default" : "secondary"} className="text-2xs">
-                    {page.is_published ? "Published" : "Draft"}
-                  </Badge>
-                  {(page.key === "privacy" || page.key === "terms") && (
-                    <Badge variant="outline" className="text-2xs"><Sparkles className="h-2.5 w-2.5 mr-1" />AI Assisted</Badge>
-                  )}
-                  {page.key === "new-hero" && (
-                    <Badge variant="outline" className="text-2xs border-primary/30 text-primary"><FlaskConical className="h-2.5 w-2.5 mr-1" />A/B Test</Badge>
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5">{page.description}</p>
-                {page.updated_at && (
-                  <p className="text-2xs text-muted-foreground mt-1">Last edited: {new Date(page.updated_at).toLocaleDateString()}</p>
-                )}
+              <div className="space-y-2">
+                {groupPages.map((page, i) => (
+                  <motion.div
+                    key={page.key}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.04 }}
+                    className="rounded-xl border border-border bg-card p-4 flex items-center gap-4 hover:shadow-card-hover transition-all group cursor-pointer"
+                    onClick={() => startEditing(page.key)}
+                  >
+                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      {page.key === "privacy" || page.key === "terms" ? (
+                        <Scale className="h-5 w-5 text-primary" />
+                      ) : page.key === "main" ? (
+                        <Globe className="h-5 w-5 text-primary" />
+                      ) : page.key === "new-hero" ? (
+                        <FlaskConical className="h-5 w-5 text-primary" />
+                      ) : (
+                        <FileText className="h-5 w-5 text-primary" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-semibold truncate">{page.title}</p>
+                        <Badge variant={page.is_published ? "default" : "secondary"} className="text-2xs">
+                          {page.is_published ? "Published" : "Draft"}
+                        </Badge>
+                        {(page.key === "privacy" || page.key === "terms") && (
+                          <Badge variant="outline" className="text-2xs"><Sparkles className="h-2.5 w-2.5 mr-1" />AI Assisted</Badge>
+                        )}
+                        {page.key === "new-hero" && (
+                          <Badge variant="outline" className="text-2xs border-primary/30 text-primary"><FlaskConical className="h-2.5 w-2.5 mr-1" />A/B Test</Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">{page.description}</p>
+                      {page.updated_at && (
+                        <p className="text-2xs text-muted-foreground mt-1">Last edited: {new Date(page.updated_at).toLocaleDateString()}</p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <a href={page.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                        <Button variant="ghost" size="icon" className="h-8 w-8"><ExternalLink className="h-4 w-4" /></Button>
+                      </a>
+                      <Button variant="outline" size="sm">
+                        <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
+                      </Button>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
-              <div className="flex items-center gap-2 shrink-0">
-                <a href={page.url} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
-                  <Button variant="ghost" size="icon" className="h-8 w-8"><ExternalLink className="h-4 w-4" /></Button>
-                </a>
-                <Button variant="outline" size="sm">
-                  <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
-                </Button>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+            </div>
+          );
+        })}
       </div>
     );
   }
