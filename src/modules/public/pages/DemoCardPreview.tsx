@@ -1,12 +1,17 @@
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { getDemoCardBySlug } from "@/lib/demoCards";
 import {
   Phone, MessageSquare, Mail, Calendar, Star, MapPin,
   ArrowLeft, ChevronRight, Sparkles, CheckCircle2, Clock,
+  Download, FileText, Send, X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { motion } from "framer-motion";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 const fade = {
   hidden: { opacity: 0, y: 16 },
@@ -18,9 +23,201 @@ const stagger = {
   visible: { transition: { staggerChildren: 0.08 } },
 };
 
+/* ── vCard generator ── */
+function downloadVCard(card: { name: string; company: string; phone: string; email: string; city: string; tagline: string }) {
+  const vcard = [
+    "BEGIN:VCARD",
+    "VERSION:3.0",
+    `FN:${card.name}`,
+    `ORG:${card.company}`,
+    `TEL;TYPE=WORK,VOICE:${card.phone}`,
+    `EMAIL:${card.email}`,
+    `ADR;TYPE=WORK:;;${card.city}`,
+    `TITLE:${card.tagline}`,
+    `URL:${window.location.href}`,
+    "END:VCARD",
+  ].join("\n");
+
+  const blob = new Blob([vcard], { type: "text/vcard" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${card.name.replace(/\s+/g, "_")}.vcf`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast.success("Contact downloaded!", { description: "Check your downloads folder." });
+}
+
+/* ── Estimate Request Modal ── */
+function EstimateModal({ card, open, onClose }: { card: { name: string; company: string; email: string; services: { name: string }[] }; open: boolean; onClose: () => void }) {
+  const [formData, setFormData] = useState({ name: "", phone: "", email: "", service: "", details: "" });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+    toast.success("Estimate request sent!", { description: `${card.name} will get back to you soon.` });
+  };
+
+  if (!open) return null;
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md bg-card rounded-2xl border border-border shadow-2xl overflow-hidden"
+          >
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <div>
+                <h3 className="font-bold text-foreground">Request Free Estimate</h3>
+                <p className="text-xs text-muted-foreground">from {card.company}</p>
+              </div>
+              <button onClick={onClose} className="h-8 w-8 rounded-full bg-muted flex items-center justify-center hover:bg-accent transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {submitted ? (
+              <div className="p-8 text-center">
+                <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle2 className="h-6 w-6 text-green-600" />
+                </div>
+                <h4 className="font-bold text-foreground mb-1">Request Sent!</h4>
+                <p className="text-sm text-muted-foreground mb-4">This is a demo — in a real card, {card.name} would receive your request instantly.</p>
+                <Button variant="outline" onClick={onClose}>Close</Button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="p-4 space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <Input placeholder="Your name *" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                  <Input placeholder="Phone *" type="tel" required value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                </div>
+                <Input placeholder="Email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+                <select
+                  className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm text-foreground"
+                  value={formData.service}
+                  onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                >
+                  <option value="">Select a service...</option>
+                  {card.services.map((s) => (
+                    <option key={s.name} value={s.name}>{s.name}</option>
+                  ))}
+                </select>
+                <Textarea placeholder="Describe what you need..." rows={3} value={formData.details} onChange={(e) => setFormData({ ...formData, details: e.target.value })} />
+                <Button type="submit" className="w-full gap-2">
+                  <Send className="h-4 w-4" /> Send Estimate Request
+                </Button>
+                <p className="text-2xs text-muted-foreground text-center">Demo only — no data is actually sent</p>
+              </form>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ── Booking Modal ── */
+function BookingModal({ card, open, onClose }: { card: { name: string; company: string; services: { name: string; duration: string }[] }; open: boolean; onClose: () => void }) {
+  const [formData, setFormData] = useState({ name: "", phone: "", service: "", date: "", time: "", notes: "" });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitted(true);
+    toast.success("Booking requested!", { description: `${card.name} will confirm your appointment.` });
+  };
+
+  if (!open) return null;
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-4"
+          onClick={onClose}
+        >
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md bg-card rounded-2xl border border-border shadow-2xl overflow-hidden"
+          >
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <div>
+                <h3 className="font-bold text-foreground">Book Appointment</h3>
+                <p className="text-xs text-muted-foreground">with {card.name}</p>
+              </div>
+              <button onClick={onClose} className="h-8 w-8 rounded-full bg-muted flex items-center justify-center hover:bg-accent transition-colors">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {submitted ? (
+              <div className="p-8 text-center">
+                <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-3">
+                  <Calendar className="h-6 w-6 text-green-600" />
+                </div>
+                <h4 className="font-bold text-foreground mb-1">Booking Requested!</h4>
+                <p className="text-sm text-muted-foreground mb-4">This is a demo — in a real card, {card.name} would receive this and confirm your slot.</p>
+                <Button variant="outline" onClick={onClose}>Close</Button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="p-4 space-y-3">
+                <Input placeholder="Your name *" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+                <Input placeholder="Phone *" type="tel" required value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+                <select
+                  className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm text-foreground"
+                  value={formData.service}
+                  onChange={(e) => setFormData({ ...formData, service: e.target.value })}
+                  required
+                >
+                  <option value="">Select a service *</option>
+                  {card.services.map((s) => (
+                    <option key={s.name} value={s.name}>{s.name} ({s.duration})</option>
+                  ))}
+                </select>
+                <div className="grid grid-cols-2 gap-3">
+                  <Input type="date" required value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} />
+                  <Input type="time" required value={formData.time} onChange={(e) => setFormData({ ...formData, time: e.target.value })} />
+                </div>
+                <Textarea placeholder="Any notes..." rows={2} value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} />
+                <Button type="submit" className="w-full gap-2">
+                  <Calendar className="h-4 w-4" /> Request Booking
+                </Button>
+                <p className="text-2xs text-muted-foreground text-center">Demo only — no booking is actually created</p>
+              </form>
+            )}
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+/* ── Main Page ── */
 export default function DemoCardPreview() {
   const { slug } = useParams();
   const card = getDemoCardBySlug(slug ?? "");
+  const [showEstimate, setShowEstimate] = useState(false);
+  const [showBooking, setShowBooking] = useState(false);
 
   if (!card) {
     return (
@@ -32,6 +229,14 @@ export default function DemoCardPreview() {
       </div>
     );
   }
+
+  const handleCall = () => {
+    window.location.href = `tel:${card.phone}`;
+  };
+
+  const handleText = () => {
+    window.location.href = `sms:${card.phone}`;
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -87,19 +292,23 @@ export default function DemoCardPreview() {
         </motion.div>
 
         {/* CTA buttons */}
-        <motion.div initial="hidden" animate="visible" variants={stagger} className="grid grid-cols-3 gap-2.5 mx-4 mt-4">
+        <motion.div initial="hidden" animate="visible" variants={stagger} className="grid grid-cols-5 gap-2 mx-4 mt-4">
           {[
-            { icon: Phone, label: "Call", color: "hsl(142, 71%, 45%)" },
-            { icon: MessageSquare, label: "Text", color: "hsl(217, 91%, 60%)" },
-            { icon: Calendar, label: "Book", color: card.accentColor },
+            { icon: Phone, label: "Call", color: "hsl(142, 71%, 45%)", onClick: handleCall },
+            { icon: MessageSquare, label: "Text", color: "hsl(217, 91%, 60%)", onClick: handleText },
+            { icon: Calendar, label: "Book", color: card.accentColor, onClick: () => setShowBooking(true) },
+            { icon: FileText, label: "Estimate", color: "hsl(25, 95%, 53%)", onClick: () => setShowEstimate(true) },
+            { icon: Download, label: "Save", color: "hsl(262, 83%, 58%)", onClick: () => downloadVCard(card) },
           ].map((cta) => (
             <motion.button
               key={cta.label}
               variants={fade}
-              className="flex flex-col items-center gap-1.5 py-3.5 rounded-xl border border-border bg-card hover:bg-muted/50 transition-all active:scale-[0.97] shadow-sm"
+              onClick={cta.onClick}
+              className="flex flex-col items-center gap-1.5 py-3 rounded-xl border border-border bg-card hover:bg-muted/50 transition-all active:scale-[0.95] shadow-sm"
+              whileTap={{ scale: 0.93 }}
             >
               <cta.icon className="h-5 w-5" style={{ color: cta.color }} />
-              <span className="text-xs font-medium text-foreground">{cta.label}</span>
+              <span className="text-2xs font-medium text-foreground">{cta.label}</span>
             </motion.button>
           ))}
         </motion.div>
@@ -205,18 +414,18 @@ export default function DemoCardPreview() {
         <motion.section initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={fade} className="mx-4 mt-6">
           <h2 className="text-lg font-bold text-foreground mb-3">Get in Touch</h2>
           <div className="rounded-xl border border-border bg-card p-5 space-y-3">
-            <div className="flex items-center gap-3 text-sm text-foreground">
+            <a href={`tel:${card.phone}`} className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors">
               <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                 <Phone className="h-4 w-4 text-primary" />
               </div>
               {card.phone}
-            </div>
-            <div className="flex items-center gap-3 text-sm text-foreground">
+            </a>
+            <a href={`mailto:${card.email}`} className="flex items-center gap-3 text-sm text-foreground hover:text-primary transition-colors">
               <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                 <Mail className="h-4 w-4 text-primary" />
               </div>
               {card.email}
-            </div>
+            </a>
             <div className="flex items-center gap-3 text-sm text-foreground">
               <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                 <MapPin className="h-4 w-4 text-primary" />
@@ -244,10 +453,14 @@ export default function DemoCardPreview() {
         {/* Powered by */}
         <div className="text-center mt-8">
           <Link to="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-            Powered by <span className="font-semibold"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></span>
+            Powered by <span className="text-primary font-extrabold">guzzl</span><span className="font-normal">.pro</span>
           </Link>
         </div>
       </div>
+
+      {/* Modals */}
+      <EstimateModal card={card} open={showEstimate} onClose={() => setShowEstimate(false)} />
+      <BookingModal card={card} open={showBooking} onClose={() => setShowBooking(false)} />
     </div>
   );
 }
