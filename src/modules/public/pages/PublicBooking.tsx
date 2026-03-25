@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import PublicTopBar from "@/modules/public/components/PublicTopBar";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Clock, Check, Calendar, Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";

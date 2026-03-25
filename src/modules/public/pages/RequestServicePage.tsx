@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PublicTopBar from "@/modules/public/components/PublicTopBar";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";

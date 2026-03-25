@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
+import PublicTopBar from "@/modules/public/components/PublicTopBar";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useMarketplaceListings, useMarketplaceProfessions, useMarketplaceServices, type MarketplaceListing } from "@/hooks/useMarketplace";
