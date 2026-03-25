@@ -1,5 +1,8 @@
-import { useState } from "react";
-import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { useRef, useState, useCallback } from "react";
+import {
+  motion, AnimatePresence, useMotionValue, useSpring, useTransform,
+  type Variants,
+} from "framer-motion";
 import {
   Star, Phone, MessageSquare, Calendar, FileText,
   MapPin, ArrowRight, Send,
