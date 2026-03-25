@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Star, Phone, MessageSquare, Calendar, FileText, MapPin, ChevronRight, ArrowRight, Send } from "lucide-react";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
+import {
+  Star, Phone, MessageSquare, Calendar, FileText,
+  MapPin, ArrowRight, Send,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -22,11 +25,8 @@ export interface AnimatedBusinessCardProps {
   reviewCount?: number;
   services: CardService[];
   photoUrl?: string;
-  /** Enable flip-to-contact-form */
   flipEnabled?: boolean;
-  /** Link for "View Full Card" */
   cardUrl?: string;
-  /** Callbacks */
   onCall?: () => void;
   onText?: () => void;
   onBook?: () => void;
@@ -34,50 +34,28 @@ export interface AnimatedBusinessCardProps {
   className?: string;
 }
 
-// ─── Animations ───
+// ─── Animation constants ───
 
-const cardVariants = {
-  idle: {
-    y: 0,
-    scale: 1,
-    boxShadow: "0 4px 24px -4px hsl(200 60% 10% / 0.08), 0 0 0 0 hsl(199 89% 48% / 0)",
-  },
-  hover: {
-    y: -10,
-    scale: 1.03,
-    boxShadow: "0 20px 50px -12px hsl(200 60% 10% / 0.18), 0 0 30px -5px hsl(199 89% 48% / 0.15)",
-    transition: { type: "spring" as const, stiffness: 300, damping: 22 },
-  },
-  tap: {
-    y: -4,
-    scale: 1.01,
-    transition: { duration: 0.15 },
-  },
-};
-
-const serviceItemVariants = {
-  hidden: { opacity: 0, y: 12 },
-  visible: (i: number) => ({
+const CARD_WRAPPER: Variants = {
+  offscreen: { opacity: 0, y: 20 },
+  onscreen: {
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.07, duration: 0.35, ease: "easeOut" as const },
-  }),
-};
-
-const ctaVariants = {
-  rest: { scale: 1 },
-  hover: {
-    scale: 1.04,
-    transition: { type: "spring" as const, stiffness: 400, damping: 17 },
+    transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] },
   },
 };
 
-const floatAnimation = {
-  y: [0, -3, 0],
-  transition: {
-    duration: 4,
-    repeat: Infinity,
-    ease: "easeInOut" as const,
+const SERVICE_PARENT: Variants = {
+  collapsed: {},
+  expanded: { transition: { staggerChildren: 0.05 } },
+};
+
+const SERVICE_ITEM: Variants = {
+  collapsed: { opacity: 0, y: 10 },
+  expanded: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] },
   },
 };
 
@@ -90,7 +68,11 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
         {[...Array(5)].map((_, i) => (
           <Star
             key={i}
-            className={`w-3.5 h-3.5 ${i < Math.round(rating) ? "fill-amber-400 text-amber-400" : "fill-muted text-muted"}`}
+            className={`w-3.5 h-3.5 ${
+              i < Math.round(rating)
+                ? "fill-amber-400 text-amber-400"
+                : "fill-muted text-muted"
+            }`}
           />
         ))}
       </div>
@@ -107,25 +89,23 @@ function QuickContactForm({ onClose }: { onClose: () => void }) {
       initial={{ rotateY: 90, opacity: 0 }}
       animate={{ rotateY: 0, opacity: 1 }}
       exit={{ rotateY: -90, opacity: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="absolute inset-0 bg-card rounded-2xl border border-border p-5 flex flex-col z-10 backface-hidden"
+      transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+      className="absolute inset-0 bg-card rounded-2xl border border-border p-5 flex flex-col z-10"
     >
       <p className="text-sm font-semibold text-foreground mb-1">Quick Contact</p>
-      <p className="text-xs text-muted-foreground mb-3">Send a message or request a quote.</p>
-
+      <p className="text-xs text-muted-foreground mb-3">
+        Send a message or request a quote.
+      </p>
       <div className="space-y-2.5 flex-1">
         <Input placeholder="Your name" className="h-9 text-sm" />
         <Input placeholder="Phone or email" className="h-9 text-sm" />
-        <Textarea placeholder="What do you need help with?" className="text-sm min-h-[70px] resize-none" />
+        <Textarea
+          placeholder="What do you need help with?"
+          className="text-sm min-h-[70px] resize-none"
+        />
       </div>
-
       <div className="flex gap-2 mt-3">
-        <Button
-          variant="outline"
-          size="sm"
-          className="flex-1 text-xs"
-          onClick={onClose}
-        >
+        <Button variant="outline" size="sm" className="flex-1 text-xs" onClick={onClose}>
           Back
         </Button>
         <motion.div className="flex-1" whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
@@ -165,27 +145,67 @@ export default function AnimatedBusinessCard({
   const [showContact, setShowContact] = useState(false);
 
   const displayInitials =
-    initials || name.split(" ").map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+    initials ||
+    name
+      .split(" ")
+      .map((w) => w[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
 
   return (
     <motion.div
       className={`relative w-full max-w-sm mx-auto ${className}`}
-      variants={cardVariants}
-      initial="idle"
-      whileHover="hover"
-      whileTap="tap"
-      animate={isHovered ? "hover" : "idle"}
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => { setIsHovered(false); setShowContact(false); }}
-      onTapStart={() => setIsHovered(true)}
+      variants={CARD_WRAPPER}
+      initial="offscreen"
+      whileInView="onscreen"
+      viewport={{ once: true, amount: 0.2 }}
       style={{ perspective: 800 }}
     >
-      {/* Idle float */}
-      <motion.div animate={floatAnimation}>
-        <div className="relative rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
+      {/* Idle pulse — very subtle scale oscillation */}
+      <motion.div
+        animate={{ scale: [1, 1.015, 1] }}
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+          ease: [0.45, 0.05, 0.55, 0.95],
+        }}
+      >
+        {/* Hover / tap wrapper */}
+        <motion.div
+          onHoverStart={() => setIsHovered(true)}
+          onHoverEnd={() => {
+            setIsHovered(false);
+            setShowContact(false);
+          }}
+          whileHover={{
+            y: -12,
+            scale: 1.04,
+            boxShadow:
+              "0 24px 56px -12px hsl(200 60% 10% / 0.22), 0 0 0 4px hsl(199 89% 48% / 0.18)",
+          }}
+          whileTap={{
+            y: -6,
+            scale: 1.02,
+            boxShadow:
+              "0 16px 40px -8px hsl(200 60% 10% / 0.18), 0 0 0 3px hsl(199 89% 48% / 0.15)",
+          }}
+          transition={{
+            type: "spring" as const,
+            stiffness: 300,
+            damping: 20,
+          }}
+          className="relative rounded-2xl border border-border bg-card overflow-hidden shadow-sm cursor-pointer"
+        >
           {/* ── Cover band ── */}
           <div className="h-20 bg-gradient-to-r from-sky-500 to-cyan-500 relative">
-            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 30% 50%, white 0%, transparent 60%)" }} />
+            <div
+              className="absolute inset-0 opacity-20"
+              style={{
+                backgroundImage:
+                  "radial-gradient(circle at 30% 50%, white 0%, transparent 60%)",
+              }}
+            />
           </div>
 
           {/* ── Profile ── */}
@@ -203,7 +223,9 @@ export default function AnimatedBusinessCard({
                 </div>
               )}
               <div className="pb-1 flex-1 min-w-0">
-                <p className="font-bold text-foreground text-base leading-tight truncate">{name}</p>
+                <p className="font-bold text-foreground text-base leading-tight truncate">
+                  {name}
+                </p>
                 <p className="text-xs text-muted-foreground truncate">{business}</p>
               </div>
             </div>
@@ -211,28 +233,28 @@ export default function AnimatedBusinessCard({
 
           {/* ── Details ── */}
           <div className="px-5 pt-3 pb-5 space-y-3.5">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-1">
               <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <MapPin className="w-3 h-3" /> {location}
+                <MapPin className="w-3 h-3 shrink-0" /> {location}
               </div>
               <StarRating rating={rating} count={reviewCount} />
             </div>
 
             {tagline && (
-              <p className="text-sm text-muted-foreground italic leading-snug">"{tagline}"</p>
+              <p className="text-sm text-muted-foreground italic leading-snug">
+                "{tagline}"
+              </p>
             )}
 
             {/* ── Action buttons ── */}
             <div className="grid grid-cols-2 gap-2">
               {[
-                { label: "Call", icon: Phone, onClick: onCall, variant: "sky" as const },
-                { label: "Text", icon: MessageSquare, onClick: onText, variant: "sky" as const },
+                { label: "Call", icon: Phone, onClick: onCall },
+                { label: "Text", icon: MessageSquare, onClick: onText },
               ].map((btn) => (
                 <motion.button
                   key={btn.label}
-                  variants={ctaVariants}
-                  initial="rest"
-                  whileHover="hover"
+                  whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="flex items-center justify-center gap-1.5 rounded-lg bg-sky-500 text-white text-xs font-medium py-2.5 shadow-sm hover:bg-sky-600 transition-colors"
                   onClick={btn.onClick}
@@ -241,9 +263,7 @@ export default function AnimatedBusinessCard({
                 </motion.button>
               ))}
               <motion.button
-                variants={ctaVariants}
-                initial="rest"
-                whileHover="hover"
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="col-span-2 flex items-center justify-center gap-1.5 rounded-lg bg-orange-500 text-white text-xs font-semibold py-2.5 shadow-sm hover:bg-orange-600 transition-colors"
                 onClick={onBook}
@@ -252,72 +272,65 @@ export default function AnimatedBusinessCard({
               </motion.button>
             </div>
 
-            {/* ── Services ── */}
-            <div className="space-y-1">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Services</p>
-              {services.map((s, i) => (
+            {/* ── Services (stagger on hover) ── */}
+            <motion.div
+              className="space-y-0"
+              variants={SERVICE_PARENT}
+              initial="collapsed"
+              animate={isHovered ? "expanded" : "collapsed"}
+            >
+              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+                Services
+              </p>
+              {services.map((s) => (
                 <motion.div
                   key={s.name}
-                  custom={i}
-                  variants={serviceItemVariants}
-                  initial="hidden"
-                  animate={isHovered ? "visible" : "hidden"}
+                  variants={SERVICE_ITEM}
                   className="flex justify-between items-center text-xs py-1.5 border-b border-border/50 last:border-0"
                 >
                   <span className="text-foreground font-medium">{s.name}</span>
                   <span className="text-muted-foreground">{s.price}</span>
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
 
-            {/* ── Bottom CTAs ── */}
-            <div className="flex gap-2 pt-1">
-              <motion.button
-                variants={ctaVariants}
-                initial="rest"
-                whileHover="hover"
-                whileTap={{ scale: 0.95 }}
-                className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border-2 border-orange-500 text-orange-600 text-xs font-semibold py-2.5 hover:bg-orange-50 dark:hover:bg-orange-500/10 transition-colors"
-                onClick={flipEnabled ? () => setShowContact(true) : onEstimate}
-              >
-                <FileText className="w-3.5 h-3.5" /> Get Free Estimate
-              </motion.button>
-            </div>
+            {/* ── Get Free Estimate ── */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="w-full flex items-center justify-center gap-1.5 rounded-lg border-2 border-orange-500 text-orange-600 text-xs font-semibold py-2.5 hover:bg-orange-50 dark:hover:bg-orange-500/10 transition-colors"
+              onClick={flipEnabled ? () => setShowContact(true) : onEstimate}
+            >
+              <FileText className="w-3.5 h-3.5" /> Get Free Estimate
+            </motion.button>
 
-            {/* View Full Card link */}
+            {/* ── View Full Card link ── */}
             {cardUrl && (
               <motion.a
                 href={cardUrl}
                 className="group flex items-center justify-center gap-1 text-xs text-primary font-medium pt-1 hover:underline"
                 whileHover={{ x: 3 }}
-                transition={{ type: "spring", stiffness: 400 }}
+                transition={{ type: "spring" as const, stiffness: 400 }}
               >
                 View Full Card
-                <motion.span
-                  className="inline-block"
-                  initial={{ x: 0 }}
-                  whileHover={{ x: 4 }}
-                  transition={{ type: "spring", stiffness: 400 }}
-                >
-                  <ArrowRight className="w-3 h-3" />
-                </motion.span>
+                <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
               </motion.a>
             )}
           </div>
 
-          {/* ── Flip: Quick Contact Form ── */}
+          {/* ── Flip overlay: Quick Contact ── */}
           <AnimatePresence>
             {showContact && flipEnabled && (
               <QuickContactForm onClose={() => setShowContact(false)} />
             )}
           </AnimatePresence>
-        </div>
+        </motion.div>
       </motion.div>
     </motion.div>
   );
 }
 
-// ─── Preset Data ───
+// ─── Preset Demo Data ───
 
 export const DEMO_CARDS: AnimatedBusinessCardProps[] = [
   {
@@ -375,5 +388,33 @@ export const DEMO_CARDS: AnimatedBusinessCardProps[] = [
       { name: "Hardscaping", price: "$4,000+" },
     ],
     cardUrl: "/demo/david-nguyen",
+  },
+  {
+    name: "Jessica Martinez",
+    business: "FitLife Personal Training",
+    location: "Miami, FL",
+    tagline: "Your goals, my mission",
+    rating: 5.0,
+    reviewCount: 89,
+    services: [
+      { name: "1-on-1 Session", price: "$75" },
+      { name: "Group Training", price: "$30/person" },
+      { name: "Nutrition Plan", price: "$200" },
+    ],
+    cardUrl: "/demo/jessica-martinez",
+  },
+  {
+    name: "Tanya Brooks",
+    business: "Tanya B Hair Studio",
+    location: "Chicago, IL",
+    tagline: "Color. Cut. Confidence.",
+    rating: 4.9,
+    reviewCount: 103,
+    services: [
+      { name: "Cut & Style", price: "$65" },
+      { name: "Full Color", price: "$120+" },
+      { name: "Bridal Package", price: "$350" },
+    ],
+    cardUrl: "/demo/tanya-brooks",
   },
 ];
