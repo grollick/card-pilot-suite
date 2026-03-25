@@ -65,6 +65,7 @@ import QuoteCalculator from "@/modules/card/components/QuoteCalculator";
 import ScanToSaveWidget from "@/modules/card/components/ScanToSaveWidget";
 import { getHeroBackgroundForProfession, getHeroBackgroundById } from "@/lib/heroBackgrounds";
 import { showsBranding } from "@/lib/plans";
+import ModernCardLayout from "@/modules/card/components/ModernCardLayout";
 
 // ── Visitor meta for analytics ──
 function getVisitorMeta() {
