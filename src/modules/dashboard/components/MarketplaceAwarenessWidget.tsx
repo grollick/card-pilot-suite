@@ -25,9 +25,9 @@ export default function MarketplaceAwarenessWidget() {
   });
 
   const { data: duty } = useQuery({
-    queryKey: ["marketplace-awareness-duty", user?.id],
+    queryKey: ["estimate-duty-status"],
     enabled: !!user,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30_000,
     queryFn: async () => {
       const { data } = await supabase
         .from("estimate_duty_status")
