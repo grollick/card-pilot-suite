@@ -22,12 +22,16 @@ export function useContacts() {
 }
 
 export function usePipelineStages() {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ["pipeline-stages"],
+    queryKey: ["pipeline-stages", user?.id],
+    enabled: !!user,
+    staleTime: 60_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pipeline_stages")
         .select("*")
+        .eq("user_id", user!.id)
         .order("sort_order", { ascending: true });
       if (error) throw error;
       return data ?? [];
@@ -36,12 +40,16 @@ export function usePipelineStages() {
 }
 
 export function useTags() {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ["tags"],
+    queryKey: ["tags", user?.id],
+    enabled: !!user,
+    staleTime: 60_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tags")
         .select("*")
+        .eq("user_id", user!.id)
         .order("name", { ascending: true });
       if (error) throw error;
       return data ?? [];
