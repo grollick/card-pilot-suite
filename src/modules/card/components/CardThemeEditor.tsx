@@ -429,6 +429,7 @@ export default function CardThemeEditor({
   const setBgPattern = _setBgPattern;
   const setMetallicEffect = _setMetallicEffect;
   const setHeroBackgroundId = _setHeroBackgroundId;
+  const setCardLayout = _setCardLayout;
 
   // Custom palettes
   const [customPalettes, setCustomPalettes] = useState<{ id: string; name: string; palette: CardPalette }[]>([]);
