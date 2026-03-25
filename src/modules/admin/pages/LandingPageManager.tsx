@@ -765,6 +765,9 @@ export default function LandingPageManager({ adminOnly = true }: LandingPageMana
                   {(page.key === "privacy" || page.key === "terms") && (
                     <Badge variant="outline" className="text-2xs"><Sparkles className="h-2.5 w-2.5 mr-1" />AI Assisted</Badge>
                   )}
+                  {page.key === "new-hero" && (
+                    <Badge variant="outline" className="text-2xs border-primary/30 text-primary"><FlaskConical className="h-2.5 w-2.5 mr-1" />A/B Test</Badge>
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5">{page.description}</p>
                 {page.updated_at && (
