@@ -189,7 +189,9 @@ export default function PublicBooking() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-start justify-center p-4 py-8">
+    <div className="min-h-screen bg-background">
+      <PublicTopBar backTo={handle ? `/${handle}` : "/"} backLabel="Back to Profile" title="Book Appointment" />
+      <div className="flex items-start justify-center p-4 py-8">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
         <div className="rounded-3xl border border-border bg-card overflow-hidden shadow-lg">
           <div className="p-6 border-b border-border flex items-center gap-3">

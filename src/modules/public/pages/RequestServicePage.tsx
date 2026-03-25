@@ -80,8 +80,9 @@ export default function RequestServicePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      <PublicTopBar backTo="/discover" backLabel="Discover" title="Request a Service" />
       <Helmet>
-        <title>Request a Service | CardPilot</title>
+        <title>Request a Service | guzzl.pro</title>
         <meta name="description" content="Get free quotes from verified local professionals. Describe your project and receive responses fast." />
       </Helmet>
 

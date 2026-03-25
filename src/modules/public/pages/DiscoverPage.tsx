@@ -363,6 +363,7 @@ export default function DiscoverPage() {
 
   return (
     <div className="min-h-screen bg-background pb-24">
+      <PublicTopBar backTo="/" backLabel="Home" title="Discover" />
       <Helmet>
         <title>{title} | guzzl.pro</title>
         <meta name="description" content={metaDescription} />
