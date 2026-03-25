@@ -375,7 +375,7 @@ export default function DiscoverPage() {
         <div className="relative max-w-6xl mx-auto px-4 py-14 md:py-20">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 mb-6">
-            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></Link>
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors"><span className="text-primary font-extrabold">guzzl</span><span className="text-foreground font-normal">.pro</span></Link>
             <span className="text-muted-foreground/40">/</span>
             <span className="text-sm text-foreground font-medium">Discover</span>
             {displayProfession && (
