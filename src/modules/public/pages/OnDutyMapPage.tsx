@@ -302,12 +302,12 @@ export default function OnDutyMapPage() {
     mapReadyRef.current = mapReady;
   }, [mapReady]);
 
+  // Auto-fallback to list when map fails
   useEffect(() => {
-    if (view !== "map") return;
-    if (hasWebGLSupport()) return;
-    console.error("[OnDutyMap] WebGL unavailable, map cannot initialize");
-    setMapError(true);
-  }, [view]);
+    if (mapError && view === "map") {
+      setView("list");
+    }
+  }, [mapError, view]);
 
   useEffect(() => {
     if (view !== "map" || mapReady || mapError) return;
