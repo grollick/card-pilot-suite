@@ -152,10 +152,11 @@ function CardFront({
             <img
               src={photoUrl}
               alt={name}
-              className="w-16 h-16 rounded-xl object-cover ring-3 ring-card shadow-md"
+              loading="lazy"
+              className="w-16 h-16 rounded-full object-cover ring-3 ring-card shadow-md"
             />
           ) : (
-            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white font-bold text-xl shadow-md ring-3 ring-card">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white font-bold text-xl shadow-md ring-3 ring-card">
               {displayInitials}
             </div>
           )}
@@ -515,71 +516,81 @@ export default function AnimatedBusinessCard({
 export const DEMO_CARDS: AnimatedBusinessCardProps[] = [
   {
     name: "Mike Reynolds",
-    business: "Reynolds Construction LLC",
+    business: "Reynolds Construction",
     location: "Toronto, ON",
-    tagline: "Quality builds, honest pricing",
+    tagline: "Quality renovations that last a lifetime",
     rating: 5.0,
-    reviewCount: 42,
+    reviewCount: 28,
+    photoUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face&q=80",
     services: [
-      { name: "Kitchen Remodel", price: "$15,000+" },
-      { name: "Bathroom Renovation", price: "$8,000+" },
-      { name: "Deck & Patio", price: "$5,500+" },
+      { name: "Kitchen Remodel", price: "From $18,500" },
+      { name: "Bathroom Renovation", price: "$7,200 – $12,000" },
+      { name: "Basement Finishing", price: "$15,000+" },
+      { name: "Deck Construction", price: "$4,800" },
     ],
     cardUrl: "/demo/mike-reynolds",
   },
   {
     name: "Marcus Cole",
     business: "Cole's Classic Cuts",
-    location: "Atlanta, GA",
-    tagline: "Where style meets precision",
+    location: "Vancouver, BC",
+    tagline: "Premium cuts & grooming for the modern gentleman",
     rating: 4.9,
-    reviewCount: 128,
+    reviewCount: 47,
+    photoUrl: "https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?w=200&h=200&fit=crop&crop=face&q=80",
     services: [
-      { name: "Classic Cut", price: "$35" },
-      { name: "Beard Trim", price: "$20" },
-      { name: "Hot Towel Shave", price: "$30" },
+      { name: "Signature Haircut", price: "$45" },
+      { name: "Beard Trim & Shape", price: "$35" },
+      { name: "Hot Towel Shave", price: "$55" },
+      { name: "Kids Cut (12 & under)", price: "$30" },
     ],
     cardUrl: "/demo/marcus-cole",
   },
   {
     name: "Sarah Chen",
     business: "Chen Realty Group",
-    location: "Vancouver, BC",
-    tagline: "Your home, my expertise",
+    location: "Calgary, AB",
+    tagline: "Helping families find their forever home",
     rating: 5.0,
-    reviewCount: 67,
+    reviewCount: 19,
+    photoUrl: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&h=200&fit=crop&crop=face&q=80",
     services: [
-      { name: "Home Valuation", price: "Free" },
-      { name: "Buyer Consultation", price: "Free" },
-      { name: "Staging Service", price: "$1,200+" },
+      { name: "Home Buying Consultation", price: "Free" },
+      { name: "Property Valuation", price: "Free" },
+      { name: "Listing Prep Package", price: "$499" },
+      { name: "First-Time Buyer Guidance", price: "Included" },
     ],
     cardUrl: "/demo/sarah-chen",
   },
   {
-    name: "David Nguyen",
-    business: "GreenScape Landscaping",
-    location: "Austin, TX",
-    tagline: "Transform your outdoor space",
+    name: "Alex Greenfield",
+    business: "Greenfield Landscapes",
+    location: "Ottawa, ON",
+    tagline: "Beautiful outdoor spaces that thrive",
     rating: 4.8,
-    reviewCount: 55,
+    reviewCount: 34,
+    photoUrl: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop&crop=face&q=80",
     services: [
-      { name: "Lawn Care", price: "$150/mo" },
-      { name: "Garden Design", price: "$2,500+" },
-      { name: "Hardscaping", price: "$4,000+" },
+      { name: "Full Landscape Design", price: "$2,500+" },
+      { name: "Lawn Maintenance", price: "$180/month" },
+      { name: "Patio & Hardscaping", price: "$8,000" },
+      { name: "Tree & Shrub Planting", price: "From $350" },
     ],
-    cardUrl: "/demo/david-nguyen",
+    cardUrl: "/demo/alex-greenfield",
   },
   {
     name: "Jessica Martinez",
     business: "FitLife Personal Training",
     location: "Miami, FL",
-    tagline: "Your goals, my mission",
+    tagline: "Transform your body, transform your life",
     rating: 5.0,
     reviewCount: 89,
+    photoUrl: "https://images.unsplash.com/photo-1594381898411-846e7d193883?w=200&h=200&fit=crop&crop=face&q=80",
     services: [
-      { name: "1-on-1 Session", price: "$75" },
-      { name: "Group Training", price: "$30/person" },
-      { name: "Nutrition Plan", price: "$200" },
+      { name: "1-on-1 Session", price: "$85" },
+      { name: "Group Training (4 ppl)", price: "$35/person" },
+      { name: "12-Week Program", price: "$1,200" },
+      { name: "Nutrition Plan", price: "$250" },
     ],
     cardUrl: "/demo/jessica-martinez",
   },
@@ -590,11 +601,29 @@ export const DEMO_CARDS: AnimatedBusinessCardProps[] = [
     tagline: "Color. Cut. Confidence.",
     rating: 4.9,
     reviewCount: 103,
+    photoUrl: "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&fit=crop&crop=face&q=80",
     services: [
       { name: "Cut & Style", price: "$65" },
       { name: "Full Color", price: "$120+" },
+      { name: "Balayage / Highlights", price: "$180+" },
       { name: "Bridal Package", price: "$350" },
     ],
     cardUrl: "/demo/tanya-brooks",
+  },
+  {
+    name: "Rachel Torres",
+    business: "Torres Electric Co.",
+    location: "Houston, TX",
+    tagline: "Licensed, insured & always on time",
+    rating: 5.0,
+    reviewCount: 61,
+    photoUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face&q=80",
+    services: [
+      { name: "Panel Upgrade", price: "$1,800+" },
+      { name: "EV Charger Install", price: "$950" },
+      { name: "Whole-Home Rewire", price: "$4,500+" },
+      { name: "Emergency Service", price: "$150/call" },
+    ],
+    cardUrl: "/demo/rachel-torres",
   },
 ];
