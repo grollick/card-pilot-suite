@@ -258,17 +258,8 @@ export default function ModernCardLayout({
           </div>
         </motion.div>
 
-        {/* Activity badges */}
+        {/* Activity badges (on-duty & verified removed — shown in cover) */}
         <div className="flex flex-wrap items-center justify-center gap-2 mx-4 mt-3">
-          {profile.verification_level && profile.verification_level !== "basic" && (
-            <VerificationBadge level={profile.verification_level} size="sm" />
-          )}
-          {profile.is_on_duty && <AvailableNowBadge />}
-          {!profile.is_on_duty && profile.available_for_work && (
-            <Badge variant="outline" className="text-[10px] font-normal gap-0.5 bg-success/5 text-success border-success/20">
-              <CheckCircle2 className="h-2.5 w-2.5" /> Available
-            </Badge>
-          )}
           {profile.avg_response_minutes != null && profile.avg_response_minutes > 0 && (
             <ResponseSpeedBadge minutes={profile.avg_response_minutes} />
           )}
