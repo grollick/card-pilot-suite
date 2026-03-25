@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { QR_PRODUCTS } from "@/lib/qrProducts";
 import { motion } from "framer-motion";
-import { ArrowLeft, Check, QrCode, ShoppingCart, ArrowRight } from "lucide-react";
+import { Check, QrCode, ShoppingCart, ArrowRight } from "lucide-react";
+import PublicTopBar from "@/modules/public/components/PublicTopBar";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -16,24 +17,7 @@ const fadeUp = {
 export default function ProductsPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Nav */}
-      <nav className="border-b border-border/50 bg-card/80 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link to="/" className="text-lg font-extrabold tracking-tight">
-            <span className="gradient-text"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></span>
-          </Link>
-          <div className="flex items-center gap-2">
-            <Link to="/">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="h-3.5 w-3.5 mr-1" /> Home
-              </Button>
-            </Link>
-            <Link to="/onboarding">
-              <Button size="sm" className="shadow-glow">Get Started</Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <PublicTopBar backTo="/" backLabel="Home" title="Products" />
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 py-16 md:py-24 text-center">

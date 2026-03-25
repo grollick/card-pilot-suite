@@ -1,8 +1,8 @@
 import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Shield, Lock, Eye, Server, BadgeCheck, ArrowLeft } from "lucide-react";
+import { Shield, Lock, Eye, Server, BadgeCheck } from "lucide-react";
 import TrustBadge from "@/components/trust/TrustBadge";
+import PublicTopBar from "@/modules/public/components/PublicTopBar";
 
 const sections = [
   {
