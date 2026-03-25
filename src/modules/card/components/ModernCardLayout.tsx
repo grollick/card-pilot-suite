@@ -226,6 +226,12 @@ export default function ModernCardLayout({
             {!coverUrl && resolvedHero && (
               <div className="absolute inset-0" style={{ background: resolvedHero.overlay }} />
             )}
+
+            {/* Trust badges in cover */}
+            <div className="absolute bottom-2 right-2 flex items-center gap-1.5 z-10">
+              {profile.is_verified && <VerificationBadge level="verified" size="sm" showLabel={false} />}
+              {profile.is_on_duty && <AvailableNowBadge />}
+            </div>
           </div>
 
           {/* Profile overlay */}
