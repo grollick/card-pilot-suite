@@ -30,29 +30,28 @@ import {
 
 /* ── Navigation structure ── */
 
-const leadsItems = [
-  { title: "All Leads", url: "/app/contacts", icon: Inbox },
+const crmItems = [
+  { title: "Contacts", url: "/app/contacts", icon: Inbox },
   { title: "Pipeline", url: "/app/pipeline", icon: Kanban },
   { title: "Job Requests", url: "/app/job-requests", icon: Bell, glowKey: "job-requests" },
   { title: "Bookings", url: "/app/bookings", icon: Calendar },
-  { title: "Estimates", url: "/app/estimates", icon: FileText },
   { title: "Tasks", url: "/app/tasks", icon: CheckSquare },
+  { title: "Reviews", url: "/app/reviews", icon: Star },
+  { title: "Loyalty", url: "/app/loyalty", icon: Gift },
 ];
 
 const jobsItems = [
   { title: "Active Jobs", url: "/app/jobs", icon: Briefcase },
   { title: "Job Pipeline", url: "/app/job-pipeline", icon: ClipboardList },
+  { title: "Projects", url: "/app/projects", icon: Briefcase },
   { title: "Recurring", url: "/app/recurring", icon: RefreshCw },
-  { title: "Invoices", url: "/app/invoices", icon: DollarSign },
-  { title: "Expenses", url: "/app/expenses", icon: DollarSign },
-  { title: "Revenue", url: "/app/revenue", icon: DollarSign },
+  { title: "Estimates", url: "/app/estimates", icon: FileText },
 ];
 
-const customersItems = [
-  { title: "Contacts", url: "/app/contacts?stage=customer", icon: UserCircle },
-  { title: "Reviews", url: "/app/reviews", icon: Star },
-  { title: "Loyalty", url: "/app/loyalty", icon: Gift },
-  { title: "Projects", url: "/app/projects", icon: Briefcase },
+const moneyItems = [
+  { title: "Invoices", url: "/app/invoices", icon: DollarSign },
+  { title: "Revenue", url: "/app/revenue", icon: DollarSign },
+  { title: "Expenses", url: "/app/expenses", icon: DollarSign },
 ];
 
 const marketingItems = [
@@ -60,18 +59,16 @@ const marketingItems = [
   { title: "Social Media", url: "/app/social", icon: Share2 },
   { title: "Email", url: "/app/email", icon: Mail },
   { title: "Campaigns", url: "/app/auto-campaigns", icon: Zap },
-  { title: "Referrals", url: "/app/referrals", icon: Gift },
   { title: "Promotions", url: "/app/promotions", icon: Tag },
+  { title: "Referrals", url: "/app/referrals", icon: Gift },
   { title: "Analytics", url: "/app/analytics", icon: BarChart3 },
 ];
 
-const toolsItems = [
+const brandItems = [
   { title: "Card Editor", url: "/app/card", icon: CreditCard },
   { title: "Page Builder", url: "/app/page-builder", icon: Globe },
   { title: "QR Campaigns", url: "/app/qr-campaigns", icon: QrCode },
   { title: "Card Viewers", url: "/app/viewers", icon: Eye },
-  { title: "Marketplace", url: "/discover/map", icon: MapPin },
-  { title: "App Store", url: "/app/marketplace", icon: Package },
   { title: "Boost", url: "/app/boost", icon: Zap },
 ];
 
@@ -80,6 +77,11 @@ const teamItems = [
   { title: "Team Cards", url: "/app/team-cards", icon: CreditCard },
   { title: "Lead Routing", url: "/app/lead-routing", icon: Inbox },
   { title: "Agency", url: "/app/agency", icon: Building2 },
+];
+
+const discoverItems = [
+  { title: "Marketplace", url: "/discover/map", icon: MapPin },
+  { title: "App Store", url: "/app/marketplace", icon: Package },
 ];
 
 const adminOnlyItems = [
