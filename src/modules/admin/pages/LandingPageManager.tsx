@@ -158,6 +158,7 @@ const SECTION_TYPE_LABELS: Record<string, string> = {
 const SECTION_ICONS: Record<string, typeof Globe> = {
   header: PanelTop,
   hero: Type,
+  hero_modern: Layers,
   problem_solution: MessageSquare,
   features: Layout,
   how_it_works: ChevronRight,
