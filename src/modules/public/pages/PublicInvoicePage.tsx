@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
+import PublicTopBar from "@/modules/public/components/PublicTopBar";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -125,6 +126,8 @@ export default function PublicInvoicePage() {
 
   return (
     <div className="min-h-screen bg-muted/30">
+      <PublicTopBar backTo="/" backLabel="Home" title="Invoice" />
+
       {/* Header bar */}
       <div className="bg-background border-b border-border">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">

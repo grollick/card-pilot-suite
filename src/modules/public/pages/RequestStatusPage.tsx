@@ -1,4 +1,5 @@
 import { useParams, Link } from "react-router-dom";
+import PublicTopBar from "@/modules/public/components/PublicTopBar";
 import { Helmet } from "react-helmet-async";
 import { useRequestResponses } from "@/hooks/useJobRequests";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,8 +39,9 @@ export default function RequestStatusPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      <PublicTopBar backTo="/" backLabel="Home" title="Your Request" />
       <Helmet>
-        <title>Your Service Request | CardPilot</title>
+        <title>Your Service Request | guzzl.pro</title>
       </Helmet>
 
       <div className="max-w-3xl mx-auto px-4 py-10 space-y-8">

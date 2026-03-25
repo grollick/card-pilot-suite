@@ -3,6 +3,7 @@ import { useLandingPage, type LandingPageSection } from "@/hooks/useLandingPages
 import { Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Link } from "react-router-dom";
+import PublicTopBar from "@/modules/public/components/PublicTopBar";
 
 const PRIVACY_POLICY = `
 ## 1. Introduction
@@ -244,28 +245,20 @@ export default function LegalPage({ pageKey }: { pageKey: string }) {
         <meta name="description" content={`${title} for guzzl.pro — the digital business card and professional marketplace platform.`} />
       </Helmet>
 
-      <header className="border-b border-border bg-card">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="text-lg font-bold text-foreground">
-            guzzl.pro
-          </Link>
-          <div className="flex items-center gap-4 text-sm">
-            {pageKey !== "privacy" && (
-              <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
-                Privacy
-              </Link>
-            )}
-            {pageKey !== "terms" && (
-              <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
-                Terms
-              </Link>
-            )}
-            <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
-              ← Home
+      <PublicTopBar backTo="/" backLabel="Home" title={title}>
+        <div className="flex items-center gap-4 text-sm">
+          {pageKey !== "privacy" && (
+            <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+              Privacy
             </Link>
-          </div>
+          )}
+          {pageKey !== "terms" && (
+            <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+              Terms
+            </Link>
+          )}
         </div>
-      </header>
+      </PublicTopBar>
 
       <main className="max-w-4xl mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold text-foreground mb-2">{title}</h1>

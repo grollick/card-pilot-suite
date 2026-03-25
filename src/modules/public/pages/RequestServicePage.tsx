@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PublicTopBar from "@/modules/public/components/PublicTopBar";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -79,8 +80,9 @@ export default function RequestServicePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/30">
+      <PublicTopBar backTo="/discover" backLabel="Discover" title="Request a Service" />
       <Helmet>
-        <title>Request a Service | CardPilot</title>
+        <title>Request a Service | guzzl.pro</title>
         <meta name="description" content="Get free quotes from verified local professionals. Describe your project and receive responses fast." />
       </Helmet>
 
