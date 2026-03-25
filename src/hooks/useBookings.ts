@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 export function useBookingServices() {
   return useQuery({
     queryKey: ["booking-services"],
+    staleTime: 60_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("booking_services")
@@ -61,6 +62,7 @@ export function useUpdateService() {
 export function useBookings() {
   return useQuery({
     queryKey: ["bookings"],
+    staleTime: 30_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")

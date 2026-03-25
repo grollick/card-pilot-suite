@@ -73,17 +73,19 @@ export function useEstimateMatches() {
         .eq("user_id", user!.id) as any);
       if (error) throw error;
 
-      // Update duty status counters
+      // Update duty status counters — use SQL increment to avoid race conditions
       if (action === "accepted") {
+        const { data: current } = await supabase
+          .from("estimate_duty_status")
+          .select("accepted_leads_count")
+          .eq("user_id", user!.id)
+          .maybeSingle();
+
+        const currentCount = (current as any)?.accepted_leads_count ?? 0;
         await (supabase
           .from("estimate_duty_status" as any)
           .update({
-            accepted_leads_count: (await supabase
-              .from("estimate_duty_status")
-              .select("accepted_leads_count")
-              .eq("user_id", user!.id)
-              .single()
-              .then(r => (r.data as any)?.accepted_leads_count ?? 0)) + 1,
+            accepted_leads_count: currentCount + 1,
             last_response_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           })
