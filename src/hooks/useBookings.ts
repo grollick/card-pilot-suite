@@ -62,6 +62,7 @@ export function useUpdateService() {
 export function useBookings() {
   return useQuery({
     queryKey: ["bookings"],
+    staleTime: 30_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("bookings")
