@@ -697,7 +697,9 @@ export default function LandingPageManager({ adminOnly = true }: LandingPageMana
       ? { logo_text: "", logo_url: "", nav_links: "", cta_text: "", cta_url: "", sticky: "true", style: "solid" }
       : type === "legal_content"
         ? { title: "", body: "", last_updated: "" }
-        : {};
+        : type === "hero_modern"
+          ? { headline: "Turn Every Conversation Into a Customer", subheadline: "", description: "", cta_primary: "Create My Free Card →", cta_primary_url: "/auth", cta_secondary: "See Live Demo Card", cta_secondary_url: "/demo/mike-reynolds", trust_line: "Free to start • No credit card required • Trusted by 1,000+ professionals", mockup_name: "Mike Reynolds", mockup_company: "Reynolds Construction LLC", mockup_location: "Toronto, ON", mockup_rating: "5.0", mockup_reviews: "42", ab_test_active: "false", ab_variant: "A" }
+          : {};
     const newSection: LandingPageSection = { id: `${type}_${Date.now()}`, type, label, enabled: true, content: defaultContent };
     setEditData({ ...editData, sections: [...editData.sections, newSection] });
     setShowAddSection(false);
