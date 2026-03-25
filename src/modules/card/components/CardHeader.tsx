@@ -418,8 +418,9 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
               lineHeight: 1,
             }}>
               <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-50" style={{ transform: 'scale(2)' }} />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500 ring-2 ring-red-500/30" />
+                <span className="absolute inline-flex h-full w-full rounded-full border-2 border-red-500 opacity-0" style={{ animation: 'ping-ring 2s cubic-bezier(0, 0, 0.2, 1) infinite' }} />
+                <span className="absolute inline-flex h-full w-full rounded-full border-2 border-red-500 opacity-0" style={{ animation: 'ping-ring 2s cubic-bezier(0, 0, 0.2, 1) infinite 0.6s' }} />
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
               </span>
               Available
             </span>
