@@ -530,14 +530,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ─── 5b. INTERACTIVE CARD SHOWCASE ─── */}
-      <InteractiveCardShowcase
-        headline="Try It Yourself"
-        subheadline="Hover, click, and flip — experience what your clients will see."
-        showThemePicker
-        showProfessionFilter
-        className="bg-muted/30"
-      />
 
       {/* ─── 6. RESULTS ─── */}
       <section className="py-20 md:py-28 relative">
