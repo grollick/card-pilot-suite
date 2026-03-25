@@ -6,6 +6,7 @@ import {
   ToggleLeft, ToggleRight, Copy, X, Monitor, Smartphone, Tablet,
   ChevronRight, Layout, Type, Star, Megaphone, CreditCard,
   MessageSquare, Image, Settings2, Sparkles, PanelTop, Scale,
+  Layers, FlaskConical, ExternalLink as ExternalLinkIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
