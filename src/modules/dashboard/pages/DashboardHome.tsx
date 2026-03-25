@@ -42,6 +42,7 @@ const WIDGET_COMPONENTS: Record<string, React.ComponentType<any>> = {
   "kpi-cards": RevenueKPICards,
   "ai-coach": AIBusinessCoachWidget,
   "health-score": BusinessHealthScore,
+  "quick-actions": MobileJobDashboard,
   "next-actions": NextActionsWidget,
   "daily-notes": DailyNotesWidget,
   "activity-feed": DashboardActivityFeed,
@@ -118,7 +119,6 @@ export default function DashboardHome() {
       </div>
 
       {/* Mobile floating quick-create */}
-      {isMobile && <MobileJobDashboard />}
       {isMobile && <MobileQuickCreate />}
 
       {/* AI Business Assistant (floating) */}
