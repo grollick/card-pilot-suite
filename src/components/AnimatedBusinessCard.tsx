@@ -46,7 +46,7 @@ const cardVariants = {
     y: -10,
     scale: 1.03,
     boxShadow: "0 20px 50px -12px hsl(200 60% 10% / 0.18), 0 0 30px -5px hsl(199 89% 48% / 0.15)",
-    transition: { type: "spring", stiffness: 300, damping: 22 },
+    transition: { type: "spring" as const, stiffness: 300, damping: 22 },
   },
   tap: {
     y: -4,
@@ -60,7 +60,7 @@ const serviceItemVariants = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.07, duration: 0.35, ease: "easeOut" },
+    transition: { delay: i * 0.07, duration: 0.35, ease: "easeOut" as const },
   }),
 };
 
@@ -68,7 +68,7 @@ const ctaVariants = {
   rest: { scale: 1 },
   hover: {
     scale: 1.04,
-    transition: { type: "spring", stiffness: 400, damping: 17 },
+    transition: { type: "spring" as const, stiffness: 400, damping: 17 },
   },
 };
 
@@ -77,7 +77,7 @@ const floatAnimation = {
   transition: {
     duration: 4,
     repeat: Infinity,
-    ease: "easeInOut",
+    ease: "easeInOut" as const,
   },
 };
 
