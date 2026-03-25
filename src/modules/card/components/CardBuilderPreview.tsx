@@ -2,6 +2,7 @@ import { CreditCard, Eye, Pencil, Smartphone, Tablet, Move, Star, Calendar, Send
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useCallback } from "react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import { getPatternSvg, type CardThemeOverrides, METALLIC_GRADIENTS, type MetallicType } from "./CardThemeEditor";
 import { CTA_ICON_MAP } from "./CtaEditor";
 import type { CtaItem } from "./CtaEditor";
