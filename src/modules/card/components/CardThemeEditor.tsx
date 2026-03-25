@@ -474,7 +474,7 @@ export default function CardThemeEditor({
     const b = currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 };
     const m = currentOverrides.metallicEffect ?? DEFAULT_METALLIC;
     const h = currentOverrides.heroBackgroundId ?? "";
-    _setPalette(p); _setFonts(f); _setTokens(t); _setGradientBg(g); _setBgPattern(b); _setMetallicEffect(m); _setHeroBackgroundId(h);
+    _setPalette(p); _setFonts(f); _setTokens(t); _setGradientBg(g); _setBgPattern(b); _setMetallicEffect(m); _setHeroBackgroundId(h); _setCardLayout(currentOverrides.cardLayout ?? "classic");
     if (open) {
       historyRef.current = [{ palette: p, fonts: f, tokens: t, gradientBg: g, bgPattern: b, metallicEffect: m, heroBackgroundId: h }];
       historyIndexRef.current = 0;
