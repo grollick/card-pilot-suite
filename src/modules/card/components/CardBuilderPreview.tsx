@@ -309,6 +309,11 @@ export default function CardBuilderPreview({
   const [internalDevice, setInternalDevice] = useState<"phone" | "tablet">("phone");
   const previewDevice = externalDevice ?? internalDevice;
   const setPreviewDevice = setInternalDevice;
+
+  // Read live duty status from the canonical query cache
+  const qc = useQueryClient();
+  const dutyData = qc.getQueryData<any>(["estimate-duty-status"]);
+  const liveIsOnDuty = dutyData?.is_on_duty ?? false;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const coverRef = useRef<HTMLDivElement>(null);
