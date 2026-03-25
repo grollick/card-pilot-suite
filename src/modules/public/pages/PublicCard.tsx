@@ -786,7 +786,7 @@ export default function PublicCard() {
                 ctaChildren={heroCtaButtons}
                 glassHero={theme.section.cardStyle === "glass"}
                 verificationLevel={profile.verification_level as any}
-                isAvailable={profile.available_for_work || profile.is_on_duty}
+                isAvailable={profile.is_on_duty === true}
               />
             </div>
           );
