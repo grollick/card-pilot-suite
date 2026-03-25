@@ -520,7 +520,9 @@ function SectionEditor({
         </div>
 
         {/* Specialized editors */}
-        {isHeader ? (
+        {isModernHero ? (
+          <ModernHeroEditor content={section.content} onUpdate={updateContent} />
+        ) : isHeader ? (
           <HeaderEditor content={section.content} onUpdate={updateContent} />
         ) : isLegal ? (
           <LegalContentEditor content={section.content} onUpdate={updateContent} pageKey={pageKey} />
