@@ -146,6 +146,34 @@ export default function AnimatedBusinessCard({
 }: AnimatedBusinessCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [showContact, setShowContact] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // ── 3D tilt motion values ──
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { stiffness: 150, damping: 20, mass: 0.5 };
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), springConfig);
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), springConfig);
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      const el = cardRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      // Normalize to -0.5 … 0.5
+      mouseX.set((e.clientX - rect.left) / rect.width - 0.5);
+      mouseY.set((e.clientY - rect.top) / rect.height - 0.5);
+    },
+    [mouseX, mouseY]
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    mouseX.set(0);
+    mouseY.set(0);
+    setIsHovered(false);
+    setShowContact(false);
+  }, [mouseX, mouseY]);
 
   const displayInitials =
     initials ||
@@ -163,7 +191,7 @@ export default function AnimatedBusinessCard({
       initial="offscreen"
       whileInView="onscreen"
       viewport={{ once: true, amount: 0.2 }}
-      style={{ perspective: 800 }}
+      style={{ perspective: 1000 }}
     >
       {/* Idle pulse — very subtle scale oscillation */}
       <motion.div
@@ -174,12 +202,16 @@ export default function AnimatedBusinessCard({
           ease: [0.45, 0.05, 0.55, 0.95],
         }}
       >
-        {/* Hover / tap wrapper */}
+        {/* 3D tilt + hover / tap wrapper */}
         <motion.div
+          ref={cardRef}
+          onMouseMove={handleMouseMove}
           onHoverStart={() => setIsHovered(true)}
-          onHoverEnd={() => {
-            setIsHovered(false);
-            setShowContact(false);
+          onMouseLeave={handleMouseLeave}
+          style={{
+            rotateX,
+            rotateY,
+            transformStyle: "preserve-3d",
           }}
           whileHover={{
             y: -12,
@@ -198,7 +230,7 @@ export default function AnimatedBusinessCard({
             stiffness: 300,
             damping: 20,
           }}
-          className="relative rounded-2xl border border-border bg-card overflow-hidden shadow-sm cursor-pointer"
+          className="relative rounded-2xl border border-border bg-card overflow-hidden shadow-sm cursor-pointer will-change-transform"
         >
           {/* ── Cover band ── */}
           <div className="h-20 bg-gradient-to-r from-sky-500 to-cyan-500 relative">
