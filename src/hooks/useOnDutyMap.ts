@@ -96,13 +96,11 @@ export function useOnDutyProfessionals() {
     staleTime: 15_000,
     refetchInterval: 30_000,
     queryFn: async (): Promise<OnDutyProfessional[]> => {
-      // Get all marketplace-enabled profiles
-      const { data: profiles } = await supabase
-        .from("public_profiles" as any)
-        .select("id, name, handle, avatar_url, company, city, bio, service_area, available_for_work, avg_response_minutes, marketplace_enabled, profession_id")
-        .not("name", "is", null);
+      // Get all marketplace-enabled profiles using the secure RPC function
+      const { data: rpcProfiles } = await supabase.rpc("get_public_profiles");
+      const profiles = rpcProfiles ?? [];
 
-      const enabled = (profiles ?? []).filter((p: any) => p.marketplace_enabled);
+      const enabled = profiles.filter((p: any) => p.marketplace_enabled);
       if (enabled.length === 0) return [];
 
       const userIds = enabled.map((p: any) => p.id);

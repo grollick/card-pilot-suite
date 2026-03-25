@@ -258,9 +258,10 @@ const ProfessionalListCard = forwardRef<HTMLDivElement, { pro: OnDutyProfessiona
 ProfessionalListCard.displayName = "ProfessionalListCard";
 
 export default function OnDutyMapPage() {
-  const [view, setView] = useState<"map" | "list">("map");
+  const webGLAvailable = useMemo(() => hasWebGLSupport(), []);
+  const [view, setView] = useState<"map" | "list">(webGLAvailable ? "map" : "list");
   const [selectedPro, setSelectedPro] = useState<OnDutyProfessional | null>(null);
-  const [mapError, setMapError] = useState(false);
+  const [mapError, setMapError] = useState(!webGLAvailable);
   const [mapReady, setMapReady] = useState(false);
   const [mapIdle, setMapIdle] = useState(false);
   const [mapInstanceKey, setMapInstanceKey] = useState(0);
@@ -301,12 +302,12 @@ export default function OnDutyMapPage() {
     mapReadyRef.current = mapReady;
   }, [mapReady]);
 
+  // Auto-fallback to list when map fails
   useEffect(() => {
-    if (view !== "map") return;
-    if (hasWebGLSupport()) return;
-    console.error("[OnDutyMap] WebGL unavailable, map cannot initialize");
-    setMapError(true);
-  }, [view]);
+    if (mapError && view === "map") {
+      setView("list");
+    }
+  }, [mapError, view]);
 
   useEffect(() => {
     if (view !== "map" || mapReady || mapError) return;

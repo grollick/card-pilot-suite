@@ -4,13 +4,16 @@ import { useAuth } from "@/contexts/AuthContext";
 
 // ── Fetch all contacts with stage + tags ──
 export function useContacts() {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ["contacts"],
+    queryKey: ["contacts", user?.id],
+    enabled: !!user,
     staleTime: 30_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("leads")
         .select("*, pipeline_stages(name, is_won, is_lost), contact_tags(tag_id, tags(id, name, color))")
+        .eq("user_id", user!.id)
         .order("updated_at", { ascending: false });
       if (error) throw error;
       return data ?? [];
@@ -19,12 +22,16 @@ export function useContacts() {
 }
 
 export function usePipelineStages() {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ["pipeline-stages"],
+    queryKey: ["pipeline-stages", user?.id],
+    enabled: !!user,
+    staleTime: 60_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("pipeline_stages")
         .select("*")
+        .eq("user_id", user!.id)
         .order("sort_order", { ascending: true });
       if (error) throw error;
       return data ?? [];
@@ -33,12 +40,16 @@ export function usePipelineStages() {
 }
 
 export function useTags() {
+  const { user } = useAuth();
   return useQuery({
-    queryKey: ["tags"],
+    queryKey: ["tags", user?.id],
+    enabled: !!user,
+    staleTime: 60_000,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("tags")
         .select("*")
+        .eq("user_id", user!.id)
         .order("name", { ascending: true });
       if (error) throw error;
       return data ?? [];
