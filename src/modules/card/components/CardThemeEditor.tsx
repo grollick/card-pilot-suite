@@ -122,6 +122,7 @@ export interface CardThemeOverrides {
   bgPattern?: CardBgPattern;
   metallicEffect?: MetallicEffect;
   heroBackgroundId?: string;
+  cardLayout?: "classic" | "modern";
 }
 
 const FONT_OPTIONS = [
