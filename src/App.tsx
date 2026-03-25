@@ -222,6 +222,7 @@ const App = () => (
             {/* Industry landing pages */}
             <Route path="/for/:industry" element={<IndustryLandingPage />} />
             <Route path="/get-started" element={<LazyRoute><SimpleLandingPage /></LazyRoute>} />
+            <Route path="/new-hero" element={<LazyRoute><NewHeroPage /></LazyRoute>} />
 
             {/* Demo cards — no auth */}
             <Route path="/demo/:slug" element={<LazyRoute><DemoCardPreview /></LazyRoute>} />
