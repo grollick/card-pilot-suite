@@ -227,10 +227,23 @@ export default function ModernCardLayout({
               <div className="absolute inset-0" style={{ background: resolvedHero.overlay }} />
             )}
 
-            {/* Trust badges in cover */}
-            <div className="absolute bottom-2 right-2 flex items-center gap-1.5 z-10">
-              {profile.is_verified && <VerificationBadge level="verified" size="sm" showLabel={false} />}
-              {profile.is_on_duty && <AvailableNowBadge />}
+            {/* Trust badges in cover — frosted glass overlay */}
+            <div className="absolute bottom-2 right-2 flex items-center gap-2 z-10">
+              {profile.is_verified && (
+                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-semibold text-white bg-white/15 backdrop-blur-md border border-white/20 shadow-lg">
+                  <ShieldCheck className="h-3 w-3" />
+                  Verified
+                </span>
+              )}
+              {profile.is_on_duty && (
+                <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold text-white bg-white/15 backdrop-blur-md border border-white/20 shadow-lg">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                  </span>
+                  Available Now
+                </span>
+              )}
             </div>
           </div>
 
