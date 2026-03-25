@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
+import InteractiveCardShowcase from "@/components/InteractiveCardShowcase";
 import {
   CreditCard, Star, Phone, MessageSquare, Calendar,
   FileText, QrCode, Zap, Shield, Users, MapPin
