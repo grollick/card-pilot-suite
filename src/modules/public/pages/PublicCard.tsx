@@ -526,6 +526,85 @@ export default function PublicCard() {
     );
   };
 
+  const isModernLayout = (themeJson as any).cardLayout === "modern";
+
+  if (isModernLayout) {
+    return (
+      <>
+        <ModernCardLayout
+          profile={profile}
+          card={card}
+          theme={theme}
+          themeJson={themeJson}
+          sections={sections}
+          enabledSections={enabledSections}
+          sectionContent={sectionContent}
+          services={services}
+          publicReviews={publicReviews}
+          dbProjects={dbProjects}
+          recentViewCount={recentViewCount}
+          professionName={professionName}
+          handle={handle!}
+          cardUrl={cardUrl}
+          isOwner={isOwner}
+          contactRevealed={contactRevealed}
+          setContactRevealed={setContactRevealed}
+          showReviewForm={showReviewForm}
+          setShowReviewForm={setShowReviewForm}
+          formSent={formSent}
+          formData={formData}
+          setFormData={setFormData}
+          honeypot={honeypot}
+          setHoneypot={setHoneypot}
+          submitting={submitting}
+          handleFormSubmit={handleFormSubmit}
+          handleCtaClick={handleCtaClick}
+          onDownloadVCard={() => {
+            supabase.from("analytics_events").insert({
+              user_id: profile.id,
+              handle: handle!,
+              event_type: "contact_saved" as const,
+              meta_json: getVisitorMeta(),
+            }).then();
+            downloadVCard({ name: profile.name, email: profile.email, phone: profile.phone, company: profile.company, handle: profile.handle, profession: professionName });
+          }}
+          onTrackEvent={(eventType, meta) => {
+            supabase.from("analytics_events").insert({
+              user_id: profile.id,
+              handle: handle!,
+              event_type: eventType as any,
+              meta_json: meta ?? {},
+            }).then();
+          }}
+        />
+        {!isOwner && (
+          <SmartEngagementPopup
+            handle={handle!}
+            profileName={profile.name ?? ""}
+            palette={palette}
+            fonts={fonts}
+            delaySeconds={8}
+            onAction={(action) => {
+              if (action === "quote") document.getElementById("quote-request-section")?.scrollIntoView({ behavior: "smooth" });
+              else if (action === "book") document.getElementById("booking-section")?.scrollIntoView({ behavior: "smooth" });
+            }}
+          />
+        )}
+        <StickyActionBar
+          profileId={profile.id}
+          handle={handle!}
+          phone={profile.phone}
+          email={profile.email}
+          professionName={professionName}
+          palette={palette}
+          enabledCtaIds={enabledCtas.map(c => c.id)}
+          onCtaClick={handleCtaClick}
+          isOwner={isOwner}
+        />
+      </>
+    );
+  }
+
   return (
     <div
       className="min-h-screen flex items-start justify-center p-4 py-8"
