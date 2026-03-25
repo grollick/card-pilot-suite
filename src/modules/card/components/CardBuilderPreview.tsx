@@ -492,6 +492,26 @@ export default function CardBuilderPreview({
                         )}
                       </div>
                     )}
+                    {/* Trust badges in cover */}
+                    {(profile?.is_on_duty || profile?.is_verified) && (
+                      <div className="absolute bottom-2 right-2 flex items-center gap-1.5 z-10">
+                        {profile.is_verified && (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-semibold text-white bg-black/50 backdrop-blur-md border border-white/20">
+                            ✓ Verified
+                          </span>
+                        )}
+                        {profile.is_on_duty && (
+                          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[9px] font-semibold text-white bg-black/50 backdrop-blur-md border border-white/20">
+                            <span className="relative flex h-2.5 w-2.5">
+                              <span className="absolute inline-flex h-full w-full rounded-full border-[1.5px] border-red-500 opacity-0" style={{ animation: 'ping-ring 2s cubic-bezier(0, 0, 0.2, 1) infinite' }} />
+                              <span className="absolute inline-flex h-full w-full rounded-full border-[1.5px] border-red-500 opacity-0" style={{ animation: 'ping-ring 2s cubic-bezier(0, 0, 0.2, 1) infinite 0.6s' }} />
+                              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" />
+                            </span>
+                            Available
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="px-5 pb-5 relative z-[2]" ref={containerRef}>
