@@ -24,6 +24,7 @@ export default function MarketplaceAwarenessWidget() {
     },
   });
 
+  // Use canonical query key — shared with useEstimateDuty
   const { data: duty } = useQuery({
     queryKey: ["estimate-duty-status"],
     enabled: !!user,
