@@ -355,6 +355,7 @@ export default function CardThemeEditor({
   const DEFAULT_METALLIC: MetallicEffect = { type: "none", intensity: 80, applyToName: true, applyToButtons: true, applyToSections: true };
   const [metallicEffect, _setMetallicEffect] = useState<MetallicEffect>(currentOverrides.metallicEffect ?? DEFAULT_METALLIC);
   const [heroBackgroundId, _setHeroBackgroundId] = useState<string>(currentOverrides.heroBackgroundId ?? "");
+  const [cardLayout, _setCardLayout] = useState<"classic" | "modern">(currentOverrides.cardLayout ?? "classic");
 
   // ── Undo / Redo history ──
   interface ThemeSnapshot { palette: CardPalette; fonts: CardFonts; tokens: CardStyleTokens; gradientBg: CardGradientBg; bgPattern: CardBgPattern; metallicEffect: MetallicEffect; heroBackgroundId: string }
