@@ -39,6 +39,7 @@ export default function EstimateDutyPanel() {
   const { status, isOnDuty, isLoading, analytics, toggleDuty } = useEstimateDuty();
   const { pendingCount } = useEstimateMatches();
   const { planKey } = usePlanLimits();
+  const { data: profile } = useProfile();
   const [showSettings, setShowSettings] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
   const [showMatches, setShowMatches] = useState(false);
@@ -46,8 +47,17 @@ export default function EstimateDutyPanel() {
 
   const isFreePlan = planKey === "starter";
   const isProPlus = planKey === "pro" || planKey === "agency";
+  const hasLocation = !!(profile as any)?.city;
 
   const handleToggle = (on: boolean, settings?: any) => {
+    // Block going ON duty if no location is set
+    if (on && !hasLocation) {
+      toast.error("Add your location to go On Duty", {
+        description: "Go to Settings and add your city so customers can find you.",
+        action: { label: "Settings", onClick: () => navigate("/app/settings") },
+      });
+      return;
+    }
     toggleDuty.mutate(
       { is_on_duty: on, ...settings },
       { onSuccess: (data) => { if (data?.is_on_duty) setShowGoLive(true); } }
