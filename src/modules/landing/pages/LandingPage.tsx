@@ -42,6 +42,7 @@ import HeroPhoneAnimation from "@/modules/landing/components/HeroPhoneAnimation"
 import { DEMO_CARDS } from "@/lib/demoCards";
 import InteractiveCardShowcase from "@/components/InteractiveCardShowcase";
 import SuccessStoryBanner from "@/components/SuccessStoryBanner";
+import DemoCardsSection from "@/modules/landing/components/DemoCardsSection";
 
 /* ── animations ── */
 const fade = {
