@@ -119,7 +119,6 @@ export default function DashboardHome() {
       </div>
 
       {/* Mobile floating quick-create */}
-      {isMobile && <MobileJobDashboard />}
       {isMobile && <MobileQuickCreate />}
 
       {/* AI Business Assistant (floating) */}
