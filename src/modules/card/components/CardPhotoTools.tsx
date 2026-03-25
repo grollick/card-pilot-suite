@@ -135,8 +135,25 @@ export default function CardPhotoTools({
     return `${data.publicUrl}?t=${Date.now()}`;
   };
 
-  const base64ToFile = async (base64: string, filename: string): Promise<File> => {
-    const res = await fetch(base64);
+  const base64ToFile = async (value: string, filename: string): Promise<File> => {
+    if (value.startsWith("data:")) {
+      const [header, data] = value.split(",", 2);
+      if (!header || !data) throw new Error("Invalid image payload");
+
+      const mimeMatch = header.match(/data:(.*?);base64/i);
+      const mimeType = mimeMatch?.[1] || "image/png";
+      const binary = atob(data);
+      const bytes = new Uint8Array(binary.length);
+
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+
+      return new File([bytes], filename, { type: mimeType });
+    }
+
+    const res = await fetch(value);
+    if (!res.ok) throw new Error("Failed to download generated image");
     const blob = await res.blob();
     return new File([blob], filename, { type: blob.type || "image/png" });
   };
