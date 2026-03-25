@@ -45,7 +45,7 @@ export default function IndustryLandingPage() {
         {/* ── Nav ── */}
         <nav className="border-b border-border/40 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-            <Link to="/" className="text-lg font-bold text-primary"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></Link>
+            <Link to="/" className="text-lg font-bold"><span className="text-primary font-extrabold">guzzl</span><span className="text-foreground font-normal">.pro</span></Link>
             <div className="flex items-center gap-3">
               <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline">Pricing</Link>
               <Button asChild size="sm">
