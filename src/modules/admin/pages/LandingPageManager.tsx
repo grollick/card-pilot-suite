@@ -6,6 +6,7 @@ import {
   ToggleLeft, ToggleRight, Copy, X, Monitor, Smartphone, Tablet,
   ChevronRight, Layout, Type, Star, Megaphone, CreditCard,
   MessageSquare, Image, Settings2, Sparkles, PanelTop, Scale,
+  Layers, FlaskConical, ExternalLink as ExternalLinkIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -104,6 +105,31 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
     ],
   },
   {
+    key: "new-hero",
+    title: "Hero Variant A — Modern Split",
+    description: "A/B test hero at /new-hero",
+    url: "/new-hero",
+    sections: [
+      { id: "hero_modern", type: "hero_modern", label: "Modern Split Hero", enabled: true, content: {
+        headline: "Turn Every Conversation Into a Customer",
+        subheadline: "The smart digital business card that captures leads, books jobs, sends estimates, and grows your local service business — all from one simple link.",
+        description: "No more lost contacts, endless texting, or slow estimates. Share via QR, NFC, text, or social — and watch your leads and bookings grow automatically.",
+        cta_primary: "Create My Free Card →",
+        cta_primary_url: "/auth",
+        cta_secondary: "See Live Demo Card",
+        cta_secondary_url: "/demo/mike-reynolds",
+        trust_line: "Free to start • No credit card required • Secure • Trusted by 1,000+ professionals",
+        mockup_name: "Mike Reynolds",
+        mockup_company: "Reynolds Construction LLC",
+        mockup_location: "Toronto, ON",
+        mockup_rating: "5.0",
+        mockup_reviews: "42",
+        ab_test_active: "false",
+        ab_variant: "A",
+      }},
+    ],
+  },
+  {
     key: "for/landscapers", title: "Landscapers Landing Page", description: "Industry page at /for/landscapers", url: "/for/landscapers",
     sections: [
       { id: "hero", type: "hero", label: "Hero", enabled: true, content: {} },
@@ -116,6 +142,7 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
 const SECTION_TYPE_LABELS: Record<string, string> = {
   header: "Header / Navigation",
   hero: "Hero Section",
+  hero_modern: "Hero — Modern Split (Variant A)",
   problem_solution: "Problem / Solution",
   features: "Features Grid",
   how_it_works: "How It Works",
@@ -131,6 +158,7 @@ const SECTION_TYPE_LABELS: Record<string, string> = {
 const SECTION_ICONS: Record<string, typeof Globe> = {
   header: PanelTop,
   hero: Type,
+  hero_modern: Layers,
   problem_solution: MessageSquare,
   features: Layout,
   how_it_works: ChevronRight,
@@ -145,7 +173,8 @@ const SECTION_ICONS: Record<string, typeof Globe> = {
 
 const NEW_SECTION_TYPES = [
   { type: "header", label: "Header / Nav" },
-  { type: "hero", label: "Hero" },
+  { type: "hero", label: "Hero (Classic)" },
+  { type: "hero_modern", label: "Hero — Modern Split (A/B)" },
   { type: "problem_solution", label: "Problem / Solution" },
   { type: "features", label: "Features" },
   { type: "how_it_works", label: "How It Works" },
@@ -342,6 +371,106 @@ function SortableSectionItem({
   );
 }
 
+// ─── Modern Hero Editor ───
+
+function ModernHeroEditor({
+  content, onUpdate,
+}: {
+  content: Record<string, any>;
+  onUpdate: (field: string, value: string) => void;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-1">
+        <div className="flex items-center gap-2">
+          <FlaskConical className="h-3.5 w-3.5 text-primary" />
+          <span className="text-xs font-semibold text-primary">A/B Testing</span>
+        </div>
+        <p className="text-2xs text-muted-foreground">This hero variant can be tested against the original.</p>
+        <div className="flex items-center justify-between mt-2">
+          <span className="text-xs text-muted-foreground">A/B Test Active</span>
+          <Switch
+            checked={content.ab_test_active === "true"}
+            onCheckedChange={(v) => onUpdate("ab_test_active", v ? "true" : "false")}
+            className="scale-75"
+          />
+        </div>
+        <div className="mt-1">
+          <label className="text-2xs text-muted-foreground">Variant Label</label>
+          <Input value={content.ab_variant || "A"} onChange={(e) => onUpdate("ab_variant", e.target.value)} className="text-xs h-7 mt-0.5" />
+        </div>
+        <a href="/new-hero" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-2xs text-primary hover:underline mt-1">
+          <ExternalLink className="h-2.5 w-2.5" /> Preview live page
+        </a>
+      </div>
+
+      <div className="border-t border-border pt-3 space-y-3">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Copy</p>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">Headline</label>
+          <Textarea value={content.headline || ""} onChange={(e) => onUpdate("headline", e.target.value)} className="text-sm min-h-[60px]" />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">Subheadline</label>
+          <Textarea value={content.subheadline || ""} onChange={(e) => onUpdate("subheadline", e.target.value)} className="text-sm min-h-[60px]" />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">Description</label>
+          <Textarea value={content.description || ""} onChange={(e) => onUpdate("description", e.target.value)} className="text-sm min-h-[50px]" />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">Trust Line</label>
+          <Input value={content.trust_line || ""} onChange={(e) => onUpdate("trust_line", e.target.value)} className="text-sm h-9" />
+        </div>
+      </div>
+
+      <div className="border-t border-border pt-3 space-y-3">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Buttons</p>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Primary CTA</label>
+            <Input value={content.cta_primary || ""} onChange={(e) => onUpdate("cta_primary", e.target.value)} className="text-xs h-8" />
+          </div>
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Primary URL</label>
+            <Input value={content.cta_primary_url || ""} onChange={(e) => onUpdate("cta_primary_url", e.target.value)} className="text-xs h-8" />
+          </div>
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Secondary CTA</label>
+            <Input value={content.cta_secondary || ""} onChange={(e) => onUpdate("cta_secondary", e.target.value)} className="text-xs h-8" />
+          </div>
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Secondary URL</label>
+            <Input value={content.cta_secondary_url || ""} onChange={(e) => onUpdate("cta_secondary_url", e.target.value)} className="text-xs h-8" />
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-border pt-3 space-y-3">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Phone Mockup</p>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Name</label>
+            <Input value={content.mockup_name || ""} onChange={(e) => onUpdate("mockup_name", e.target.value)} className="text-xs h-8" />
+          </div>
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Company</label>
+            <Input value={content.mockup_company || ""} onChange={(e) => onUpdate("mockup_company", e.target.value)} className="text-xs h-8" />
+          </div>
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Location</label>
+            <Input value={content.mockup_location || ""} onChange={(e) => onUpdate("mockup_location", e.target.value)} className="text-xs h-8" />
+          </div>
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Rating</label>
+            <Input value={content.mockup_rating || ""} onChange={(e) => onUpdate("mockup_rating", e.target.value)} className="text-xs h-8" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Section Property Editor ───
 
 function SectionEditor({
@@ -358,6 +487,7 @@ function SectionEditor({
 
   const isHeader = section.type === "header";
   const isLegal = section.type === "legal_content";
+  const isModernHero = section.type === "hero_modern";
 
   return (
     <motion.div
@@ -390,7 +520,9 @@ function SectionEditor({
         </div>
 
         {/* Specialized editors */}
-        {isHeader ? (
+        {isModernHero ? (
+          <ModernHeroEditor content={section.content} onUpdate={updateContent} />
+        ) : isHeader ? (
           <HeaderEditor content={section.content} onUpdate={updateContent} />
         ) : isLegal ? (
           <LegalContentEditor content={section.content} onUpdate={updateContent} pageKey={pageKey} />
@@ -565,7 +697,9 @@ export default function LandingPageManager({ adminOnly = true }: LandingPageMana
       ? { logo_text: "", logo_url: "", nav_links: "", cta_text: "", cta_url: "", sticky: "true", style: "solid" }
       : type === "legal_content"
         ? { title: "", body: "", last_updated: "" }
-        : {};
+        : type === "hero_modern"
+          ? { headline: "Turn Every Conversation Into a Customer", subheadline: "", description: "", cta_primary: "Create My Free Card →", cta_primary_url: "/auth", cta_secondary: "See Live Demo Card", cta_secondary_url: "/demo/mike-reynolds", trust_line: "Free to start • No credit card required • Trusted by 1,000+ professionals", mockup_name: "Mike Reynolds", mockup_company: "Reynolds Construction LLC", mockup_location: "Toronto, ON", mockup_rating: "5.0", mockup_reviews: "42", ab_test_active: "false", ab_variant: "A" }
+          : {};
     const newSection: LandingPageSection = { id: `${type}_${Date.now()}`, type, label, enabled: true, content: defaultContent };
     setEditData({ ...editData, sections: [...editData.sections, newSection] });
     setShowAddSection(false);
@@ -618,6 +752,8 @@ export default function LandingPageManager({ adminOnly = true }: LandingPageMana
                   <Scale className="h-5 w-5 text-primary" />
                 ) : page.key === "main" ? (
                   <Globe className="h-5 w-5 text-primary" />
+                ) : page.key === "new-hero" ? (
+                  <FlaskConical className="h-5 w-5 text-primary" />
                 ) : (
                   <FileText className="h-5 w-5 text-primary" />
                 )}
@@ -630,6 +766,9 @@ export default function LandingPageManager({ adminOnly = true }: LandingPageMana
                   </Badge>
                   {(page.key === "privacy" || page.key === "terms") && (
                     <Badge variant="outline" className="text-2xs"><Sparkles className="h-2.5 w-2.5 mr-1" />AI Assisted</Badge>
+                  )}
+                  {page.key === "new-hero" && (
+                    <Badge variant="outline" className="text-2xs border-primary/30 text-primary"><FlaskConical className="h-2.5 w-2.5 mr-1" />A/B Test</Badge>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground mt-0.5">{page.description}</p>
