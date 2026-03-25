@@ -8,7 +8,7 @@ import {
   Phone, MessageSquare, Mail, Calendar, Star, MapPin,
   Download, FileText, CheckCircle2, Clock, Globe,
   Instagram, Facebook, Linkedin, Twitter, Youtube,
-  Send, X, Play, Image as ImageIcon, Share2,
+  Send, X, Play, Image as ImageIcon, Share2, ShieldCheck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
