@@ -417,7 +417,10 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
               fontWeight: 600,
               lineHeight: 1,
             }}>
-              <Circle style={{ width: 6, height: 6, fill: "#4ade80", color: "#4ade80" }} />
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-success" />
+              </span>
               Available
             </span>
           )}
