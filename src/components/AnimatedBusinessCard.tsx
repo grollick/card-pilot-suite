@@ -152,10 +152,11 @@ function CardFront({
             <img
               src={photoUrl}
               alt={name}
-              className="w-16 h-16 rounded-xl object-cover ring-3 ring-card shadow-md"
+              loading="lazy"
+              className="w-16 h-16 rounded-full object-cover ring-3 ring-card shadow-md"
             />
           ) : (
-            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white font-bold text-xl shadow-md ring-3 ring-card">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white font-bold text-xl shadow-md ring-3 ring-card">
               {displayInitials}
             </div>
           )}
