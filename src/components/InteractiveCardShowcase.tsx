@@ -1,95 +1,30 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import AnimatedBusinessCard, {
-  DEMO_CARDS as ANIMATED_DEMO_CARDS,
-  type AnimatedBusinessCardProps,
-} from "@/components/AnimatedBusinessCard";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { DEMO_CARDS, type DemoCard } from "@/lib/demoCards";
 import {
-  Paintbrush,
-  ChevronLeft,
-  ChevronRight,
-  Palette,
+  Star, CheckCircle2, ArrowUpRight, ChevronLeft, ChevronRight, Palette,
 } from "lucide-react";
-
-// ─── Theme presets ───
-
-interface CardTheme {
-  key: string;
-  label: string;
-  gradient: string;        // cover gradient
-  accent: string;          // accent color class
-  ring: string;            // glow ring
-  description: string;
-}
-
-const THEMES: CardTheme[] = [
-  {
-    key: "ocean",
-    label: "Ocean Teal",
-    gradient: "from-sky-500 to-cyan-500",
-    accent: "sky",
-    ring: "ring-sky-400/30",
-    description: "Default professional look",
-  },
-  {
-    key: "sunset",
-    label: "Sunset Orange",
-    gradient: "from-orange-500 to-amber-500",
-    accent: "orange",
-    ring: "ring-orange-400/30",
-    description: "Warm and energetic",
-  },
-  {
-    key: "forest",
-    label: "Forest Green",
-    gradient: "from-emerald-500 to-teal-500",
-    accent: "emerald",
-    ring: "ring-emerald-400/30",
-    description: "Natural and grounded",
-  },
-  {
-    key: "royal",
-    label: "Royal Purple",
-    gradient: "from-violet-500 to-purple-500",
-    accent: "violet",
-    ring: "ring-violet-400/30",
-    description: "Bold and premium",
-  },
-  {
-    key: "slate",
-    label: "Slate Dark",
-    gradient: "from-slate-700 to-slate-900",
-    accent: "slate",
-    ring: "ring-slate-400/30",
-    description: "Sleek and modern",
-  },
-];
 
 // Profession filter labels
 const PROFESSIONS = [
   { key: "all", label: "All" },
-  { key: "contractor", label: "Contractor" },
-  { key: "barber", label: "Barber" },
-  { key: "realtor", label: "Realtor" },
-  { key: "landscaper", label: "Landscaper" },
-  { key: "trainer", label: "Trainer" },
-  { key: "stylist", label: "Stylist" },
-  { key: "electrician", label: "Electrician" },
+  { key: "Contractor", label: "Contractor" },
+  { key: "Barber", label: "Barber" },
+  { key: "Realtor", label: "Realtor" },
+  { key: "Landscaper", label: "Landscaper" },
+  { key: "Trainer", label: "Trainer" },
+  { key: "Photographer", label: "Photographer" },
 ];
 
-function getProfessionKey(business: string): string {
-  const b = business.toLowerCase();
-  if (b.includes("construction") || b.includes("contractor")) return "contractor";
-  if (b.includes("cut") || b.includes("barber")) return "barber";
-  if (b.includes("realty") || b.includes("real")) return "realtor";
-  if (b.includes("landscape") || b.includes("green")) return "landscaper";
-  if (b.includes("training") || b.includes("fit")) return "trainer";
-  if (b.includes("hair") || b.includes("studio") || b.includes("salon")) return "stylist";
-  if (b.includes("electric")) return "electrician";
-  return "other";
-}
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.92 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] as const },
+  },
+};
 
 interface InteractiveCardShowcaseProps {
   headline?: string;
@@ -100,26 +35,93 @@ interface InteractiveCardShowcaseProps {
   className?: string;
 }
 
+function DemoCardItem({ card }: { card: DemoCard }) {
+  return (
+    <Link to={`/demo/${card.slug}`} className="block group">
+      <div className="landing-card rounded-2xl overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-1">
+        {/* Cover image */}
+        <div className="relative h-28">
+          <div className="absolute inset-0 overflow-hidden">
+            <img
+              src={card.coverUrl}
+              alt={card.company}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          </div>
+          {/* Avatar overlapping cover bottom */}
+          <div className="absolute -bottom-5 left-4">
+            <div className="h-10 w-10 rounded-full overflow-hidden ring-2 ring-card shadow-md">
+              <img src={card.avatarUrl} alt={card.name} className="h-full w-full object-cover" />
+            </div>
+          </div>
+          {/* Profession badge */}
+          <div className="absolute top-2.5 right-2.5">
+            <span className="px-2 py-0.5 rounded-full text-2xs font-semibold bg-black/40 text-white backdrop-blur-sm">
+              {card.profession}
+            </span>
+          </div>
+        </div>
+
+        {/* Card body */}
+        <div className="pt-7 px-4 pb-4 space-y-2.5">
+          <div>
+            <h3 className="font-bold text-foreground text-sm leading-tight">{card.name}</h3>
+            <p className="text-2xs text-muted-foreground mt-0.5">{card.company} · {card.city}</p>
+          </div>
+
+          {/* Services */}
+          <div className="space-y-1">
+            {card.services.slice(0, 3).map((s) => (
+              <div key={s.name} className="flex items-center justify-between text-xs">
+                <div className="flex items-center gap-1.5 text-foreground">
+                  <CheckCircle2 className="h-3 w-3 text-success shrink-0" />
+                  <span className="truncate">{s.name}</span>
+                </div>
+                <span className="text-muted-foreground shrink-0 ml-2 font-medium">{s.price}</span>
+              </div>
+            ))}
+            {card.services.length > 3 && (
+              <p className="text-2xs text-muted-foreground">+{card.services.length - 3} more</p>
+            )}
+          </div>
+
+          {/* Rating */}
+          <div className="flex items-center gap-0.5 pt-0.5">
+            {Array.from({ length: 5 }).map((_, j) => (
+              <Star key={j} className="h-3 w-3 fill-warning text-warning" />
+            ))}
+            <span className="text-2xs text-muted-foreground ml-1">5.0 ({card.testimonials.length})</span>
+          </div>
+
+          {/* CTA */}
+          <div className="pt-1">
+            <span className="flex items-center justify-center w-full py-2 rounded-lg bg-primary/10 text-primary text-xs font-semibold group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+              View Card <ArrowUpRight className="h-3 w-3 ml-1" />
+            </span>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 export default function InteractiveCardShowcase({
   headline = "Interactive Demo Cards",
   subheadline = "Hover, click, and flip — see how your digital card looks and feels in action.",
-  showThemePicker = true,
+  showThemePicker = false,
   showProfessionFilter = true,
   maxCards = 6,
   className = "",
 }: InteractiveCardShowcaseProps) {
-  const [activeTheme, setActiveTheme] = useState<string>("ocean");
   const [activeProfession, setActiveProfession] = useState<string>("all");
   const [cardIndex, setCardIndex] = useState(0);
 
-  const filteredCards = ANIMATED_DEMO_CARDS.filter((card) => {
+  const filteredCards = DEMO_CARDS.filter((card) => {
     if (activeProfession === "all") return true;
-    return getProfessionKey(card.business) === activeProfession;
+    return card.profession === activeProfession;
   }).slice(0, maxCards);
 
-  const theme = THEMES.find((t) => t.key === activeTheme) ?? THEMES[0];
-
-  // For mobile carousel
   const canPrev = cardIndex > 0;
   const canNext = cardIndex < filteredCards.length - 1;
 
@@ -145,66 +147,40 @@ export default function InteractiveCardShowcase({
         </motion.div>
 
         {/* Controls bar */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
-          {/* Profession filter */}
-          {showProfessionFilter && (
-            <div className="flex flex-wrap justify-center gap-2">
-              {PROFESSIONS.map((p) => (
-                <button
-                  key={p.key}
-                  onClick={() => {
-                    setActiveProfession(p.key);
-                    setCardIndex(0);
-                  }}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                    activeProfession === p.key
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"
-                  }`}
-                >
-                  {p.label}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Theme picker */}
-          {showThemePicker && (
-            <div className="flex items-center gap-2">
-              <Palette className="h-4 w-4 text-muted-foreground" />
-              <div className="flex gap-1.5">
-                {THEMES.map((t) => (
-                  <button
-                    key={t.key}
-                    onClick={() => setActiveTheme(t.key)}
-                    title={t.label}
-                    className={`w-6 h-6 rounded-full bg-gradient-to-br ${t.gradient} transition-all ${
-                      activeTheme === t.key
-                        ? "ring-2 ring-offset-2 ring-offset-background ring-primary scale-110"
-                        : "opacity-60 hover:opacity-100 hover:scale-105"
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-xs text-muted-foreground hidden sm:inline">
-                {theme.label}
-              </span>
-            </div>
-          )}
-        </div>
+        {showProfessionFilter && (
+          <div className="flex flex-wrap justify-center gap-2 mb-10">
+            {PROFESSIONS.map((p) => (
+              <button
+                key={p.key}
+                onClick={() => {
+                  setActiveProfession(p.key);
+                  setCardIndex(0);
+                }}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  activeProfession === p.key
+                    ? "bg-primary text-primary-foreground shadow-sm"
+                    : "bg-muted text-muted-foreground hover:bg-accent hover:text-foreground"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Cards grid — desktop */}
-        <div className="hidden sm:grid grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="hidden sm:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
           <AnimatePresence mode="popLayout">
             {filteredCards.map((card, i) => (
               <motion.div
-                key={`${card.name}-${activeProfession}`}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
+                key={`${card.slug}-${activeProfession}`}
+                variants={scaleIn}
+                initial="hidden"
+                animate="visible"
                 exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ delay: i * 0.08, duration: 0.3 }}
+                transition={{ delay: i * 0.06 }}
               >
-                <AnimatedBusinessCard {...card} flipEnabled />
+                <DemoCardItem card={card} />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -216,17 +192,16 @@ export default function InteractiveCardShowcase({
             <AnimatePresence mode="wait">
               {filteredCards[cardIndex] && (
                 <motion.div
-                  key={`mobile-${filteredCards[cardIndex].name}-${cardIndex}`}
+                  key={`mobile-${filteredCards[cardIndex].slug}-${cardIndex}`}
                   initial={{ opacity: 0, x: 40 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -40 }}
                   transition={{ duration: 0.3 }}
                   className="flex justify-center"
                 >
-                  <AnimatedBusinessCard
-                    {...filteredCards[cardIndex]}
-                    flipEnabled
-                  />
+                  <div className="w-[260px]">
+                    <DemoCardItem card={filteredCards[cardIndex]} />
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -244,11 +219,7 @@ export default function InteractiveCardShowcase({
                 {cardIndex + 1} / {filteredCards.length}
               </span>
               <button
-                onClick={() =>
-                  setCardIndex((p) =>
-                    Math.min(filteredCards.length - 1, p + 1)
-                  )
-                }
+                onClick={() => setCardIndex((p) => Math.min(filteredCards.length - 1, p + 1))}
                 disabled={!canNext}
                 className="h-9 w-9 rounded-full bg-muted flex items-center justify-center disabled:opacity-30 hover:bg-accent transition-colors"
               >
@@ -265,7 +236,7 @@ export default function InteractiveCardShowcase({
           viewport={{ once: true }}
           className="text-center text-xs text-muted-foreground mt-8"
         >
-          💡 Hover to see animations • Click to flip • Try different themes above
+          💡 Click any card to see the full interactive experience
         </motion.p>
       </div>
     </section>
