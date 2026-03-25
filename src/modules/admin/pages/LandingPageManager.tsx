@@ -105,6 +105,31 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
     ],
   },
   {
+    key: "new-hero",
+    title: "Hero Variant A — Modern Split",
+    description: "A/B test hero at /new-hero",
+    url: "/new-hero",
+    sections: [
+      { id: "hero_modern", type: "hero_modern", label: "Modern Split Hero", enabled: true, content: {
+        headline: "Turn Every Conversation Into a Customer",
+        subheadline: "The smart digital business card that captures leads, books jobs, sends estimates, and grows your local service business — all from one simple link.",
+        description: "No more lost contacts, endless texting, or slow estimates. Share via QR, NFC, text, or social — and watch your leads and bookings grow automatically.",
+        cta_primary: "Create My Free Card →",
+        cta_primary_url: "/auth",
+        cta_secondary: "See Live Demo Card",
+        cta_secondary_url: "/demo/mike-reynolds",
+        trust_line: "Free to start • No credit card required • Secure • Trusted by 1,000+ professionals",
+        mockup_name: "Mike Reynolds",
+        mockup_company: "Reynolds Construction LLC",
+        mockup_location: "Toronto, ON",
+        mockup_rating: "5.0",
+        mockup_reviews: "42",
+        ab_test_active: "false",
+        ab_variant: "A",
+      }},
+    ],
+  },
+  {
     key: "for/landscapers", title: "Landscapers Landing Page", description: "Industry page at /for/landscapers", url: "/for/landscapers",
     sections: [
       { id: "hero", type: "hero", label: "Hero", enabled: true, content: {} },
