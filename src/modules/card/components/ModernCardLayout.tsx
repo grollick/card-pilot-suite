@@ -264,13 +264,6 @@ export default function ModernCardLayout({
           </div>
         </motion.div>
 
-        {/* Activity badges (on-duty & verified removed — shown in cover) */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mx-4 mt-3">
-          {profile.avg_response_minutes != null && profile.avg_response_minutes > 0 && (
-            <ResponseSpeedBadge minutes={profile.avg_response_minutes} />
-          )}
-          {recentViewCount > 0 && <RecentViewsBadge count={recentViewCount} />}
-        </div>
 
         {/* CTA buttons — 5-column grid */}
         <motion.div initial="hidden" animate="visible" variants={stagger} className="grid grid-cols-5 gap-2 mx-4 mt-4">
