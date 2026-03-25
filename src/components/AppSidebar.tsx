@@ -296,12 +296,13 @@ export function AppSidebar() {
           {!collapsed && <Separator className="mx-2 my-1 w-auto opacity-30" />}
 
           {/* ── Workflow Groups ── */}
-          {renderGroup("Leads", Inbox, leadsItems)}
+          {renderGroup("CRM", UserCheck, crmItems)}
           {renderGroup("Jobs", Briefcase, jobsItems)}
-          {renderGroup("Customers", UserCheck, customersItems)}
+          {renderGroup("Money", DollarSign, moneyItems)}
           {renderGroup("Marketing", Megaphone, marketingItems)}
-          {renderGroup("Tools", CreditCard, toolsItems)}
+          {renderGroup("Brand", CreditCard, brandItems)}
           {renderGroup("Team", Users, teamItems)}
+          {renderGroup("Discover", MapPin, discoverItems)}
 
           {/* View website link */}
           {profile?.handle && !collapsed && (
