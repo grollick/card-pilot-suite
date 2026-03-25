@@ -173,7 +173,8 @@ const SECTION_ICONS: Record<string, typeof Globe> = {
 
 const NEW_SECTION_TYPES = [
   { type: "header", label: "Header / Nav" },
-  { type: "hero", label: "Hero" },
+  { type: "hero", label: "Hero (Classic)" },
+  { type: "hero_modern", label: "Hero — Modern Split (A/B)" },
   { type: "problem_solution", label: "Problem / Solution" },
   { type: "features", label: "Features" },
   { type: "how_it_works", label: "How It Works" },
