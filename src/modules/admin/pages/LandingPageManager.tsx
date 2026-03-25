@@ -750,6 +750,8 @@ export default function LandingPageManager({ adminOnly = true }: LandingPageMana
                   <Scale className="h-5 w-5 text-primary" />
                 ) : page.key === "main" ? (
                   <Globe className="h-5 w-5 text-primary" />
+                ) : page.key === "new-hero" ? (
+                  <FlaskConical className="h-5 w-5 text-primary" />
                 ) : (
                   <FileText className="h-5 w-5 text-primary" />
                 )}
