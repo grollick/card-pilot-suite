@@ -31,6 +31,13 @@ function getProfessionPrompt(profession: string): string {
   return `A professional, clean workspace environment suitable for a ${profession}, with modern design elements and warm lighting`;
 }
 
+// Try models in order of preference
+const IMAGE_MODELS = [
+  "google/gemini-3.1-flash-image-preview",
+  "google/gemini-3-pro-image-preview",
+  "google/gemini-2.5-flash-image",
+];
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -58,46 +65,71 @@ serve(async (req) => {
     const basePrompt = custom_prompt || getProfessionPrompt(profession || "Professional");
     const fullPrompt = `Generate a wide banner backdrop image (landscape orientation, 16:9 aspect ratio). ${basePrompt}. The image should work well as a background behind a profile photo. Use a slight depth-of-field blur effect so the background doesn't compete with a foreground subject. Rich colors, professional quality, photorealistic.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-image",
-        messages: [{ role: "user", content: fullPrompt }],
-        modalities: ["image", "text"],
-      }),
-    });
+    let lastError = "";
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    for (const model of IMAGE_MODELS) {
+      try {
+        console.log(`Trying model: ${model}`);
+        const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model,
+            messages: [{ role: "user", content: fullPrompt }],
+            modalities: ["image", "text"],
+          }),
         });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add credits." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+
+        if (response.status === 429) {
+          return new Response(JSON.stringify({ error: "Rate limit exceeded. Please wait a moment and try again." }), {
+            status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+        if (response.status === 402) {
+          return new Response(JSON.stringify({ error: "AI credits exhausted. Please add credits in Settings." }), {
+            status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+
+        if (!response.ok) {
+          const text = await response.text();
+          console.error(`Model ${model} failed (${response.status}):`, text);
+          lastError = `${model}: ${response.status}`;
+          continue; // try next model
+        }
+
+        const result = await response.json();
+        const imageData = result.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+        if (!imageData) {
+          console.error(`Model ${model} returned no image. Response:`, JSON.stringify(result).slice(0, 500));
+          lastError = `${model}: no image in response`;
+          continue; // try next model
+        }
+
+        console.log(`Success with model: ${model}`);
+        return new Response(JSON.stringify({ success: true, image_url: imageData }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+      } catch (modelErr) {
+        console.error(`Model ${model} threw:`, modelErr);
+        lastError = `${model}: ${String(modelErr)}`;
+        continue;
       }
-      const text = await response.text();
-      console.error("AI gateway error:", response.status, text);
-      throw new Error("Backdrop generation failed");
     }
 
-    const result = await response.json();
-    const imageData = result.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    if (!imageData) throw new Error("No image returned from AI");
-
-    return new Response(JSON.stringify({ success: true, image_url: imageData }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    // All models failed
+    console.error("All models failed. Last error:", lastError);
+    return new Response(
+      JSON.stringify({ error: "Backdrop generation failed after trying multiple models. Please try again." }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   } catch (err) {
     console.error("generate-backdrop error:", err);
     return new Response(
-      JSON.stringify({ error: "Internal server error" }),
+      JSON.stringify({ error: err?.message || "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
