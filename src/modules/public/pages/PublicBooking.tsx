@@ -394,6 +394,7 @@ export default function PublicBooking() {
           </div>
         </div>
       </motion.div>
+      </div>
     </div>
   );
 }
