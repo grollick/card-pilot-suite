@@ -151,6 +151,9 @@ const SalesCrmPage = lazy(() => import("@/modules/admin/pages/SalesCrmPage"));
 const UserPageBuilder = lazy(() => import("@/modules/website/pages/UserPageBuilder"));
 const TeamPage = lazy(() => import("@/modules/settings/pages/TeamPage"));
 
+// Feedback
+const BugReviewPage = lazy(() => import("@/modules/feedback/pages/BugReviewPage"));
+
 // Help
 const HelpCenter = lazy(() => import("@/modules/help/pages/HelpCenter"));
 
@@ -320,6 +323,7 @@ const App = () => (
               <Route path="lead-routing" element={<LazyRoute><LeadRoutingPage /></LazyRoute>} />
               <Route path="team-cards" element={<LazyRoute><TeamCardsPage /></LazyRoute>} />
               <Route path="expenses" element={<LazyRoute><ExpensesPage /></LazyRoute>} />
+              <Route path="bugs" element={<LazyRoute><BugReviewPage /></LazyRoute>} />
               <Route path="help" element={<LazyRoute><HelpCenter /></LazyRoute>} />
             </Route>
 
