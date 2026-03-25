@@ -227,6 +227,32 @@ export default function EstimateDutyPanel() {
               </div>
             )}
 
+            {!isFreePlan && !hasLocation && (
+              <div className="rounded-lg border border-warning/20 bg-warning/5 p-3 flex items-start gap-2.5">
+                <MapPin className="h-4 w-4 text-warning shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-medium">Add your location to go On Duty</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    Set your city in Settings so customers in your area can find you.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 h-7 text-xs gap-1 border-warning/30 text-warning hover:bg-warning/10"
+                    onClick={() => navigate("/app/settings")}
+                  >
+                    <MapPin className="h-3 w-3" /> Add Location
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {!isOnDuty && !isFreePlan && hasLocation && (
+              <p className="text-xs text-muted-foreground">
+                You are not visible right now. Toggle on to receive estimate requests.
+              </p>
+            )}
+
             {isOnDuty && !isFreePlan && (
               <div className="space-y-2">
                 {leadsMax > 0 && (
