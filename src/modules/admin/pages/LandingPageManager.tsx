@@ -142,6 +142,7 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
 const SECTION_TYPE_LABELS: Record<string, string> = {
   header: "Header / Navigation",
   hero: "Hero Section",
+  hero_modern: "Hero — Modern Split (Variant A)",
   problem_solution: "Problem / Solution",
   features: "Features Grid",
   how_it_works: "How It Works",
