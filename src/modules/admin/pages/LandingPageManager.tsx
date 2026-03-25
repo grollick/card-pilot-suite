@@ -371,6 +371,106 @@ function SortableSectionItem({
   );
 }
 
+// ─── Modern Hero Editor ───
+
+function ModernHeroEditor({
+  content, onUpdate,
+}: {
+  content: Record<string, any>;
+  onUpdate: (field: string, value: string) => void;
+}) {
+  return (
+    <div className="space-y-4">
+      <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-1">
+        <div className="flex items-center gap-2">
+          <FlaskConical className="h-3.5 w-3.5 text-primary" />
+          <span className="text-xs font-semibold text-primary">A/B Testing</span>
+        </div>
+        <p className="text-2xs text-muted-foreground">This hero variant can be tested against the original.</p>
+        <div className="flex items-center justify-between mt-2">
+          <span className="text-xs text-muted-foreground">A/B Test Active</span>
+          <Switch
+            checked={content.ab_test_active === "true"}
+            onCheckedChange={(v) => onUpdate("ab_test_active", v ? "true" : "false")}
+            className="scale-75"
+          />
+        </div>
+        <div className="mt-1">
+          <label className="text-2xs text-muted-foreground">Variant Label</label>
+          <Input value={content.ab_variant || "A"} onChange={(e) => onUpdate("ab_variant", e.target.value)} className="text-xs h-7 mt-0.5" />
+        </div>
+        <a href="/new-hero" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-2xs text-primary hover:underline mt-1">
+          <ExternalLink className="h-2.5 w-2.5" /> Preview live page
+        </a>
+      </div>
+
+      <div className="border-t border-border pt-3 space-y-3">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Copy</p>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">Headline</label>
+          <Textarea value={content.headline || ""} onChange={(e) => onUpdate("headline", e.target.value)} className="text-sm min-h-[60px]" />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">Subheadline</label>
+          <Textarea value={content.subheadline || ""} onChange={(e) => onUpdate("subheadline", e.target.value)} className="text-sm min-h-[60px]" />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">Description</label>
+          <Textarea value={content.description || ""} onChange={(e) => onUpdate("description", e.target.value)} className="text-sm min-h-[50px]" />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1 block">Trust Line</label>
+          <Input value={content.trust_line || ""} onChange={(e) => onUpdate("trust_line", e.target.value)} className="text-sm h-9" />
+        </div>
+      </div>
+
+      <div className="border-t border-border pt-3 space-y-3">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Buttons</p>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Primary CTA</label>
+            <Input value={content.cta_primary || ""} onChange={(e) => onUpdate("cta_primary", e.target.value)} className="text-xs h-8" />
+          </div>
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Primary URL</label>
+            <Input value={content.cta_primary_url || ""} onChange={(e) => onUpdate("cta_primary_url", e.target.value)} className="text-xs h-8" />
+          </div>
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Secondary CTA</label>
+            <Input value={content.cta_secondary || ""} onChange={(e) => onUpdate("cta_secondary", e.target.value)} className="text-xs h-8" />
+          </div>
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Secondary URL</label>
+            <Input value={content.cta_secondary_url || ""} onChange={(e) => onUpdate("cta_secondary_url", e.target.value)} className="text-xs h-8" />
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-border pt-3 space-y-3">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Phone Mockup</p>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Name</label>
+            <Input value={content.mockup_name || ""} onChange={(e) => onUpdate("mockup_name", e.target.value)} className="text-xs h-8" />
+          </div>
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Company</label>
+            <Input value={content.mockup_company || ""} onChange={(e) => onUpdate("mockup_company", e.target.value)} className="text-xs h-8" />
+          </div>
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Location</label>
+            <Input value={content.mockup_location || ""} onChange={(e) => onUpdate("mockup_location", e.target.value)} className="text-xs h-8" />
+          </div>
+          <div>
+            <label className="text-2xs text-muted-foreground mb-1 block">Rating</label>
+            <Input value={content.mockup_rating || ""} onChange={(e) => onUpdate("mockup_rating", e.target.value)} className="text-xs h-8" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Section Property Editor ───
 
 function SectionEditor({
@@ -387,6 +487,7 @@ function SectionEditor({
 
   const isHeader = section.type === "header";
   const isLegal = section.type === "legal_content";
+  const isModernHero = section.type === "hero_modern";
 
   return (
     <motion.div
