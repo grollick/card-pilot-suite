@@ -151,6 +151,9 @@ const SalesCrmPage = lazy(() => import("@/modules/admin/pages/SalesCrmPage"));
 const UserPageBuilder = lazy(() => import("@/modules/website/pages/UserPageBuilder"));
 const TeamPage = lazy(() => import("@/modules/settings/pages/TeamPage"));
 
+// Feedback
+const BugReviewPage = lazy(() => import("@/modules/feedback/pages/BugReviewPage"));
+
 // Help
 const HelpCenter = lazy(() => import("@/modules/help/pages/HelpCenter"));
 
