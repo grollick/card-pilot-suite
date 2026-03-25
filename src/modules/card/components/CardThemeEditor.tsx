@@ -122,6 +122,7 @@ export interface CardThemeOverrides {
   bgPattern?: CardBgPattern;
   metallicEffect?: MetallicEffect;
   heroBackgroundId?: string;
+  cardLayout?: "classic" | "modern";
 }
 
 const FONT_OPTIONS = [
@@ -354,6 +355,7 @@ export default function CardThemeEditor({
   const DEFAULT_METALLIC: MetallicEffect = { type: "none", intensity: 80, applyToName: true, applyToButtons: true, applyToSections: true };
   const [metallicEffect, _setMetallicEffect] = useState<MetallicEffect>(currentOverrides.metallicEffect ?? DEFAULT_METALLIC);
   const [heroBackgroundId, _setHeroBackgroundId] = useState<string>(currentOverrides.heroBackgroundId ?? "");
+  const [cardLayout, _setCardLayout] = useState<"classic" | "modern">(currentOverrides.cardLayout ?? "classic");
 
   // ── Undo / Redo history ──
   interface ThemeSnapshot { palette: CardPalette; fonts: CardFonts; tokens: CardStyleTokens; gradientBg: CardGradientBg; bgPattern: CardBgPattern; metallicEffect: MetallicEffect; heroBackgroundId: string }
@@ -427,6 +429,7 @@ export default function CardThemeEditor({
   const setBgPattern = _setBgPattern;
   const setMetallicEffect = _setMetallicEffect;
   const setHeroBackgroundId = _setHeroBackgroundId;
+  const setCardLayout = _setCardLayout;
 
   // Custom palettes
   const [customPalettes, setCustomPalettes] = useState<{ id: string; name: string; palette: CardPalette }[]>([]);
@@ -471,7 +474,7 @@ export default function CardThemeEditor({
     const b = currentOverrides.bgPattern ?? { type: "none", opacity: 0.08 };
     const m = currentOverrides.metallicEffect ?? DEFAULT_METALLIC;
     const h = currentOverrides.heroBackgroundId ?? "";
-    _setPalette(p); _setFonts(f); _setTokens(t); _setGradientBg(g); _setBgPattern(b); _setMetallicEffect(m); _setHeroBackgroundId(h);
+    _setPalette(p); _setFonts(f); _setTokens(t); _setGradientBg(g); _setBgPattern(b); _setMetallicEffect(m); _setHeroBackgroundId(h); _setCardLayout(currentOverrides.cardLayout ?? "classic");
     if (open) {
       historyRef.current = [{ palette: p, fonts: f, tokens: t, gradientBg: g, bgPattern: b, metallicEffect: m, heroBackgroundId: h }];
       historyIndexRef.current = 0;
@@ -490,6 +493,7 @@ export default function CardThemeEditor({
       bgPattern: bgPattern.type !== "none" ? bgPattern : undefined,
       metallicEffect: metallicEffect.type !== "none" ? metallicEffect : undefined,
       heroBackgroundId: heroBackgroundId || undefined,
+      cardLayout,
     });
   }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId, open, onPreview]);
 
@@ -512,9 +516,10 @@ export default function CardThemeEditor({
       bgPattern: bgPattern.type !== "none" ? bgPattern : undefined,
       metallicEffect: metallicEffect.type !== "none" ? metallicEffect : undefined,
       heroBackgroundId: heroBackgroundId || undefined,
+      cardLayout,
     });
     onOpenChange(false);
-  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId, onSave, onOpenChange]);
+  }, [palette, fonts, tokens, gradientBg, bgPattern, metallicEffect, heroBackgroundId, cardLayout, onSave, onOpenChange]);
 
   const updateToken = useCallback(<K extends keyof CardStyleTokens>(key: K, value: CardStyleTokens[K]) => {
     setTokens((prev) => ({ ...prev, [key]: value }));
@@ -882,6 +887,23 @@ export default function CardThemeEditor({
 
             {/* ── Layout Tab ── */}
             <TabsContent value="layout" className="mt-3 space-y-4">
+              {/* Card Layout Mode */}
+              <div className="space-y-1.5">
+                <SectionLabel>Card Layout</SectionLabel>
+                <OptionGrid
+                  cols={2}
+                  options={[
+                    { value: "classic", label: "Classic" },
+                    { value: "modern", label: "Modern" },
+                  ]}
+                  value={cardLayout}
+                  onChange={(v) => setCardLayout(v as "classic" | "modern")}
+                />
+                <p className="text-[10px] text-muted-foreground">
+                  {cardLayout === "modern" ? "Full-width layout matching demo cards" : "Traditional centered card layout"}
+                </p>
+              </div>
+
               <div className="space-y-1.5">
                 <SectionLabel>Header Layout</SectionLabel>
                 <OptionGrid
