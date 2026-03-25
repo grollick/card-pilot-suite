@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { motion } from "framer-motion";
+import { useEstimateDuty } from "@/hooks/useEstimateDuty";
 
 interface DutySettingsPanelProps {
   isOnDuty: boolean;
@@ -19,20 +20,34 @@ interface DutySettingsPanelProps {
 }
 
 export default function DutySettingsPanel({ isOnDuty, isProPlus, isPending, onSave }: DutySettingsPanelProps) {
+  const { status } = useEstimateDuty();
   const [availableUntil, setAvailableUntil] = useState("");
   const [maxLeads, setMaxLeads] = useState("");
   const [radiusKm, setRadiusKm] = useState("");
   const [autoOffHours, setAutoOffHours] = useState("");
   const [autoOffOutside, setAutoOffOutside] = useState(false);
 
+  // Hydrate from existing duty settings
+  useEffect(() => {
+    if (!status) return;
+    if (status.available_until) {
+      try {
+        const d = new Date(status.available_until);
+        setAvailableUntil(`${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`);
+      } catch { /* ignore invalid dates */ }
+    }
+    if (status.max_leads != null) setMaxLeads(String(status.max_leads));
+    if (status.service_radius_km != null) setRadiusKm(String(status.service_radius_km));
+    if (status.auto_off_after_hours != null) setAutoOffHours(String(status.auto_off_after_hours));
+    if (status.auto_off_outside_hours) setAutoOffOutside(true);
+  }, [status]);
+
   const handleSave = () => {
-    // Convert time string "HH:MM" to a full ISO timestamp (today at that time)
     let parsedUntil: string | null = null;
     if (availableUntil) {
       const [hours, minutes] = availableUntil.split(":").map(Number);
       const d = new Date();
       d.setHours(hours, minutes, 0, 0);
-      // If the time is in the past, assume tomorrow
       if (d <= new Date()) d.setDate(d.getDate() + 1);
       parsedUntil = d.toISOString();
     }
