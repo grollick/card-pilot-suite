@@ -76,6 +76,7 @@ const PROFESSIONS = [
   { key: "landscaper", label: "Landscaper" },
   { key: "trainer", label: "Trainer" },
   { key: "stylist", label: "Stylist" },
+  { key: "electrician", label: "Electrician" },
 ];
 
 function getProfessionKey(business: string): string {
@@ -86,6 +87,7 @@ function getProfessionKey(business: string): string {
   if (b.includes("landscape") || b.includes("green")) return "landscaper";
   if (b.includes("training") || b.includes("fit")) return "trainer";
   if (b.includes("hair") || b.includes("studio") || b.includes("salon")) return "stylist";
+  if (b.includes("electric")) return "electrician";
   return "other";
 }
 
