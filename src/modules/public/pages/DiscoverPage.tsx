@@ -348,7 +348,7 @@ export default function DiscoverPage() {
   const onDutyListings = useMemo(() => filteredListings?.filter((l) => l.is_on_duty && !l.featured && !boostedIds.has(l.id)) ?? [], [filteredListings, boostedIds]);
   const allNonFeatured = useMemo(() => filteredListings?.filter((l) => !l.featured && !boostedIds.has(l.id)) ?? [], [filteredListings, boostedIds]);
   const regularListings = useMemo(() => allNonFeatured.slice(3), [allNonFeatured]);
-  const onDutyCount = useMemo(() => filteredListings.filter(l => l.is_on_duty || l.available_for_work).length, [filteredListings]);
+  const onDutyCount = useMemo(() => filteredListings.filter(l => l.is_on_duty).length, [filteredListings]);
 
   const boostedUserIdsArray = useMemo(() => boostedListings.map(l => l.id), [boostedListings]);
   useTrackBoostViews(boostedUserIdsArray);
