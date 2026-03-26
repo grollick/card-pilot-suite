@@ -86,7 +86,22 @@ export default function ScanBusinessCard() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { error } = await supabase.from("leads").insert({
+      // Get first pipeline stage for proper CRM placement
+      const { data: stages } = await supabase
+        .from("pipeline_stages")
+        .select("id")
+        .eq("user_id", user.id)
+        .order("sort_order", { ascending: true })
+        .limit(1);
+
+      const notesText = [
+        contact.job_title && `Title: ${contact.job_title}`,
+        contact.website && `Website: ${contact.website}`,
+        contact.address && `Address: ${contact.address}`,
+        contact.notes,
+      ].filter(Boolean).join("\n") || null;
+
+      const { data: newLead, error } = await supabase.from("leads").insert({
         user_id: user.id,
         name: contact.name.trim(),
         email: contact.email?.trim() || null,
@@ -94,18 +109,28 @@ export default function ScanBusinessCard() {
         company: contact.company?.trim() || null,
         source: "business_card" as any,
         contact_type: contactType as any,
-        notes: [
-          contact.job_title && `Title: ${contact.job_title}`,
-          contact.website && `Website: ${contact.website}`,
-          contact.address && `Address: ${contact.address}`,
-          contact.notes,
-        ].filter(Boolean).join("\n") || null,
-      });
+        stage_id: stages?.[0]?.id || null,
+        notes: notesText,
+      }).select("id").single();
 
       if (error) throw error;
-      toast.success("Contact saved!");
+
+      // Log activity for the new contact
+      if (newLead?.id) {
+        await supabase.from("contact_activities").insert({
+          user_id: user.id,
+          lead_id: newLead.id,
+          activity_type: "card_scanned",
+          title: "Business card scanned",
+          description: `Contact added via business card scan${contact.company ? ` — ${contact.company}` : ""}`,
+          occurred_at: new Date().toISOString(),
+        });
+      }
+
+      toast.success(`${contact.name.trim()} saved to contacts!`);
       navigate("/app/contacts");
     } catch (err: any) {
+      console.error("Save contact error:", err);
       toast.error(err.message || "Failed to save contact");
     } finally {
       setSaving(false);
