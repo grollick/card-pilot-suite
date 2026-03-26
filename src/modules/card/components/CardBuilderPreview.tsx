@@ -534,11 +534,12 @@ export default function CardBuilderPreview({
                       )}
                     </div>
 
-                    <div className="px-5 pb-2 pt-0">
+                    <div className="px-4 pb-3 pt-0 relative">
                       {/* Draggable Identity Block */}
                       <div
                         className="relative group/drag"
                         style={{
+                          marginTop: -28,
                           transform: identityPosition ? `translate(${identityPosition.x}px, ${identityPosition.y}px)` : undefined,
                           cursor: (repositionMode && onIdentityPositionChange) ? "grab" : undefined,
                           userSelect: repositionMode ? "none" : undefined,
@@ -564,9 +565,9 @@ export default function CardBuilderPreview({
                           </div>
                         )}
 
-                        {/* Avatar */}
+                        {/* Avatar — overlaps cover */}
                         <div
-                          className="h-20 w-20 rounded-2xl border-4 flex items-center justify-center mb-3 cursor-pointer relative group overflow-hidden"
+                          className="h-16 w-16 rounded-full border-[3px] flex items-center justify-center mb-2.5 cursor-pointer relative group overflow-hidden shadow-md"
                           onClick={(e) => { if (!isDragging.current) fileInputRef.current?.click(); }}
                           style={{
                             borderColor: previewTheme.palette.background,
@@ -574,12 +575,12 @@ export default function CardBuilderPreview({
                           }}
                         >
                           {avatarUrl ? (
-                            <img src={avatarUrl} alt="avatar" className={`h-full w-full rounded-2xl ${avatarBgColor !== "transparent" ? "object-contain" : "object-cover"}`} style={{ transform: `rotate(${avatarRotation}deg)` }} />
+                            <img src={avatarUrl} alt="avatar" className={`h-full w-full rounded-full ${avatarBgColor !== "transparent" ? "object-contain" : "object-cover"}`} style={{ transform: `rotate(${avatarRotation}deg)` }} />
                           ) : (
-                            <CreditCard className="h-8 w-8 text-muted-foreground" />
+                            <CreditCard className="h-6 w-6 text-muted-foreground" />
                           )}
-                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-2xl">
-                            <CreditCard className="h-5 w-5 text-white" />
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-full">
+                            <CreditCard className="h-4 w-4 text-white" />
                           </div>
                         </div>
                         <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
@@ -601,45 +602,59 @@ export default function CardBuilderPreview({
                           }}
                         />
 
-                        <div style={{ display: "flex", alignItems: logoVerticalAlign === "top" ? "flex-start" : logoVerticalAlign === "bottom" ? "flex-end" : "center", gap: logoNameGap }}>
-                          {logoUrl && logoPosition === "beside-name" && (
-                            <div
-                              className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
-                              style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
-                            >
-                              <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
-                            </div>
-                          )}
-                          <h3 style={{ color: (() => { const me = currentThemeOverrides.metallicEffect; return me?.type && me.type !== "none" && me.applyToName ? "transparent" : previewTheme.palette.secondary; })(), fontFamily: `'${previewTheme.fonts.primary}', sans-serif`, fontWeight: nameFontWeight ?? 700, fontStyle: nameItalic ? "italic" : undefined, fontSize: nameFontSize ?? 18, lineHeight: nameLineHeight ?? undefined, ...(uppercaseName ? { textTransform: 'uppercase' as const } : {}), ...(nameLetterSpacing ? { letterSpacing: `${nameLetterSpacing}px` } : {}), ...(nameTextStroke ? { WebkitTextStroke: `${nameTextStrokeWidth ?? 1}px white`, paintOrder: 'stroke fill' as const } : {}), ...(() => { const me = currentThemeOverrides.metallicEffect; if (me?.type && me.type !== "none" && me.applyToName) { return { background: METALLIC_GRADIENTS[me.type as Exclude<MetallicType, "none">], WebkitBackgroundClip: "text" as const, WebkitTextFillColor: "transparent", backgroundClip: "text" as const }; } return {}; })() }}>
-                            {(() => {
-                              const full = (editName ?? profile?.name) || "Your Name";
-                              const display = uppercaseName ? full.toUpperCase() : full;
-                              const parts = display.trim().split(/\s+/);
-                              if (parts.length <= 1) {
-                                if (firstNameFontWeight != null) return <span style={{ fontWeight: firstNameFontWeight }}>{display}</span>;
-                                if (boldLastName) return <span style={{ fontWeight: 800 }}>{display}</span>;
-                                return display;
-                              }
-                              const last = parts.pop()!;
-                              const firstName = parts.join(" ");
-                              const firstStyle = firstNameFontWeight != null ? { fontWeight: firstNameFontWeight } : undefined;
-                              const lastStyle = boldLastName ? { fontWeight: 800 } : undefined;
-                              return <>{firstStyle ? <span style={firstStyle}>{firstName}</span> : firstName} {lastStyle ? <span style={lastStyle}>{last}</span> : last}</>;
-                            })()}
-                          </h3>
-                          {logoUrl && logoPosition === "beside-name-right" && (
-                            <div
-                              className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
-                              style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
-                            >
-                              <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
-                            </div>
+                        <div className="space-y-0.5" style={{ display: "flex", flexDirection: "column" }}>
+                          <div style={{ display: "flex", alignItems: logoVerticalAlign === "top" ? "flex-start" : logoVerticalAlign === "bottom" ? "flex-end" : "center", gap: logoNameGap }}>
+                            {logoUrl && logoPosition === "beside-name" && (
+                              <div
+                                className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
+                                style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
+                              >
+                                <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
+                              </div>
+                            )}
+                            <h3 style={{
+                              color: (() => { const me = currentThemeOverrides.metallicEffect; return me?.type && me.type !== "none" && me.applyToName ? "transparent" : previewTheme.palette.primary; })(),
+                              fontFamily: `'${previewTheme.fonts.primary}', sans-serif`,
+                              fontWeight: nameFontWeight ?? 700,
+                              fontStyle: nameItalic ? "italic" : undefined,
+                              fontSize: nameFontSize ?? 18,
+                              lineHeight: nameLineHeight ?? 1.2,
+                              margin: 0,
+                              ...(uppercaseName ? { textTransform: 'uppercase' as const } : {}),
+                              ...(nameLetterSpacing ? { letterSpacing: `${nameLetterSpacing}px` } : {}),
+                              ...(nameTextStroke ? { WebkitTextStroke: `${nameTextStrokeWidth ?? 1}px white`, paintOrder: 'stroke fill' as const } : {}),
+                              ...(() => { const me = currentThemeOverrides.metallicEffect; if (me?.type && me.type !== "none" && me.applyToName) { return { background: METALLIC_GRADIENTS[me.type as Exclude<MetallicType, "none">], WebkitBackgroundClip: "text" as const, WebkitTextFillColor: "transparent", backgroundClip: "text" as const }; } return {}; })(),
+                            }}>
+                              {(() => {
+                                const full = (editName ?? profile?.name) || "Your Name";
+                                const display = uppercaseName ? full.toUpperCase() : full;
+                                const parts = display.trim().split(/\s+/);
+                                if (parts.length <= 1) {
+                                  if (firstNameFontWeight != null) return <span style={{ fontWeight: firstNameFontWeight }}>{display}</span>;
+                                  if (boldLastName) return <span style={{ fontWeight: 800 }}>{display}</span>;
+                                  return display;
+                                }
+                                const last = parts.pop()!;
+                                const firstName = parts.join(" ");
+                                const firstStyle = firstNameFontWeight != null ? { fontWeight: firstNameFontWeight } : undefined;
+                                const lastStyle = boldLastName ? { fontWeight: 800 } : undefined;
+                                return <>{firstStyle ? <span style={firstStyle}>{firstName}</span> : firstName} {lastStyle ? <span style={lastStyle}>{last}</span> : last}</>;
+                              })()}
+                            </h3>
+                            {logoUrl && logoPosition === "beside-name-right" && (
+                              <div
+                                className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
+                                style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
+                              >
+                                <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
+                              </div>
+                            )}
+                          </div>
+                          <p style={{ color: previewTheme.palette.secondary, fontSize: subtitleFontSize ?? 13, fontStyle: subtitleItalic ? "italic" : undefined, margin: 0, marginTop: 2 }}>{displayJobTitle}</p>
+                          {showCompany && (editCompany ?? profile?.company) && (
+                            <p style={{ color: companyColor || `${previewTheme.palette.secondary}90`, fontSize: 12, margin: 0, marginTop: subtitleSpacing ?? 2 }}>{editCompany ?? profile?.company}</p>
                           )}
                         </div>
-                        <p style={{ color: `${previewTheme.palette.secondary}99`, fontSize: subtitleFontSize ?? 14, fontStyle: subtitleItalic ? "italic" : undefined }}>{displayJobTitle}</p>
-                        {showCompany && (editCompany ?? profile?.company) && (
-                          <p className="text-xs" style={{ color: companyColor || `${previewTheme.palette.secondary}70`, marginTop: subtitleSpacing ?? 2 }}>{editCompany ?? profile?.company}</p>
-                        )}
                       </div>
 
                       {/* CTA Buttons */}
