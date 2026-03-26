@@ -51,12 +51,18 @@ export default function ScanBusinessCard() {
         body: { image: base64 },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Scan edge function error:", error);
+        throw new Error(typeof error === "object" && error.message ? error.message : "Scan failed — please try again");
+      }
       if (data?.error) throw new Error(data.error);
+      if (!data?.contact?.name) throw new Error("Could not read the card — try a clearer photo");
 
       setContact(data.contact);
       setStep("review");
+      toast.success("Card scanned! Review the details below.");
     } catch (err: any) {
+      console.error("Scan business card error:", err);
       toast.error(err.message || "Failed to scan business card");
       setStep("capture");
     }
