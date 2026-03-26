@@ -68,7 +68,7 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
         contact.notes,
       ].filter(Boolean).join("\n");
 
-      await captureLead({
+      const result = await captureLead({
         ownerId,
         name: contact.name.trim(),
         email: contact.email?.trim() || null,
@@ -85,6 +85,11 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
         },
       });
 
+      if (!result) {
+        throw new Error("Failed to save contact — no result returned");
+      }
+
+      console.log("Card scanned & saved successfully:", result);
       setStep("done");
       onSuccess?.();
     } catch {
