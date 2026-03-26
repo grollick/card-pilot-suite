@@ -24,7 +24,21 @@ serve(async (req) => {
       });
     }
 
-    const { lead_id } = await req.json();
+    let lead_id: string;
+    try {
+      const body = await req.json();
+      lead_id = body.lead_id;
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid or missing request body" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (!lead_id) {
+      return new Response(JSON.stringify({ error: "lead_id is required" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     // Fetch lead + profile + activities
     const [{ data: lead }, { data: profile }, { data: activities }] = await Promise.all([
