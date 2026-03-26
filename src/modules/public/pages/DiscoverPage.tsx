@@ -631,7 +631,7 @@ export default function DiscoverPage() {
                 <Star className="h-4 w-4" /> {filteredListings.filter(l => l.review_count > 0).length} reviewed
               </span>
               <span className="flex items-center gap-1.5 hidden sm:flex">
-                <CheckCircle2 className="h-4 w-4 text-emerald-600" /> {filteredListings.filter(l => l.available_for_work).length} available
+                <CheckCircle2 className="h-4 w-4 text-emerald-600" /> {filteredListings.filter(l => l.is_on_duty).length} on duty
               </span>
               <span className="flex items-center gap-1.5 hidden sm:flex">
                 <MapPin className="h-4 w-4" /> {cities.length} cities
