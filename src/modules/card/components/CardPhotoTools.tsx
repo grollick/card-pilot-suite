@@ -275,6 +275,30 @@ export default function CardPhotoTools({
     onAvatarRotationChange?.(next);
   };
 
+  const handleCartoonize = async () => {
+    if (!avatarUrl || !user) return;
+    setCartoonizing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("cartoonize-avatar", {
+        body: { image_url: avatarUrl, style: cartoonStyle },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const imageUrl = data.image_url;
+      if (!imageUrl) throw new Error("No image returned");
+      const file = await base64ToFile(imageUrl, "avatar-cartoon.png");
+      const path = `${user.id}/avatar-cartoon.png`;
+      const url = await uploadFile(file, path);
+      await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
+      onAvatarChange(url);
+      toast.success("Avatar cartoonized!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to cartoonize avatar");
+    } finally {
+      setCartoonizing(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
