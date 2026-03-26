@@ -1,4 +1,4 @@
-import { CreditCard, Eye, Pencil, Smartphone, Tablet, Move, Star, Calendar, Send, Globe, Instagram, Facebook, Linkedin, Twitter, Youtube, Play } from "lucide-react";
+import { CreditCard, Eye, Pencil, Smartphone, Tablet, Move, Star, Calendar, Send, Globe, Instagram, Facebook, Linkedin, Twitter, Youtube, Play, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useState, useRef, useCallback } from "react";
@@ -653,6 +653,12 @@ export default function CardBuilderPreview({
                           <p style={{ color: previewTheme.palette.secondary, fontSize: subtitleFontSize ?? 13, fontStyle: subtitleItalic ? "italic" : undefined, margin: 0, marginTop: 2 }}>{displayJobTitle}</p>
                           {showCompany && (editCompany ?? profile?.company) && (
                             <p style={{ color: companyColor || `${previewTheme.palette.secondary}90`, fontSize: 12, margin: 0, marginTop: subtitleSpacing ?? 2 }}>{editCompany ?? profile?.company}</p>
+                          )}
+                          {profile?.city && (
+                            <p style={{ display: "flex", alignItems: "center", gap: 3, color: `${previewTheme.palette.secondary}70`, fontSize: 11, margin: 0, marginTop: 4 }}>
+                              <MapPin style={{ width: 11, height: 11, flexShrink: 0 }} />
+                              {profile.city}
+                            </p>
                           )}
                         </div>
                       </div>
