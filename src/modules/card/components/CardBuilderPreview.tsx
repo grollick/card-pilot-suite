@@ -657,7 +657,7 @@ export default function CardBuilderPreview({
                         </div>
                       </div>
 
-                      {/* CTA Buttons */}
+                      {/* CTA Buttons — matching template example style */}
                       {(() => {
                         const enabledCtas = ctaConfig.filter(c => c.enabled);
                         const primary = enabledCtas.find(c => c.isPrimary) || enabledCtas[0];
@@ -665,9 +665,9 @@ export default function CardBuilderPreview({
 
                         if (ctaIconsOnly) {
                           return (
-                            <div className="flex items-center justify-center gap-3 mt-4">
+                            <div className="flex items-center justify-center gap-2.5 mt-3">
                               {enabledCtas.map(c => (
-                                <button key={c.id} className="h-10 w-10 rounded-full flex items-center justify-center transition-colors"
+                                <button key={c.id} className="h-9 w-9 rounded-full flex items-center justify-center transition-colors"
                                   style={{
                                     background: c.isPrimary ? previewTheme.palette.primary : "transparent",
                                     color: c.isPrimary ? previewTheme.palette.background : previewTheme.palette.primary,
@@ -679,23 +679,16 @@ export default function CardBuilderPreview({
                           );
                         }
                         return (
-                          <div className="space-y-2 mt-4">
-                            {primary && (
-                              <button className="w-full text-xs font-semibold py-2.5 rounded-lg transition-colors"
-                                style={{ background: previewTheme.palette.primary, color: previewTheme.palette.background }}>
-                                {primary.label}
+                          <div className="flex gap-1.5 mt-3">
+                            {enabledCtas.map(c => (
+                              <button key={c.id} className="flex-1 text-[11px] font-bold py-2 rounded-lg transition-colors"
+                                style={{
+                                  background: c.isPrimary ? previewTheme.palette.primary : `${previewTheme.palette.primary}10`,
+                                  color: c.isPrimary ? previewTheme.palette.background : previewTheme.palette.primary,
+                                }}>
+                                {c.label}
                               </button>
-                            )}
-                            {secondary.length > 0 && (
-                              <div className="flex gap-2">
-                                {secondary.map(c => (
-                                  <button key={c.id} className="flex-1 text-xs font-semibold py-2 rounded-lg border transition-colors"
-                                    style={{ borderColor: `${previewTheme.palette.primary}40`, color: previewTheme.palette.primary, background: "transparent" }}>
-                                    {c.label}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
+                            ))}
                           </div>
                         );
                       })()}
