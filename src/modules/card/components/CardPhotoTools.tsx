@@ -119,6 +119,8 @@ export default function CardPhotoTools({
   const [generatingBackdrop, setGeneratingBackdrop] = useState(false);
   const [customPrompt, setCustomPrompt] = useState("");
   const [bgRemoved, setBgRemoved] = useState(false);
+  const [cartoonizing, setCartoonizing] = useState(false);
+  const [cartoonStyle, setCartoonStyle] = useState<string>("cartoon");
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [coverCropSrc, setCoverCropSrc] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
