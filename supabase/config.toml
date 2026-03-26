@@ -57,3 +57,5 @@ project_id = "yxsnqhuilqdvqrmkjxzf"
     verify_jwt = false
   [functions.handle-email-suppression]
     verify_jwt = false
+  [functions.scan-business-card-public]
+    verify_jwt = false
