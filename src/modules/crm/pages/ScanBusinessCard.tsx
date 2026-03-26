@@ -56,11 +56,19 @@ export default function ScanBusinessCard() {
         throw new Error(typeof error === "object" && error.message ? error.message : "Scan failed — please try again");
       }
       if (data?.error) throw new Error(data.error);
-      if (!data?.contact?.name) throw new Error("Could not read the card — try a clearer photo");
 
-      setContact(data.contact);
+      setContact({
+        name: data?.contact?.name ?? "",
+        email: data?.contact?.email ?? "",
+        phone: data?.contact?.phone ?? "",
+        company: data?.contact?.company ?? "",
+        job_title: data?.contact?.job_title ?? "",
+        website: data?.contact?.website ?? "",
+        address: data?.contact?.address ?? "",
+        notes: data?.contact?.notes ?? "",
+      });
       setStep("review");
-      toast.success("Card scanned! Review the details below.");
+      toast.success("Card scanned! Review and tap Save Contact.");
     } catch (err: any) {
       console.error("Scan business card error:", err);
       toast.error(err.message || "Failed to scan business card");
@@ -105,7 +113,7 @@ export default function ScanBusinessCard() {
     }
     try {
       const compressed = await compressImage(file);
-      processImage(compressed);
+      await processImage(compressed);
     } catch (err: any) {
       toast.error(err.message || "Failed to read image");
     }
@@ -183,7 +191,7 @@ export default function ScanBusinessCard() {
     <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+        <Button type="button" variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
@@ -205,10 +213,10 @@ export default function ScanBusinessCard() {
               Position the business card in good lighting for best results
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button onClick={() => cameraInputRef.current?.click()} className="gap-2">
+              <Button type="button" onClick={() => cameraInputRef.current?.click()} className="gap-2">
                 <Camera className="h-4 w-4" /> Take Photo
               </Button>
-              <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="gap-2">
+              <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} className="gap-2">
                 <Upload className="h-4 w-4" /> Upload Image
               </Button>
             </div>
@@ -252,7 +260,7 @@ export default function ScanBusinessCard() {
             <div className="relative">
               <img src={imagePreview} alt="Business card" className="w-full rounded-lg border border-border opacity-60" />
               <div className="absolute top-2 right-2">
-                <Button variant="secondary" size="sm" onClick={reset} className="gap-1">
+                <Button type="button" variant="secondary" size="sm" onClick={reset} className="gap-1">
                   <X className="h-3 w-3" /> Rescan
                 </Button>
               </div>
@@ -311,10 +319,10 @@ export default function ScanBusinessCard() {
           </div>
 
           <div className="flex gap-3">
-            <Button variant="outline" className="flex-1" onClick={reset}>
+            <Button type="button" variant="outline" className="flex-1" onClick={reset}>
               Scan Another
             </Button>
-            <Button className="flex-1 gap-2" onClick={handleSave} disabled={saving}>
+            <Button type="button" className="flex-1 gap-2" onClick={handleSave} disabled={saving}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
               Save Contact
             </Button>
