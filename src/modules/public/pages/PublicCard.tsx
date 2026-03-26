@@ -739,58 +739,120 @@ export default function PublicCard() {
           ) : undefined;
 
           return (
-            <CardSectionWrapper theme={theme} index={0} metallicEffect={metallicEffect} className="relative z-[2] overflow-hidden">
-              <div style={{ margin: `-${theme.spacing.inner}px`, marginBottom: 0 }}>
-                <CardHeader
-                  theme={theme}
-                  name={profile.name || "Your Name"}
-                  boldLastName={themeJson.bold_last_name === true}
-                  uppercaseName={themeJson.uppercase_name === true}
-                  nameLetterSpacing={typeof themeJson.name_letter_spacing === "number" ? themeJson.name_letter_spacing : 0}
-                  nameFontWeight={typeof themeJson.name_font_weight === "number" ? themeJson.name_font_weight : 700}
-                  firstNameFontWeight={typeof themeJson.first_name_font_weight === "number" ? themeJson.first_name_font_weight : null}
-                  nameItalic={themeJson.name_italic === true}
-                  nameFontSize={typeof themeJson.name_font_size === "number" ? themeJson.name_font_size : null}
-                  subtitleFontSize={typeof themeJson.subtitle_font_size === "number" ? themeJson.subtitle_font_size : null}
-                  subtitleItalic={themeJson.subtitle_italic === true}
-                  subtitleSpacing={typeof themeJson.subtitle_spacing === "number" ? themeJson.subtitle_spacing : null}
-                  showCompany={themeJson.show_company !== false}
-                  companyColor={typeof themeJson.company_color === "string" ? themeJson.company_color : null}
-                  nameLineHeight={typeof themeJson.name_line_height === "number" ? themeJson.name_line_height : null}
-                  nameTextStroke={themeJson.name_text_stroke === true}
-                  nameTextStrokeWidth={typeof themeJson.name_text_stroke_width === "number" ? (themeJson.name_text_stroke_width as number) : 1}
-                  profession={displayJobTitle}
-                  company={profile.company ?? undefined}
-                  avatarUrl={profile.avatar_url}
-                  coverUrl={coverUrl}
-                  avatarBgColor={themeJson.avatar_bg_color as string | undefined}
-                  avatarRotation={themeJson.avatar_rotation as number | undefined}
-                  avatarBorderWidth={(themeJson.tokens as any)?.header?.avatarBorderWidth ?? 3}
-                  avatarSize={(themeJson.tokens as any)?.header?.avatarSize ?? 80}
-                  avatarBannerText={(themeJson.tokens as any)?.header?.avatarBannerText ?? ""}
-                  avatarBannerBg={(themeJson.tokens as any)?.header?.avatarBannerBg ?? ""}
-                  avatarBannerPosition={(themeJson.tokens as any)?.header?.avatarBannerPosition ?? "bottom"}
-                  avatarBannerAnimation={(themeJson.tokens as any)?.header?.avatarBannerAnimation ?? "none"}
-                  coverOffsetY={themeJson.cover_offset_y as number | undefined}
-                  logoUrl={themeJson.logo_url as string | undefined}
-                  logoFrostedBg={themeJson.logo_frosted_bg !== false}
-                  logoGlow={themeJson.logo_glow === true}
-                  logoPosition={(themeJson.logo_position as any) ?? "top-right"}
-                  logoSize={(themeJson.logo_size as any) ?? "medium"}
-                  logoOpacity={typeof themeJson.logo_opacity === "number" ? (themeJson.logo_opacity as number) : 100}
-                  logoPadding={typeof themeJson.logo_padding === "number" ? (themeJson.logo_padding as number) : 4}
-                  logoNameGap={typeof themeJson.logo_name_gap === "number" ? (themeJson.logo_name_gap as number) : 8}
-                  logoVerticalAlign={(themeJson.logo_vertical_align as any) ?? "center"}
-                  logoCustomPosition={themeJson.logo_custom_position as { x: number; y: number } | undefined}
-                  metallicEffect={metallicEffect}
-                  heroBackground={resolvedHeroBackground}
-                  ctaChildren={heroCtaButtons}
-                  glassHero={theme.section.cardStyle === "glass"}
-                  verificationLevel={profile.verification_level as any}
-                  isAvailable={profile.is_on_duty === true}
-                />
-              </div>
-            </CardSectionWrapper>
+            <div style={{ padding: `${spacing.section}px`, paddingBottom: 0 }}>
+              <CardSectionWrapper theme={theme} index={0} metallicEffect={metallicEffect} className="relative z-[2] overflow-hidden">
+                <div style={{ margin: `-${theme.spacing.inner}px`, marginBottom: 0 }}>
+                  <CardHeader
+                    theme={theme}
+                    name={profile.name || "Your Name"}
+                    boldLastName={themeJson.bold_last_name === true}
+                    uppercaseName={themeJson.uppercase_name === true}
+                    nameLetterSpacing={typeof themeJson.name_letter_spacing === "number" ? themeJson.name_letter_spacing : 0}
+                    nameFontWeight={typeof themeJson.name_font_weight === "number" ? themeJson.name_font_weight : 700}
+                    firstNameFontWeight={typeof themeJson.first_name_font_weight === "number" ? themeJson.first_name_font_weight : null}
+                    nameItalic={themeJson.name_italic === true}
+                    nameFontSize={typeof themeJson.name_font_size === "number" ? themeJson.name_font_size : null}
+                    subtitleFontSize={typeof themeJson.subtitle_font_size === "number" ? themeJson.subtitle_font_size : null}
+                    subtitleItalic={themeJson.subtitle_italic === true}
+                    subtitleSpacing={typeof themeJson.subtitle_spacing === "number" ? themeJson.subtitle_spacing : null}
+                    showCompany={themeJson.show_company !== false}
+                    companyColor={typeof themeJson.company_color === "string" ? themeJson.company_color : null}
+                    nameLineHeight={typeof themeJson.name_line_height === "number" ? themeJson.name_line_height : null}
+                    nameTextStroke={themeJson.name_text_stroke === true}
+                    nameTextStrokeWidth={typeof themeJson.name_text_stroke_width === "number" ? (themeJson.name_text_stroke_width as number) : 1}
+                    profession={displayJobTitle}
+                    company={profile.company ?? undefined}
+                    avatarUrl={profile.avatar_url}
+                    coverUrl={coverUrl}
+                    avatarBgColor={themeJson.avatar_bg_color as string | undefined}
+                    avatarRotation={themeJson.avatar_rotation as number | undefined}
+                    avatarBorderWidth={(themeJson.tokens as any)?.header?.avatarBorderWidth ?? 3}
+                    avatarSize={(themeJson.tokens as any)?.header?.avatarSize ?? 80}
+                    avatarBannerText={(themeJson.tokens as any)?.header?.avatarBannerText ?? ""}
+                    avatarBannerBg={(themeJson.tokens as any)?.header?.avatarBannerBg ?? ""}
+                    avatarBannerPosition={(themeJson.tokens as any)?.header?.avatarBannerPosition ?? "bottom"}
+                    avatarBannerAnimation={(themeJson.tokens as any)?.header?.avatarBannerAnimation ?? "none"}
+                    coverOffsetY={themeJson.cover_offset_y as number | undefined}
+                    logoUrl={themeJson.logo_url as string | undefined}
+                    logoFrostedBg={themeJson.logo_frosted_bg !== false}
+                    logoGlow={themeJson.logo_glow === true}
+                    logoPosition={(themeJson.logo_position as any) ?? "top-right"}
+                    logoSize={(themeJson.logo_size as any) ?? "medium"}
+                    logoOpacity={typeof themeJson.logo_opacity === "number" ? (themeJson.logo_opacity as number) : 100}
+                    logoPadding={typeof themeJson.logo_padding === "number" ? (themeJson.logo_padding as number) : 4}
+                    logoNameGap={typeof themeJson.logo_name_gap === "number" ? (themeJson.logo_name_gap as number) : 8}
+                    logoVerticalAlign={(themeJson.logo_vertical_align as any) ?? "center"}
+                    logoCustomPosition={themeJson.logo_custom_position as { x: number; y: number } | undefined}
+                    metallicEffect={metallicEffect}
+                    heroBackground={resolvedHeroBackground}
+                    ctaChildren={heroCtaButtons}
+                    glassHero={theme.section.cardStyle === "glass"}
+                    verificationLevel={profile.verification_level as any}
+                    isAvailable={profile.is_on_duty === true}
+                  />
+                </div>
+
+                {/* Location tag */}
+                {profile.city && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 4, color: `${palette.secondary}90`, fontSize: 12, marginTop: 8, padding: "0 4px" }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                    {profile.city}
+                  </div>
+                )}
+
+                {/* CTA Buttons inside the tile */}
+                {primaryCtaItem && theme.header.layout !== "hero" && (
+                  <div style={{ padding: "0 4px", marginTop: 12 }}>
+                    {ctaIconsOnly ? (
+                      <div style={{ display: "flex", justifyContent: "center", gap: 10 }}>
+                        {enabledCtas.map((ctaItem) => (
+                          <motion.button
+                            key={ctaItem.id}
+                            onClick={() => handleCtaClick(ctaItem.id)}
+                            title={ctaItem.label}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.92 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                            style={{
+                              width: 40, height: 40, borderRadius: "50%",
+                              display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
+                              background: ctaItem.isPrimary ? palette.primary : "transparent",
+                              color: ctaItem.isPrimary ? palette.background : palette.primary,
+                              border: ctaItem.isPrimary ? "none" : `1.5px solid ${palette.primary}40`,
+                            }}
+                          >
+                            {CTA_ICONS[ctaItem.id]}
+                          </motion.button>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{ display: "flex", gap: 6 }}>
+                        {enabledCtas.map((ctaItem) => (
+                          <motion.button
+                            key={ctaItem.id}
+                            onClick={() => handleCtaClick(ctaItem.id)}
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.96 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                            style={{
+                              flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                              padding: "10px 12px", borderRadius: radii.button,
+                              background: ctaItem.isPrimary ? palette.primary : `${palette.primary}10`,
+                              color: ctaItem.isPrimary ? palette.background : palette.primary,
+                              border: "none", fontWeight: 700, fontSize: 12,
+                              fontFamily: `'${fonts.secondary}', sans-serif`, cursor: "pointer",
+                            }}
+                          >
+                            {CTA_ICONS[ctaItem.id]}
+                            <span>{ctaItem.label}</span>
+                          </motion.button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardSectionWrapper>
+            </div>
           );
         })()}
 
