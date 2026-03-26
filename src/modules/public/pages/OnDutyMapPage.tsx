@@ -207,12 +207,7 @@ const ProfessionalListCard = forwardRef<HTMLDivElement, { pro: OnDutyProfessiona
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
             <p className="font-semibold text-sm truncate">{pro.name}</p>
-            {pro.status === "available" && (
-              <span className="h-2 w-2 rounded-full bg-success animate-pulse shrink-0" />
-            )}
-            {pro.status === "recent" && (
-              <span className="h-2 w-2 rounded-full bg-warning shrink-0" />
-            )}
+            <span className="h-2 w-2 rounded-full bg-success animate-pulse shrink-0" />
           </div>
           {pro.profession_name && (
             <p className="text-xs text-muted-foreground truncate">{pro.profession_name}</p>
@@ -385,8 +380,7 @@ export default function OnDutyMapPage() {
   }, [professionals, latestEvent, clearEvent]);
 
   const center = userLocation ?? { lat: 39.8283, lng: -98.5795 };
-  const availableCount = professionals?.filter((p) => p.status === "available").length ?? 0;
-  const recentCount = professionals?.filter((p) => p.status === "recent").length ?? 0;
+  const availableCount = professionals?.length ?? 0;
 
   const handleSelect = useCallback((pro: OnDutyProfessional) => {
     setSelectedPro(pro);
@@ -431,7 +425,7 @@ export default function OnDutyMapPage() {
                 </Badge>
               </h1>
               <p className="text-xs text-muted-foreground">
-                {isLoading ? "Loading..." : `${availableCount} available now · ${recentCount} recently active`}
+                {isLoading ? "Loading..." : `${availableCount} on duty now`}
               </p>
             </div>
           </div>
@@ -462,10 +456,10 @@ export default function OnDutyMapPage() {
       <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-success" /> Available now
+            <span className="h-2.5 w-2.5 rounded-full bg-success" /> On Duty now
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-warning" /> Recently active
+            <Shield className="h-3 w-3" /> Tap a pin to connect instantly
           </span>
           <span className="flex items-center gap-1.5">
             <Shield className="h-3 w-3" /> Tap a pin to connect instantly
