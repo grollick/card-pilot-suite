@@ -52,9 +52,10 @@ export default function QRShareDialog({ url, name = "Card", size = 200 }: QRShar
   return (
     <Dialog modal={false}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="icon" className="h-8 w-8" title="QR Code">
-          <QrCode className="h-4 w-4" />
-        </Button>
+        <button className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-card px-3 py-3 text-foreground shadow-sm hover:bg-accent transition-colors w-full">
+          <QrCode className="h-5 w-5 text-primary" />
+          <span className="text-[10px] font-medium text-muted-foreground">QR Code</span>
+        </button>
       </DialogTrigger>
       <DialogContent className="max-w-xs">
         <DialogHeader>
