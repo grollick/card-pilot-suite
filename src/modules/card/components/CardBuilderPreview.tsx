@@ -477,17 +477,17 @@ export default function CardBuilderPreview({
                                 };
                                 return base[logoPosition] ?? { top: 8, right: 8 };
                               })()),
-                          cursor: onLogoCustomPositionChange ? "grab" : undefined,
-                          userSelect: "none",
-                          touchAction: "none",
+                          cursor: (repositionMode && onLogoCustomPositionChange) ? "grab" : undefined,
+                          userSelect: repositionMode ? "none" : undefined,
+                          touchAction: repositionMode ? "none" : undefined,
                           zIndex: 5,
                         }}
-                        onPointerDown={onLogoCustomPositionChange ? handleLogoPointerDown : undefined}
-                        onPointerMove={onLogoCustomPositionChange ? handleLogoPointerMove : undefined}
-                        onPointerUp={onLogoCustomPositionChange ? handleLogoPointerUp : undefined}
+                        onPointerDown={(repositionMode && onLogoCustomPositionChange) ? handleLogoPointerDown : undefined}
+                        onPointerMove={(repositionMode && onLogoCustomPositionChange) ? handleLogoPointerMove : undefined}
+                        onPointerUp={(repositionMode && onLogoCustomPositionChange) ? handleLogoPointerUp : undefined}
                       >
                         <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain pointer-events-none" />
-                        {onLogoCustomPositionChange && (
+                        {repositionMode && onLogoCustomPositionChange && (
                           <div className="absolute -top-1 -right-1 z-10 opacity-0 group-hover/logo:opacity-100 transition-opacity flex gap-1">
                             <div className="bg-primary/90 text-primary-foreground rounded-full p-1 shadow-md" title="Drag to reposition">
                               <Move className="h-3 w-3" />
