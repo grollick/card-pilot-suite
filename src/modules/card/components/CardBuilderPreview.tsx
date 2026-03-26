@@ -701,6 +701,7 @@ export default function CardBuilderPreview({
                       })()}
                     </div>
                   </CardSectionWrapper>
+                  </div>
 
                   <div className="px-5 pb-5 relative z-[2]">
                     {/* Section Previews — themed to match public card */}
