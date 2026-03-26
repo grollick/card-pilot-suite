@@ -128,11 +128,6 @@ export default function ListingCard({ listing, boosted, variant = "default" }: L
                 {listing.is_on_duty && (
                   <AvailableNowBadge />
                 )}
-                {listing.available_for_work && !listing.is_on_duty && (
-                  <Badge variant="outline" className="text-[10px] font-normal gap-0.5 bg-success/5 text-success border-success/20">
-                    <CheckCircle2 className="h-2.5 w-2.5" /> Available
-                  </Badge>
-                )}
               </div>
             </div>
           </div>
