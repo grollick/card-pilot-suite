@@ -10,25 +10,19 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   MapPin, List, Map as MapIcon, Star, Clock, Zap, Shield,
-  MessageSquare, Eye, Radio, Loader2, ArrowLeft,
+  MessageSquare, Eye, Radio, Loader2, ArrowLeft, AlertTriangle,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import InstantConnectPanel from "@/modules/public/components/InstantConnectPanel";
 
-const MAPBOX_TOKEN =
-  (import.meta.env.VITE_MAPBOX_ACCESS_TOKEN as string | undefined)
-  ?? (import.meta.env.VITE_MAPBOX_PUBLIC_TOKEN as string | undefined)
-  ?? "";
-
-const FALLBACK_RASTER_STYLE = {
-  version: 8,
+/* ─── Map style: pure OSM raster (no token needed) ─── */
+const OSM_STYLE = {
+  version: 8 as const,
   sources: {
     osm: {
-      type: "raster",
+      type: "raster" as const,
       tiles: [
-        "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "https://b.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        "https://c.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
       ],
       tileSize: 256,
       attribution: "© OpenStreetMap contributors",
@@ -36,33 +30,20 @@ const FALLBACK_RASTER_STYLE = {
   },
   layers: [
     {
-      id: "osm",
-      type: "raster",
+      id: "osm-tiles",
+      type: "raster" as const,
       source: "osm",
+      minzoom: 0,
+      maxzoom: 19,
     },
   ],
-} as const;
-
-type MapStyleCandidate = {
-  id: string;
-  style: string | Record<string, unknown>;
 };
 
-const MAP_STYLE_CANDIDATES: MapStyleCandidate[] = [
-  ...(MAPBOX_TOKEN
-    ? [{
-      id: "mapbox-streets",
-      style: `https://api.mapbox.com/styles/v1/mapbox/streets-v12?access_token=${MAPBOX_TOKEN}`,
-    }]
-    : []),
-  {
-    id: "osm-raster-fallback",
-    style: FALLBACK_RASTER_STYLE,
-  },
-];
+/* ─── Static test pin (Kansas, center of US) ─── */
+const STATIC_TEST_PIN = { lat: 39.8283, lng: -98.5795, name: "Test Pin" };
+const DEFAULT_CENTER = { lat: 39.8283, lng: -98.5795 };
 
 const MAX_PINS = 50;
-const MAP_LOAD_TIMEOUT_MS = 12000;
 
 function hasValidCoordinates(pro: OnDutyProfessional) {
   return Number.isFinite(pro.lat)
@@ -78,7 +59,7 @@ function formatResponseTime(min: number | null) {
 }
 
 function hasWebGLSupport() {
-  if (typeof window === "undefined") return true;
+  if (typeof window === "undefined") return false;
   try {
     const canvas = document.createElement("canvas");
     return Boolean(
@@ -92,9 +73,7 @@ function hasWebGLSupport() {
 
 // ── Live activity toast ──
 function LiveActivityToast({
-  professional,
-  onClose,
-  onSelect,
+  professional, onClose, onSelect,
 }: {
   professional: OnDutyProfessional | null;
   onClose: () => void;
@@ -251,16 +230,179 @@ const ProfessionalListCard = forwardRef<HTMLDivElement, { pro: OnDutyProfessiona
 
 ProfessionalListCard.displayName = "ProfessionalListCard";
 
+/* ─── Standalone map wrapper that renders only client-side ─── */
+function OnDutyMapView({
+  professionals,
+  burstingIds,
+  onSelect,
+  userLocation,
+}: {
+  professionals: OnDutyProfessional[];
+  burstingIds: Set<string>;
+  onSelect: (p: OnDutyProfessional) => void;
+  userLocation: { lat: number; lng: number } | null;
+}) {
+  const [mounted, setMounted] = useState(false);
+  const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapError, setMapError] = useState(false);
+  const errorCountRef = useRef(0);
+
+  // Only render map after client mount (prevents SSR/hydration issues)
+  useEffect(() => {
+    console.log("[OnDutyMap] Component mounted, preparing to render map");
+    setMounted(true);
+  }, []);
+
+  const center = userLocation ?? DEFAULT_CENTER;
+
+  const visibleProfessionals = useMemo(() => {
+    const valid = professionals.filter((p) => hasValidCoordinates(p));
+    const sorted = [...valid].sort((a, b) => {
+      if (a.status === "available" && b.status !== "available") return -1;
+      if (a.status !== "available" && b.status === "available") return 1;
+      return 0;
+    });
+    return sorted.slice(0, MAX_PINS);
+  }, [professionals]);
+
+  const handleLoad = useCallback(() => {
+    console.log("[OnDutyMap] ✅ Map initialized successfully");
+    console.log("[OnDutyMap] ✅ Provider loaded: OSM raster tiles");
+    setMapLoaded(true);
+    errorCountRef.current = 0;
+  }, []);
+
+  const handleError = useCallback((event: any) => {
+    errorCountRef.current += 1;
+    const msg = event?.error?.message ?? "unknown";
+    console.error("[OnDutyMap] Map error:", { count: errorCountRef.current, message: msg });
+
+    // Only fail after many consecutive errors
+    if (errorCountRef.current >= 10) {
+      console.error("[OnDutyMap] Too many errors, showing fallback");
+      setMapError(true);
+    }
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="w-full flex items-center justify-center bg-muted/30" style={{ minHeight: 400, height: "calc(100vh - 140px)" }}>
+        <div className="text-center">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">Preparing map…</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (mapError) {
+    return (
+      <div
+        className="w-full flex items-center justify-center bg-muted/30 border border-border rounded-lg"
+        style={{ minHeight: 400, height: "calc(100vh - 140px)" }}
+      >
+        <div className="text-center p-6 max-w-xs">
+          <AlertTriangle className="h-10 w-10 text-warning mx-auto mb-3" />
+          <p className="text-base font-semibold mb-1">Map could not be loaded</p>
+          <p className="text-xs text-muted-foreground mb-4">
+            There was a problem rendering the map. Please try the list view instead.
+          </p>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setMapError(false);
+              setMapLoaded(false);
+              errorCountRef.current = 0;
+            }}
+          >
+            Retry Map
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  console.log("[OnDutyMap] Rendering MapGL component", {
+    center,
+    pinCount: visibleProfessionals.length,
+    testPin: STATIC_TEST_PIN,
+  });
+
+  return (
+    <div
+      className="w-full relative"
+      style={{ minHeight: 400, height: "calc(100vh - 140px)" }}
+    >
+      <MapGL
+        initialViewState={{
+          longitude: center.lng,
+          latitude: center.lat,
+          zoom: userLocation ? 11 : 4,
+        }}
+        style={{ width: "100%", height: "100%" }}
+        mapStyle={OSM_STYLE as any}
+        attributionControl={true as any}
+        onLoad={handleLoad}
+        onError={handleError}
+      >
+        <NavigationControl position="top-right" />
+
+        {/* Static test pin — always visible for debugging */}
+        <Marker
+          longitude={STATIC_TEST_PIN.lng}
+          latitude={STATIC_TEST_PIN.lat}
+          anchor="center"
+        >
+          <div
+            className="rounded-full border-2 border-background shadow-lg"
+            style={{
+              width: 16,
+              height: 16,
+              backgroundColor: "hsl(var(--primary))",
+              boxShadow: "0 0 8px hsl(var(--primary) / 0.5)",
+            }}
+            title="Static test pin"
+          />
+        </Marker>
+
+        {/* Live professional pins */}
+        {visibleProfessionals.map((pro) => (
+          <Marker
+            key={pro.id}
+            longitude={pro.lng}
+            latitude={pro.lat}
+            anchor="center"
+          >
+            <DutyPin
+              pro={pro}
+              isBursting={burstingIds.has(pro.id)}
+              onClick={() => onSelect(pro)}
+            />
+          </Marker>
+        ))}
+      </MapGL>
+
+      {!mapLoaded && (
+        <div className="absolute left-1/2 -translate-x-1/2 bottom-4 z-[500] rounded-lg bg-card/95 border border-border px-3 py-2 shadow-sm flex items-center gap-2 text-xs text-muted-foreground">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          Loading map tiles…
+        </div>
+      )}
+
+      {mapLoaded && (
+        <div className="absolute right-2 bottom-2 z-[500] rounded bg-card/80 border border-border px-2 py-1 text-[10px] text-muted-foreground">
+          {visibleProfessionals.length} pins + 1 test pin
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function OnDutyMapPage() {
   const webGLAvailable = useMemo(() => hasWebGLSupport(), []);
   const [view, setView] = useState<"map" | "list">(webGLAvailable ? "map" : "list");
   const [selectedPro, setSelectedPro] = useState<OnDutyProfessional | null>(null);
-  const [mapError, setMapError] = useState(!webGLAvailable);
-  const [mapReady, setMapReady] = useState(false);
-  const [mapIdle, setMapIdle] = useState(false);
-  const [mapInstanceKey, setMapInstanceKey] = useState(0);
-  const [mapStyleIndex, setMapStyleIndex] = useState(0);
-  const [mapFetchErrorCount, setMapFetchErrorCount] = useState(0);
   const { data: professionals, isLoading } = useOnDutyProfessionals();
   const { location: userLocation } = useUserLocation();
   const { latestEvent, clearEvent } = useOnDutyRealtime();
@@ -268,95 +410,34 @@ export default function OnDutyMapPage() {
   const [burstingIds, setBurstingIds] = useState<Set<string>>(new Set());
   const [toastPro, setToastPro] = useState<OnDutyProfessional | null>(null);
   const [professionFilter, setProfessionFilter] = useState<string | null>(null);
-  const prevIdsRef = useRef<Set<string>>(new Set());
-  // Unique profession names for filter chips
+
+  // Debug: log WebGL support
+  useEffect(() => {
+    console.log("[OnDutyMap] WebGL available:", webGLAvailable);
+    console.log("[OnDutyMap] Initial view:", webGLAvailable ? "map" : "list");
+  }, [webGLAvailable]);
+
   const professionNames = useMemo(() => {
     if (!professionals) return [];
     const names = new Set(professionals.map((p) => p.profession_name).filter(Boolean) as string[]);
     return [...names].sort();
   }, [professionals]);
 
-  // Filtered list for the list view
   const filteredProfessionals = useMemo(() => {
     if (!professionals) return [];
     if (!professionFilter) return professionals;
     return professionals.filter((p) => p.profession_name === professionFilter);
   }, [professionals, professionFilter]);
 
-  const mapErrorCountRef = useRef(0);
-  const mapReadyRef = useRef(false);
-  const activeMapStyle = MAP_STYLE_CANDIDATES[mapStyleIndex] ?? MAP_STYLE_CANDIDATES[0];
-
-  useEffect(() => {
-    if (MAPBOX_TOKEN) return;
-    console.warn("[OnDutyMap] Missing Mapbox token, starting with non-Mapbox fallback styles");
-  }, []);
-
-  useEffect(() => {
-    mapReadyRef.current = mapReady;
-  }, [mapReady]);
-
-  // Auto-fallback to list when map fails
-  useEffect(() => {
-    if (mapError && view === "map") {
-      setView("list");
-    }
-  }, [mapError, view]);
-
-  useEffect(() => {
-    if (view !== "map" || mapReady || mapError) return;
-
-    const timeout = setTimeout(() => {
-      if (!mapReadyRef.current) {
-        console.error(`[OnDutyMap] Map did not become ready within ${MAP_LOAD_TIMEOUT_MS}ms`);
-        setMapError(true);
-      }
-    }, MAP_LOAD_TIMEOUT_MS);
-
-    return () => clearTimeout(timeout);
-  }, [view, mapReady, mapError, mapInstanceKey]);
-
-  useEffect(() => {
-    if (view !== "map" || !mapReady || mapIdle) return;
-    if (mapError) return;
-
-    const timeout = setTimeout(() => {
-      if (!mapIdle) {
-        console.warn("[OnDutyMap] Tiles never became ready after map load");
-        setMapError(true);
-      }
-    }, 7000);
-
-    return () => clearTimeout(timeout);
-  }, [view, mapReady, mapIdle, mapError, mapInstanceKey, mapStyleIndex]);
-
   // Debug logging
   useEffect(() => {
     if (professionals) {
       const withCoords = professionals.filter((p) => hasValidCoordinates(p));
-      const withoutCoords = professionals.filter((p) => !hasValidCoordinates(p));
-      console.log(`[OnDutyMap] Fetched: ${professionals.length} users, ${withCoords.length} with coords, ${withoutCoords.length} missing coords`);
-      if (withoutCoords.length > 0) {
-        console.warn("[OnDutyMap] Users missing coordinates:", withoutCoords.map((p) => p.id));
-      }
+      console.log(`[OnDutyMap] Fetched: ${professionals.length} users, ${withCoords.length} with valid coords`);
     }
   }, [professionals]);
 
-  // Limit pins for performance
-  const visibleProfessionals = useMemo(() => {
-    if (!professionals) return [];
-    const valid = professionals.filter((p) => hasValidCoordinates(p));
-    const sorted = [...valid].sort((a, b) => {
-      if (a.status === "available" && b.status !== "available") return -1;
-      if (a.status !== "available" && b.status === "available") return 1;
-      return 0;
-    });
-    const limited = sorted.slice(0, MAX_PINS);
-    console.log(`[OnDutyMap] Rendering ${limited.length} pins (max ${MAX_PINS})`);
-    return limited;
-  }, [professionals]);
-
-  // When realtime event fires and data refreshes, detect new arrivals
+  // Realtime events
   useEffect(() => {
     if (!professionals || !latestEvent) return;
     if (!latestEvent.isOnDuty) return;
@@ -373,30 +454,16 @@ export default function OnDutyMapPage() {
         });
       }, 4000);
     }
-
-    prevIdsRef.current = new Set(professionals.map((p) => p.id));
     clearEvent();
   }, [professionals, latestEvent, clearEvent]);
 
-  const center = userLocation ?? { lat: 39.8283, lng: -98.5795 };
   const availableCount = professionals?.length ?? 0;
-
   const handleSelect = useCallback((pro: OnDutyProfessional) => {
     setSelectedPro(pro);
     setToastPro(null);
   }, []);
-
   const handleClose = useCallback(() => setSelectedPro(null), []);
   const handleToastClose = useCallback(() => setToastPro(null), []);
-  const handleRetryMap = useCallback(() => {
-    setMapError(false);
-    setMapReady(false);
-    setMapIdle(false);
-    setMapStyleIndex(0);
-    setMapFetchErrorCount(0);
-    mapErrorCountRef.current = 0;
-    setMapInstanceKey((prev) => prev + 1);
-  }, []);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -460,9 +527,6 @@ export default function OnDutyMapPage() {
           <span className="flex items-center gap-1.5">
             <Shield className="h-3 w-3" /> Tap a pin to connect instantly
           </span>
-          <span className="flex items-center gap-1.5">
-            <Shield className="h-3 w-3" /> Tap a pin to connect instantly
-          </span>
         </div>
       </div>
 
@@ -474,110 +538,13 @@ export default function OnDutyMapPage() {
           </div>
         </div>
       ) : view === "map" ? (
-        <div className="flex-1 relative" style={{ minHeight: "420px", height: "calc(100vh - 120px)" }}>
-          {mapError ? (
-            <div className="absolute inset-0 flex items-center justify-center bg-muted/50 z-10">
-              <div className="text-center p-6 bg-card rounded-xl border border-border shadow-lg max-w-xs">
-                <MapIcon className="h-10 w-10 text-primary mx-auto mb-3" />
-                <p className="text-base font-semibold mb-1">Map View — Coming Soon</p>
-                <p className="text-xs text-muted-foreground mb-4">
-                  Coming soon — please use list mode.
-                </p>
-                <Button size="sm" className="w-full" onClick={() => setView("list")}>
-                  <List className="h-3.5 w-3.5 mr-1.5" /> View Available Professionals
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <MapGL
-              key={mapInstanceKey}
-              initialViewState={{
-                longitude: center.lng,
-                latitude: center.lat,
-                zoom: userLocation ? 11 : 4,
-              }}
-              style={{ width: "100%", height: "100%" }}
-              mapStyle={activeMapStyle.style as any}
-              attributionControl={true as any}
-              onLoad={() => {
-                setMapReady(true);
-                setMapIdle(false);
-                setMapFetchErrorCount(0);
-                mapErrorCountRef.current = 0;
-                console.log("[OnDutyMap] Map became ready", { style: activeMapStyle.id });
-              }}
-              onIdle={() => {
-                setMapIdle(true);
-              }}
-              onError={(event: any) => {
-                mapErrorCountRef.current += 1;
-                setMapFetchErrorCount(mapErrorCountRef.current);
-                console.error("[OnDutyMap] MapLibre event error", {
-                  count: mapErrorCountRef.current,
-                  message: event?.error?.message ?? null,
-                  sourceId: event?.sourceId ?? null,
-                  type: event?.type ?? null,
-                  style: activeMapStyle.id,
-                });
-
-                const message = String(event?.error?.message ?? "").toLowerCase();
-                const looksLikeFetchFailure = message.includes("failed to fetch") || message.includes("network");
-
-                if (looksLikeFetchFailure && mapErrorCountRef.current >= 5) {
-                  setMapError(true);
-                  return;
-                }
-
-                if (!mapReadyRef.current && looksLikeFetchFailure && mapStyleIndex < MAP_STYLE_CANDIDATES.length - 1) {
-                  const nextIndex = mapStyleIndex + 1;
-                  console.warn("[OnDutyMap] Switching map style fallback", {
-                    from: activeMapStyle.id,
-                    to: MAP_STYLE_CANDIDATES[nextIndex]?.id,
-                  });
-                  mapErrorCountRef.current = 0;
-                  setMapReady(false);
-                  setMapIdle(false);
-                  setMapStyleIndex(nextIndex);
-                  setMapInstanceKey((prev) => prev + 1);
-                  return;
-                }
-
-                if (!mapReadyRef.current && mapErrorCountRef.current >= 3) {
-                  setMapError(true);
-                }
-              }}
-            >
-              <NavigationControl position="top-right" />
-
-              {visibleProfessionals.map((pro) => (
-                <Marker
-                  key={pro.id}
-                  longitude={pro.lng}
-                  latitude={pro.lat}
-                  anchor="center"
-                >
-                  <DutyPin
-                    pro={pro}
-                    isBursting={burstingIds.has(pro.id)}
-                    onClick={() => handleSelect(pro)}
-                  />
-                </Marker>
-              ))}
-            </MapGL>
-          )}
-
-          {!mapReady && !mapError && (
-            <div className="absolute left-1/2 -translate-x-1/2 bottom-4 z-[500] rounded-lg bg-card/95 border border-border px-3 py-2 shadow-sm flex items-center gap-2 text-xs text-muted-foreground">
-              <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              Loading map tiles…
-            </div>
-          )}
-
-          {mapReady && !mapError && mapFetchErrorCount >= 3 && (
-            <div className="absolute left-1/2 -translate-x-1/2 top-4 z-[500] rounded-lg bg-card/95 border border-border px-3 py-2 shadow-sm text-xs text-muted-foreground">
-              Having trouble loading map tiles…
-            </div>
-          )}
+        <div className="flex-1 relative">
+          <OnDutyMapView
+            professionals={professionals ?? []}
+            burstingIds={burstingIds}
+            onSelect={handleSelect}
+            userLocation={userLocation}
+          />
 
           <LiveActivityToast
             professional={toastPro}
@@ -585,7 +552,7 @@ export default function OnDutyMapPage() {
             onSelect={handleSelect}
           />
 
-          {!visibleProfessionals.length && !mapError && (
+          {(professionals ?? []).filter(hasValidCoordinates).length === 0 && (
             <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[500] bg-card border border-border rounded-xl p-4 shadow-lg text-center max-w-xs">
               <MapPin className="h-5 w-5 text-muted-foreground mx-auto mb-2" />
               <p className="text-sm font-medium">No active users yet</p>
