@@ -131,8 +131,16 @@ export function useOnDutyProfessionals() {
       const professionMap = new Map<string, string>();
       (professionsRes.data ?? []).forEach((p: any) => professionMap.set(p.id, p.name));
 
+      // Only on-duty users (already filtered by query)
+      const onDutySet = new Set<string>();
+      (dutyRes.data ?? []).forEach((d: any) => onDutySet.add(d.user_id));
+
       const dutyMap = new Map<string, any>();
       (dutyRes.data ?? []).forEach((d: any) => dutyMap.set(d.user_id, d));
+
+      // Only users with published cards
+      const publishedSet = new Set<string>();
+      (cardsRes.data ?? []).forEach((c: any) => publishedSet.add(c.user_id));
 
       const ratingsMap: Record<string, { avg: number; count: number }> = {};
       const grouped: Record<string, number[]> = {};
@@ -145,33 +153,19 @@ export function useOnDutyProfessionals() {
         ratingsMap[uid] = { avg: Math.round(avg * 10) / 10, count: ratings.length };
       }
 
-      const now = Date.now();
-      const twoHoursMs = 2 * 60 * 60 * 1000;
-
-      return enabled
+      const results = enabled
+        // Must be on duty AND have a published card AND have a city/coords
+        .filter((p: any) => onDutySet.has(p.id) && publishedSet.has(p.id))
         .map((p: any) => {
           const duty = dutyMap.get(p.id);
           const coords = cityToCoords(p.city, p.id, p.service_area);
           if (!coords) return null;
 
-          let status: "available" | "recent" | "offline" = "offline";
-          if (duty?.is_on_duty) {
-            status = "available";
-          } else if (duty?.updated_at && now - new Date(duty.updated_at).getTime() < twoHoursMs) {
-            status = "recent";
-          } else if (p.available_for_work) {
-            status = "offline";
-          }
-
-          // Only show available and recent on the map
-          if (status === "offline") return null;
-
-          const badges: string[] = [];
+          const badges: string[] = ["On Duty"];
           const respMin = p.avg_response_minutes;
           if (respMin && respMin < 30) badges.push("Fast Responder");
           const rd = ratingsMap[p.id];
           if (rd && rd.avg >= 4.5 && rd.count >= 3) badges.push("Highly Rated");
-          if (duty?.is_on_duty) badges.push("On Duty");
 
           return {
             id: p.id,
@@ -185,7 +179,7 @@ export function useOnDutyProfessionals() {
             avg_rating: rd?.avg ?? null,
             review_count: rd?.count ?? 0,
             avg_response_minutes: respMin ?? null,
-            status,
+            status: "available" as const,
             went_on_duty_at: duty?.went_on_duty_at ?? null,
             badges,
             lat: coords.lat,
@@ -193,6 +187,9 @@ export function useOnDutyProfessionals() {
           } satisfies OnDutyProfessional;
         })
         .filter(Boolean) as OnDutyProfessional[];
+
+      console.log(`[OnDutyMap] Data: ${enabled.length} marketplace profiles, ${onDutySet.size} on duty, ${publishedSet.size} published, ${results.length} valid for map`);
+      return results;
     },
   });
 }
