@@ -385,8 +385,7 @@ export default function OnDutyMapPage() {
   }, [professionals, latestEvent, clearEvent]);
 
   const center = userLocation ?? { lat: 39.8283, lng: -98.5795 };
-  const availableCount = professionals?.filter((p) => p.status === "available").length ?? 0;
-  const recentCount = professionals?.filter((p) => p.status === "recent").length ?? 0;
+  const availableCount = professionals?.length ?? 0;
 
   const handleSelect = useCallback((pro: OnDutyProfessional) => {
     setSelectedPro(pro);
