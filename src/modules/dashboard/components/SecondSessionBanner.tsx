@@ -51,7 +51,7 @@ export default function SecondSessionBanner() {
       const [leadsRes, bookingsRes, dutyRes, matchesRes] = await Promise.all([
         supabase.from("leads").select("id", { count: "exact", head: true }).eq("user_id", userId),
         supabase.from("bookings").select("id", { count: "exact", head: true }).eq("user_id", userId),
-        supabase.from("estimate_duty_status").select("is_on_duty").eq("user_id", userId).maybeSingle(),
+        supabase.from("estimate_duty_status").select("is_on_duty, leads_received").eq("user_id", userId).maybeSingle(),
         supabase.from("estimate_matches").select("id", { count: "exact", head: true })
           .eq("user_id", userId).eq("status", "pending"),
       ]);

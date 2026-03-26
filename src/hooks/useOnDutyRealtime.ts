@@ -28,7 +28,10 @@ export function useOnDutyRealtime() {
     };
 
     setLatestEvent(event);
+    // Invalidate ALL presence-related queries for global sync
     qc.invalidateQueries({ queryKey: ["on-duty-map"] });
+    qc.invalidateQueries({ queryKey: ["estimate-duty-status"] });
+    qc.invalidateQueries({ queryKey: ["marketplace"] });
   }, [qc]);
 
   useEffect(() => {
