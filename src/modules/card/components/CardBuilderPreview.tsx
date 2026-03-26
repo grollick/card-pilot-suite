@@ -419,6 +419,14 @@ export default function CardBuilderPreview({
           )}
         </div>
       )}
+      {(onIdentityPositionChange || onLogoCustomPositionChange) && (
+        <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/50 px-3 py-1.5 mt-2">
+          <Switch checked={repositionMode} onCheckedChange={setRepositionMode} id="reposition-toggle" />
+          <label htmlFor="reposition-toggle" className="text-xs text-muted-foreground font-medium cursor-pointer select-none flex items-center gap-1.5">
+            <Move className="h-3 w-3" />Drag to reposition avatar & logo
+          </label>
+        </div>
+      )}
 
       {/* Device Frame */}
       <div className="flex items-start justify-center py-4 transition-all duration-300">
