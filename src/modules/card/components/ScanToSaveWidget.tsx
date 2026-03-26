@@ -42,8 +42,24 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-      setContact(data.contact);
+
+      const extracted = data?.contact;
+      if (!extracted || typeof extracted !== "object") {
+        throw new Error("Could not read this card. Please try a clearer photo.");
+      }
+
+      setContact({
+        name: extracted.name ?? "",
+        email: extracted.email ?? "",
+        phone: extracted.phone ?? "",
+        company: extracted.company ?? "",
+        job_title: extracted.job_title ?? "",
+        website: extracted.website ?? "",
+        address: extracted.address ?? "",
+        notes: extracted.notes ?? "",
+      });
       setStep("review");
+      toast.success("Card scanned. Please confirm and share.");
     } catch (err: any) {
       toast.error(err.message || "Failed to scan card");
       setStep("idle");
