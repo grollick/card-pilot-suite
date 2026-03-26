@@ -572,14 +572,6 @@ export default function CardBuilderPreview({
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-2xl">
                           <CreditCard className="h-5 w-5 text-white" />
         </div>
-        {(onIdentityPositionChange || onLogoCustomPositionChange) && (
-          <div className="flex items-center gap-2">
-            <Switch checked={repositionMode} onCheckedChange={setRepositionMode} id="reposition-toggle" />
-            <label htmlFor="reposition-toggle" className="text-xs text-muted-foreground font-medium cursor-pointer select-none">
-              <Move className="h-3 w-3 inline mr-1" />Reposition
-            </label>
-          </div>
-        )}
       </div>
                       <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
                         onChange={async (e) => {
