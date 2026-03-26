@@ -106,10 +106,11 @@ export function useOnDutyProfessionals() {
       const userIds = enabled.map((p: any) => p.id);
       const professionIds = [...new Set(enabled.map((p: any) => p.profession_id).filter(Boolean))];
 
-      const [dutyRes, ratingsRes, professionsRes] = await Promise.all([
+      const [dutyRes, ratingsRes, professionsRes, cardsRes] = await Promise.all([
         supabase
           .from("estimate_duty_status")
           .select("user_id, is_on_duty, went_on_duty_at, updated_at")
+          .eq("is_on_duty", true)
           .in("user_id", userIds),
         supabase
           .from("reviews")
@@ -119,6 +120,12 @@ export function useOnDutyProfessionals() {
         professionIds.length > 0
           ? supabase.from("professions").select("id, name").in("id", professionIds)
           : Promise.resolve({ data: [] }),
+        // Only show users with published cards
+        supabase
+          .from("cards")
+          .select("user_id")
+          .eq("status", "published")
+          .in("user_id", userIds),
       ]);
 
       const professionMap = new Map<string, string>();
