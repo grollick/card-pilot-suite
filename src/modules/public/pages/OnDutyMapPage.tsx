@@ -54,7 +54,7 @@ export default function OnDutyMapPage() {
         style: `https://api.mapbox.com/styles/v1/mapbox/streets-v12?access_token=${MAPBOX_TOKEN}`,
         center: STATIC_CENTER,
         zoom: 4,
-        attributionControl: true,
+        attributionControl: false,
       });
 
       map.on("load", () => {
