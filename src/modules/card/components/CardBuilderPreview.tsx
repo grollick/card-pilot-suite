@@ -540,7 +540,7 @@ export default function CardBuilderPreview({
                       onPointerUp={(repositionMode && onIdentityPositionChange) ? handlePointerUp : undefined}
                     >
                       {/* Drag handle indicator */}
-                      {onIdentityPositionChange && (
+                      {repositionMode && onIdentityPositionChange && (
                         <div className="absolute -top-1 -right-1 z-10 opacity-0 group-hover/drag:opacity-100 transition-opacity flex gap-1">
                           <div className="bg-primary/90 text-primary-foreground rounded-full p-1 shadow-md" title="Drag to reposition">
                             <Move className="h-3 w-3" />
