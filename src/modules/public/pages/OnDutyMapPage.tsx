@@ -430,7 +430,7 @@ export default function OnDutyMapPage() {
                 </Badge>
               </h1>
               <p className="text-xs text-muted-foreground">
-                {isLoading ? "Loading..." : `${availableCount} available now · ${recentCount} recently active`}
+                {isLoading ? "Loading..." : `${availableCount} on duty now`}
               </p>
             </div>
           </div>
