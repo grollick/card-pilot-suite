@@ -1,11 +1,12 @@
-import { useEffect, useRef, useMemo, useState, useCallback } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
-import { MapPin, List, Radio, ArrowRight } from "lucide-react";
+import { MapPin, List, Radio, ArrowRight, Map, Phone } from "lucide-react";
 import { useOnDutyProfessionals } from "@/hooks/useOnDutyMap";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -13,104 +14,14 @@ import "maplibre-gl/dist/maplibre-gl.css";
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ?? "pk.eyJ1IjoiZ3JvbGxpY2siLCJhIjoiY21uODFjNjY0MDZpcTMxcTRhZGVjcGZleiJ9.NVS5tdI_TZRyZv0299LCqQ";
 const HAS_TOKEN = Boolean(MAPBOX_TOKEN.trim());
 
-/* ── static test data ── */
-const STATIC_CENTER: [number, number] = [-98.5795, 39.8283]; // lng, lat — center US
-const STATIC_PIN = { lng: -98.5795, lat: 39.8283 };
+const STATIC_CENTER: [number, number] = [-98.5795, 39.8283];
 
-type MapStatus = "loading" | "ready" | "error" | "no-token";
+type MapStatus = "idle" | "loading" | "ready" | "error" | "no-token";
 
 export default function OnDutyMapPage() {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
-  const [mounted, setMounted] = useState(false);
-  const [mapStatus, setMapStatus] = useState<MapStatus>("loading");
-  const [mapError, setMapError] = useState<string | null>(null);
   const navigate = useNavigate();
-
   const { data: professionals = [], isLoading } = useOnDutyProfessionals();
-
-  /* ── mount guard ── */
-  useEffect(() => {
-    setMounted(true);
-    console.info("[Map] client mounted");
-    console.info(`[Map] token ${HAS_TOKEN ? "found (VITE_MAPBOX_TOKEN)" : "missing"}`);
-  }, []);
-
-  /* ── map init ── */
-  useEffect(() => {
-    if (!mounted) return;
-    if (!HAS_TOKEN) {
-      setMapStatus("no-token");
-      console.warn("[Map] init skipped — no token");
-      return;
-    }
-    if (!mapContainerRef.current) return;
-    if (mapRef.current) return;
-
-    let timeoutId: ReturnType<typeof setTimeout>;
-
-    try {
-      const styleUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v12?access_token=${MAPBOX_TOKEN}`;
-      console.info("[Map] initializing…");
-      console.info("[Map] token detected: yes");
-      console.info(`[Map] style URL: ${styleUrl.slice(0, 70)}…`);
-
-      const map = new maplibregl.Map({
-        container: mapContainerRef.current,
-        style: styleUrl,
-        center: STATIC_CENTER,
-        zoom: 4,
-        attributionControl: false,
-      });
-
-      // Timeout: if map hasn't loaded in 15s, treat as failure
-      timeoutId = setTimeout(() => {
-        if (mapStatus === "loading") {
-          console.error("[Map] timed out after 15s — style may have failed silently");
-          setMapError("Map timed out. Token detected: yes. Style request may have failed — check network tab for 401/403.");
-          setMapStatus("error");
-        }
-      }, 15000);
-
-      map.on("load", () => {
-        clearTimeout(timeoutId);
-        console.info("[Map] ✓ style loaded, provider initialized");
-
-        new maplibregl.Marker({ color: "#22c55e" })
-          .setLngLat([STATIC_PIN.lng, STATIC_PIN.lat])
-          .setPopup(new maplibregl.Popup().setHTML("<b>Test Pin</b><br/>Static marker"))
-          .addTo(map);
-
-        console.info("[Map] ✓ static test marker rendered");
-        setMapStatus("ready");
-      });
-
-      map.on("error", (e) => {
-        clearTimeout(timeoutId);
-        const msg = e.error?.message ?? "Unknown map error";
-        console.error("[Map] error event:", msg);
-        console.error("[Map] diagnostics — token detected: yes | style request failed: likely yes | provider init failed: yes");
-        setMapError(`Token detected: yes. Provider error: ${msg}`);
-        setMapStatus("error");
-      });
-
-      mapRef.current = map;
-    } catch (err: any) {
-      console.error("[Map] init exception:", err);
-      setMapError(`Token detected: yes. Init exception: ${err?.message ?? "unknown"}`);
-      setMapStatus("error");
-    }
-
-    return () => {
-      clearTimeout(timeoutId!);
-      mapRef.current?.remove();
-      mapRef.current = null;
-    };
-  }, [mounted]);
-
-  const scrollToList = useCallback(() => {
-    document.getElementById("on-duty-list")?.scrollIntoView({ behavior: "smooth" });
-  }, []);
+  const [activeTab, setActiveTab] = useState("list");
 
   return (
     <div className="min-h-screen w-full bg-background">
@@ -125,132 +36,238 @@ export default function OnDutyMapPage() {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Available Now Near You</h1>
         </div>
 
-        {/* ── Map area ── */}
-        <section className="relative w-full rounded-xl border border-border bg-muted/30 overflow-hidden mb-8"
-                 style={{ minHeight: 500 }}>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="mb-6">
+            <TabsTrigger value="list" className="gap-1.5">
+              <List className="h-4 w-4" /> List View
+            </TabsTrigger>
+            <TabsTrigger value="map" className="gap-1.5">
+              <Map className="h-4 w-4" /> Map View
+            </TabsTrigger>
+          </TabsList>
 
-          {/* Map container — always in DOM so maplibre can attach */}
-          <div
-            ref={mapContainerRef}
-            className="absolute inset-0 w-full h-full"
-            style={{ minHeight: 500, display: HAS_TOKEN ? "block" : "none" }}
-          />
+          <TabsContent value="list">
+            <ProfessionalList professionals={professionals} isLoading={isLoading} navigate={navigate} />
+          </TabsContent>
 
-          {/* Overlays based on status */}
-          {!mounted && (
-            <div className="flex min-h-[500px] items-center justify-center">
-              <p className="text-sm text-muted-foreground">Loading map…</p>
+          <TabsContent value="map">
+            <MapPanel professionals={professionals} onSwitchToList={() => setActiveTab("list")} navigate={navigate} />
+            {/* Also show list below map for redundancy */}
+            <div className="mt-8">
+              <ProfessionalList professionals={professionals} isLoading={isLoading} navigate={navigate} />
             </div>
-          )}
-
-          {mounted && mapStatus === "no-token" && (
-            <div className="flex min-h-[500px] flex-col items-center justify-center gap-4 px-6 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
-                <MapPin className="h-7 w-7 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-lg font-semibold text-foreground">Map unavailable right now</p>
-                <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-                  Use the list view to see available professionals.
-                </p>
-              </div>
-              <Button variant="outline" size="sm" onClick={scrollToList}>
-                <List className="mr-2 h-4 w-4" />
-                Switch to List View
-              </Button>
-            </div>
-          )}
-
-          {mounted && mapStatus === "error" && (
-            <div className="flex min-h-[500px] flex-col items-center justify-center gap-4 px-6 text-center">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
-                <MapPin className="h-7 w-7 text-destructive" />
-              </div>
-              <div>
-                <p className="text-lg font-semibold text-foreground">Map could not be loaded</p>
-                {mapError && (
-                  <p className="mt-1 max-w-md text-xs text-muted-foreground font-mono break-all">{mapError}</p>
-                )}
-              </div>
-              <Button variant="outline" size="sm" onClick={scrollToList}>
-                <List className="mr-2 h-4 w-4" />
-                Switch to List View
-              </Button>
-            </div>
-          )}
-
-          {mounted && mapStatus === "loading" && HAS_TOKEN && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-              <p className="text-sm text-muted-foreground bg-background/80 px-3 py-1 rounded">Map loading…</p>
-            </div>
-          )}
-        </section>
-
-        {/* ── LIST VIEW ── */}
-        <section id="on-duty-list">
-          <div className="flex items-center gap-2 mb-4">
-            <List className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold text-foreground">On Duty Professionals</h2>
-          </div>
-
-          {isLoading ? (
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-20 animate-pulse rounded-lg border border-border bg-muted/40" />
-              ))}
-            </div>
-          ) : professionals.length === 0 ? (
-            <div className="rounded-lg border border-border bg-card px-6 py-10 text-center">
-              <p className="text-sm text-muted-foreground">No professionals are on duty right now. Check back soon.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {professionals.map((pro) => (
-                <div
-                  key={pro.id}
-                  className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-accent/30"
-                >
-                  <Avatar className="h-11 w-11 shrink-0">
-                    <AvatarImage src={pro.avatar_url ?? undefined} alt={pro.name} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-semibold">
-                      {pro.name?.charAt(0) ?? "?"}
-                    </AvatarFallback>
-                  </Avatar>
-
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-foreground truncate">{pro.name}</p>
-                    <p className="text-xs text-muted-foreground truncate">
-                      {[pro.profession_name, pro.company, pro.city].filter(Boolean).join(" · ")}
-                    </p>
-                    <div className="mt-1 flex flex-wrap gap-1">
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 bg-green-500/15 text-green-700 border-0">
-                        On Duty
-                      </Badge>
-                      {pro.avg_rating !== null && (
-                        <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                          ★ {pro.avg_rating}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex shrink-0 gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-xs"
-                      onClick={() => navigate(`/site/${pro.handle}`)}
-                    >
-                      View
-                      <ArrowRight className="ml-1 h-3 w-3" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
+  );
+}
+
+/* ── LIST VIEW ── */
+function ProfessionalList({
+  professionals,
+  isLoading,
+  navigate,
+}: {
+  professionals: any[];
+  isLoading: boolean;
+  navigate: ReturnType<typeof useNavigate>;
+}) {
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="h-24 animate-pulse rounded-xl border border-border bg-muted/40" />
+        ))}
+      </div>
+    );
+  }
+
+  if (professionals.length === 0) {
+    return (
+      <div className="rounded-xl border border-border bg-card px-6 py-14 text-center">
+        <Radio className="mx-auto h-10 w-10 text-muted-foreground/50 mb-3" />
+        <p className="text-base font-medium text-foreground">No professionals are on duty right now</p>
+        <p className="mt-1 text-sm text-muted-foreground">Check back soon — professionals go on duty throughout the day.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {professionals.map((pro) => (
+        <div
+          key={pro.id}
+          className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 shadow-sm transition-all hover:shadow-md hover:border-primary/20"
+        >
+          <Avatar className="h-12 w-12 shrink-0 ring-2 ring-green-500/30">
+            <AvatarImage src={pro.avatar_url ?? undefined} alt={pro.name} />
+            <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+              {pro.name?.charAt(0) ?? "?"}
+            </AvatarFallback>
+          </Avatar>
+
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground truncate">{pro.name}</p>
+            <p className="text-xs text-muted-foreground truncate">
+              {[pro.profession_name, pro.company, pro.city].filter(Boolean).join(" · ")}
+            </p>
+            <div className="mt-1.5 flex flex-wrap gap-1.5">
+              <Badge variant="secondary" className="text-[10px] px-2 py-0.5 bg-green-500/15 text-green-700 dark:text-green-400 border-0 font-medium">
+                ● On Duty
+              </Badge>
+              {pro.avg_rating !== null && (
+                <Badge variant="outline" className="text-[10px] px-2 py-0.5">
+                  ★ {pro.avg_rating}
+                </Badge>
+              )}
+              {pro.badges?.includes("Fast Responder") && (
+                <Badge variant="outline" className="text-[10px] px-2 py-0.5 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800">
+                  ⚡ Fast
+                </Badge>
+              )}
+            </div>
+          </div>
+
+          <div className="flex shrink-0 gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs"
+              onClick={() => navigate(`/site/${pro.handle}`)}
+            >
+              View <ArrowRight className="ml-1 h-3 w-3" />
+            </Button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ── MAP PANEL ── */
+function MapPanel({
+  professionals,
+  onSwitchToList,
+  navigate,
+}: {
+  professionals: any[];
+  onSwitchToList: () => void;
+  navigate: ReturnType<typeof useNavigate>;
+}) {
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
+  const [mapStatus, setMapStatus] = useState<MapStatus>("idle");
+  const [mapError, setMapError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!HAS_TOKEN) {
+      console.warn("[Map] no token — skipping init");
+      setMapStatus("no-token");
+      return;
+    }
+    if (!mapContainerRef.current || mapRef.current) return;
+
+    setMapStatus("loading");
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    try {
+      const styleUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v12?access_token=${MAPBOX_TOKEN}`;
+      console.info("[Map] init with token, style:", styleUrl.slice(0, 70) + "…");
+
+      const map = new maplibregl.Map({
+        container: mapContainerRef.current,
+        style: styleUrl,
+        center: STATIC_CENTER,
+        zoom: 4,
+        attributionControl: false,
+      });
+
+      timeoutId = setTimeout(() => {
+        if (mapStatus === "loading") {
+          console.error("[Map] timed out 15s");
+          setMapError("Map timed out — style may have failed.");
+          setMapStatus("error");
+        }
+      }, 15000);
+
+      map.on("load", () => {
+        clearTimeout(timeoutId);
+        console.info("[Map] ✓ loaded");
+
+        // Add markers for on-duty professionals
+        const pts = professionals.length > 0 ? professionals : [{ lat: STATIC_CENTER[1], lng: STATIC_CENTER[0], name: "Test Pin" }];
+        pts.forEach((p) => {
+          new maplibregl.Marker({ color: "#22c55e" })
+            .setLngLat([p.lng, p.lat])
+            .setPopup(new maplibregl.Popup().setHTML(`<b>${p.name ?? "Professional"}</b>`))
+            .addTo(map);
+        });
+
+        setMapStatus("ready");
+      });
+
+      map.on("error", (e) => {
+        clearTimeout(timeoutId);
+        const msg = e.error?.message ?? "Unknown";
+        console.error("[Map] error:", msg);
+        setMapError(`Provider error: ${msg}`);
+        setMapStatus("error");
+      });
+
+      mapRef.current = map;
+    } catch (err: any) {
+      console.error("[Map] init exception:", err);
+      setMapError(`Init failed: ${err?.message}`);
+      setMapStatus("error");
+    }
+
+    return () => {
+      clearTimeout(timeoutId!);
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  const showFallback = mapStatus === "no-token" || mapStatus === "error";
+
+  return (
+    <section className="relative w-full rounded-xl border border-border bg-muted/30 overflow-hidden" style={{ minHeight: 400 }}>
+      {/* Map container */}
+      <div
+        ref={mapContainerRef}
+        className="absolute inset-0 w-full h-full"
+        style={{ minHeight: 400, display: showFallback ? "none" : "block" }}
+      />
+
+      {/* Loading overlay */}
+      {mapStatus === "loading" && (
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+          <p className="text-sm text-muted-foreground bg-background/80 px-3 py-1 rounded">Loading map…</p>
+        </div>
+      )}
+
+      {/* Fallback */}
+      {showFallback && (
+        <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 px-6 text-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+            <MapPin className="h-7 w-7 text-muted-foreground" />
+          </div>
+          <div>
+            <p className="text-lg font-semibold text-foreground">Map unavailable right now</p>
+            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+              Use List View to see available professionals.
+            </p>
+            {mapError && (
+              <p className="mt-2 max-w-md text-[10px] text-muted-foreground/60 font-mono break-all">{mapError}</p>
+            )}
+          </div>
+          <Button variant="outline" size="sm" onClick={onSwitchToList}>
+            <List className="mr-2 h-4 w-4" />
+            Switch to List View
+          </Button>
+        </div>
+      )}
+    </section>
   );
 }
