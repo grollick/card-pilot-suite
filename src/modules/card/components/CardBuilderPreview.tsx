@@ -460,7 +460,8 @@ export default function CardBuilderPreview({
                   )}
 
                   {/* Top Section — shadowed tile matching other sections */}
-                  <CardSectionWrapper theme={previewTheme} index={0} metallicEffect={currentThemeOverrides.metallicEffect} className="relative z-[2] overflow-hidden">
+                  <div className="px-5 pt-5 relative z-[2]">
+                  <CardSectionWrapper theme={previewTheme} index={0} metallicEffect={currentThemeOverrides.metallicEffect} className="overflow-hidden">
                     {/* Cover */}
                     <div ref={coverRef} className="h-36 relative overflow-hidden" style={{
                       margin: `-${previewTheme.spacing.inner}px`,
