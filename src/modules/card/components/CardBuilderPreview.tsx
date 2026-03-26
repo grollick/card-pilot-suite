@@ -1,5 +1,6 @@
 import { CreditCard, Eye, Pencil, Smartphone, Tablet, Move, Star, Calendar, Send, Globe, Instagram, Facebook, Linkedin, Twitter, Youtube, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useState, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
