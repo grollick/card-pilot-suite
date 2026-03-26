@@ -207,12 +207,7 @@ const ProfessionalListCard = forwardRef<HTMLDivElement, { pro: OnDutyProfessiona
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
             <p className="font-semibold text-sm truncate">{pro.name}</p>
-            {pro.status === "available" && (
-              <span className="h-2 w-2 rounded-full bg-success animate-pulse shrink-0" />
-            )}
-            {pro.status === "recent" && (
-              <span className="h-2 w-2 rounded-full bg-warning shrink-0" />
-            )}
+            <span className="h-2 w-2 rounded-full bg-success animate-pulse shrink-0" />
           </div>
           {pro.profession_name && (
             <p className="text-xs text-muted-foreground truncate">{pro.profession_name}</p>
