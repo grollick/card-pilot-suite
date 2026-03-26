@@ -48,21 +48,15 @@ function calcProfileCompleteness(p: any): number {
 export function useMarketplaceListings(filters: MarketplaceFilters) {
   return useQuery({
     queryKey: ["marketplace", filters],
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30_000, // 30s — keep in sync with duty changes
     queryFn: async (): Promise<MarketplaceListing[]> => {
-      const query = supabase
-        .from("profiles")
-        .select("id, name, handle, avatar_url, company, city, bio, service_area, featured, featured_until, marketplace_enabled, updated_at, available_for_work, avg_response_minutes, verification_level, professions(name, category)" as any)
-        .not("handle", "is", null)
-        .not("name", "is", null)
-        .order("name");
+      // Use secure RPC — single source of truth for public profiles
+      const { data: rpcProfiles } = await supabase.rpc("get_public_profiles");
+      const enabledProfiles = (rpcProfiles ?? []).filter((p: any) => p.marketplace_enabled);
+      if (enabledProfiles.length === 0) return [];
 
-      const { data: profilesData, error: profilesError } = await query;
-      if (profilesError) throw profilesError;
-
-      const enabledProfiles = (profilesData ?? []).filter((p: any) => p.marketplace_enabled);
       const userIds = enabledProfiles.map((p: any) => p.id);
-      if (userIds.length === 0) return [];
+      const professionIds = [...new Set(enabledProfiles.map((p: any) => p.profession_id).filter(Boolean))];
 
       // Fetch ratings, services, lead counts & duty status in parallel
       const [ratingsResult, servicesResult, leadsResult, dutyResult] = await Promise.all([
