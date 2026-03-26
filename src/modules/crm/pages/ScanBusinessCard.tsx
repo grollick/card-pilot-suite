@@ -1,6 +1,6 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Camera, Upload, Loader2, Check, ArrowLeft, ScanLine, UserPlus, X } from "lucide-react";
+import { Camera, Upload, Loader2, ArrowLeft, ScanLine, UserPlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +17,8 @@ const CONTACT_TYPES = [
   { value: "personal", label: "Personal", description: "Personal contact" },
   { value: "other", label: "Other", description: "Other contact" },
 ] as const;
+
+const DRAFT_KEY = "scan_business_card_draft_v1";
 
 interface ExtractedContact {
   name: string;
@@ -41,6 +43,51 @@ export default function ScanBusinessCard() {
   const [contact, setContact] = useState<ExtractedContact>({ name: "" });
   const [contactType, setContactType] = useState<string>("lead");
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      const draft = JSON.parse(raw) as {
+        imagePreview?: string | null;
+        contact?: ExtractedContact;
+        contactType?: string;
+      };
+      if (!draft.contact) return;
+      setImagePreview(draft.imagePreview ?? null);
+      setContact({
+        name: draft.contact.name ?? "",
+        email: draft.contact.email ?? "",
+        phone: draft.contact.phone ?? "",
+        company: draft.contact.company ?? "",
+        job_title: draft.contact.job_title ?? "",
+        website: draft.contact.website ?? "",
+        address: draft.contact.address ?? "",
+        notes: draft.contact.notes ?? "",
+      });
+      setContactType(draft.contactType ?? "lead");
+      setStep("review");
+    } catch {
+      // ignore malformed draft
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      if (step === "review") {
+        sessionStorage.setItem(
+          DRAFT_KEY,
+          JSON.stringify({
+            imagePreview,
+            contact,
+            contactType,
+          }),
+        );
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, [step, imagePreview, contact, contactType]);
 
   const processImage = useCallback(async (base64: string) => {
     setImagePreview(base64);
@@ -129,7 +176,6 @@ export default function ScanBusinessCard() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      // Get first pipeline stage for proper CRM placement
       const { data: stages } = await supabase
         .from("pipeline_stages")
         .select("id")
@@ -158,7 +204,6 @@ export default function ScanBusinessCard() {
 
       if (error) throw error;
 
-      // Log activity for the new contact
       if (newLead?.id) {
         await supabase.from("contact_activities").insert({
           user_id: user.id,
@@ -168,6 +213,12 @@ export default function ScanBusinessCard() {
           description: `Contact added via business card scan${contact.company ? ` — ${contact.company}` : ""}`,
           occurred_at: new Date().toISOString(),
         });
+      }
+
+      try {
+        sessionStorage.removeItem(DRAFT_KEY);
+      } catch {
+        // ignore storage errors
       }
 
       toast.success(`${contact.name.trim()} saved to contacts!`);
@@ -185,11 +236,15 @@ export default function ScanBusinessCard() {
     setImagePreview(null);
     setContact({ name: "" });
     setContactType("lead");
+    try {
+      sessionStorage.removeItem(DRAFT_KEY);
+    } catch {
+      // ignore storage errors
+    }
   };
 
   return (
     <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
-      {/* Header */}
       <div className="flex items-center gap-3">
         <Button type="button" variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-5 w-5" />
@@ -204,7 +259,6 @@ export default function ScanBusinessCard() {
         </div>
       </div>
 
-      {/* ── CAPTURE STEP ── */}
       {step === "capture" && (
         <div className="space-y-4">
           <div className="border-2 border-dashed border-border rounded-xl p-10 text-center space-y-4">
@@ -240,7 +294,6 @@ export default function ScanBusinessCard() {
         </div>
       )}
 
-      {/* ── SCANNING STEP ── */}
       {step === "scanning" && (
         <div className="space-y-4">
           {imagePreview && (
@@ -253,7 +306,6 @@ export default function ScanBusinessCard() {
         </div>
       )}
 
-      {/* ── REVIEW STEP ── */}
       {step === "review" && (
         <div className="space-y-4">
           {imagePreview && (
