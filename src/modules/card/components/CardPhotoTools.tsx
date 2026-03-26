@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import { Camera, Eraser, ImagePlus, Loader2, RotateCw, Wand2, Paintbrush } from "lucide-react";
+import { Camera, Eraser, ImagePlus, Loader2, RotateCw, Wand2, Paintbrush, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -119,6 +119,8 @@ export default function CardPhotoTools({
   const [generatingBackdrop, setGeneratingBackdrop] = useState(false);
   const [customPrompt, setCustomPrompt] = useState("");
   const [bgRemoved, setBgRemoved] = useState(false);
+  const [cartoonizing, setCartoonizing] = useState(false);
+  const [cartoonStyle, setCartoonStyle] = useState<string>("cartoon");
   const [cropSrc, setCropSrc] = useState<string | null>(null);
   const [coverCropSrc, setCoverCropSrc] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -273,6 +275,30 @@ export default function CardPhotoTools({
     onAvatarRotationChange?.(next);
   };
 
+  const handleCartoonize = async () => {
+    if (!avatarUrl || !user) return;
+    setCartoonizing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("cartoonize-avatar", {
+        body: { image_url: avatarUrl, style: cartoonStyle },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const imageUrl = data.image_url;
+      if (!imageUrl) throw new Error("No image returned");
+      const file = await base64ToFile(imageUrl, "avatar-cartoon.png");
+      const path = `${user.id}/avatar-cartoon.png`;
+      const url = await uploadFile(file, path);
+      await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
+      onAvatarChange(url);
+      toast.success("Avatar cartoonized!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to cartoonize avatar");
+    } finally {
+      setCartoonizing(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
@@ -309,7 +335,45 @@ export default function CardPhotoTools({
             </Button>
           </div>
 
-          {/* Rotation slider */}
+          {/* Cartoonize Avatar */}
+          <div className="space-y-1.5 pt-1 border-t border-border/30">
+            <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <Sparkles className="h-3 w-3" />
+              AI Art Style
+            </Label>
+            <div className="flex flex-wrap gap-1">
+              {([
+                { value: "cartoon", label: "Cartoon" },
+                { value: "anime", label: "Anime" },
+                { value: "pixar", label: "3D/Pixar" },
+                { value: "comic", label: "Comic" },
+                { value: "watercolor", label: "Watercolor" },
+              ] as const).map((s) => (
+                <button
+                  key={s.value}
+                  type="button"
+                  onClick={() => setCartoonStyle(s.value)}
+                  className={`text-[11px] px-2.5 py-1 rounded-full border transition-all ${
+                    cartoonStyle === s.value
+                      ? "border-primary bg-primary/10 text-primary font-medium"
+                      : "border-border/50 text-muted-foreground hover:border-border hover:bg-muted/30"
+                  }`}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={handleCartoonize}
+              disabled={cartoonizing}
+            >
+              {cartoonizing ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+              {cartoonizing ? "Generating…" : `Apply ${cartoonStyle.charAt(0).toUpperCase() + cartoonStyle.slice(1)} Style`}
+            </Button>
+          </div>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label className="text-xs text-muted-foreground">Rotation</Label>
