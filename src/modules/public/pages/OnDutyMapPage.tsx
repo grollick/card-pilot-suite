@@ -145,15 +145,11 @@ function LiveActivityToast({
 }
 
 // ── Map Pin Component ──
-function DutyPin({
-  pro,
-  isBursting,
-  onClick,
-}: {
+const DutyPin = forwardRef<HTMLButtonElement, {
   pro: OnDutyProfessional;
   isBursting: boolean;
   onClick: () => void;
-}) {
+}>(function DutyPin({ pro, isBursting, onClick }, ref) {
   const isAvailable = pro.status === "available";
   const size = isBursting ? 28 : isAvailable ? 24 : 20;
 
