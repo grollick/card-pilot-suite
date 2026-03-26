@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Camera, Upload, Loader2, ArrowLeft, ScanLine, UserPlus, X } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
+import { Camera, Upload, Loader2, ArrowLeft, ScanLine, UserPlus, X, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,23 +19,52 @@ const CONTACT_TYPES = [
   { value: "other", label: "Other", description: "Other contact" },
 ] as const;
 
-const DRAFT_KEY = "scan_business_card_draft_v2";
+const DRAFT_KEY = "scan_business_card_draft_v3";
 
 interface ExtractedContact {
   name: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
   email?: string;
   phone?: string;
   company?: string;
+  title?: string;
   job_title?: string;
   website?: string;
   address?: string;
   notes?: string;
 }
 
-type Step = "capture" | "scanning" | "review";
+type Step = "capture" | "scanning" | "review" | "saved";
+
+const safeString = (value: unknown) => (typeof value === "string" ? value.trim() : "");
+
+const normalizeExtractedContact = (raw: any): ExtractedContact => {
+  const firstName = safeString(raw?.first_name || raw?.firstName);
+  const lastName = safeString(raw?.last_name || raw?.lastName);
+  const fullName = safeString(raw?.full_name || raw?.fullName || raw?.name) || [firstName, lastName].filter(Boolean).join(" ").trim();
+  const title = safeString(raw?.title || raw?.job_title || raw?.jobTitle);
+
+  return {
+    name: fullName,
+    full_name: fullName,
+    first_name: firstName,
+    last_name: lastName,
+    email: safeString(raw?.email),
+    phone: safeString(raw?.phone),
+    company: safeString(raw?.company),
+    title,
+    job_title: title,
+    website: safeString(raw?.website),
+    address: safeString(raw?.address),
+    notes: safeString(raw?.notes),
+  };
+};
 
 export default function ScanBusinessCard() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -43,6 +73,8 @@ export default function ScanBusinessCard() {
   const [contact, setContact] = useState<ExtractedContact>({ name: "" });
   const [contactType, setContactType] = useState<string>("lead");
   const [saving, setSaving] = useState(false);
+  const [savedLeadId, setSavedLeadId] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const persistDraft = useCallback((draft: { imagePreview: string | null; contact: ExtractedContact; contactType: string }) => {
     try {
@@ -62,17 +94,11 @@ export default function ScanBusinessCard() {
         contactType?: string;
       };
       if (!draft.contact) return;
+
+      const restored = normalizeExtractedContact(draft.contact);
+      console.log("[scan-card] OCR result restored", restored);
       setImagePreview(draft.imagePreview ?? null);
-      setContact({
-        name: draft.contact.name ?? "",
-        email: draft.contact.email ?? "",
-        phone: draft.contact.phone ?? "",
-        company: draft.contact.company ?? "",
-        job_title: draft.contact.job_title ?? "",
-        website: draft.contact.website ?? "",
-        address: draft.contact.address ?? "",
-        notes: draft.contact.notes ?? "",
-      });
+      setContact(restored);
       setContactType(draft.contactType ?? "lead");
       setStep("review");
     } catch {
@@ -80,9 +106,16 @@ export default function ScanBusinessCard() {
     }
   }, []);
 
+  useEffect(() => {
+    if (step !== "review") return;
+    persistDraft({ imagePreview, contact, contactType });
+  }, [contact, contactType, imagePreview, persistDraft, step]);
+
   const processImage = useCallback(async (base64: string) => {
     setImagePreview(base64);
     setStep("scanning");
+    setSaveError(null);
+    setSavedLeadId(null);
 
     try {
       const { data, error } = await supabase.functions.invoke("scan-business-card", {
@@ -90,28 +123,25 @@ export default function ScanBusinessCard() {
       });
 
       if (error) {
-        console.error("Scan edge function error:", error);
+        console.error("[scan-card] Scan edge function error", error);
         throw new Error(typeof error === "object" && error.message ? error.message : "Scan failed — please try again");
       }
       if (data?.error) throw new Error(data.error);
 
-      const scanned: ExtractedContact = {
-        name: data?.contact?.name ?? "",
-        email: data?.contact?.email ?? "",
-        phone: data?.contact?.phone ?? "",
-        company: data?.contact?.company ?? "",
-        job_title: data?.contact?.job_title ?? "",
-        website: data?.contact?.website ?? "",
-        address: data?.contact?.address ?? "",
-        notes: data?.contact?.notes ?? "",
-      };
+      console.log("[scan-card] OCR result received", data?.contact);
+      const scanned = normalizeExtractedContact(data?.contact ?? {});
 
+      if (!scanned.name && !scanned.email && !scanned.phone) {
+        throw new Error("Could not extract contact details. Please retake the photo.");
+      }
+
+      console.log("[scan-card] OCR result stored", scanned);
       persistDraft({ imagePreview: base64, contact: scanned, contactType });
       setContact(scanned);
       setStep("review");
       toast.success("Card scanned! Review and tap Save Contact.");
     } catch (err: any) {
-      console.error("Scan business card error:", err);
+      console.error("[scan-card] Scan business card error", err);
       toast.error(err.message || "Failed to scan business card");
       setStep("capture");
     }
@@ -164,68 +194,111 @@ export default function ScanBusinessCard() {
   }, [compressImage, processImage]);
 
   const handleSave = async () => {
-    if (!contact.name.trim()) {
+    if (saving) return;
+
+    const finalName = safeString(contact.name) || [safeString(contact.first_name), safeString(contact.last_name)].filter(Boolean).join(" ").trim();
+
+    if (!finalName) {
+      setSaveError("Could not save contact. Try again.");
       toast.error("Name is required");
       return;
     }
+
     setSaving(true);
+    setSaveError(null);
+
     try {
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const { data: stages } = await supabase
+      const { data: stages, error: stagesError } = await supabase
         .from("pipeline_stages")
         .select("id")
         .eq("user_id", user.id)
         .order("sort_order", { ascending: true })
         .limit(1);
 
+      if (stagesError) {
+        console.error("[scan-card] Stage fetch error", stagesError);
+      }
+
       const notesText = [
-        contact.job_title && `Title: ${contact.job_title}`,
+        contact.title && `Title: ${contact.title}`,
         contact.website && `Website: ${contact.website}`,
-        contact.address && `Address: ${contact.address}`,
         contact.notes,
       ]
         .filter(Boolean)
         .join("\n") || null;
 
+      const savePayload = {
+        user_id: user.id,
+        name: finalName,
+        email: safeString(contact.email) || null,
+        phone: safeString(contact.phone) || null,
+        company: safeString(contact.company) || null,
+        source: "business_card" as any,
+        contact_type: contactType as any,
+        stage_id: stages?.[0]?.id || null,
+        notes: notesText,
+        address: safeString(contact.address) || null,
+        custom_fields_json: {
+          first_name: safeString(contact.first_name),
+          last_name: safeString(contact.last_name),
+          full_name: safeString(contact.full_name) || finalName,
+          title: safeString(contact.title),
+          website: safeString(contact.website),
+          ocr_source: "scan-business-card",
+        },
+      };
+
+      console.log("[scan-card] review form values at save", contact);
+      console.log("[scan-card] contact save payload", savePayload);
+
       const { data: newLead, error } = await supabase
         .from("leads")
-        .insert({
-          user_id: user.id,
-          name: contact.name.trim(),
-          email: contact.email?.trim() || null,
-          phone: contact.phone?.trim() || null,
-          company: contact.company?.trim() || null,
-          source: "business_card" as any,
-          contact_type: contactType as any,
-          stage_id: stages?.[0]?.id || null,
-          notes: notesText,
-        })
+        .insert(savePayload)
         .select("id")
         .single();
 
       if (error) throw error;
 
-      if (newLead?.id) {
-        await supabase.from("contact_activities").insert({
-          user_id: user.id,
-          lead_id: newLead.id,
-          activity_type: "card_scanned",
-          title: "Business card scanned",
-          description: `Contact added via business card scan${contact.company ? ` — ${contact.company}` : ""}`,
-          occurred_at: new Date().toISOString(),
-        });
+      if (!newLead?.id) {
+        throw new Error("Insert succeeded but no lead id was returned");
       }
 
+      await supabase.from("contact_activities").insert({
+        user_id: user.id,
+        lead_id: newLead.id,
+        activity_type: "card_scanned",
+        title: "Business card scanned",
+        description: `Contact added via business card scan${contact.company ? ` — ${contact.company}` : ""}`,
+        occurred_at: new Date().toISOString(),
+      });
+
+      const { data: verifyContact, error: verifyError } = await supabase
+        .from("leads")
+        .select("id")
+        .eq("id", newLead.id)
+        .maybeSingle();
+
+      if (verifyError) {
+        console.error("[scan-card] contact verify error", verifyError);
+      }
+
+      console.log("[scan-card] contact save success", { leadId: newLead.id, existsInListQuery: Boolean(verifyContact?.id) });
+
       sessionStorage.removeItem(DRAFT_KEY);
-      toast.success(`${contact.name.trim()} saved to contacts!`);
-      navigate("/app/contacts");
-    } catch (err: any) {
-      console.error("Save contact error:", err);
-      toast.error(err.message || "Failed to save contact");
+      await queryClient.invalidateQueries({ queryKey: ["contacts"] });
+      setSavedLeadId(newLead.id);
+      setStep("saved");
+      toast.success("Contact saved");
+    } catch (err) {
+      console.error("[scan-card] contact save failure", err);
+      setSaveError("Could not save contact. Try again.");
+      toast.error("Could not save contact. Try again.");
+      setStep("review");
     } finally {
       setSaving(false);
     }
@@ -236,6 +309,8 @@ export default function ScanBusinessCard() {
     setImagePreview(null);
     setContact({ name: "" });
     setContactType("lead");
+    setSaveError(null);
+    setSavedLeadId(null);
     sessionStorage.removeItem(DRAFT_KEY);
   };
 
@@ -256,6 +331,7 @@ export default function ScanBusinessCard() {
             {step === "capture" && "Take a photo or upload an image"}
             {step === "scanning" && "Extracting contact info…"}
             {step === "review" && "Review and save"}
+            {step === "saved" && "Contact saved"}
           </p>
         </div>
       </div>
@@ -326,7 +402,13 @@ export default function ScanBusinessCard() {
           <div className="space-y-3">
             <div>
               <Label>Contact Type</Label>
-              <Select value={contactType} onValueChange={setContactType}>
+              <Select
+                value={contactType}
+                onValueChange={(value) => {
+                  setSaveError(null);
+                  setContactType(value);
+                }}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -341,38 +423,116 @@ export default function ScanBusinessCard() {
               </Select>
             </div>
             <div>
-              <Label>Name *</Label>
-              <Input value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} />
+              <Label>Full Name *</Label>
+              <Input
+                value={contact.name}
+                onChange={(e) => {
+                  setSaveError(null);
+                  setContact({ ...contact, name: e.target.value, full_name: e.target.value });
+                }}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>First Name</Label>
+                <Input
+                  value={contact.first_name || ""}
+                  onChange={(e) => {
+                    setSaveError(null);
+                    setContact({ ...contact, first_name: e.target.value });
+                  }}
+                />
+              </div>
+              <div>
+                <Label>Last Name</Label>
+                <Input
+                  value={contact.last_name || ""}
+                  onChange={(e) => {
+                    setSaveError(null);
+                    setContact({ ...contact, last_name: e.target.value });
+                  }}
+                />
+              </div>
             </div>
             <div>
               <Label>Email</Label>
-              <Input type="email" value={contact.email || ""} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
+              <Input
+                type="email"
+                value={contact.email || ""}
+                onChange={(e) => {
+                  setSaveError(null);
+                  setContact({ ...contact, email: e.target.value });
+                }}
+              />
             </div>
             <div>
               <Label>Phone</Label>
-              <Input value={contact.phone || ""} onChange={(e) => setContact({ ...contact, phone: e.target.value })} />
+              <Input
+                value={contact.phone || ""}
+                onChange={(e) => {
+                  setSaveError(null);
+                  setContact({ ...contact, phone: e.target.value });
+                }}
+              />
             </div>
             <div>
               <Label>Company</Label>
-              <Input value={contact.company || ""} onChange={(e) => setContact({ ...contact, company: e.target.value })} />
+              <Input
+                value={contact.company || ""}
+                onChange={(e) => {
+                  setSaveError(null);
+                  setContact({ ...contact, company: e.target.value });
+                }}
+              />
             </div>
             <div>
-              <Label>Job Title</Label>
-              <Input value={contact.job_title || ""} onChange={(e) => setContact({ ...contact, job_title: e.target.value })} />
+              <Label>Title</Label>
+              <Input
+                value={contact.title || ""}
+                onChange={(e) => {
+                  setSaveError(null);
+                  setContact({ ...contact, title: e.target.value, job_title: e.target.value });
+                }}
+              />
             </div>
             <div>
               <Label>Website</Label>
-              <Input value={contact.website || ""} onChange={(e) => setContact({ ...contact, website: e.target.value })} />
+              <Input
+                value={contact.website || ""}
+                onChange={(e) => {
+                  setSaveError(null);
+                  setContact({ ...contact, website: e.target.value });
+                }}
+              />
             </div>
             <div>
               <Label>Address</Label>
-              <Input value={contact.address || ""} onChange={(e) => setContact({ ...contact, address: e.target.value })} />
+              <Input
+                value={contact.address || ""}
+                onChange={(e) => {
+                  setSaveError(null);
+                  setContact({ ...contact, address: e.target.value });
+                }}
+              />
             </div>
             <div>
               <Label>Notes</Label>
-              <Textarea value={contact.notes || ""} onChange={(e) => setContact({ ...contact, notes: e.target.value })} rows={3} />
+              <Textarea
+                value={contact.notes || ""}
+                onChange={(e) => {
+                  setSaveError(null);
+                  setContact({ ...contact, notes: e.target.value });
+                }}
+                rows={3}
+              />
             </div>
           </div>
+
+          {saveError && (
+            <p className="text-sm text-destructive" role="alert">
+              {saveError}
+            </p>
+          )}
 
           <div className="flex gap-3">
             <Button type="button" variant="outline" className="flex-1" onClick={reset}>
@@ -381,6 +541,23 @@ export default function ScanBusinessCard() {
             <Button type="button" className="flex-1 gap-2" onClick={handleSave} disabled={saving}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
               Save Contact
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {step === "saved" && (
+        <div className="space-y-4 rounded-lg border border-border bg-card p-4">
+          <div className="flex items-center gap-2 text-primary">
+            <CheckCircle2 className="h-5 w-5" />
+            <p className="font-medium">Contact saved</p>
+          </div>
+          <div className="flex gap-3">
+            <Button type="button" className="flex-1" onClick={() => savedLeadId && navigate(`/app/contacts/${savedLeadId}`)} disabled={!savedLeadId}>
+              View Contact
+            </Button>
+            <Button type="button" variant="outline" className="flex-1" onClick={reset}>
+              Scan Another Card
             </Button>
           </div>
         </div>
