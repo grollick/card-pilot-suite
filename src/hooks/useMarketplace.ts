@@ -138,7 +138,10 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
       const threeDaysAgoMs = now.getTime() - 3 * 24 * 60 * 60 * 1000;
       const sevenDaysAgoMs = now.getTime() - 7 * 24 * 60 * 60 * 1000;
 
-      let listings: MarketplaceListing[] = enabledProfiles.map((p: any) => {
+      let listings: MarketplaceListing[] = enabledProfiles
+        // Only show users with a published card
+        .filter((p: any) => publishedCardSet.has(p.id))
+        .map((p: any) => {
         const featuredUntil = p.featured_until ? new Date(p.featured_until) : null;
         const isFeatured = p.featured || (featuredUntil && featuredUntil > now);
         const reviewData = ratingsMap[p.id];
@@ -146,6 +149,7 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         const completeness = calcProfileCompleteness(p);
         const leads = leadCounts[p.id] ?? 0;
         const isOnDuty = onDutySet.has(p.id);
+        const profession = p.profession_id ? professionMap.get(p.profession_id) : null;
 
         // ── Velocity multipliers ──
         let velocityBoost = 1.0;
@@ -176,8 +180,8 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
           company: p.company,
           city: p.city,
           bio: p.bio,
-          profession_name: p.professions?.name ?? null,
-          profession_category: p.professions?.category ?? null,
+          profession_name: profession?.name ?? null,
+          profession_category: profession?.category ?? null,
           service_area: p.service_area ?? null,
           featured: isFeatured ?? false,
           avg_rating: reviewData?.avg ?? null,
