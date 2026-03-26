@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useRef, useMemo, useState, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
 import { MapPin, List, Radio, ArrowRight } from "lucide-react";
 import { useOnDutyProfessionals } from "@/hooks/useOnDutyMap";
@@ -6,38 +6,92 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 
-/* ───────────────────────────────────────────
-   ENV TOKEN CONFIG
-   Expected variable: VITE_MAPTILER_KEY
-   Fallback check:    VITE_MAPBOX_TOKEN
-   ─────────────────────────────────────────── */
-function readMapToken() {
-  const env = import.meta.env as Record<string, string | undefined>;
-  const candidates = [
-    { key: "VITE_MAPTILER_KEY", value: env.VITE_MAPTILER_KEY },
-    { key: "VITE_MAPBOX_TOKEN", value: env.VITE_MAPBOX_TOKEN },
-  ];
-  const found = candidates.find((c) => Boolean(c.value?.trim()));
-  return { key: found?.key ?? null, value: found?.value?.trim() ?? "" };
-}
+/* ── token config ── */
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ?? "";
+const HAS_TOKEN = Boolean(MAPBOX_TOKEN.trim());
+
+/* ── static test data ── */
+const STATIC_CENTER: [number, number] = [-98.5795, 39.8283]; // lng, lat — center US
+const STATIC_PIN = { lng: -98.5795, lat: 39.8283 };
+
+type MapStatus = "loading" | "ready" | "error" | "no-token";
 
 export default function OnDutyMapPage() {
-  const token = useMemo(() => readMapToken(), []);
-  const hasToken = Boolean(token.value);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [mapStatus, setMapStatus] = useState<MapStatus>("loading");
+  const [mapError, setMapError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const { data: professionals = [], isLoading } = useOnDutyProfessionals();
 
+  /* ── mount guard ── */
   useEffect(() => {
     setMounted(true);
-    if (import.meta.env.DEV) {
-      console.info("[Map] client mounted");
-      console.info(`[Map] token ${hasToken ? "found" : "missing"} (source: ${token.key ?? "none"})`);
-      console.info(`[Map] map init ${hasToken ? "allowed" : "skipped — no token"}`);
+    console.info("[Map] client mounted");
+    console.info(`[Map] token ${HAS_TOKEN ? "found (VITE_MAPBOX_TOKEN)" : "missing"}`);
+  }, []);
+
+  /* ── map init ── */
+  useEffect(() => {
+    if (!mounted) return;
+    if (!HAS_TOKEN) {
+      setMapStatus("no-token");
+      console.warn("[Map] init skipped — no token");
+      return;
     }
-  }, [hasToken, token.key]);
+    if (!mapContainerRef.current) return;
+    if (mapRef.current) return; // already initialized
+
+    try {
+      console.info("[Map] initializing Mapbox via maplibre-gl…");
+      const map = new maplibregl.Map({
+        container: mapContainerRef.current,
+        style: `https://api.mapbox.com/styles/v1/mapbox/streets-v12?access_token=${MAPBOX_TOKEN}`,
+        center: STATIC_CENTER,
+        zoom: 4,
+        attributionControl: true,
+      });
+
+      map.on("load", () => {
+        console.info("[Map] ✓ provider loaded & map initialized");
+
+        // static test marker
+        new maplibregl.Marker({ color: "#22c55e" })
+          .setLngLat([STATIC_PIN.lng, STATIC_PIN.lat])
+          .setPopup(new maplibregl.Popup().setHTML("<b>Test Pin</b><br/>Static marker"))
+          .addTo(map);
+
+        console.info("[Map] ✓ static test marker rendered");
+        setMapStatus("ready");
+      });
+
+      map.on("error", (e) => {
+        console.error("[Map] map error:", e);
+        setMapError(e.error?.message ?? "Unknown map error");
+        setMapStatus("error");
+      });
+
+      mapRef.current = map;
+    } catch (err: any) {
+      console.error("[Map] init failed:", err);
+      setMapError(err?.message ?? "Failed to initialize map");
+      setMapStatus("error");
+    }
+
+    return () => {
+      mapRef.current?.remove();
+      mapRef.current = null;
+    };
+  }, [mounted]);
+
+  const scrollToList = useCallback(() => {
+    document.getElementById("on-duty-list")?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
   return (
     <div className="min-h-screen w-full bg-background">
@@ -52,45 +106,68 @@ export default function OnDutyMapPage() {
           <h1 className="text-2xl font-bold tracking-tight text-foreground">Available Now Near You</h1>
         </div>
 
-        {/* ── Map area: render map OR fallback ── */}
-        <section className="w-full min-h-[400px] rounded-xl border border-border bg-muted/30 overflow-hidden mb-8">
-          {!mounted ? (
-            <div className="flex min-h-[400px] items-center justify-center">
-              <p className="text-sm text-muted-foreground">Loading…</p>
+        {/* ── Map area ── */}
+        <section className="relative w-full rounded-xl border border-border bg-muted/30 overflow-hidden mb-8"
+                 style={{ minHeight: 500 }}>
+
+          {/* Map container — always in DOM so maplibre can attach */}
+          <div
+            ref={mapContainerRef}
+            className="absolute inset-0 w-full h-full"
+            style={{ minHeight: 500, display: HAS_TOKEN ? "block" : "none" }}
+          />
+
+          {/* Overlays based on status */}
+          {!mounted && (
+            <div className="flex min-h-[500px] items-center justify-center">
+              <p className="text-sm text-muted-foreground">Loading map…</p>
             </div>
-          ) : !hasToken ? (
-            /* ── TOKEN MISSING FALLBACK ── */
-            <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 px-6 text-center">
+          )}
+
+          {mounted && mapStatus === "no-token" && (
+            <div className="flex min-h-[500px] flex-col items-center justify-center gap-4 px-6 text-center">
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
                 <MapPin className="h-7 w-7 text-muted-foreground" />
               </div>
               <div>
                 <p className="text-lg font-semibold text-foreground">Map unavailable right now</p>
                 <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-                  Map setup is not complete yet. Use the list view below to see available professionals.
+                  Use the list view to see available professionals.
                 </p>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const el = document.getElementById("on-duty-list");
-                  el?.scrollIntoView({ behavior: "smooth" });
-                }}
-              >
+              <Button variant="outline" size="sm" onClick={scrollToList}>
                 <List className="mr-2 h-4 w-4" />
                 Switch to List View
               </Button>
             </div>
-          ) : (
-            /* ── MAP WOULD RENDER HERE once token is configured ── */
-            <div className="flex min-h-[400px] items-center justify-center">
-              <p className="text-sm text-muted-foreground">Map loading…</p>
+          )}
+
+          {mounted && mapStatus === "error" && (
+            <div className="flex min-h-[500px] flex-col items-center justify-center gap-4 px-6 text-center">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
+                <MapPin className="h-7 w-7 text-destructive" />
+              </div>
+              <div>
+                <p className="text-lg font-semibold text-foreground">Map could not be loaded</p>
+                {mapError && (
+                  <p className="mt-1 max-w-md text-xs text-muted-foreground font-mono break-all">{mapError}</p>
+                )}
+              </div>
+              <Button variant="outline" size="sm" onClick={scrollToList}>
+                <List className="mr-2 h-4 w-4" />
+                Switch to List View
+              </Button>
+            </div>
+          )}
+
+          {mounted && mapStatus === "loading" && HAS_TOKEN && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+              <p className="text-sm text-muted-foreground bg-background/80 px-3 py-1 rounded">Map loading…</p>
             </div>
           )}
         </section>
 
-        {/* ── LIST VIEW (always works) ── */}
+        {/* ── LIST VIEW ── */}
         <section id="on-duty-list">
           <div className="flex items-center gap-2 mb-4">
             <List className="h-5 w-5 text-primary" />
