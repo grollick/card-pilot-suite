@@ -654,6 +654,12 @@ export default function CardBuilderPreview({
                           {showCompany && (editCompany ?? profile?.company) && (
                             <p style={{ color: companyColor || `${previewTheme.palette.secondary}90`, fontSize: 12, margin: 0, marginTop: subtitleSpacing ?? 2 }}>{editCompany ?? profile?.company}</p>
                           )}
+                          {profile?.city && (
+                            <p style={{ display: "flex", alignItems: "center", gap: 3, color: `${previewTheme.palette.secondary}70`, fontSize: 11, margin: 0, marginTop: 4 }}>
+                              <MapPin style={{ width: 11, height: 11, flexShrink: 0 }} />
+                              {profile.city}
+                            </p>
+                          )}
                         </div>
                       </div>
 
