@@ -45,22 +45,37 @@ export default function OnDutyMapPage() {
       return;
     }
     if (!mapContainerRef.current) return;
-    if (mapRef.current) return; // already initialized
+    if (mapRef.current) return;
+
+    let timeoutId: ReturnType<typeof setTimeout>;
 
     try {
-      console.info("[Map] initializing Mapbox via maplibre-gl…");
+      const styleUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v12?access_token=${MAPBOX_TOKEN}`;
+      console.info("[Map] initializing…");
+      console.info("[Map] token detected: yes");
+      console.info(`[Map] style URL: ${styleUrl.slice(0, 70)}…`);
+
       const map = new maplibregl.Map({
         container: mapContainerRef.current,
-        style: `https://api.mapbox.com/styles/v1/mapbox/streets-v12?access_token=${MAPBOX_TOKEN}`,
+        style: styleUrl,
         center: STATIC_CENTER,
         zoom: 4,
         attributionControl: false,
       });
 
-      map.on("load", () => {
-        console.info("[Map] ✓ provider loaded & map initialized");
+      // Timeout: if map hasn't loaded in 15s, treat as failure
+      timeoutId = setTimeout(() => {
+        if (mapStatus === "loading") {
+          console.error("[Map] timed out after 15s — style may have failed silently");
+          setMapError("Map timed out. Token detected: yes. Style request may have failed — check network tab for 401/403.");
+          setMapStatus("error");
+        }
+      }, 15000);
 
-        // static test marker
+      map.on("load", () => {
+        clearTimeout(timeoutId);
+        console.info("[Map] ✓ style loaded, provider initialized");
+
         new maplibregl.Marker({ color: "#22c55e" })
           .setLngLat([STATIC_PIN.lng, STATIC_PIN.lat])
           .setPopup(new maplibregl.Popup().setHTML("<b>Test Pin</b><br/>Static marker"))
@@ -71,19 +86,23 @@ export default function OnDutyMapPage() {
       });
 
       map.on("error", (e) => {
-        console.error("[Map] map error:", e);
-        setMapError(e.error?.message ?? "Unknown map error");
+        clearTimeout(timeoutId);
+        const msg = e.error?.message ?? "Unknown map error";
+        console.error("[Map] error event:", msg);
+        console.error("[Map] diagnostics — token detected: yes | style request failed: likely yes | provider init failed: yes");
+        setMapError(`Token detected: yes. Provider error: ${msg}`);
         setMapStatus("error");
       });
 
       mapRef.current = map;
     } catch (err: any) {
-      console.error("[Map] init failed:", err);
-      setMapError(err?.message ?? "Failed to initialize map");
+      console.error("[Map] init exception:", err);
+      setMapError(`Token detected: yes. Init exception: ${err?.message ?? "unknown"}`);
       setMapStatus("error");
     }
 
     return () => {
+      clearTimeout(timeoutId!);
       mapRef.current?.remove();
       mapRef.current = null;
     };
