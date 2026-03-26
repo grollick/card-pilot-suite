@@ -11,6 +11,7 @@ export interface CachedProfile {
   onboarding_completed: boolean;
   current_org_id: string | null;
   company: string | null;
+  avatar_rotation: number;
 }
 
 /**
