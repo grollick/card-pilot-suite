@@ -318,6 +318,7 @@ export default function CardBuilderPreview({
     enabled: false, // Don't fetch — just subscribe to existing cache
   });
   const liveIsOnDuty = (dutyData as any)?.is_on_duty ?? false;
+  const [repositionMode, setRepositionMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const coverRef = useRef<HTMLDivElement>(null);
