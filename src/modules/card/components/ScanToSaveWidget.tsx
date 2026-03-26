@@ -50,12 +50,86 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
     }
   }, []);
 
-  const handleFile = useCallback((file: File) => {
-    if (!file.type.startsWith("image/") || file.size > 10 * 1024 * 1024) return;
-    const reader = new FileReader();
-    reader.onload = () => processImage(reader.result as string);
-    reader.readAsDataURL(file);
-  }, [processImage]);
+  const prepareImageForScan = useCallback(async (file: File): Promise<string> => {
+    if (!file.type.startsWith("image/")) {
+      throw new Error("Please upload a valid image file.");
+    }
+
+    if (file.size > 15 * 1024 * 1024) {
+      throw new Error("Image is too large. Please use an image under 15MB.");
+    }
+
+    const maxBase64Length = 2_700_000;
+
+    const readOriginal = () =>
+      new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(new Error("Failed to read image."));
+        reader.readAsDataURL(file);
+      });
+
+    try {
+      const objectUrl = URL.createObjectURL(file);
+      const img = new Image();
+
+      await new Promise<void>((resolve, reject) => {
+        img.onload = () => resolve();
+        img.onerror = () => reject(new Error("Could not process this image. Try a different photo."));
+        img.src = objectUrl;
+      });
+
+      const maxDim = 1600;
+      const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+      let width = Math.max(1, Math.round(img.width * scale));
+      let height = Math.max(1, Math.round(img.height * scale));
+
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Could not process image.");
+
+      let quality = 0.88;
+      let output = "";
+
+      for (let attempt = 0; attempt < 6; attempt++) {
+        canvas.width = width;
+        canvas.height = height;
+        ctx.clearRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+
+        output = canvas.toDataURL("image/jpeg", quality);
+        if (output.length <= maxBase64Length) break;
+
+        quality = Math.max(0.55, quality - 0.08);
+        width = Math.max(900, Math.round(width * 0.88));
+        height = Math.max(900, Math.round(height * 0.88));
+      }
+
+      URL.revokeObjectURL(objectUrl);
+
+      if (!output || output.length > maxBase64Length) {
+        throw new Error("Image is still too large after optimization. Please crop it tighter and try again.");
+      }
+
+      return output;
+    } catch {
+      const original = await readOriginal();
+      if (original.length > maxBase64Length) {
+        throw new Error("Image is too large. Please use a smaller or cropped photo.");
+      }
+      return original;
+    }
+  }, []);
+
+  const handleFile = useCallback(async (file: File) => {
+    try {
+      const preparedImage = await prepareImageForScan(file);
+      await processImage(preparedImage);
+    } catch (err: any) {
+      toast.error(err?.message || "Could not prepare image for scanning");
+      setStep("idle");
+    }
+  }, [prepareImageForScan, processImage]);
 
   const handleSave = async () => {
     if (!contact.name?.trim()) return;
