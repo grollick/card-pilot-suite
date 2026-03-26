@@ -126,6 +126,14 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         dutyResult.data.forEach((d: any) => onDutySet.add(d.user_id));
       }
 
+      // Build profession map
+      const professionMap = new Map<string, { name: string; category: string }>();
+      (professionsResult.data ?? []).forEach((p: any) => professionMap.set(p.id, { name: p.name, category: p.category }));
+
+      // Build published card set — only users with published cards should appear
+      const publishedCardSet = new Set<string>();
+      (cardsResult.data ?? []).forEach((c: any) => publishedCardSet.add(c.user_id));
+
       const now = new Date();
       const threeDaysAgoMs = now.getTime() - 3 * 24 * 60 * 60 * 1000;
       const sevenDaysAgoMs = now.getTime() - 7 * 24 * 60 * 60 * 1000;
