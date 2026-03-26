@@ -1,5 +1,6 @@
 import { CreditCard, Eye, Pencil, Smartphone, Tablet, Move, Star, Calendar, Send, Globe, Instagram, Facebook, Linkedin, Twitter, Youtube, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { useState, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -317,6 +318,7 @@ export default function CardBuilderPreview({
     enabled: false, // Don't fetch — just subscribe to existing cache
   });
   const liveIsOnDuty = (dutyData as any)?.is_on_duty ?? false;
+  const [repositionMode, setRepositionMode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -475,17 +477,17 @@ export default function CardBuilderPreview({
                                 };
                                 return base[logoPosition] ?? { top: 8, right: 8 };
                               })()),
-                          cursor: onLogoCustomPositionChange ? "grab" : undefined,
-                          userSelect: "none",
-                          touchAction: "none",
+                          cursor: (repositionMode && onLogoCustomPositionChange) ? "grab" : undefined,
+                          userSelect: repositionMode ? "none" : undefined,
+                          touchAction: repositionMode ? "none" : undefined,
                           zIndex: 5,
                         }}
-                        onPointerDown={onLogoCustomPositionChange ? handleLogoPointerDown : undefined}
-                        onPointerMove={onLogoCustomPositionChange ? handleLogoPointerMove : undefined}
-                        onPointerUp={onLogoCustomPositionChange ? handleLogoPointerUp : undefined}
+                        onPointerDown={(repositionMode && onLogoCustomPositionChange) ? handleLogoPointerDown : undefined}
+                        onPointerMove={(repositionMode && onLogoCustomPositionChange) ? handleLogoPointerMove : undefined}
+                        onPointerUp={(repositionMode && onLogoCustomPositionChange) ? handleLogoPointerUp : undefined}
                       >
                         <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain pointer-events-none" />
-                        {onLogoCustomPositionChange && (
+                        {repositionMode && onLogoCustomPositionChange && (
                           <div className="absolute -top-1 -right-1 z-10 opacity-0 group-hover/logo:opacity-100 transition-opacity flex gap-1">
                             <div className="bg-primary/90 text-primary-foreground rounded-full p-1 shadow-md" title="Drag to reposition">
                               <Move className="h-3 w-3" />
@@ -529,16 +531,16 @@ export default function CardBuilderPreview({
                       className="relative group/drag"
                       style={{
                         transform: identityPosition ? `translate(${identityPosition.x}px, ${identityPosition.y}px)` : undefined,
-                        cursor: onIdentityPositionChange ? "grab" : undefined,
-                        userSelect: "none",
-                        touchAction: "none",
+                        cursor: (repositionMode && onIdentityPositionChange) ? "grab" : undefined,
+                        userSelect: repositionMode ? "none" : undefined,
+                        touchAction: repositionMode ? "none" : undefined,
                       }}
-                      onPointerDown={onIdentityPositionChange ? handlePointerDown : undefined}
-                      onPointerMove={onIdentityPositionChange ? handlePointerMove : undefined}
-                      onPointerUp={onIdentityPositionChange ? handlePointerUp : undefined}
+                      onPointerDown={(repositionMode && onIdentityPositionChange) ? handlePointerDown : undefined}
+                      onPointerMove={(repositionMode && onIdentityPositionChange) ? handlePointerMove : undefined}
+                      onPointerUp={(repositionMode && onIdentityPositionChange) ? handlePointerUp : undefined}
                     >
                       {/* Drag handle indicator */}
-                      {onIdentityPositionChange && (
+                      {repositionMode && onIdentityPositionChange && (
                         <div className="absolute -top-1 -right-1 z-10 opacity-0 group-hover/drag:opacity-100 transition-opacity flex gap-1">
                           <div className="bg-primary/90 text-primary-foreground rounded-full p-1 shadow-md" title="Drag to reposition">
                             <Move className="h-3 w-3" />
@@ -569,8 +571,16 @@ export default function CardBuilderPreview({
                         )}
                         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-2xl">
                           <CreditCard className="h-5 w-5 text-white" />
-                        </div>
-                      </div>
+        </div>
+        {(onIdentityPositionChange || onLogoCustomPositionChange) && (
+          <div className="flex items-center gap-2">
+            <Switch checked={repositionMode} onCheckedChange={setRepositionMode} id="reposition-toggle" />
+            <label htmlFor="reposition-toggle" className="text-xs text-muted-foreground font-medium cursor-pointer select-none">
+              <Move className="h-3 w-3 inline mr-1" />Reposition
+            </label>
+          </div>
+        )}
+      </div>
                       <input ref={fileInputRef} type="file" accept="image/*" className="hidden"
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
