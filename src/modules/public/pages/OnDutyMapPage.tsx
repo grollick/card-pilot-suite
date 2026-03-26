@@ -168,7 +168,7 @@ export default function OnDutyMapPage() {
                   style={{ width: "100%", minHeight: 500 }}
                   onLoad={handleMapLoad}
                   onError={handleMapError}
-                  attributionControl
+                  attributionControl={{ compact: false }}
                 >
                   <NavigationControl position="top-right" />
 
