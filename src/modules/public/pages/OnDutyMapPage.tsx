@@ -145,20 +145,17 @@ function LiveActivityToast({
 }
 
 // ── Map Pin Component ──
-function DutyPin({
-  pro,
-  isBursting,
-  onClick,
-}: {
+const DutyPin = forwardRef<HTMLButtonElement, {
   pro: OnDutyProfessional;
   isBursting: boolean;
   onClick: () => void;
-}) {
+}>(function DutyPin({ pro, isBursting, onClick }, ref) {
   const isAvailable = pro.status === "available";
   const size = isBursting ? 28 : isAvailable ? 24 : 20;
 
   return (
     <button
+      ref={ref}
       onClick={onClick}
       className="relative group cursor-pointer"
       style={{ width: size, height: size, transform: "translate(-50%, -50%)" }}
@@ -185,7 +182,9 @@ function DutyPin({
       />
     </button>
   );
-}
+});
+
+DutyPin.displayName = "DutyPin";
 
 // ── Professional card (list view) ──
 const ProfessionalListCard = forwardRef<HTMLDivElement, { pro: OnDutyProfessional; onSelect: (p: OnDutyProfessional) => void }>(
