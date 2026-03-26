@@ -58,8 +58,8 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
       const userIds = enabledProfiles.map((p: any) => p.id);
       const professionIds = [...new Set(enabledProfiles.map((p: any) => p.profession_id).filter(Boolean))];
 
-      // Fetch ratings, services, lead counts & duty status in parallel
-      const [ratingsResult, servicesResult, leadsResult, dutyResult] = await Promise.all([
+      // Fetch ratings, services, lead counts, duty status & professions in parallel
+      const [ratingsResult, servicesResult, leadsResult, dutyResult, professionsResult, cardsResult] = await Promise.all([
         supabase
           .from("reviews")
           .select("user_id, rating")
@@ -78,6 +78,15 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
           .from("estimate_duty_status")
           .select("user_id, is_on_duty")
           .eq("is_on_duty", true),
+        professionIds.length > 0
+          ? supabase.from("professions").select("id, name, category").in("id", professionIds)
+          : Promise.resolve({ data: [] }),
+        // Check which users have published cards
+        supabase
+          .from("cards")
+          .select("user_id, status")
+          .eq("status", "published")
+          .in("user_id", userIds),
       ]);
 
       // Build ratings map
