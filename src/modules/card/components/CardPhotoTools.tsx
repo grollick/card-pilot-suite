@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import { Camera, Eraser, ImagePlus, Loader2, RotateCw, Wand2, Paintbrush } from "lucide-react";
+import { Camera, Eraser, ImagePlus, Loader2, RotateCw, Wand2, Paintbrush, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
