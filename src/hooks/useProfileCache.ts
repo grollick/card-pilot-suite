@@ -35,7 +35,22 @@ export function useProfileCache() {
         .eq("id", user!.id)
         .maybeSingle();
       if (error) throw error;
-      return data as CachedProfile | null;
+
+      // Get avatar rotation from the user's card theme_json
+      let avatarRotation = 0;
+      const { data: card } = await supabase
+        .from("cards")
+        .select("theme_json")
+        .eq("user_id", user!.id)
+        .eq("is_team_card", false)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (card?.theme_json && typeof (card.theme_json as any).avatar_rotation === "number") {
+        avatarRotation = (card.theme_json as any).avatar_rotation;
+      }
+
+      return { ...data, avatar_rotation: avatarRotation } as CachedProfile | null;
     },
   });
 }
