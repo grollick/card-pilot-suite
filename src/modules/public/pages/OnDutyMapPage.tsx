@@ -461,10 +461,10 @@ export default function OnDutyMapPage() {
       <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 py-2 flex items-center gap-4 text-xs text-muted-foreground">
           <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-success" /> Available now
+            <span className="h-2.5 w-2.5 rounded-full bg-success" /> On Duty now
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-warning" /> Recently active
+            <Shield className="h-3 w-3" /> Tap a pin to connect instantly
           </span>
           <span className="flex items-center gap-1.5">
             <Shield className="h-3 w-3" /> Tap a pin to connect instantly
