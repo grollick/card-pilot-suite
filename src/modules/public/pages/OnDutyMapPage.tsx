@@ -155,6 +155,7 @@ const DutyPin = forwardRef<HTMLButtonElement, {
 
   return (
     <button
+      ref={ref}
       onClick={onClick}
       className="relative group cursor-pointer"
       style={{ width: size, height: size, transform: "translate(-50%, -50%)" }}
@@ -181,7 +182,9 @@ const DutyPin = forwardRef<HTMLButtonElement, {
       />
     </button>
   );
-}
+});
+
+DutyPin.displayName = "DutyPin";
 
 // ── Professional card (list view) ──
 const ProfessionalListCard = forwardRef<HTMLDivElement, { pro: OnDutyProfessional; onSelect: (p: OnDutyProfessional) => void }>(
