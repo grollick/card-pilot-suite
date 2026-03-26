@@ -18,7 +18,7 @@ const CONTACT_TYPES = [
   { value: "other", label: "Other", description: "Other contact" },
 ] as const;
 
-const DRAFT_KEY = "scan_business_card_draft_v1";
+const DRAFT_KEY = "scan_business_card_draft_v2";
 
 interface ExtractedContact {
   name: string;
@@ -43,6 +43,14 @@ export default function ScanBusinessCard() {
   const [contact, setContact] = useState<ExtractedContact>({ name: "" });
   const [contactType, setContactType] = useState<string>("lead");
   const [saving, setSaving] = useState(false);
+
+  const persistDraft = useCallback((draft: { imagePreview: string | null; contact: ExtractedContact; contactType: string }) => {
+    try {
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
 
   useEffect(() => {
     try {
@@ -72,23 +80,6 @@ export default function ScanBusinessCard() {
     }
   }, []);
 
-  useEffect(() => {
-    try {
-      if (step === "review") {
-        sessionStorage.setItem(
-          DRAFT_KEY,
-          JSON.stringify({
-            imagePreview,
-            contact,
-            contactType,
-          }),
-        );
-      }
-    } catch {
-      // ignore storage errors
-    }
-  }, [step, imagePreview, contact, contactType]);
-
   const processImage = useCallback(async (base64: string) => {
     setImagePreview(base64);
     setStep("scanning");
@@ -104,7 +95,7 @@ export default function ScanBusinessCard() {
       }
       if (data?.error) throw new Error(data.error);
 
-      setContact({
+      const scanned: ExtractedContact = {
         name: data?.contact?.name ?? "",
         email: data?.contact?.email ?? "",
         phone: data?.contact?.phone ?? "",
@@ -113,7 +104,10 @@ export default function ScanBusinessCard() {
         website: data?.contact?.website ?? "",
         address: data?.contact?.address ?? "",
         notes: data?.contact?.notes ?? "",
-      });
+      };
+
+      persistDraft({ imagePreview: base64, contact: scanned, contactType });
+      setContact(scanned);
       setStep("review");
       toast.success("Card scanned! Review and tap Save Contact.");
     } catch (err: any) {
@@ -121,14 +115,15 @@ export default function ScanBusinessCard() {
       toast.error(err.message || "Failed to scan business card");
       setStep("capture");
     }
-  }, []);
+  }, [contactType, persistDraft]);
 
   const compressImage = useCallback((file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
         const MAX = 1600;
-        let w = img.width, h = img.height;
+        let w = img.width;
+        let h = img.height;
         if (w > MAX || h > MAX) {
           const ratio = Math.min(MAX / w, MAX / h);
           w = Math.round(w * ratio);
@@ -143,7 +138,9 @@ export default function ScanBusinessCard() {
       };
       img.onerror = () => reject(new Error("Could not read image"));
       const reader = new FileReader();
-      reader.onload = () => { img.src = reader.result as string; };
+      reader.onload = () => {
+        img.src = reader.result as string;
+      };
       reader.onerror = () => reject(new Error("Could not read file"));
       reader.readAsDataURL(file);
     });
@@ -173,7 +170,9 @@ export default function ScanBusinessCard() {
     }
     setSaving(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
       const { data: stages } = await supabase
@@ -188,19 +187,25 @@ export default function ScanBusinessCard() {
         contact.website && `Website: ${contact.website}`,
         contact.address && `Address: ${contact.address}`,
         contact.notes,
-      ].filter(Boolean).join("\n") || null;
+      ]
+        .filter(Boolean)
+        .join("\n") || null;
 
-      const { data: newLead, error } = await supabase.from("leads").insert({
-        user_id: user.id,
-        name: contact.name.trim(),
-        email: contact.email?.trim() || null,
-        phone: contact.phone?.trim() || null,
-        company: contact.company?.trim() || null,
-        source: "business_card" as any,
-        contact_type: contactType as any,
-        stage_id: stages?.[0]?.id || null,
-        notes: notesText,
-      }).select("id").single();
+      const { data: newLead, error } = await supabase
+        .from("leads")
+        .insert({
+          user_id: user.id,
+          name: contact.name.trim(),
+          email: contact.email?.trim() || null,
+          phone: contact.phone?.trim() || null,
+          company: contact.company?.trim() || null,
+          source: "business_card" as any,
+          contact_type: contactType as any,
+          stage_id: stages?.[0]?.id || null,
+          notes: notesText,
+        })
+        .select("id")
+        .single();
 
       if (error) throw error;
 
@@ -215,12 +220,7 @@ export default function ScanBusinessCard() {
         });
       }
 
-      try {
-        sessionStorage.removeItem(DRAFT_KEY);
-      } catch {
-        // ignore storage errors
-      }
-
+      sessionStorage.removeItem(DRAFT_KEY);
       toast.success(`${contact.name.trim()} saved to contacts!`);
       navigate("/app/contacts");
     } catch (err: any) {
@@ -236,11 +236,7 @@ export default function ScanBusinessCard() {
     setImagePreview(null);
     setContact({ name: "" });
     setContactType("lead");
-    try {
-      sessionStorage.removeItem(DRAFT_KEY);
-    } catch {
-      // ignore storage errors
-    }
+    sessionStorage.removeItem(DRAFT_KEY);
   };
 
   return (
@@ -263,9 +259,7 @@ export default function ScanBusinessCard() {
         <div className="space-y-4">
           <div className="border-2 border-dashed border-border rounded-xl p-10 text-center space-y-4">
             <ScanLine className="h-12 w-12 mx-auto text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
-              Position the business card in good lighting for best results
-            </p>
+            <p className="text-sm text-muted-foreground">Position the business card in good lighting for best results</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button type="button" onClick={() => cameraInputRef.current?.click()} className="gap-2">
                 <Camera className="h-4 w-4" /> Take Photo
@@ -280,25 +274,30 @@ export default function ScanBusinessCard() {
             ref={cameraInputRef}
             type="file"
             accept="image/*"
-            capture="environment"
             className="hidden"
-            onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.currentTarget.value = "";
+              if (file) void handleFile(file);
+            }}
           />
           <input
             ref={fileInputRef}
             type="file"
             accept="image/*"
             className="hidden"
-            onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.currentTarget.value = "";
+              if (file) void handleFile(file);
+            }}
           />
         </div>
       )}
 
       {step === "scanning" && (
         <div className="space-y-4">
-          {imagePreview && (
-            <img src={imagePreview} alt="Business card" className="w-full rounded-lg border border-border" />
-          )}
+          {imagePreview && <img src={imagePreview} alt="Business card" className="w-full rounded-lg border border-border" />}
           <div className="flex items-center justify-center gap-3 py-8">
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
             <span className="text-sm font-medium">Analyzing business card…</span>
