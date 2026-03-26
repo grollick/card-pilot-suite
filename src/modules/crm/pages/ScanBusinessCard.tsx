@@ -240,7 +240,12 @@ export default function ScanBusinessCard() {
   };
 
   return (
-    <div className="max-w-lg mx-auto px-4 py-6 space-y-6">
+    <div
+      className="max-w-lg mx-auto px-4 py-6 space-y-6"
+      onTouchStartCapture={(e) => e.stopPropagation()}
+      onTouchMoveCapture={(e) => e.stopPropagation()}
+      onTouchEndCapture={(e) => e.stopPropagation()}
+    >
       <div className="flex items-center gap-3">
         <Button type="button" variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <ArrowLeft className="h-5 w-5" />
