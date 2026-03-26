@@ -39,8 +39,8 @@ export async function captureLead(params: CaptureLeadParams): Promise<CaptureLea
   });
 
   if (error) {
-    console.error("capture_lead error:", error);
-    return null;
+    console.error("capture_lead error:", error.message, error.details, error.hint, error.code);
+    throw new Error(`capture_lead failed: ${error.message}`);
   }
 
   return data as unknown as CaptureLeadResult;
