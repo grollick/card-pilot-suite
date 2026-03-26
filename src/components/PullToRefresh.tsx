@@ -1,6 +1,7 @@
-import { useState, useRef, useCallback, type ReactNode } from "react";
+import { useState, useRef, useCallback, useEffect, type ReactNode } from "react";
 import { RefreshCw } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "react-router-dom";
 
 const THRESHOLD = 80;
 const MAX_PULL = 120;
@@ -8,14 +9,26 @@ const DEAD_ZONE = 15;
 
 export default function PullToRefresh({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
+  const { pathname } = useLocation();
+  const disablePullToRefresh = pathname.startsWith("/app/scan-card");
   const [pullDistance, setPullDistance] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const startY = useRef(0);
   const activated = useRef(false);
   const tracking = useRef(false);
 
+  useEffect(() => {
+    if (!disablePullToRefresh) return;
+    tracking.current = false;
+    activated.current = false;
+    setPullDistance(0);
+    setRefreshing(false);
+  }, [disablePullToRefresh]);
+
   const onTouchStart = useCallback(
     (e: React.TouchEvent) => {
+      if (disablePullToRefresh) return;
+
       // Only allow pull when scrolled to the very top
       const scrollTop =
         document.documentElement.scrollTop ||
@@ -26,11 +39,11 @@ export default function PullToRefresh({ children }: { children: ReactNode }) {
       tracking.current = true;
       activated.current = false;
     },
-    [refreshing]
+    [disablePullToRefresh, refreshing]
   );
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
-    if (!tracking.current) return;
+    if (disablePullToRefresh || !tracking.current) return;
     const delta = e.touches[0].clientY - startY.current;
 
     if (delta < 0) {
@@ -47,9 +60,11 @@ export default function PullToRefresh({ children }: { children: ReactNode }) {
 
     const dampened = Math.min((delta - DEAD_ZONE) * 0.4, MAX_PULL);
     setPullDistance(dampened);
-  }, []);
+  }, [disablePullToRefresh]);
 
   const onTouchEnd = useCallback(async () => {
+    if (disablePullToRefresh) return;
+
     if (!activated.current) {
       tracking.current = false;
       return;
@@ -66,9 +81,9 @@ export default function PullToRefresh({ children }: { children: ReactNode }) {
       setRefreshing(false);
     }
     setPullDistance(0);
-  }, [pullDistance, queryClient]);
+  }, [disablePullToRefresh, pullDistance, queryClient]);
 
-  const showIndicator = pullDistance > 5 || refreshing;
+  const showIndicator = !disablePullToRefresh && (pullDistance > 5 || refreshing);
   const progress = Math.min(pullDistance / THRESHOLD, 1);
 
   return (
