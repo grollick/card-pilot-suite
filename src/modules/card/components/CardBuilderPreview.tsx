@@ -531,13 +531,13 @@ export default function CardBuilderPreview({
                       className="relative group/drag"
                       style={{
                         transform: identityPosition ? `translate(${identityPosition.x}px, ${identityPosition.y}px)` : undefined,
-                        cursor: onIdentityPositionChange ? "grab" : undefined,
-                        userSelect: "none",
-                        touchAction: "none",
+                        cursor: (repositionMode && onIdentityPositionChange) ? "grab" : undefined,
+                        userSelect: repositionMode ? "none" : undefined,
+                        touchAction: repositionMode ? "none" : undefined,
                       }}
-                      onPointerDown={onIdentityPositionChange ? handlePointerDown : undefined}
-                      onPointerMove={onIdentityPositionChange ? handlePointerMove : undefined}
-                      onPointerUp={onIdentityPositionChange ? handlePointerUp : undefined}
+                      onPointerDown={(repositionMode && onIdentityPositionChange) ? handlePointerDown : undefined}
+                      onPointerMove={(repositionMode && onIdentityPositionChange) ? handlePointerMove : undefined}
+                      onPointerUp={(repositionMode && onIdentityPositionChange) ? handlePointerUp : undefined}
                     >
                       {/* Drag handle indicator */}
                       {onIdentityPositionChange && (
