@@ -192,6 +192,7 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
         <p style={{ fontSize: 14, fontWeight: 600, color: palette.primary, margin: 0 }}>Card saved!</p>
         <p style={{ fontSize: 12, color: palette.secondary, margin: "4px 0 0" }}>Thank you for sharing your info.</p>
         <button
+          type="button"
           onClick={() => { setStep("idle"); setContact({ name: "" }); }}
           style={{ fontSize: 12, color: palette.primary, background: "none", border: "none", cursor: "pointer", marginTop: 8, textDecoration: "underline" }}
         >
@@ -215,7 +216,7 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span style={{ fontSize: 13, fontWeight: 600, color: palette.primary, fontFamily: `'${fonts.primary}', sans-serif` }}>Confirm your info</span>
-          <button onClick={() => { setStep("idle"); setContact({ name: "" }); }} style={{ background: "none", border: "none", cursor: "pointer", color: palette.secondary }}>
+          <button type="button" onClick={() => { setStep("idle"); setContact({ name: "" }); }} style={{ background: "none", border: "none", cursor: "pointer", color: palette.secondary }}>
             <X style={{ width: 16, height: 16 }} />
           </button>
         </div>
@@ -224,6 +225,7 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
         <input style={inputStyle} placeholder="Phone" value={contact.phone || ""} onChange={(e) => setContact({ ...contact, phone: e.target.value })} />
         <input style={inputStyle} placeholder="Company" value={contact.company || ""} onChange={(e) => setContact({ ...contact, company: e.target.value })} />
         <button
+          type="button"
           onClick={handleSave}
           disabled={saving || !contact.name?.trim()}
           style={{
@@ -254,6 +256,7 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
       </p>
       <div style={{ display: "flex", gap: 8, width: "100%" }}>
         <button
+          type="button"
           onClick={() => cameraRef.current?.click()}
           style={{
             flex: 1,
@@ -276,6 +279,7 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
           <span>Take Photo</span>
         </button>
         <button
+          type="button"
           onClick={() => fileRef.current?.click()}
           style={{
             flex: 1,
