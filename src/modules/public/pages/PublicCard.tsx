@@ -859,7 +859,7 @@ export default function PublicCard() {
         <div style={{ padding: `${spacing.section}px`, display: "flex", flexDirection: "column", gap: spacing.section, position: "relative", zIndex: 2 }}>
 
           {/* ── Sharing Tools ── */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, flexWrap: "wrap" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
             <QRShareDialog url={cardUrl} name={profile.name || "Contact"} />
             <NFCShareDialog url={cardUrl} name={profile.name || "Contact"} />
             <WalletPassDialog handle={handle!} name={profile.name || "Contact"} />
