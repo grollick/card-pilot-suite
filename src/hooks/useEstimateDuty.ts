@@ -157,6 +157,8 @@ export function useEstimateDuty() {
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["estimate-duty-status"] });
       qc.invalidateQueries({ queryKey: ["estimate-duty-analytics"] });
+      qc.invalidateQueries({ queryKey: ["on-duty-map"] });
+      qc.invalidateQueries({ queryKey: ["marketplace"] });
       toast.success(data.is_on_duty ? "You're now On Duty for Estimates!" : "You're now Off Duty");
     },
     onError: (_err, _vars, context) => {

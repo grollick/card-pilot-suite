@@ -48,24 +48,18 @@ function calcProfileCompleteness(p: any): number {
 export function useMarketplaceListings(filters: MarketplaceFilters) {
   return useQuery({
     queryKey: ["marketplace", filters],
-    staleTime: 5 * 60 * 1000,
+    staleTime: 30_000, // 30s — keep in sync with duty changes
     queryFn: async (): Promise<MarketplaceListing[]> => {
-      const query = supabase
-        .from("profiles")
-        .select("id, name, handle, avatar_url, company, city, bio, service_area, featured, featured_until, marketplace_enabled, updated_at, available_for_work, avg_response_minutes, verification_level, professions(name, category)" as any)
-        .not("handle", "is", null)
-        .not("name", "is", null)
-        .order("name");
+      // Use secure RPC — single source of truth for public profiles
+      const { data: rpcProfiles } = await supabase.rpc("get_public_profiles");
+      const enabledProfiles = (rpcProfiles ?? []).filter((p: any) => p.marketplace_enabled);
+      if (enabledProfiles.length === 0) return [];
 
-      const { data: profilesData, error: profilesError } = await query;
-      if (profilesError) throw profilesError;
-
-      const enabledProfiles = (profilesData ?? []).filter((p: any) => p.marketplace_enabled);
       const userIds = enabledProfiles.map((p: any) => p.id);
-      if (userIds.length === 0) return [];
+      const professionIds = [...new Set(enabledProfiles.map((p: any) => p.profession_id).filter(Boolean))];
 
-      // Fetch ratings, services, lead counts & duty status in parallel
-      const [ratingsResult, servicesResult, leadsResult, dutyResult] = await Promise.all([
+      // Fetch ratings, services, lead counts, duty status & professions in parallel
+      const [ratingsResult, servicesResult, leadsResult, dutyResult, professionsResult, cardsResult] = await Promise.all([
         supabase
           .from("reviews")
           .select("user_id, rating")
@@ -84,6 +78,15 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
           .from("estimate_duty_status")
           .select("user_id, is_on_duty")
           .eq("is_on_duty", true),
+        professionIds.length > 0
+          ? supabase.from("professions").select("id, name, category").in("id", professionIds)
+          : Promise.resolve({ data: [] }),
+        // Check which users have published cards
+        supabase
+          .from("cards")
+          .select("user_id, status")
+          .eq("status", "published")
+          .in("user_id", userIds),
       ]);
 
       // Build ratings map
@@ -123,11 +126,22 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         dutyResult.data.forEach((d: any) => onDutySet.add(d.user_id));
       }
 
+      // Build profession map
+      const professionMap = new Map<string, { name: string; category: string }>();
+      (professionsResult.data ?? []).forEach((p: any) => professionMap.set(p.id, { name: p.name, category: p.category }));
+
+      // Build published card set — only users with published cards should appear
+      const publishedCardSet = new Set<string>();
+      (cardsResult.data ?? []).forEach((c: any) => publishedCardSet.add(c.user_id));
+
       const now = new Date();
       const threeDaysAgoMs = now.getTime() - 3 * 24 * 60 * 60 * 1000;
       const sevenDaysAgoMs = now.getTime() - 7 * 24 * 60 * 60 * 1000;
 
-      let listings: MarketplaceListing[] = enabledProfiles.map((p: any) => {
+      let listings: MarketplaceListing[] = enabledProfiles
+        // Only show users with a published card
+        .filter((p: any) => publishedCardSet.has(p.id))
+        .map((p: any) => {
         const featuredUntil = p.featured_until ? new Date(p.featured_until) : null;
         const isFeatured = p.featured || (featuredUntil && featuredUntil > now);
         const reviewData = ratingsMap[p.id];
@@ -135,6 +149,7 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
         const completeness = calcProfileCompleteness(p);
         const leads = leadCounts[p.id] ?? 0;
         const isOnDuty = onDutySet.has(p.id);
+        const profession = p.profession_id ? professionMap.get(p.profession_id) : null;
 
         // ── Velocity multipliers ──
         let velocityBoost = 1.0;
@@ -165,8 +180,8 @@ export function useMarketplaceListings(filters: MarketplaceFilters) {
           company: p.company,
           city: p.city,
           bio: p.bio,
-          profession_name: p.professions?.name ?? null,
-          profession_category: p.professions?.category ?? null,
+          profession_name: profession?.name ?? null,
+          profession_category: profession?.category ?? null,
           service_area: p.service_area ?? null,
           featured: isFeatured ?? false,
           avg_rating: reviewData?.avg ?? null,

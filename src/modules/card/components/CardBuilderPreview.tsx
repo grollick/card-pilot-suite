@@ -2,7 +2,7 @@ import { CreditCard, Eye, Pencil, Smartphone, Tablet, Move, Star, Calendar, Send
 import { Button } from "@/components/ui/button";
 import { useState, useRef, useCallback } from "react";
 import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getPatternSvg, type CardThemeOverrides, METALLIC_GRADIENTS, type MetallicType } from "./CardThemeEditor";
 import { CTA_ICON_MAP } from "./CtaEditor";
 import type { CtaItem } from "./CtaEditor";
@@ -310,10 +310,13 @@ export default function CardBuilderPreview({
   const previewDevice = externalDevice ?? internalDevice;
   const setPreviewDevice = setInternalDevice;
 
-  // Read live duty status from the canonical query cache
+  // Read live duty status reactively from the canonical query
   const qc = useQueryClient();
-  const dutyData = qc.getQueryData<any>(["estimate-duty-status"]);
-  const liveIsOnDuty = dutyData?.is_on_duty ?? false;
+  const { data: dutyData } = useQuery({
+    queryKey: ["estimate-duty-status"],
+    enabled: false, // Don't fetch — just subscribe to existing cache
+  });
+  const liveIsOnDuty = (dutyData as any)?.is_on_duty ?? false;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const coverRef = useRef<HTMLDivElement>(null);
