@@ -342,7 +342,7 @@ function OnDutyMapView({
         }}
         style={{ width: "100%", height: "100%" }}
         mapStyle={OSM_STYLE as any}
-        attributionControl={true}
+        attributionControl={true as any}
         onLoad={handleLoad}
         onError={handleError}
       >
