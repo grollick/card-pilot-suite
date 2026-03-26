@@ -51,18 +51,50 @@ export default function ScanBusinessCard() {
         body: { image: base64 },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Scan edge function error:", error);
+        throw new Error(typeof error === "object" && error.message ? error.message : "Scan failed — please try again");
+      }
       if (data?.error) throw new Error(data.error);
+      if (!data?.contact?.name) throw new Error("Could not read the card — try a clearer photo");
 
       setContact(data.contact);
       setStep("review");
+      toast.success("Card scanned! Review the details below.");
     } catch (err: any) {
+      console.error("Scan business card error:", err);
       toast.error(err.message || "Failed to scan business card");
       setStep("capture");
     }
   }, []);
 
-  const handleFile = useCallback((file: File) => {
+  const compressImage = useCallback((file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1600;
+        let w = img.width, h = img.height;
+        if (w > MAX || h > MAX) {
+          const ratio = Math.min(MAX / w, MAX / h);
+          w = Math.round(w * ratio);
+          h = Math.round(h * ratio);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/jpeg", 0.85));
+      };
+      img.onerror = () => reject(new Error("Could not read image"));
+      const reader = new FileReader();
+      reader.onload = () => { img.src = reader.result as string; };
+      reader.onerror = () => reject(new Error("Could not read file"));
+      reader.readAsDataURL(file);
+    });
+  }, []);
+
+  const handleFile = useCallback(async (file: File) => {
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");
       return;
@@ -71,10 +103,13 @@ export default function ScanBusinessCard() {
       toast.error("Image must be under 10 MB");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => processImage(reader.result as string);
-    reader.readAsDataURL(file);
-  }, [processImage]);
+    try {
+      const compressed = await compressImage(file);
+      processImage(compressed);
+    } catch (err: any) {
+      toast.error(err.message || "Failed to read image");
+    }
+  }, [compressImage, processImage]);
 
   const handleSave = async () => {
     if (!contact.name.trim()) {
