@@ -10,7 +10,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 /* ── token config ── */
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ?? "pk.eyJ1IjoiZ3JvbGxpY2siLCJhIjoiY21uODBpNWpnMDY3ZzMxcTA1dXQzbnl6dyJ9.DygTFrXa3lJu5tnxIOXGyg";
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ?? "pk.eyJ1IjoiZ3JvbGxpY2siLCJhIjoiY21uODFjNjY0MDZpcTMxcTRhZGVjcGZleiJ9.NVS5tdI_TZRyZv0299LCqQ";
 const HAS_TOKEN = Boolean(MAPBOX_TOKEN.trim());
 
 /* ── static test data ── */
