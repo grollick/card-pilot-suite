@@ -32,6 +32,7 @@ export default function ScanBusinessCard() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedLeadId, setSavedLeadId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   // Rehydrate persisted draft on mount
