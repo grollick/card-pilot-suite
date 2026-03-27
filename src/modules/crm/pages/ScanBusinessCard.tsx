@@ -563,6 +563,15 @@ export default function ScanBusinessCard() {
   }, []);
 
   const processImage = useCallback(async (base64: string) => {
+    const ocrStartedAt = isoNow();
+    updateRuntimeDebug((prev) => ({
+      ...prev,
+      timeline: {
+        ...prev.timeline,
+        ocrStartedAt,
+      },
+    }));
+
     setImagePreview(base64);
     setStep("scanning");
     setSaveError(null);
@@ -580,6 +589,18 @@ export default function ScanBusinessCard() {
       if (data?.error) throw new Error(data.error);
 
       console.log("[scan-card] OCR result received", data?.contact);
+      const ocrSuccessAt = isoNow();
+      updateRuntimeDebug((prev) => ({
+        ...prev,
+        ocrSuccessReceived: true,
+        lastOcrAt: ocrSuccessAt,
+        pathAtOcrSuccess: location.pathname,
+        timeline: {
+          ...prev.timeline,
+          ocrSuccessAt,
+        },
+      }));
+
       const scanned = normalizeExtractedContact(data?.contact ?? {});
 
       if (!scanned.name && !scanned.email && !scanned.phone) {
@@ -590,6 +611,14 @@ export default function ScanBusinessCard() {
       persistDraft({ imagePreview: base64, contact: scanned, contactType });
       setContact(scanned);
       setStep("review");
+      updateRuntimeDebug((prev) => ({
+        ...prev,
+        currentStep: "review",
+        timeline: {
+          ...prev.timeline,
+          stepReviewAt: isoNow(),
+        },
+      }));
       console.log("[scan-card] step set to review — no navigation, staying on same page");
       toast.success("Card scanned! Review and tap Save Contact.");
     } catch (err: any) {
@@ -597,7 +626,7 @@ export default function ScanBusinessCard() {
       toast.error(err.message || "Failed to scan business card");
       setStep("capture");
     }
-  }, [contactType, persistDraft]);
+  }, [contactType, location.pathname, persistDraft, updateRuntimeDebug]);
 
   const compressImage = useCallback((file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -629,6 +658,14 @@ export default function ScanBusinessCard() {
   }, []);
 
   const handleFile = useCallback(async (file: File) => {
+    updateRuntimeDebug((prev) => ({
+      ...prev,
+      timeline: {
+        ...prev.timeline,
+        fileSelectedAt: isoNow(),
+      },
+    }));
+
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");
       return;
@@ -643,7 +680,7 @@ export default function ScanBusinessCard() {
     } catch (err: any) {
       toast.error(err.message || "Failed to read image");
     }
-  }, [compressImage, processImage]);
+  }, [compressImage, processImage, updateRuntimeDebug]);
 
   const handleSave = useCallback(async () => {
     console.log("[scan-card] save handler started");
@@ -759,7 +796,7 @@ export default function ScanBusinessCard() {
       setSaving(false);
       console.log("[scan-card] save handler completed");
     }
-  }, [contact, contactType, queryClient, navigate]);
+  }, [contact, contactType, queryClient]);
 
   const handleSaveContactClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     console.log("[scan-card] save button click handler runs");
@@ -771,6 +808,7 @@ export default function ScanBusinessCard() {
 
   const reset = () => {
     console.log("[scan-card-debug] RESET triggered");
+    const resetAt = isoNow();
     setStep("capture");
     setImagePreview(null);
     setContact({ name: "" });
@@ -778,7 +816,13 @@ export default function ScanBusinessCard() {
     setSaveError(null);
     setSavedLeadId(null);
     sessionStorage.removeItem(DRAFT_KEY);
-    setDebugInfo(prev => ({ ...prev, lastResetBy: "user-reset", draftFound: false, rehydrated: false }));
+    updateRuntimeDebug((prev) => ({
+      ...prev,
+      currentStep: "capture",
+      draftExists: false,
+      lastStateResetAt: resetAt,
+      lastResetReason: "user-reset",
+    }));
   };
 
   return (
@@ -788,7 +832,7 @@ export default function ScanBusinessCard() {
       onSubmitCapture={handleSubmitCapture}
     >
       <div className="flex items-center gap-3">
-        <Button type="button" variant="ghost" size="icon" onClick={() => navigate(-1)}>
+        <Button type="button" variant="ghost" size="icon" onClick={() => trackedNavigate(-1)}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
@@ -803,22 +847,56 @@ export default function ScanBusinessCard() {
       </div>
 
       {/* Temporary debug panel */}
-      <div className="rounded-lg border border-yellow-500 bg-yellow-50 dark:bg-yellow-950 p-3 text-xs font-mono space-y-1">
-        <p className="font-bold text-yellow-800 dark:text-yellow-200">🔍 Scanner Debug Panel</p>
+      <div className="rounded-lg border border-border bg-muted p-3 text-xs font-mono space-y-1">
+        <p className="font-bold text-foreground">🔍 Scanner Debug Panel</p>
+        <p>Current route/path: <strong>{runtimeDebug.currentPath || "—"}</strong></p>
         <p>Step: <strong>{step}</strong></p>
-        <p>Mount #{mountCount} at {debugInfo.mountedAt}</p>
+        <p>Mount count: <strong>{runtimeDebug.mountCount}</strong> (last: {runtimeDebug.lastMountAt || "—"})</p>
+        <p>Unmount count: <strong>{runtimeDebug.unmountCount}</strong> (last: {runtimeDebug.lastUnmountAt || "—"})</p>
         <p>Draft key: {DRAFT_KEY}</p>
-        <p>Draft in sessionStorage: <strong>{(() => { try { return sessionStorage.getItem(DRAFT_KEY) ? "YES ✅" : "NO ❌"; } catch { return "ERROR"; } })()}</strong></p>
-        <p>Draft found on mount: {debugInfo.draftFound ? "YES ✅" : "NO ❌"}</p>
-        <p>Rehydrated: {debugInfo.rehydrated ? "YES ✅" : "NO ❌"}</p>
-        <p>Rehydrated from: {debugInfo.rehydratedFrom || "—"}</p>
-        <p>Draft timestamp: {debugInfo.draftTimestamp || "—"}</p>
-        <p>Last reset by: {debugInfo.lastResetBy || "—"}</p>
+        <p>sessionStorage draft exists: <strong>{runtimeDebug.draftExists ? "YES ✅" : "NO ❌"}</strong></p>
+        <p>Rehydration succeeded: <strong>{runtimeDebug.rehydrationSucceeded ? "YES ✅" : "NO ❌"}</strong></p>
+        <p>OCR success received: <strong>{runtimeDebug.ocrSuccessReceived ? "YES ✅" : "NO ❌"}</strong></p>
+        <p>Last OCR timestamp: {runtimeDebug.lastOcrAt || "—"}</p>
+        <p>Last route change timestamp: {runtimeDebug.lastRouteChangeAt || "—"}</p>
+        <p>Last state reset timestamp: {runtimeDebug.lastStateResetAt || "—"}</p>
+        <p>Path at OCR success: {runtimeDebug.pathAtOcrSuccess || "—"}</p>
+        <p>Path after OCR route change: {runtimeDebug.pathAfterOcrRouteChange || "—"}</p>
+        <p>Route changed after OCR: <strong>{runtimeDebug.routeChangedAfterOcr ? "YES ⚠️" : "NO ✅"}</strong></p>
+        <p>Component remounted after OCR: <strong>{runtimeDebug.remountedAfterOcr ? "YES ⚠️" : "NO ✅"}</strong></p>
+        <p>Step reset after OCR: <strong>{runtimeDebug.stepResetAfterOcr ? "YES ⚠️" : "NO ✅"}</strong></p>
+        <p>Contact reset after OCR: <strong>{runtimeDebug.contactResetAfterOcr ? "YES ⚠️" : "NO ✅"}</strong></p>
+        <p>navigate() calls seen: <strong>{runtimeDebug.navigateCalls}</strong> (last target: {runtimeDebug.lastNavigateTarget || "—"}, at {runtimeDebug.lastNavigateAt || "—"})</p>
+        <p>Last reset reason: {runtimeDebug.lastResetReason || "—"}</p>
         <p>Contact name: {contact.name || "(empty)"}</p>
         <p>Contact email: {contact.email || "(empty)"}</p>
-        {debugInfo.rehydrated && step === "review" && (
-          <p className="text-green-700 dark:text-green-400 font-bold">🟢 Recovered scanned card draft</p>
+        {runtimeDebug.trueReloadDetected && (
+          <p className="text-destructive font-bold">🔴 True browser reload/unload detected ({runtimeDebug.trueReloadEvent} at {runtimeDebug.trueReloadAt || "—"})</p>
         )}
+        {runtimeDebug.routeChangedAfterOcr && (
+          <p className="text-destructive font-bold">🔴 Route changed after OCR</p>
+        )}
+        {runtimeDebug.remountedAfterOcr && (
+          <p className="text-destructive font-bold">🔴 Component remounted after OCR</p>
+        )}
+        {(runtimeDebug.stepResetAfterOcr || runtimeDebug.contactResetAfterOcr) && (
+          <p className="text-destructive font-bold">🔴 State reset after OCR</p>
+        )}
+        {runtimeDebug.rehydrationSucceeded && step === "review" && (
+          <p className="text-primary font-bold">🟢 Recovered scanned card draft</p>
+        )}
+
+        <div className="pt-2 mt-2 border-t border-border space-y-1">
+          <p className="font-bold">OCR Success Timeline</p>
+          <p>1) file selected: {runtimeDebug.timeline.fileSelectedAt || "—"}</p>
+          <p>2) OCR started: {runtimeDebug.timeline.ocrStartedAt || "—"}</p>
+          <p>3) OCR success received: {runtimeDebug.timeline.ocrSuccessAt || "—"}</p>
+          <p>4) draft written: {runtimeDebug.timeline.draftWrittenAt || "—"}</p>
+          <p>5) step switched to review: {runtimeDebug.timeline.stepReviewAt || "—"}</p>
+          <p>6) route changed after OCR: {runtimeDebug.timeline.routeChangedAfterOcr ? `YES at ${runtimeDebug.timeline.routeChangedAt || "—"}` : "NO"}</p>
+          <p>7) component remounted after OCR: {runtimeDebug.timeline.remountedAfterOcr ? `YES at ${runtimeDebug.timeline.remountedAt || "—"}` : "NO"}</p>
+          <p>8) state reset after OCR: {runtimeDebug.timeline.stateResetAfterOcr ? `YES at ${runtimeDebug.timeline.stateResetAt || "—"}` : "NO"}</p>
+        </div>
       </div>
 
       {step === "capture" && (
@@ -1038,7 +1116,7 @@ export default function ScanBusinessCard() {
             <p className="font-medium">Contact saved</p>
           </div>
           <div className="flex gap-3">
-            <Button type="button" className="flex-1" onClick={() => savedLeadId && navigate(`/app/contacts/${savedLeadId}`)} disabled={!savedLeadId}>
+            <Button type="button" className="flex-1" onClick={() => savedLeadId && trackedNavigate(`/app/contacts/${savedLeadId}`)} disabled={!savedLeadId}>
               View Contact
             </Button>
             <Button type="button" variant="outline" className="flex-1" onClick={reset}>
