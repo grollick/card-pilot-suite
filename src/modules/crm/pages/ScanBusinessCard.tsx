@@ -268,6 +268,7 @@ export default function ScanBusinessCard() {
         <p style={{ margin: 0 }}>File: <b>{file ? `${file.name} (${(file.size/1024).toFixed(0)}KB)` : "—"}</b></p>
         <p style={{ margin: 0 }}>Preview: <b>{previewUrl ? "YES ✅" : "NO"}</b></p>
         <p style={{ margin: 0 }}>Draft stored: <b>{contact ? "YES ✅" : "NO"}</b></p>
+        <p style={{ margin: 0 }}>Save: <b>{savedLeadId ? `✅ ${savedLeadId}` : saving ? "⏳" : "—"}</b></p>
         <p style={{ margin: 0 }}>Last event: <b>{lastEvent}</b></p>
       </div>
 
