@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import { Camera, Upload, Loader2, ScanLine, Check, X, RotateCcw } from "lucide-react";
+import { Upload, Loader2, ScanLine, Check, X, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { captureLead } from "@/lib/captureLead";
 import { toast } from "sonner";
