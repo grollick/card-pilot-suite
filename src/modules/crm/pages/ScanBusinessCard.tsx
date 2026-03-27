@@ -474,6 +474,25 @@ export default function ScanBusinessCard() {
         </div>
       </div>
 
+      {/* Temporary debug panel */}
+      <div className="rounded-lg border border-yellow-500 bg-yellow-50 dark:bg-yellow-950 p-3 text-xs font-mono space-y-1">
+        <p className="font-bold text-yellow-800 dark:text-yellow-200">🔍 Scanner Debug Panel</p>
+        <p>Step: <strong>{step}</strong></p>
+        <p>Mount #{mountCount} at {debugInfo.mountedAt}</p>
+        <p>Draft key: {DRAFT_KEY}</p>
+        <p>Draft in sessionStorage: <strong>{(() => { try { return sessionStorage.getItem(DRAFT_KEY) ? "YES ✅" : "NO ❌"; } catch { return "ERROR"; } })()}</strong></p>
+        <p>Draft found on mount: {debugInfo.draftFound ? "YES ✅" : "NO ❌"}</p>
+        <p>Rehydrated: {debugInfo.rehydrated ? "YES ✅" : "NO ❌"}</p>
+        <p>Rehydrated from: {debugInfo.rehydratedFrom || "—"}</p>
+        <p>Draft timestamp: {debugInfo.draftTimestamp || "—"}</p>
+        <p>Last reset by: {debugInfo.lastResetBy || "—"}</p>
+        <p>Contact name: {contact.name || "(empty)"}</p>
+        <p>Contact email: {contact.email || "(empty)"}</p>
+        {debugInfo.rehydrated && step === "review" && (
+          <p className="text-green-700 dark:text-green-400 font-bold">🟢 Recovered scanned card draft</p>
+        )}
+      </div>
+
       {step === "capture" && (
         <div className="space-y-4">
           <div className="border-2 border-dashed border-border rounded-xl p-10 text-center space-y-4">
