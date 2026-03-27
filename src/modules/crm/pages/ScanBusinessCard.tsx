@@ -431,7 +431,7 @@ export default function ScanBusinessCard() {
       setSaving(false);
       console.log("[scan-card] save handler completed");
     }
-  };
+  }, [contact, contactType, queryClient, navigate]);
 
   const handleSaveContactClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     console.log("[scan-card] save button click handler runs");
