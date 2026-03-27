@@ -127,6 +127,36 @@ const createDefaultRuntimeState = (path: string, step: Step): RuntimeDebugState 
   timeline: defaultRuntimeTimeline(),
 });
 
+const writeStoredRuntimeState = (state: RuntimeDebugState) => {
+  try {
+    sessionStorage.setItem(RUNTIME_DEBUG_KEY, JSON.stringify(state));
+  } catch {
+    // ignore diagnostics storage failures
+  }
+};
+
+const readStoredRuntimeState = (path: string, step: Step): RuntimeDebugState => {
+  const base = createDefaultRuntimeState(path, step);
+  try {
+    const raw = sessionStorage.getItem(RUNTIME_DEBUG_KEY);
+    if (!raw) return base;
+
+    const parsed = JSON.parse(raw) as Partial<RuntimeDebugState>;
+    return {
+      ...base,
+      ...parsed,
+      currentPath: path,
+      currentStep: step,
+      timeline: {
+        ...base.timeline,
+        ...(parsed.timeline ?? {}),
+      },
+    };
+  } catch {
+    return base;
+  }
+};
+
 const safeString = (value: unknown) => (typeof value === "string" ? value.trim() : "");
 
 const normalizeExtractedContact = (raw: any): ExtractedContact => {
