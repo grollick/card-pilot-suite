@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect, type FormEvent, type MouseEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Camera, Upload, Loader2, ArrowLeft, ScanLine, UserPlus, X, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ const CONTACT_TYPES = [
 ] as const;
 
 const DRAFT_KEY = "scan_business_card_draft_v3";
+const RUNTIME_DEBUG_KEY = "scan_business_card_runtime_debug_v1";
 
 interface ExtractedContact {
   name: string;
@@ -37,6 +38,124 @@ interface ExtractedContact {
 }
 
 type Step = "capture" | "scanning" | "review" | "saved";
+
+interface RuntimeTimeline {
+  fileSelectedAt: string;
+  ocrStartedAt: string;
+  ocrSuccessAt: string;
+  draftWrittenAt: string;
+  stepReviewAt: string;
+  routeChangedAfterOcr: boolean;
+  routeChangedAt: string;
+  remountedAfterOcr: boolean;
+  remountedAt: string;
+  stateResetAfterOcr: boolean;
+  stateResetAt: string;
+}
+
+interface RuntimeDebugState {
+  currentPath: string;
+  currentStep: Step;
+  mountCount: number;
+  unmountCount: number;
+  lastMountAt: string;
+  lastUnmountAt: string;
+  draftExists: boolean;
+  rehydrationSucceeded: boolean;
+  ocrSuccessReceived: boolean;
+  lastOcrAt: string;
+  lastRouteChangeAt: string;
+  lastStateResetAt: string;
+  trueReloadDetected: boolean;
+  trueReloadEvent: string;
+  trueReloadAt: string;
+  routeChangedAfterOcr: boolean;
+  remountedAfterOcr: boolean;
+  stepResetAfterOcr: boolean;
+  contactResetAfterOcr: boolean;
+  pathAtOcrSuccess: string;
+  pathAfterOcrRouteChange: string;
+  lastResetReason: string;
+  navigateCalls: number;
+  lastNavigateAt: string;
+  lastNavigateTarget: string;
+  timeline: RuntimeTimeline;
+}
+
+const isoNow = () => new Date().toISOString();
+
+const defaultRuntimeTimeline = (): RuntimeTimeline => ({
+  fileSelectedAt: "",
+  ocrStartedAt: "",
+  ocrSuccessAt: "",
+  draftWrittenAt: "",
+  stepReviewAt: "",
+  routeChangedAfterOcr: false,
+  routeChangedAt: "",
+  remountedAfterOcr: false,
+  remountedAt: "",
+  stateResetAfterOcr: false,
+  stateResetAt: "",
+});
+
+const createDefaultRuntimeState = (path: string, step: Step): RuntimeDebugState => ({
+  currentPath: path,
+  currentStep: step,
+  mountCount: 0,
+  unmountCount: 0,
+  lastMountAt: "",
+  lastUnmountAt: "",
+  draftExists: false,
+  rehydrationSucceeded: false,
+  ocrSuccessReceived: false,
+  lastOcrAt: "",
+  lastRouteChangeAt: "",
+  lastStateResetAt: "",
+  trueReloadDetected: false,
+  trueReloadEvent: "",
+  trueReloadAt: "",
+  routeChangedAfterOcr: false,
+  remountedAfterOcr: false,
+  stepResetAfterOcr: false,
+  contactResetAfterOcr: false,
+  pathAtOcrSuccess: "",
+  pathAfterOcrRouteChange: "",
+  lastResetReason: "",
+  navigateCalls: 0,
+  lastNavigateAt: "",
+  lastNavigateTarget: "",
+  timeline: defaultRuntimeTimeline(),
+});
+
+const writeStoredRuntimeState = (state: RuntimeDebugState) => {
+  try {
+    sessionStorage.setItem(RUNTIME_DEBUG_KEY, JSON.stringify(state));
+  } catch {
+    // ignore diagnostics storage failures
+  }
+};
+
+const readStoredRuntimeState = (path: string, step: Step): RuntimeDebugState => {
+  const base = createDefaultRuntimeState(path, step);
+  try {
+    const raw = sessionStorage.getItem(RUNTIME_DEBUG_KEY);
+    if (!raw) return base;
+
+    const parsed = JSON.parse(raw) as Partial<RuntimeDebugState>;
+    return {
+      ...base,
+      ...parsed,
+      currentPath: path,
+      currentStep: step,
+      timeline: {
+        ...base.timeline,
+        ...(parsed.timeline ?? {}),
+      },
+    };
+  } catch {
+    return base;
+  }
+};
 
 const safeString = (value: unknown) => (typeof value === "string" ? value.trim() : "");
 
@@ -64,6 +183,7 @@ const normalizeExtractedContact = (raw: any): ExtractedContact => {
 };
 
 export default function ScanBusinessCard() {
+  const location = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -79,44 +199,214 @@ export default function ScanBusinessCard() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const stepRef = useRef<Step>("capture");
   const savingRef = useRef(false);
-  const mountCountRef = useRef(0);
-  const [mountCount, setMountCount] = useState(0);
-  const [debugInfo, setDebugInfo] = useState({
-    draftFound: false,
-    draftTimestamp: "",
-    rehydrated: false,
-    rehydratedFrom: "",
-    lastResetBy: "",
-    mountedAt: "",
-  });
+  const previousPathRef = useRef(location.pathname);
+  const previousStepRef = useRef<Step>("capture");
+  const previousContactRef = useRef<ExtractedContact>({ name: "" });
+  const [runtimeDebug, setRuntimeDebug] = useState<RuntimeDebugState>(() => createDefaultRuntimeState(location.pathname, "capture"));
+  const runtimeRef = useRef<RuntimeDebugState>(createDefaultRuntimeState(location.pathname, "capture"));
 
-  // Track mounts
+  const updateRuntimeDebug = useCallback((updater: (prev: RuntimeDebugState) => RuntimeDebugState) => {
+    setRuntimeDebug((previous) => {
+      const next = updater(previous);
+      runtimeRef.current = next;
+      try {
+        sessionStorage.setItem(RUNTIME_DEBUG_KEY, JSON.stringify(next));
+      } catch {
+        // ignore storage write failures for diagnostics
+      }
+      return next;
+    });
+  }, []);
+
+  const trackedNavigate = useCallback((to: string | number, options?: { replace?: boolean }) => {
+    const at = isoNow();
+    updateRuntimeDebug((prev) => ({
+      ...prev,
+      navigateCalls: prev.navigateCalls + 1,
+      lastNavigateAt: at,
+      lastNavigateTarget: String(to),
+    }));
+    if (typeof to === "number") {
+      navigate(to);
+      return;
+    }
+    navigate(to, options);
+  }, [navigate, updateRuntimeDebug]);
+
+  const hasContactData = useCallback((value: ExtractedContact) => {
+    return [
+      value.name,
+      value.first_name,
+      value.last_name,
+      value.email,
+      value.phone,
+      value.company,
+      value.title,
+      value.website,
+      value.address,
+      value.notes,
+    ].some((item) => safeString(item).length > 0);
+  }, []);
+
   useEffect(() => {
-    mountCountRef.current += 1;
-    const count = mountCountRef.current;
-    setMountCount(count);
-    const now = new Date().toISOString().slice(11, 19);
-    console.log(`[scan-card-debug] MOUNT #${count} at ${now}`);
-    setDebugInfo(prev => ({ ...prev, mountedAt: now }));
+    const mountedAt = isoNow();
+    const restored = readStoredRuntimeState(location.pathname, step);
+    const remountedAfterOcr = Boolean(restored.ocrSuccessReceived || restored.rehydrationSucceeded);
+
+    const next: RuntimeDebugState = {
+      ...restored,
+      currentPath: location.pathname,
+      currentStep: step,
+      mountCount: restored.mountCount + 1,
+      lastMountAt: mountedAt,
+      remountedAfterOcr: restored.remountedAfterOcr || remountedAfterOcr,
+      timeline: {
+        ...restored.timeline,
+        remountedAfterOcr: restored.timeline.remountedAfterOcr || remountedAfterOcr,
+        remountedAt: remountedAfterOcr ? mountedAt : restored.timeline.remountedAt,
+      },
+    };
+
+    runtimeRef.current = next;
+    setRuntimeDebug(next);
+    writeStoredRuntimeState(next);
+
+    console.log("[scan-card-debug] mount", {
+      mountCount: next.mountCount,
+      remountedAfterOcr,
+      mountedAt,
+    });
+
+    return () => {
+      const unmountedAt = isoNow();
+      const current = runtimeRef.current;
+      const nextOnUnmount: RuntimeDebugState = {
+        ...current,
+        unmountCount: current.unmountCount + 1,
+        lastUnmountAt: unmountedAt,
+      };
+      runtimeRef.current = nextOnUnmount;
+      writeStoredRuntimeState(nextOnUnmount);
+      console.log("[scan-card-debug] unmount", {
+        unmountCount: nextOnUnmount.unmountCount,
+        unmountedAt,
+      });
+    };
+    // intentionally only on mount/unmount for remount diagnostics
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     stepRef.current = step;
-  }, [step]);
+    updateRuntimeDebug((prev) => ({
+      ...prev,
+      currentPath: location.pathname,
+      currentStep: step,
+      draftExists: (() => {
+        try {
+          return Boolean(sessionStorage.getItem(DRAFT_KEY));
+        } catch {
+          return prev.draftExists;
+        }
+      })(),
+    }));
+  }, [location.pathname, step, updateRuntimeDebug]);
 
   useEffect(() => {
     savingRef.current = saving;
   }, [saving]);
 
+  useEffect(() => {
+    const previousPath = previousPathRef.current;
+    if (previousPath === location.pathname) return;
+
+    const changedAt = isoNow();
+    updateRuntimeDebug((prev) => ({
+      ...prev,
+      currentPath: location.pathname,
+      lastRouteChangeAt: changedAt,
+      routeChangedAfterOcr: prev.routeChangedAfterOcr || prev.ocrSuccessReceived,
+      pathAfterOcrRouteChange: prev.ocrSuccessReceived ? location.pathname : prev.pathAfterOcrRouteChange,
+      timeline: {
+        ...prev.timeline,
+        routeChangedAfterOcr: prev.timeline.routeChangedAfterOcr || prev.ocrSuccessReceived,
+        routeChangedAt: changedAt,
+      },
+    }));
+
+    console.warn("[scan-card-debug] route changed", {
+      from: previousPath,
+      to: location.pathname,
+      afterOcr: runtimeRef.current.ocrSuccessReceived,
+    });
+
+    previousPathRef.current = location.pathname;
+  }, [location.pathname, updateRuntimeDebug]);
+
+  useEffect(() => {
+    const previousStep = previousStepRef.current;
+    const hadOcr = runtimeRef.current.ocrSuccessReceived || runtimeRef.current.rehydrationSucceeded;
+
+    if (hadOcr && previousStep !== "capture" && step === "capture") {
+      const resetAt = isoNow();
+      updateRuntimeDebug((prev) => ({
+        ...prev,
+        stepResetAfterOcr: true,
+        lastStateResetAt: resetAt,
+        lastResetReason: `Step reset after OCR (${previousStep} -> capture)`,
+        timeline: {
+          ...prev.timeline,
+          stateResetAfterOcr: true,
+          stateResetAt: resetAt,
+        },
+      }));
+      console.warn("[scan-card-debug] Step reset after OCR", { previousStep, nextStep: step });
+    }
+
+    previousStepRef.current = step;
+  }, [step, updateRuntimeDebug]);
+
+  useEffect(() => {
+    const hadOcr = runtimeRef.current.ocrSuccessReceived || runtimeRef.current.rehydrationSucceeded;
+    const hadPreviousData = hasContactData(previousContactRef.current);
+    const hasCurrentData = hasContactData(contact);
+
+    if (hadOcr && hadPreviousData && !hasCurrentData) {
+      const resetAt = isoNow();
+      updateRuntimeDebug((prev) => ({
+        ...prev,
+        contactResetAfterOcr: true,
+        lastStateResetAt: resetAt,
+        lastResetReason: "Contact state reset after OCR",
+        timeline: {
+          ...prev.timeline,
+          stateResetAfterOcr: true,
+          stateResetAt: resetAt,
+        },
+      }));
+      console.warn("[scan-card-debug] Contact state reset after OCR");
+    }
+
+    previousContactRef.current = contact;
+  }, [contact, hasContactData, updateRuntimeDebug]);
+
   const persistDraft = useCallback((draft: { imagePreview: string | null; contact: ExtractedContact; contactType: string; timestamp?: string }) => {
     try {
-      const withTimestamp = { ...draft, timestamp: draft.timestamp || new Date().toISOString() };
+      const withTimestamp = { ...draft, timestamp: draft.timestamp || isoNow() };
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify(withTimestamp));
       console.log("[scan-card-debug] draft WRITTEN to sessionStorage", DRAFT_KEY);
+      updateRuntimeDebug((prev) => ({
+        ...prev,
+        draftExists: true,
+        timeline: {
+          ...prev.timeline,
+          draftWrittenAt: withTimestamp.timestamp || isoNow(),
+        },
+      }));
     } catch (e) {
       console.error("[scan-card-debug] draft write FAILED", e);
     }
-  }, []);
+  }, [updateRuntimeDebug]);
 
   // Rehydration — runs once on mount, restores draft if present
   useEffect(() => {
@@ -124,39 +414,58 @@ export default function ScanBusinessCard() {
       const raw = sessionStorage.getItem(DRAFT_KEY);
       console.log("[scan-card-debug] rehydration check — draft present:", !!raw);
       if (!raw) {
-        setDebugInfo(prev => ({ ...prev, draftFound: false, rehydrated: false }));
+        updateRuntimeDebug((prev) => ({
+          ...prev,
+          draftExists: false,
+          rehydrationSucceeded: false,
+        }));
         return;
       }
+
       const draft = JSON.parse(raw) as {
         imagePreview?: string | null;
         contact?: ExtractedContact;
         contactType?: string;
         timestamp?: string;
       };
+
       if (!draft.contact) {
-        console.log("[scan-card-debug] draft found but no contact data");
-        setDebugInfo(prev => ({ ...prev, draftFound: true, rehydrated: false, rehydratedFrom: "no contact in draft" }));
+        updateRuntimeDebug((prev) => ({
+          ...prev,
+          draftExists: true,
+          rehydrationSucceeded: false,
+          lastResetReason: "Draft exists but contact payload missing",
+        }));
         return;
       }
 
       const restored = normalizeExtractedContact(draft.contact);
-      console.log("[scan-card-debug] REHYDRATING from draft", { restored, timestamp: draft.timestamp });
       setImagePreview(draft.imagePreview ?? null);
       setContact(restored);
       setContactType(draft.contactType ?? "lead");
       setStep("review");
-      setDebugInfo(prev => ({
+
+      const reviewAt = isoNow();
+      updateRuntimeDebug((prev) => ({
         ...prev,
-        draftFound: true,
-        draftTimestamp: draft.timestamp || "unknown",
-        rehydrated: true,
-        rehydratedFrom: `name: ${restored.name}, email: ${restored.email}`,
+        currentStep: "review",
+        draftExists: true,
+        rehydrationSucceeded: true,
+        timeline: {
+          ...prev.timeline,
+          stepReviewAt: reviewAt,
+        },
       }));
     } catch (e) {
       console.error("[scan-card-debug] rehydration FAILED", e);
-      setDebugInfo(prev => ({ ...prev, draftFound: false, rehydrated: false, rehydratedFrom: "parse error" }));
+      updateRuntimeDebug((prev) => ({
+        ...prev,
+        draftExists: false,
+        rehydrationSucceeded: false,
+        lastResetReason: "Draft parse failed during rehydration",
+      }));
     }
-  }, []);
+  }, [updateRuntimeDebug]);
 
   useEffect(() => {
     if (step !== "review") return;
@@ -201,27 +510,46 @@ export default function ScanBusinessCard() {
     document.documentElement.style.overscrollBehaviorY = "contain";
     document.body.style.overscrollBehaviorY = "contain";
 
-    const onBeforeUnload = () => {
-      console.warn("[scan-card] unexpected beforeunload", {
-        step: stepRef.current,
-        saving: savingRef.current,
+    const markTrueReload = (eventName: "beforeunload" | "unload" | "pagehide" | "visibilitychange") => {
+      const at = isoNow();
+      const current = runtimeRef.current;
+      const next = {
+        ...current,
+        trueReloadDetected: true,
+        trueReloadEvent: eventName,
+        trueReloadAt: at,
+        lastResetReason: `True browser reload/unload detected (${eventName})`,
+      };
+
+      runtimeRef.current = next;
+      setRuntimeDebug(next);
+      writeStoredRuntimeState(next);
+
+      console.warn("[scan-card-debug] True browser reload/unload detected", {
+        eventName,
+        at,
       });
     };
 
-    const onPageHide = (event: PageTransitionEvent) => {
-      console.warn("[scan-card] pagehide triggered", {
-        persisted: event.persisted,
-        step: stepRef.current,
-        saving: savingRef.current,
-      });
+    const onBeforeUnload = () => markTrueReload("beforeunload");
+    const onUnload = () => markTrueReload("unload");
+    const onPageHide = () => markTrueReload("pagehide");
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        markTrueReload("visibilitychange");
+      }
     };
 
     window.addEventListener("beforeunload", onBeforeUnload);
+    window.addEventListener("unload", onUnload);
     window.addEventListener("pagehide", onPageHide);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       window.removeEventListener("beforeunload", onBeforeUnload);
+      window.removeEventListener("unload", onUnload);
       window.removeEventListener("pagehide", onPageHide);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       document.documentElement.style.overscrollBehaviorY = prevHtmlOverscrollY;
       document.body.style.overscrollBehaviorY = prevBodyOverscrollY;
     };
@@ -235,6 +563,15 @@ export default function ScanBusinessCard() {
   }, []);
 
   const processImage = useCallback(async (base64: string) => {
+    const ocrStartedAt = isoNow();
+    updateRuntimeDebug((prev) => ({
+      ...prev,
+      timeline: {
+        ...prev.timeline,
+        ocrStartedAt,
+      },
+    }));
+
     setImagePreview(base64);
     setStep("scanning");
     setSaveError(null);
@@ -252,6 +589,18 @@ export default function ScanBusinessCard() {
       if (data?.error) throw new Error(data.error);
 
       console.log("[scan-card] OCR result received", data?.contact);
+      const ocrSuccessAt = isoNow();
+      updateRuntimeDebug((prev) => ({
+        ...prev,
+        ocrSuccessReceived: true,
+        lastOcrAt: ocrSuccessAt,
+        pathAtOcrSuccess: location.pathname,
+        timeline: {
+          ...prev.timeline,
+          ocrSuccessAt,
+        },
+      }));
+
       const scanned = normalizeExtractedContact(data?.contact ?? {});
 
       if (!scanned.name && !scanned.email && !scanned.phone) {
@@ -262,6 +611,14 @@ export default function ScanBusinessCard() {
       persistDraft({ imagePreview: base64, contact: scanned, contactType });
       setContact(scanned);
       setStep("review");
+      updateRuntimeDebug((prev) => ({
+        ...prev,
+        currentStep: "review",
+        timeline: {
+          ...prev.timeline,
+          stepReviewAt: isoNow(),
+        },
+      }));
       console.log("[scan-card] step set to review — no navigation, staying on same page");
       toast.success("Card scanned! Review and tap Save Contact.");
     } catch (err: any) {
@@ -269,7 +626,7 @@ export default function ScanBusinessCard() {
       toast.error(err.message || "Failed to scan business card");
       setStep("capture");
     }
-  }, [contactType, persistDraft]);
+  }, [contactType, location.pathname, persistDraft, updateRuntimeDebug]);
 
   const compressImage = useCallback((file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -301,6 +658,14 @@ export default function ScanBusinessCard() {
   }, []);
 
   const handleFile = useCallback(async (file: File) => {
+    updateRuntimeDebug((prev) => ({
+      ...prev,
+      timeline: {
+        ...prev.timeline,
+        fileSelectedAt: isoNow(),
+      },
+    }));
+
     if (!file.type.startsWith("image/")) {
       toast.error("Please select an image file");
       return;
@@ -315,7 +680,7 @@ export default function ScanBusinessCard() {
     } catch (err: any) {
       toast.error(err.message || "Failed to read image");
     }
-  }, [compressImage, processImage]);
+  }, [compressImage, processImage, updateRuntimeDebug]);
 
   const handleSave = useCallback(async () => {
     console.log("[scan-card] save handler started");
@@ -431,7 +796,7 @@ export default function ScanBusinessCard() {
       setSaving(false);
       console.log("[scan-card] save handler completed");
     }
-  }, [contact, contactType, queryClient, navigate]);
+  }, [contact, contactType, queryClient]);
 
   const handleSaveContactClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     console.log("[scan-card] save button click handler runs");
@@ -443,6 +808,7 @@ export default function ScanBusinessCard() {
 
   const reset = () => {
     console.log("[scan-card-debug] RESET triggered");
+    const resetAt = isoNow();
     setStep("capture");
     setImagePreview(null);
     setContact({ name: "" });
@@ -450,7 +816,13 @@ export default function ScanBusinessCard() {
     setSaveError(null);
     setSavedLeadId(null);
     sessionStorage.removeItem(DRAFT_KEY);
-    setDebugInfo(prev => ({ ...prev, lastResetBy: "user-reset", draftFound: false, rehydrated: false }));
+    updateRuntimeDebug((prev) => ({
+      ...prev,
+      currentStep: "capture",
+      draftExists: false,
+      lastStateResetAt: resetAt,
+      lastResetReason: "user-reset",
+    }));
   };
 
   return (
@@ -460,7 +832,7 @@ export default function ScanBusinessCard() {
       onSubmitCapture={handleSubmitCapture}
     >
       <div className="flex items-center gap-3">
-        <Button type="button" variant="ghost" size="icon" onClick={() => navigate(-1)}>
+        <Button type="button" variant="ghost" size="icon" onClick={() => trackedNavigate(-1)}>
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
@@ -475,22 +847,56 @@ export default function ScanBusinessCard() {
       </div>
 
       {/* Temporary debug panel */}
-      <div className="rounded-lg border border-yellow-500 bg-yellow-50 dark:bg-yellow-950 p-3 text-xs font-mono space-y-1">
-        <p className="font-bold text-yellow-800 dark:text-yellow-200">🔍 Scanner Debug Panel</p>
+      <div className="rounded-lg border border-border bg-muted p-3 text-xs font-mono space-y-1">
+        <p className="font-bold text-foreground">🔍 Scanner Debug Panel</p>
+        <p>Current route/path: <strong>{runtimeDebug.currentPath || "—"}</strong></p>
         <p>Step: <strong>{step}</strong></p>
-        <p>Mount #{mountCount} at {debugInfo.mountedAt}</p>
+        <p>Mount count: <strong>{runtimeDebug.mountCount}</strong> (last: {runtimeDebug.lastMountAt || "—"})</p>
+        <p>Unmount count: <strong>{runtimeDebug.unmountCount}</strong> (last: {runtimeDebug.lastUnmountAt || "—"})</p>
         <p>Draft key: {DRAFT_KEY}</p>
-        <p>Draft in sessionStorage: <strong>{(() => { try { return sessionStorage.getItem(DRAFT_KEY) ? "YES ✅" : "NO ❌"; } catch { return "ERROR"; } })()}</strong></p>
-        <p>Draft found on mount: {debugInfo.draftFound ? "YES ✅" : "NO ❌"}</p>
-        <p>Rehydrated: {debugInfo.rehydrated ? "YES ✅" : "NO ❌"}</p>
-        <p>Rehydrated from: {debugInfo.rehydratedFrom || "—"}</p>
-        <p>Draft timestamp: {debugInfo.draftTimestamp || "—"}</p>
-        <p>Last reset by: {debugInfo.lastResetBy || "—"}</p>
+        <p>sessionStorage draft exists: <strong>{runtimeDebug.draftExists ? "YES ✅" : "NO ❌"}</strong></p>
+        <p>Rehydration succeeded: <strong>{runtimeDebug.rehydrationSucceeded ? "YES ✅" : "NO ❌"}</strong></p>
+        <p>OCR success received: <strong>{runtimeDebug.ocrSuccessReceived ? "YES ✅" : "NO ❌"}</strong></p>
+        <p>Last OCR timestamp: {runtimeDebug.lastOcrAt || "—"}</p>
+        <p>Last route change timestamp: {runtimeDebug.lastRouteChangeAt || "—"}</p>
+        <p>Last state reset timestamp: {runtimeDebug.lastStateResetAt || "—"}</p>
+        <p>Path at OCR success: {runtimeDebug.pathAtOcrSuccess || "—"}</p>
+        <p>Path after OCR route change: {runtimeDebug.pathAfterOcrRouteChange || "—"}</p>
+        <p>Route changed after OCR: <strong>{runtimeDebug.routeChangedAfterOcr ? "YES ⚠️" : "NO ✅"}</strong></p>
+        <p>Component remounted after OCR: <strong>{runtimeDebug.remountedAfterOcr ? "YES ⚠️" : "NO ✅"}</strong></p>
+        <p>Step reset after OCR: <strong>{runtimeDebug.stepResetAfterOcr ? "YES ⚠️" : "NO ✅"}</strong></p>
+        <p>Contact reset after OCR: <strong>{runtimeDebug.contactResetAfterOcr ? "YES ⚠️" : "NO ✅"}</strong></p>
+        <p>navigate() calls seen: <strong>{runtimeDebug.navigateCalls}</strong> (last target: {runtimeDebug.lastNavigateTarget || "—"}, at {runtimeDebug.lastNavigateAt || "—"})</p>
+        <p>Last reset reason: {runtimeDebug.lastResetReason || "—"}</p>
         <p>Contact name: {contact.name || "(empty)"}</p>
         <p>Contact email: {contact.email || "(empty)"}</p>
-        {debugInfo.rehydrated && step === "review" && (
-          <p className="text-green-700 dark:text-green-400 font-bold">🟢 Recovered scanned card draft</p>
+        {runtimeDebug.trueReloadDetected && (
+          <p className="text-destructive font-bold">🔴 True browser reload/unload detected ({runtimeDebug.trueReloadEvent} at {runtimeDebug.trueReloadAt || "—"})</p>
         )}
+        {runtimeDebug.routeChangedAfterOcr && (
+          <p className="text-destructive font-bold">🔴 Route changed after OCR</p>
+        )}
+        {runtimeDebug.remountedAfterOcr && (
+          <p className="text-destructive font-bold">🔴 Component remounted after OCR</p>
+        )}
+        {(runtimeDebug.stepResetAfterOcr || runtimeDebug.contactResetAfterOcr) && (
+          <p className="text-destructive font-bold">🔴 State reset after OCR</p>
+        )}
+        {runtimeDebug.rehydrationSucceeded && step === "review" && (
+          <p className="text-primary font-bold">🟢 Recovered scanned card draft</p>
+        )}
+
+        <div className="pt-2 mt-2 border-t border-border space-y-1">
+          <p className="font-bold">OCR Success Timeline</p>
+          <p>1) file selected: {runtimeDebug.timeline.fileSelectedAt || "—"}</p>
+          <p>2) OCR started: {runtimeDebug.timeline.ocrStartedAt || "—"}</p>
+          <p>3) OCR success received: {runtimeDebug.timeline.ocrSuccessAt || "—"}</p>
+          <p>4) draft written: {runtimeDebug.timeline.draftWrittenAt || "—"}</p>
+          <p>5) step switched to review: {runtimeDebug.timeline.stepReviewAt || "—"}</p>
+          <p>6) route changed after OCR: {runtimeDebug.timeline.routeChangedAfterOcr ? `YES at ${runtimeDebug.timeline.routeChangedAt || "—"}` : "NO"}</p>
+          <p>7) component remounted after OCR: {runtimeDebug.timeline.remountedAfterOcr ? `YES at ${runtimeDebug.timeline.remountedAt || "—"}` : "NO"}</p>
+          <p>8) state reset after OCR: {runtimeDebug.timeline.stateResetAfterOcr ? `YES at ${runtimeDebug.timeline.stateResetAt || "—"}` : "NO"}</p>
+        </div>
       </div>
 
       {step === "capture" && (
@@ -710,7 +1116,7 @@ export default function ScanBusinessCard() {
             <p className="font-medium">Contact saved</p>
           </div>
           <div className="flex gap-3">
-            <Button type="button" className="flex-1" onClick={() => savedLeadId && navigate(`/app/contacts/${savedLeadId}`)} disabled={!savedLeadId}>
+            <Button type="button" className="flex-1" onClick={() => savedLeadId && trackedNavigate(`/app/contacts/${savedLeadId}`)} disabled={!savedLeadId}>
               View Contact
             </Button>
             <Button type="button" variant="outline" className="flex-1" onClick={reset}>
