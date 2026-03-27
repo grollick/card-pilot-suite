@@ -287,14 +287,10 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
         Scan your business card to share your contact info
       </p>
       <div style={{ display: "flex", gap: 8, width: "100%" }}>
-        <button type="button" onClick={() => cameraRef.current?.click()} style={btnPrimary}>
-          <Camera style={{ width: 16, height: 16 }} /> Take Photo
-        </button>
-        <button type="button" onClick={() => fileRef.current?.click()} style={btnOutline}>
-          <Upload style={{ width: 16, height: 16 }} /> Upload
+        <button type="button" onClick={() => fileRef.current?.click()} style={btnPrimary}>
+          <Upload style={{ width: 16, height: 16 }} /> Upload Image
         </button>
       </div>
-      <input ref={cameraRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFileChange} />
       <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFileChange} />
     </div>
   );
