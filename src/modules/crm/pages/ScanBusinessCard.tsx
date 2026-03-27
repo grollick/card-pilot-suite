@@ -375,6 +375,8 @@ export default function ScanBusinessCard() {
           full_name: safeString(contact.full_name) || finalName,
           title: safeString(contact.title),
           website: safeString(contact.website),
+          address: safeString(contact.address),
+          company: safeString(contact.company),
           ocr_source: "scan-business-card",
         },
       };
