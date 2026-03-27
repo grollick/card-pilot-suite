@@ -946,6 +946,15 @@ export default function ScanBusinessCard() {
           <p>7) component remounted after OCR: {runtimeDebug.timeline.remountedAfterOcr ? `YES at ${runtimeDebug.timeline.remountedAt || "—"}` : "NO"}</p>
           <p>8) state reset after OCR: {runtimeDebug.timeline.stateResetAfterOcr ? `YES at ${runtimeDebug.timeline.stateResetAt || "—"}` : "NO"}</p>
         </div>
+
+        <div className="pt-2 mt-2 border-t border-border space-y-1">
+          <p className="font-bold">🧪 Capture vs OCR Isolation</p>
+          <p>Image preview visible: <strong>{imagePreview ? "YES ✅" : "NO ❌"}</strong></p>
+          <p>OCR manually started: <strong>{ocrManuallyStarted ? "YES" : "NO"}</strong></p>
+          <p>Pending base64 ready: <strong>{pendingBase64 ? "YES ✅" : "NO ❌"}</strong></p>
+          <p>Unload phase: <strong>{unloadPhase}</strong></p>
+          <p>Previous unload (sessionStorage): <strong>{(() => { try { return sessionStorage.getItem("scan_unload_phase") || "—"; } catch { return "—"; } })()}</strong></p>
+        </div>
       </div>
 
       {step === "capture" && (
