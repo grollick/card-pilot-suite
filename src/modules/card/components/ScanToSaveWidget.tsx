@@ -179,6 +179,16 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
         throw new Error("Failed to save contact — no result returned");
       }
 
+      // Patch company/address/notes directly on leads table (capture_lead doesn't set these columns)
+      const patchFields: Record<string, string | null> = {};
+      if (contact.company?.trim()) patchFields.company = contact.company.trim();
+      if (contact.address?.trim()) patchFields.address = contact.address.trim();
+      if (noteParts) patchFields.notes = noteParts;
+
+      if (Object.keys(patchFields).length > 0) {
+        await supabase.from("leads").update(patchFields).eq("id", result.lead_id);
+      }
+
       console.log("Card scanned & saved successfully:", result);
       setStep("done");
       onSuccess?.();
