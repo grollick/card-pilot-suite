@@ -227,6 +227,16 @@ export default function ScanBusinessCard() {
 
       if (!result) throw new Error("No result returned from save");
 
+      // captureLead DB function doesn't set company/address/notes columns directly — patch them now
+      const patchFields: Record<string, string | null> = {};
+      if (contact.company?.trim()) patchFields.company = contact.company.trim();
+      if (contact.address?.trim()) patchFields.address = contact.address.trim();
+      if (noteParts) patchFields.notes = noteParts;
+
+      if (Object.keys(patchFields).length > 0) {
+        await supabase.from("leads").update(patchFields).eq("id", result.lead_id);
+      }
+
       // Clear draft only after confirmed save
       try { sessionStorage.removeItem(DRAFT_KEY); } catch {}
       setSavedLeadId(result.lead_id);
