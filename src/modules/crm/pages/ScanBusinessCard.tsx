@@ -220,8 +220,9 @@ export default function ScanBusinessCard() {
       console.log("[scan-card] OCR result stored", scanned);
       persistDraft({ imagePreview: base64, contact: scanned, contactType });
       setContact(scanned);
-      setStep("review");
       toast.success("Card scanned! Review and tap Save Contact.");
+      // Navigate to standalone review page to avoid parent-wrapper refresh issues
+      navigate("/app/scan-card/review", { replace: true });
     } catch (err: any) {
       console.error("[scan-card] Scan business card error", err);
       toast.error(err.message || "Failed to scan business card");
