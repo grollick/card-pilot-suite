@@ -3,7 +3,7 @@ import {
   ChevronLeft, LogOut, Globe, ChevronRight, HelpCircle,
   Inbox, FileText, Calendar, Kanban,
   ClipboardList, RefreshCw, DollarSign,
-  UserCircle, Star,
+  UserCircle, Star, ScanLine,
   Mail, Share2, Gift, BarChart3, QrCode, Tag, Zap,
   Bot, Eye, CreditCard, Package, Building2, CheckSquare,
   Shield, Sparkles, ExternalLink, Bell, MapPin, Bug,
@@ -32,6 +32,7 @@ import {
 
 const crmItems = [
   { title: "Contacts", url: "/app/contacts", icon: Inbox },
+  { title: "Scan Card", url: "/app/scan-card", icon: ScanLine },
   { title: "Pipeline", url: "/app/pipeline", icon: Kanban },
   { title: "Job Requests", url: "/app/job-requests", icon: Bell, glowKey: "job-requests" },
   { title: "Bookings", url: "/app/bookings", icon: Calendar },
