@@ -32,6 +32,7 @@ import {
 
 const crmItems = [
   { title: "Contacts", url: "/app/contacts", icon: Inbox },
+  { title: "Scan Card", url: "/app/scan-card", icon: ScanLine },
   { title: "Pipeline", url: "/app/pipeline", icon: Kanban },
   { title: "Job Requests", url: "/app/job-requests", icon: Bell, glowKey: "job-requests" },
   { title: "Bookings", url: "/app/bookings", icon: Calendar },
