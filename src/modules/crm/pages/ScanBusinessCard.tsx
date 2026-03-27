@@ -44,21 +44,22 @@ const normalizeExtractedContact = (raw: any): ExtractedContact => {
   const firstName = safeString(raw?.first_name || raw?.firstName);
   const lastName = safeString(raw?.last_name || raw?.lastName);
   const fullName = safeString(raw?.full_name || raw?.fullName || raw?.name) || [firstName, lastName].filter(Boolean).join(" ").trim();
-  const title = safeString(raw?.title || raw?.job_title || raw?.jobTitle);
+  const title = safeString(raw?.title || raw?.job_title || raw?.jobTitle || raw?.position || raw?.role);
+  const company = safeString(raw?.company || raw?.company_name || raw?.companyName || raw?.business_name || raw?.businessName || raw?.organization || raw?.org);
 
   return {
     name: fullName,
     full_name: fullName,
     first_name: firstName,
     last_name: lastName,
-    email: safeString(raw?.email),
-    phone: safeString(raw?.phone),
-    company: safeString(raw?.company),
+    email: safeString(raw?.email || raw?.email_address),
+    phone: safeString(raw?.phone || raw?.phone_number || raw?.mobile || raw?.tel),
+    company,
     title,
     job_title: title,
-    website: safeString(raw?.website),
-    address: safeString(raw?.address),
-    notes: safeString(raw?.notes),
+    website: safeString(raw?.website || raw?.url || raw?.web),
+    address: safeString(raw?.address || raw?.location || raw?.office_address),
+    notes: safeString(raw?.notes || raw?.other),
   };
 };
 
