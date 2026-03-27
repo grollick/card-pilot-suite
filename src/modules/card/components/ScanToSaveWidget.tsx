@@ -45,6 +45,8 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
     const url = URL.createObjectURL(selected);
     setPreviewUrl(url);
     setStep("preview");
+    // Reset input value so same file/camera can be re-selected
+    e.target.value = "";
   }, []);
 
   const prepareBase64 = useCallback(async (f: File): Promise<string> => {
