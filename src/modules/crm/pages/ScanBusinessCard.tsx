@@ -237,7 +237,7 @@ export default function ScanBusinessCard() {
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-12">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <Camera className="h-7 w-7 text-primary" />
+              <Image className="h-7 w-7 text-primary" />
             </div>
             <div className="text-center">
               <p className="text-sm font-medium text-foreground">Select or capture a business card</p>
