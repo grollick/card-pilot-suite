@@ -887,6 +887,7 @@ export default function ScanBusinessCard() {
           <h1 className="text-xl font-bold">Scan Business Card</h1>
           <p className="text-sm text-muted-foreground">
             {step === "capture" && "Take a photo or upload an image"}
+            {step === "preview" && "Image captured — start OCR when ready"}
             {step === "scanning" && "Extracting contact info…"}
             {step === "review" && "Review and save"}
             {step === "saved" && "Contact saved"}
