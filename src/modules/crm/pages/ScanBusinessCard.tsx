@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, type FormEvent, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Camera, Upload, Loader2, ArrowLeft, ScanLine, UserPlus, X, CheckCircle2 } from "lucide-react";
@@ -65,6 +65,7 @@ const normalizeExtractedContact = (raw: any): ExtractedContact => {
 export default function ScanBusinessCard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const rootRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -75,6 +76,16 @@ export default function ScanBusinessCard() {
   const [saving, setSaving] = useState(false);
   const [savedLeadId, setSavedLeadId] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const stepRef = useRef<Step>("capture");
+  const savingRef = useRef(false);
+
+  useEffect(() => {
+    stepRef.current = step;
+  }, [step]);
+
+  useEffect(() => {
+    savingRef.current = saving;
+  }, [saving]);
 
   const persistDraft = useCallback((draft: { imagePreview: string | null; contact: ExtractedContact; contactType: string }) => {
     try {
@@ -110,6 +121,77 @@ export default function ScanBusinessCard() {
     if (step !== "review") return;
     persistDraft({ imagePreview, contact, contactType });
   }, [contact, contactType, imagePreview, persistDraft, step]);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const preventNativeSubmit = (event: Event) => {
+      console.warn("[scan-card] submit event fired");
+      event.preventDefault();
+      event.stopPropagation();
+      console.warn("[scan-card] preventDefault executed");
+    };
+
+    const ancestorForms: HTMLFormElement[] = [];
+    let node: HTMLElement | null = root.parentElement;
+    while (node) {
+      if (node instanceof HTMLFormElement) {
+        ancestorForms.push(node);
+      }
+      node = node.parentElement;
+    }
+
+    ancestorForms.forEach((form) => form.addEventListener("submit", preventNativeSubmit, true));
+
+    if (ancestorForms.length > 0) {
+      console.warn("[scan-card] attached submit guards to ancestor forms", ancestorForms.length);
+    }
+
+    return () => {
+      ancestorForms.forEach((form) => form.removeEventListener("submit", preventNativeSubmit, true));
+    };
+  }, []);
+
+  useEffect(() => {
+    const prevHtmlOverscrollY = document.documentElement.style.overscrollBehaviorY;
+    const prevBodyOverscrollY = document.body.style.overscrollBehaviorY;
+
+    document.documentElement.style.overscrollBehaviorY = "contain";
+    document.body.style.overscrollBehaviorY = "contain";
+
+    const onBeforeUnload = () => {
+      console.warn("[scan-card] unexpected beforeunload", {
+        step: stepRef.current,
+        saving: savingRef.current,
+      });
+    };
+
+    const onPageHide = (event: PageTransitionEvent) => {
+      console.warn("[scan-card] pagehide triggered", {
+        persisted: event.persisted,
+        step: stepRef.current,
+        saving: savingRef.current,
+      });
+    };
+
+    window.addEventListener("beforeunload", onBeforeUnload);
+    window.addEventListener("pagehide", onPageHide);
+
+    return () => {
+      window.removeEventListener("beforeunload", onBeforeUnload);
+      window.removeEventListener("pagehide", onPageHide);
+      document.documentElement.style.overscrollBehaviorY = prevHtmlOverscrollY;
+      document.body.style.overscrollBehaviorY = prevBodyOverscrollY;
+    };
+  }, []);
+
+  const handleSubmitCapture = useCallback((event: FormEvent<HTMLDivElement>) => {
+    console.warn("[scan-card] submit event fired (capture)");
+    event.preventDefault();
+    event.stopPropagation();
+    console.warn("[scan-card] preventDefault executed");
+  }, []);
 
   const processImage = useCallback(async (base64: string) => {
     setImagePreview(base64);
@@ -193,7 +275,16 @@ export default function ScanBusinessCard() {
     }
   }, [compressImage, processImage]);
 
-  const handleSave = async () => {
+  const handleSave = async (event?: MouseEvent<HTMLButtonElement>) => {
+    console.log("[scan-card] save button clicked");
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      console.log("[scan-card] preventDefault executed");
+    }
+
+    console.log("[scan-card] save handler started");
+
     if (saving) return;
 
     const finalName = safeString(contact.name) || [safeString(contact.first_name), safeString(contact.last_name)].filter(Boolean).join(" ").trim();
@@ -301,6 +392,7 @@ export default function ScanBusinessCard() {
       setStep("review");
     } finally {
       setSaving(false);
+      console.log("[scan-card] save handler completed");
     }
   };
 
@@ -316,7 +408,9 @@ export default function ScanBusinessCard() {
 
   return (
     <div
+      ref={rootRef}
       className="max-w-lg mx-auto px-4 py-6 space-y-6"
+      onSubmitCapture={handleSubmitCapture}
       onTouchStartCapture={(e) => e.stopPropagation()}
       onTouchMoveCapture={(e) => e.stopPropagation()}
       onTouchEndCapture={(e) => e.stopPropagation()}
@@ -538,7 +632,7 @@ export default function ScanBusinessCard() {
             <Button type="button" variant="outline" className="flex-1" onClick={reset}>
               Scan Another
             </Button>
-            <Button type="button" className="flex-1 gap-2" onClick={handleSave} disabled={saving}>
+            <Button type="button" className="flex-1 gap-2" onClick={(event) => void handleSave(event)} disabled={saving}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
               Save Contact
             </Button>
