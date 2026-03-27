@@ -317,10 +317,10 @@ export default function ScanBusinessCard() {
     }
   }, [compressImage, processImage]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     console.log("[scan-card] save handler started");
 
-    if (saving) return;
+    if (savingRef.current) return;
 
     const finalName = safeString(contact.name) || [safeString(contact.first_name), safeString(contact.last_name)].filter(Boolean).join(" ").trim();
 
