@@ -1,9 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { Camera, Upload, Loader2, ScanLine, Check, ArrowLeft, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { captureLead } from "@/lib/captureLead";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 
-const isoNow = () => new Date().toISOString();
 const DRAFT_KEY = "scan_business_card_draft_v3";
 
 type Step = "capture" | "preview" | "ocr_running" | "review" | "saving" | "saved";
@@ -28,18 +32,10 @@ export default function ScanBusinessCard() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedLeadId, setSavedLeadId] = useState<string | null>(null);
-  const [mountCount, setMountCount] = useState(0);
-  const [lastEvent, setLastEvent] = useState("none");
-  const mountCountRef = useRef(0);
-  const phaseRef = useRef("idle");
   const navigate = useNavigate();
 
-  // Mount counter + rehydrate draft
+  // Rehydrate persisted draft on mount
   useEffect(() => {
-    mountCountRef.current += 1;
-    setMountCount(mountCountRef.current);
-
-    // Rehydrate persisted draft on mount
     try {
       const raw = sessionStorage.getItem(DRAFT_KEY);
       if (raw) {
@@ -47,31 +43,9 @@ export default function ScanBusinessCard() {
         if (draft.name) {
           setContact(draft);
           setStep("review");
-          phaseRef.current = "review_rehydrated";
         }
       }
     } catch {}
-  }, []);
-
-  // Unload detection — only real unloads, not visibilitychange
-  useEffect(() => {
-    const mark = (evt: string) => {
-      setLastEvent(`${phaseRef.current} (${evt}) ${isoNow()}`);
-    };
-    const onBU = () => mark("beforeunload");
-    const onPH = () => mark("pagehide");
-    const onVC = () => {
-      if (document.visibilityState === "hidden") setLastEvent(`visibility_hidden ${isoNow()}`);
-    };
-
-    window.addEventListener("beforeunload", onBU);
-    window.addEventListener("pagehide", onPH);
-    document.addEventListener("visibilitychange", onVC);
-    return () => {
-      window.removeEventListener("beforeunload", onBU);
-      window.removeEventListener("pagehide", onPH);
-      document.removeEventListener("visibilitychange", onVC);
-    };
   }, []);
 
   // Prevent pull-to-refresh
@@ -85,20 +59,18 @@ export default function ScanBusinessCard() {
     };
   }, []);
 
-  // ── File selection → preview only ──
+  // File selection → preview only
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
-    phaseRef.current = "file_selected";
     setFile(selected);
     setOcrError(null);
     const url = URL.createObjectURL(selected);
     setPreviewUrl(url);
     setStep("preview");
-    phaseRef.current = "preview_ready";
   }, []);
 
-  // ── Prepare base64 for OCR ──
+  // Prepare base64 for OCR
   const prepareBase64 = useCallback(async (f: File): Promise<string> => {
     const objectUrl = URL.createObjectURL(f);
     const img = new Image();
@@ -107,7 +79,6 @@ export default function ScanBusinessCard() {
       img.onerror = () => reject(new Error("Could not load image"));
       img.src = objectUrl;
     });
-
     const maxDim = 1600;
     const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
     const w = Math.max(1, Math.round(img.width * scale));
@@ -121,13 +92,11 @@ export default function ScanBusinessCard() {
     return canvas.toDataURL("image/jpeg", 0.85);
   }, []);
 
-  // ── Manual OCR start ──
+  // Manual OCR start
   const handleStartOcr = useCallback(async () => {
     if (!file) return;
     setStep("ocr_running");
     setOcrError(null);
-    phaseRef.current = "ocr_running";
-
     try {
       const base64 = await prepareBase64(file);
       const { data, error } = await supabase.functions.invoke("scan-business-card-public", {
@@ -135,12 +104,10 @@ export default function ScanBusinessCard() {
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-
       const extracted = data?.contact;
       if (!extracted || typeof extracted !== "object" || !extracted.name) {
         throw new Error("Could not read this card. Try a clearer photo.");
       }
-
       const draft: ExtractedContact = {
         name: extracted.name ?? "",
         email: extracted.email ?? "",
@@ -151,20 +118,16 @@ export default function ScanBusinessCard() {
         address: extracted.address ?? "",
         notes: extracted.notes ?? "",
       };
-
-      // Persist BEFORE changing step
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
       setContact(draft);
       setStep("review");
-      phaseRef.current = "review";
     } catch (err: any) {
       setOcrError(err?.message || "OCR failed");
-      setStep("preview"); // back to preview, keep image
-      phaseRef.current = "ocr_failed";
+      setStep("preview");
     }
   }, [file, prepareBase64]);
 
-  // ── Clear everything ──
+  // Clear everything
   const handleClear = useCallback(() => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setFile(null);
@@ -175,11 +138,10 @@ export default function ScanBusinessCard() {
     setSavedLeadId(null);
     setSaving(false);
     setStep("capture");
-    phaseRef.current = "idle";
     try { sessionStorage.removeItem(DRAFT_KEY); } catch {}
   }, [previewUrl]);
 
-  // ── Update a contact field and persist ──
+  // Update a contact field and persist
   const updateField = useCallback((field: keyof ExtractedContact, value: string) => {
     setContact(prev => {
       const updated = { ...prev!, [field]: value };
@@ -188,14 +150,12 @@ export default function ScanBusinessCard() {
     });
   }, []);
 
-  // ── Save Contact ──
+  // Save Contact
   const handleSaveContact = useCallback(async () => {
     if (!contact?.name?.trim() || saving) return;
     setSaving(true);
     setSaveError(null);
     setStep("saving");
-    phaseRef.current = "saving";
-
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("You must be signed in to save contacts.");
@@ -227,166 +187,173 @@ export default function ScanBusinessCard() {
 
       if (!result) throw new Error("No result returned from save");
 
-      // captureLead DB function doesn't set company/address/notes columns directly — patch them now
+      // Patch company/address/notes directly (capture_lead doesn't set these columns)
       const patchFields: Record<string, string | null> = {};
       if (contact.company?.trim()) patchFields.company = contact.company.trim();
       if (contact.address?.trim()) patchFields.address = contact.address.trim();
       if (noteParts) patchFields.notes = noteParts;
-
       if (Object.keys(patchFields).length > 0) {
         await supabase.from("leads").update(patchFields).eq("id", result.lead_id);
       }
 
-      // Clear draft only after confirmed save
       try { sessionStorage.removeItem(DRAFT_KEY); } catch {}
       setSavedLeadId(result.lead_id);
       setStep("saved");
-      phaseRef.current = "saved";
     } catch (err: any) {
       setSaveError(err?.message || "Could not save contact. Try again.");
-      setStep("review"); // back to review, keep data
-      phaseRef.current = "save_failed";
+      setStep("review");
     } finally {
       setSaving(false);
     }
   }, [contact, saving]);
 
-  // ── Styles ──
-  const panel: React.CSSProperties = {
-    border: "1px solid #ccc", borderRadius: 8, padding: 12, marginBottom: 16,
-    fontSize: 12, fontFamily: "monospace", background: "#f9f9f9", lineHeight: 1.8,
-  };
-  const btn = (bg: string, color: string): React.CSSProperties => ({
-    width: "100%", padding: "10px 16px", borderRadius: 8, fontSize: 14,
-    fontWeight: 600, border: "none", cursor: "pointer", background: bg, color,
-  });
-  const inputStyle: React.CSSProperties = {
-    width: "100%", padding: "8px 12px", borderRadius: 6,
-    border: "1px solid #ccc", fontSize: 13, outline: "none", boxSizing: "border-box",
+  const FIELD_LABELS: Record<keyof ExtractedContact, string> = {
+    name: "Full Name *",
+    email: "Email",
+    phone: "Phone",
+    company: "Company",
+    job_title: "Job Title",
+    website: "Website",
+    address: "Address",
+    notes: "Notes",
   };
 
   return (
-    <div style={{ maxWidth: 480, margin: "0 auto", padding: 16 }}>
-      <h1 style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>
-        📷 Business Card Scanner
-      </h1>
-
-      {/* ── Debug Panel ── */}
-      <div style={panel}>
-        <p style={{ fontWeight: 700, margin: 0 }}>🔍 Debug</p>
-        <p style={{ margin: 0 }}>Step: <b>{step}</b> | Mounts: <b>{mountCount}</b></p>
-        <p style={{ margin: 0 }}>File: <b>{file ? `${file.name} (${(file.size/1024).toFixed(0)}KB)` : "—"}</b></p>
-        <p style={{ margin: 0 }}>Preview: <b>{previewUrl ? "YES ✅" : "NO"}</b></p>
-        <p style={{ margin: 0 }}>Draft stored: <b>{contact ? "YES ✅" : "NO"}</b></p>
-        <p style={{ margin: 0 }}>Save: <b>{savedLeadId ? `✅ ${savedLeadId}` : saving ? "⏳" : "—"}</b></p>
-        <p style={{ margin: 0 }}>Last event: <b>{lastEvent}</b></p>
+    <div className="max-w-lg mx-auto px-4 py-6">
+      <div className="flex items-center gap-3 mb-6">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/app/contacts")}>
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div>
+          <h1 className="text-lg font-bold text-foreground">Scan Business Card</h1>
+          <p className="text-xs text-muted-foreground">Capture a card to add a contact</p>
+        </div>
       </div>
 
-      {/* ── STEP: CAPTURE ── */}
+      {/* CAPTURE */}
       {step === "capture" && (
-        <div style={{ border: "2px dashed #ccc", borderRadius: 12, padding: 32, textAlign: "center" }}>
-          <p style={{ fontSize: 14, marginBottom: 12 }}>Select or capture a business card image</p>
-          <input type="file" accept="image/*" onChange={handleFileChange} style={{ fontSize: 14 }} />
-        </div>
+        <Card>
+          <CardContent className="flex flex-col items-center gap-4 py-12">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+              <Camera className="h-7 w-7 text-primary" />
+            </div>
+            <div className="text-center">
+              <p className="text-sm font-medium text-foreground">Select or capture a business card</p>
+              <p className="text-xs text-muted-foreground mt-1">Take a photo or choose from your gallery</p>
+            </div>
+            <label className="w-full">
+              <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+              <div className="flex gap-2">
+                <Button type="button" className="flex-1 gap-2" onClick={(e) => {
+                  const input = (e.currentTarget.parentElement?.querySelector('input[type="file"]') as HTMLInputElement);
+                  input?.click();
+                }}>
+                  <Upload className="h-4 w-4" /> Choose Image
+                </Button>
+              </div>
+            </label>
+          </CardContent>
+        </Card>
       )}
 
-      {/* ── STEP: PREVIEW (image selected, OCR not started) ── */}
+      {/* PREVIEW */}
       {step === "preview" && previewUrl && (
-        <div>
-          <div style={{ background: "#e8f5e9", border: "1px solid #4caf50", borderRadius: 8, padding: 8, textAlign: "center", marginBottom: 8 }}>
-            <p style={{ fontWeight: 600, color: "#2e7d32", fontSize: 14, margin: 0 }}>✅ Image captured — ready for OCR</p>
-          </div>
-          <img src={previewUrl} alt="Card preview" style={{ width: "100%", borderRadius: 8, border: "1px solid #ddd" }} />
+        <div className="space-y-3">
+          <img src={previewUrl} alt="Card preview" className="w-full rounded-lg border" />
           {ocrError && (
-            <div style={{ background: "#fbe9e7", border: "1px solid #e53935", borderRadius: 8, padding: 8, marginTop: 8, textAlign: "center" }}>
-              <p style={{ color: "#c62828", fontSize: 13, margin: 0 }}>❌ {ocrError}</p>
+            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 text-center">
+              <p className="text-sm text-destructive">{ocrError}</p>
             </div>
           )}
-          <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-            <button type="button" onClick={handleStartOcr} style={btn("#1976d2", "#fff")}>
-              🔍 Start OCR
-            </button>
-            <button type="button" onClick={handleClear} style={btn("#fff", "#333")}>
-              ↩ Retake
-            </button>
+          <div className="flex gap-2">
+            <Button type="button" onClick={handleStartOcr} className="flex-1 gap-2">
+              <ScanLine className="h-4 w-4" /> Read Card
+            </Button>
+            <Button type="button" variant="outline" onClick={handleClear} className="gap-2">
+              <RotateCcw className="h-4 w-4" /> Retake
+            </Button>
           </div>
         </div>
       )}
 
-      {/* ── STEP: OCR RUNNING ── */}
+      {/* OCR RUNNING */}
       {step === "ocr_running" && (
-        <div>
+        <div className="space-y-3">
           {previewUrl && (
-            <img src={previewUrl} alt="Card preview" style={{ width: "100%", borderRadius: 8, border: "1px solid #ddd", opacity: 0.6 }} />
+            <img src={previewUrl} alt="Card preview" className="w-full rounded-lg border opacity-60" />
           )}
-          <div style={{ background: "#e3f2fd", border: "1px solid #1976d2", borderRadius: 8, padding: 12, marginTop: 8, textAlign: "center" }}>
-            <p style={{ fontSize: 14, fontWeight: 600, color: "#1565c0", margin: 0 }}>⏳ OCR running…</p>
+          <div className="flex items-center justify-center gap-2 py-4">
+            <Loader2 className="h-5 w-5 text-primary animate-spin" />
+            <span className="text-sm font-medium text-muted-foreground">Reading card…</span>
           </div>
         </div>
       )}
 
-      {/* ── STEP: REVIEW ── */}
+      {/* REVIEW */}
       {step === "review" && contact && (
-        <div>
-          <div style={{ background: "#e8f5e9", border: "1px solid #4caf50", borderRadius: 8, padding: 8, textAlign: "center", marginBottom: 12 }}>
-            <p style={{ fontWeight: 600, color: "#2e7d32", fontSize: 14, margin: 0 }}>✅ OCR complete — review & save</p>
+        <div className="space-y-4">
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 text-center">
+            <p className="text-sm font-medium text-primary">Review extracted info, then save</p>
           </div>
           {saveError && (
-            <div style={{ background: "#fbe9e7", border: "1px solid #e53935", borderRadius: 8, padding: 8, marginBottom: 8, textAlign: "center" }}>
-              <p style={{ color: "#c62828", fontSize: 13, margin: 0 }}>❌ {saveError}</p>
+            <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-3 text-center">
+              <p className="text-sm text-destructive">{saveError}</p>
             </div>
           )}
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {(["name", "email", "phone", "company", "job_title", "website", "address", "notes"] as (keyof ExtractedContact)[]).map(field => (
+          <div className="space-y-3">
+            {(Object.keys(FIELD_LABELS) as (keyof ExtractedContact)[]).map(field => (
               <div key={field}>
-                <label style={{ fontSize: 11, fontWeight: 600, textTransform: "capitalize", color: "#555" }}>
-                  {field.replace("_", " ")}{field === "name" ? " *" : ""}
-                </label>
-                <input
-                  style={inputStyle}
+                <Label className="text-xs">{FIELD_LABELS[field]}</Label>
+                <Input
                   value={contact[field] || ""}
                   onChange={e => updateField(field, e.target.value)}
-                  placeholder={field.replace("_", " ")}
+                  placeholder={FIELD_LABELS[field].replace(" *", "")}
                 />
               </div>
             ))}
           </div>
-          <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-            <button type="button" onClick={handleSaveContact} style={{ ...btn("#4caf50", "#fff"), opacity: !contact.name?.trim() ? 0.5 : 1 }} disabled={!contact.name?.trim()}>
-              💾 Save Contact
-            </button>
-            <button type="button" onClick={handleClear} style={btn("#fff", "#333")}>
-              ↩ Start Over
-            </button>
+          <div className="flex gap-2 pt-2">
+            <Button type="button" onClick={handleSaveContact} className="flex-1" disabled={!contact.name?.trim()}>
+              Save Contact
+            </Button>
+            <Button type="button" variant="outline" onClick={handleClear}>
+              Start Over
+            </Button>
           </div>
         </div>
       )}
 
-      {/* ── STEP: SAVING ── */}
+      {/* SAVING */}
       {step === "saving" && (
-        <div style={{ background: "#e3f2fd", border: "1px solid #1976d2", borderRadius: 8, padding: 16, textAlign: "center" }}>
-          <p style={{ fontSize: 14, fontWeight: 600, color: "#1565c0", margin: 0 }}>⏳ Saving contact…</p>
+        <div className="flex items-center justify-center gap-2 py-16">
+          <Loader2 className="h-5 w-5 text-primary animate-spin" />
+          <span className="text-sm font-medium text-muted-foreground">Saving contact…</span>
         </div>
       )}
 
-      {/* ── STEP: SAVED ── */}
+      {/* SAVED */}
       {step === "saved" && (
-        <div>
-          <div style={{ background: "#e8f5e9", border: "1px solid #4caf50", borderRadius: 8, padding: 16, textAlign: "center", marginBottom: 12 }}>
-            <p style={{ fontWeight: 700, color: "#2e7d32", fontSize: 16, margin: 0 }}>✅ Contact saved!</p>
-            <p style={{ fontSize: 13, color: "#555", margin: "4px 0 0" }}>{contact?.name}</p>
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            {savedLeadId && (
-              <button type="button" onClick={() => navigate(`/app/contacts/${savedLeadId}`)} style={btn("#1976d2", "#fff")}>
-                👤 View Contact
-              </button>
-            )}
-            <button type="button" onClick={handleClear} style={btn("#fff", "#333")}>
-              📷 Scan Another Card
-            </button>
-          </div>
-        </div>
+        <Card>
+          <CardContent className="flex flex-col items-center gap-4 py-12">
+            <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <Check className="h-7 w-7 text-green-600 dark:text-green-400" />
+            </div>
+            <div className="text-center">
+              <p className="text-base font-semibold text-foreground">Contact saved!</p>
+              {contact?.name && <p className="text-sm text-muted-foreground mt-1">{contact.name}</p>}
+            </div>
+            <div className="flex gap-2 w-full">
+              {savedLeadId && (
+                <Button type="button" onClick={() => navigate(`/app/contacts/${savedLeadId}`)} className="flex-1">
+                  View Contact
+                </Button>
+              )}
+              <Button type="button" variant="outline" onClick={handleClear} className="flex-1 gap-2">
+                <Camera className="h-4 w-4" /> Scan Another
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
