@@ -107,33 +107,53 @@ export default function ScanBusinessCard() {
     savingRef.current = saving;
   }, [saving]);
 
-  const persistDraft = useCallback((draft: { imagePreview: string | null; contact: ExtractedContact; contactType: string }) => {
+  const persistDraft = useCallback((draft: { imagePreview: string | null; contact: ExtractedContact; contactType: string; timestamp?: string }) => {
     try {
-      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-    } catch {
-      // ignore storage errors
+      const withTimestamp = { ...draft, timestamp: draft.timestamp || new Date().toISOString() };
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(withTimestamp));
+      console.log("[scan-card-debug] draft WRITTEN to sessionStorage", DRAFT_KEY);
+    } catch (e) {
+      console.error("[scan-card-debug] draft write FAILED", e);
     }
   }, []);
 
+  // Rehydration — runs once on mount, restores draft if present
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(DRAFT_KEY);
-      if (!raw) return;
+      console.log("[scan-card-debug] rehydration check — draft present:", !!raw);
+      if (!raw) {
+        setDebugInfo(prev => ({ ...prev, draftFound: false, rehydrated: false }));
+        return;
+      }
       const draft = JSON.parse(raw) as {
         imagePreview?: string | null;
         contact?: ExtractedContact;
         contactType?: string;
+        timestamp?: string;
       };
-      if (!draft.contact) return;
+      if (!draft.contact) {
+        console.log("[scan-card-debug] draft found but no contact data");
+        setDebugInfo(prev => ({ ...prev, draftFound: true, rehydrated: false, rehydratedFrom: "no contact in draft" }));
+        return;
+      }
 
       const restored = normalizeExtractedContact(draft.contact);
-      console.log("[scan-card] OCR result restored", restored);
+      console.log("[scan-card-debug] REHYDRATING from draft", { restored, timestamp: draft.timestamp });
       setImagePreview(draft.imagePreview ?? null);
       setContact(restored);
       setContactType(draft.contactType ?? "lead");
       setStep("review");
-    } catch {
-      // ignore malformed draft
+      setDebugInfo(prev => ({
+        ...prev,
+        draftFound: true,
+        draftTimestamp: draft.timestamp || "unknown",
+        rehydrated: true,
+        rehydratedFrom: `name: ${restored.name}, email: ${restored.email}`,
+      }));
+    } catch (e) {
+      console.error("[scan-card-debug] rehydration FAILED", e);
+      setDebugInfo(prev => ({ ...prev, draftFound: false, rehydrated: false, rehydratedFrom: "parse error" }));
     }
   }, []);
 
