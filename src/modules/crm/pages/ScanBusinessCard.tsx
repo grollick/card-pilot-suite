@@ -153,6 +153,7 @@ const normalizeExtractedContact = (raw: any): ExtractedContact => {
 };
 
 export default function ScanBusinessCard() {
+  const location = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const rootRef = useRef<HTMLDivElement>(null);
@@ -168,16 +169,39 @@ export default function ScanBusinessCard() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const stepRef = useRef<Step>("capture");
   const savingRef = useRef(false);
-  const mountCountRef = useRef(0);
-  const [mountCount, setMountCount] = useState(0);
-  const [debugInfo, setDebugInfo] = useState({
-    draftFound: false,
-    draftTimestamp: "",
-    rehydrated: false,
-    rehydratedFrom: "",
-    lastResetBy: "",
-    mountedAt: "",
-  });
+  const previousPathRef = useRef(location.pathname);
+  const previousStepRef = useRef<Step>("capture");
+  const previousContactRef = useRef<ExtractedContact>({ name: "" });
+  const [runtimeDebug, setRuntimeDebug] = useState<RuntimeDebugState>(() => createDefaultRuntimeState(location.pathname, "capture"));
+  const runtimeRef = useRef<RuntimeDebugState>(createDefaultRuntimeState(location.pathname, "capture"));
+
+  const updateRuntimeDebug = useCallback((updater: (prev: RuntimeDebugState) => RuntimeDebugState) => {
+    setRuntimeDebug((previous) => {
+      const next = updater(previous);
+      runtimeRef.current = next;
+      try {
+        sessionStorage.setItem(RUNTIME_DEBUG_KEY, JSON.stringify(next));
+      } catch {
+        // ignore storage write failures for diagnostics
+      }
+      return next;
+    });
+  }, []);
+
+  const trackedNavigate = useCallback((to: string | number, options?: { replace?: boolean }) => {
+    const at = isoNow();
+    updateRuntimeDebug((prev) => ({
+      ...prev,
+      navigateCalls: prev.navigateCalls + 1,
+      lastNavigateAt: at,
+      lastNavigateTarget: String(to),
+    }));
+    if (typeof to === "number") {
+      navigate(to);
+      return;
+    }
+    navigate(to, options);
+  }, [navigate, updateRuntimeDebug]);
 
   // Track mounts
   useEffect(() => {
