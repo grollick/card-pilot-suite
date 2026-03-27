@@ -233,33 +233,180 @@ export default function ScanBusinessCard() {
     navigate(to, options);
   }, [navigate, updateRuntimeDebug]);
 
-  // Track mounts
+  const hasContactData = useCallback((value: ExtractedContact) => {
+    return [
+      value.name,
+      value.first_name,
+      value.last_name,
+      value.email,
+      value.phone,
+      value.company,
+      value.title,
+      value.website,
+      value.address,
+      value.notes,
+    ].some((item) => safeString(item).length > 0);
+  }, []);
+
   useEffect(() => {
-    mountCountRef.current += 1;
-    const count = mountCountRef.current;
-    setMountCount(count);
-    const now = new Date().toISOString().slice(11, 19);
-    console.log(`[scan-card-debug] MOUNT #${count} at ${now}`);
-    setDebugInfo(prev => ({ ...prev, mountedAt: now }));
+    const mountedAt = isoNow();
+    const restored = readStoredRuntimeState(location.pathname, step);
+    const remountedAfterOcr = Boolean(restored.ocrSuccessReceived || restored.rehydrationSucceeded);
+
+    const next: RuntimeDebugState = {
+      ...restored,
+      currentPath: location.pathname,
+      currentStep: step,
+      mountCount: restored.mountCount + 1,
+      lastMountAt: mountedAt,
+      remountedAfterOcr: restored.remountedAfterOcr || remountedAfterOcr,
+      timeline: {
+        ...restored.timeline,
+        remountedAfterOcr: restored.timeline.remountedAfterOcr || remountedAfterOcr,
+        remountedAt: remountedAfterOcr ? mountedAt : restored.timeline.remountedAt,
+      },
+    };
+
+    runtimeRef.current = next;
+    setRuntimeDebug(next);
+    writeStoredRuntimeState(next);
+
+    console.log("[scan-card-debug] mount", {
+      mountCount: next.mountCount,
+      remountedAfterOcr,
+      mountedAt,
+    });
+
+    return () => {
+      const unmountedAt = isoNow();
+      const current = runtimeRef.current;
+      const nextOnUnmount: RuntimeDebugState = {
+        ...current,
+        unmountCount: current.unmountCount + 1,
+        lastUnmountAt: unmountedAt,
+      };
+      runtimeRef.current = nextOnUnmount;
+      writeStoredRuntimeState(nextOnUnmount);
+      console.log("[scan-card-debug] unmount", {
+        unmountCount: nextOnUnmount.unmountCount,
+        unmountedAt,
+      });
+    };
+    // intentionally only on mount/unmount for remount diagnostics
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     stepRef.current = step;
-  }, [step]);
+    updateRuntimeDebug((prev) => ({
+      ...prev,
+      currentPath: location.pathname,
+      currentStep: step,
+      draftExists: (() => {
+        try {
+          return Boolean(sessionStorage.getItem(DRAFT_KEY));
+        } catch {
+          return prev.draftExists;
+        }
+      })(),
+    }));
+  }, [location.pathname, step, updateRuntimeDebug]);
 
   useEffect(() => {
     savingRef.current = saving;
   }, [saving]);
 
+  useEffect(() => {
+    const previousPath = previousPathRef.current;
+    if (previousPath === location.pathname) return;
+
+    const changedAt = isoNow();
+    updateRuntimeDebug((prev) => ({
+      ...prev,
+      currentPath: location.pathname,
+      lastRouteChangeAt: changedAt,
+      routeChangedAfterOcr: prev.routeChangedAfterOcr || prev.ocrSuccessReceived,
+      pathAfterOcrRouteChange: prev.ocrSuccessReceived ? location.pathname : prev.pathAfterOcrRouteChange,
+      timeline: {
+        ...prev.timeline,
+        routeChangedAfterOcr: prev.timeline.routeChangedAfterOcr || prev.ocrSuccessReceived,
+        routeChangedAt: changedAt,
+      },
+    }));
+
+    console.warn("[scan-card-debug] route changed", {
+      from: previousPath,
+      to: location.pathname,
+      afterOcr: runtimeRef.current.ocrSuccessReceived,
+    });
+
+    previousPathRef.current = location.pathname;
+  }, [location.pathname, updateRuntimeDebug]);
+
+  useEffect(() => {
+    const previousStep = previousStepRef.current;
+    const hadOcr = runtimeRef.current.ocrSuccessReceived || runtimeRef.current.rehydrationSucceeded;
+
+    if (hadOcr && previousStep !== "capture" && step === "capture") {
+      const resetAt = isoNow();
+      updateRuntimeDebug((prev) => ({
+        ...prev,
+        stepResetAfterOcr: true,
+        lastStateResetAt: resetAt,
+        lastResetReason: `Step reset after OCR (${previousStep} -> capture)`,
+        timeline: {
+          ...prev.timeline,
+          stateResetAfterOcr: true,
+          stateResetAt: resetAt,
+        },
+      }));
+      console.warn("[scan-card-debug] Step reset after OCR", { previousStep, nextStep: step });
+    }
+
+    previousStepRef.current = step;
+  }, [step, updateRuntimeDebug]);
+
+  useEffect(() => {
+    const hadOcr = runtimeRef.current.ocrSuccessReceived || runtimeRef.current.rehydrationSucceeded;
+    const hadPreviousData = hasContactData(previousContactRef.current);
+    const hasCurrentData = hasContactData(contact);
+
+    if (hadOcr && hadPreviousData && !hasCurrentData) {
+      const resetAt = isoNow();
+      updateRuntimeDebug((prev) => ({
+        ...prev,
+        contactResetAfterOcr: true,
+        lastStateResetAt: resetAt,
+        lastResetReason: "Contact state reset after OCR",
+        timeline: {
+          ...prev.timeline,
+          stateResetAfterOcr: true,
+          stateResetAt: resetAt,
+        },
+      }));
+      console.warn("[scan-card-debug] Contact state reset after OCR");
+    }
+
+    previousContactRef.current = contact;
+  }, [contact, hasContactData, updateRuntimeDebug]);
+
   const persistDraft = useCallback((draft: { imagePreview: string | null; contact: ExtractedContact; contactType: string; timestamp?: string }) => {
     try {
-      const withTimestamp = { ...draft, timestamp: draft.timestamp || new Date().toISOString() };
+      const withTimestamp = { ...draft, timestamp: draft.timestamp || isoNow() };
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify(withTimestamp));
       console.log("[scan-card-debug] draft WRITTEN to sessionStorage", DRAFT_KEY);
+      updateRuntimeDebug((prev) => ({
+        ...prev,
+        draftExists: true,
+        timeline: {
+          ...prev.timeline,
+          draftWrittenAt: withTimestamp.timestamp || isoNow(),
+        },
+      }));
     } catch (e) {
       console.error("[scan-card-debug] draft write FAILED", e);
     }
-  }, []);
+  }, [updateRuntimeDebug]);
 
   // Rehydration — runs once on mount, restores draft if present
   useEffect(() => {
@@ -267,39 +414,58 @@ export default function ScanBusinessCard() {
       const raw = sessionStorage.getItem(DRAFT_KEY);
       console.log("[scan-card-debug] rehydration check — draft present:", !!raw);
       if (!raw) {
-        setDebugInfo(prev => ({ ...prev, draftFound: false, rehydrated: false }));
+        updateRuntimeDebug((prev) => ({
+          ...prev,
+          draftExists: false,
+          rehydrationSucceeded: false,
+        }));
         return;
       }
+
       const draft = JSON.parse(raw) as {
         imagePreview?: string | null;
         contact?: ExtractedContact;
         contactType?: string;
         timestamp?: string;
       };
+
       if (!draft.contact) {
-        console.log("[scan-card-debug] draft found but no contact data");
-        setDebugInfo(prev => ({ ...prev, draftFound: true, rehydrated: false, rehydratedFrom: "no contact in draft" }));
+        updateRuntimeDebug((prev) => ({
+          ...prev,
+          draftExists: true,
+          rehydrationSucceeded: false,
+          lastResetReason: "Draft exists but contact payload missing",
+        }));
         return;
       }
 
       const restored = normalizeExtractedContact(draft.contact);
-      console.log("[scan-card-debug] REHYDRATING from draft", { restored, timestamp: draft.timestamp });
       setImagePreview(draft.imagePreview ?? null);
       setContact(restored);
       setContactType(draft.contactType ?? "lead");
       setStep("review");
-      setDebugInfo(prev => ({
+
+      const reviewAt = isoNow();
+      updateRuntimeDebug((prev) => ({
         ...prev,
-        draftFound: true,
-        draftTimestamp: draft.timestamp || "unknown",
-        rehydrated: true,
-        rehydratedFrom: `name: ${restored.name}, email: ${restored.email}`,
+        currentStep: "review",
+        draftExists: true,
+        rehydrationSucceeded: true,
+        timeline: {
+          ...prev.timeline,
+          stepReviewAt: reviewAt,
+        },
       }));
     } catch (e) {
       console.error("[scan-card-debug] rehydration FAILED", e);
-      setDebugInfo(prev => ({ ...prev, draftFound: false, rehydrated: false, rehydratedFrom: "parse error" }));
+      updateRuntimeDebug((prev) => ({
+        ...prev,
+        draftExists: false,
+        rehydrationSucceeded: false,
+        lastResetReason: "Draft parse failed during rehydration",
+      }));
     }
-  }, []);
+  }, [updateRuntimeDebug]);
 
   useEffect(() => {
     if (step !== "review") return;
@@ -344,27 +510,46 @@ export default function ScanBusinessCard() {
     document.documentElement.style.overscrollBehaviorY = "contain";
     document.body.style.overscrollBehaviorY = "contain";
 
-    const onBeforeUnload = () => {
-      console.warn("[scan-card] unexpected beforeunload", {
-        step: stepRef.current,
-        saving: savingRef.current,
+    const markTrueReload = (eventName: "beforeunload" | "unload" | "pagehide" | "visibilitychange") => {
+      const at = isoNow();
+      const current = runtimeRef.current;
+      const next = {
+        ...current,
+        trueReloadDetected: true,
+        trueReloadEvent: eventName,
+        trueReloadAt: at,
+        lastResetReason: `True browser reload/unload detected (${eventName})`,
+      };
+
+      runtimeRef.current = next;
+      setRuntimeDebug(next);
+      writeStoredRuntimeState(next);
+
+      console.warn("[scan-card-debug] True browser reload/unload detected", {
+        eventName,
+        at,
       });
     };
 
-    const onPageHide = (event: PageTransitionEvent) => {
-      console.warn("[scan-card] pagehide triggered", {
-        persisted: event.persisted,
-        step: stepRef.current,
-        saving: savingRef.current,
-      });
+    const onBeforeUnload = () => markTrueReload("beforeunload");
+    const onUnload = () => markTrueReload("unload");
+    const onPageHide = () => markTrueReload("pagehide");
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        markTrueReload("visibilitychange");
+      }
     };
 
     window.addEventListener("beforeunload", onBeforeUnload);
+    window.addEventListener("unload", onUnload);
     window.addEventListener("pagehide", onPageHide);
+    document.addEventListener("visibilitychange", onVisibilityChange);
 
     return () => {
       window.removeEventListener("beforeunload", onBeforeUnload);
+      window.removeEventListener("unload", onUnload);
       window.removeEventListener("pagehide", onPageHide);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       document.documentElement.style.overscrollBehaviorY = prevHtmlOverscrollY;
       document.body.style.overscrollBehaviorY = prevBodyOverscrollY;
     };
