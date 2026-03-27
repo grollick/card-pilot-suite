@@ -344,7 +344,7 @@ export default function ScanBusinessCard() {
                 </Button>
               )}
               <Button type="button" variant="outline" onClick={handleClear} className="flex-1 gap-2">
-                <Camera className="h-4 w-4" /> Scan Another
+                <RotateCcw className="h-4 w-4" /> Scan Another
               </Button>
             </div>
           </CardContent>
