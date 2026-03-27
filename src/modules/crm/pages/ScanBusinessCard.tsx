@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { captureLead } from "@/lib/captureLead";
 
 const isoNow = () => new Date().toISOString();
 const DRAFT_KEY = "scan_business_card_draft_v3";
 
-type Step = "capture" | "preview" | "ocr_running" | "review";
+type Step = "capture" | "preview" | "ocr_running" | "review" | "saving" | "saved";
 
 interface ExtractedContact {
   name: string;
@@ -23,10 +25,14 @@ export default function ScanBusinessCard() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [contact, setContact] = useState<ExtractedContact | null>(null);
   const [ocrError, setOcrError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [savedLeadId, setSavedLeadId] = useState<string | null>(null);
   const [mountCount, setMountCount] = useState(0);
   const [lastEvent, setLastEvent] = useState("none");
   const mountCountRef = useRef(0);
   const phaseRef = useRef("idle");
+  const navigate = useNavigate();
 
   // Mount counter + rehydrate draft
   useEffect(() => {
@@ -165,6 +171,9 @@ export default function ScanBusinessCard() {
     setPreviewUrl(null);
     setContact(null);
     setOcrError(null);
+    setSaveError(null);
+    setSavedLeadId(null);
+    setSaving(false);
     setStep("capture");
     phaseRef.current = "idle";
     try { sessionStorage.removeItem(DRAFT_KEY); } catch {}
@@ -178,6 +187,59 @@ export default function ScanBusinessCard() {
       return updated;
     });
   }, []);
+
+  // ── Save Contact ──
+  const handleSaveContact = useCallback(async () => {
+    if (!contact?.name?.trim() || saving) return;
+    setSaving(true);
+    setSaveError(null);
+    setStep("saving");
+    phaseRef.current = "saving";
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("You must be signed in to save contacts.");
+
+      const noteParts = [
+        contact.job_title && `Title: ${contact.job_title}`,
+        contact.website && `Website: ${contact.website}`,
+        contact.address && `Address: ${contact.address}`,
+        contact.notes,
+      ].filter(Boolean).join("\n");
+
+      const result = await captureLead({
+        ownerId: user.id,
+        name: contact.name.trim(),
+        email: contact.email?.trim() || null,
+        phone: contact.phone?.trim() || null,
+        source: "business_card",
+        activityType: "card_scanned",
+        activityTitle: `Business card scanned: ${contact.name.trim()}`,
+        activityDescription: noteParts || null,
+        metaJson: {
+          company: contact.company || "",
+          job_title: contact.job_title || "",
+          website: contact.website || "",
+          address: contact.address || "",
+          scan_source: "crm_scanner",
+        },
+      });
+
+      if (!result) throw new Error("No result returned from save");
+
+      // Clear draft only after confirmed save
+      try { sessionStorage.removeItem(DRAFT_KEY); } catch {}
+      setSavedLeadId(result.lead_id);
+      setStep("saved");
+      phaseRef.current = "saved";
+    } catch (err: any) {
+      setSaveError(err?.message || "Could not save contact. Try again.");
+      setStep("review"); // back to review, keep data
+      phaseRef.current = "save_failed";
+    } finally {
+      setSaving(false);
+    }
+  }, [contact, saving]);
 
   // ── Styles ──
   const panel: React.CSSProperties = {
@@ -206,6 +268,7 @@ export default function ScanBusinessCard() {
         <p style={{ margin: 0 }}>File: <b>{file ? `${file.name} (${(file.size/1024).toFixed(0)}KB)` : "—"}</b></p>
         <p style={{ margin: 0 }}>Preview: <b>{previewUrl ? "YES ✅" : "NO"}</b></p>
         <p style={{ margin: 0 }}>Draft stored: <b>{contact ? "YES ✅" : "NO"}</b></p>
+        <p style={{ margin: 0 }}>Save: <b>{savedLeadId ? `✅ ${savedLeadId}` : saving ? "⏳" : "—"}</b></p>
         <p style={{ margin: 0 }}>Last event: <b>{lastEvent}</b></p>
       </div>
 
@@ -258,6 +321,11 @@ export default function ScanBusinessCard() {
           <div style={{ background: "#e8f5e9", border: "1px solid #4caf50", borderRadius: 8, padding: 8, textAlign: "center", marginBottom: 12 }}>
             <p style={{ fontWeight: 600, color: "#2e7d32", fontSize: 14, margin: 0 }}>✅ OCR complete — review & save</p>
           </div>
+          {saveError && (
+            <div style={{ background: "#fbe9e7", border: "1px solid #e53935", borderRadius: 8, padding: 8, marginBottom: 8, textAlign: "center" }}>
+              <p style={{ color: "#c62828", fontSize: 13, margin: 0 }}>❌ {saveError}</p>
+            </div>
+          )}
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {(["name", "email", "phone", "company", "job_title", "website", "address", "notes"] as (keyof ExtractedContact)[]).map(field => (
               <div key={field}>
@@ -274,11 +342,38 @@ export default function ScanBusinessCard() {
             ))}
           </div>
           <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
-            <button type="button" style={{ ...btn("#4caf50", "#fff"), opacity: !contact.name?.trim() ? 0.5 : 1 }} disabled={!contact.name?.trim()}>
+            <button type="button" onClick={handleSaveContact} style={{ ...btn("#4caf50", "#fff"), opacity: !contact.name?.trim() ? 0.5 : 1 }} disabled={!contact.name?.trim()}>
               💾 Save Contact
             </button>
             <button type="button" onClick={handleClear} style={btn("#fff", "#333")}>
               ↩ Start Over
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── STEP: SAVING ── */}
+      {step === "saving" && (
+        <div style={{ background: "#e3f2fd", border: "1px solid #1976d2", borderRadius: 8, padding: 16, textAlign: "center" }}>
+          <p style={{ fontSize: 14, fontWeight: 600, color: "#1565c0", margin: 0 }}>⏳ Saving contact…</p>
+        </div>
+      )}
+
+      {/* ── STEP: SAVED ── */}
+      {step === "saved" && (
+        <div>
+          <div style={{ background: "#e8f5e9", border: "1px solid #4caf50", borderRadius: 8, padding: 16, textAlign: "center", marginBottom: 12 }}>
+            <p style={{ fontWeight: 700, color: "#2e7d32", fontSize: 16, margin: 0 }}>✅ Contact saved!</p>
+            <p style={{ fontSize: 13, color: "#555", margin: "4px 0 0" }}>{contact?.name}</p>
+          </div>
+          <div style={{ display: "flex", gap: 8 }}>
+            {savedLeadId && (
+              <button type="button" onClick={() => navigate(`/app/contacts/${savedLeadId}`)} style={btn("#1976d2", "#fff")}>
+                👤 View Contact
+              </button>
+            )}
+            <button type="button" onClick={handleClear} style={btn("#fff", "#333")}>
+              📷 Scan Another Card
             </button>
           </div>
         </div>
