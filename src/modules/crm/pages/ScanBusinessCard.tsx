@@ -37,7 +37,7 @@ interface ExtractedContact {
   notes?: string;
 }
 
-type Step = "capture" | "scanning" | "review" | "saved";
+type Step = "capture" | "preview" | "scanning" | "review" | "saved";
 
 interface RuntimeTimeline {
   fileSelectedAt: string;
