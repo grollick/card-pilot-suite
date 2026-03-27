@@ -3,7 +3,7 @@ import {
   ChevronLeft, LogOut, Globe, ChevronRight, HelpCircle,
   Inbox, FileText, Calendar, Kanban,
   ClipboardList, RefreshCw, DollarSign,
-  UserCircle, Star,
+  UserCircle, Star, ScanLine,
   Mail, Share2, Gift, BarChart3, QrCode, Tag, Zap,
   Bot, Eye, CreditCard, Package, Building2, CheckSquare,
   Shield, Sparkles, ExternalLink, Bell, MapPin, Bug,
