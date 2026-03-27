@@ -78,6 +78,26 @@ export default function ScanBusinessCard() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const stepRef = useRef<Step>("capture");
   const savingRef = useRef(false);
+  const mountCountRef = useRef(0);
+  const [mountCount, setMountCount] = useState(0);
+  const [debugInfo, setDebugInfo] = useState({
+    draftFound: false,
+    draftTimestamp: "",
+    rehydrated: false,
+    rehydratedFrom: "",
+    lastResetBy: "",
+    mountedAt: "",
+  });
+
+  // Track mounts
+  useEffect(() => {
+    mountCountRef.current += 1;
+    const count = mountCountRef.current;
+    setMountCount(count);
+    const now = new Date().toISOString().slice(11, 19);
+    console.log(`[scan-card-debug] MOUNT #${count} at ${now}`);
+    setDebugInfo(prev => ({ ...prev, mountedAt: now }));
+  }, []);
 
   useEffect(() => {
     stepRef.current = step;
@@ -87,33 +107,53 @@ export default function ScanBusinessCard() {
     savingRef.current = saving;
   }, [saving]);
 
-  const persistDraft = useCallback((draft: { imagePreview: string | null; contact: ExtractedContact; contactType: string }) => {
+  const persistDraft = useCallback((draft: { imagePreview: string | null; contact: ExtractedContact; contactType: string; timestamp?: string }) => {
     try {
-      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
-    } catch {
-      // ignore storage errors
+      const withTimestamp = { ...draft, timestamp: draft.timestamp || new Date().toISOString() };
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify(withTimestamp));
+      console.log("[scan-card-debug] draft WRITTEN to sessionStorage", DRAFT_KEY);
+    } catch (e) {
+      console.error("[scan-card-debug] draft write FAILED", e);
     }
   }, []);
 
+  // Rehydration — runs once on mount, restores draft if present
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(DRAFT_KEY);
-      if (!raw) return;
+      console.log("[scan-card-debug] rehydration check — draft present:", !!raw);
+      if (!raw) {
+        setDebugInfo(prev => ({ ...prev, draftFound: false, rehydrated: false }));
+        return;
+      }
       const draft = JSON.parse(raw) as {
         imagePreview?: string | null;
         contact?: ExtractedContact;
         contactType?: string;
+        timestamp?: string;
       };
-      if (!draft.contact) return;
+      if (!draft.contact) {
+        console.log("[scan-card-debug] draft found but no contact data");
+        setDebugInfo(prev => ({ ...prev, draftFound: true, rehydrated: false, rehydratedFrom: "no contact in draft" }));
+        return;
+      }
 
       const restored = normalizeExtractedContact(draft.contact);
-      console.log("[scan-card] OCR result restored", restored);
+      console.log("[scan-card-debug] REHYDRATING from draft", { restored, timestamp: draft.timestamp });
       setImagePreview(draft.imagePreview ?? null);
       setContact(restored);
       setContactType(draft.contactType ?? "lead");
       setStep("review");
-    } catch {
-      // ignore malformed draft
+      setDebugInfo(prev => ({
+        ...prev,
+        draftFound: true,
+        draftTimestamp: draft.timestamp || "unknown",
+        rehydrated: true,
+        rehydratedFrom: `name: ${restored.name}, email: ${restored.email}`,
+      }));
+    } catch (e) {
+      console.error("[scan-card-debug] rehydration FAILED", e);
+      setDebugInfo(prev => ({ ...prev, draftFound: false, rehydrated: false, rehydratedFrom: "parse error" }));
     }
   }, []);
 
@@ -399,6 +439,7 @@ export default function ScanBusinessCard() {
   }, [handleSave]);
 
   const reset = () => {
+    console.log("[scan-card-debug] RESET triggered");
     setStep("capture");
     setImagePreview(null);
     setContact({ name: "" });
@@ -406,6 +447,7 @@ export default function ScanBusinessCard() {
     setSaveError(null);
     setSavedLeadId(null);
     sessionStorage.removeItem(DRAFT_KEY);
+    setDebugInfo(prev => ({ ...prev, lastResetBy: "user-reset", draftFound: false, rehydrated: false }));
   };
 
   return (
@@ -430,6 +472,25 @@ export default function ScanBusinessCard() {
             {step === "saved" && "Contact saved"}
           </p>
         </div>
+      </div>
+
+      {/* Temporary debug panel */}
+      <div className="rounded-lg border border-yellow-500 bg-yellow-50 dark:bg-yellow-950 p-3 text-xs font-mono space-y-1">
+        <p className="font-bold text-yellow-800 dark:text-yellow-200">🔍 Scanner Debug Panel</p>
+        <p>Step: <strong>{step}</strong></p>
+        <p>Mount #{mountCount} at {debugInfo.mountedAt}</p>
+        <p>Draft key: {DRAFT_KEY}</p>
+        <p>Draft in sessionStorage: <strong>{(() => { try { return sessionStorage.getItem(DRAFT_KEY) ? "YES ✅" : "NO ❌"; } catch { return "ERROR"; } })()}</strong></p>
+        <p>Draft found on mount: {debugInfo.draftFound ? "YES ✅" : "NO ❌"}</p>
+        <p>Rehydrated: {debugInfo.rehydrated ? "YES ✅" : "NO ❌"}</p>
+        <p>Rehydrated from: {debugInfo.rehydratedFrom || "—"}</p>
+        <p>Draft timestamp: {debugInfo.draftTimestamp || "—"}</p>
+        <p>Last reset by: {debugInfo.lastResetBy || "—"}</p>
+        <p>Contact name: {contact.name || "(empty)"}</p>
+        <p>Contact email: {contact.email || "(empty)"}</p>
+        {debugInfo.rehydrated && step === "review" && (
+          <p className="text-green-700 dark:text-green-400 font-bold">🟢 Recovered scanned card draft</p>
+        )}
       </div>
 
       {step === "capture" && (
