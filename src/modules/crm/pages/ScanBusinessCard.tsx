@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useEffect, type FormEvent, type MouseEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { Camera, Upload, Loader2, ArrowLeft, ScanLine, UserPlus, X, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ const CONTACT_TYPES = [
 ] as const;
 
 const DRAFT_KEY = "scan_business_card_draft_v3";
+const RUNTIME_DEBUG_KEY = "scan_business_card_runtime_debug_v1";
 
 interface ExtractedContact {
   name: string;
@@ -37,6 +38,94 @@ interface ExtractedContact {
 }
 
 type Step = "capture" | "scanning" | "review" | "saved";
+
+interface RuntimeTimeline {
+  fileSelectedAt: string;
+  ocrStartedAt: string;
+  ocrSuccessAt: string;
+  draftWrittenAt: string;
+  stepReviewAt: string;
+  routeChangedAfterOcr: boolean;
+  routeChangedAt: string;
+  remountedAfterOcr: boolean;
+  remountedAt: string;
+  stateResetAfterOcr: boolean;
+  stateResetAt: string;
+}
+
+interface RuntimeDebugState {
+  currentPath: string;
+  currentStep: Step;
+  mountCount: number;
+  unmountCount: number;
+  lastMountAt: string;
+  lastUnmountAt: string;
+  draftExists: boolean;
+  rehydrationSucceeded: boolean;
+  ocrSuccessReceived: boolean;
+  lastOcrAt: string;
+  lastRouteChangeAt: string;
+  lastStateResetAt: string;
+  trueReloadDetected: boolean;
+  trueReloadEvent: string;
+  trueReloadAt: string;
+  routeChangedAfterOcr: boolean;
+  remountedAfterOcr: boolean;
+  stepResetAfterOcr: boolean;
+  contactResetAfterOcr: boolean;
+  pathAtOcrSuccess: string;
+  pathAfterOcrRouteChange: string;
+  lastResetReason: string;
+  navigateCalls: number;
+  lastNavigateAt: string;
+  lastNavigateTarget: string;
+  timeline: RuntimeTimeline;
+}
+
+const isoNow = () => new Date().toISOString();
+
+const defaultRuntimeTimeline = (): RuntimeTimeline => ({
+  fileSelectedAt: "",
+  ocrStartedAt: "",
+  ocrSuccessAt: "",
+  draftWrittenAt: "",
+  stepReviewAt: "",
+  routeChangedAfterOcr: false,
+  routeChangedAt: "",
+  remountedAfterOcr: false,
+  remountedAt: "",
+  stateResetAfterOcr: false,
+  stateResetAt: "",
+});
+
+const createDefaultRuntimeState = (path: string, step: Step): RuntimeDebugState => ({
+  currentPath: path,
+  currentStep: step,
+  mountCount: 0,
+  unmountCount: 0,
+  lastMountAt: "",
+  lastUnmountAt: "",
+  draftExists: false,
+  rehydrationSucceeded: false,
+  ocrSuccessReceived: false,
+  lastOcrAt: "",
+  lastRouteChangeAt: "",
+  lastStateResetAt: "",
+  trueReloadDetected: false,
+  trueReloadEvent: "",
+  trueReloadAt: "",
+  routeChangedAfterOcr: false,
+  remountedAfterOcr: false,
+  stepResetAfterOcr: false,
+  contactResetAfterOcr: false,
+  pathAtOcrSuccess: "",
+  pathAfterOcrRouteChange: "",
+  lastResetReason: "",
+  navigateCalls: 0,
+  lastNavigateAt: "",
+  lastNavigateTarget: "",
+  timeline: defaultRuntimeTimeline(),
+});
 
 const safeString = (value: unknown) => (typeof value === "string" ? value.trim() : "");
 
