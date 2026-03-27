@@ -25,10 +25,14 @@ export default function ScanBusinessCard() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [contact, setContact] = useState<ExtractedContact | null>(null);
   const [ocrError, setOcrError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [savedLeadId, setSavedLeadId] = useState<string | null>(null);
   const [mountCount, setMountCount] = useState(0);
   const [lastEvent, setLastEvent] = useState("none");
   const mountCountRef = useRef(0);
   const phaseRef = useRef("idle");
+  const navigate = useNavigate();
 
   // Mount counter + rehydrate draft
   useEffect(() => {
