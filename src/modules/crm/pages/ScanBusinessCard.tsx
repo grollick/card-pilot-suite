@@ -78,6 +78,26 @@ export default function ScanBusinessCard() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const stepRef = useRef<Step>("capture");
   const savingRef = useRef(false);
+  const mountCountRef = useRef(0);
+  const [mountCount, setMountCount] = useState(0);
+  const [debugInfo, setDebugInfo] = useState({
+    draftFound: false,
+    draftTimestamp: "",
+    rehydrated: false,
+    rehydratedFrom: "",
+    lastResetBy: "",
+    mountedAt: "",
+  });
+
+  // Track mounts
+  useEffect(() => {
+    mountCountRef.current += 1;
+    const count = mountCountRef.current;
+    setMountCount(count);
+    const now = new Date().toISOString().slice(11, 19);
+    console.log(`[scan-card-debug] MOUNT #${count} at ${now}`);
+    setDebugInfo(prev => ({ ...prev, mountedAt: now }));
+  }, []);
 
   useEffect(() => {
     stepRef.current = step;
