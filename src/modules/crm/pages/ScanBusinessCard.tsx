@@ -458,9 +458,6 @@ export default function ScanBusinessCard() {
       ref={rootRef}
       className="max-w-lg mx-auto px-4 py-6 space-y-6"
       onSubmitCapture={handleSubmitCapture}
-      onTouchStartCapture={(e) => e.stopPropagation()}
-      onTouchMoveCapture={(e) => e.stopPropagation()}
-      onTouchEndCapture={(e) => e.stopPropagation()}
     >
       <div className="flex items-center gap-3">
         <Button type="button" variant="ghost" size="icon" onClick={() => navigate(-1)}>
