@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import { Camera, Upload, Loader2, ScanLine, Check, X } from "lucide-react";
+import { Camera, Upload, Loader2, ScanLine, Check, X, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { captureLead } from "@/lib/captureLead";
 import { toast } from "sonner";
@@ -13,7 +13,7 @@ interface Props {
   onSuccess?: () => void;
 }
 
-type Step = "idle" | "scanning" | "review" | "done";
+type Step = "idle" | "preview" | "ocr_running" | "review" | "saving" | "done";
 
 interface ExtractedContact {
   name: string;
@@ -28,26 +28,62 @@ interface ExtractedContact {
 
 export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radii, onSuccess }: Props) {
   const [step, setStep] = useState<Step>("idle");
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [contact, setContact] = useState<ExtractedContact>({ name: "" });
+  const [ocrError, setOcrError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const cameraRef = useRef<HTMLInputElement>(null);
 
-  const processImage = useCallback(async (base64: string) => {
-    setStep("scanning");
+  // File selection → preview only (no auto-OCR)
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0];
+    if (!selected) return;
+    setFile(selected);
+    setOcrError(null);
+    const url = URL.createObjectURL(selected);
+    setPreviewUrl(url);
+    setStep("preview");
+  }, []);
+
+  const prepareBase64 = useCallback(async (f: File): Promise<string> => {
+    const objectUrl = URL.createObjectURL(f);
+    const img = new Image();
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("Could not load image"));
+      img.src = objectUrl;
+    });
+    const maxDim = 1600;
+    const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(objectUrl);
+    return canvas.toDataURL("image/jpeg", 0.85);
+  }, []);
+
+  // Manual OCR start
+  const handleStartOcr = useCallback(async () => {
+    if (!file) return;
+    setStep("ocr_running");
+    setOcrError(null);
     try {
-      // Use the public (no-auth) edge function so unauthenticated visitors can scan
+      const base64 = await prepareBase64(file);
       const { data, error } = await supabase.functions.invoke("scan-business-card-public", {
         body: { image: base64 },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
-
       const extracted = data?.contact;
-      if (!extracted || typeof extracted !== "object") {
-        throw new Error("Could not read this card. Please try a clearer photo.");
+      if (!extracted || typeof extracted !== "object" || !extracted.name) {
+        throw new Error("Could not read this card. Try a clearer photo.");
       }
-
       setContact({
         name: extracted.name ?? "",
         email: extracted.email ?? "",
@@ -59,97 +95,26 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
         notes: extracted.notes ?? "",
       });
       setStep("review");
-      toast.success("Card scanned. Please confirm and share.");
     } catch (err: any) {
-      toast.error(err.message || "Failed to scan card");
-      setStep("idle");
+      setOcrError(err?.message || "OCR failed");
+      setStep("preview");
     }
-  }, []);
+  }, [file, prepareBase64]);
 
-  const prepareImageForScan = useCallback(async (file: File): Promise<string> => {
-    if (!file.type.startsWith("image/")) {
-      throw new Error("Please upload a valid image file.");
-    }
+  const handleClear = useCallback(() => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setFile(null);
+    setPreviewUrl(null);
+    setContact({ name: "" });
+    setOcrError(null);
+    setSaving(false);
+    setStep("idle");
+  }, [previewUrl]);
 
-    if (file.size > 15 * 1024 * 1024) {
-      throw new Error("Image is too large. Please use an image under 15MB.");
-    }
-
-    const maxBase64Length = 2_700_000;
-
-    const readOriginal = () =>
-      new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = () => reject(new Error("Failed to read image."));
-        reader.readAsDataURL(file);
-      });
-
-    try {
-      const objectUrl = URL.createObjectURL(file);
-      const img = new Image();
-
-      await new Promise<void>((resolve, reject) => {
-        img.onload = () => resolve();
-        img.onerror = () => reject(new Error("Could not process this image. Try a different photo."));
-        img.src = objectUrl;
-      });
-
-      const maxDim = 1600;
-      const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
-      let width = Math.max(1, Math.round(img.width * scale));
-      let height = Math.max(1, Math.round(img.height * scale));
-
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      if (!ctx) throw new Error("Could not process image.");
-
-      let quality = 0.88;
-      let output = "";
-
-      for (let attempt = 0; attempt < 6; attempt++) {
-        canvas.width = width;
-        canvas.height = height;
-        ctx.clearRect(0, 0, width, height);
-        ctx.drawImage(img, 0, 0, width, height);
-
-        output = canvas.toDataURL("image/jpeg", quality);
-        if (output.length <= maxBase64Length) break;
-
-        quality = Math.max(0.55, quality - 0.08);
-        width = Math.max(900, Math.round(width * 0.88));
-        height = Math.max(900, Math.round(height * 0.88));
-      }
-
-      URL.revokeObjectURL(objectUrl);
-
-      if (!output || output.length > maxBase64Length) {
-        throw new Error("Image is still too large after optimization. Please crop it tighter and try again.");
-      }
-
-      return output;
-    } catch {
-      const original = await readOriginal();
-      if (original.length > maxBase64Length) {
-        throw new Error("Image is too large. Please use a smaller or cropped photo.");
-      }
-      return original;
-    }
-  }, []);
-
-  const handleFile = useCallback(async (file: File) => {
-    try {
-      const preparedImage = await prepareImageForScan(file);
-      await processImage(preparedImage);
-    } catch (err: any) {
-      toast.error(err?.message || "Could not prepare image for scanning");
-      setStep("idle");
-    }
-  }, [prepareImageForScan, processImage]);
-
-  const handleSave = async () => {
-    if (!contact.name?.trim()) return;
+  const handleSave = useCallback(async () => {
+    if (!contact.name?.trim() || saving) return;
     setSaving(true);
+    setStep("saving");
     try {
       const noteParts = [
         contact.job_title && `Title: ${contact.job_title}`,
@@ -175,29 +140,25 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
         },
       });
 
-      if (!result) {
-        throw new Error("Failed to save contact — no result returned");
-      }
+      if (!result) throw new Error("No result returned");
 
-      // Patch company/address/notes directly on leads table (capture_lead doesn't set these columns)
       const patchFields: Record<string, string | null> = {};
       if (contact.company?.trim()) patchFields.company = contact.company.trim();
       if (contact.address?.trim()) patchFields.address = contact.address.trim();
       if (noteParts) patchFields.notes = noteParts;
-
       if (Object.keys(patchFields).length > 0) {
         await supabase.from("leads").update(patchFields).eq("id", result.lead_id);
       }
 
-      console.log("Card scanned & saved successfully:", result);
       setStep("done");
       onSuccess?.();
     } catch {
       toast.error("Failed to save contact");
+      setStep("review");
     } finally {
       setSaving(false);
     }
-  };
+  }, [contact, saving, ownerId, handle, onSuccess]);
 
   const inputStyle: React.CSSProperties = {
     width: "100%",
@@ -211,38 +172,62 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
     color: palette.primary,
   };
 
+  const btnPrimary: React.CSSProperties = {
+    flex: 1,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    padding: "10px 12px",
+    borderRadius: radii.button,
+    background: palette.primary,
+    color: "#fff",
+    fontSize: 13,
+    fontWeight: 600,
+    border: "none",
+    cursor: "pointer",
+    fontFamily: `'${fonts.secondary}', sans-serif`,
+  };
+
+  const btnOutline: React.CSSProperties = {
+    ...btnPrimary,
+    background: "transparent",
+    color: palette.primary,
+    border: `1px solid ${palette.primary}`,
+  };
+
+  // ── DONE ──
   if (step === "done") {
     return (
       <div style={{ textAlign: "center", padding: 16, borderRadius: radii.card, background: `${palette.primary}10` }}>
         <Check style={{ width: 28, height: 28, color: palette.primary, margin: "0 auto 8px" }} />
         <p style={{ fontSize: 14, fontWeight: 600, color: palette.primary, margin: 0 }}>Card saved!</p>
         <p style={{ fontSize: 12, color: palette.secondary, margin: "4px 0 0" }}>Thank you for sharing your info.</p>
-        <button
-          type="button"
-          onClick={() => { setStep("idle"); setContact({ name: "" }); }}
-          style={{ fontSize: 12, color: palette.primary, background: "none", border: "none", cursor: "pointer", marginTop: 8, textDecoration: "underline" }}
-        >
+        <button type="button" onClick={handleClear}
+          style={{ fontSize: 12, color: palette.primary, background: "none", border: "none", cursor: "pointer", marginTop: 8, textDecoration: "underline" }}>
           Scan another card
         </button>
       </div>
     );
   }
 
-  if (step === "scanning") {
+  // ── SAVING ──
+  if (step === "saving") {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: 24 }}>
         <Loader2 style={{ width: 18, height: 18, color: palette.primary, animation: "spin 1s linear infinite" }} />
-        <span style={{ fontSize: 13, color: palette.secondary, fontFamily: `'${fonts.secondary}', sans-serif` }}>Reading your card…</span>
+        <span style={{ fontSize: 13, color: palette.secondary, fontFamily: `'${fonts.secondary}', sans-serif` }}>Saving…</span>
       </div>
     );
   }
 
+  // ── REVIEW ──
   if (step === "review") {
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <span style={{ fontSize: 13, fontWeight: 600, color: palette.primary, fontFamily: `'${fonts.primary}', sans-serif` }}>Confirm your info</span>
-          <button type="button" onClick={() => { setStep("idle"); setContact({ name: "" }); }} style={{ background: "none", border: "none", cursor: "pointer", color: palette.secondary }}>
+          <button type="button" onClick={handleClear} style={{ background: "none", border: "none", cursor: "pointer", color: palette.secondary }}>
             <X style={{ width: 16, height: 16 }} />
           </button>
         </div>
@@ -250,88 +235,65 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
         <input style={inputStyle} placeholder="Email" value={contact.email || ""} onChange={(e) => setContact({ ...contact, email: e.target.value })} />
         <input style={inputStyle} placeholder="Phone" value={contact.phone || ""} onChange={(e) => setContact({ ...contact, phone: e.target.value })} />
         <input style={inputStyle} placeholder="Company" value={contact.company || ""} onChange={(e) => setContact({ ...contact, company: e.target.value })} />
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={saving || !contact.name?.trim()}
-          style={{
-            width: "100%",
-            padding: "10px 16px",
-            borderRadius: radii.button,
-            background: palette.primary,
-            color: "#fff",
-            fontSize: 14,
-            fontWeight: 600,
-            border: "none",
-            cursor: saving ? "wait" : "pointer",
-            fontFamily: `'${fonts.secondary}', sans-serif`,
-            opacity: saving ? 0.7 : 1,
-          }}
-        >
+        <button type="button" onClick={handleSave} disabled={saving || !contact.name?.trim()}
+          style={{ ...btnPrimary, flex: "unset", width: "100%", opacity: saving ? 0.7 : 1, cursor: saving ? "wait" : "pointer" }}>
           {saving ? "Saving…" : "Share My Info"}
         </button>
       </div>
     );
   }
 
-  // ── IDLE: Show scan buttons ──
+  // ── OCR RUNNING ──
+  if (step === "ocr_running") {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
+        {previewUrl && (
+          <img src={previewUrl} alt="Card preview" style={{ width: "100%", borderRadius: radii.card, opacity: 0.6 }} />
+        )}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: 12 }}>
+          <Loader2 style={{ width: 18, height: 18, color: palette.primary, animation: "spin 1s linear infinite" }} />
+          <span style={{ fontSize: 13, color: palette.secondary, fontFamily: `'${fonts.secondary}', sans-serif` }}>Reading your card…</span>
+        </div>
+      </div>
+    );
+  }
+
+  // ── PREVIEW ──
+  if (step === "preview" && previewUrl) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        <img src={previewUrl} alt="Card preview" style={{ width: "100%", borderRadius: radii.card }} />
+        {ocrError && (
+          <p style={{ fontSize: 12, color: "#dc2626", textAlign: "center", margin: 0 }}>{ocrError}</p>
+        )}
+        <div style={{ display: "flex", gap: 8 }}>
+          <button type="button" onClick={handleStartOcr} style={btnPrimary}>
+            <ScanLine style={{ width: 16, height: 16 }} /> Read Card
+          </button>
+          <button type="button" onClick={handleClear} style={btnOutline}>
+            <RotateCcw style={{ width: 14, height: 14 }} /> Retake
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── IDLE ──
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "center" }}>
       <p style={{ fontSize: 12, color: palette.secondary, margin: 0, textAlign: "center", fontFamily: `'${fonts.secondary}', sans-serif` }}>
         Scan your business card to share your contact info
       </p>
       <div style={{ display: "flex", gap: 8, width: "100%" }}>
-        <button
-          type="button"
-          onClick={() => cameraRef.current?.click()}
-          style={{
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 6,
-            padding: "10px 12px",
-            borderRadius: radii.button,
-            background: palette.primary,
-            color: "#fff",
-            fontSize: 13,
-            fontWeight: 600,
-            border: "none",
-            cursor: "pointer",
-            fontFamily: `'${fonts.secondary}', sans-serif`,
-          }}
-        >
-          <Camera style={{ width: 16, height: 16 }} />
-          <span>Take Photo</span>
+        <button type="button" onClick={() => cameraRef.current?.click()} style={btnPrimary}>
+          <Camera style={{ width: 16, height: 16 }} /> Take Photo
         </button>
-        <button
-          type="button"
-          onClick={() => fileRef.current?.click()}
-          style={{
-            flex: 1,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 6,
-            padding: "10px 12px",
-            borderRadius: radii.button,
-            background: "transparent",
-            color: palette.primary,
-            fontSize: 13,
-            fontWeight: 600,
-            border: `1px solid ${palette.primary}`,
-            cursor: "pointer",
-            fontFamily: `'${fonts.secondary}', sans-serif`,
-          }}
-        >
-          <Upload style={{ width: 16, height: 16 }} />
-          <span>Upload</span>
+        <button type="button" onClick={() => fileRef.current?.click()} style={btnOutline}>
+          <Upload style={{ width: 16, height: 16 }} /> Upload
         </button>
       </div>
-      <input ref={cameraRef} type="file" accept="image/*" capture="environment" className="hidden" style={{ display: "none" }}
-        onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
-      <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }}
-        onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0])} />
+      <input ref={cameraRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFileChange} />
+      <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFileChange} />
     </div>
   );
 }
