@@ -1016,7 +1016,7 @@ export default function ScanBusinessCard() {
         </div>
       )}
 
-
+      {step === "scanning" && (
         <div className="space-y-4">
           {imagePreview && <img src={imagePreview} alt="Business card" className="w-full rounded-lg border border-border" />}
           <div className="flex items-center justify-center gap-3 py-8">
