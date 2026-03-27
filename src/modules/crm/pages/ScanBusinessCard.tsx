@@ -439,6 +439,7 @@ export default function ScanBusinessCard() {
   }, [handleSave]);
 
   const reset = () => {
+    console.log("[scan-card-debug] RESET triggered");
     setStep("capture");
     setImagePreview(null);
     setContact({ name: "" });
@@ -446,6 +447,7 @@ export default function ScanBusinessCard() {
     setSaveError(null);
     setSavedLeadId(null);
     sessionStorage.removeItem(DRAFT_KEY);
+    setDebugInfo(prev => ({ ...prev, lastResetBy: "user-reset", draftFound: false, rehydrated: false }));
   };
 
   return (
