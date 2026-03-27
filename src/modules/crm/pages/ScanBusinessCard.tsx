@@ -37,7 +37,7 @@ interface ExtractedContact {
   notes?: string;
 }
 
-type Step = "capture" | "scanning" | "review" | "saved";
+type Step = "capture" | "preview" | "scanning" | "review" | "saved";
 
 interface RuntimeTimeline {
   fileSelectedAt: string;
@@ -657,6 +657,43 @@ export default function ScanBusinessCard() {
     });
   }, []);
 
+  const [pendingBase64, setPendingBase64] = useState<string | null>(null);
+  const [ocrManuallyStarted, setOcrManuallyStarted] = useState(false);
+  const [unloadPhase, setUnloadPhase] = useState<string>("none");
+
+  // Track which phase unload happens in
+  useEffect(() => {
+    const detectPhase = (eventName: string) => {
+      const phase = step === "capture" ? "capture" : step === "preview" ? "idle_preview" : step === "scanning" ? "ocr_running" : step;
+      setUnloadPhase(`${phase} (${eventName})`);
+      try {
+        sessionStorage.setItem("scan_unload_phase", `${phase} (${eventName}) at ${isoNow()}`);
+      } catch {}
+    };
+    const onBU = () => detectPhase("beforeunload");
+    const onU = () => detectPhase("unload");
+    const onPH = () => detectPhase("pagehide");
+    const onVC = () => { if (document.visibilityState === "hidden") detectPhase("visibilitychange"); };
+    window.addEventListener("beforeunload", onBU);
+    window.addEventListener("unload", onU);
+    window.addEventListener("pagehide", onPH);
+    document.addEventListener("visibilitychange", onVC);
+    return () => {
+      window.removeEventListener("beforeunload", onBU);
+      window.removeEventListener("unload", onU);
+      window.removeEventListener("pagehide", onPH);
+      document.removeEventListener("visibilitychange", onVC);
+    };
+  }, [step]);
+
+  // Rehydrate unload phase from previous session
+  useEffect(() => {
+    try {
+      const prev = sessionStorage.getItem("scan_unload_phase");
+      if (prev) setUnloadPhase(prev);
+    } catch {}
+  }, []);
+
   const handleFile = useCallback(async (file: File) => {
     updateRuntimeDebug((prev) => ({
       ...prev,
@@ -676,11 +713,22 @@ export default function ScanBusinessCard() {
     }
     try {
       const compressed = await compressImage(file);
-      await processImage(compressed);
+      // Do NOT auto-start OCR — just show preview
+      setImagePreview(compressed);
+      setPendingBase64(compressed);
+      setOcrManuallyStarted(false);
+      setStep("preview");
+      toast.success("Image captured successfully — tap Start OCR when ready");
     } catch (err: any) {
       toast.error(err.message || "Failed to read image");
     }
-  }, [compressImage, processImage, updateRuntimeDebug]);
+  }, [compressImage, updateRuntimeDebug]);
+
+  const handleStartOcr = useCallback(() => {
+    if (!pendingBase64) return;
+    setOcrManuallyStarted(true);
+    void processImage(pendingBase64);
+  }, [pendingBase64, processImage]);
 
   const handleSave = useCallback(async () => {
     console.log("[scan-card] save handler started");
@@ -839,6 +887,7 @@ export default function ScanBusinessCard() {
           <h1 className="text-xl font-bold">Scan Business Card</h1>
           <p className="text-sm text-muted-foreground">
             {step === "capture" && "Take a photo or upload an image"}
+            {step === "preview" && "Image captured — start OCR when ready"}
             {step === "scanning" && "Extracting contact info…"}
             {step === "review" && "Review and save"}
             {step === "saved" && "Contact saved"}
@@ -897,6 +946,15 @@ export default function ScanBusinessCard() {
           <p>7) component remounted after OCR: {runtimeDebug.timeline.remountedAfterOcr ? `YES at ${runtimeDebug.timeline.remountedAt || "—"}` : "NO"}</p>
           <p>8) state reset after OCR: {runtimeDebug.timeline.stateResetAfterOcr ? `YES at ${runtimeDebug.timeline.stateResetAt || "—"}` : "NO"}</p>
         </div>
+
+        <div className="pt-2 mt-2 border-t border-border space-y-1">
+          <p className="font-bold">🧪 Capture vs OCR Isolation</p>
+          <p>Image preview visible: <strong>{imagePreview ? "YES ✅" : "NO ❌"}</strong></p>
+          <p>OCR manually started: <strong>{ocrManuallyStarted ? "YES" : "NO"}</strong></p>
+          <p>Pending base64 ready: <strong>{pendingBase64 ? "YES ✅" : "NO ❌"}</strong></p>
+          <p>Unload phase: <strong>{unloadPhase}</strong></p>
+          <p>Previous unload (sessionStorage): <strong>{(() => { try { return sessionStorage.getItem("scan_unload_phase") || "—"; } catch { return "—"; } })()}</strong></p>
+        </div>
       </div>
 
       {step === "capture" && (
@@ -937,6 +995,24 @@ export default function ScanBusinessCard() {
               if (file) void handleFile(file);
             }}
           />
+        </div>
+      )}
+
+      {step === "preview" && (
+        <div className="space-y-4">
+          <div className="rounded-lg border-2 border-primary/30 bg-primary/5 p-3 text-center">
+            <p className="text-sm font-semibold text-primary">✅ Image captured successfully</p>
+            <p className="text-xs text-muted-foreground mt-1">No OCR yet — tap "Start OCR" when ready</p>
+          </div>
+          {imagePreview && <img src={imagePreview} alt="Business card preview" className="w-full rounded-lg border border-border" />}
+          <div className="flex gap-3">
+            <Button type="button" variant="outline" className="flex-1" onClick={() => { setStep("capture"); setImagePreview(null); setPendingBase64(null); }}>
+              Retake
+            </Button>
+            <Button type="button" className="flex-1 gap-2" onClick={handleStartOcr}>
+              <ScanLine className="h-4 w-4" /> Start OCR
+            </Button>
+          </div>
         </div>
       )}
 
