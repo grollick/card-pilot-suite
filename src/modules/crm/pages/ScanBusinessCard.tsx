@@ -171,6 +171,9 @@ export default function ScanBusinessCard() {
     setPreviewUrl(null);
     setContact(null);
     setOcrError(null);
+    setSaveError(null);
+    setSavedLeadId(null);
+    setSaving(false);
     setStep("capture");
     phaseRef.current = "idle";
     try { sessionStorage.removeItem(DRAFT_KEY); } catch {}
@@ -184,6 +187,59 @@ export default function ScanBusinessCard() {
       return updated;
     });
   }, []);
+
+  // ── Save Contact ──
+  const handleSaveContact = useCallback(async () => {
+    if (!contact?.name?.trim() || saving) return;
+    setSaving(true);
+    setSaveError(null);
+    setStep("saving");
+    phaseRef.current = "saving";
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("You must be signed in to save contacts.");
+
+      const noteParts = [
+        contact.job_title && `Title: ${contact.job_title}`,
+        contact.website && `Website: ${contact.website}`,
+        contact.address && `Address: ${contact.address}`,
+        contact.notes,
+      ].filter(Boolean).join("\n");
+
+      const result = await captureLead({
+        ownerId: user.id,
+        name: contact.name.trim(),
+        email: contact.email?.trim() || null,
+        phone: contact.phone?.trim() || null,
+        source: "business_card",
+        activityType: "card_scanned",
+        activityTitle: `Business card scanned: ${contact.name.trim()}`,
+        activityDescription: noteParts || null,
+        metaJson: {
+          company: contact.company || "",
+          job_title: contact.job_title || "",
+          website: contact.website || "",
+          address: contact.address || "",
+          scan_source: "crm_scanner",
+        },
+      });
+
+      if (!result) throw new Error("No result returned from save");
+
+      // Clear draft only after confirmed save
+      try { sessionStorage.removeItem(DRAFT_KEY); } catch {}
+      setSavedLeadId(result.lead_id);
+      setStep("saved");
+      phaseRef.current = "saved";
+    } catch (err: any) {
+      setSaveError(err?.message || "Could not save contact. Try again.");
+      setStep("review"); // back to review, keep data
+      phaseRef.current = "save_failed";
+    } finally {
+      setSaving(false);
+    }
+  }, [contact, saving]);
 
   // ── Styles ──
   const panel: React.CSSProperties = {
