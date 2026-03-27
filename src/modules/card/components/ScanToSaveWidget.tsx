@@ -34,7 +34,7 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
   const [ocrError, setOcrError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
-  const cameraRef = useRef<HTMLInputElement>(null);
+  
 
   // File selection → preview only (no auto-OCR)
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
