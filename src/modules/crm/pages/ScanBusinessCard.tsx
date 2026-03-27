@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Camera, Upload, Loader2, ScanLine, Check, ArrowLeft, RotateCcw } from "lucide-react";
+import { Upload, Loader2, ScanLine, Check, ArrowLeft, RotateCcw, ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { captureLead } from "@/lib/captureLead";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,6 @@ export default function ScanBusinessCard() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedLeadId, setSavedLeadId] = useState<string | null>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
@@ -238,18 +237,14 @@ export default function ScanBusinessCard() {
         <Card>
           <CardContent className="flex flex-col items-center gap-4 py-12">
             <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-              <Camera className="h-7 w-7 text-primary" />
+              <ImageIcon className="h-7 w-7 text-primary" />
             </div>
             <div className="text-center">
               <p className="text-sm font-medium text-foreground">Select or capture a business card</p>
-              <p className="text-xs text-muted-foreground mt-1">Take a photo or choose from your gallery</p>
+            <p className="text-xs text-muted-foreground mt-1">Choose an image from your gallery</p>
             </div>
-            <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileChange} className="hidden" />
             <input ref={galleryInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-            <Button type="button" className="w-full gap-2" onClick={() => cameraInputRef.current?.click()}>
-              <Camera className="h-4 w-4" /> Scan Card
-            </Button>
-            <Button type="button" variant="outline" className="w-full gap-2" onClick={() => galleryInputRef.current?.click()}>
+            <Button type="button" className="w-full gap-2" onClick={() => galleryInputRef.current?.click()}>
               <Upload className="h-4 w-4" /> Choose from Gallery
             </Button>
           </CardContent>
@@ -349,7 +344,7 @@ export default function ScanBusinessCard() {
                 </Button>
               )}
               <Button type="button" variant="outline" onClick={handleClear} className="flex-1 gap-2">
-                <Camera className="h-4 w-4" /> Scan Another
+                <RotateCcw className="h-4 w-4" /> Scan Another
               </Button>
             </div>
           </CardContent>
