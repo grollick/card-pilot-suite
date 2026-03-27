@@ -244,17 +244,12 @@ export default function ScanBusinessCard() {
               <p className="text-sm font-medium text-foreground">Select or capture a business card</p>
               <p className="text-xs text-muted-foreground mt-1">Take a photo or choose from your gallery</p>
             </div>
-            <input ref={fileInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileChange} className="hidden" />
-            <Button type="button" className="w-full gap-2" onClick={() => fileInputRef.current?.click()}>
+            <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileChange} className="hidden" />
+            <input ref={galleryInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+            <Button type="button" className="w-full gap-2" onClick={() => cameraInputRef.current?.click()}>
               <Camera className="h-4 w-4" /> Scan Card
             </Button>
-            <Button type="button" variant="outline" className="w-full gap-2" onClick={() => {
-              if (fileInputRef.current) {
-                fileInputRef.current.removeAttribute('capture');
-                fileInputRef.current.click();
-                setTimeout(() => fileInputRef.current?.setAttribute('capture', 'environment'), 500);
-              }
-            }}>
+            <Button type="button" variant="outline" className="w-full gap-2" onClick={() => galleryInputRef.current?.click()}>
               <Upload className="h-4 w-4" /> Choose from Gallery
             </Button>
           </CardContent>
