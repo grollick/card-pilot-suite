@@ -275,14 +275,7 @@ export default function ScanBusinessCard() {
     }
   }, [compressImage, processImage]);
 
-  const handleSave = async (event?: MouseEvent<HTMLButtonElement>) => {
-    console.log("[scan-card] save button clicked");
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      console.log("[scan-card] preventDefault executed");
-    }
-
+  const handleSave = async () => {
     console.log("[scan-card] save handler started");
 
     if (saving) return;
@@ -395,6 +388,14 @@ export default function ScanBusinessCard() {
       console.log("[scan-card] save handler completed");
     }
   };
+
+  const handleSaveContactClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    console.log("[scan-card] save button click handler runs");
+    event.preventDefault();
+    event.stopPropagation();
+    console.log("[scan-card] preventDefault executed for save button");
+    void handleSave();
+  }, [handleSave]);
 
   const reset = () => {
     setStep("capture");
@@ -632,7 +633,7 @@ export default function ScanBusinessCard() {
             <Button type="button" variant="outline" className="flex-1" onClick={reset}>
               Scan Another
             </Button>
-            <Button type="button" className="flex-1 gap-2" onClick={(event) => void handleSave(event)} disabled={saving}>
+            <Button type="button" className="flex-1 gap-2" onClick={handleSaveContactClick} disabled={saving}>
               {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <UserPlus className="h-4 w-4" />}
               Save Contact
             </Button>
