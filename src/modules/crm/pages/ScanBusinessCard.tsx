@@ -317,10 +317,10 @@ export default function ScanBusinessCard() {
     }
   }, [compressImage, processImage]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     console.log("[scan-card] save handler started");
 
-    if (saving) return;
+    if (savingRef.current) return;
 
     const finalName = safeString(contact.name) || [safeString(contact.first_name), safeString(contact.last_name)].filter(Boolean).join(" ").trim();
 
@@ -431,7 +431,7 @@ export default function ScanBusinessCard() {
       setSaving(false);
       console.log("[scan-card] save handler completed");
     }
-  };
+  }, [contact, contactType, queryClient, navigate]);
 
   const handleSaveContactClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     console.log("[scan-card] save button click handler runs");
@@ -458,9 +458,6 @@ export default function ScanBusinessCard() {
       ref={rootRef}
       className="max-w-lg mx-auto px-4 py-6 space-y-6"
       onSubmitCapture={handleSubmitCapture}
-      onTouchStartCapture={(e) => e.stopPropagation()}
-      onTouchMoveCapture={(e) => e.stopPropagation()}
-      onTouchEndCapture={(e) => e.stopPropagation()}
     >
       <div className="flex items-center gap-3">
         <Button type="button" variant="ghost" size="icon" onClick={() => navigate(-1)}>
