@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { captureLead } from "@/lib/captureLead";
 
 const isoNow = () => new Date().toISOString();
 const DRAFT_KEY = "scan_business_card_draft_v3";
 
-type Step = "capture" | "preview" | "ocr_running" | "review";
+type Step = "capture" | "preview" | "ocr_running" | "review" | "saving" | "saved";
 
 interface ExtractedContact {
   name: string;
