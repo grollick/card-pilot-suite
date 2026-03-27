@@ -70,6 +70,7 @@ export default function ScanBusinessCard() {
     const url = URL.createObjectURL(selected);
     setPreviewUrl(url);
     setStep("preview");
+    e.target.value = "";
   }, []);
 
   // Prepare base64 for OCR
