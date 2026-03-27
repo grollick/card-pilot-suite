@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback, useRef as _useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Camera, Upload, Loader2, ScanLine, Check, ArrowLeft, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
