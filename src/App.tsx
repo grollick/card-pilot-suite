@@ -77,6 +77,7 @@ const ContactDetail = lazy(() => import("@/modules/crm/pages/ContactDetail"));
 const PipelinePage = lazy(() => import("@/modules/crm/pages/PipelinePage"));
 const TasksPage = lazy(() => import("@/modules/crm/pages/TasksPage"));
 const ScanBusinessCard = lazy(() => import("@/modules/crm/pages/ScanBusinessCard"));
+const ScanCardReview = lazy(() => import("@/modules/crm/pages/ScanCardReview"));
 const ScannerDiagnostic = lazy(() => import("@/pages/ScannerDiagnostic"));
 
 // Booking
