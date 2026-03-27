@@ -998,7 +998,25 @@ export default function ScanBusinessCard() {
         </div>
       )}
 
-      {step === "scanning" && (
+      {step === "preview" && (
+        <div className="space-y-4">
+          <div className="rounded-lg border-2 border-primary/30 bg-primary/5 p-3 text-center">
+            <p className="text-sm font-semibold text-primary">✅ Image captured successfully</p>
+            <p className="text-xs text-muted-foreground mt-1">No OCR yet — tap "Start OCR" when ready</p>
+          </div>
+          {imagePreview && <img src={imagePreview} alt="Business card preview" className="w-full rounded-lg border border-border" />}
+          <div className="flex gap-3">
+            <Button type="button" variant="outline" className="flex-1" onClick={() => { setStep("capture"); setImagePreview(null); setPendingBase64(null); }}>
+              Retake
+            </Button>
+            <Button type="button" className="flex-1 gap-2" onClick={handleStartOcr}>
+              <ScanLine className="h-4 w-4" /> Start OCR
+            </Button>
+          </div>
+        </div>
+      )}
+
+
         <div className="space-y-4">
           {imagePreview && <img src={imagePreview} alt="Business card" className="w-full rounded-lg border border-border" />}
           <div className="flex items-center justify-center gap-3 py-8">
