@@ -657,6 +657,43 @@ export default function ScanBusinessCard() {
     });
   }, []);
 
+  const [pendingBase64, setPendingBase64] = useState<string | null>(null);
+  const [ocrManuallyStarted, setOcrManuallyStarted] = useState(false);
+  const [unloadPhase, setUnloadPhase] = useState<string>("none");
+
+  // Track which phase unload happens in
+  useEffect(() => {
+    const detectPhase = (eventName: string) => {
+      const phase = step === "capture" ? "capture" : step === "preview" ? "idle_preview" : step === "scanning" ? "ocr_running" : step;
+      setUnloadPhase(`${phase} (${eventName})`);
+      try {
+        sessionStorage.setItem("scan_unload_phase", `${phase} (${eventName}) at ${isoNow()}`);
+      } catch {}
+    };
+    const onBU = () => detectPhase("beforeunload");
+    const onU = () => detectPhase("unload");
+    const onPH = () => detectPhase("pagehide");
+    const onVC = () => { if (document.visibilityState === "hidden") detectPhase("visibilitychange"); };
+    window.addEventListener("beforeunload", onBU);
+    window.addEventListener("unload", onU);
+    window.addEventListener("pagehide", onPH);
+    document.addEventListener("visibilitychange", onVC);
+    return () => {
+      window.removeEventListener("beforeunload", onBU);
+      window.removeEventListener("unload", onU);
+      window.removeEventListener("pagehide", onPH);
+      document.removeEventListener("visibilitychange", onVC);
+    };
+  }, [step]);
+
+  // Rehydrate unload phase from previous session
+  useEffect(() => {
+    try {
+      const prev = sessionStorage.getItem("scan_unload_phase");
+      if (prev) setUnloadPhase(prev);
+    } catch {}
+  }, []);
+
   const handleFile = useCallback(async (file: File) => {
     updateRuntimeDebug((prev) => ({
       ...prev,
@@ -676,11 +713,22 @@ export default function ScanBusinessCard() {
     }
     try {
       const compressed = await compressImage(file);
-      await processImage(compressed);
+      // Do NOT auto-start OCR — just show preview
+      setImagePreview(compressed);
+      setPendingBase64(compressed);
+      setOcrManuallyStarted(false);
+      setStep("preview");
+      toast.success("Image captured successfully — tap Start OCR when ready");
     } catch (err: any) {
       toast.error(err.message || "Failed to read image");
     }
-  }, [compressImage, processImage, updateRuntimeDebug]);
+  }, [compressImage, updateRuntimeDebug]);
+
+  const handleStartOcr = useCallback(() => {
+    if (!pendingBase64) return;
+    setOcrManuallyStarted(true);
+    void processImage(pendingBase64);
+  }, [pendingBase64, processImage]);
 
   const handleSave = useCallback(async () => {
     console.log("[scan-card] save handler started");
