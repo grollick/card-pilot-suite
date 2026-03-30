@@ -213,7 +213,7 @@ serve(async (req) => {
     }
 
     // ─── ENFORCEMENT: check limits before AI calls ───
-    const AI_ACTIONS = ["insights", "lead_reply", "follow_up", "booking_confirm", "review_request", "profile_optimize"];
+    const AI_ACTIONS = ["insights", "lead_reply", "follow_up", "booking_confirm", "review_request", "profile_optimize", "score_lead"];
     if (AI_ACTIONS.includes(action) && businessId) {
       const monthStart = new Date();
       monthStart.setDate(1);
