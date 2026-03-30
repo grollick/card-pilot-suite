@@ -5,6 +5,8 @@ import { ReviewDashboard } from "../components/ReviewDashboard";
 import ProviderAIAssistant from "../components/ProviderAIAssistant";
 import AIInsightsPanel from "../components/AIInsightsPanel";
 import { ProfileOptimizePanel } from "../components/AIActionCards";
+import AIFeatureGate from "../components/AIFeatureGate";
+import { useAIUsage } from "../hooks/useProviderInsights";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
