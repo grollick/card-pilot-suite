@@ -32,7 +32,7 @@ const stagger = {
   show: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.08, duration: 0.35, ease: "easeOut" },
+    transition: { delay: i * 0.08, duration: 0.35, ease: "easeOut" as const },
   }),
 };
 
