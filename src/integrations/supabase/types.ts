@@ -4282,6 +4282,102 @@ export type Database = {
           },
         ]
       }
+      lead_scores: {
+        Row: {
+          business_id: string
+          created_at: string
+          explanation: string | null
+          id: string
+          label: string
+          lead_id: string
+          recommended_action: string | null
+          score: number
+          scoring_factors: Json | null
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          label?: string
+          lead_id: string
+          recommended_action?: string | null
+          score?: number
+          scoring_factors?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          label?: string
+          lead_id?: string
+          recommended_action?: string | null
+          score?: number
+          scoring_factors?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_scores_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "lead_scores_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_ai_entitlements"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "lead_scores_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "lead_scores_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_plan_status"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "lead_scores_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_scores_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "lead_scores_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: true
+            referencedRelation: "business_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_scores_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: true
+            referencedRelation: "copilot_lead_context"
+            referencedColumns: ["lead_id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           address: string | null
