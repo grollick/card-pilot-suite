@@ -122,6 +122,12 @@ export default function ProviderDashboard() {
       {/* AI ROI Panel */}
       <AIRoiPanel />
 
+      {/* High Intent Leads */}
+      <HighIntentLeadsPanel
+        onViewLead={(id) => toast.info(`View lead ${id}`)}
+        onReply={(id) => toast.info(`Reply to lead ${id}`)}
+      />
+
       {/* Performance Panel */}
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <div className="p-5 border-b border-border">
