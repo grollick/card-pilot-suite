@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { Eye, Users, CalendarCheck, Star, TrendingUp, CheckCircle2, AlertCircle, Plus, Pencil, Trash2, Rocket, ArrowUpRight, ShieldCheck, Zap, Crown } from "lucide-react";
+import { ReviewDashboard } from "../components/ReviewDashboard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -207,6 +208,12 @@ export default function ProviderDashboard() {
           </div>
           <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
         </button>
+      </div>
+
+      {/* Reviews Dashboard */}
+      <div className="rounded-xl border border-border bg-card p-5">
+        <h2 className="font-semibold text-foreground mb-4">Reviews & Trust</h2>
+        <ReviewDashboard businessId={mockBusinessId} />
       </div>
 
       {/* Boost Campaign Panel */}
