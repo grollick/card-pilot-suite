@@ -393,6 +393,113 @@ export type Database = {
           },
         ]
       }
+      ai_message_events: {
+        Row: {
+          booking_id: string | null
+          business_id: string
+          created_at: string | null
+          generated_content: string
+          id: string
+          lead_id: string | null
+          message_type: string
+          was_auto_sent: boolean | null
+          was_user_edited: boolean | null
+        }
+        Insert: {
+          booking_id?: string | null
+          business_id: string
+          created_at?: string | null
+          generated_content: string
+          id?: string
+          lead_id?: string | null
+          message_type: string
+          was_auto_sent?: boolean | null
+          was_user_edited?: boolean | null
+        }
+        Update: {
+          booking_id?: string | null
+          business_id?: string
+          created_at?: string | null
+          generated_content?: string
+          id?: string
+          lead_id?: string | null
+          message_type?: string
+          was_auto_sent?: boolean | null
+          was_user_edited?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_message_events_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "business_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_booking_context"
+            referencedColumns: ["booking_id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_ai_entitlements"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_plan_status"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "business_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_lead_context"
+            referencedColumns: ["lead_id"]
+          },
+        ]
+      }
       ai_plan_limits: {
         Row: {
           advanced_growth_enabled: boolean
