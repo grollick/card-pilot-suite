@@ -132,6 +132,7 @@ const BusinessProfilePage = lazy(() => import("@/modules/marketplace/pages/Busin
 const BookingFlowPage = lazy(() => import("@/modules/marketplace/pages/BookingFlow"));
 const PostBookingPage = lazy(() => import("@/modules/marketplace/pages/PostBooking"));
 const ProviderDashboardPage = lazy(() => import("@/modules/marketplace/pages/ProviderDashboard"));
+const BusinessOnboardingPage = lazy(() => import("@/modules/marketplace/pages/BusinessOnboardingPage"));
 
 // AI Assistant
 const AssistantPage = lazy(() => import("@/modules/assistant/pages/AssistantPage"));
