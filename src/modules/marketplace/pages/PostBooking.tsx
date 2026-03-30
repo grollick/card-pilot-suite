@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { Star, ArrowRight, ThumbsUp } from "lucide-react";
+import { CustomerViralLoop } from "../components/ViralLoopCards";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
