@@ -437,6 +437,23 @@ Leads last 30d: ${metrics?.lead_count_30d || 0}`;
       supabase.from("ai_assistant_suggestions").insert(rows).then(() => {});
     }
 
+    // ─── LOG USAGE EVENT ───
+    if (businessId && result && !result.error) {
+      const entityType = action === "lead_reply" || action === "follow_up" ? "lead"
+        : action === "booking_confirm" || action === "review_request" ? "booking"
+        : action === "profile_optimize" ? "profile" : null;
+      const entityId = context?.lead?.lead_id || context?.booking?.booking_id || null;
+
+      supabase.from("ai_usage_events").insert({
+        business_id: businessId,
+        user_id: user.id,
+        feature_key: action,
+        entity_type: entityType,
+        entity_id: entityId,
+        credits_used: 1,
+      }).then(() => {});
+    }
+
     return new Response(JSON.stringify({ result, action }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
