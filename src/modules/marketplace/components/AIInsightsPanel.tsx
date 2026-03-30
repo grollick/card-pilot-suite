@@ -224,6 +224,14 @@ export default function AIInsightsPanel({ onAction }: Props) {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Upgrade Modal */}
+      <AIUpgradeModal
+        open={upgradeOpen}
+        onClose={() => setUpgradeOpen(false)}
+        currentPlan={usage?.plan}
+        reason="limit_reached"
+      />
     </div>
   );
 }
