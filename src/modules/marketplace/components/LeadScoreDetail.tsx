@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { RefreshCw, Loader2, Zap, Target, Clock, Phone, Wrench } from "lucide-react";
+import { RefreshCw, Loader2, Zap, Target, Clock, Phone, Wrench, Sparkles, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -39,26 +39,33 @@ export default function LeadScoreDetail({ leadId }: Props) {
 
   if (!score) {
     return (
-      <div className="rounded-xl border border-border bg-card p-4">
-        <div className="text-center py-4">
-          <Target className="h-7 w-7 text-muted-foreground/40 mx-auto mb-2" />
-          <p className="text-sm font-medium text-foreground mb-1">No score yet</p>
-          <p className="text-xs text-muted-foreground mb-3">
-            Score this lead to see how likely they are to convert.
-          </p>
+      <div className="rounded-xl border border-border bg-card p-5">
+        <div className="text-center py-4 space-y-3">
+          <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mx-auto">
+            <Target className="h-6 w-6 text-primary" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-foreground">How strong is this lead?</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Copilot will analyze this lead and tell you what to do next
+            </p>
+          </div>
           <Button
-            size="sm"
+            size="default"
             onClick={handleScore}
             disabled={scoreMutation.isPending}
-            className="gap-1"
+            className="gap-1.5 h-10"
           >
             {scoreMutation.isPending ? (
-              <Loader2 className="h-3 w-3 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
-              <Zap className="h-3 w-3" />
+              <Zap className="h-4 w-4" />
             )}
-            Score Lead
+            Score This Lead
           </Button>
+          <p className="text-[10px] text-muted-foreground flex items-center justify-center gap-1">
+            <Bot className="h-2.5 w-2.5" /> Suggested by Copilot
+          </p>
         </div>
       </div>
     );
@@ -72,8 +79,13 @@ export default function LeadScoreDetail({ leadId }: Props) {
       animate={{ opacity: 1, y: 0 }}
       className="rounded-xl border border-border bg-card overflow-hidden"
     >
+      {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-        <span className="text-xs font-semibold text-foreground">Lead Score</span>
+        <div className="flex items-center gap-1.5">
+          <Sparkles className="h-3 w-3 text-primary" />
+          <span className="text-xs font-semibold text-foreground">Lead Score</span>
+          <span className="text-[10px] text-muted-foreground">by Copilot</span>
+        </div>
         <Button
           size="sm"
           variant="ghost"
@@ -94,25 +106,34 @@ export default function LeadScoreDetail({ leadId }: Props) {
         {/* Score badge */}
         <LeadScoreBadge score={score.score} label={score.label} size="md" />
 
-        {/* Explanation */}
+        {/* AI summary — "What this customer wants" */}
         {score.explanation && (
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            {score.explanation}
-          </p>
-        )}
-
-        {/* Recommended action */}
-        {score.recommended_action && (
-          <div className="p-2.5 rounded-lg bg-primary/5 border border-primary/10">
-            <p className="text-xs font-medium text-primary mb-0.5">Recommended action</p>
-            <p className="text-xs text-foreground">{score.recommended_action}</p>
+          <div className="p-3 rounded-lg bg-muted/50">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+              AI Summary
+            </p>
+            <p className="text-xs text-foreground leading-relaxed">
+              {score.explanation}
+            </p>
           </div>
         )}
 
-        {/* Scoring factors */}
+        {/* Recommended action — prominent */}
+        {score.recommended_action && (
+          <div className="p-3 rounded-lg bg-primary/5 border border-primary/10">
+            <p className="text-[10px] font-semibold text-primary uppercase tracking-wider mb-0.5">
+              What to do next
+            </p>
+            <p className="text-sm font-medium text-foreground">{score.recommended_action}</p>
+          </div>
+        )}
+
+        {/* Scoring factors — compact */}
         {Object.keys(factors).length > 0 && (
-          <div className="space-y-2">
-            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">Scoring factors</p>
+          <div className="space-y-2 pt-1">
+            <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">
+              Why this score
+            </p>
             {Object.entries(factors).map(([key, value]) => {
               const cfg = factorConfig[key];
               if (!cfg || typeof value !== "number") return null;
