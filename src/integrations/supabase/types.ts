@@ -6806,13 +6806,19 @@ export type Database = {
           booking_id: string | null
           business_id: string
           created_at: string | null
+          delivered_at: string | null
           delivery_status: string | null
+          error_code: string | null
+          error_message: string | null
+          failed_at: string | null
           id: string
           lead_id: string | null
           message_body: string
           message_type: string
           phone: string | null
           sent_at: string | null
+          twilio_message_sid: string | null
+          updated_at: string | null
           was_ai_generated: boolean | null
           was_user_edited: boolean | null
         }
@@ -6820,13 +6826,19 @@ export type Database = {
           booking_id?: string | null
           business_id: string
           created_at?: string | null
+          delivered_at?: string | null
           delivery_status?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          failed_at?: string | null
           id?: string
           lead_id?: string | null
           message_body: string
           message_type: string
           phone?: string | null
           sent_at?: string | null
+          twilio_message_sid?: string | null
+          updated_at?: string | null
           was_ai_generated?: boolean | null
           was_user_edited?: boolean | null
         }
@@ -6834,13 +6846,19 @@ export type Database = {
           booking_id?: string | null
           business_id?: string
           created_at?: string | null
+          delivered_at?: string | null
           delivery_status?: string | null
+          error_code?: string | null
+          error_message?: string | null
+          failed_at?: string | null
           id?: string
           lead_id?: string | null
           message_body?: string
           message_type?: string
           phone?: string | null
           sent_at?: string | null
+          twilio_message_sid?: string | null
+          updated_at?: string | null
           was_ai_generated?: boolean | null
           was_user_edited?: boolean | null
         }
@@ -8098,6 +8116,169 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_delivery_summary: {
+        Row: {
+          business_id: string | null
+          delivery_rate: number | null
+          total_delivered: number | null
+          total_failed: number | null
+          total_messages: number | null
+          total_sent: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_ai_entitlements"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_plan_status"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
+        ]
+      }
+      sms_message_context: {
+        Row: {
+          booking_id: string | null
+          business_id: string | null
+          business_name: string | null
+          created_at: string | null
+          customer_name: string | null
+          delivered_at: string | null
+          delivery_status: string | null
+          error_code: string | null
+          error_message: string | null
+          failed_at: string | null
+          id: string | null
+          lead_id: string | null
+          message_body: string | null
+          message_type: string | null
+          phone: string | null
+          sent_at: string | null
+          twilio_message_sid: string | null
+          was_ai_generated: boolean | null
+          was_user_edited: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_message_events_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "business_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_booking_context"
+            referencedColumns: ["booking_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_ai_entitlements"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_plan_status"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "business_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_lead_context"
+            referencedColumns: ["lead_id"]
+          },
+        ]
+      }
     }
     Functions: {
       capture_lead: {
@@ -8248,6 +8429,7 @@ export type Database = {
         }
         Returns: number
       }
+      normalize_twilio_status: { Args: { p_status: string }; Returns: string }
       onboard_business: {
         Args: { p_business_name: string; p_city: string; p_region: string }
         Returns: Json
@@ -8255,6 +8437,15 @@ export type Database = {
       owns_lead: {
         Args: { _lead_id: string; _user_id: string }
         Returns: boolean
+      }
+      process_sms_webhook: {
+        Args: {
+          p_delivery_status: string
+          p_error_code?: string
+          p_error_message?: string
+          p_twilio_message_sid: string
+        }
+        Returns: undefined
       }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
@@ -8338,6 +8529,15 @@ export type Database = {
               total_count: number
             }[]
           }
+      update_sms_delivery_status: {
+        Args: {
+          p_delivery_status: string
+          p_error_code?: string
+          p_error_message?: string
+          p_twilio_message_sid: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       analytics_event_type:

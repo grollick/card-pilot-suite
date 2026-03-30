@@ -14,8 +14,14 @@ export interface SmsMessage {
   delivery_status: string;
   was_ai_generated: boolean;
   was_user_edited: boolean;
+  twilio_message_sid: string | null;
+  error_code: string | null;
+  error_message: string | null;
   sent_at: string | null;
+  delivered_at: string | null;
+  failed_at: string | null;
   created_at: string;
+  updated_at: string;
 }
 
 export function useSmsMessages(opts?: { leadId?: string; bookingId?: string }) {
