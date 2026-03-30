@@ -4490,6 +4490,44 @@ export type Database = {
           },
         ]
       }
+      plan_limits: {
+        Row: {
+          branding_removed: boolean | null
+          created_at: string | null
+          featured_enabled: boolean | null
+          max_bookings_per_month: number | null
+          max_service_areas: number | null
+          max_services: number | null
+          plan_id: string
+        }
+        Insert: {
+          branding_removed?: boolean | null
+          created_at?: string | null
+          featured_enabled?: boolean | null
+          max_bookings_per_month?: number | null
+          max_service_areas?: number | null
+          max_services?: number | null
+          plan_id: string
+        }
+        Update: {
+          branding_removed?: boolean | null
+          created_at?: string | null
+          featured_enabled?: boolean | null
+          max_bookings_per_month?: number | null
+          max_service_areas?: number | null
+          max_services?: number | null
+          plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plan_limits_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: true
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       professions: {
         Row: {
           category: string
