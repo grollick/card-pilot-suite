@@ -43,7 +43,7 @@ export function useBusinessAreas() {
         .eq("is_active", true)
         .order("city");
       if (error) throw error;
-      return (data || []) as { id: string; city: string; region: string | null; is_active: boolean }[];
+      return (data || []) as unknown as { id: string; city: string; region: string | null; is_active: boolean }[];
     },
   });
 }
