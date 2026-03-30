@@ -146,11 +146,16 @@ export function AppSidebar() {
               {!collapsed && <span className="truncate">{item.title}</span>}
               {shouldGlow && !collapsed && (
                 <span className="ml-auto flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary/15 px-1">
+                  <span className="relative flex h-1.5 w-1.5 mr-0.5">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/50" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+                  </span>
                   <span className="text-[10px] font-semibold text-primary">{jobStats?.newRequests}</span>
                 </span>
               )}
               {shouldGlow && collapsed && (
                 <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/40" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
                 </span>
               )}
