@@ -6386,6 +6386,40 @@ export type Database = {
         Args: { p_user_id: string }
         Returns: string
       }
+      refresh_marketplace_scores: {
+        Args: { p_business_id?: string }
+        Returns: undefined
+      }
+      search_marketplace: {
+        Args: {
+          p_category?: string
+          p_city?: string
+          p_keyword?: string
+          p_limit?: number
+          p_min_rating?: number
+          p_offset?: number
+        }
+        Returns: {
+          avg_rating: number
+          business_id: string
+          business_name: string
+          categories: string[]
+          cover_image_url: string
+          description: string
+          email: string
+          has_premium_badge: boolean
+          is_boosted: boolean
+          is_featured: boolean
+          location_city: string
+          location_region: string
+          logo_url: string
+          marketplace_score: number
+          phone: string
+          review_count: number
+          slug: string
+          total_count: number
+        }[]
+      }
     }
     Enums: {
       analytics_event_type:
