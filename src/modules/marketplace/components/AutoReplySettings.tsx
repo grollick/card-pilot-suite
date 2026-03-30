@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useAutoReplySettings, useSaveAutoReplySettings, type AutoReplySettings as SettingsType } from "../hooks/useAutoReply";
@@ -18,11 +17,8 @@ export default function AutoReplySettings() {
     auto_follow_up_enabled: false,
     review_before_send: true,
     reply_tone: "professional",
-    auto_reply_scope: "marketplace",
     business_hours_only: true,
-    business_hours_start: "08:00",
-    business_hours_end: "18:00",
-    min_lead_score: null,
+    high_intent_only: false,
   });
 
   useEffect(() => {
@@ -109,29 +105,25 @@ export default function AutoReplySettings() {
             </div>
             <div>
               <Label className="text-sm font-medium">Only during business hours</Label>
-              <p className="text-xs text-muted-foreground">Auto-replies sent between set hours</p>
+              <p className="text-xs text-muted-foreground">Auto-replies sent during working hours only</p>
             </div>
           </div>
           <Switch checked={settings.business_hours_only} onCheckedChange={(v) => update("business_hours_only", v)} />
         </div>
 
-        {settings.business_hours_only && (
-          <div className="flex items-center gap-3 pl-14">
-            <Input
-              type="time"
-              value={settings.business_hours_start}
-              onChange={(e) => update("business_hours_start", e.target.value)}
-              className="w-32"
-            />
-            <span className="text-sm text-muted-foreground">to</span>
-            <Input
-              type="time"
-              value={settings.business_hours_end}
-              onChange={(e) => update("business_hours_end", e.target.value)}
-              className="w-32"
-            />
+        {/* High intent only */}
+        <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-warning/10">
+              <Zap className="h-4 w-4 text-warning" />
+            </div>
+            <div>
+              <Label className="text-sm font-medium">High intent leads only</Label>
+              <p className="text-xs text-muted-foreground">Only auto-reply to leads scored 80+</p>
+            </div>
           </div>
-        )}
+          <Switch checked={settings.high_intent_only} onCheckedChange={(v) => update("high_intent_only", v)} />
+        </div>
 
         {/* Reply tone */}
         <div className="space-y-1.5">
@@ -147,36 +139,6 @@ export default function AutoReplySettings() {
             </SelectContent>
           </Select>
         </div>
-
-        {/* Scope */}
-        <div className="space-y-1.5">
-          <Label className="text-sm font-medium">Auto-reply scope</Label>
-          <Select value={settings.auto_reply_scope} onValueChange={(v) => update("auto_reply_scope", v)}>
-            <SelectTrigger className="w-56">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="marketplace">Marketplace leads only</SelectItem>
-              <SelectItem value="all">All leads</SelectItem>
-              <SelectItem value="high_intent">High intent leads only</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* Min lead score */}
-        {settings.auto_reply_scope === "high_intent" && (
-          <div className="space-y-1.5">
-            <Label className="text-sm font-medium">Minimum lead score</Label>
-            <Input
-              type="number"
-              min={1}
-              max={100}
-              value={settings.min_lead_score ?? 80}
-              onChange={(e) => update("min_lead_score", parseInt(e.target.value) || null)}
-              className="w-24"
-            />
-          </div>
-        )}
 
         {/* Safety note */}
         <div className="p-3 rounded-lg bg-muted/50 border border-border">

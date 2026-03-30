@@ -245,6 +245,13 @@ export type Database = {
             foreignKeyName: "ai_assistant_suggestions_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_assistant_suggestions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "copilot_profile_context"
             referencedColumns: ["business_id"]
           },
@@ -338,6 +345,13 @@ export type Database = {
             foreignKeyName: "ai_automation_settings_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: true
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_automation_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
             referencedRelation: "copilot_profile_context"
             referencedColumns: ["business_id"]
           },
@@ -389,6 +403,7 @@ export type Database = {
           lead_id: string
           recommended_action: string | null
           score: number
+          scoring_factors: Json | null
           updated_at: string | null
         }
         Insert: {
@@ -400,6 +415,7 @@ export type Database = {
           lead_id: string
           recommended_action?: string | null
           score: number
+          scoring_factors?: Json | null
           updated_at?: string | null
         }
         Update: {
@@ -411,6 +427,7 @@ export type Database = {
           lead_id?: string
           recommended_action?: string | null
           score?: number
+          scoring_factors?: Json | null
           updated_at?: string | null
         }
         Relationships: [
@@ -448,6 +465,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_lead_scores_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
           },
           {
             foreignKeyName: "ai_lead_scores_business_id_fkey"
@@ -555,6 +579,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
           },
           {
             foreignKeyName: "ai_message_events_business_id_fkey"
@@ -707,6 +738,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_usage_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
           },
           {
             foreignKeyName: "ai_usage_events_business_id_fkey"
@@ -1591,6 +1629,13 @@ export type Database = {
             foreignKeyName: "business_bookings_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_bookings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "copilot_profile_context"
             referencedColumns: ["business_id"]
           },
@@ -1676,6 +1721,13 @@ export type Database = {
             foreignKeyName: "business_categories_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_categories_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "copilot_profile_context"
             referencedColumns: ["business_id"]
           },
@@ -1753,6 +1805,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_leads_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
           },
           {
             foreignKeyName: "business_leads_business_id_fkey"
@@ -1859,6 +1918,13 @@ export type Database = {
             foreignKeyName: "business_profiles_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: true
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_profiles_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
             referencedRelation: "copilot_profile_context"
             referencedColumns: ["business_id"]
           },
@@ -1952,6 +2018,13 @@ export type Database = {
             foreignKeyName: "business_reviews_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_reviews_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "copilot_profile_context"
             referencedColumns: ["business_id"]
           },
@@ -2029,6 +2102,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_subscriptions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
           },
           {
             foreignKeyName: "business_subscriptions_business_id_fkey"
@@ -2551,6 +2631,13 @@ export type Database = {
             foreignKeyName: "copilot_auto_reply_settings_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: true
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_auto_reply_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
             referencedRelation: "copilot_profile_context"
             referencedColumns: ["business_id"]
           },
@@ -2642,6 +2729,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
           },
           {
             foreignKeyName: "copilot_reply_log_business_id_fkey"
@@ -4839,6 +4933,13 @@ export type Database = {
             foreignKeyName: "lead_scores_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "lead_scores_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "copilot_profile_context"
             referencedColumns: ["business_id"]
           },
@@ -5272,6 +5373,13 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "businesses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "marketplace_metrics_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
           },
           {
             foreignKeyName: "marketplace_metrics_business_id_fkey"
@@ -6449,6 +6557,13 @@ export type Database = {
             foreignKeyName: "service_areas_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "service_areas_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "copilot_profile_context"
             referencedColumns: ["business_id"]
           },
@@ -6523,6 +6638,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "services_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
           },
           {
             foreignKeyName: "services_business_id_fkey"
@@ -7218,6 +7340,13 @@ export type Database = {
             foreignKeyName: "ai_usage_events_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_usage_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "copilot_profile_context"
             referencedColumns: ["business_id"]
           },
@@ -7344,10 +7473,29 @@ export type Database = {
             foreignKeyName: "business_bookings_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_bookings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "copilot_profile_context"
             referencedColumns: ["business_id"]
           },
         ]
+      }
+      copilot_dashboard_summary: {
+        Row: {
+          active_suggestions: number | null
+          ai_usage_this_month: number | null
+          business_id: string | null
+          high_intent_leads: number | null
+          monthly_ai_limit: number | null
+          new_leads: number | null
+          pending_bookings: number | null
+        }
+        Relationships: []
       }
       copilot_lead_context: {
         Row: {
@@ -7398,6 +7546,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_leads_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
           },
           {
             foreignKeyName: "business_leads_business_id_fkey"
@@ -7475,6 +7630,76 @@ export type Database = {
           },
           {
             foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
+        ]
+      }
+      copilot_reply_stats_v2: {
+        Row: {
+          auto_sent_replies: number | null
+          business_id: string | null
+          edited_replies: number | null
+          leads_answered: number | null
+          manual_replies: number | null
+          replies_30d: number | null
+          replies_7d: number | null
+          total_replies: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_ai_entitlements"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_plan_status"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_message_events_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "copilot_profile_context"

@@ -118,6 +118,30 @@ export function useAIUsage() {
   });
 }
 
+export interface DashboardSummary {
+  new_leads: number;
+  high_intent_leads: number;
+  pending_bookings: number;
+  ai_usage_this_month: number;
+  monthly_ai_limit: number;
+  active_suggestions: number;
+}
+
+/** Get copilot dashboard summary */
+export function useDashboardSummary() {
+  const { user } = useAuth();
+  return useQuery<DashboardSummary | null>({
+    queryKey: ["dashboard-summary", user?.id],
+    enabled: !!user,
+    staleTime: 1000 * 60 * 2,
+    queryFn: async () => {
+      const result = await callInsights("get_dashboard_summary");
+      return result as DashboardSummary | null;
+    },
+  });
+}
+
+
 /** Get AI ROI metrics for current business */
 export function useAIRoi() {
   const { user } = useAuth();

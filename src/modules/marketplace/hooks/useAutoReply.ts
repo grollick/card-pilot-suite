@@ -16,11 +16,8 @@ export interface AutoReplySettings {
   auto_follow_up_enabled: boolean;
   review_before_send: boolean;
   reply_tone: string;
-  auto_reply_scope: string;
   business_hours_only: boolean;
-  business_hours_start: string;
-  business_hours_end: string;
-  min_lead_score: number | null;
+  high_intent_only: boolean;
 }
 
 export interface ReplyStats {

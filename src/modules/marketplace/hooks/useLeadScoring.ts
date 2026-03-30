@@ -35,6 +35,11 @@ async function callInsights(action: string, context?: any) {
     body: { action, context },
   });
   if (error) throw error;
+  if (data?.error === "ai_limit_reached" || data?.error === "feature_locked") {
+    const err = new Error(data.error) as any;
+    err.aiError = data;
+    throw err;
+  }
   if (data?.error) throw new Error(data.error);
   return data?.result;
 }
