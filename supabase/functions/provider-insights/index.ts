@@ -576,7 +576,7 @@ Leads last 30d: ${metrics?.lead_count_30d || 0}`;
 
     // ─── LOG USAGE EVENT ───
     if (businessId && result && !result.error) {
-      const entityType = action === "lead_reply" || action === "follow_up" ? "lead"
+      const entityType = action === "lead_reply" || action === "follow_up" || action === "score_lead" ? "lead"
         : action === "booking_confirm" || action === "review_request" ? "booking"
         : action === "profile_optimize" ? "profile" : null;
       const entityId = context?.lead?.lead_id || context?.booking?.booking_id || null;
