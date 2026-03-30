@@ -24,7 +24,9 @@ export default function TopBar() {
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const { data: profile } = useProfileCache();
+  const unreadCount = useUnreadCount();
 
   const initials = profile?.name
     ? profile.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()
