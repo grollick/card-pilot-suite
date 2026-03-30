@@ -89,10 +89,14 @@ export default function MarketplaceHome() {
   // Fetch featured (high score) and all providers for the user's city
   const { data: featuredData, isLoading: featuredLoading } = useMarketplaceSearch({
     city: location.city,
+    lat: location.lat,
+    lon: location.lon,
     limit: 8,
   });
 
   const { data: allData, isLoading: allLoading } = useMarketplaceSearch({
+    lat: location.lat,
+    lon: location.lon,
     limit: 8,
   });
 
