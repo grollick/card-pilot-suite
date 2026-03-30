@@ -73,8 +73,8 @@ export function useMarkNotificationRead() {
 
 export function useMarkAllRead() {
   const qc = useQueryClient();
-  const { data: ctx } = useProviderInsights();
-  const businessId = ctx?.business_id;
+  const { data: biz } = useProviderBusiness();
+  const businessId = biz?.id;
 
   return useMutation({
     mutationFn: async () => {
