@@ -140,6 +140,9 @@ export default function ProviderDashboard() {
         onReply={(id) => toast.info(`Reply to lead ${id}`)}
       />
 
+      {/* AI Reply Stats */}
+      <ReplyStatsPanel />
+
       {/* Performance Panel */}
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <div className="p-5 border-b border-border">
