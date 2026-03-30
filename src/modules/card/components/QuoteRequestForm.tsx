@@ -96,6 +96,14 @@ export default function QuoteRequestForm({
       toast.error("Please enter your name");
       return;
     }
+    if (!form.email.trim() && !form.phone.trim()) {
+      toast.error("Please enter your email or phone number");
+      return;
+    }
+    if (!form.description.trim()) {
+      toast.error("Please describe your project");
+      return;
+    }
     // Bot detection
     const botCheck = detectBot(honeypot, formLoadTime);
     if (botCheck.isBot) {
