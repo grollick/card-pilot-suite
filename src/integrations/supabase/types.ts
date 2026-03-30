@@ -5408,6 +5408,8 @@ export type Database = {
           city: string
           created_at: string | null
           id: string
+          latitude: number | null
+          longitude: number | null
           postal_code: string | null
           radius_km: number | null
           region: string | null
@@ -5417,6 +5419,8 @@ export type Database = {
           city: string
           created_at?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           postal_code?: string | null
           radius_km?: number | null
           region?: string | null
@@ -5426,6 +5430,8 @@ export type Database = {
           city?: string
           created_at?: string | null
           id?: string
+          latitude?: number | null
+          longitude?: number | null
           postal_code?: string | null
           radius_km?: number | null
           region?: string | null
