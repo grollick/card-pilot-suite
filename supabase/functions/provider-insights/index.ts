@@ -91,6 +91,83 @@ serve(async (req) => {
       });
     }
 
+    // ─── GET USAGE ───
+    if (action === "get_usage") {
+      if (!businessId) {
+        return new Response(JSON.stringify({ result: { used: 0, limit: 8, plan: "free", features: {} } }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const monthStart = new Date();
+      monthStart.setDate(1);
+      monthStart.setHours(0, 0, 0, 0);
+
+      const [entRes, usageRes] = await Promise.all([
+        supabase.from("business_ai_entitlements").select("*").eq("business_id", businessId).maybeSingle(),
+        supabase.from("ai_usage_events").select("id", { count: "exact", head: true }).eq("business_id", businessId).gte("created_at", monthStart.toISOString()),
+      ]);
+
+      const ent = entRes.data;
+      const used = usageRes.count || 0;
+      return new Response(JSON.stringify({
+        result: {
+          used,
+          limit: ent?.monthly_ai_generations ?? 8,
+          plan: ent?.plan_name ?? "free",
+          features: {
+            follow_up: ent?.follow_up_enabled ?? false,
+            profile_rewrite: ent?.profile_rewrite_enabled ?? false,
+            advanced_growth: ent?.advanced_growth_enabled ?? false,
+          },
+        },
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // ─── ENFORCEMENT: check limits before AI calls ───
+    const AI_ACTIONS = ["insights", "lead_reply", "follow_up", "booking_confirm", "review_request", "profile_optimize"];
+    if (AI_ACTIONS.includes(action) && businessId) {
+      const monthStart = new Date();
+      monthStart.setDate(1);
+      monthStart.setHours(0, 0, 0, 0);
+
+      const [entRes, usageRes] = await Promise.all([
+        supabase.from("business_ai_entitlements").select("*").eq("business_id", businessId).maybeSingle(),
+        supabase.from("ai_usage_events").select("id", { count: "exact", head: true }).eq("business_id", businessId).gte("created_at", monthStart.toISOString()),
+      ]);
+
+      const ent = entRes.data;
+      const used = usageRes.count || 0;
+      const limit = ent?.monthly_ai_generations ?? 8;
+
+      // Check generation limit
+      if (used >= limit) {
+        return new Response(JSON.stringify({
+          error: "ai_limit_reached",
+          used,
+          limit,
+          plan: ent?.plan_name ?? "free",
+        }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      // Feature gating
+      if (action === "follow_up" && !(ent?.follow_up_enabled)) {
+        return new Response(JSON.stringify({
+          error: "feature_locked",
+          feature: "follow_up",
+          plan: ent?.plan_name ?? "free",
+          required_plan: "pro",
+        }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      if (action === "profile_optimize" && !(ent?.profile_rewrite_enabled)) {
+        return new Response(JSON.stringify({
+          error: "feature_locked",
+          feature: "profile_rewrite",
+          plan: ent?.plan_name ?? "free",
+          required_plan: "pro",
+        }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
+
     // ─── FETCH REAL CONTEXT DATA ───
     let contextData: any = {};
 
