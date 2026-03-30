@@ -35,6 +35,8 @@ export default function CategoryResults() {
     keyword: keyword.trim() || undefined,
     category: category || undefined,
     minRating: parseFloat(minRating),
+    lat: location.lat,
+    lon: location.lon,
   });
 
   const results = data?.results || [];
