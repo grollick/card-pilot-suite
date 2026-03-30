@@ -107,7 +107,7 @@ export default function FirstTimeDashboard() {
               <Button variant="outline" onClick={() => window.open(cardUrl, "_blank")}>
                 <ExternalLink className="h-4 w-4 mr-1.5" /> View Your Card
               </Button>
-              <Button onClick={handleShare}>
+              <Button onClick={() => setShareOpen(true)}>
                 <Share2 className="h-4 w-4 mr-1.5" /> Share Your Card
               </Button>
             </div>
