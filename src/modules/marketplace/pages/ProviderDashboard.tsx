@@ -3,9 +3,8 @@ import { Helmet } from "react-helmet-async";
 import { Eye, Users, CalendarCheck, Star, TrendingUp, CheckCircle2, AlertCircle, Plus, Pencil, Trash2, Rocket, ArrowUpRight, ShieldCheck, Zap, Crown } from "lucide-react";
 import { ReviewDashboard } from "../components/ReviewDashboard";
 import ProviderAIAssistant from "../components/ProviderAIAssistant";
-import AIInsightsPanel from "../components/AIInsightsPanel";
+import CopilotPriorityStack from "../components/CopilotPriorityStack";
 import AIRoiPanel from "../components/AIRoiPanel";
-import HighIntentLeadsPanel from "../components/HighIntentLeadsPanel";
 import ReplyStatsPanel from "../components/ReplyStatsPanel";
 import AutoReplySettings from "../components/AutoReplySettings";
 import { ProfileOptimizePanel } from "../components/AIActionCards";
@@ -107,17 +106,11 @@ export default function ProviderDashboard() {
         </div>
       </div>
 
-      {/* AI Insights Panel */}
-      <AIInsightsPanel onAction={(s) => toast.info(`Action: ${s.title}`)} />
+      {/* Copilot Priority Stack — hero section */}
+      <CopilotPriorityStack onAction={(s) => toast.info(`Action: ${s.title}`)} />
 
       {/* AI ROI Panel */}
       <AIRoiPanel />
-
-      {/* High Intent Leads */}
-      <HighIntentLeadsPanel
-        onViewLead={(id) => toast.info(`View lead ${id}`)}
-        onReply={(id) => toast.info(`Reply to lead ${id}`)}
-      />
 
       {/* AI Reply Stats */}
       <ReplyStatsPanel />
