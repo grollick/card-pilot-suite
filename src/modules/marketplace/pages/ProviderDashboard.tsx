@@ -10,40 +10,19 @@ import ReplyStatsPanel from "../components/ReplyStatsPanel";
 import AutoReplySettings from "../components/AutoReplySettings";
 import { ProfileOptimizePanel } from "../components/AIActionCards";
 import AIFeatureGate from "../components/AIFeatureGate";
-import { useAIUsage } from "../hooks/useProviderInsights";
+import { useAIUsage, useProviderBusiness, useDashboardSummary } from "../hooks/useProviderInsights";
+import { useBusinessServices, useBusinessAreas, useBusinessCategories, useMarketplaceMetrics, useProfileCompleteness } from "../hooks/useProviderData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import BoostCampaignPanel from "../components/BoostCampaignPanel";
 import PlanLimitModal from "../components/PlanLimitModal";
 import { useBusinessPlanStatus, type LimitKind } from "../hooks/useBusinessPlanStatus";
-
-
-const MOCK_SERVICES = [
-  { id: "1", title: "Spring Cleanup", price: 250, active: true },
-  { id: "2", title: "Lawn Maintenance", price: 75, active: true },
-  { id: "3", title: "Garden Design", price: null, active: false },
-];
-
-const MOCK_AREAS = ["Thunder Bay", "Sudbury", "Sault Ste. Marie"];
-
-const MOCK_CATEGORIES = [
-  { key: "landscaping", label: "Landscaping", selected: true },
-  { key: "lawn-care", label: "Lawn Care", selected: true },
-  { key: "snow-removal", label: "Snow Removal", selected: false },
-];
-
-const TIPS = [
-  { done: true, label: "Upload a logo" },
-  { done: true, label: "Add at least 3 services" },
-  { done: false, label: "Get your first review" },
-  { done: false, label: "Complete your profile bio" },
-  { done: true, label: "Set service areas" },
-];
 
 const PLAN_COLORS: Record<string, string> = {
   free: "bg-muted text-muted-foreground",
@@ -54,12 +33,21 @@ const PLAN_COLORS: Record<string, string> = {
 export default function ProviderDashboard() {
   const [isVisible, setIsVisible] = useState(true);
   const navigate = useNavigate();
-  const completeness = 68;
-  const { data: aiUsage } = useAIUsage();
 
-  // TODO: replace with real business ID from auth context
-  const mockBusinessId = undefined;
-  const { plan, isLimitReached, getLimit } = useBusinessPlanStatus(mockBusinessId);
+  // Real business data
+  const { data: business, isLoading: bizLoading } = useProviderBusiness();
+  const businessId = business?.id;
+  const { data: aiUsage } = useAIUsage();
+  const { data: summary } = useDashboardSummary();
+  const { data: services = [], isLoading: servicesLoading } = useBusinessServices();
+  const { data: areas = [], isLoading: areasLoading } = useBusinessAreas();
+  const { data: categories = [], isLoading: catsLoading } = useBusinessCategories();
+  const { data: metrics } = useMarketplaceMetrics();
+  const { data: profile } = useProfileCompleteness();
+  const { plan, isLimitReached, getLimit } = useBusinessPlanStatus(businessId);
+
+  const completeness = profile?.percent ?? 0;
+  const tips = profile?.tips ?? [];
 
   // Limit modal state
   const [limitModal, setLimitModal] = useState<{ open: boolean; kind: LimitKind; count: number }>({
@@ -73,7 +61,7 @@ export default function ProviderDashboard() {
   };
 
   const handleAddService = () => {
-    const activeCount = MOCK_SERVICES.filter((s) => s.active).length;
+    const activeCount = services.filter((s) => s.active).length;
     if (isLimitReached("services", activeCount)) {
       openLimitModal("services", activeCount);
       return;
@@ -82,17 +70,17 @@ export default function ProviderDashboard() {
   };
 
   const handleAddArea = () => {
-    if (isLimitReached("service_areas", MOCK_AREAS.length)) {
-      openLimitModal("service_areas", MOCK_AREAS.length);
+    if (isLimitReached("service_areas", areas.length)) {
+      openLimitModal("service_areas", areas.length);
       return;
     }
     toast.info("Add service area");
   };
 
   const handleNewBooking = () => {
-    const mockMonthlyBookings = 11;
-    if (isLimitReached("bookings", mockMonthlyBookings)) {
-      openLimitModal("bookings", mockMonthlyBookings);
+    const monthlyBookings = summary?.pending_bookings ?? 0;
+    if (isLimitReached("bookings", monthlyBookings)) {
+      openLimitModal("bookings", monthlyBookings);
       return;
     }
     toast.info("Create booking");
@@ -147,20 +135,17 @@ export default function ProviderDashboard() {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-border">
           {[
-            { label: "Profile Views", value: "142", icon: Eye, change: "+12%" },
-            { label: "Leads Received", value: "23", icon: Users, change: "+8%" },
-            { label: "Bookings", value: "11", icon: CalendarCheck, change: "+15%" },
-            { label: "Avg. Rating", value: "4.8", icon: Star, change: "↑ 0.1" },
+            { label: "Profile Views", value: metrics?.profile_views_30d ?? "—", icon: Eye },
+            { label: "Leads Received", value: summary?.new_leads ?? metrics?.lead_count_30d ?? "—", icon: Users },
+            { label: "Bookings", value: summary?.pending_bookings ?? metrics?.booking_count_30d ?? "—", icon: CalendarCheck },
+            { label: "Avg. Rating", value: metrics?.avg_rating != null ? Number(metrics.avg_rating).toFixed(1) : "—", icon: Star },
           ].map((stat) => (
             <div key={stat.label} className="p-4">
               <div className="flex items-center gap-1.5 mb-1">
                 <stat.icon className="h-3.5 w-3.5 text-muted-foreground" />
                 <span className="text-xs text-muted-foreground">{stat.label}</span>
               </div>
-              <div className="flex items-end gap-1.5">
-                <span className="text-xl font-bold text-foreground">{stat.value}</span>
-                <span className="text-xs text-success font-medium mb-0.5">{stat.change}</span>
-              </div>
+              <span className="text-xl font-bold text-foreground">{stat.value}</span>
             </div>
           ))}
         </div>
@@ -239,7 +224,7 @@ export default function ProviderDashboard() {
       {/* Reviews Dashboard */}
       <div className="rounded-xl border border-border bg-card p-5">
         <h2 className="font-semibold text-foreground mb-4">Reviews & Trust</h2>
-        <ReviewDashboard businessId={mockBusinessId} />
+        <ReviewDashboard businessId={businessId} />
       </div>
 
       {/* Boost Campaign Panel */}
@@ -255,7 +240,7 @@ export default function ProviderDashboard() {
         </div>
         <Progress value={completeness} className="h-2 mb-4" />
         <div className="space-y-2">
-          {TIPS.map((tip, i) => (
+          {tips.map((tip, i) => (
             <div key={i} className="flex items-center gap-2 text-sm">
               {tip.done ? (
                 <CheckCircle2 className="h-4 w-4 text-success" />
@@ -279,16 +264,22 @@ export default function ProviderDashboard() {
       {/* Categories */}
       <div className="rounded-xl border border-border bg-card p-5">
         <h2 className="font-semibold text-foreground mb-3">Business Categories</h2>
-        <div className="flex flex-wrap gap-2">
-          {MOCK_CATEGORIES.map((c) => (
-            <Badge key={c.key} variant={c.selected ? "default" : "outline"} className="cursor-pointer" onClick={() => toast.info(`Toggle ${c.label}`)}>
-              {c.label}
-            </Badge>
-          ))}
-          <Badge variant="outline" className="cursor-pointer border-dashed" onClick={() => toast.info("Add category")}>
-            <Plus className="h-3 w-3 mr-1" /> Add
-          </Badge>
-        </div>
+        {catsLoading ? (
+          <div className="flex gap-2"><Skeleton className="h-6 w-24" /><Skeleton className="h-6 w-20" /></div>
+        ) : categories.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No categories added yet.</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {categories.map((c) => (
+              <Badge key={c.key} variant={c.selected ? "default" : "outline"} className="cursor-pointer" onClick={() => toast.info(`Toggle ${c.label}`)}>
+                {c.label}
+              </Badge>
+            ))}
+          </div>
+        )}
+        <Badge variant="outline" className="cursor-pointer border-dashed mt-2" onClick={() => toast.info("Add category")}>
+          <Plus className="h-3 w-3 mr-1" /> Add
+        </Badge>
       </div>
 
       {/* Service Areas with limit check */}
@@ -297,18 +288,24 @@ export default function ProviderDashboard() {
           <h2 className="font-semibold text-foreground">Service Areas</h2>
           {getLimit("service_areas") !== null && (
             <span className="text-xs text-muted-foreground">
-              {MOCK_AREAS.length}/{getLimit("service_areas")} used
+              {areas.length}/{getLimit("service_areas")} used
             </span>
           )}
         </div>
-        <div className="flex flex-wrap gap-2 mb-3">
-          {MOCK_AREAS.map((a) => (
-            <Badge key={a} variant="secondary" className="gap-1">
-              {a}
-              <button className="ml-1 hover:text-destructive"><Trash2 className="h-3 w-3" /></button>
-            </Badge>
-          ))}
-        </div>
+        {areasLoading ? (
+          <div className="flex gap-2"><Skeleton className="h-6 w-28" /><Skeleton className="h-6 w-24" /></div>
+        ) : areas.length === 0 ? (
+          <p className="text-sm text-muted-foreground mb-3">No service areas set.</p>
+        ) : (
+          <div className="flex flex-wrap gap-2 mb-3">
+            {areas.map((a) => (
+              <Badge key={a.id} variant="secondary" className="gap-1">
+                {a.city}{a.region ? `, ${a.region}` : ""}
+                <button className="ml-1 hover:text-destructive"><Trash2 className="h-3 w-3" /></button>
+              </Badge>
+            ))}
+          </div>
+        )}
         <div className="flex gap-2">
           <Input placeholder="Add a city…" className="max-w-xs" />
           <Button size="sm" variant="outline" onClick={handleAddArea}><Plus className="h-4 w-4" /></Button>
@@ -322,7 +319,7 @@ export default function ProviderDashboard() {
             <h2 className="font-semibold text-foreground">Services</h2>
             {getLimit("services") !== null && (
               <span className="text-xs text-muted-foreground">
-                {MOCK_SERVICES.filter((s) => s.active).length}/{getLimit("services")}
+                {services.filter((s) => s.active).length}/{getLimit("services")}
               </span>
             )}
           </div>
@@ -330,22 +327,28 @@ export default function ProviderDashboard() {
             <Plus className="h-4 w-4 mr-1" /> Add Service
           </Button>
         </div>
-        <div className="space-y-2">
-          {MOCK_SERVICES.map((s) => (
-            <div key={s.id} className="flex items-center justify-between p-3 rounded-lg border border-border">
-              <div>
-                <span className="text-sm font-medium text-foreground">{s.title}</span>
-                <span className="text-xs text-muted-foreground ml-2">{s.price ? `$${s.price}` : "Quote only"}</span>
+        {servicesLoading ? (
+          <div className="space-y-2">{[1, 2].map(i => <Skeleton key={i} className="h-14 rounded-lg" />)}</div>
+        ) : services.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No services added yet.</p>
+        ) : (
+          <div className="space-y-2">
+            {services.map((s) => (
+              <div key={s.id} className="flex items-center justify-between p-3 rounded-lg border border-border">
+                <div>
+                  <span className="text-sm font-medium text-foreground">{s.title}</span>
+                  <span className="text-xs text-muted-foreground ml-2">{s.price ? `$${s.price}` : "Quote only"}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant={s.active ? "default" : "secondary"} className="text-xs">
+                    {s.active ? "Active" : "Inactive"}
+                  </Badge>
+                  <button className="text-muted-foreground hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge variant={s.active ? "default" : "secondary"} className="text-xs">
-                  {s.active ? "Active" : "Inactive"}
-                </Badge>
-                <button className="text-muted-foreground hover:text-foreground"><Pencil className="h-3.5 w-3.5" /></button>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Review Summary */}
@@ -353,16 +356,17 @@ export default function ProviderDashboard() {
         <h2 className="font-semibold text-foreground mb-3">Review Summary</h2>
         <div className="flex items-center gap-4">
           <div className="text-center">
-            <span className="text-3xl font-bold text-foreground">4.8</span>
+            <span className="text-3xl font-bold text-foreground">
+              {metrics?.avg_rating != null ? Number(metrics.avg_rating).toFixed(1) : "—"}
+            </span>
             <div className="flex gap-0.5 mt-1">
               {[1, 2, 3, 4, 5].map((i) => (
-                <Star key={i} className={`h-4 w-4 ${i <= 5 ? "fill-warning text-warning" : "text-muted"}`} />
+                <Star key={i} className={`h-4 w-4 ${i <= Math.round(Number(metrics?.avg_rating ?? 0)) ? "fill-warning text-warning" : "text-muted"}`} />
               ))}
             </div>
           </div>
           <div className="flex-1">
-            <p className="text-sm text-muted-foreground">47 total reviews</p>
-            <p className="text-xs text-success">+3 this month</p>
+            <p className="text-sm text-muted-foreground">{metrics?.review_count ?? 0} total reviews</p>
           </div>
         </div>
       </div>
