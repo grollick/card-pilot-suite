@@ -106,17 +106,11 @@ export default function ProviderDashboard() {
         </div>
       </div>
 
-      {/* AI Insights Panel */}
-      <AIInsightsPanel onAction={(s) => toast.info(`Action: ${s.title}`)} />
+      {/* Copilot Priority Stack — hero section */}
+      <CopilotPriorityStack onAction={(s) => toast.info(`Action: ${s.title}`)} />
 
       {/* AI ROI Panel */}
       <AIRoiPanel />
-
-      {/* High Intent Leads */}
-      <HighIntentLeadsPanel
-        onViewLead={(id) => toast.info(`View lead ${id}`)}
-        onReply={(id) => toast.info(`Reply to lead ${id}`)}
-      />
 
       {/* AI Reply Stats */}
       <ReplyStatsPanel />
