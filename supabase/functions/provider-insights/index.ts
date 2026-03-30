@@ -33,7 +33,7 @@ serve(async (req) => {
     }
 
     const { action, context } = body;
-    const NON_AI_ACTIONS = ["update_suggestion", "get_suggestions", "get_usage"];
+    const NON_AI_ACTIONS = ["update_suggestion", "get_suggestions", "get_usage", "get_roi"];
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY && !NON_AI_ACTIONS.includes(action)) {
