@@ -25,8 +25,8 @@ const URGENCY_ORDER: Record<string, number> = {
 
 export function useNotifications() {
   const { user } = useAuth();
-  const { data: ctx } = useProviderInsights();
-  const businessId = ctx?.business_id;
+  const { data: biz } = useProviderBusiness();
+  const businessId = biz?.id;
 
   return useQuery<BusinessNotification[]>({
     queryKey: ["business-notifications", businessId],
