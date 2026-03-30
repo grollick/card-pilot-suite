@@ -1408,9 +1408,11 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_marketplace_visible: boolean | null
+          latitude: number | null
           location_city: string | null
           location_region: string | null
           logo_url: string | null
+          longitude: number | null
           owner_user_id: string
           phone: string | null
           slug: string
@@ -1427,9 +1429,11 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_marketplace_visible?: boolean | null
+          latitude?: number | null
           location_city?: string | null
           location_region?: string | null
           logo_url?: string | null
+          longitude?: number | null
           owner_user_id: string
           phone?: string | null
           slug: string
@@ -1446,9 +1450,11 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_marketplace_visible?: boolean | null
+          latitude?: number | null
           location_city?: string | null
           location_region?: string | null
           logo_url?: string | null
+          longitude?: number | null
           owner_user_id?: string
           phone?: string | null
           slug?: string
@@ -6396,36 +6402,71 @@ export type Database = {
         Args: { p_business_id?: string }
         Returns: undefined
       }
-      search_marketplace: {
-        Args: {
-          p_category?: string
-          p_city?: string
-          p_keyword?: string
-          p_limit?: number
-          p_min_rating?: number
-          p_offset?: number
-        }
-        Returns: {
-          avg_rating: number
-          business_id: string
-          business_name: string
-          categories: string[]
-          cover_image_url: string
-          description: string
-          email: string
-          has_premium_badge: boolean
-          is_boosted: boolean
-          is_featured: boolean
-          location_city: string
-          location_region: string
-          logo_url: string
-          marketplace_score: number
-          phone: string
-          review_count: number
-          slug: string
-          total_count: number
-        }[]
-      }
+      search_marketplace:
+        | {
+            Args: {
+              p_category?: string
+              p_city?: string
+              p_keyword?: string
+              p_lat?: number
+              p_limit?: number
+              p_lon?: number
+              p_min_rating?: number
+              p_offset?: number
+              p_radius_km?: number
+            }
+            Returns: {
+              avg_rating: number
+              business_id: string
+              business_name: string
+              categories: string[]
+              cover_image_url: string
+              description: string
+              distance_km: number
+              email: string
+              has_premium_badge: boolean
+              is_boosted: boolean
+              is_featured: boolean
+              location_city: string
+              location_region: string
+              logo_url: string
+              marketplace_score: number
+              phone: string
+              review_count: number
+              slug: string
+              total_count: number
+            }[]
+          }
+        | {
+            Args: {
+              p_category?: string
+              p_city?: string
+              p_keyword?: string
+              p_limit?: number
+              p_min_rating?: number
+              p_offset?: number
+            }
+            Returns: {
+              avg_rating: number
+              business_id: string
+              business_name: string
+              categories: string[]
+              cover_image_url: string
+              description: string
+              email: string
+              has_premium_badge: boolean
+              is_boosted: boolean
+              is_featured: boolean
+              location_city: string
+              location_region: string
+              logo_url: string
+              marketplace_score: number
+              phone: string
+              review_count: number
+              slug: string
+              total_count: number
+            }[]
+          }
     }
     Enums: {
       analytics_event_type:
