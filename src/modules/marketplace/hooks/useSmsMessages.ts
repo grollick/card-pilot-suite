@@ -20,8 +20,8 @@ export interface SmsMessage {
 
 export function useSmsMessages(opts?: { leadId?: string; bookingId?: string }) {
   const { user } = useAuth();
-  const { data: ctx } = useProviderInsights();
-  const businessId = ctx?.business_id;
+  const { data: biz } = useProviderBusiness();
+  const businessId = biz?.id;
 
   return useQuery<SmsMessage[]>({
     queryKey: ["sms-messages", businessId, opts?.leadId, opts?.bookingId],
