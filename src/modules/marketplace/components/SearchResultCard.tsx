@@ -40,6 +40,9 @@ export function SearchResultCard({ biz }: { biz: MarketplaceResult }) {
         <div className="flex items-center gap-1 text-xs text-muted-foreground mb-2">
           <MapPin className="h-3 w-3" />
           {biz.location_city}{biz.location_region ? `, ${biz.location_region}` : ""}
+          {biz.distance_km != null && (
+            <span className="ml-1 text-muted-foreground">· {biz.distance_km} km away</span>
+          )}
         </div>
         {biz.description && (
           <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{biz.description}</p>

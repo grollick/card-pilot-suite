@@ -19,6 +19,7 @@ export interface MarketplaceResult {
   is_boosted: boolean;
   has_premium_badge: boolean;
   categories: string[];
+  distance_km: number | null;
   total_count: number;
 }
 
@@ -27,6 +28,9 @@ interface SearchParams {
   keyword?: string | null;
   category?: string | null;
   minRating?: number;
+  lat?: number | null;
+  lon?: number | null;
+  radiusKm?: number;
   limit?: number;
   offset?: number;
 }
@@ -40,6 +44,9 @@ export function useMarketplaceSearch(params: SearchParams) {
         p_keyword: params.keyword || null,
         p_category: params.category || null,
         p_min_rating: params.minRating ?? 0,
+        p_lat: params.lat ?? null,
+        p_lon: params.lon ?? null,
+        p_radius_km: params.radiusKm ?? 50,
         p_limit: params.limit ?? 50,
         p_offset: params.offset ?? 0,
       });
