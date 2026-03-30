@@ -33,7 +33,11 @@ serve(async (req) => {
     }
 
     const { action, context } = body;
-    const NON_AI_ACTIONS = ["update_suggestion", "get_suggestions", "get_usage", "get_roi", "get_lead_scores", "get_lead_score", "log_reply", "get_reply_stats", "get_auto_reply_settings", "save_auto_reply_settings"];
+    const NON_AI_ACTIONS = [
+      "update_suggestion", "get_suggestions", "get_usage", "get_roi",
+      "get_lead_scores", "get_lead_score", "log_reply", "get_reply_stats",
+      "get_auto_reply_settings", "save_auto_reply_settings", "get_dashboard_summary",
+    ];
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY && !NON_AI_ACTIONS.includes(action)) {
@@ -53,51 +57,53 @@ serve(async (req) => {
     const businessId = business?.id;
     const businessName = business?.business_name || "your business";
 
+    const ok = (result: any) => new Response(JSON.stringify({ result }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+    const err = (msg: string, status = 400) => new Response(JSON.stringify({ error: msg }), {
+      status, headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+
     // ─── SUGGESTION STATUS UPDATE ───
     if (action === "update_suggestion") {
       const { suggestionId, status } = context || {};
-      if (!suggestionId || !["active", "used", "dismissed"].includes(status)) {
-        return new Response(JSON.stringify({ error: "Invalid suggestion update" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      if (!suggestionId || !["active", "used", "dismissed"].includes(status)) return err("Invalid suggestion update");
       const { error } = await supabase
         .from("ai_assistant_suggestions")
         .update({ status, updated_at: new Date().toISOString() })
         .eq("id", suggestionId)
         .eq("user_id", user.id);
       if (error) throw error;
-      return new Response(JSON.stringify({ result: { success: true } }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return ok({ success: true });
     }
 
     // ─── GET SAVED SUGGESTIONS ───
     if (action === "get_suggestions") {
-      if (!businessId) {
-        return new Response(JSON.stringify({ result: [] }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const { data: suggestions } = await supabase
+      if (!businessId) return ok([]);
+      const { data } = await supabase
         .from("ai_assistant_suggestions")
         .select("*")
         .eq("business_id", businessId)
         .eq("status", "active")
         .order("created_at", { ascending: false })
         .limit(20);
-      return new Response(JSON.stringify({ result: suggestions || [] }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return ok(data || []);
+    }
+
+    // ─── GET DASHBOARD SUMMARY ───
+    if (action === "get_dashboard_summary") {
+      if (!businessId) return ok(null);
+      const { data } = await supabase
+        .from("copilot_dashboard_summary")
+        .select("*")
+        .eq("business_id", businessId)
+        .maybeSingle();
+      return ok(data);
     }
 
     // ─── GET USAGE ───
     if (action === "get_usage") {
-      if (!businessId) {
-        return new Response(JSON.stringify({ result: { used: 0, limit: 8, plan: "free", features: {} } }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      if (!businessId) return ok({ used: 0, limit: 8, plan: "free", features: {} });
       const monthStart = new Date();
       monthStart.setDate(1);
       monthStart.setHours(0, 0, 0, 0);
@@ -109,35 +115,24 @@ serve(async (req) => {
 
       const ent = entRes.data;
       const used = usageRes.count || 0;
-      return new Response(JSON.stringify({
-        result: {
-          used,
-          limit: ent?.monthly_ai_generations ?? 8,
-          plan: ent?.plan_name ?? "free",
-          features: {
-            follow_up: ent?.follow_up_enabled ?? false,
-            profile_rewrite: ent?.profile_rewrite_enabled ?? false,
-            advanced_growth: ent?.advanced_growth_enabled ?? false,
-          },
+      return ok({
+        used,
+        limit: ent?.monthly_ai_generations ?? 8,
+        plan: ent?.plan_name ?? "free",
+        features: {
+          follow_up: ent?.follow_up_enabled ?? false,
+          profile_rewrite: ent?.profile_rewrite_enabled ?? false,
+          advanced_growth: ent?.advanced_growth_enabled ?? false,
         },
-      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      });
     }
 
     // ─── GET ROI METRICS ───
     if (action === "get_roi") {
-      if (!businessId) {
-        return new Response(JSON.stringify({ result: null }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      if (!businessId) return ok(null);
 
-      const { data: roi } = await supabase
-        .from("ai_roi_metrics")
-        .select("*")
-        .eq("business_id", businessId)
-        .maybeSingle();
+      const { data: roi } = await supabase.from("ai_roi_metrics").select("*").eq("business_id", businessId).maybeSingle();
 
-      // Estimate revenue: use avg service price or default $150
       let avgJobValue = 150;
       const { data: services } = await supabase
         .from("services")
@@ -145,82 +140,58 @@ serve(async (req) => {
         .eq("business_id", businessId)
         .eq("is_active", true)
         .not("price_amount", "is", null);
-      
+
       if (services && services.length > 0) {
         const total = services.reduce((sum: number, s: any) => sum + (s.price_amount || 0), 0);
         avgJobValue = Math.round(total / services.length) || 150;
       }
 
-      const estimatedRevenue = (roi?.ai_assisted_bookings || 0) * avgJobValue;
-      const estimatedRevenueMonth = (roi?.ai_assisted_bookings_month || 0) * avgJobValue;
+      const base = roi || {
+        total_ai_generations: 0, total_ai_generations_month: 0,
+        ai_assisted_leads: 0, ai_assisted_leads_month: 0,
+        ai_assisted_bookings: 0, ai_assisted_bookings_month: 0,
+        ai_assisted_leads_prev_month: 0, ai_assisted_bookings_prev_month: 0,
+        conversion_rate: 0, conversion_rate_month: 0,
+      };
 
-      return new Response(JSON.stringify({
-        result: {
-          ...(roi || {
-            total_ai_generations: 0,
-            total_ai_generations_month: 0,
-            ai_assisted_leads: 0,
-            ai_assisted_leads_month: 0,
-            ai_assisted_bookings: 0,
-            ai_assisted_bookings_month: 0,
-            ai_assisted_leads_prev_month: 0,
-            ai_assisted_bookings_prev_month: 0,
-            conversion_rate: 0,
-            conversion_rate_month: 0,
-          }),
-          avg_job_value: avgJobValue,
-          estimated_revenue: estimatedRevenue,
-          estimated_revenue_month: estimatedRevenueMonth,
-        },
-      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return ok({
+        ...base,
+        avg_job_value: avgJobValue,
+        estimated_revenue: (base.ai_assisted_bookings || 0) * avgJobValue,
+        estimated_revenue_month: (base.ai_assisted_bookings_month || 0) * avgJobValue,
+      });
     }
 
     // ─── GET LEAD SCORES ───
     if (action === "get_lead_scores") {
-      if (!businessId) {
-        return new Response(JSON.stringify({ result: [] }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const { data: scores } = await supabase
-        .from("lead_scores")
+      if (!businessId) return ok([]);
+      const { data } = await supabase
+        .from("ai_lead_scores")
         .select("*, business_leads(full_name, email, phone, message, status, source, created_at)")
         .eq("business_id", businessId)
         .order("score", { ascending: false })
         .limit(50);
-      return new Response(JSON.stringify({ result: scores || [] }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return ok(data || []);
     }
 
     // ─── GET SINGLE LEAD SCORE ───
     if (action === "get_lead_score") {
       const leadId = context?.leadId;
-      if (!leadId || !businessId) {
-        return new Response(JSON.stringify({ result: null }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const { data: score } = await supabase
-        .from("lead_scores")
+      if (!leadId || !businessId) return ok(null);
+      const { data } = await supabase
+        .from("ai_lead_scores")
         .select("*")
         .eq("lead_id", leadId)
         .eq("business_id", businessId)
         .maybeSingle();
-      return new Response(JSON.stringify({ result: score }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return ok(data);
     }
 
     // ─── LOG REPLY ───
     if (action === "log_reply") {
-      if (!businessId) {
-        return new Response(JSON.stringify({ error: "No business found" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      if (!businessId) return err("No business found");
       const { leadId, bookingId, messageType, content, wasAutoSent, wasUserEdited } = context || {};
-      const { error } = await supabase.from("copilot_reply_log").insert({
+      const { error } = await supabase.from("ai_message_events").insert({
         business_id: businessId,
         lead_id: leadId || null,
         booking_id: bookingId || null,
@@ -228,73 +199,49 @@ serve(async (req) => {
         generated_content: content || "",
         was_auto_sent: wasAutoSent || false,
         was_user_edited: wasUserEdited || false,
-        sent_at: new Date().toISOString(),
       });
       if (error) throw error;
-      return new Response(JSON.stringify({ result: { success: true } }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return ok({ success: true });
     }
 
     // ─── GET REPLY STATS ───
     if (action === "get_reply_stats") {
-      if (!businessId) {
-        return new Response(JSON.stringify({ result: null }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const { data: stats } = await supabase
-        .from("copilot_reply_stats")
+      if (!businessId) return ok({ total_replies: 0, sent_replies: 0, auto_sent_replies: 0, edited_replies: 0, leads_answered: 0, replies_30d: 0, replies_7d: 0 });
+      const { data } = await supabase
+        .from("copilot_reply_stats_v2")
         .select("*")
         .eq("business_id", businessId)
         .maybeSingle();
-      return new Response(JSON.stringify({ result: stats || { total_replies: 0, sent_replies: 0, auto_sent_replies: 0, edited_replies: 0, leads_answered: 0, replies_30d: 0, replies_7d: 0 } }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return ok(data || { total_replies: 0, sent_replies: 0, auto_sent_replies: 0, edited_replies: 0, leads_answered: 0, replies_30d: 0, replies_7d: 0 });
     }
 
     // ─── GET AUTO-REPLY SETTINGS ───
     if (action === "get_auto_reply_settings") {
-      if (!businessId) {
-        return new Response(JSON.stringify({ result: null }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const { data: settings } = await supabase
-        .from("copilot_auto_reply_settings")
+      if (!businessId) return ok(null);
+      const { data } = await supabase
+        .from("ai_automation_settings")
         .select("*")
         .eq("business_id", businessId)
         .maybeSingle();
-      return new Response(JSON.stringify({ result: settings }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return ok(data);
     }
 
     // ─── SAVE AUTO-REPLY SETTINGS ───
     if (action === "save_auto_reply_settings") {
-      if (!businessId) {
-        return new Response(JSON.stringify({ error: "No business found" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      const settings = context?.settings || {};
-      const { error } = await supabase.from("copilot_auto_reply_settings").upsert({
+      if (!businessId) return err("No business found");
+      const s = context?.settings || {};
+      const { error } = await supabase.from("ai_automation_settings").upsert({
         business_id: businessId,
-        auto_reply_enabled: settings.auto_reply_enabled ?? false,
-        auto_follow_up_enabled: settings.auto_follow_up_enabled ?? false,
-        review_before_send: settings.review_before_send ?? true,
-        reply_tone: settings.reply_tone ?? "professional",
-        auto_reply_scope: settings.auto_reply_scope ?? "marketplace",
-        business_hours_only: settings.business_hours_only ?? true,
-        business_hours_start: settings.business_hours_start ?? "08:00",
-        business_hours_end: settings.business_hours_end ?? "18:00",
-        min_lead_score: settings.min_lead_score ?? null,
+        auto_reply_enabled: s.auto_reply_enabled ?? false,
+        auto_follow_up_enabled: s.auto_follow_up_enabled ?? false,
+        review_before_send: s.review_before_send ?? true,
+        reply_tone: s.reply_tone ?? "professional",
+        business_hours_only: s.business_hours_only ?? true,
+        high_intent_only: s.high_intent_only ?? false,
         updated_at: new Date().toISOString(),
       }, { onConflict: "business_id" });
       if (error) throw error;
-      return new Response(JSON.stringify({ result: { success: true } }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return ok({ success: true });
     }
 
     // ─── ENFORCEMENT: check limits before AI calls ───
@@ -313,38 +260,26 @@ serve(async (req) => {
       const used = usageRes.count || 0;
       const limit = ent?.monthly_ai_generations ?? 8;
 
-      // Check generation limit
       if (used >= limit) {
         return new Response(JSON.stringify({
-          error: "ai_limit_reached",
-          used,
-          limit,
-          plan: ent?.plan_name ?? "free",
+          error: "ai_limit_reached", used, limit, plan: ent?.plan_name ?? "free",
         }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
 
-      // Feature gating
       if (action === "follow_up" && !(ent?.follow_up_enabled)) {
         return new Response(JSON.stringify({
-          error: "feature_locked",
-          feature: "follow_up",
-          plan: ent?.plan_name ?? "free",
-          required_plan: "pro",
+          error: "feature_locked", feature: "follow_up", plan: ent?.plan_name ?? "free", required_plan: "pro",
         }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
       if (action === "profile_optimize" && !(ent?.profile_rewrite_enabled)) {
         return new Response(JSON.stringify({
-          error: "feature_locked",
-          feature: "profile_rewrite",
-          plan: ent?.plan_name ?? "free",
-          required_plan: "pro",
+          error: "feature_locked", feature: "profile_rewrite", plan: ent?.plan_name ?? "free", required_plan: "pro",
         }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
     }
 
     // ─── FETCH REAL CONTEXT DATA ───
     let contextData: any = {};
-
     if (businessId) {
       const [leadsRes, bookingsRes, reviewsRes, profileRes, metricsRes, servicesRes] = await Promise.all([
         supabase.from("copilot_lead_context").select("*").eq("business_id", businessId).order("created_at", { ascending: false }).limit(30),
@@ -366,19 +301,15 @@ serve(async (req) => {
       };
     }
 
-    // Helper: detect stale leads (no contact after 24-48h)
     const now = Date.now();
     const staleLeads = (contextData.leads || []).filter((l: any) => {
       if (l.status && l.status !== "new") return false;
-      const age = now - new Date(l.created_at).getTime();
-      return age > 24 * 60 * 60 * 1000; // older than 24h
+      return now - new Date(l.created_at).getTime() > 24 * 60 * 60 * 1000;
     });
-
     const newLeads = (contextData.leads || []).filter((l: any) => !l.status || l.status === "new");
     const pendingBookings = (contextData.bookings || []).filter((b: any) => b.status === "pending");
     const completedBookings = (contextData.bookings || []).filter((b: any) => b.status === "completed");
 
-    // Build prompt based on action
     let systemPrompt = "";
     let userPrompt = "";
 
@@ -405,19 +336,20 @@ Generate actionable suggestions as a JSON array. Prioritize stale leads (follow_
 
       case "lead_reply": {
         const lead = context?.lead;
-        // If leadId provided, fetch real data
         let leadData = lead;
         if (lead?.lead_id && businessId) {
-          const { data: realLead } = await supabase
-            .from("copilot_lead_context")
-            .select("*")
-            .eq("lead_id", lead.lead_id)
-            .eq("business_id", businessId)
-            .maybeSingle();
+          const { data: realLead } = await supabase.from("copilot_lead_context").select("*").eq("lead_id", lead.lead_id).eq("business_id", businessId).maybeSingle();
           if (realLead) leadData = realLead;
         }
 
-        systemPrompt = `You are a helpful assistant for ${businessName}, a service provider. Generate a professional, friendly reply to a customer lead inquiry. Keep it concise (3-5 sentences), warm, and action-oriented. Include a call to action (suggest booking or call). Return JSON: { reply: string, summary: string, missingInfo: string[], suggestedAction: string }`;
+        // Load reply tone from automation settings
+        let replyTone = "professional";
+        if (businessId) {
+          const { data: settings } = await supabase.from("ai_automation_settings").select("reply_tone").eq("business_id", businessId).maybeSingle();
+          if (settings?.reply_tone) replyTone = settings.reply_tone;
+        }
+
+        systemPrompt = `You are a helpful assistant for ${businessName}, a service provider. Generate a ${replyTone}, friendly reply to a customer lead inquiry. Keep it concise (3-5 sentences), warm, and action-oriented. Include a call to action (suggest booking or call). Return JSON: { reply: string, summary: string, missingInfo: string[], suggestedAction: string }`;
         userPrompt = `Lead details:
 - Name: ${leadData?.full_name || "Unknown"}
 - Message: "${leadData?.message || "No message provided"}"
@@ -434,18 +366,11 @@ Generate actionable suggestions as a JSON array. Prioritize stale leads (follow_
         const lead = context?.lead;
         let leadData = lead;
         if (lead?.lead_id && businessId) {
-          const { data: realLead } = await supabase
-            .from("copilot_lead_context")
-            .select("*")
-            .eq("lead_id", lead.lead_id)
-            .eq("business_id", businessId)
-            .maybeSingle();
+          const { data: realLead } = await supabase.from("copilot_lead_context").select("*").eq("lead_id", lead.lead_id).eq("business_id", businessId).maybeSingle();
           if (realLead) leadData = realLead;
         }
 
-        const ageHours = leadData?.created_at
-          ? Math.round((now - new Date(leadData.created_at).getTime()) / 3600000)
-          : null;
+        const ageHours = leadData?.created_at ? Math.round((now - new Date(leadData.created_at).getTime()) / 3600000) : null;
 
         systemPrompt = `You are a follow-up specialist for ${businessName}. Generate a friendly, non-pushy follow-up message for a lead that hasn't been contacted or booked yet. Keep it short (2-4 sentences). Return JSON: { message: string, subject: string }`;
         userPrompt = `Lead: ${leadData?.full_name || "Customer"}
@@ -460,12 +385,7 @@ Our services: ${contextData.services?.map((s: any) => s.title).join(", ") || "Va
         const booking = context?.booking;
         let bookingData = booking;
         if (booking?.booking_id && businessId) {
-          const { data: realBooking } = await supabase
-            .from("copilot_booking_context")
-            .select("*")
-            .eq("booking_id", booking.booking_id)
-            .eq("business_id", businessId)
-            .maybeSingle();
+          const { data: realBooking } = await supabase.from("copilot_booking_context").select("*").eq("booking_id", booking.booking_id).eq("business_id", businessId).maybeSingle();
           if (realBooking) bookingData = realBooking;
         }
 
@@ -478,12 +398,7 @@ Our services: ${contextData.services?.map((s: any) => s.title).join(", ") || "Va
         const booking = context?.booking;
         let bookingData = booking;
         if (booking?.booking_id && businessId) {
-          const { data: realBooking } = await supabase
-            .from("copilot_booking_context")
-            .select("*")
-            .eq("booking_id", booking.booking_id)
-            .eq("business_id", businessId)
-            .maybeSingle();
+          const { data: realBooking } = await supabase.from("copilot_booking_context").select("*").eq("booking_id", booking.booking_id).eq("business_id", businessId).maybeSingle();
           if (realBooking) bookingData = realBooking;
         }
 
@@ -522,18 +437,11 @@ Leads last 30d: ${metrics?.lead_count_30d || 0}`;
         const lead = context?.lead;
         let leadData = lead;
         if (lead?.lead_id && businessId) {
-          const { data: realLead } = await supabase
-            .from("copilot_lead_context")
-            .select("*")
-            .eq("lead_id", lead.lead_id)
-            .eq("business_id", businessId)
-            .maybeSingle();
+          const { data: realLead } = await supabase.from("copilot_lead_context").select("*").eq("lead_id", lead.lead_id).eq("business_id", businessId).maybeSingle();
           if (realLead) leadData = realLead;
         }
 
-        const ageHours = leadData?.created_at
-          ? Math.round((now - new Date(leadData.created_at).getTime()) / 3600000)
-          : null;
+        const ageHours = leadData?.created_at ? Math.round((now - new Date(leadData.created_at).getTime()) / 3600000) : null;
 
         systemPrompt = `You are a lead scoring expert for a local service business called ${businessName}. Score this lead from 1-100 on how likely it is to convert into a booking. Consider: completeness of info (name, email, phone), urgency language, service match clarity, recency, contact details provided, location match, and message detail. Return JSON: { score: number (1-100), label: "High Intent" | "Medium Intent" | "Low Intent", explanation: string (1-2 sentences, plain language, explain why), recommended_action: string (practical next step), factors: { completeness: number (0-100), urgency: number (0-100), service_match: number (0-100), recency: number (0-100), contact_quality: number (0-100) } }. Label mapping: 80-100=High Intent, 50-79=Medium Intent, below 50=Low Intent.`;
         userPrompt = `Lead details:
@@ -551,9 +459,7 @@ Leads last 30d: ${metrics?.lead_count_30d || 0}`;
       }
 
       default:
-        return new Response(JSON.stringify({ error: "Unknown action" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return err("Unknown action");
     }
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -587,31 +493,19 @@ Leads last 30d: ${metrics?.lead_count_30d || 0}`;
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Too many requests. Please wait a moment." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
+      if (response.status === 429) return err("Too many requests. Please wait a moment.", 429);
+      if (response.status === 402) return err("AI credits exhausted.", 402);
       const t = await response.text();
       console.error("AI gateway error:", response.status, t);
-      return new Response(JSON.stringify({ error: "AI service temporarily unavailable." }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return err("AI service temporarily unavailable.", 500);
     }
 
     const aiData = await response.json();
-
     let result: any = null;
     try {
       const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
       if (toolCall?.function?.arguments) {
-        const args = JSON.parse(toolCall.function.arguments);
-        result = args.result;
+        result = JSON.parse(toolCall.function.arguments).result;
       }
     } catch (e) {
       try {
@@ -625,29 +519,23 @@ Leads last 30d: ${metrics?.lead_count_30d || 0}`;
       result = action === "insights" || action === "profile_optimize" ? [] : { error: "Could not generate suggestions" };
     }
 
-    // Save insights suggestions to database
+    // Save insights suggestions
     if (action === "insights" && Array.isArray(result) && businessId) {
       const rows = result.map((s: any) => ({
-        business_id: businessId,
-        user_id: user.id,
-        suggestion_type: s.type || "general",
-        title: s.title || "Suggestion",
-        description: s.description || "",
-        priority: s.priority || "medium",
-        status: "active",
-        lead_id: s.leadId || null,
-        booking_id: s.bookingId || null,
+        business_id: businessId, user_id: user.id,
+        suggestion_type: s.type || "general", title: s.title || "Suggestion",
+        description: s.description || "", priority: s.priority || "medium",
+        status: "active", lead_id: s.leadId || null, booking_id: s.bookingId || null,
         ai_response: s,
       }));
-      // Don't block response on save
       supabase.from("ai_assistant_suggestions").insert(rows).then(() => {});
     }
 
-    // Save lead score to database
+    // Save lead score to ai_lead_scores
     if (action === "score_lead" && result && !result.error && businessId && context?.lead?.lead_id) {
       const score = Math.max(1, Math.min(100, result.score || 0));
       const label = score >= 80 ? "High Intent" : score >= 50 ? "Medium Intent" : "Low Intent";
-      supabase.from("lead_scores").upsert({
+      supabase.from("ai_lead_scores").upsert({
         lead_id: context.lead.lead_id,
         business_id: businessId,
         score,
@@ -659,26 +547,32 @@ Leads last 30d: ${metrics?.lead_count_30d || 0}`;
       }, { onConflict: "lead_id" }).then(() => {});
     }
 
-    // ─── LOG USAGE EVENT ───
+    // Save reply to ai_message_events
+    if ((action === "lead_reply" || action === "follow_up") && result && !result.error && businessId && context?.lead?.lead_id) {
+      supabase.from("ai_message_events").insert({
+        business_id: businessId,
+        lead_id: context.lead.lead_id,
+        message_type: action === "follow_up" ? "follow_up" : "initial_reply",
+        generated_content: result.reply || result.message || "",
+        was_auto_sent: false,
+        was_user_edited: false,
+      }).then(() => {});
+    }
+
+    // Log usage event
     if (businessId && result && !result.error) {
-      const entityType = action === "lead_reply" || action === "follow_up" || action === "score_lead" ? "lead"
-        : action === "booking_confirm" || action === "review_request" ? "booking"
+      const entityType = ["lead_reply", "follow_up", "score_lead"].includes(action) ? "lead"
+        : ["booking_confirm", "review_request"].includes(action) ? "booking"
         : action === "profile_optimize" ? "profile" : null;
       const entityId = context?.lead?.lead_id || context?.booking?.booking_id || null;
 
       supabase.from("ai_usage_events").insert({
-        business_id: businessId,
-        user_id: user.id,
-        feature_key: action,
-        entity_type: entityType,
-        entity_id: entityId,
-        credits_used: 1,
+        business_id: businessId, user_id: user.id,
+        feature_key: action, entity_type: entityType, entity_id: entityId, credits_used: 1,
       }).then(() => {});
     }
 
-    return new Response(JSON.stringify({ result, action }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return ok(result);
 
   } catch (e) {
     console.error("provider-insights error:", e);
