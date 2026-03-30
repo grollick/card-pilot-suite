@@ -270,8 +270,6 @@ const fieldIcons: Record<string, typeof Bot> = {
   website: AlertCircle,
 };
 
-// ImagePlus not imported above, add it
-import { ImagePlus } from "lucide-react";
 
 export function ProfileOptimizePanel() {
   const { data: suggestions, isLoading } = useProfileOptimize();
