@@ -13,13 +13,13 @@ export function useBusinessServices() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("services")
-        .select("id, service_name, description, price_amount, is_active")
+        .select("id, title, description, price_amount, is_active")
         .eq("business_id", businessId!)
-        .order("service_name");
+        .order("title");
       if (error) throw error;
       return (data || []).map((s) => ({
         id: s.id,
-        title: s.service_name,
+        title: s.title,
         price: s.price_amount,
         active: s.is_active ?? true,
       }));
