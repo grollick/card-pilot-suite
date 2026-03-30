@@ -5651,6 +5651,33 @@ export type Database = {
         }
         Relationships: []
       }
+      subscription_plans: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          monthly_price: number
+          name: string
+          yearly_price: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          monthly_price: number
+          name: string
+          yearly_price?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          monthly_price?: number
+          name?: string
+          yearly_price?: number | null
+        }
+        Relationships: []
+      }
       success_stories: {
         Row: {
           business_type: string
