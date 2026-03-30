@@ -274,35 +274,47 @@ export type Database = {
       ai_automation_settings: {
         Row: {
           auto_follow_up_enabled: boolean | null
+          auto_follow_up_sms_enabled: boolean | null
           auto_reply_enabled: boolean | null
+          booking_reminder_sms_enabled: boolean | null
           business_hours_only: boolean | null
           business_id: string
           created_at: string | null
           high_intent_only: boolean | null
           reply_tone: string | null
           review_before_send: boolean | null
+          sms_enabled: boolean | null
+          sms_review_before_send: boolean | null
           updated_at: string | null
         }
         Insert: {
           auto_follow_up_enabled?: boolean | null
+          auto_follow_up_sms_enabled?: boolean | null
           auto_reply_enabled?: boolean | null
+          booking_reminder_sms_enabled?: boolean | null
           business_hours_only?: boolean | null
           business_id: string
           created_at?: string | null
           high_intent_only?: boolean | null
           reply_tone?: string | null
           review_before_send?: boolean | null
+          sms_enabled?: boolean | null
+          sms_review_before_send?: boolean | null
           updated_at?: string | null
         }
         Update: {
           auto_follow_up_enabled?: boolean | null
+          auto_follow_up_sms_enabled?: boolean | null
           auto_reply_enabled?: boolean | null
+          booking_reminder_sms_enabled?: boolean | null
           business_hours_only?: boolean | null
           business_id?: string
           created_at?: string | null
           high_intent_only?: boolean | null
           reply_tone?: string | null
           review_before_send?: boolean | null
+          sms_enabled?: boolean | null
+          sms_review_before_send?: boolean | null
           updated_at?: string | null
         }
         Relationships: [
@@ -1826,6 +1838,101 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "services"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_notifications: {
+        Row: {
+          action_label: string | null
+          body: string | null
+          business_id: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          is_read: boolean
+          title: string
+          type: string
+          urgency: string
+          user_id: string | null
+        }
+        Insert: {
+          action_label?: string | null
+          body?: string | null
+          business_id: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          is_read?: boolean
+          title: string
+          type: string
+          urgency?: string
+          user_id?: string | null
+        }
+        Update: {
+          action_label?: string | null
+          body?: string | null
+          business_id?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          is_read?: boolean
+          title?: string
+          type?: string
+          urgency?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_notifications_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_notifications_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_ai_entitlements"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_notifications_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_notifications_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_plan_status"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_notifications_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_notifications_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_notifications_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
           },
         ]
       }
@@ -6693,6 +6800,129 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      sms_messages: {
+        Row: {
+          booking_id: string | null
+          business_id: string
+          created_at: string
+          delivery_status: string
+          id: string
+          lead_id: string | null
+          message_body: string
+          message_type: string
+          phone: string | null
+          sent_at: string | null
+          was_ai_generated: boolean
+          was_user_edited: boolean
+        }
+        Insert: {
+          booking_id?: string | null
+          business_id: string
+          created_at?: string
+          delivery_status?: string
+          id?: string
+          lead_id?: string | null
+          message_body: string
+          message_type: string
+          phone?: string | null
+          sent_at?: string | null
+          was_ai_generated?: boolean
+          was_user_edited?: boolean
+        }
+        Update: {
+          booking_id?: string | null
+          business_id?: string
+          created_at?: string
+          delivery_status?: string
+          id?: string
+          lead_id?: string | null
+          message_body?: string
+          message_type?: string
+          phone?: string | null
+          sent_at?: string | null
+          was_ai_generated?: boolean
+          was_user_edited?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_messages_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "business_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_messages_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_booking_context"
+            referencedColumns: ["booking_id"]
+          },
+          {
+            foreignKeyName: "sms_messages_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_messages_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_ai_entitlements"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_messages_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_messages_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_plan_status"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_messages_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_messages_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_messages_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_messages_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "business_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_messages_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_lead_context"
+            referencedColumns: ["lead_id"]
+          },
+        ]
       }
       social_accounts: {
         Row: {
