@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  useProviderInsights, useProviderBusiness,
+  useProviderInsights, useProviderBusiness, useAIUsage,
   useStaleLeads, usePendingBookings, useCompletedBookings,
   useUpdateSuggestion, useSavedSuggestions,
   type AISuggestion,
 } from "../hooks/useProviderInsights";
+import AIUsageMeter from "./AIUsageMeter";
+import AIUpgradeModal from "./AIUpgradeModal";
 
 const typeConfig: Record<string, { icon: typeof Bot; color: string; actionLabel: string }> = {
   lead_reply: { icon: MessageSquare, color: "text-primary", actionLabel: "Reply to Lead" },
@@ -82,12 +84,14 @@ export default function AIInsightsPanel({ onAction }: Props) {
   const businessId = business?.id;
 
   const { data: aiSuggestions, isLoading: aiLoading, refetch, isFetching } = useProviderInsights();
+  const { data: usage, isLoading: usageLoading } = useAIUsage();
   const { data: staleLeads = [], isLoading: staleLoading } = useStaleLeads(businessId);
   const { data: pendingBookings = [], isLoading: pendingLoading } = usePendingBookings(businessId);
   const { data: completedBookings = [], isLoading: completedLoading } = useCompletedBookings(businessId);
   const updateSuggestion = useUpdateSuggestion();
 
   const [dismissed, setDismissed] = useState<Set<number>>(new Set());
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   const isLoading = aiLoading || staleLoading || pendingLoading || completedLoading;
 
@@ -136,6 +140,9 @@ export default function AIInsightsPanel({ onAction }: Props) {
           Refresh
         </Button>
       </div>
+
+      {/* Usage Meter */}
+      <AIUsageMeter usage={usage} isLoading={usageLoading} />
 
       {/* Live data summary */}
       {(staleLeads.length > 0 || pendingBookings.length > 0) && (
@@ -217,6 +224,14 @@ export default function AIInsightsPanel({ onAction }: Props) {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Upgrade Modal */}
+      <AIUpgradeModal
+        open={upgradeOpen}
+        onClose={() => setUpgradeOpen(false)}
+        currentPlan={usage?.plan}
+        reason="limit_reached"
+      />
     </div>
   );
 }

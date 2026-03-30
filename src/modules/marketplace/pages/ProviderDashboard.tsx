@@ -5,6 +5,8 @@ import { ReviewDashboard } from "../components/ReviewDashboard";
 import ProviderAIAssistant from "../components/ProviderAIAssistant";
 import AIInsightsPanel from "../components/AIInsightsPanel";
 import { ProfileOptimizePanel } from "../components/AIActionCards";
+import AIFeatureGate from "../components/AIFeatureGate";
+import { useAIUsage } from "../hooks/useProviderInsights";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +50,7 @@ export default function ProviderDashboard() {
   const [isVisible, setIsVisible] = useState(true);
   const navigate = useNavigate();
   const completeness = 68;
+  const { data: aiUsage } = useAIUsage();
 
   // TODO: replace with real business ID from auth context
   const mockBusinessId = undefined;
@@ -249,7 +252,9 @@ export default function ProviderDashboard() {
       </div>
 
       {/* AI Profile Optimization */}
-      <ProfileOptimizePanel />
+      <AIFeatureGate feature="profile_rewrite" enabled={aiUsage?.features?.profile_rewrite}>
+        <ProfileOptimizePanel />
+      </AIFeatureGate>
 
       {/* Categories */}
       <div className="rounded-xl border border-border bg-card p-5">

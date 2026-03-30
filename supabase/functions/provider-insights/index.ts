@@ -33,9 +33,10 @@ serve(async (req) => {
     }
 
     const { action, context } = body;
+    const NON_AI_ACTIONS = ["update_suggestion", "get_suggestions", "get_usage"];
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY && action !== "update_suggestion" && action !== "get_suggestions") {
+    if (!LOVABLE_API_KEY && !NON_AI_ACTIONS.includes(action)) {
       return new Response(JSON.stringify({ error: "AI not configured" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -88,6 +89,83 @@ serve(async (req) => {
       return new Response(JSON.stringify({ result: suggestions || [] }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // ─── GET USAGE ───
+    if (action === "get_usage") {
+      if (!businessId) {
+        return new Response(JSON.stringify({ result: { used: 0, limit: 8, plan: "free", features: {} } }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const monthStart = new Date();
+      monthStart.setDate(1);
+      monthStart.setHours(0, 0, 0, 0);
+
+      const [entRes, usageRes] = await Promise.all([
+        supabase.from("business_ai_entitlements").select("*").eq("business_id", businessId).maybeSingle(),
+        supabase.from("ai_usage_events").select("id", { count: "exact", head: true }).eq("business_id", businessId).gte("created_at", monthStart.toISOString()),
+      ]);
+
+      const ent = entRes.data;
+      const used = usageRes.count || 0;
+      return new Response(JSON.stringify({
+        result: {
+          used,
+          limit: ent?.monthly_ai_generations ?? 8,
+          plan: ent?.plan_name ?? "free",
+          features: {
+            follow_up: ent?.follow_up_enabled ?? false,
+            profile_rewrite: ent?.profile_rewrite_enabled ?? false,
+            advanced_growth: ent?.advanced_growth_enabled ?? false,
+          },
+        },
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // ─── ENFORCEMENT: check limits before AI calls ───
+    const AI_ACTIONS = ["insights", "lead_reply", "follow_up", "booking_confirm", "review_request", "profile_optimize"];
+    if (AI_ACTIONS.includes(action) && businessId) {
+      const monthStart = new Date();
+      monthStart.setDate(1);
+      monthStart.setHours(0, 0, 0, 0);
+
+      const [entRes, usageRes] = await Promise.all([
+        supabase.from("business_ai_entitlements").select("*").eq("business_id", businessId).maybeSingle(),
+        supabase.from("ai_usage_events").select("id", { count: "exact", head: true }).eq("business_id", businessId).gte("created_at", monthStart.toISOString()),
+      ]);
+
+      const ent = entRes.data;
+      const used = usageRes.count || 0;
+      const limit = ent?.monthly_ai_generations ?? 8;
+
+      // Check generation limit
+      if (used >= limit) {
+        return new Response(JSON.stringify({
+          error: "ai_limit_reached",
+          used,
+          limit,
+          plan: ent?.plan_name ?? "free",
+        }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+
+      // Feature gating
+      if (action === "follow_up" && !(ent?.follow_up_enabled)) {
+        return new Response(JSON.stringify({
+          error: "feature_locked",
+          feature: "follow_up",
+          plan: ent?.plan_name ?? "free",
+          required_plan: "pro",
+        }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      if (action === "profile_optimize" && !(ent?.profile_rewrite_enabled)) {
+        return new Response(JSON.stringify({
+          error: "feature_locked",
+          feature: "profile_rewrite",
+          plan: ent?.plan_name ?? "free",
+          required_plan: "pro",
+        }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
     }
 
     // ─── FETCH REAL CONTEXT DATA ───
@@ -357,6 +435,23 @@ Leads last 30d: ${metrics?.lead_count_30d || 0}`;
       }));
       // Don't block response on save
       supabase.from("ai_assistant_suggestions").insert(rows).then(() => {});
+    }
+
+    // ─── LOG USAGE EVENT ───
+    if (businessId && result && !result.error) {
+      const entityType = action === "lead_reply" || action === "follow_up" ? "lead"
+        : action === "booking_confirm" || action === "review_request" ? "booking"
+        : action === "profile_optimize" ? "profile" : null;
+      const entityId = context?.lead?.lead_id || context?.booking?.booking_id || null;
+
+      supabase.from("ai_usage_events").insert({
+        business_id: businessId,
+        user_id: user.id,
+        feature_key: action,
+        entity_type: entityType,
+        entity_id: entityId,
+        credits_used: 1,
+      }).then(() => {});
     }
 
     return new Response(JSON.stringify({ result, action }), {
