@@ -141,6 +141,9 @@ export default function AIInsightsPanel({ onAction }: Props) {
         </Button>
       </div>
 
+      {/* Usage Meter */}
+      <AIUsageMeter usage={usage} isLoading={usageLoading} />
+
       {/* Live data summary */}
       {(staleLeads.length > 0 || pendingBookings.length > 0) && (
         <div className="px-5 py-2 bg-warning/5 border-b border-warning/10 flex items-center gap-3 text-xs text-warning">
