@@ -558,6 +558,22 @@ Leads last 30d: ${metrics?.lead_count_30d || 0}`;
       supabase.from("ai_assistant_suggestions").insert(rows).then(() => {});
     }
 
+    // Save lead score to database
+    if (action === "score_lead" && result && !result.error && businessId && context?.lead?.lead_id) {
+      const score = Math.max(1, Math.min(100, result.score || 0));
+      const label = score >= 80 ? "High Intent" : score >= 50 ? "Medium Intent" : "Low Intent";
+      supabase.from("lead_scores").upsert({
+        lead_id: context.lead.lead_id,
+        business_id: businessId,
+        score,
+        label: result.label || label,
+        explanation: result.explanation || "",
+        recommended_action: result.recommended_action || "",
+        scoring_factors: result.factors || {},
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "lead_id" }).then(() => {});
+    }
+
     // ─── LOG USAGE EVENT ───
     if (businessId && result && !result.error) {
       const entityType = action === "lead_reply" || action === "follow_up" ? "lead"
