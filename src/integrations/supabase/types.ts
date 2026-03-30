@@ -1065,6 +1065,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "business_bookings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
+          {
             foreignKeyName: "business_bookings_lead_id_fkey"
             columns: ["lead_id"]
             isOneToOne: false
@@ -1128,6 +1135,13 @@ export type Database = {
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "business_categories_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
         ]
       }
       business_leads: {
@@ -1188,6 +1202,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_leads_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
           },
           {
             foreignKeyName: "business_leads_service_id_fkey"
@@ -1269,6 +1290,13 @@ export type Database = {
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "business_profiles_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
         ]
       }
       business_reviews: {
@@ -1341,6 +1369,13 @@ export type Database = {
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "business_reviews_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
         ]
       }
       business_subscriptions: {
@@ -1401,6 +1436,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_subscriptions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
           },
           {
             foreignKeyName: "business_subscriptions_plan_id_fkey"
@@ -4327,6 +4369,13 @@ export type Database = {
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "marketplace_metrics_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
         ]
       }
       marketplace_quote_requests: {
@@ -5478,6 +5527,13 @@ export type Database = {
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "service_areas_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
         ]
       }
       services: {
@@ -5535,6 +5591,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "businesses"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "services_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
           },
         ]
       }
@@ -6251,6 +6314,13 @@ export type Database = {
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "business_bookings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
         ]
       }
       copilot_lead_context: {
@@ -6289,7 +6359,32 @@ export type Database = {
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "business_leads_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
         ]
+      }
+      copilot_profile_context: {
+        Row: {
+          bio: string | null
+          booking_enabled: boolean | null
+          business_id: string | null
+          business_name: string | null
+          cover_image_url: string | null
+          description: string | null
+          headline: string | null
+          lead_form_enabled: boolean | null
+          logo_url: string | null
+          marketplace_enabled: boolean | null
+          service_area_count: number | null
+          service_count: number | null
+          subheadline: string | null
+        }
+        Relationships: []
       }
       public_profiles: {
         Row: {
