@@ -2,6 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { Star, ArrowRight, ThumbsUp } from "lucide-react";
+import { CustomerViralLoop } from "../components/ViralLoopCards";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -93,14 +94,8 @@ export default function PostBooking() {
           </div>
         </section>
 
-        {/* Provider CTA */}
-        <section className="rounded-xl bg-gradient-to-r from-primary/10 to-accent/10 p-6 text-center">
-          <h3 className="font-semibold text-foreground mb-1">Are you a service provider?</h3>
-          <p className="text-sm text-muted-foreground mb-4">Create your free guzzl card and start getting bookings.</p>
-          <Button onClick={() => navigate("/auth")}>
-            Create Your Free guzzl Card <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </section>
+        {/* Viral Loop */}
+        <CustomerViralLoop />
       </div>
     </div>
   );

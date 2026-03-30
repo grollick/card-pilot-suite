@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import ShareCardModal from "../components/ShareCardModal";
+import ShareCtaWidget from "../components/ShareCtaWidget";
 
 /* ─── Mock state (replace with real queries) ─── */
 const MOCK_BUSINESS = {
@@ -40,6 +42,7 @@ export default function FirstTimeDashboard() {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [checklist] = useState(INITIAL_CHECKLIST);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const completedCount = checklist.filter((c) => c.done).length;
   const progressPercent = (completedCount / checklist.length) * 100;
@@ -104,7 +107,7 @@ export default function FirstTimeDashboard() {
               <Button variant="outline" onClick={() => window.open(cardUrl, "_blank")}>
                 <ExternalLink className="h-4 w-4 mr-1.5" /> View Your Card
               </Button>
-              <Button onClick={handleShare}>
+              <Button onClick={() => setShareOpen(true)}>
                 <Share2 className="h-4 w-4 mr-1.5" /> Share Your Card
               </Button>
             </div>
@@ -313,6 +316,9 @@ export default function FirstTimeDashboard() {
         </p>
       </motion.div>
 
+      {/* ─── SHARE CTA WIDGET ─── */}
+      <ShareCtaWidget views={0} onShare={() => setShareOpen(true)} />
+
       {/* ─── SECTION 5: SOFT UPGRADE PROMPT ─── */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -337,6 +343,14 @@ export default function FirstTimeDashboard() {
           </Button>
         </div>
       </motion.div>
+
+      {/* Share Modal */}
+      <ShareCardModal
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        businessName={MOCK_BUSINESS.name}
+        slug={MOCK_BUSINESS.slug}
+      />
     </div>
   );
 }
