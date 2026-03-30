@@ -1294,6 +1294,67 @@ export type Database = {
           },
         ]
       }
+      business_subscriptions: {
+        Row: {
+          billing_cycle: string | null
+          business_id: string
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          plan_id: string
+          started_at: string | null
+          status: string | null
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+        }
+        Insert: {
+          billing_cycle?: string | null
+          business_id: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          plan_id: string
+          started_at?: string | null
+          status?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+        }
+        Update: {
+          billing_cycle?: string | null
+          business_id?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          plan_id?: string
+          started_at?: string | null
+          status?: string | null
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_subscriptions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_subscriptions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       businesses: {
         Row: {
           business_name: string
