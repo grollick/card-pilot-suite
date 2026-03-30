@@ -45,8 +45,8 @@ export function useSmsMessages(opts?: { leadId?: string; bookingId?: string }) {
 
 export function useCreateSmsDraft() {
   const qc = useQueryClient();
-  const { data: ctx } = useProviderInsights();
-  const businessId = ctx?.business_id;
+  const { data: biz } = useProviderBusiness();
+  const businessId = biz?.id;
 
   return useMutation({
     mutationFn: async (msg: {
