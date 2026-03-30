@@ -210,6 +210,13 @@ export type Database = {
             foreignKeyName: "ai_assistant_suggestions_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_assistant_suggestions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "business_ai_entitlements"
             referencedColumns: ["business_id"]
           },
@@ -387,6 +394,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "ai_usage_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "ai_usage_events_business_id_fkey"
             columns: ["business_id"]
@@ -1263,6 +1277,13 @@ export type Database = {
             foreignKeyName: "business_bookings_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_bookings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "business_ai_entitlements"
             referencedColumns: ["business_id"]
           },
@@ -1341,6 +1362,13 @@ export type Database = {
             foreignKeyName: "business_categories_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_categories_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "business_ai_entitlements"
             referencedColumns: ["business_id"]
           },
@@ -1412,6 +1440,13 @@ export type Database = {
           status?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "business_leads_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "business_leads_business_id_fkey"
             columns: ["business_id"]
@@ -1510,6 +1545,13 @@ export type Database = {
             foreignKeyName: "business_profiles_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: true
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_profiles_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
             referencedRelation: "business_ai_entitlements"
             referencedColumns: ["business_id"]
           },
@@ -1596,6 +1638,13 @@ export type Database = {
             foreignKeyName: "business_reviews_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_reviews_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "business_ai_entitlements"
             referencedColumns: ["business_id"]
           },
@@ -1667,6 +1716,13 @@ export type Database = {
           stripe_subscription_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "business_subscriptions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "business_subscriptions_business_id_fkey"
             columns: ["business_id"]
@@ -4610,6 +4666,13 @@ export type Database = {
             foreignKeyName: "marketplace_metrics_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: true
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "marketplace_metrics_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
             referencedRelation: "business_ai_entitlements"
             referencedColumns: ["business_id"]
           },
@@ -5775,6 +5838,13 @@ export type Database = {
             foreignKeyName: "service_areas_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "service_areas_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "business_ai_entitlements"
             referencedColumns: ["business_id"]
           },
@@ -5843,6 +5913,13 @@ export type Database = {
           title?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "services_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "services_business_id_fkey"
             columns: ["business_id"]
@@ -6501,6 +6578,23 @@ export type Database = {
       }
     }
     Views: {
+      ai_roi_metrics: {
+        Row: {
+          ai_assisted_bookings: number | null
+          ai_assisted_bookings_month: number | null
+          ai_assisted_bookings_prev_month: number | null
+          ai_assisted_leads: number | null
+          ai_assisted_leads_month: number | null
+          ai_assisted_leads_prev_month: number | null
+          business_id: string | null
+          business_name: string | null
+          conversion_rate: number | null
+          conversion_rate_month: number | null
+          total_ai_generations: number | null
+          total_ai_generations_month: number | null
+        }
+        Relationships: []
+      }
       ai_usage_monthly: {
         Row: {
           business_id: string | null
@@ -6509,6 +6603,13 @@ export type Database = {
           total_generations: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "ai_usage_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "ai_usage_events_business_id_fkey"
             columns: ["business_id"]
@@ -6632,6 +6733,13 @@ export type Database = {
             foreignKeyName: "business_bookings_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_bookings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
             referencedRelation: "business_ai_entitlements"
             referencedColumns: ["business_id"]
           },
@@ -6680,6 +6788,13 @@ export type Database = {
           status: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "business_leads_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "business_leads_business_id_fkey"
             columns: ["business_id"]
