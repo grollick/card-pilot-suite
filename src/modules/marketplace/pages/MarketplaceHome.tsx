@@ -1,15 +1,24 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-import { Search, MapPin, Star, ArrowRight, ChevronRight } from "lucide-react";
+import { Search, MapPin, Star, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CATEGORIES, getFeaturedBusinesses, getTopRatedBusinesses, getRecentBusinesses } from "../data/mockData";
+import { FeaturedBadge, PremiumBadge, BoostedBadge } from "../components/MarketplaceBadges";
 import type { MockBusiness } from "../data/mockData";
 
 function ProviderCard({ biz, onView }: { biz: MockBusiness; onView: () => void }) {
   return (
-    <div className="min-w-[280px] max-w-[320px] flex-shrink-0 rounded-xl border border-border bg-card shadow-sm hover:shadow-md transition-shadow">
+    <div className="min-w-[280px] max-w-[320px] flex-shrink-0 rounded-xl border border-border bg-card shadow-sm hover:shadow-md transition-shadow relative">
+      {/* Badges */}
+      {(biz.is_featured || biz.has_premium_badge || biz.is_boosted) && (
+        <div className="absolute top-3 right-3 flex flex-col gap-1 items-end z-10">
+          {biz.is_featured && <FeaturedBadge />}
+          {biz.has_premium_badge && <PremiumBadge />}
+          {biz.is_boosted && !biz.is_featured && <BoostedBadge />}
+        </div>
+      )}
       <div className="p-5">
         <div className="flex items-center gap-3 mb-3">
           <img src={biz.logo_url} alt={biz.business_name} className="w-12 h-12 rounded-xl object-cover" />
@@ -125,7 +134,7 @@ export default function MarketplaceHome() {
         </section>
 
         {/* ── Featured ── */}
-        <ProviderRow title="Featured Providers" businesses={getFeaturedBusinesses()} />
+        <ProviderRow title="⭐ Featured Providers" businesses={getFeaturedBusinesses()} />
 
         {/* ── Top Rated ── */}
         <ProviderRow title="Top Rated" businesses={getTopRatedBusinesses()} />

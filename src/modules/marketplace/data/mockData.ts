@@ -16,6 +16,9 @@ export interface MockBusiness {
   categories: string[];
   is_available_today: boolean;
   is_top_rated: boolean;
+  is_featured: boolean;
+  is_boosted: boolean;
+  has_premium_badge: boolean;
   created_at: string;
   services: MockService[];
   reviews: MockReview[];
@@ -67,7 +70,8 @@ export const MOCK_BUSINESSES: MockBusiness[] = [
     location_city: "Thunder Bay", location_region: "Ontario",
     phone: "(807) 555-0101", email: "info@northstarlandscaping.ca", website: "https://northstarlandscaping.ca",
     avg_rating: 4.8, review_count: 47, categories: ["landscaping", "lawn-care"],
-    is_available_today: true, is_top_rated: true, created_at: "2024-01-15",
+    is_available_today: true, is_top_rated: true, is_featured: true, is_boosted: true, has_premium_badge: true,
+    created_at: "2024-01-15",
     services: [
       svc("s1", "Spring Cleanup", "Complete yard cleanup including debris removal and garden prep", "fixed", 250, 180),
       svc("s2", "Lawn Maintenance", "Weekly mowing, edging, and trimming", "starting_at", 75, 60),
@@ -88,7 +92,8 @@ export const MOCK_BUSINESSES: MockBusiness[] = [
     location_city: "Thunder Bay", location_region: "Ontario",
     phone: "(807) 555-0202", email: "info@frostking.ca", website: "",
     avg_rating: 4.6, review_count: 32, categories: ["snow-removal"],
-    is_available_today: true, is_top_rated: true, created_at: "2024-03-10",
+    is_available_today: true, is_top_rated: true, is_featured: false, is_boosted: true, has_premium_badge: false,
+    created_at: "2024-03-10",
     services: [
       svc("s4", "Residential Snow Removal", "Driveway and walkway clearing", "starting_at", 60, 45),
       svc("s5", "Commercial Snow Removal", "Parking lot and building clearing", "quote_only", null, null),
@@ -108,7 +113,8 @@ export const MOCK_BUSINESSES: MockBusiness[] = [
     location_city: "Thunder Bay", location_region: "Ontario",
     phone: "(807) 555-0303", email: "hello@sparkleclean.ca", website: "https://sparkleclean.ca",
     avg_rating: 4.9, review_count: 63, categories: ["cleaning"],
-    is_available_today: false, is_top_rated: true, created_at: "2023-11-01",
+    is_available_today: false, is_top_rated: true, is_featured: true, is_boosted: false, has_premium_badge: true,
+    created_at: "2023-11-01",
     services: [
       svc("s7", "Standard Cleaning", "Regular home cleaning — kitchen, bathroom, living areas", "fixed", 150, 120),
       svc("s8", "Deep Cleaning", "Thorough top-to-bottom cleaning", "starting_at", 300, 240),
@@ -129,7 +135,8 @@ export const MOCK_BUSINESSES: MockBusiness[] = [
     location_city: "Thunder Bay", location_region: "Ontario",
     phone: "(807) 555-0404", email: "jobs@handymanhub.ca", website: "",
     avg_rating: 4.5, review_count: 21, categories: ["handyman"],
-    is_available_today: true, is_top_rated: false, created_at: "2024-06-20",
+    is_available_today: true, is_top_rated: false, is_featured: false, is_boosted: false, has_premium_badge: false,
+    created_at: "2024-06-20",
     services: [
       svc("s10", "General Repairs", "Drywall, plumbing, electrical basics", "starting_at", 85, 60),
       svc("s11", "Furniture Assembly", "Assemble any flat-pack furniture", "fixed", 75, 60),
@@ -149,7 +156,8 @@ export const MOCK_BUSINESSES: MockBusiness[] = [
     location_city: "Thunder Bay", location_region: "Ontario",
     phone: "(807) 555-0505", email: "quotes@apexroofing.ca", website: "https://apexroofing.ca",
     avg_rating: 4.7, review_count: 18, categories: ["roofing"],
-    is_available_today: false, is_top_rated: false, created_at: "2024-08-01",
+    is_available_today: false, is_top_rated: false, is_featured: false, is_boosted: false, has_premium_badge: false,
+    created_at: "2024-08-01",
     services: [
       svc("s13", "Roof Inspection", "Complete roof assessment with written report", "fixed", 199, 90),
       svc("s14", "Roof Repair", "Patch leaks, replace shingles, fix flashing", "quote_only", null, null),
@@ -169,7 +177,8 @@ export const MOCK_BUSINESSES: MockBusiness[] = [
     location_city: "Thunder Bay", location_region: "Ontario",
     phone: "(807) 555-0606", email: "book@quickhaul.ca", website: "",
     avg_rating: 4.4, review_count: 15, categories: ["junk-removal"],
-    is_available_today: true, is_top_rated: false, created_at: "2024-09-01",
+    is_available_today: true, is_top_rated: false, is_featured: false, is_boosted: false, has_premium_badge: false,
+    created_at: "2024-09-01",
     services: [
       svc("s16", "Single Item Pickup", "One large item removal", "fixed", 50, 30),
       svc("s17", "Half Truck Load", "Fill half our truck with your junk", "fixed", 250, 60),
@@ -190,7 +199,11 @@ export function getBusinessesByCategory(category: string): MockBusiness[] {
 }
 
 export function getFeaturedBusinesses(): MockBusiness[] {
-  return MOCK_BUSINESSES.filter((b) => b.is_top_rated).slice(0, 6);
+  return MOCK_BUSINESSES.filter((b) => b.is_featured).slice(0, 6);
+}
+
+export function getBoostedBusinesses(): MockBusiness[] {
+  return MOCK_BUSINESSES.filter((b) => b.is_boosted);
 }
 
 export function getTopRatedBusinesses(): MockBusiness[] {

@@ -7,11 +7,23 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { CATEGORIES, MOCK_BUSINESSES, type MockBusiness } from "../data/mockData";
+import { FeaturedBadge, PremiumBadge, BoostedBadge } from "../components/MarketplaceBadges";
 
 function ResultCard({ biz }: { biz: MockBusiness }) {
   const navigate = useNavigate();
   return (
-    <div className="flex flex-col sm:flex-row gap-4 p-5 rounded-xl border border-border bg-card hover:shadow-md transition-shadow">
+    <div className={`flex flex-col sm:flex-row gap-4 p-5 rounded-xl border bg-card hover:shadow-md transition-shadow relative ${
+      biz.is_featured || biz.is_boosted ? "border-primary/20 bg-primary/[0.02]" : "border-border"
+    }`}>
+      {/* Badges */}
+      {(biz.is_featured || biz.has_premium_badge || biz.is_boosted) && (
+        <div className="absolute top-3 right-3 flex gap-1.5 z-10">
+          {biz.is_featured && <FeaturedBadge />}
+          {biz.has_premium_badge && <PremiumBadge />}
+          {biz.is_boosted && !biz.is_featured && <BoostedBadge />}
+        </div>
+      )}
+
       <img src={biz.logo_url} alt={biz.business_name} className="w-16 h-16 rounded-xl object-cover flex-shrink-0" />
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2 mb-1">
@@ -83,11 +95,16 @@ export default function CategoryResults() {
     const rating = parseFloat(minRating);
     if (rating > 0) list = list.filter((b) => b.avg_rating >= rating);
 
-    list.sort((a, b) =>
-      sortBy === "newest"
+    // Sort: featured/boosted first, then by selected sort
+    list.sort((a, b) => {
+      const aFeatured = a.is_featured || a.is_boosted ? 1 : 0;
+      const bFeatured = b.is_featured || b.is_boosted ? 1 : 0;
+      if (bFeatured !== aFeatured) return bFeatured - aFeatured;
+
+      return sortBy === "newest"
         ? new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        : b.avg_rating * b.review_count - a.avg_rating * a.review_count
-    );
+        : b.avg_rating * b.review_count - a.avg_rating * a.review_count;
+    });
 
     return list;
   }, [category, keyword, minRating, sortBy]);
@@ -99,7 +116,6 @@ export default function CategoryResults() {
       </Helmet>
 
       <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* Back + Title */}
         <button onClick={() => navigate("/marketplace")} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors">
           <ArrowLeft className="h-4 w-4" /> Back to Marketplace
         </button>
