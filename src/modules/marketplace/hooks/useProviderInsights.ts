@@ -118,6 +118,20 @@ export function useAIUsage() {
   });
 }
 
+/** Get AI ROI metrics for current business */
+export function useAIRoi() {
+  const { user } = useAuth();
+  return useQuery<AIRoiData>({
+    queryKey: ["ai-roi", user?.id],
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5,
+    queryFn: async () => {
+      const result = await callInsights("get_roi");
+      return result as AIRoiData;
+    },
+  });
+}
+
 /** Get the current user's business */
 export function useProviderBusiness() {
   const { user } = useAuth();
