@@ -105,9 +105,13 @@ export default function TopBar() {
 
         {/* Notifications */}
         <Tip label="Notifications">
-          <Button variant="ghost" size="icon" className="h-9 w-9 relative rounded-lg">
+          <Button variant="ghost" size="icon" className="h-9 w-9 relative rounded-lg" onClick={() => setNotifOpen(true)}>
             <Bell className="h-4 w-4" />
-            <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-destructive ring-2 ring-card" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 h-4 min-w-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center ring-2 ring-card">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </Button>
         </Tip>
 
