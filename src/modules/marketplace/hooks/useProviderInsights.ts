@@ -78,8 +78,28 @@ async function callInsights(action: string, context?: any) {
     body: { action, context },
   });
   if (error) throw error;
+  // Check for structured error responses (limit/feature gating)
+  if (data?.error === "ai_limit_reached" || data?.error === "feature_locked") {
+    const err = new Error(data.error) as any;
+    err.aiError = data as AIErrorResponse;
+    throw err;
+  }
   if (data?.error) throw new Error(data.error);
   return data?.result;
+}
+
+/** Get AI usage for current business */
+export function useAIUsage() {
+  const { user } = useAuth();
+  return useQuery<AIUsageData>({
+    queryKey: ["ai-usage", user?.id],
+    enabled: !!user,
+    staleTime: 1000 * 60 * 2,
+    queryFn: async () => {
+      const result = await callInsights("get_usage");
+      return result as AIUsageData;
+    },
+  });
 }
 
 /** Get the current user's business */
