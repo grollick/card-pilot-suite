@@ -252,7 +252,9 @@ export default function ProviderDashboard() {
       </div>
 
       {/* AI Profile Optimization */}
-      <ProfileOptimizePanel />
+      <AIFeatureGate feature="profile_rewrite" enabled={aiUsage?.features?.profile_rewrite}>
+        <ProfileOptimizePanel />
+      </AIFeatureGate>
 
       {/* Categories */}
       <div className="rounded-xl border border-border bg-card p-5">
