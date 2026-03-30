@@ -33,7 +33,7 @@ serve(async (req) => {
     }
 
     const { action, context } = body;
-    const NON_AI_ACTIONS = ["update_suggestion", "get_suggestions", "get_usage", "get_roi", "get_lead_scores", "get_lead_score"];
+    const NON_AI_ACTIONS = ["update_suggestion", "get_suggestions", "get_usage", "get_roi", "get_lead_scores", "get_lead_score", "log_reply", "get_reply_stats", "get_auto_reply_settings", "save_auto_reply_settings"];
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY && !NON_AI_ACTIONS.includes(action)) {
@@ -208,6 +208,91 @@ serve(async (req) => {
         .eq("business_id", businessId)
         .maybeSingle();
       return new Response(JSON.stringify({ result: score }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ─── LOG REPLY ───
+    if (action === "log_reply") {
+      if (!businessId) {
+        return new Response(JSON.stringify({ error: "No business found" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { leadId, bookingId, messageType, content, wasAutoSent, wasUserEdited } = context || {};
+      const { error } = await supabase.from("copilot_reply_log").insert({
+        business_id: businessId,
+        lead_id: leadId || null,
+        booking_id: bookingId || null,
+        message_type: messageType || "initial_reply",
+        generated_content: content || "",
+        was_auto_sent: wasAutoSent || false,
+        was_user_edited: wasUserEdited || false,
+        sent_at: new Date().toISOString(),
+      });
+      if (error) throw error;
+      return new Response(JSON.stringify({ result: { success: true } }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ─── GET REPLY STATS ───
+    if (action === "get_reply_stats") {
+      if (!businessId) {
+        return new Response(JSON.stringify({ result: null }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { data: stats } = await supabase
+        .from("copilot_reply_stats")
+        .select("*")
+        .eq("business_id", businessId)
+        .maybeSingle();
+      return new Response(JSON.stringify({ result: stats || { total_replies: 0, sent_replies: 0, auto_sent_replies: 0, edited_replies: 0, leads_answered: 0, replies_30d: 0, replies_7d: 0 } }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ─── GET AUTO-REPLY SETTINGS ───
+    if (action === "get_auto_reply_settings") {
+      if (!businessId) {
+        return new Response(JSON.stringify({ result: null }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { data: settings } = await supabase
+        .from("copilot_auto_reply_settings")
+        .select("*")
+        .eq("business_id", businessId)
+        .maybeSingle();
+      return new Response(JSON.stringify({ result: settings }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ─── SAVE AUTO-REPLY SETTINGS ───
+    if (action === "save_auto_reply_settings") {
+      if (!businessId) {
+        return new Response(JSON.stringify({ error: "No business found" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const settings = context?.settings || {};
+      const { error } = await supabase.from("copilot_auto_reply_settings").upsert({
+        business_id: businessId,
+        auto_reply_enabled: settings.auto_reply_enabled ?? false,
+        auto_follow_up_enabled: settings.auto_follow_up_enabled ?? false,
+        review_before_send: settings.review_before_send ?? true,
+        reply_tone: settings.reply_tone ?? "professional",
+        auto_reply_scope: settings.auto_reply_scope ?? "marketplace",
+        business_hours_only: settings.business_hours_only ?? true,
+        business_hours_start: settings.business_hours_start ?? "08:00",
+        business_hours_end: settings.business_hours_end ?? "18:00",
+        min_lead_score: settings.min_lead_score ?? null,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "business_id" });
+      if (error) throw error;
+      return new Response(JSON.stringify({ result: { success: true } }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }

@@ -6,6 +6,8 @@ import ProviderAIAssistant from "../components/ProviderAIAssistant";
 import AIInsightsPanel from "../components/AIInsightsPanel";
 import AIRoiPanel from "../components/AIRoiPanel";
 import HighIntentLeadsPanel from "../components/HighIntentLeadsPanel";
+import ReplyStatsPanel from "../components/ReplyStatsPanel";
+import AutoReplySettings from "../components/AutoReplySettings";
 import { ProfileOptimizePanel } from "../components/AIActionCards";
 import AIFeatureGate from "../components/AIFeatureGate";
 import { useAIUsage } from "../hooks/useProviderInsights";
@@ -19,6 +21,7 @@ import { useNavigate } from "react-router-dom";
 import BoostCampaignPanel from "../components/BoostCampaignPanel";
 import PlanLimitModal from "../components/PlanLimitModal";
 import { useBusinessPlanStatus, type LimitKind } from "../hooks/useBusinessPlanStatus";
+
 
 const MOCK_SERVICES = [
   { id: "1", title: "Spring Cleanup", price: 250, active: true },
@@ -127,6 +130,9 @@ export default function ProviderDashboard() {
         onViewLead={(id) => toast.info(`View lead ${id}`)}
         onReply={(id) => toast.info(`Reply to lead ${id}`)}
       />
+
+      {/* AI Reply Stats */}
+      <ReplyStatsPanel />
 
       {/* Performance Panel */}
       <div className="rounded-xl border border-border bg-card overflow-hidden">
@@ -261,6 +267,9 @@ export default function ProviderDashboard() {
           ))}
         </div>
       </div>
+
+      {/* Auto-Reply Settings */}
+      <AutoReplySettings />
 
       {/* AI Profile Optimization */}
       <AIFeatureGate feature="profile_rewrite" enabled={aiUsage?.features?.profile_rewrite}>

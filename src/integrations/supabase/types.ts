@@ -2186,6 +2186,207 @@ export type Database = {
           },
         ]
       }
+      copilot_auto_reply_settings: {
+        Row: {
+          auto_follow_up_enabled: boolean
+          auto_reply_enabled: boolean
+          auto_reply_scope: string
+          business_hours_end: string
+          business_hours_only: boolean
+          business_hours_start: string
+          business_id: string
+          created_at: string
+          id: string
+          min_lead_score: number | null
+          reply_tone: string
+          review_before_send: boolean
+          updated_at: string
+        }
+        Insert: {
+          auto_follow_up_enabled?: boolean
+          auto_reply_enabled?: boolean
+          auto_reply_scope?: string
+          business_hours_end?: string
+          business_hours_only?: boolean
+          business_hours_start?: string
+          business_id: string
+          created_at?: string
+          id?: string
+          min_lead_score?: number | null
+          reply_tone?: string
+          review_before_send?: boolean
+          updated_at?: string
+        }
+        Update: {
+          auto_follow_up_enabled?: boolean
+          auto_reply_enabled?: boolean
+          auto_reply_scope?: string
+          business_hours_end?: string
+          business_hours_only?: boolean
+          business_hours_start?: string
+          business_id?: string
+          created_at?: string
+          id?: string
+          min_lead_score?: number | null
+          reply_tone?: string
+          review_before_send?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copilot_auto_reply_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_auto_reply_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "business_ai_entitlements"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_auto_reply_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_auto_reply_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "business_plan_status"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_auto_reply_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "copilot_auto_reply_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
+        ]
+      }
+      copilot_reply_log: {
+        Row: {
+          booking_id: string | null
+          business_id: string
+          created_at: string
+          generated_content: string
+          id: string
+          lead_id: string | null
+          message_type: string
+          sent_at: string | null
+          was_auto_sent: boolean
+          was_user_edited: boolean
+        }
+        Insert: {
+          booking_id?: string | null
+          business_id: string
+          created_at?: string
+          generated_content: string
+          id?: string
+          lead_id?: string | null
+          message_type?: string
+          sent_at?: string | null
+          was_auto_sent?: boolean
+          was_user_edited?: boolean
+        }
+        Update: {
+          booking_id?: string | null
+          business_id?: string
+          created_at?: string
+          generated_content?: string
+          id?: string
+          lead_id?: string | null
+          message_type?: string
+          sent_at?: string | null
+          was_auto_sent?: boolean
+          was_user_edited?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copilot_reply_log_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "business_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_booking_context"
+            referencedColumns: ["booking_id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_ai_entitlements"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_plan_status"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "business_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_lead_context"
+            referencedColumns: ["lead_id"]
+          },
+        ]
+      }
       custom_palettes: {
         Row: {
           created_at: string
@@ -6945,6 +7146,62 @@ export type Database = {
           subheadline: string | null
         }
         Relationships: []
+      }
+      copilot_reply_stats: {
+        Row: {
+          auto_sent_replies: number | null
+          business_id: string | null
+          edited_replies: number | null
+          leads_answered: number | null
+          replies_30d: number | null
+          replies_7d: number | null
+          sent_replies: number | null
+          total_replies: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_ai_entitlements"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_plan_status"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "copilot_reply_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
+        ]
       }
       public_profiles: {
         Row: {
