@@ -31,6 +31,22 @@ export interface AISuggestion {
   bookingId?: string;
 }
 
+export interface AIRoiData {
+  total_ai_generations: number;
+  total_ai_generations_month: number;
+  ai_assisted_leads: number;
+  ai_assisted_leads_month: number;
+  ai_assisted_bookings: number;
+  ai_assisted_bookings_month: number;
+  ai_assisted_leads_prev_month: number;
+  ai_assisted_bookings_prev_month: number;
+  conversion_rate: number;
+  conversion_rate_month: number;
+  avg_job_value: number;
+  estimated_revenue: number;
+  estimated_revenue_month: number;
+}
+
 export interface SavedSuggestion {
   id: string;
   business_id: string;
@@ -98,6 +114,20 @@ export function useAIUsage() {
     queryFn: async () => {
       const result = await callInsights("get_usage");
       return result as AIUsageData;
+    },
+  });
+}
+
+/** Get AI ROI metrics for current business */
+export function useAIRoi() {
+  const { user } = useAuth();
+  return useQuery<AIRoiData>({
+    queryKey: ["ai-roi", user?.id],
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5,
+    queryFn: async () => {
+      const result = await callInsights("get_roi");
+      return result as AIRoiData;
     },
   });
 }
