@@ -433,6 +433,38 @@ Leads last 30d: ${metrics?.lead_count_30d || 0}`;
         break;
       }
 
+      case "score_lead": {
+        const lead = context?.lead;
+        let leadData = lead;
+        if (lead?.lead_id && businessId) {
+          const { data: realLead } = await supabase
+            .from("copilot_lead_context")
+            .select("*")
+            .eq("lead_id", lead.lead_id)
+            .eq("business_id", businessId)
+            .maybeSingle();
+          if (realLead) leadData = realLead;
+        }
+
+        const ageHours = leadData?.created_at
+          ? Math.round((now - new Date(leadData.created_at).getTime()) / 3600000)
+          : null;
+
+        systemPrompt = `You are a lead scoring expert for a local service business called ${businessName}. Score this lead from 1-100 on how likely it is to convert into a booking. Consider: completeness of info (name, email, phone), urgency language, service match clarity, recency, contact details provided, location match, and message detail. Return JSON: { score: number (1-100), label: "High Intent" | "Medium Intent" | "Low Intent", explanation: string (1-2 sentences, plain language, explain why), recommended_action: string (practical next step), factors: { completeness: number (0-100), urgency: number (0-100), service_match: number (0-100), recency: number (0-100), contact_quality: number (0-100) } }. Label mapping: 80-100=High Intent, 50-79=Medium Intent, below 50=Low Intent.`;
+        userPrompt = `Lead details:
+- Name: ${leadData?.full_name || "Not provided"}
+- Email: ${leadData?.email || "Not provided"}
+- Phone: ${leadData?.phone || "Not provided"}
+- Message: "${leadData?.message || "No message"}"
+- Service requested: ${leadData?.service_title || "Not specified"}
+- Source: ${leadData?.source || "unknown"}
+- Received: ${leadData?.created_at || "unknown"}${ageHours !== null ? ` (${ageHours}h ago)` : ""}
+- Status: ${leadData?.status || "new"}
+- Our services: ${contextData.services?.map((s: any) => s.title).join(", ") || "Various services"}
+- Our location: ${business?.location_city || "Unknown"}`;
+        break;
+      }
+
       default:
         return new Response(JSON.stringify({ error: "Unknown action" }), {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
