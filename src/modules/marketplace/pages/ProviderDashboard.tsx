@@ -343,6 +343,9 @@ export default function ProviderDashboard() {
         currentCount={limitModal.count}
         maxLimit={getLimit(limitModal.kind)}
       />
+
+      {/* Provider AI Assistant */}
+      <ProviderAIAssistant />
     </div>
   );
 }
