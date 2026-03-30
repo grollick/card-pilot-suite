@@ -6365,6 +6365,10 @@ export type Database = {
         }
         Returns: number
       }
+      onboard_business: {
+        Args: { p_business_name: string; p_city: string; p_region: string }
+        Returns: Json
+      }
       owns_lead: {
         Args: { _lead_id: string; _user_id: string }
         Returns: boolean
