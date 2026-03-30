@@ -210,6 +210,12 @@ export default function ProviderDashboard() {
         </button>
       </div>
 
+      {/* Reviews Dashboard */}
+      <div className="rounded-xl border border-border bg-card p-5">
+        <h2 className="font-semibold text-foreground mb-4">Reviews & Trust</h2>
+        <ReviewDashboard businessId={mockBusinessId} />
+      </div>
+
       {/* Boost Campaign Panel */}
       <div id="boost-panel">
         <BoostCampaignPanel />
