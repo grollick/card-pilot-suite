@@ -1314,6 +1314,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "business_reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_booking_context"
+            referencedColumns: ["booking_id"]
+          },
+          {
             foreignKeyName: "business_reviews_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
@@ -6207,6 +6214,44 @@ export type Database = {
           service_area?: string | null
         }
         Relationships: []
+      }
+      copilot_booking_context: {
+        Row: {
+          booking_date: string | null
+          booking_id: string | null
+          booking_time: string | null
+          business_id: string | null
+          business_name: string | null
+          customer_email: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          notes: string | null
+          service_title: string | null
+          status: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_bookings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_bookings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_plan_status"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_bookings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       copilot_lead_context: {
         Row: {
