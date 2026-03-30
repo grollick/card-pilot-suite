@@ -22,9 +22,6 @@ import BoostCampaignPanel from "../components/BoostCampaignPanel";
 import PlanLimitModal from "../components/PlanLimitModal";
 import { useBusinessPlanStatus, type LimitKind } from "../hooks/useBusinessPlanStatus";
 
-      {/* Auto-Reply Settings */}
-      <AutoReplySettings />
-
 
 const MOCK_SERVICES = [
   { id: "1", title: "Spring Cleanup", price: 250, active: true },
