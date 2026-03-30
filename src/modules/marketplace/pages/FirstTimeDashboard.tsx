@@ -42,6 +42,7 @@ export default function FirstTimeDashboard() {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
   const [checklist] = useState(INITIAL_CHECKLIST);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const completedCount = checklist.filter((c) => c.done).length;
   const progressPercent = (completedCount / checklist.length) * 100;
