@@ -5,6 +5,7 @@ import { ReviewDashboard } from "../components/ReviewDashboard";
 import ProviderAIAssistant from "../components/ProviderAIAssistant";
 import AIInsightsPanel from "../components/AIInsightsPanel";
 import AIRoiPanel from "../components/AIRoiPanel";
+import HighIntentLeadsPanel from "../components/HighIntentLeadsPanel";
 import { ProfileOptimizePanel } from "../components/AIActionCards";
 import AIFeatureGate from "../components/AIFeatureGate";
 import { useAIUsage } from "../hooks/useProviderInsights";
