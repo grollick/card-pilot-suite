@@ -258,6 +258,14 @@ const App = () => (
             <Route path="/ref/:code" element={<ReferralRedirect />} />
             <Route path="/unsubscribe" element={<LazyRoute><UnsubscribePage /></LazyRoute>} />
 
+            {/* Public Marketplace */}
+            <Route path="/marketplace" element={<LazyRoute><MarketplaceHomePage /></LazyRoute>} />
+            <Route path="/marketplace/category/:category" element={<LazyRoute><CategoryResultsPage /></LazyRoute>} />
+            <Route path="/marketplace/search" element={<LazyRoute><CategoryResultsPage /></LazyRoute>} />
+            <Route path="/marketplace/:slug" element={<LazyRoute><BusinessProfilePage /></LazyRoute>} />
+            <Route path="/marketplace/:slug/book" element={<LazyRoute><BookingFlowPage /></LazyRoute>} />
+            <Route path="/marketplace/:slug/post-booking" element={<LazyRoute><PostBookingPage /></LazyRoute>} />
+
             {/* Client Portal v2 — authenticated */}
             <Route path="/client/auth" element={<LazyRoute><ClientAuthPage /></LazyRoute>} />
             <Route path="/client" element={
