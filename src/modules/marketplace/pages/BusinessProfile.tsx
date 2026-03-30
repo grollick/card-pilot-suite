@@ -87,14 +87,18 @@ export default function BusinessProfile() {
 
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!leadForm.name.trim() || !leadForm.email.trim() || !leadForm.phone.trim() || !leadForm.message.trim()) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
     setSubmitting(true);
     try {
       const { error } = await supabase.from("business_leads").insert({
         business_id: biz.id,
         full_name: leadForm.name.trim(),
-        email: leadForm.email.trim() || null,
-        phone: leadForm.phone.trim() || null,
-        message: leadForm.message.trim() || null,
+        email: leadForm.email.trim(),
+        phone: leadForm.phone.trim(),
+        message: leadForm.message.trim(),
         source: "marketplace",
       });
       if (error) throw error;
