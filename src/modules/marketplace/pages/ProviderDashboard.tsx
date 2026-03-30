@@ -3,6 +3,8 @@ import { Helmet } from "react-helmet-async";
 import { Eye, Users, CalendarCheck, Star, TrendingUp, CheckCircle2, AlertCircle, Plus, Pencil, Trash2, Rocket, ArrowUpRight, ShieldCheck, Zap, Crown } from "lucide-react";
 import { ReviewDashboard } from "../components/ReviewDashboard";
 import ProviderAIAssistant from "../components/ProviderAIAssistant";
+import AIInsightsPanel from "../components/AIInsightsPanel";
+import { ProfileOptimizePanel } from "../components/AIActionCards";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -108,6 +110,9 @@ export default function ProviderDashboard() {
           <Switch checked={isVisible} onCheckedChange={(v) => { setIsVisible(v); toast.success(v ? "You're now visible on the marketplace" : "Hidden from marketplace"); }} />
         </div>
       </div>
+
+      {/* AI Insights Panel */}
+      <AIInsightsPanel onAction={(s) => toast.info(`Action: ${s.title}`)} />
 
       {/* Performance Panel */}
       <div className="rounded-xl border border-border bg-card overflow-hidden">
@@ -242,6 +247,9 @@ export default function ProviderDashboard() {
           ))}
         </div>
       </div>
+
+      {/* AI Profile Optimization */}
+      <ProfileOptimizePanel />
 
       {/* Categories */}
       <div className="rounded-xl border border-border bg-card p-5">
