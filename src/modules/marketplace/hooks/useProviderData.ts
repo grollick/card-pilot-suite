@@ -37,13 +37,13 @@ export function useBusinessAreas() {
     staleTime: 1000 * 60 * 5,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("service_areas")
+        .from("service_areas" as any)
         .select("id, city, region, is_active")
         .eq("business_id", businessId!)
         .eq("is_active", true)
         .order("city");
       if (error) throw error;
-      return data || [];
+      return (data || []) as { id: string; city: string; region: string | null; is_active: boolean }[];
     },
   });
 }
