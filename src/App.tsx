@@ -125,6 +125,14 @@ const MarketplacePerformancePage = lazy(() => import("@/modules/marketplace/page
 const JobRequestsPage = lazy(() => import("@/modules/marketplace/pages/JobRequestsPage"));
 const RequestStatusPage = lazy(() => import("@/modules/public/pages/RequestStatusPage"));
 
+// Public Marketplace
+const MarketplaceHomePage = lazy(() => import("@/modules/marketplace/pages/MarketplaceHome"));
+const CategoryResultsPage = lazy(() => import("@/modules/marketplace/pages/CategoryResults"));
+const BusinessProfilePage = lazy(() => import("@/modules/marketplace/pages/BusinessProfile"));
+const BookingFlowPage = lazy(() => import("@/modules/marketplace/pages/BookingFlow"));
+const PostBookingPage = lazy(() => import("@/modules/marketplace/pages/PostBooking"));
+const ProviderDashboardPage = lazy(() => import("@/modules/marketplace/pages/ProviderDashboard"));
+
 // AI Assistant
 const AssistantPage = lazy(() => import("@/modules/assistant/pages/AssistantPage"));
 const AgencyDashboard = lazy(() => import("@/modules/agency/pages/AgencyDashboard"));
@@ -250,6 +258,14 @@ const App = () => (
             <Route path="/ref/:code" element={<ReferralRedirect />} />
             <Route path="/unsubscribe" element={<LazyRoute><UnsubscribePage /></LazyRoute>} />
 
+            {/* Public Marketplace */}
+            <Route path="/marketplace" element={<LazyRoute><MarketplaceHomePage /></LazyRoute>} />
+            <Route path="/marketplace/category/:category" element={<LazyRoute><CategoryResultsPage /></LazyRoute>} />
+            <Route path="/marketplace/search" element={<LazyRoute><CategoryResultsPage /></LazyRoute>} />
+            <Route path="/marketplace/:slug" element={<LazyRoute><BusinessProfilePage /></LazyRoute>} />
+            <Route path="/marketplace/:slug/book" element={<LazyRoute><BookingFlowPage /></LazyRoute>} />
+            <Route path="/marketplace/:slug/post-booking" element={<LazyRoute><PostBookingPage /></LazyRoute>} />
+
             {/* Client Portal v2 — authenticated */}
             <Route path="/client/auth" element={<LazyRoute><ClientAuthPage /></LazyRoute>} />
             <Route path="/client" element={
@@ -301,6 +317,7 @@ const App = () => (
               <Route path="duty" element={<LazyRoute><DutyPage /></LazyRoute>} />
               <Route path="loyalty" element={<LazyRoute><LoyaltyPage /></LazyRoute>} />
               <Route path="marketplace-performance" element={<LazyRoute><MarketplacePerformancePage /></LazyRoute>} />
+              <Route path="marketplace-hub" element={<LazyRoute><ProviderDashboardPage /></LazyRoute>} />
               <Route path="job-requests" element={<LazyRoute><JobRequestsPage /></LazyRoute>} />
               <Route path="estimates" element={<LazyRoute><EstimatesPage /></LazyRoute>} />
               <Route path="jobs" element={<LazyRoute><JobsPage /></LazyRoute>} />
