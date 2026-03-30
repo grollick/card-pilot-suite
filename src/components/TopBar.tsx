@@ -128,6 +128,7 @@ export default function TopBar() {
           </button>
         </Tip>
       </header>
+      <NotificationPanel open={notifOpen} onClose={() => setNotifOpen(false)} />
     </TooltipProvider>
   );
 }

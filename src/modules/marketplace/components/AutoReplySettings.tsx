@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Settings, Bot, Clock, Shield, Zap } from "lucide-react";
+import { Settings, Bot, Clock, Shield, Zap, MessageSquare, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -12,13 +12,22 @@ export default function AutoReplySettings() {
   const { data: saved, isLoading } = useAutoReplySettings();
   const saveMutation = useSaveAutoReplySettings();
 
-  const [settings, setSettings] = useState<Partial<SettingsType>>({
+  const [settings, setSettings] = useState<Partial<SettingsType & {
+    sms_enabled: boolean;
+    sms_review_before_send: boolean;
+    auto_follow_up_sms_enabled: boolean;
+    booking_reminder_sms_enabled: boolean;
+  }>>({
     auto_reply_enabled: false,
     auto_follow_up_enabled: false,
     review_before_send: true,
     reply_tone: "professional",
     business_hours_only: true,
     high_intent_only: false,
+    sms_enabled: false,
+    sms_review_before_send: true,
+    auto_follow_up_sms_enabled: false,
+    booking_reminder_sms_enabled: false,
   });
 
   useEffect(() => {
