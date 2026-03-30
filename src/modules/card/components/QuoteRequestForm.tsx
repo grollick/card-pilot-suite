@@ -96,6 +96,14 @@ export default function QuoteRequestForm({
       toast.error("Please enter your name");
       return;
     }
+    if (!form.email.trim() && !form.phone.trim()) {
+      toast.error("Please enter your email or phone number");
+      return;
+    }
+    if (!form.description.trim()) {
+      toast.error("Please describe your project");
+      return;
+    }
     // Bot detection
     const botCheck = detectBot(honeypot, formLoadTime);
     if (botCheck.isBot) {
@@ -212,22 +220,24 @@ export default function QuoteRequestForm({
         {/* Email & Phone row */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
           <div>
-            <label style={labelStyle}>Email</label>
+            <label style={labelStyle}>Email *</label>
             <input
               type="email"
-              placeholder="Email"
+              placeholder="Your email"
               value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
               style={inputStyle}
+              required
             />
           </div>
           <div>
-            <label style={labelStyle}>Phone</label>
+            <label style={labelStyle}>Phone *</label>
             <input
-              placeholder="Phone"
+              placeholder="Your phone number"
               value={form.phone}
               onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
               style={inputStyle}
+              required
             />
           </div>
         </div>
@@ -278,7 +288,7 @@ export default function QuoteRequestForm({
 
         {/* Description */}
         <div>
-          <label style={labelStyle}>Description</label>
+          <label style={labelStyle}>Description *</label>
           <textarea
             placeholder="Tell us more about your project..."
             rows={4}

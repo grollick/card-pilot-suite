@@ -87,14 +87,18 @@ export default function BusinessProfile() {
 
   const handleLeadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!leadForm.name.trim() || !leadForm.email.trim() || !leadForm.phone.trim() || !leadForm.message.trim()) {
+      toast.error("Please fill in all required fields.");
+      return;
+    }
     setSubmitting(true);
     try {
       const { error } = await supabase.from("business_leads").insert({
         business_id: biz.id,
         full_name: leadForm.name.trim(),
-        email: leadForm.email.trim() || null,
-        phone: leadForm.phone.trim() || null,
-        message: leadForm.message.trim() || null,
+        email: leadForm.email.trim(),
+        phone: leadForm.phone.trim(),
+        message: leadForm.message.trim(),
         source: "marketplace",
       });
       if (error) throw error;
@@ -219,10 +223,10 @@ export default function BusinessProfile() {
           <h2 className="text-lg font-semibold text-foreground mb-4">Request a Quote</h2>
           <form onSubmit={handleLeadSubmit} className="grid sm:grid-cols-2 gap-3 max-w-lg">
             <Input placeholder="Full name *" required value={leadForm.name} onChange={(e) => setLeadForm((p) => ({ ...p, name: e.target.value }))} />
-            <Input type="email" placeholder="Email" value={leadForm.email} onChange={(e) => setLeadForm((p) => ({ ...p, email: e.target.value }))} />
-            <Input type="tel" placeholder="Phone" value={leadForm.phone} onChange={(e) => setLeadForm((p) => ({ ...p, phone: e.target.value }))} />
+            <Input type="email" placeholder="Email *" required value={leadForm.email} onChange={(e) => setLeadForm((p) => ({ ...p, email: e.target.value }))} />
+            <Input type="tel" placeholder="Phone *" required value={leadForm.phone} onChange={(e) => setLeadForm((p) => ({ ...p, phone: e.target.value }))} />
             <div className="sm:col-span-2">
-              <Textarea placeholder="Tell us about your project…" rows={3} value={leadForm.message} onChange={(e) => setLeadForm((p) => ({ ...p, message: e.target.value }))} />
+              <Textarea placeholder="Tell us about your project… *" required rows={3} value={leadForm.message} onChange={(e) => setLeadForm((p) => ({ ...p, message: e.target.value }))} />
             </div>
             <Button type="submit" disabled={submitting} className="sm:col-span-2">
               {submitting ? "Sending…" : "Request Quote"}
