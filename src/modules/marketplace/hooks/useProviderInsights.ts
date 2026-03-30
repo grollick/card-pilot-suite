@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -9,6 +9,20 @@ export interface AISuggestion {
   priority: "high" | "medium" | "low";
   leadId?: string;
   bookingId?: string;
+}
+
+export interface SavedSuggestion {
+  id: string;
+  business_id: string;
+  suggestion_type: string;
+  title: string;
+  description: string;
+  priority: string;
+  status: "active" | "used" | "dismissed";
+  lead_id: string | null;
+  booking_id: string | null;
+  ai_response: any;
+  created_at: string;
 }
 
 export interface LeadReplyResult {
@@ -48,6 +62,26 @@ async function callInsights(action: string, context?: any) {
   return data?.result;
 }
 
+/** Get the current user's business */
+export function useProviderBusiness() {
+  const { user } = useAuth();
+  return useQuery({
+    queryKey: ["provider-business", user?.id],
+    enabled: !!user,
+    staleTime: 1000 * 60 * 10,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("businesses")
+        .select("id, business_name, slug, location_city")
+        .eq("owner_user_id", user!.id)
+        .eq("is_active", true)
+        .maybeSingle();
+      return data;
+    },
+  });
+}
+
+/** AI-generated insights (calls edge function) */
 export function useProviderInsights() {
   const { user } = useAuth();
   return useQuery<AISuggestion[]>({
@@ -58,6 +92,92 @@ export function useProviderInsights() {
     queryFn: async () => {
       const result = await callInsights("insights");
       return Array.isArray(result) ? result : [];
+    },
+  });
+}
+
+/** Get saved suggestions from database */
+export function useSavedSuggestions() {
+  const { user } = useAuth();
+  return useQuery<SavedSuggestion[]>({
+    queryKey: ["saved-suggestions", user?.id],
+    enabled: !!user,
+    staleTime: 1000 * 60 * 2,
+    queryFn: async () => {
+      const result = await callInsights("get_suggestions");
+      return Array.isArray(result) ? result : [];
+    },
+  });
+}
+
+/** Update suggestion status (used/dismissed) */
+export function useUpdateSuggestion() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ suggestionId, status }: { suggestionId: string; status: "active" | "used" | "dismissed" }) => {
+      return await callInsights("update_suggestion", { suggestionId, status });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["saved-suggestions"] });
+    },
+  });
+}
+
+/** Real leads needing reply (from copilot_lead_context) */
+export function useStaleLeads(businessId?: string) {
+  return useQuery({
+    queryKey: ["stale-leads", businessId],
+    enabled: !!businessId,
+    staleTime: 1000 * 60 * 3,
+    queryFn: async () => {
+      const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { data } = await supabase
+        .from("copilot_lead_context" as any)
+        .select("*")
+        .eq("business_id", businessId!)
+        .or("status.eq.new,status.is.null")
+        .lt("created_at", cutoff)
+        .order("created_at", { ascending: true })
+        .limit(10);
+      return (data || []) as any[];
+    },
+  });
+}
+
+/** Pending bookings needing confirmation */
+export function usePendingBookings(businessId?: string) {
+  return useQuery({
+    queryKey: ["pending-bookings", businessId],
+    enabled: !!businessId,
+    staleTime: 1000 * 60 * 3,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("copilot_booking_context" as any)
+        .select("*")
+        .eq("business_id", businessId!)
+        .eq("status", "pending")
+        .order("booking_date", { ascending: true })
+        .limit(10);
+      return (data || []) as any[];
+    },
+  });
+}
+
+/** Completed bookings needing review request */
+export function useCompletedBookings(businessId?: string) {
+  return useQuery({
+    queryKey: ["completed-bookings-review", businessId],
+    enabled: !!businessId,
+    staleTime: 1000 * 60 * 3,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("copilot_booking_context" as any)
+        .select("*")
+        .eq("business_id", businessId!)
+        .eq("status", "completed")
+        .order("booking_date", { ascending: false })
+        .limit(10);
+      return (data || []) as any[];
     },
   });
 }

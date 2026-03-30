@@ -145,6 +145,111 @@ export type Database = {
         }
         Relationships: []
       }
+      ai_assistant_suggestions: {
+        Row: {
+          ai_response: Json | null
+          booking_id: string | null
+          business_id: string
+          created_at: string
+          description: string | null
+          id: string
+          lead_id: string | null
+          priority: string
+          status: string
+          suggestion_type: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_response?: Json | null
+          booking_id?: string | null
+          business_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          lead_id?: string | null
+          priority?: string
+          status?: string
+          suggestion_type: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_response?: Json | null
+          booking_id?: string | null
+          business_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          lead_id?: string | null
+          priority?: string
+          status?: string
+          suggestion_type?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_assistant_suggestions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "business_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_assistant_suggestions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_booking_context"
+            referencedColumns: ["booking_id"]
+          },
+          {
+            foreignKeyName: "ai_assistant_suggestions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_assistant_suggestions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_plan_status"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_assistant_suggestions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_assistant_suggestions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_assistant_suggestions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "business_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_assistant_suggestions_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_lead_context"
+            referencedColumns: ["lead_id"]
+          },
+        ]
+      }
       ai_credit_purchases: {
         Row: {
           amount_paid: number
