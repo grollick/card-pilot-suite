@@ -996,6 +996,320 @@ export type Database = {
         }
         Relationships: []
       }
+      business_bookings: {
+        Row: {
+          booking_date: string
+          booking_time: string | null
+          business_id: string
+          created_at: string | null
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string | null
+          id: string
+          lead_id: string | null
+          notes: string | null
+          service_id: string | null
+          status: string | null
+        }
+        Insert: {
+          booking_date: string
+          booking_time?: string | null
+          business_id: string
+          created_at?: string | null
+          customer_email?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          id?: string
+          lead_id?: string | null
+          notes?: string | null
+          service_id?: string | null
+          status?: string | null
+        }
+        Update: {
+          booking_date?: string
+          booking_time?: string | null
+          business_id?: string
+          created_at?: string | null
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          id?: string
+          lead_id?: string | null
+          notes?: string | null
+          service_id?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_bookings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_bookings_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "business_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_categories: {
+        Row: {
+          business_id: string
+          category_key: string
+          id: string
+        }
+        Insert: {
+          business_id: string
+          category_key: string
+          id?: string
+        }
+        Update: {
+          business_id?: string
+          category_key?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_categories_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_leads: {
+        Row: {
+          business_id: string
+          created_at: string | null
+          email: string | null
+          full_name: string
+          id: string
+          message: string | null
+          phone: string | null
+          service_id: string | null
+          source: string | null
+          status: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string | null
+          email?: string | null
+          full_name: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          service_id?: string | null
+          source?: string | null
+          status?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string | null
+          email?: string | null
+          full_name?: string
+          id?: string
+          message?: string | null
+          phone?: string | null
+          service_id?: string | null
+          source?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_leads_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_leads_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_profiles: {
+        Row: {
+          bio: string | null
+          booking_enabled: boolean | null
+          business_id: string
+          created_at: string | null
+          cta_primary_text: string | null
+          cta_secondary_text: string | null
+          custom_domain: string | null
+          headline: string | null
+          id: string
+          lead_form_enabled: boolean | null
+          marketplace_enabled: boolean | null
+          subheadline: string | null
+          theme_color: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          bio?: string | null
+          booking_enabled?: boolean | null
+          business_id: string
+          created_at?: string | null
+          cta_primary_text?: string | null
+          cta_secondary_text?: string | null
+          custom_domain?: string | null
+          headline?: string | null
+          id?: string
+          lead_form_enabled?: boolean | null
+          marketplace_enabled?: boolean | null
+          subheadline?: string | null
+          theme_color?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          bio?: string | null
+          booking_enabled?: boolean | null
+          business_id?: string
+          created_at?: string | null
+          cta_primary_text?: string | null
+          cta_secondary_text?: string | null
+          custom_domain?: string | null
+          headline?: string | null
+          id?: string
+          lead_form_enabled?: boolean | null
+          marketplace_enabled?: boolean | null
+          subheadline?: string | null
+          theme_color?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_profiles_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_reviews: {
+        Row: {
+          booking_id: string | null
+          business_id: string
+          created_at: string | null
+          id: string
+          is_approved: boolean | null
+          rating: number
+          review_text: string | null
+          reviewer_name: string
+        }
+        Insert: {
+          booking_id?: string | null
+          business_id: string
+          created_at?: string | null
+          id?: string
+          is_approved?: boolean | null
+          rating: number
+          review_text?: string | null
+          reviewer_name: string
+        }
+        Update: {
+          booking_id?: string | null
+          business_id?: string
+          created_at?: string | null
+          id?: string
+          is_approved?: boolean | null
+          rating?: number
+          review_text?: string | null
+          reviewer_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "business_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reviews_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      businesses: {
+        Row: {
+          business_name: string
+          country: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          description: string | null
+          email: string | null
+          id: string
+          is_active: boolean | null
+          is_marketplace_visible: boolean | null
+          location_city: string | null
+          location_region: string | null
+          logo_url: string | null
+          owner_user_id: string
+          phone: string | null
+          slug: string
+          updated_at: string | null
+          website: string | null
+        }
+        Insert: {
+          business_name: string
+          country?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_marketplace_visible?: boolean | null
+          location_city?: string | null
+          location_region?: string | null
+          logo_url?: string | null
+          owner_user_id: string
+          phone?: string | null
+          slug: string
+          updated_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          business_name?: string
+          country?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          description?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_marketplace_visible?: boolean | null
+          location_city?: string | null
+          location_region?: string | null
+          logo_url?: string | null
+          owner_user_id?: string
+          phone?: string | null
+          slug?: string
+          updated_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       campaign_emails: {
         Row: {
           campaign_id: string
@@ -3790,6 +4104,50 @@ export type Database = {
           },
         ]
       }
+      marketplace_metrics: {
+        Row: {
+          avg_rating: number | null
+          booking_count_30d: number | null
+          business_id: string
+          lead_count_30d: number | null
+          marketplace_score: number | null
+          profile_completeness_score: number | null
+          response_score: number | null
+          review_count: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          avg_rating?: number | null
+          booking_count_30d?: number | null
+          business_id: string
+          lead_count_30d?: number | null
+          marketplace_score?: number | null
+          profile_completeness_score?: number | null
+          response_score?: number | null
+          review_count?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          avg_rating?: number | null
+          booking_count_30d?: number | null
+          business_id?: string
+          lead_count_30d?: number | null
+          marketplace_score?: number | null
+          profile_completeness_score?: number | null
+          response_score?: number | null
+          review_count?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketplace_metrics_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       marketplace_quote_requests: {
         Row: {
           budget: string | null
@@ -4841,6 +5199,85 @@ export type Database = {
             columns: ["variant_id"]
             isOneToOne: false
             referencedRelation: "followup_variants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_areas: {
+        Row: {
+          business_id: string
+          city: string
+          id: string
+          postal_code: string | null
+          radius_km: number | null
+          region: string | null
+        }
+        Insert: {
+          business_id: string
+          city: string
+          id?: string
+          postal_code?: string | null
+          radius_km?: number | null
+          region?: string | null
+        }
+        Update: {
+          business_id?: string
+          city?: string
+          id?: string
+          postal_code?: string | null
+          radius_km?: number | null
+          region?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_areas_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      services: {
+        Row: {
+          business_id: string
+          created_at: string | null
+          description: string | null
+          duration_minutes: number | null
+          id: string
+          is_active: boolean | null
+          price_amount: number | null
+          price_type: string | null
+          title: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          price_amount?: number | null
+          price_type?: string | null
+          title: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string | null
+          description?: string | null
+          duration_minutes?: number | null
+          id?: string
+          is_active?: boolean | null
+          price_amount?: number | null
+          price_type?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
         ]
