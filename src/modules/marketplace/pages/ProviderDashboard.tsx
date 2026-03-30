@@ -50,6 +50,7 @@ export default function ProviderDashboard() {
   const [isVisible, setIsVisible] = useState(true);
   const navigate = useNavigate();
   const completeness = 68;
+  const { data: aiUsage } = useAIUsage();
 
   // TODO: replace with real business ID from auth context
   const mockBusinessId = undefined;
