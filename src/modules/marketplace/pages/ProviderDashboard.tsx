@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { Eye, Users, CalendarCheck, Star, TrendingUp, CheckCircle2, AlertCircle, Plus, Pencil, Trash2, Rocket, ArrowUpRight, ShieldCheck, Zap } from "lucide-react";
+import { Eye, Users, CalendarCheck, Star, TrendingUp, CheckCircle2, AlertCircle, Plus, Pencil, Trash2, Rocket, ArrowUpRight, ShieldCheck, Zap, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,8 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import BoostCampaignPanel from "../components/BoostCampaignPanel";
+import PlanLimitModal from "../components/PlanLimitModal";
+import { useBusinessPlanStatus, type LimitKind } from "../hooks/useBusinessPlanStatus";
 
 const MOCK_SERVICES = [
   { id: "1", title: "Spring Cleanup", price: 250, active: true },
@@ -32,18 +34,73 @@ const TIPS = [
   { done: true, label: "Set service areas" },
 ];
 
+const PLAN_COLORS: Record<string, string> = {
+  free: "bg-muted text-muted-foreground",
+  pro: "bg-primary/10 text-primary",
+  growth: "bg-warning/10 text-warning",
+};
+
 export default function ProviderDashboard() {
   const [isVisible, setIsVisible] = useState(true);
   const navigate = useNavigate();
   const completeness = 68;
-  const currentPlan: string = "free"; // mock
+
+  // TODO: replace with real business ID from auth context
+  const mockBusinessId = undefined;
+  const { plan, isLimitReached, getLimit } = useBusinessPlanStatus(mockBusinessId);
+
+  // Limit modal state
+  const [limitModal, setLimitModal] = useState<{ open: boolean; kind: LimitKind; count: number }>({
+    open: false,
+    kind: "services",
+    count: 0,
+  });
+
+  const openLimitModal = (kind: LimitKind, currentCount: number) => {
+    setLimitModal({ open: true, kind, count: currentCount });
+  };
+
+  const handleAddService = () => {
+    const activeCount = MOCK_SERVICES.filter((s) => s.active).length;
+    if (isLimitReached("services", activeCount)) {
+      openLimitModal("services", activeCount);
+      return;
+    }
+    toast.info("Add service");
+  };
+
+  const handleAddArea = () => {
+    if (isLimitReached("service_areas", MOCK_AREAS.length)) {
+      openLimitModal("service_areas", MOCK_AREAS.length);
+      return;
+    }
+    toast.info("Add service area");
+  };
+
+  const handleNewBooking = () => {
+    const mockMonthlyBookings = 11;
+    if (isLimitReached("bookings", mockMonthlyBookings)) {
+      openLimitModal("bookings", mockMonthlyBookings);
+      return;
+    }
+    toast.info("Create booking");
+  };
+
+  const planColor = PLAN_COLORS[plan.plan_name] ?? PLAN_COLORS.free;
 
   return (
     <div className="space-y-6">
       <Helmet><title>Marketplace | Dashboard</title></Helmet>
 
+      {/* Header with plan badge */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Marketplace</h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-2xl font-bold text-foreground">Marketplace</h1>
+          <Badge className={`text-xs capitalize gap-1 ${planColor}`}>
+            <Crown className="h-3 w-3" />
+            {plan.plan_name} plan
+          </Badge>
+        </div>
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">Visible on marketplace</span>
           <Switch checked={isVisible} onCheckedChange={(v) => { setIsVisible(v); toast.success(v ? "You're now visible on the marketplace" : "Hidden from marketplace"); }} />
@@ -80,7 +137,6 @@ export default function ProviderDashboard() {
             </div>
           ))}
         </div>
-        {/* Upgrade hook inside performance */}
         <div className="px-5 py-3 bg-primary/5 border-t border-primary/10 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Rocket className="h-4 w-4 text-primary" />
@@ -104,7 +160,7 @@ export default function ProviderDashboard() {
               <p className="text-xs text-muted-foreground">Increases trust and clicks on your profile</p>
             </div>
           </div>
-          {currentPlan === "growth" ? (
+          {plan.plan_name === "growth" ? (
             <Badge className="bg-warning/10 text-warning border-warning/20 gap-1">
               <ShieldCheck className="h-3 w-3" /> Active
             </Badge>
@@ -114,11 +170,10 @@ export default function ProviderDashboard() {
             </Button>
           )}
         </div>
-        {currentPlan !== "growth" && (
+        {plan.plan_name !== "growth" && (
           <div className="mt-3 p-3 rounded-lg bg-muted/50">
             <p className="text-xs text-muted-foreground">
               Growth plan providers see <span className="font-medium text-foreground">40% more clicks</span> with the Premium badge.
-              Customers trust verified professionals more.
             </p>
           </div>
         )}
@@ -195,9 +250,16 @@ export default function ProviderDashboard() {
         </div>
       </div>
 
-      {/* Service Areas */}
+      {/* Service Areas with limit check */}
       <div className="rounded-xl border border-border bg-card p-5">
-        <h2 className="font-semibold text-foreground mb-3">Service Areas</h2>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold text-foreground">Service Areas</h2>
+          {getLimit("service_areas") !== null && (
+            <span className="text-xs text-muted-foreground">
+              {MOCK_AREAS.length}/{getLimit("service_areas")} used
+            </span>
+          )}
+        </div>
         <div className="flex flex-wrap gap-2 mb-3">
           {MOCK_AREAS.map((a) => (
             <Badge key={a} variant="secondary" className="gap-1">
@@ -208,15 +270,24 @@ export default function ProviderDashboard() {
         </div>
         <div className="flex gap-2">
           <Input placeholder="Add a city…" className="max-w-xs" />
-          <Button size="sm" variant="outline"><Plus className="h-4 w-4" /></Button>
+          <Button size="sm" variant="outline" onClick={handleAddArea}><Plus className="h-4 w-4" /></Button>
         </div>
       </div>
 
-      {/* Services */}
+      {/* Services with limit check */}
       <div className="rounded-xl border border-border bg-card p-5">
         <div className="flex items-center justify-between mb-3">
-          <h2 className="font-semibold text-foreground">Services</h2>
-          <Button size="sm" variant="outline" onClick={() => toast.info("Add service")}><Plus className="h-4 w-4 mr-1" /> Add Service</Button>
+          <div className="flex items-center gap-2">
+            <h2 className="font-semibold text-foreground">Services</h2>
+            {getLimit("services") !== null && (
+              <span className="text-xs text-muted-foreground">
+                {MOCK_SERVICES.filter((s) => s.active).length}/{getLimit("services")}
+              </span>
+            )}
+          </div>
+          <Button size="sm" variant="outline" onClick={handleAddService}>
+            <Plus className="h-4 w-4 mr-1" /> Add Service
+          </Button>
         </div>
         <div className="space-y-2">
           {MOCK_SERVICES.map((s) => (
@@ -254,6 +325,16 @@ export default function ProviderDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Plan Limit Modal */}
+      <PlanLimitModal
+        open={limitModal.open}
+        onClose={() => setLimitModal((s) => ({ ...s, open: false }))}
+        limitKind={limitModal.kind}
+        currentPlan={plan.plan_name}
+        currentCount={limitModal.count}
+        maxLimit={getLimit(limitModal.kind)}
+      />
     </div>
   );
 }
