@@ -4,6 +4,7 @@ import { Eye, Users, CalendarCheck, Star, TrendingUp, CheckCircle2, AlertCircle,
 import { ReviewDashboard } from "../components/ReviewDashboard";
 import ProviderAIAssistant from "../components/ProviderAIAssistant";
 import AIInsightsPanel from "../components/AIInsightsPanel";
+import AIRoiPanel from "../components/AIRoiPanel";
 import { ProfileOptimizePanel } from "../components/AIActionCards";
 import AIFeatureGate from "../components/AIFeatureGate";
 import { useAIUsage } from "../hooks/useProviderInsights";
