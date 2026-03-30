@@ -36,7 +36,7 @@ export default function ProviderDashboard() {
   const [isVisible, setIsVisible] = useState(true);
   const navigate = useNavigate();
   const completeness = 68;
-  const currentPlan = "free"; // mock
+  const currentPlan: string = "free"; // mock
 
   return (
     <div className="space-y-6">
