@@ -132,6 +132,7 @@ const BusinessProfilePage = lazy(() => import("@/modules/marketplace/pages/Busin
 const BookingFlowPage = lazy(() => import("@/modules/marketplace/pages/BookingFlow"));
 const PostBookingPage = lazy(() => import("@/modules/marketplace/pages/PostBooking"));
 const ProviderDashboardPage = lazy(() => import("@/modules/marketplace/pages/ProviderDashboard"));
+const BusinessOnboardingPage = lazy(() => import("@/modules/marketplace/pages/BusinessOnboardingPage"));
 
 // AI Assistant
 const AssistantPage = lazy(() => import("@/modules/assistant/pages/AssistantPage"));
@@ -318,6 +319,7 @@ const App = () => (
               <Route path="loyalty" element={<LazyRoute><LoyaltyPage /></LazyRoute>} />
               <Route path="marketplace-performance" element={<LazyRoute><MarketplacePerformancePage /></LazyRoute>} />
               <Route path="marketplace-hub" element={<LazyRoute><ProviderDashboardPage /></LazyRoute>} />
+              <Route path="business-onboarding" element={<LazyRoute><BusinessOnboardingPage /></LazyRoute>} />
               <Route path="job-requests" element={<LazyRoute><JobRequestsPage /></LazyRoute>} />
               <Route path="estimates" element={<LazyRoute><EstimatesPage /></LazyRoute>} />
               <Route path="jobs" element={<LazyRoute><JobsPage /></LazyRoute>} />
