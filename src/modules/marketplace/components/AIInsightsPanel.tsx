@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  useProviderInsights, useProviderBusiness,
+  useProviderInsights, useProviderBusiness, useAIUsage,
   useStaleLeads, usePendingBookings, useCompletedBookings,
   useUpdateSuggestion, useSavedSuggestions,
   type AISuggestion,
 } from "../hooks/useProviderInsights";
+import AIUsageMeter from "./AIUsageMeter";
+import AIUpgradeModal from "./AIUpgradeModal";
 
 const typeConfig: Record<string, { icon: typeof Bot; color: string; actionLabel: string }> = {
   lead_reply: { icon: MessageSquare, color: "text-primary", actionLabel: "Reply to Lead" },
