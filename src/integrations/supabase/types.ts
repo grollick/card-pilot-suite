@@ -1009,6 +1009,7 @@ export type Database = {
           lead_id: string | null
           notes: string | null
           service_id: string | null
+          source: string | null
           status: string | null
         }
         Insert: {
@@ -1023,6 +1024,7 @@ export type Database = {
           lead_id?: string | null
           notes?: string | null
           service_id?: string | null
+          source?: string | null
           status?: string | null
         }
         Update: {
@@ -1037,9 +1039,17 @@ export type Database = {
           lead_id?: string | null
           notes?: string | null
           service_id?: string | null
+          source?: string | null
           status?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "business_bookings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "business_bookings_business_id_fkey"
             columns: ["business_id"]
@@ -1067,19 +1077,29 @@ export type Database = {
         Row: {
           business_id: string
           category_key: string
+          created_at: string | null
           id: string
         }
         Insert: {
           business_id: string
           category_key: string
+          created_at?: string | null
           id?: string
         }
         Update: {
           business_id?: string
           category_key?: string
+          created_at?: string | null
           id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "business_categories_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "business_categories_business_id_fkey"
             columns: ["business_id"]
@@ -1127,6 +1147,13 @@ export type Database = {
           status?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "business_leads_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "business_leads_business_id_fkey"
             columns: ["business_id"]
@@ -1197,6 +1224,13 @@ export type Database = {
             foreignKeyName: "business_profiles_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: true
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "business_profiles_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
@@ -1212,6 +1246,7 @@ export type Database = {
           rating: number
           review_text: string | null
           reviewer_name: string
+          source: string | null
         }
         Insert: {
           booking_id?: string | null
@@ -1222,6 +1257,7 @@ export type Database = {
           rating: number
           review_text?: string | null
           reviewer_name: string
+          source?: string | null
         }
         Update: {
           booking_id?: string | null
@@ -1232,6 +1268,7 @@ export type Database = {
           rating?: number
           review_text?: string | null
           reviewer_name?: string
+          source?: string | null
         }
         Relationships: [
           {
@@ -1240,6 +1277,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "business_bookings"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_reviews_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
           },
           {
             foreignKeyName: "business_reviews_business_id_fkey"
@@ -4143,6 +4187,13 @@ export type Database = {
             foreignKeyName: "marketplace_metrics_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: true
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "marketplace_metrics_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
             referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
@@ -5207,6 +5258,7 @@ export type Database = {
         Row: {
           business_id: string
           city: string
+          created_at: string | null
           id: string
           postal_code: string | null
           radius_km: number | null
@@ -5215,6 +5267,7 @@ export type Database = {
         Insert: {
           business_id: string
           city: string
+          created_at?: string | null
           id?: string
           postal_code?: string | null
           radius_km?: number | null
@@ -5223,12 +5276,20 @@ export type Database = {
         Update: {
           business_id?: string
           city?: string
+          created_at?: string | null
           id?: string
           postal_code?: string | null
           radius_km?: number | null
           region?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "service_areas_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "service_areas_business_id_fkey"
             columns: ["business_id"]
@@ -5273,6 +5334,13 @@ export type Database = {
           title?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "services_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
           {
             foreignKeyName: "services_business_id_fkey"
             columns: ["business_id"]
@@ -5876,6 +5944,17 @@ export type Database = {
       }
     }
     Views: {
+      business_pipeline_summary: {
+        Row: {
+          avg_rating: number | null
+          business_id: string | null
+          business_name: string | null
+          total_bookings: number | null
+          total_leads: number | null
+          total_reviews: number | null
+        }
+        Relationships: []
+      }
       client_safe_profiles: {
         Row: {
           avatar_url: string | null
