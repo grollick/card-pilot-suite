@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import ShareCardModal from "../components/ShareCardModal";
+import ShareCtaWidget from "../components/ShareCtaWidget";
 
 /* ─── Mock state (replace with real queries) ─── */
 const MOCK_BUSINESS = {
