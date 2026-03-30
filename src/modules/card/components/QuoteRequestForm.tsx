@@ -220,22 +220,24 @@ export default function QuoteRequestForm({
         {/* Email & Phone row */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
           <div>
-            <label style={labelStyle}>Email</label>
+            <label style={labelStyle}>Email *</label>
             <input
               type="email"
-              placeholder="Email"
+              placeholder="Your email"
               value={form.email}
               onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
               style={inputStyle}
+              required
             />
           </div>
           <div>
-            <label style={labelStyle}>Phone</label>
+            <label style={labelStyle}>Phone *</label>
             <input
-              placeholder="Phone"
+              placeholder="Your phone number"
               value={form.phone}
               onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
               style={inputStyle}
+              required
             />
           </div>
         </div>
