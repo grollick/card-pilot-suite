@@ -111,6 +111,9 @@ export default function ProviderDashboard() {
         </div>
       </div>
 
+      {/* AI Insights Panel */}
+      <AIInsightsPanel onAction={(s) => toast.info(`Action: ${s.title}`)} />
+
       {/* Performance Panel */}
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <div className="p-5 border-b border-border">
