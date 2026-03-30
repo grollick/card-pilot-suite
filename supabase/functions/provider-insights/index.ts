@@ -175,6 +175,43 @@ serve(async (req) => {
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    // ─── GET LEAD SCORES ───
+    if (action === "get_lead_scores") {
+      if (!businessId) {
+        return new Response(JSON.stringify({ result: [] }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { data: scores } = await supabase
+        .from("lead_scores")
+        .select("*, business_leads(full_name, email, phone, message, status, source, created_at)")
+        .eq("business_id", businessId)
+        .order("score", { ascending: false })
+        .limit(50);
+      return new Response(JSON.stringify({ result: scores || [] }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ─── GET SINGLE LEAD SCORE ───
+    if (action === "get_lead_score") {
+      const leadId = context?.leadId;
+      if (!leadId || !businessId) {
+        return new Response(JSON.stringify({ result: null }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { data: score } = await supabase
+        .from("lead_scores")
+        .select("*")
+        .eq("lead_id", leadId)
+        .eq("business_id", businessId)
+        .maybeSingle();
+      return new Response(JSON.stringify({ result: score }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // ─── ENFORCEMENT: check limits before AI calls ───
     const AI_ACTIONS = ["insights", "lead_reply", "follow_up", "booking_confirm", "review_request", "profile_optimize"];
     if (AI_ACTIONS.includes(action) && businessId) {
