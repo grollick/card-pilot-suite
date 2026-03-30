@@ -288,7 +288,7 @@ export default function QuoteRequestForm({
 
         {/* Description */}
         <div>
-          <label style={labelStyle}>Description</label>
+          <label style={labelStyle}>Description *</label>
           <textarea
             placeholder="Tell us more about your project..."
             rows={4}
