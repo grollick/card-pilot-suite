@@ -6801,6 +6801,129 @@ export type Database = {
         }
         Relationships: []
       }
+      sms_message_events: {
+        Row: {
+          booking_id: string | null
+          business_id: string
+          created_at: string | null
+          delivery_status: string | null
+          id: string
+          lead_id: string | null
+          message_body: string
+          message_type: string
+          phone: string | null
+          sent_at: string | null
+          was_ai_generated: boolean | null
+          was_user_edited: boolean | null
+        }
+        Insert: {
+          booking_id?: string | null
+          business_id: string
+          created_at?: string | null
+          delivery_status?: string | null
+          id?: string
+          lead_id?: string | null
+          message_body: string
+          message_type: string
+          phone?: string | null
+          sent_at?: string | null
+          was_ai_generated?: boolean | null
+          was_user_edited?: boolean | null
+        }
+        Update: {
+          booking_id?: string | null
+          business_id?: string
+          created_at?: string | null
+          delivery_status?: string | null
+          id?: string
+          lead_id?: string | null
+          message_body?: string
+          message_type?: string
+          phone?: string | null
+          sent_at?: string | null
+          was_ai_generated?: boolean | null
+          was_user_edited?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sms_message_events_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "business_bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_booking_context"
+            referencedColumns: ["booking_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_ai_entitlements"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "business_plan_status"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_dashboard_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "business_leads"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sms_message_events_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "copilot_lead_context"
+            referencedColumns: ["lead_id"]
+          },
+        ]
+      }
       sms_messages: {
         Row: {
           booking_id: string | null
@@ -7997,6 +8120,18 @@ export type Database = {
         Returns: Json
       }
       check_referral_activation: { Args: { p_user_id: string }; Returns: Json }
+      create_notification: {
+        Args: {
+          p_body: string
+          p_business_id: string
+          p_entity_id: string
+          p_entity_type: string
+          p_title: string
+          p_type: string
+          p_urgency?: string
+        }
+        Returns: undefined
+      }
       create_workspace_from_profession: {
         Args: {
           p_owner_user_id: string
