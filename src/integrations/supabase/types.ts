@@ -264,6 +264,85 @@ export type Database = {
           },
         ]
       }
+      ai_automation_settings: {
+        Row: {
+          auto_follow_up_enabled: boolean | null
+          auto_reply_enabled: boolean | null
+          business_hours_only: boolean | null
+          business_id: string
+          created_at: string | null
+          high_intent_only: boolean | null
+          reply_tone: string | null
+          review_before_send: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          auto_follow_up_enabled?: boolean | null
+          auto_reply_enabled?: boolean | null
+          business_hours_only?: boolean | null
+          business_id: string
+          created_at?: string | null
+          high_intent_only?: boolean | null
+          reply_tone?: string | null
+          review_before_send?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          auto_follow_up_enabled?: boolean | null
+          auto_reply_enabled?: boolean | null
+          business_hours_only?: boolean | null
+          business_id?: string
+          created_at?: string | null
+          high_intent_only?: boolean | null
+          reply_tone?: string | null
+          review_before_send?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ai_automation_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "ai_roi_metrics"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_automation_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "business_ai_entitlements"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_automation_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "business_pipeline_summary"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_automation_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "business_plan_status"
+            referencedColumns: ["business_id"]
+          },
+          {
+            foreignKeyName: "ai_automation_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ai_automation_settings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: true
+            referencedRelation: "copilot_profile_context"
+            referencedColumns: ["business_id"]
+          },
+        ]
+      }
       ai_credit_purchases: {
         Row: {
           amount_paid: number
