@@ -84,12 +84,14 @@ export default function AIInsightsPanel({ onAction }: Props) {
   const businessId = business?.id;
 
   const { data: aiSuggestions, isLoading: aiLoading, refetch, isFetching } = useProviderInsights();
+  const { data: usage, isLoading: usageLoading } = useAIUsage();
   const { data: staleLeads = [], isLoading: staleLoading } = useStaleLeads(businessId);
   const { data: pendingBookings = [], isLoading: pendingLoading } = usePendingBookings(businessId);
   const { data: completedBookings = [], isLoading: completedLoading } = useCompletedBookings(businessId);
   const updateSuggestion = useUpdateSuggestion();
 
   const [dismissed, setDismissed] = useState<Set<number>>(new Set());
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
 
   const isLoading = aiLoading || staleLoading || pendingLoading || completedLoading;
 
