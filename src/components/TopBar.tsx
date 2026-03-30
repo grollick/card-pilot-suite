@@ -16,6 +16,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Tip from "@/components/Tip";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfileCache } from "@/hooks/useProfileCache";
+import { useUnreadCount } from "@/modules/marketplace/hooks/useNotifications";
+import NotificationPanel from "@/modules/marketplace/components/NotificationPanel";
 
 export default function TopBar() {
   const navigate = useNavigate();
