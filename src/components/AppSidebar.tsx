@@ -137,26 +137,21 @@ export function AppSidebar() {
                 active
                   ? "bg-primary/10 text-primary font-semibold shadow-sm"
                   : shouldGlow
-                    ? "bg-destructive/10 text-destructive font-semibold shadow-[0_0_12px_hsl(var(--destructive)/0.4)] ring-1 ring-destructive/30 animate-pulse"
+                    ? "text-sidebar-foreground font-medium"
                     : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-muted/50"
               }`}
               activeClassName="bg-primary/10 text-primary font-semibold"
             >
-              <item.icon className={`h-4 w-4 shrink-0 ${active ? "text-primary" : shouldGlow ? "text-destructive" : "text-muted-foreground"}`} />
+              <item.icon className={`h-4 w-4 shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`} />
               {!collapsed && <span className="truncate">{item.title}</span>}
               {shouldGlow && !collapsed && (
-                <span className="ml-auto flex items-center gap-1">
-                  <span className="relative flex h-2.5 w-2.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive/60" />
-                    <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-destructive" />
-                  </span>
-                  <span className="text-[10px] font-bold text-destructive">{jobStats?.newRequests}</span>
+                <span className="ml-auto flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-primary/15 px-1">
+                  <span className="text-[10px] font-semibold text-primary">{jobStats?.newRequests}</span>
                 </span>
               )}
               {shouldGlow && collapsed && (
-                <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive/60" />
-                  <span className="relative inline-flex h-3 w-3 rounded-full bg-destructive" />
+                <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
                 </span>
               )}
             </NavLink>
