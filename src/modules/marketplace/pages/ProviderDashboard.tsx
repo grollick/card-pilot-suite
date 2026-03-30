@@ -135,7 +135,7 @@ export default function ProviderDashboard() {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 divide-x divide-border">
           {[
-            { label: "Profile Views", value: metrics?.profile_views_30d ?? "—", icon: Eye },
+            { label: "Profile Views", value: "—", icon: Eye },
             { label: "Leads Received", value: summary?.new_leads ?? metrics?.lead_count_30d ?? "—", icon: Users },
             { label: "Bookings", value: summary?.pending_bookings ?? metrics?.booking_count_30d ?? "—", icon: CalendarCheck },
             { label: "Avg. Rating", value: metrics?.avg_rating != null ? Number(metrics.avg_rating).toFixed(1) : "—", icon: Star },
