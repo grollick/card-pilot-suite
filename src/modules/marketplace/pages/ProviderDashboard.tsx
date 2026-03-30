@@ -248,6 +248,9 @@ export default function ProviderDashboard() {
         </div>
       </div>
 
+      {/* AI Profile Optimization */}
+      <ProfileOptimizePanel />
+
       {/* Categories */}
       <div className="rounded-xl border border-border bg-card p-5">
         <h2 className="font-semibold text-foreground mb-3">Business Categories</h2>
