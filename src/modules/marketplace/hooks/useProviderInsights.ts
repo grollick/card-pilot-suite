@@ -2,6 +2,26 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+export interface AIUsageData {
+  used: number;
+  limit: number;
+  plan: string;
+  features: {
+    follow_up: boolean;
+    profile_rewrite: boolean;
+    advanced_growth: boolean;
+  };
+}
+
+export interface AIErrorResponse {
+  error: "ai_limit_reached" | "feature_locked";
+  used?: number;
+  limit?: number;
+  plan?: string;
+  feature?: string;
+  required_plan?: string;
+}
+
 export interface AISuggestion {
   type: "lead_reply" | "follow_up" | "review_request" | "profile_improve" | "booking_confirm";
   title: string;
