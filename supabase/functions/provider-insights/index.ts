@@ -123,6 +123,58 @@ serve(async (req) => {
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    // ─── GET ROI METRICS ───
+    if (action === "get_roi") {
+      if (!businessId) {
+        return new Response(JSON.stringify({ result: null }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { data: roi } = await supabase
+        .from("ai_roi_metrics")
+        .select("*")
+        .eq("business_id", businessId)
+        .maybeSingle();
+
+      // Estimate revenue: use avg service price or default $150
+      let avgJobValue = 150;
+      const { data: services } = await supabase
+        .from("services")
+        .select("price_amount")
+        .eq("business_id", businessId)
+        .eq("is_active", true)
+        .not("price_amount", "is", null);
+      
+      if (services && services.length > 0) {
+        const total = services.reduce((sum: number, s: any) => sum + (s.price_amount || 0), 0);
+        avgJobValue = Math.round(total / services.length) || 150;
+      }
+
+      const estimatedRevenue = (roi?.ai_assisted_bookings || 0) * avgJobValue;
+      const estimatedRevenueMonth = (roi?.ai_assisted_bookings_month || 0) * avgJobValue;
+
+      return new Response(JSON.stringify({
+        result: {
+          ...(roi || {
+            total_ai_generations: 0,
+            total_ai_generations_month: 0,
+            ai_assisted_leads: 0,
+            ai_assisted_leads_month: 0,
+            ai_assisted_bookings: 0,
+            ai_assisted_bookings_month: 0,
+            ai_assisted_leads_prev_month: 0,
+            ai_assisted_bookings_prev_month: 0,
+            conversion_rate: 0,
+            conversion_rate_month: 0,
+          }),
+          avg_job_value: avgJobValue,
+          estimated_revenue: estimatedRevenue,
+          estimated_revenue_month: estimatedRevenueMonth,
+        },
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     // ─── ENFORCEMENT: check limits before AI calls ───
     const AI_ACTIONS = ["insights", "lead_reply", "follow_up", "booking_confirm", "review_request", "profile_optimize"];
     if (AI_ACTIONS.includes(action) && businessId) {
