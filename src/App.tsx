@@ -125,6 +125,14 @@ const MarketplacePerformancePage = lazy(() => import("@/modules/marketplace/page
 const JobRequestsPage = lazy(() => import("@/modules/marketplace/pages/JobRequestsPage"));
 const RequestStatusPage = lazy(() => import("@/modules/public/pages/RequestStatusPage"));
 
+// Public Marketplace
+const MarketplaceHomePage = lazy(() => import("@/modules/marketplace/pages/MarketplaceHome"));
+const CategoryResultsPage = lazy(() => import("@/modules/marketplace/pages/CategoryResults"));
+const BusinessProfilePage = lazy(() => import("@/modules/marketplace/pages/BusinessProfile"));
+const BookingFlowPage = lazy(() => import("@/modules/marketplace/pages/BookingFlow"));
+const PostBookingPage = lazy(() => import("@/modules/marketplace/pages/PostBooking"));
+const ProviderDashboardPage = lazy(() => import("@/modules/marketplace/pages/ProviderDashboard"));
+
 // AI Assistant
 const AssistantPage = lazy(() => import("@/modules/assistant/pages/AssistantPage"));
 const AgencyDashboard = lazy(() => import("@/modules/agency/pages/AgencyDashboard"));
