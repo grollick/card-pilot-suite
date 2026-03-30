@@ -316,6 +316,9 @@ export default function FirstTimeDashboard() {
         </p>
       </motion.div>
 
+      {/* ─── SHARE CTA WIDGET ─── */}
+      <ShareCtaWidget views={0} onShare={() => setShareOpen(true)} />
+
       {/* ─── SECTION 5: SOFT UPGRADE PROMPT ─── */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -340,6 +343,14 @@ export default function FirstTimeDashboard() {
           </Button>
         </div>
       </motion.div>
+
+      {/* Share Modal */}
+      <ShareCardModal
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        businessName={MOCK_BUSINESS.name}
+        slug={MOCK_BUSINESS.slug}
+      />
     </div>
   );
 }
