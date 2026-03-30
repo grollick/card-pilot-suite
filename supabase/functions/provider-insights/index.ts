@@ -33,7 +33,7 @@ serve(async (req) => {
     }
 
     const { action, context } = body;
-    const NON_AI_ACTIONS = ["update_suggestion", "get_suggestions", "get_usage", "get_roi"];
+    const NON_AI_ACTIONS = ["update_suggestion", "get_suggestions", "get_usage", "get_roi", "get_lead_scores", "get_lead_score"];
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY && !NON_AI_ACTIONS.includes(action)) {
@@ -175,8 +175,45 @@ serve(async (req) => {
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    // ─── GET LEAD SCORES ───
+    if (action === "get_lead_scores") {
+      if (!businessId) {
+        return new Response(JSON.stringify({ result: [] }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { data: scores } = await supabase
+        .from("lead_scores")
+        .select("*, business_leads(full_name, email, phone, message, status, source, created_at)")
+        .eq("business_id", businessId)
+        .order("score", { ascending: false })
+        .limit(50);
+      return new Response(JSON.stringify({ result: scores || [] }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ─── GET SINGLE LEAD SCORE ───
+    if (action === "get_lead_score") {
+      const leadId = context?.leadId;
+      if (!leadId || !businessId) {
+        return new Response(JSON.stringify({ result: null }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { data: score } = await supabase
+        .from("lead_scores")
+        .select("*")
+        .eq("lead_id", leadId)
+        .eq("business_id", businessId)
+        .maybeSingle();
+      return new Response(JSON.stringify({ result: score }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // ─── ENFORCEMENT: check limits before AI calls ───
-    const AI_ACTIONS = ["insights", "lead_reply", "follow_up", "booking_confirm", "review_request", "profile_optimize"];
+    const AI_ACTIONS = ["insights", "lead_reply", "follow_up", "booking_confirm", "review_request", "profile_optimize", "score_lead"];
     if (AI_ACTIONS.includes(action) && businessId) {
       const monthStart = new Date();
       monthStart.setDate(1);
@@ -396,6 +433,38 @@ Leads last 30d: ${metrics?.lead_count_30d || 0}`;
         break;
       }
 
+      case "score_lead": {
+        const lead = context?.lead;
+        let leadData = lead;
+        if (lead?.lead_id && businessId) {
+          const { data: realLead } = await supabase
+            .from("copilot_lead_context")
+            .select("*")
+            .eq("lead_id", lead.lead_id)
+            .eq("business_id", businessId)
+            .maybeSingle();
+          if (realLead) leadData = realLead;
+        }
+
+        const ageHours = leadData?.created_at
+          ? Math.round((now - new Date(leadData.created_at).getTime()) / 3600000)
+          : null;
+
+        systemPrompt = `You are a lead scoring expert for a local service business called ${businessName}. Score this lead from 1-100 on how likely it is to convert into a booking. Consider: completeness of info (name, email, phone), urgency language, service match clarity, recency, contact details provided, location match, and message detail. Return JSON: { score: number (1-100), label: "High Intent" | "Medium Intent" | "Low Intent", explanation: string (1-2 sentences, plain language, explain why), recommended_action: string (practical next step), factors: { completeness: number (0-100), urgency: number (0-100), service_match: number (0-100), recency: number (0-100), contact_quality: number (0-100) } }. Label mapping: 80-100=High Intent, 50-79=Medium Intent, below 50=Low Intent.`;
+        userPrompt = `Lead details:
+- Name: ${leadData?.full_name || "Not provided"}
+- Email: ${leadData?.email || "Not provided"}
+- Phone: ${leadData?.phone || "Not provided"}
+- Message: "${leadData?.message || "No message"}"
+- Service requested: ${leadData?.service_title || "Not specified"}
+- Source: ${leadData?.source || "unknown"}
+- Received: ${leadData?.created_at || "unknown"}${ageHours !== null ? ` (${ageHours}h ago)` : ""}
+- Status: ${leadData?.status || "new"}
+- Our services: ${contextData.services?.map((s: any) => s.title).join(", ") || "Various services"}
+- Our location: ${business?.location_city || "Unknown"}`;
+        break;
+      }
+
       default:
         return new Response(JSON.stringify({ error: "Unknown action" }), {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -489,9 +558,25 @@ Leads last 30d: ${metrics?.lead_count_30d || 0}`;
       supabase.from("ai_assistant_suggestions").insert(rows).then(() => {});
     }
 
+    // Save lead score to database
+    if (action === "score_lead" && result && !result.error && businessId && context?.lead?.lead_id) {
+      const score = Math.max(1, Math.min(100, result.score || 0));
+      const label = score >= 80 ? "High Intent" : score >= 50 ? "Medium Intent" : "Low Intent";
+      supabase.from("lead_scores").upsert({
+        lead_id: context.lead.lead_id,
+        business_id: businessId,
+        score,
+        label: result.label || label,
+        explanation: result.explanation || "",
+        recommended_action: result.recommended_action || "",
+        scoring_factors: result.factors || {},
+        updated_at: new Date().toISOString(),
+      }, { onConflict: "lead_id" }).then(() => {});
+    }
+
     // ─── LOG USAGE EVENT ───
     if (businessId && result && !result.error) {
-      const entityType = action === "lead_reply" || action === "follow_up" ? "lead"
+      const entityType = action === "lead_reply" || action === "follow_up" || action === "score_lead" ? "lead"
         : action === "booking_confirm" || action === "review_request" ? "booking"
         : action === "profile_optimize" ? "profile" : null;
       const entityId = context?.lead?.lead_id || context?.booking?.booking_id || null;

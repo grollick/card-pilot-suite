@@ -5,6 +5,7 @@ import { ReviewDashboard } from "../components/ReviewDashboard";
 import ProviderAIAssistant from "../components/ProviderAIAssistant";
 import AIInsightsPanel from "../components/AIInsightsPanel";
 import AIRoiPanel from "../components/AIRoiPanel";
+import HighIntentLeadsPanel from "../components/HighIntentLeadsPanel";
 import { ProfileOptimizePanel } from "../components/AIActionCards";
 import AIFeatureGate from "../components/AIFeatureGate";
 import { useAIUsage } from "../hooks/useProviderInsights";
@@ -120,6 +121,12 @@ export default function ProviderDashboard() {
 
       {/* AI ROI Panel */}
       <AIRoiPanel />
+
+      {/* High Intent Leads */}
+      <HighIntentLeadsPanel
+        onViewLead={(id) => toast.info(`View lead ${id}`)}
+        onReply={(id) => toast.info(`Reply to lead ${id}`)}
+      />
 
       {/* Performance Panel */}
       <div className="rounded-xl border border-border bg-card overflow-hidden">
