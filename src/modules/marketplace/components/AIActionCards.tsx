@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import {
   Bot, Copy, Check, Loader2, RefreshCw, AlertCircle,
-  Send, MessageSquare, Star, Calendar, Sparkles,
+  Send, MessageSquare, Star, Calendar, Sparkles, ImagePlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
