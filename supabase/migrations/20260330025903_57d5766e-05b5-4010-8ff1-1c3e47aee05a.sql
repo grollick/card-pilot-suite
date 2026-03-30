@@ -1,0 +1,1 @@
+ALTER VIEW public.copilot_lead_context SET (security_invoker = true);
