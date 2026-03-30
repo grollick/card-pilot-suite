@@ -16,13 +16,17 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Tip from "@/components/Tip";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfileCache } from "@/hooks/useProfileCache";
+import { useUnreadCount } from "@/modules/marketplace/hooks/useNotifications";
+import NotificationPanel from "@/modules/marketplace/components/NotificationPanel";
 
 export default function TopBar() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const { data: profile } = useProfileCache();
+  const unreadCount = useUnreadCount();
 
   const initials = profile?.name
     ? profile.name.split(" ").map((n: string) => n[0]).join("").slice(0, 2).toUpperCase()
@@ -101,9 +105,13 @@ export default function TopBar() {
 
         {/* Notifications */}
         <Tip label="Notifications">
-          <Button variant="ghost" size="icon" className="h-9 w-9 relative rounded-lg">
+          <Button variant="ghost" size="icon" className="h-9 w-9 relative rounded-lg" onClick={() => setNotifOpen(true)}>
             <Bell className="h-4 w-4" />
-            <span className="absolute top-2 right-2 h-1.5 w-1.5 rounded-full bg-destructive ring-2 ring-card" />
+            {unreadCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 h-4 min-w-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold flex items-center justify-center ring-2 ring-card">
+                {unreadCount > 9 ? "9+" : unreadCount}
+              </span>
+            )}
           </Button>
         </Tip>
 
@@ -120,6 +128,7 @@ export default function TopBar() {
           </button>
         </Tip>
       </header>
+      <NotificationPanel open={notifOpen} onClose={() => setNotifOpen(false)} />
     </TooltipProvider>
   );
 }
