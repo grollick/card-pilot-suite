@@ -268,6 +268,9 @@ export default function ProviderDashboard() {
         </div>
       </div>
 
+      {/* Auto-Reply Settings */}
+      <AutoReplySettings />
+
       {/* AI Profile Optimization */}
       <AIFeatureGate feature="profile_rewrite" enabled={aiUsage?.features?.profile_rewrite}>
         <ProfileOptimizePanel />
