@@ -21,16 +21,7 @@ import { useNavigate } from "react-router-dom";
 import BoostCampaignPanel from "../components/BoostCampaignPanel";
 import PlanLimitModal from "../components/PlanLimitModal";
 import { useBusinessPlanStatus, type LimitKind } from "../hooks/useBusinessPlanStatus";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { Switch } from "@/components/ui/switch";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
-import BoostCampaignPanel from "../components/BoostCampaignPanel";
-import PlanLimitModal from "../components/PlanLimitModal";
-import { useBusinessPlanStatus, type LimitKind } from "../hooks/useBusinessPlanStatus";
+
 
 const MOCK_SERVICES = [
   { id: "1", title: "Spring Cleanup", price: 250, active: true },
