@@ -149,6 +149,71 @@ export default function AutoReplySettings() {
           </Select>
         </div>
 
+        {/* SMS Section Divider */}
+        <div className="pt-2 border-t border-border">
+          <div className="flex items-center gap-2 mb-3">
+            <Phone className="h-4 w-4 text-primary" />
+            <span className="text-sm font-semibold text-foreground">SMS Communication</span>
+            <Badge variant="outline" className="text-[10px]">Coming Soon</Badge>
+          </div>
+        </div>
+
+        {/* SMS enabled */}
+        <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10">
+              <MessageSquare className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <Label className="text-sm font-medium">Enable SMS messaging</Label>
+              <p className="text-xs text-muted-foreground">Text leads and customers directly</p>
+            </div>
+          </div>
+          <Switch checked={settings.sms_enabled} onCheckedChange={(v) => update("sms_enabled" as any, v)} />
+        </div>
+
+        {/* SMS review before send */}
+        <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-success/10">
+              <Shield className="h-4 w-4 text-success" />
+            </div>
+            <div>
+              <Label className="text-sm font-medium">Review SMS before sending</Label>
+              <p className="text-xs text-muted-foreground">Always preview text messages first</p>
+            </div>
+          </div>
+          <Switch checked={settings.sms_review_before_send} onCheckedChange={(v) => update("sms_review_before_send" as any, v)} />
+        </div>
+
+        {/* Auto follow-up SMS */}
+        <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-warning/10">
+              <Zap className="h-4 w-4 text-warning" />
+            </div>
+            <div>
+              <Label className="text-sm font-medium">Auto follow-up SMS</Label>
+              <p className="text-xs text-muted-foreground">Send follow-up texts when leads go quiet</p>
+            </div>
+          </div>
+          <Switch checked={settings.auto_follow_up_sms_enabled} onCheckedChange={(v) => update("auto_follow_up_sms_enabled" as any, v)} />
+        </div>
+
+        {/* Booking reminder SMS */}
+        <div className="flex items-center justify-between p-3 rounded-lg border border-border">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-muted">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+            </div>
+            <div>
+              <Label className="text-sm font-medium">Booking reminder SMS</Label>
+              <p className="text-xs text-muted-foreground">Send reminders before upcoming bookings</p>
+            </div>
+          </div>
+          <Switch checked={settings.booking_reminder_sms_enabled} onCheckedChange={(v) => update("booking_reminder_sms_enabled" as any, v)} />
+        </div>
+
         {/* Safety note */}
         <div className="p-3 rounded-lg bg-muted/50 border border-border">
           <div className="flex items-center gap-2 mb-1">
@@ -160,6 +225,7 @@ export default function AutoReplySettings() {
             <li>Never confirms exact availability</li>
             <li>Falls back to draft if confidence is low</li>
             <li>Skips auto-send when required info is missing</li>
+            <li>SMS is never sent without a valid phone number</li>
           </ul>
         </div>
 
