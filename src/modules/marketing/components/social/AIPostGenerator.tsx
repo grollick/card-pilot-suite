@@ -73,21 +73,25 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
   const shuffleImage = async (idx: number) => {
     const idea = ideas[idx];
     if (!idea) return;
-
+    setRegeneratingIdx(idx);
     try {
-      const { data, error } = await supabase.functions.invoke("generate-post-ideas", {
-        body: { platforms, topic: idea.title, count: 1 },
+      const { data, error } = await supabase.functions.invoke("regenerate-post-image", {
+        body: {
+          image_description: idea.image_description || idea.image_query || idea.title,
+          image_query: idea.image_query,
+          post_style: idea.style,
+          post_title: idea.title,
+        },
       });
-      if (error) throw error;
-      const nextIdea = data?.posts?.[0];
-      if (!nextIdea?.image_url) throw new Error("No replacement image returned");
-
-      setIdeas(prev => prev.map((currentIdea, i) => (
-        i === idx ? { ...currentIdea, image_url: nextIdea.image_url, image_query: nextIdea.image_query || currentIdea.image_query } : currentIdea
-      )));
-      toast.success("New image loaded!");
+      if (error || !data?.image_url) throw new Error(data?.error || "No image returned");
+      setIdeas(prev => prev.map((currentIdea, i) =>
+        i === idx ? { ...currentIdea, image_url: data.image_url } : currentIdea
+      ));
+      toast.success("New AI image generated!");
     } catch (err: any) {
-      toast.error(err.message || "Couldn't load a new image");
+      toast.error(err.message || "Couldn't generate a new image");
+    } finally {
+      setRegeneratingIdx(null);
     }
   };
 
