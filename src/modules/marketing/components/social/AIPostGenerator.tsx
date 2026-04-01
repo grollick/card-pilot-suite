@@ -138,7 +138,7 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
                       className="w-full h-full object-cover"
                       loading="lazy"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${encodeURIComponent(idea.image_query)}/800/600`;
+                        (e.target as HTMLImageElement).src = `https://source.unsplash.com/800x600/?${encodeURIComponent(idea.image_query)}`;
                       }}
                     />
                     <Badge className={cn("absolute top-1.5 left-1.5 text-[10px] border", style.color)}>
