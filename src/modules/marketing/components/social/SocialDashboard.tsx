@@ -352,7 +352,7 @@ export default function SocialDashboard() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = `https://picsum.photos/seed/${encodeURIComponent(idea.image_query || idx.toString())}/800/600`;
+                      (e.target as HTMLImageElement).src = `https://source.unsplash.com/800x600/?${encodeURIComponent(idea.image_query || idea.title || 'professional service')}`;
                     }}
                   />
                   <Badge className="absolute top-2 left-2 text-[10px] bg-background/80 backdrop-blur-sm text-foreground border-border">

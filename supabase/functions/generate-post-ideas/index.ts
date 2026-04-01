@@ -156,12 +156,12 @@ For each post, also suggest a specific stock photo search query that would pair 
 
     const result = JSON.parse(toolCall.function.arguments);
 
-    // Attach image URLs
+    // Attach profession-relevant image URLs using Unsplash source
     if (result.posts) {
       for (let i = 0; i < result.posts.length; i++) {
         const post = result.posts[i];
-        const seed = encodeURIComponent(post.image_query).slice(0, 50) + i;
-        post.image_url = `https://picsum.photos/seed/${seed}/800/600`;
+        const query = encodeURIComponent(post.image_query || `${professionName} ${professionCategory}`);
+        post.image_url = `https://source.unsplash.com/800x600/?${query}`;
       }
     }
 
