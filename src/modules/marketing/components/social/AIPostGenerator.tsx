@@ -69,13 +69,25 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
     toast.success("Post added! You can edit it before saving.");
   };
 
-  const shuffleImage = (idx: number) => {
-    setIdeas(prev => prev.map((idea, i) => {
-      if (i !== idx) return idea;
-      const tagQuery = (idea.image_query || "professional service").toLowerCase().replace(/[^a-z0-9]+/g, ",").replace(/^,+|,+$/g, "") || "professional,service";
-      return { ...idea, image_url: `https://loremflickr.com/800/600/${tagQuery}?lock=${Date.now()}` };
-    }));
-    toast.success("New image loaded!");
+  const shuffleImage = async (idx: number) => {
+    const idea = ideas[idx];
+    if (!idea) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-post-ideas", {
+        body: { platforms, topic: idea.title, count: 1 },
+      });
+      if (error) throw error;
+      const nextIdea = data?.posts?.[0];
+      if (!nextIdea?.image_url) throw new Error("No replacement image returned");
+
+      setIdeas(prev => prev.map((currentIdea, i) => (
+        i === idx ? { ...currentIdea, image_url: nextIdea.image_url, image_query: nextIdea.image_query || currentIdea.image_query } : currentIdea
+      )));
+      toast.success("New image loaded!");
+    } catch (err: any) {
+      toast.error(err.message || "Couldn't load a new image");
+    }
   };
 
   return (
