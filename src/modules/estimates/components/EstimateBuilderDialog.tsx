@@ -64,8 +64,14 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
   const updateEstimate = useUpdateEstimate();
   const { planKey, profile } = usePlanLimits();
   const { data: presets = [] } = useEstimatePresets();
+  const { data: customTemplates = [] } = useCustomEstimateTemplates();
+  const createTemplate = useCreateEstimateTemplate();
+  const deleteTemplate = useDeleteEstimateTemplate();
 
   const allPresets = presets.length > 0 ? presets : DEFAULT_PRESETS as any[];
+
+  const [showSaveTemplate, setShowSaveTemplate] = useState(false);
+  const [newTemplateName, setNewTemplateName] = useState("");
 
   const [leadId, setLeadId] = useState("");
   const [bookingId] = useState(defaultBookingId ?? "");
