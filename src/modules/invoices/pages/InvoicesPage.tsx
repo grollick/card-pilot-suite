@@ -3,7 +3,7 @@ import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import { useNavigate } from "react-router-dom";
 import {
   Plus, Loader2, FileText, Send, Eye, CheckCircle, AlertTriangle,
-  MoreHorizontal, Trash2, Download, Search, DollarSign,
+  MoreHorizontal, Trash2, Download, Search, DollarSign, FileInput,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,7 @@ import DocumentStatusBadge from "@/components/DocumentStatusBadge";
 import UpgradePrompt from "@/components/UpgradePrompt";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Sparkles } from "lucide-react";
+import CreateInvoiceFromEstimateDialog from "../components/CreateInvoiceFromEstimateDialog";
 
 const STATUS_TABS: Array<{ value: string; label: string; icon: any }> = [
   { value: "all", label: "All", icon: FileText },
