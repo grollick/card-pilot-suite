@@ -69,13 +69,25 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
     toast.success("Post added! You can edit it before saving.");
   };
 
-  const shuffleImage = (idx: number) => {
-    setIdeas(prev => prev.map((idea, i) => {
-      if (i !== idx) return idea;
-      const tagQuery = (idea.image_query || "professional service").toLowerCase().replace(/[^a-z0-9]+/g, ",").replace(/^,+|,+$/g, "") || "professional,service";
-      return { ...idea, image_url: `https://loremflickr.com/800/600/${tagQuery}?lock=${Date.now()}` };
-    }));
-    toast.success("New image loaded!");
+  const shuffleImage = async (idx: number) => {
+    const idea = ideas[idx];
+    if (!idea) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-post-ideas", {
+        body: { platforms, topic: idea.title, count: 1 },
+      });
+      if (error) throw error;
+      const nextIdea = data?.posts?.[0];
+      if (!nextIdea?.image_url) throw new Error("No replacement image returned");
+
+      setIdeas(prev => prev.map((currentIdea, i) => (
+        i === idx ? { ...currentIdea, image_url: nextIdea.image_url, image_query: nextIdea.image_query || currentIdea.image_query } : currentIdea
+      )));
+      toast.success("New image loaded!");
+    } catch (err: any) {
+      toast.error(err.message || "Couldn't load a new image");
+    }
   };
 
   return (
@@ -139,8 +151,7 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
                       className="w-full h-full object-cover"
                       loading="lazy"
                       onError={(e) => {
-                        const tagQuery = (idea.image_query || "professional service").toLowerCase().replace(/[^a-z0-9]+/g, ",").replace(/^,+|,+$/g, "") || "professional,service";
-                        (e.target as HTMLImageElement).src = `https://loremflickr.com/800/600/${tagQuery}`;
+                        (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 900'%3E%3Crect width='1200' height='900' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%236b7280' font-family='Arial,sans-serif' font-size='36'%3EImage unavailable%3C/text%3E%3C/svg%3E";
                       }}
                     />
                     <Badge className={cn("absolute top-1.5 left-1.5 text-[10px] border", style.color)}>

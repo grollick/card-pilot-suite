@@ -19,7 +19,7 @@ function InstagramPreview({ content, hashtags, imageUrl }: { content: string; ha
       </div>
       <div className="h-32 bg-muted flex items-center justify-center overflow-hidden">
         {imageUrl ? (
-          <img src={imageUrl} alt="Post" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = `https://loremflickr.com/800/600/professional,service`; }} />
+          <img src={imageUrl} alt="Post" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 900'%3E%3Crect width='1200' height='900' fill='%23f3f4f6'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%236b7280' font-family='Arial,sans-serif' font-size='36'%3EImage unavailable%3C/text%3E%3C/svg%3E"; }} />
         ) : (
           <span className="text-xs text-muted-foreground">Image preview</span>
         )}

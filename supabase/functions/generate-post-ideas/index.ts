@@ -7,6 +7,120 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const IMAGE_MODELS = [
+  "google/gemini-3.1-flash-image-preview",
+  "google/gemini-3-pro-image-preview",
+];
+
+function extractImageUrl(choice: any): string | undefined {
+  if (choice?.content && Array.isArray(choice.content)) {
+    for (const part of choice.content) {
+      if (part?.type === "image_url" && part.image_url?.url) {
+        return part.image_url.url;
+      }
+      if (part?.inline_data?.data) {
+        return `data:${part.inline_data.mime_type || "image/png"};base64,${part.inline_data.data}`;
+      }
+    }
+  }
+
+  if (choice?.images?.[0]) {
+    const img = choice.images[0];
+    return img.image_url?.url || img.url || (img.data ? `data:image/png;base64,${img.data}` : undefined);
+  }
+
+  return undefined;
+}
+
+function sanitizeTagQuery(parts: Array<string | undefined | null>) {
+  return parts
+    .join(" ")
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean)
+    .slice(0, 6)
+    .join(",") || "professional,business";
+}
+
+function buildFallbackImageUrl(parts: Array<string | undefined | null>, index: number) {
+  const tagQuery = sanitizeTagQuery(parts);
+  return `https://loremflickr.com/1200/900/${tagQuery}?lock=${Date.now()}-${index}-${crypto.randomUUID()}`;
+}
+
+async function generateBusinessImage({
+  LOVABLE_API_KEY,
+  businessName,
+  professionName,
+  locationLabel,
+  businessDescription,
+  servicesList,
+  post,
+  index,
+  total,
+}: {
+  LOVABLE_API_KEY: string;
+  businessName: string;
+  professionName: string;
+  locationLabel: string;
+  businessDescription: string;
+  servicesList: string[];
+  post: any;
+  index: number;
+  total: number;
+}) {
+  const serviceSnippet = servicesList.length
+    ? `Core offers: ${servicesList.slice(0, 4).join(", ")}.`
+    : "";
+
+  const prompt = [
+    `Create a photorealistic social media marketing image for ${businessName}.`,
+    `${businessName} is a ${professionName}${locationLabel ? ` based in ${locationLabel}` : ""}.`,
+    businessDescription ? `Business context: ${businessDescription}` : "",
+    serviceSnippet,
+    `This image is variation ${index + 1} of ${total}, so it must look visually distinct from the other images in the batch.`,
+    `Post style: ${post.style}.`,
+    `Image concept: ${post.image_description || post.image_query || post.title}.`,
+    `Match the actual business context; do not default to construction, hard hats, or trade imagery unless the business context clearly supports it.`,
+    `Avoid generic stock-photo poses. No text, no logos, no watermarks, no UI screenshots, no split panels. Landscape composition for a social media tile.`,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  for (const model of IMAGE_MODELS) {
+    try {
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: "user", content: prompt }],
+          modalities: ["image", "text"],
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.error(`Image generation failed for ${model}:`, response.status, text);
+        continue;
+      }
+
+      const result = await response.json();
+      const imageUrl = extractImageUrl(result.choices?.[0]?.message);
+      if (imageUrl) return imageUrl;
+    } catch (error) {
+      console.error(`Image generation error for ${model}:`, error);
+    }
+  }
+
+  return buildFallbackImageUrl(
+    [businessName, professionName, post.style, post.image_query, post.title],
+    index,
+  );
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -20,16 +134,24 @@ serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const { data: { user }, error: authError } = await sb.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await sb.auth.getUser();
     if (authError || !user) throw new Error("Unauthorized");
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Fetch profile AND services in parallel
-    const [profileResult, servicesResult] = await Promise.all([
+    const requestBody = await req.json().catch(() => ({}));
+    const platforms = Array.isArray(requestBody?.platforms) ? requestBody.platforms : ["Instagram", "Facebook"];
+    const topic = typeof requestBody?.topic === "string" ? requestBody.topic.trim() : "";
+    const count = typeof requestBody?.count === "number" ? requestBody.count : 4;
+    const postCount = Math.min(Math.max(count || 4, 1), 6);
+
+    const [profileResult, servicesResult, businessResult] = await Promise.all([
       sb.from("profiles")
-        .select("name, company, city, profession_id, professions(name, category)")
+        .select("name, company, city, bio, profession_id, professions(name, category)")
         .eq("id", user.id)
         .single(),
       sb.from("booking_services")
@@ -37,53 +159,70 @@ serve(async (req) => {
         .eq("user_id", user.id)
         .eq("active", true)
         .limit(10),
+      sb.from("businesses")
+        .select("business_name, description, location_city, location_region, slug")
+        .eq("owner_user_id", user.id)
+        .maybeSingle(),
     ]);
 
     const profile = profileResult.data as any;
     const services = servicesResult.data ?? [];
+    const business = businessResult.data as any;
 
     const professionName = profile?.professions?.name ?? "service professional";
     const professionCategory = profile?.professions?.category ?? "general";
-    const city = profile?.city ?? "";
-    const company = profile?.company ?? "";
-    const userName = profile?.name ?? "";
+    const userName = profile?.name?.trim() ?? "";
+    const businessName = business?.business_name?.trim() || profile?.company?.trim() || userName || professionName;
+    const locationCity = business?.location_city?.trim() || profile?.city?.trim() || "";
+    const locationRegion = business?.location_region?.trim() || "";
+    const locationLabel = [locationCity, locationRegion].filter(Boolean).join(", ");
+    const businessDescription = business?.description?.trim() || profile?.bio?.trim() || "";
 
-    // Build services context
-    const servicesList = services.map((s: any) => {
-      let line = s.name;
-      if (s.price) line += ` ($${s.price})`;
-      if (s.description) line += ` — ${s.description}`;
-      return line;
-    });
+    const servicesList = services.map((service: any) => {
+      const parts = [service.name?.trim()];
+      if (service.price) parts.push(`$${service.price}`);
+      if (service.description) parts.push(service.description.trim());
+      return parts.filter(Boolean).join(" — ");
+    }).filter(Boolean);
+
     const servicesContext = servicesList.length > 0
-      ? `\nServices offered:\n${servicesList.map((s: string) => `• ${s}`).join("\n")}`
-      : "";
+      ? `\nActual services offered:\n${servicesList.map((service: string) => `• ${service}`).join("\n")}`
+      : "\nNo service list is available, so stay close to the company/profession context without inventing technical offers.";
 
-    const { platforms, topic, count } = await req.json();
-    const postCount = Math.min(count || 4, 6);
-
-    const systemPrompt = `You are a social media marketing expert specializing in content for ${professionName}s (${professionCategory} industry).
-You create highly engaging, platform-optimized social media posts.
-Business: ${company || "a local " + professionName}${userName ? ` run by ${userName}` : ""} ${city ? "in " + city : ""}.${servicesContext}
+    const systemPrompt = `You are a social media strategist creating posts for a real business, not generic template content.
+Business name: ${businessName}
+Owner/founder: ${userName || "not specified"}
+Profession: ${professionName}
+Industry category: ${professionCategory}
+Location: ${locationLabel || "not specified"}
+Business description: ${businessDescription || "not provided"}${servicesContext}
 
 CRITICAL RULES:
-- Every post MUST directly relate to this specific ${professionName} business and their actual services
-- Reference real services, pricing, and location when relevant
-- Use trade-specific terminology and scenarios
-- Sound authentic and personal, NOT generic or templated
-- Include the city/area name when it makes sense for local marketing`;
+- Every post must be clearly about this exact business.
+- Keep the content grounded in the provided business context.
+- Do not default to contractor, home service, or blue-collar imagery unless the business context explicitly supports it.
+- If this is a software, consulting, coaching, marketing, or platform business, reflect that directly.
+- Use the company name naturally where it helps the post feel specific.
+- Make each post angle noticeably different from the others.
+- Each image_query must describe a visually distinct scene that matches the post and the business.`;
 
-    const userPrompt = `Generate ${postCount} unique social media post ideas${topic ? ` about: "${topic}"` : ""} for this ${professionName} business.
-Target platforms: ${platforms?.join(", ") || "Instagram, Facebook"}.
+    const userPrompt = `Generate ${postCount} unique social media post ideas${topic ? ` about: "${topic}"` : ""} for ${businessName}.
+Target platforms: ${platforms.join(", ")}.
 
-Each post should have a completely different angle:
-1. A showcase/portfolio style post highlighting a specific service
-2. An educational tip or how-to related to their trade
-3. A promotional/offer post for one of their actual services
-4. A behind-the-scenes or personal/relatable post
-${postCount > 4 ? "5. A seasonal/timely post relevant to their trade\n6. A customer testimonial-style post" : ""}
+Required mix:
+1. Showcase/portfolio post
+2. Educational tip or insight post
+3. Promotional or offer-oriented post
+4. Personal, founder, or behind-the-scenes post
+${postCount > 4 ? "5. Timely or seasonal post\n6. Testimonial or proof post" : ""}
 
-For each post, also suggest a specific stock photo search query that would pair perfectly with it.`;
+For every post:
+- write a concise title
+- write a strong caption
+- include 5-8 hashtags
+- include a CTA
+- include an image_query for a stock or AI image search
+- include an image_description describing exactly what should be pictured`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -102,7 +241,7 @@ For each post, also suggest a specific stock photo search query that would pair 
             type: "function",
             function: {
               name: "generate_post_ideas",
-              description: `Generate ${postCount} social media post variations with image suggestions`,
+              description: `Generate ${postCount} business-specific social media post ideas with distinct image suggestions`,
               parameters: {
                 type: "object",
                 properties: {
@@ -111,12 +250,12 @@ For each post, also suggest a specific stock photo search query that would pair 
                     items: {
                       type: "object",
                       properties: {
-                        title: { type: "string", description: "Short label for this post idea (3-5 words)" },
+                        title: { type: "string", description: "Short label for this post idea (3-7 words)" },
                         caption: { type: "string", description: "Full post caption (2-4 sentences, engaging, under 300 chars)" },
                         hashtags: { type: "array", items: { type: "string" }, description: "5-8 relevant hashtags without #" },
                         cta: { type: "string", description: "Call-to-action line" },
-                        image_query: { type: "string", description: "Specific stock photo search query" },
-                        image_description: { type: "string", description: "What the ideal image should show" },
+                        image_query: { type: "string", description: "Specific image search query for this exact business post" },
+                        image_description: { type: "string", description: "Detailed description of what the ideal image should show" },
                         style: { type: "string", enum: ["showcase", "educational", "promotional", "personal"], description: "Post style category" },
                       },
                       required: ["title", "caption", "hashtags", "cta", "image_query", "image_description", "style"],
@@ -137,16 +276,18 @@ For each post, also suggest a specific stock photo search query that would pair 
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limited, please try again shortly." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "AI credits exhausted. Add credits in Settings." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
+      const text = await response.text();
+      console.error("AI gateway error:", response.status, text);
       throw new Error("AI generation failed");
     }
 
@@ -156,18 +297,30 @@ For each post, also suggest a specific stock photo search query that would pair 
 
     const result = JSON.parse(toolCall.function.arguments);
 
-    // Attach profession-relevant image URLs — each post gets a unique image
-    if (result.posts) {
-      for (let i = 0; i < result.posts.length; i++) {
-        const post = result.posts[i];
-        // Use the specific image_query per post (each is different) + a unique lock seed
-        const rawQuery = (post.image_query || `${professionName} ${post.style || professionCategory}`).toLowerCase();
-        const words = rawQuery.split(/[^a-z0-9]+/).filter(Boolean).slice(0, 3);
-        const tagQuery = words.join(",") || "professional,service";
-        // Use a large random lock value so each tile gets a distinct image
-        const lockSeed = i * 1000 + Math.floor(Math.random() * 999);
-        post.image_url = `https://loremflickr.com/800/600/${tagQuery}?lock=${lockSeed}`;
-      }
+    if (Array.isArray(result.posts) && result.posts.length > 0) {
+      const imageUrls = await Promise.all(
+        result.posts.map((post: any, index: number) =>
+          generateBusinessImage({
+            LOVABLE_API_KEY,
+            businessName,
+            professionName,
+            locationLabel,
+            businessDescription,
+            servicesList,
+            post,
+            index,
+            total: result.posts.length,
+          })
+        )
+      );
+
+      result.posts = result.posts.map((post: any, index: number) => ({
+        ...post,
+        image_url: imageUrls[index] || buildFallbackImageUrl(
+          [businessName, professionName, post.style, post.image_query, post.title],
+          index,
+        ),
+      }));
     }
 
     return new Response(JSON.stringify(result), {
