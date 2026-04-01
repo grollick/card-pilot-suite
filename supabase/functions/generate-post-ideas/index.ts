@@ -26,33 +26,62 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Get user's profession
-    const { data: profile } = await sb
-      .from("profiles")
-      .select("name, company, city, profession_id, professions(name, category)")
-      .eq("id", user.id)
-      .single();
+    // Fetch profile AND services in parallel
+    const [profileResult, servicesResult] = await Promise.all([
+      sb.from("profiles")
+        .select("name, company, city, profession_id, professions(name, category)")
+        .eq("id", user.id)
+        .single(),
+      sb.from("booking_services")
+        .select("name, description, price")
+        .eq("user_id", user.id)
+        .eq("active", true)
+        .limit(10),
+    ]);
 
-    const professionName = (profile as any)?.professions?.name ?? "service professional";
-    const professionCategory = (profile as any)?.professions?.category ?? "general";
-    const city = (profile as any)?.city ?? "";
-    const company = (profile as any)?.company ?? "";
+    const profile = profileResult.data as any;
+    const services = servicesResult.data ?? [];
 
-    const { platforms, topic } = await req.json();
+    const professionName = profile?.professions?.name ?? "service professional";
+    const professionCategory = profile?.professions?.category ?? "general";
+    const city = profile?.city ?? "";
+    const company = profile?.company ?? "";
+    const userName = profile?.name ?? "";
+
+    // Build services context
+    const servicesList = services.map((s: any) => {
+      let line = s.name;
+      if (s.price) line += ` ($${s.price})`;
+      if (s.description) line += ` — ${s.description}`;
+      return line;
+    });
+    const servicesContext = servicesList.length > 0
+      ? `\nServices offered:\n${servicesList.map((s: string) => `• ${s}`).join("\n")}`
+      : "";
+
+    const { platforms, topic, count } = await req.json();
+    const postCount = Math.min(count || 4, 6);
 
     const systemPrompt = `You are a social media marketing expert specializing in content for ${professionName}s (${professionCategory} industry).
 You create highly engaging, platform-optimized social media posts.
-Business: ${company || "a local " + professionName} ${city ? "in " + city : ""}.
-Be specific to the trade. Use industry terminology. Sound authentic, not generic.`;
+Business: ${company || "a local " + professionName}${userName ? ` run by ${userName}` : ""} ${city ? "in " + city : ""}.${servicesContext}
 
-    const userPrompt = `Generate 4 unique social media post ideas${topic ? ` about: "${topic}"` : ""} for a ${professionName}.
+CRITICAL RULES:
+- Every post MUST directly relate to this specific ${professionName} business and their actual services
+- Reference real services, pricing, and location when relevant
+- Use trade-specific terminology and scenarios
+- Sound authentic and personal, NOT generic or templated
+- Include the city/area name when it makes sense for local marketing`;
+
+    const userPrompt = `Generate ${postCount} unique social media post ideas${topic ? ` about: "${topic}"` : ""} for this ${professionName} business.
 Target platforms: ${platforms?.join(", ") || "Instagram, Facebook"}.
 
-Each post should have a completely different angle/approach:
-1. A showcase/portfolio style post
-2. An educational tip or how-to
-3. A promotional/offer post  
+Each post should have a completely different angle:
+1. A showcase/portfolio style post highlighting a specific service
+2. An educational tip or how-to related to their trade
+3. A promotional/offer post for one of their actual services
 4. A behind-the-scenes or personal/relatable post
+${postCount > 4 ? "5. A seasonal/timely post relevant to their trade\n6. A customer testimonial-style post" : ""}
 
 For each post, also suggest a specific stock photo search query that would pair perfectly with it.`;
 
@@ -73,7 +102,7 @@ For each post, also suggest a specific stock photo search query that would pair 
             type: "function",
             function: {
               name: "generate_post_ideas",
-              description: "Generate 4 social media post variations with image suggestions",
+              description: `Generate ${postCount} social media post variations with image suggestions`,
               parameters: {
                 type: "object",
                 properties: {
@@ -108,14 +137,12 @@ For each post, also suggest a specific stock photo search query that would pair 
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limited, please try again shortly." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "AI credits exhausted. Add credits in Settings." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const t = await response.text();
@@ -129,7 +156,7 @@ For each post, also suggest a specific stock photo search query that would pair 
 
     const result = JSON.parse(toolCall.function.arguments);
 
-    // Attach image URLs using picsum.photos (reliable, no API key)
+    // Attach image URLs
     if (result.posts) {
       for (let i = 0; i < result.posts.length; i++) {
         const post = result.posts[i];
@@ -144,7 +171,7 @@ For each post, also suggest a specific stock photo search query that would pair 
   } catch (e) {
     console.error("generate-post-ideas error:", e);
     return new Response(
-      JSON.stringify({ error: "Internal server error" }),
+      JSON.stringify({ error: e instanceof Error ? e.message : "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
