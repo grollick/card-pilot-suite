@@ -466,8 +466,8 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
                       size="sm"
                       className="h-7 text-[10px]"
                       onClick={() => {
-                        const seed = `change-${Date.now()}`;
-                        setImageUrl(`https://picsum.photos/seed/${seed}/800/600`);
+                        const q = content.split(/\s+/).slice(0, 3).join(" ") || "professional service";
+                        setImageUrl(`https://source.unsplash.com/800x600/?${encodeURIComponent(q)}&sig=${Date.now()}`);
                         toast.success("New image loaded!");
                       }}
                     >
