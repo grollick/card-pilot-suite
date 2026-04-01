@@ -3736,6 +3736,36 @@ export type Database = {
           },
         ]
       }
+      estimate_templates: {
+        Row: {
+          created_at: string
+          default_job_type: string
+          id: string
+          name: string
+          sections_json: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          default_job_type?: string
+          id?: string
+          name: string
+          sections_json?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          default_job_type?: string
+          id?: string
+          name?: string
+          sections_json?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       estimates: {
         Row: {
           approved_at: string | null
