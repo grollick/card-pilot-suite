@@ -191,6 +191,16 @@ export default function GrowthDashboard() {
               onClick={() => window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(cardUrl)}`, "_blank")}>
               Share to LinkedIn
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              disabled={nfcWriting || !cardUrl}
+              onClick={handleProgramNfc}
+            >
+              {nfcWriting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Nfc className="h-3.5 w-3.5" />}
+              {nfcWriting ? "Hold NFC tag near..." : "Program NFC Card"}
+            </Button>
           </div>
         </div>
       </motion.div>
