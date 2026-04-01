@@ -116,7 +116,8 @@ export default function CardViewersPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {kpis.map((kpi, i) => (
           <motion.div key={kpi.label} {...anim} transition={{ delay: i * 0.05 }}
-            className="rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-card-hover transition-shadow"
+            onClick={() => navigate(kpi.path)}
+            className="rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-card-hover hover:ring-1 hover:ring-primary/20 transition-all cursor-pointer active:scale-[0.98]"
           >
             <div className="flex items-start justify-between">
               <div className="space-y-1.5">
