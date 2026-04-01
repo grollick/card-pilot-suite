@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  Eye, UserPlus, CalendarCheck, Gift, TrendingUp, ArrowUpRight, Share2, Copy, Check
+  Eye, UserPlus, CalendarCheck, Gift, TrendingUp, ArrowUpRight, Share2, Copy, Check, Nfc, Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
