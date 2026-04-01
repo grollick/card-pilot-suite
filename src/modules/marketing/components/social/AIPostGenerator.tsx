@@ -72,8 +72,7 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
   const shuffleImage = (idx: number) => {
     setIdeas(prev => prev.map((idea, i) => {
       if (i !== idx) return idea;
-      const seed = `${idea.image_query}-${Date.now()}`;
-      return { ...idea, image_url: `https://picsum.photos/seed/${encodeURIComponent(seed)}/800/600` };
+      return { ...idea, image_url: `https://source.unsplash.com/800x600/?${encodeURIComponent(idea.image_query)}&sig=${Date.now()}` };
     }));
     toast.success("New image loaded!");
   };
