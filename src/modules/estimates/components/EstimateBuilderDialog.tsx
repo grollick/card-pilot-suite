@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
-import { Plus, Trash2, Loader2, Download, ChevronDown, ChevronRight, Calculator, Bookmark, Sparkles } from "lucide-react";
+import { Plus, Trash2, Loader2, Download, ChevronDown, ChevronRight, Calculator, Bookmark, Sparkles, Save, X } from "lucide-react";
+import { useCustomEstimateTemplates, useCreateEstimateTemplate, useDeleteEstimateTemplate } from "@/hooks/useEstimateTemplates";
 import EstimateAssistantSheet from "./EstimateAssistantSheet";
 import EstimatePhotoUpload from "./EstimatePhotoUpload";
 import { Button } from "@/components/ui/button";
