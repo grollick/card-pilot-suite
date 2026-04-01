@@ -336,6 +336,12 @@ export default function InvoicesPage() {
         feature="invoice"
         currentPlan={planKey}
       />
+
+      <CreateInvoiceFromEstimateDialog
+        open={showFromEstimate}
+        onOpenChange={setShowFromEstimate}
+        onCreated={() => navigate("/app/invoices")}
+      />
     </div>
   );
 }
