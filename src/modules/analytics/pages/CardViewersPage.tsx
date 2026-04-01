@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
 import UpgradePrompt from "@/components/UpgradePrompt";
@@ -28,6 +29,7 @@ const deviceIcons: Record<string, typeof Monitor> = {
 const anim = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 } };
 
 export default function CardViewersPage() {
+  const navigate = useNavigate();
   const { planKey } = usePlanLimits();
   const isGated = planKey === "starter";
   const [showUpgrade, setShowUpgrade] = useState(false);
@@ -36,10 +38,10 @@ export default function CardViewersPage() {
   const stats = useViewerStats(days);
 
   const kpis = [
-    { label: "Total Views", value: stats.totalViews, icon: Eye, color: "text-primary bg-primary/10" },
-    { label: "Returning Visitors", value: stats.returningCount, icon: RotateCw, color: "text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10" },
-    { label: "Unique Visitors", value: stats.uniqueVisitors, icon: UserCheck, color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10" },
-    { label: "Unique Locations", value: stats.uniqueLocations, icon: MapPin, color: "text-accent-foreground bg-accent" },
+    { label: "Total Views", value: stats.totalViews, icon: Eye, color: "text-primary bg-primary/10", path: "/app/analytics" },
+    { label: "Returning Visitors", value: stats.returningCount, icon: RotateCw, color: "text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10", path: "/app/viewers" },
+    { label: "Unique Visitors", value: stats.uniqueVisitors, icon: UserCheck, color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10", path: "/app/analytics" },
+    { label: "Unique Locations", value: stats.uniqueLocations, icon: MapPin, color: "text-accent-foreground bg-accent", path: "/app/analytics" },
   ];
 
   if (isGated) {
@@ -114,7 +116,8 @@ export default function CardViewersPage() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {kpis.map((kpi, i) => (
           <motion.div key={kpi.label} {...anim} transition={{ delay: i * 0.05 }}
-            className="rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-card-hover transition-shadow"
+            onClick={() => navigate(kpi.path)}
+            className="rounded-xl border border-border bg-card p-5 shadow-card hover:shadow-card-hover hover:ring-1 hover:ring-primary/20 transition-all cursor-pointer active:scale-[0.98]"
           >
             <div className="flex items-start justify-between">
               <div className="space-y-1.5">
