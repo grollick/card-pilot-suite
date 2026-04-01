@@ -97,6 +97,13 @@ export default function GrowthDashboard() {
     { label: "Referrals Sent", value: data?.referralsSent ?? 0, trend: 0, icon: Gift, color: "text-accent", path: "/app/referrals" },
   ];
 
+  return (
+    <div className="space-y-6 max-w-5xl">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Growth Dashboard</span></h1>
+        <p className="text-muted-foreground text-sm mt-1">Track how your card drives leads, bookings, and referrals</p>
+      </div>
+
       {/* KPI Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {metrics.map((m, i) => (
