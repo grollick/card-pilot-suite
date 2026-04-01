@@ -3,14 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  Eye, UserPlus, CalendarCheck, Gift, TrendingUp, ArrowUpRight, Share2, Copy, Check
+  Eye, UserPlus, CalendarCheck, Gift, TrendingUp, ArrowUpRight, Share2, Copy, Check, Nfc, Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { subDays, startOfDay } from "date-fns";
 
 function useGrowthStats() {
@@ -79,9 +79,36 @@ export default function GrowthDashboard() {
   const { data, isLoading } = useGrowthStats();
   const [copiedCard, setCopiedCard] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
+  const [nfcWriting, setNfcWriting] = useState(false);
 
   const cardUrl = data?.handle ? `${window.location.origin}/${data.handle}` : "";
   const refLink = data?.referralCode ? `${window.location.origin}/auth?ref=${data.referralCode}` : "";
+
+  const supportsNfc = typeof window !== "undefined" && "NDEFReader" in window;
+
+  const handleProgramNfc = useCallback(async () => {
+    if (!cardUrl) return;
+    if (!supportsNfc) {
+      toast.error("Web NFC is only supported on Chrome for Android. Please use an Android device.");
+      return;
+    }
+    setNfcWriting(true);
+    try {
+      const ndef = new (window as any).NDEFReader();
+      await ndef.write({
+        records: [{ recordType: "url", data: cardUrl }],
+      });
+      toast.success("NFC card programmed! Tap it with any phone to open your card.");
+    } catch (err: any) {
+      if (err.name === "AbortError" || err.message?.includes("cancelled")) {
+        toast.info("NFC write cancelled.");
+      } else {
+        toast.error(err.message || "Failed to write NFC tag. Make sure NFC is enabled.");
+      }
+    } finally {
+      setNfcWriting(false);
+    }
+  }, [cardUrl, supportsNfc]);
 
   const copyUrl = (url: string, type: "card" | "ref") => {
     navigator.clipboard.writeText(url);
@@ -163,6 +190,16 @@ export default function GrowthDashboard() {
             <Button variant="outline" size="sm"
               onClick={() => window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(cardUrl)}`, "_blank")}>
               Share to LinkedIn
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5"
+              disabled={nfcWriting || !cardUrl}
+              onClick={handleProgramNfc}
+            >
+              {nfcWriting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Nfc className="h-3.5 w-3.5" />}
+              {nfcWriting ? "Hold NFC tag near..." : "Program NFC Card"}
             </Button>
           </div>
         </div>
