@@ -78,6 +78,7 @@ export default function SocialDashboard() {
   // AI suggestions
   const [suggestions, setSuggestions] = useState<PostIdea[]>([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  const [regeneratingImageIdx, setRegeneratingImageIdx] = useState<number | null>(null);
   const hasFetched = useRef(false);
 
   // Quick compose
@@ -384,6 +385,36 @@ export default function SocialDashboard() {
                   <Badge className="absolute top-2 left-2 text-[10px] bg-background/80 backdrop-blur-sm text-foreground border-border">
                     {STYLE_EMOJI[idea.style] || "📝"} {idea.style}
                   </Badge>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setRegeneratingImageIdx(idx);
+                      supabase.functions.invoke("regenerate-post-image", {
+                        body: {
+                          image_description: idea.image_query || idea.title,
+                          image_query: idea.image_query,
+                          post_style: idea.style,
+                          post_title: idea.title,
+                        },
+                      }).then(({ data, error }) => {
+                        if (error || !data?.image_url) {
+                          toast.error("Couldn't generate a new image. Try again.");
+                        } else {
+                          setSuggestions(prev => prev.map((s, i) => i === idx ? { ...s, image_url: data.image_url } : s));
+                          toast.success("New AI image generated!");
+                        }
+                      }).finally(() => setRegeneratingImageIdx(null));
+                    }}
+                    disabled={regeneratingImageIdx === idx}
+                    className="absolute bottom-2 right-2 flex items-center gap-1 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm text-[10px] font-medium text-foreground opacity-0 group-hover:opacity-100 transition-opacity hover:bg-background disabled:opacity-100"
+                    title="Generate a new AI image for this post"
+                  >
+                    {regeneratingImageIdx === idx ? (
+                      <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</>
+                    ) : (
+                      <><Wand2 className="h-3 w-3" /> AI Image</>
+                    )}
+                  </button>
                 </div>
                 <CardContent className="p-3 space-y-2">
                   <p className="text-sm font-semibold leading-tight line-clamp-1">{idea.title}</p>

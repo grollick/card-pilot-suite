@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Sparkles, Loader2, Check, RefreshCw, Wand2, ImageOff } from "lucide-react";
+import { Sparkles, Loader2, Check, RefreshCw, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -36,6 +36,7 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
   const [ideas, setIdeas] = useState<PostIdea[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [regeneratingIdx, setRegeneratingIdx] = useState<number | null>(null);
 
   const generate = async () => {
     setLoading(true);
@@ -72,21 +73,25 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
   const shuffleImage = async (idx: number) => {
     const idea = ideas[idx];
     if (!idea) return;
-
+    setRegeneratingIdx(idx);
     try {
-      const { data, error } = await supabase.functions.invoke("generate-post-ideas", {
-        body: { platforms, topic: idea.title, count: 1 },
+      const { data, error } = await supabase.functions.invoke("regenerate-post-image", {
+        body: {
+          image_description: idea.image_description || idea.image_query || idea.title,
+          image_query: idea.image_query,
+          post_style: idea.style,
+          post_title: idea.title,
+        },
       });
-      if (error) throw error;
-      const nextIdea = data?.posts?.[0];
-      if (!nextIdea?.image_url) throw new Error("No replacement image returned");
-
-      setIdeas(prev => prev.map((currentIdea, i) => (
-        i === idx ? { ...currentIdea, image_url: nextIdea.image_url, image_query: nextIdea.image_query || currentIdea.image_query } : currentIdea
-      )));
-      toast.success("New image loaded!");
+      if (error || !data?.image_url) throw new Error(data?.error || "No image returned");
+      setIdeas(prev => prev.map((currentIdea, i) =>
+        i === idx ? { ...currentIdea, image_url: data.image_url } : currentIdea
+      ));
+      toast.success("New AI image generated!");
     } catch (err: any) {
-      toast.error(err.message || "Couldn't load a new image");
+      toast.error(err.message || "Couldn't generate a new image");
+    } finally {
+      setRegeneratingIdx(null);
     }
   };
 
@@ -159,11 +164,15 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
                     </Badge>
                     <button
                       onClick={(e) => { e.stopPropagation(); shuffleImage(idx); }}
-                      className="absolute bottom-1.5 right-1.5 flex items-center gap-1 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm text-[10px] font-medium text-foreground opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-background"
-                      title="Get a different image"
+                      disabled={regeneratingIdx === idx}
+                      className="absolute bottom-1.5 right-1.5 flex items-center gap-1 px-2 py-1 rounded-md bg-background/80 backdrop-blur-sm text-[10px] font-medium text-foreground opacity-0 group-hover/img:opacity-100 transition-opacity hover:bg-background disabled:opacity-100"
+                      title="Generate a new AI image for this post"
                     >
-                      <ImageOff className="h-3 w-3" />
-                      New image
+                      {regeneratingIdx === idx ? (
+                        <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</>
+                      ) : (
+                        <><Wand2 className="h-3 w-3" /> AI Image</>
+                      )}
                     </button>
                   </div>
 
