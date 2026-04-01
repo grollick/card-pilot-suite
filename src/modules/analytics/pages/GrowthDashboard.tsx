@@ -91,10 +91,10 @@ export default function GrowthDashboard() {
   };
 
   const metrics = [
-    { label: "Card Views", value: data?.cardViews ?? 0, trend: data?.cardViewsTrend ?? 0, icon: Eye, color: "text-primary" },
-    { label: "Leads Generated", value: data?.leadsGenerated ?? 0, trend: data?.leadsTrend ?? 0, icon: UserPlus, color: "text-success" },
-    { label: "Bookings", value: data?.bookingsReceived ?? 0, trend: data?.bookingsTrend ?? 0, icon: CalendarCheck, color: "text-warning" },
-    { label: "Referrals Sent", value: data?.referralsSent ?? 0, trend: 0, icon: Gift, color: "text-accent" },
+    { label: "Card Views", value: data?.cardViews ?? 0, trend: data?.cardViewsTrend ?? 0, icon: Eye, color: "text-primary", path: "/app/analytics" },
+    { label: "Leads Generated", value: data?.leadsGenerated ?? 0, trend: data?.leadsTrend ?? 0, icon: UserPlus, color: "text-success", path: "/app/contacts" },
+    { label: "Bookings", value: data?.bookingsReceived ?? 0, trend: data?.bookingsTrend ?? 0, icon: CalendarCheck, color: "text-warning", path: "/app/bookings" },
+    { label: "Referrals Sent", value: data?.referralsSent ?? 0, trend: 0, icon: Gift, color: "text-accent", path: "/app/referrals" },
   ];
 
   return (
@@ -108,7 +108,8 @@ export default function GrowthDashboard() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {metrics.map((m, i) => (
           <motion.div key={m.label} {...fadeUp} transition={{ delay: i * 0.04 }}
-            className="dash-card p-5">
+            onClick={() => navigate(m.path)}
+            className="dash-card p-5 cursor-pointer hover:ring-1 hover:ring-primary/20 transition-all active:scale-[0.98]">
             <div className="flex items-center justify-between mb-3">
               <div className={`h-9 w-9 rounded-lg bg-muted/60 flex items-center justify-center`}>
                 <m.icon className={`h-4.5 w-4.5 ${m.color}`} />
