@@ -3,7 +3,7 @@ import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import { useNavigate } from "react-router-dom";
 import {
   Plus, Loader2, FileText, Send, Eye, CheckCircle, AlertTriangle,
-  MoreHorizontal, Trash2, Download, Search, DollarSign,
+  MoreHorizontal, Trash2, Download, Search, DollarSign, FileInput,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +24,7 @@ import DocumentStatusBadge from "@/components/DocumentStatusBadge";
 import UpgradePrompt from "@/components/UpgradePrompt";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Sparkles } from "lucide-react";
+import CreateInvoiceFromEstimateDialog from "../components/CreateInvoiceFromEstimateDialog";
 
 const STATUS_TABS: Array<{ value: string; label: string; icon: any }> = [
   { value: "all", label: "All", icon: FileText },
@@ -39,6 +40,7 @@ export default function InvoicesPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [showFromEstimate, setShowFromEstimate] = useState(false);
   const { data: invoices = [], isLoading } = useInvoices(statusFilter);
   const updateStatus = useUpdateInvoiceStatus();
   const deleteInvoice = useDeleteInvoice();
@@ -98,18 +100,26 @@ export default function InvoicesPage() {
             Manage billing and track payments
           </p>
         </div>
-        <Button
-          className="shadow-glow"
-          onClick={() => {
-            if (invoiceLimitReached) {
-              setShowUpgrade(true);
-            } else {
-              navigate("/app/invoices/new");
-            }
-          }}
-        >
-          <Plus className="h-4 w-4 mr-2" /> New Invoice
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowFromEstimate(true)}
+          >
+            <FileInput className="h-4 w-4 mr-2" /> From Estimate
+          </Button>
+          <Button
+            className="shadow-glow"
+            onClick={() => {
+              if (invoiceLimitReached) {
+                setShowUpgrade(true);
+              } else {
+                navigate("/app/invoices/new");
+              }
+            }}
+          >
+            <Plus className="h-4 w-4 mr-2" /> New Invoice
+          </Button>
+        </div>
       </motion.div>
 
       {/* KPI Cards */}
@@ -325,6 +335,12 @@ export default function InvoicesPage() {
         onOpenChange={setShowUpgrade}
         feature="invoice"
         currentPlan={planKey}
+      />
+
+      <CreateInvoiceFromEstimateDialog
+        open={showFromEstimate}
+        onOpenChange={setShowFromEstimate}
+        onCreated={() => navigate("/app/invoices")}
       />
     </div>
   );
