@@ -79,9 +79,36 @@ export default function GrowthDashboard() {
   const { data, isLoading } = useGrowthStats();
   const [copiedCard, setCopiedCard] = useState(false);
   const [copiedRef, setCopiedRef] = useState(false);
+  const [nfcWriting, setNfcWriting] = useState(false);
 
   const cardUrl = data?.handle ? `${window.location.origin}/${data.handle}` : "";
   const refLink = data?.referralCode ? `${window.location.origin}/auth?ref=${data.referralCode}` : "";
+
+  const supportsNfc = typeof window !== "undefined" && "NDEFReader" in window;
+
+  const handleProgramNfc = useCallback(async () => {
+    if (!cardUrl) return;
+    if (!supportsNfc) {
+      toast.error("Web NFC is only supported on Chrome for Android. Please use an Android device.");
+      return;
+    }
+    setNfcWriting(true);
+    try {
+      const ndef = new (window as any).NDEFReader();
+      await ndef.write({
+        records: [{ recordType: "url", data: cardUrl }],
+      });
+      toast.success("NFC card programmed! Tap it with any phone to open your card.");
+    } catch (err: any) {
+      if (err.name === "AbortError" || err.message?.includes("cancelled")) {
+        toast.info("NFC write cancelled.");
+      } else {
+        toast.error(err.message || "Failed to write NFC tag. Make sure NFC is enabled.");
+      }
+    } finally {
+      setNfcWriting(false);
+    }
+  }, [cardUrl, supportsNfc]);
 
   const copyUrl = (url: string, type: "card" | "ref") => {
     navigator.clipboard.writeText(url);
