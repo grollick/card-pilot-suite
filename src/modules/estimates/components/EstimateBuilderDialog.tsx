@@ -147,6 +147,7 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
 
   const handleTemplateChange = (key: string) => {
     setTemplateKey(key);
+    // Check built-in templates first
     const tpl = TRADES_TEMPLATES.find(t => t.key === key);
     if (tpl) {
       setJobType(tpl.defaultJobType);
@@ -154,7 +155,34 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
         _tempId: crypto.randomUUID(), name: sec.name, notes: "", sort_order: si,
         items: sec.items.map((li, i) => calculateLineTotals({ ...li, sort_order: i } as any)),
       })));
+      return;
     }
+    // Check custom templates
+    const custom = customTemplates.find(t => t.id === key);
+    if (custom) {
+      setJobType(custom.default_job_type);
+      const secs = (custom.sections_json as any[]) ?? [];
+      setSections(secs.map((sec: any, si: number) => ({
+        _tempId: crypto.randomUUID(), name: sec.name, notes: "", sort_order: si,
+        items: (sec.items ?? []).map((li: any, i: number) => calculateLineTotals({ ...li, sort_order: i } as any)),
+      })));
+    }
+  };
+
+  const handleSaveAsTemplate = async () => {
+    const name = newTemplateName.trim();
+    if (!name) return;
+    const sectionsData = sections.map(s => ({
+      name: s.name,
+      items: s.items.map(({ line_total, sort_order, ...rest }) => rest),
+    }));
+    await createTemplate.mutateAsync({
+      name,
+      default_job_type: jobType || "General",
+      sections_json: sectionsData,
+    });
+    setNewTemplateName("");
+    setShowSaveTemplate(false);
   };
 
   const updateLineItem = useCallback((sectionIdx: number, itemIdx: number, field: string, value: any) => {
