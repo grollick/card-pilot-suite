@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   Sparkles, Loader2, RefreshCw, ArrowRight, Send, Save, Clock, Hash,
   Image, Upload, Check, Wand2, X, CalendarDays, BarChart3, Eye,
-  FileText, CheckCircle, AlertCircle, MoreHorizontal, Trash2, Edit3, Copy
+  FileText, CheckCircle, AlertCircle, MoreHorizontal, Trash2, Edit3, Copy,
+  Zap, Star, Repeat, Smartphone, Monitor, Layout
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,8 +17,9 @@ import { Calendar } from "@/components/ui/calendar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, startOfWeek, endOfWeek, isWithinInterval } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -40,6 +42,29 @@ interface PostIdea {
 const STYLE_EMOJI: Record<string, string> = {
   showcase: "📸", educational: "💡", promotional: "🎯", personal: "🎬",
 };
+
+// ── Post Templates ──
+const POST_TEMPLATES = [
+  { id: "before_after", label: "Before & After", emoji: "🔄", template: "🔄 BEFORE → AFTER\n\nCheck out this transformation!\n\n[Describe the before]\n↓\n[Describe the after]\n\nReady for your own transformation?" },
+  { id: "pro_tip", label: "Pro Tip", emoji: "💡", template: "💡 PRO TIP\n\nHere's something most people don't know:\n\n[Share your expert insight]\n\n👉 Save this for later!" },
+  { id: "special_offer", label: "Special Offer", emoji: "🎉", template: "🎉 LIMITED TIME OFFER\n\n[Describe your offer]\n\n✅ [Benefit 1]\n✅ [Benefit 2]\n✅ [Benefit 3]\n\n📞 Book now before spots fill up!" },
+  { id: "client_review", label: "Client Review", emoji: "⭐", template: "⭐⭐⭐⭐⭐\n\n\"[Client's review quote]\"\n— [Client Name]\n\nThank you for the kind words! We love what we do.\n\n📩 Want results like this? Let's chat!" },
+];
+
+// ── Best Time to Post by industry (simplified) ──
+const BEST_TIMES = [
+  { day: "Mon–Fri", time: "7:00 AM", label: "Morning commute" },
+  { day: "Mon–Fri", time: "12:00 PM", label: "Lunch break" },
+  { day: "Mon–Fri", time: "6:00 PM", label: "After work" },
+  { day: "Sat–Sun", time: "10:00 AM", label: "Weekend morning" },
+];
+
+// ── Platform Preview configs ──
+const PREVIEW_MODES = [
+  { id: "instagram", label: "Instagram", icon: Smartphone, maxChars: 2200, aspect: "aspect-square" },
+  { id: "facebook", label: "Facebook", icon: Monitor, maxChars: 63206, aspect: "aspect-video" },
+  { id: "linkedin", label: "LinkedIn", icon: Layout, maxChars: 3000, aspect: "aspect-video" },
+] as const;
 
 export default function SocialDashboard() {
   const { user } = useAuth();
@@ -64,12 +89,30 @@ export default function SocialDashboard() {
   const [scheduledTime, setScheduledTime] = useState("10:00");
   const [uploading, setUploading] = useState(false);
   const [editingPost, setEditingPost] = useState<SocialPost | null>(null);
+  const [isEvergreen, setIsEvergreen] = useState(false);
+  const [previewPlatform, setPreviewPlatform] = useState<string | null>(null);
 
   // Detail drawer
   const [detailPost, setDetailPost] = useState<SocialPost | null>(null);
 
   // Posts filter
   const [postsTab, setPostsTab] = useState("all");
+
+  // ── Quick Stats ──
+  const weekStats = useMemo(() => {
+    const now = new Date();
+    const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+    const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+    const thisWeek = posts.filter(p => {
+      const d = new Date(p.created_at);
+      return isWithinInterval(d, { start: weekStart, end: weekEnd });
+    });
+    return {
+      created: thisWeek.length,
+      scheduled: posts.filter(p => p.status === "scheduled").length,
+      published: thisWeek.filter(p => p.status === "published").length,
+    };
+  }, [posts]);
 
   const fetchSuggestions = useCallback(async () => {
     setSuggestionsLoading(true);
@@ -101,7 +144,13 @@ export default function SocialDashboard() {
     setImageUrl(idea.image_url);
     setEditingPost(null);
     toast.success("Post loaded — edit and publish!");
-    // Scroll to compose
+    document.getElementById("quick-compose")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const useTemplate = (template: string) => {
+    setContent(template);
+    setEditingPost(null);
+    toast.success("Template loaded — customize it!");
     document.getElementById("quick-compose")?.scrollIntoView({ behavior: "smooth" });
   };
 
@@ -132,7 +181,7 @@ export default function SocialDashboard() {
     setContent(""); setHashtags(""); setImageUrl("");
     setSelectedPlatforms(["Instagram", "Facebook"]);
     setScheduledDate(undefined); setScheduledTime("10:00");
-    setEditingPost(null);
+    setEditingPost(null); setIsEvergreen(false); setPreviewPlatform(null);
   };
 
   const handlePublish = async (asDraft = false) => {
@@ -213,8 +262,51 @@ export default function SocialDashboard() {
     return true;
   });
 
+  // Platform preview
+  const activePreview = PREVIEW_MODES.find(m => m.id === previewPlatform);
+
   return (
     <div className="max-w-5xl mx-auto space-y-8">
+
+      {/* ─── Quick Stats Bar ─── */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label: "Created This Week", value: weekStats.created, icon: FileText, color: "text-primary" },
+          { label: "Scheduled", value: weekStats.scheduled, icon: Clock, color: "text-amber-500" },
+          { label: "Published This Week", value: weekStats.published, icon: CheckCircle, color: "text-emerald-500" },
+        ].map(stat => (
+          <Card key={stat.label} className="p-3">
+            <div className="flex items-center gap-2">
+              <stat.icon className={cn("h-4 w-4", stat.color)} />
+              <span className="text-2xl font-bold">{stat.value}</span>
+            </div>
+            <p className="text-[11px] text-muted-foreground mt-0.5">{stat.label}</p>
+          </Card>
+        ))}
+      </div>
+
+      {/* ─── Post Templates ─── */}
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <Zap className="h-4 w-4 text-primary" />
+          <h3 className="text-sm font-semibold">Quick Templates</h3>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {POST_TEMPLATES.map(t => (
+            <button
+              key={t.id}
+              onClick={() => useTemplate(t.template)}
+              className="flex items-center gap-2 p-3 rounded-lg border border-border bg-card hover:bg-accent/50 hover:border-primary/30 transition-all text-left group"
+            >
+              <span className="text-lg">{t.emoji}</span>
+              <span className="text-xs font-medium group-hover:text-primary transition-colors">{t.label}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <Separator />
+
       {/* ─── AI Suggestions ─── */}
       <section>
         <div className="flex items-center justify-between mb-4">
@@ -400,6 +492,61 @@ export default function SocialDashboard() {
               </div>
             </div>
 
+            {/* Evergreen toggle + Platform Preview */}
+            <div className="flex flex-wrap items-center gap-4">
+              <label className="flex items-center gap-2 text-xs cursor-pointer">
+                <Switch checked={isEvergreen} onCheckedChange={setIsEvergreen} />
+                <Repeat className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-muted-foreground">Evergreen (re-suggest later)</span>
+              </label>
+
+              <div className="flex items-center gap-1 ml-auto">
+                <span className="text-[10px] text-muted-foreground mr-1">Preview:</span>
+                {PREVIEW_MODES.map(m => (
+                  <button
+                    key={m.id}
+                    onClick={() => setPreviewPlatform(previewPlatform === m.id ? null : m.id)}
+                    className={cn(
+                      "p-1.5 rounded border transition-all",
+                      previewPlatform === m.id ? "border-primary bg-primary/10" : "border-transparent hover:border-border"
+                    )}
+                    title={`Preview as ${m.label}`}
+                  >
+                    <m.icon className="h-3.5 w-3.5" />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Platform Preview Panel */}
+            {activePreview && content.trim() && (
+              <div className="border border-border rounded-lg p-4 bg-muted/30">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-medium">{activePreview.label} Preview</span>
+                  {content.length > activePreview.maxChars && (
+                    <Badge variant="destructive" className="text-[9px]">
+                      {content.length}/{activePreview.maxChars} chars — too long!
+                    </Badge>
+                  )}
+                </div>
+                <div className="max-w-sm mx-auto bg-card rounded-lg border border-border overflow-hidden shadow-sm">
+                  {imageUrl && (
+                    <div className={cn("bg-muted overflow-hidden", activePreview.aspect)}>
+                      <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <div className="p-3">
+                    <p className="text-xs whitespace-pre-wrap line-clamp-6">{content}</p>
+                    {hashtags && (
+                      <p className="text-[10px] text-primary/70 mt-1.5">
+                        {hashtags.split(",").map(h => `#${h.trim()}`).filter(h => h.length > 1).join(" ")}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Schedule + Actions */}
             <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
               {socialLimits.canSchedule && (
@@ -412,8 +559,29 @@ export default function SocialDashboard() {
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar mode="single" selected={scheduledDate} onSelect={setScheduledDate} initialFocus className="p-3 pointer-events-auto" />
-                    <div className="px-3 pb-3">
+                    <div className="px-3 pb-3 space-y-2">
                       <Input type="time" value={scheduledTime} onChange={e => setScheduledTime(e.target.value)} className="h-8 text-xs" />
+                      <div className="border-t border-border pt-2">
+                        <p className="text-[10px] font-medium text-muted-foreground mb-1.5 flex items-center gap-1">
+                          <Zap className="h-3 w-3" /> Best times to post
+                        </p>
+                        <div className="grid grid-cols-2 gap-1">
+                          {BEST_TIMES.map((bt, i) => (
+                            <button
+                              key={i}
+                              onClick={() => {
+                                const [h, m] = bt.time.replace(" AM", "").replace(" PM", "").split(":").map(Number);
+                                const hour24 = bt.time.includes("PM") && h !== 12 ? h + 12 : h;
+                                setScheduledTime(`${String(hour24).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+                              }}
+                              className="text-[10px] text-left p-1.5 rounded hover:bg-accent/50 transition-colors"
+                            >
+                              <span className="font-medium">{bt.time}</span>
+                              <span className="block text-muted-foreground">{bt.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </PopoverContent>
                 </Popover>
