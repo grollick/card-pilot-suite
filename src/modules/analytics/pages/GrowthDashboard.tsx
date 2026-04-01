@@ -191,6 +191,22 @@ export default function GrowthDashboard() {
               onClick={() => window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(cardUrl)}`, "_blank")}>
               Share to LinkedIn
             </Button>
+            <Button variant="outline" size="sm"
+              onClick={() => window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(cardUrl)}&text=${encodeURIComponent("Check out my digital business card!")}`, "_blank")}>
+              Share to X
+            </Button>
+            <Button variant="outline" size="sm"
+              onClick={() => window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Check out my card: " + cardUrl)}`, "_blank")}>
+              WhatsApp
+            </Button>
+            <Button variant="outline" size="sm"
+              onClick={() => window.open(`mailto:?subject=${encodeURIComponent("My Digital Business Card")}&body=${encodeURIComponent("Here's my card: " + cardUrl)}`, "_blank")}>
+              Email
+            </Button>
+            <Button variant="outline" size="sm"
+              onClick={() => window.open(`sms:?body=${encodeURIComponent("Check out my card: " + cardUrl)}`)}>
+              Text / SMS
+            </Button>
             <Button
               variant="outline"
               size="sm"
