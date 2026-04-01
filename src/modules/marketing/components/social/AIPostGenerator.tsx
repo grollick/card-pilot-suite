@@ -139,7 +139,8 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
                       className="w-full h-full object-cover"
                       loading="lazy"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = `https://source.unsplash.com/800x600/?${encodeURIComponent(idea.image_query)}`;
+                        const tagQuery = (idea.image_query || "professional service").toLowerCase().replace(/[^a-z0-9]+/g, ",").replace(/^,+|,+$/g, "") || "professional,service";
+                        (e.target as HTMLImageElement).src = `https://loremflickr.com/800/600/${tagQuery}`;
                       }}
                     />
                     <Badge className={cn("absolute top-1.5 left-1.5 text-[10px] border", style.color)}>

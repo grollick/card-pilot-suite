@@ -19,7 +19,7 @@ function InstagramPreview({ content, hashtags, imageUrl }: { content: string; ha
       </div>
       <div className="h-32 bg-muted flex items-center justify-center overflow-hidden">
         {imageUrl ? (
-          <img src={imageUrl} alt="Post" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = `https://source.unsplash.com/800x600/?professional+service`; }} />
+          <img src={imageUrl} alt="Post" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).src = `https://loremflickr.com/800/600/professional,service`; }} />
         ) : (
           <span className="text-xs text-muted-foreground">Image preview</span>
         )}
