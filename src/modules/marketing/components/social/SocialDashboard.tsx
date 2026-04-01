@@ -265,6 +265,31 @@ export default function SocialDashboard() {
   // Platform preview
   const activePreview = PREVIEW_MODES.find(m => m.id === previewPlatform);
 
+  if (postsLoading) {
+    return (
+      <div className="max-w-5xl mx-auto space-y-8">
+        <div className="grid grid-cols-3 gap-3">
+          {[1, 2, 3].map(i => (
+            <Card key={i} className="p-3">
+              <Skeleton className="h-8 w-16 mb-1" />
+              <Skeleton className="h-3 w-24" />
+            </Card>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {[1, 2, 3, 4].map(i => (
+            <Skeleton key={i} className="h-10 rounded-lg" />
+          ))}
+        </div>
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => (
+            <Skeleton key={i} className="h-48 rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-5xl mx-auto space-y-8">
 
