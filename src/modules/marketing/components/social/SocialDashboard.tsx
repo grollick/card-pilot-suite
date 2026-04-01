@@ -78,6 +78,7 @@ export default function SocialDashboard() {
   // AI suggestions
   const [suggestions, setSuggestions] = useState<PostIdea[]>([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  const [regeneratingImageIdx, setRegeneratingImageIdx] = useState<number | null>(null);
   const hasFetched = useRef(false);
 
   // Quick compose
