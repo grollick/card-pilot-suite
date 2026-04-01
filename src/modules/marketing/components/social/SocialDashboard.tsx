@@ -372,12 +372,14 @@ export default function SocialDashboard() {
               <Card key={idx} className="overflow-hidden hover:shadow-md transition-shadow group cursor-pointer border-border hover:border-primary/30">
                 <div className="relative aspect-video bg-muted overflow-hidden">
                   <img
-                    src={idea.image_url}
+                    src={idea.image_url || `https://loremflickr.com/800/600/${((idea.image_query || idea.title || "professional service").toLowerCase().replace(/[^a-z0-9]+/g, ",").replace(/^,+|,+$/g, "") || "professional,service")}?lock=${idx + 1}`}
                     alt={idea.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
+                    loading="eager"
+                    decoding="async"
                     onError={(e) => {
-                      (e.target as HTMLImageElement).src = `https://source.unsplash.com/800x600/?${encodeURIComponent(idea.image_query || idea.title || 'professional service')}`;
+                      const fallbackQuery = ((idea.image_query || idea.title || "professional service").toLowerCase().replace(/[^a-z0-9]+/g, ",").replace(/^,+|,+$/g, "") || "professional,service");
+                      (e.target as HTMLImageElement).src = `https://loremflickr.com/800/600/${fallbackQuery}?lock=${idx + 1}`;
                     }}
                   />
                   <Badge className="absolute top-2 left-2 text-[10px] bg-background/80 backdrop-blur-sm text-foreground border-border">
