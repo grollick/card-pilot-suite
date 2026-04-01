@@ -36,6 +36,7 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
   const [ideas, setIdeas] = useState<PostIdea[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [regeneratingIdx, setRegeneratingIdx] = useState<number | null>(null);
 
   const generate = async () => {
     setLoading(true);
