@@ -29,6 +29,7 @@ const deviceIcons: Record<string, typeof Monitor> = {
 const anim = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 } };
 
 export default function CardViewersPage() {
+  const navigate = useNavigate();
   const { planKey } = usePlanLimits();
   const isGated = planKey === "starter";
   const [showUpgrade, setShowUpgrade] = useState(false);
