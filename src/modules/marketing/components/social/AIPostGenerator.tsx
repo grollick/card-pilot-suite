@@ -165,7 +165,7 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
                     <button
                       onClick={(e) => { e.stopPropagation(); shuffleImage(idx); }}
                       disabled={regeneratingIdx === idx}
-                      className="absolute bottom-1.5 right-1.5 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary text-primary-foreground text-[11px] font-semibold shadow-[0_0_8px_hsl(var(--primary)/0.5),0_0_20px_hsl(var(--primary)/0.3)] transition-all hover:shadow-[0_0_12px_hsl(var(--primary)/0.7),0_0_30px_hsl(var(--primary)/0.4)] hover:scale-105 active:scale-95 disabled:opacity-80 animate-in fade-in animate-pulse"
+                      className="absolute bottom-1.5 right-1.5 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-primary text-primary-foreground text-[11px] font-semibold animate-glow-pulse transition-all hover:scale-105 active:scale-95 disabled:opacity-80"
                       title="Generate a new AI image for this post"
                     >
                       {regeneratingIdx === idx ? (
