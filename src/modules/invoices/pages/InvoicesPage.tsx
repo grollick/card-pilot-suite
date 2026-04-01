@@ -40,6 +40,7 @@ export default function InvoicesPage() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
   const [showUpgrade, setShowUpgrade] = useState(false);
+  const [showFromEstimate, setShowFromEstimate] = useState(false);
   const { data: invoices = [], isLoading } = useInvoices(statusFilter);
   const updateStatus = useUpdateInvoiceStatus();
   const deleteInvoice = useDeleteInvoice();
