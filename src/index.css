@@ -242,6 +242,14 @@
   .shadow-elevated { box-shadow: var(--shadow-lg); }
   .shadow-glow { box-shadow: var(--shadow-glow); }
   .shadow-glow-lg { box-shadow: 0 0 40px -8px hsl(var(--primary) / 0.3), 0 0 16px -4px hsl(var(--primary) / 0.15); }
+  
+  @keyframes glow-pulse {
+    0%, 100% { box-shadow: 0 0 8px 2px hsl(var(--primary) / 0.4), 0 0 20px 4px hsl(var(--primary) / 0.2); }
+    50% { box-shadow: 0 0 14px 4px hsl(var(--primary) / 0.6), 0 0 30px 8px hsl(var(--primary) / 0.3); }
+  }
+  .animate-glow-pulse {
+    animation: glow-pulse 2s ease-in-out infinite;
+  }
 
   /* ── Typography hierarchy ── */
   .text-page-title {
