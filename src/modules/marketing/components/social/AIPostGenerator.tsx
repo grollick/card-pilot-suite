@@ -72,7 +72,8 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
   const shuffleImage = (idx: number) => {
     setIdeas(prev => prev.map((idea, i) => {
       if (i !== idx) return idea;
-      return { ...idea, image_url: `https://source.unsplash.com/800x600/?${encodeURIComponent(idea.image_query)}&sig=${Date.now()}` };
+      const tagQuery = (idea.image_query || "professional service").toLowerCase().replace(/[^a-z0-9]+/g, ",").replace(/^,+|,+$/g, "") || "professional,service";
+      return { ...idea, image_url: `https://loremflickr.com/800/600/${tagQuery}?lock=${Date.now()}` };
     }));
     toast.success("New image loaded!");
   };
