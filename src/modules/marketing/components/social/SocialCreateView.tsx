@@ -467,7 +467,8 @@ export default function SocialCreateView({ editPost, onDone, pendingContent, onP
                       className="h-7 text-[10px]"
                       onClick={() => {
                         const q = content.split(/\s+/).slice(0, 3).join(" ") || "professional service";
-                        setImageUrl(`https://source.unsplash.com/800x600/?${encodeURIComponent(q)}&sig=${Date.now()}`);
+                        const tagQuery = q.toLowerCase().replace(/[^a-z0-9]+/g, ",").replace(/^,+|,+$/g, "") || "professional,service";
+                        setImageUrl(`https://loremflickr.com/800/600/${tagQuery}?lock=${Date.now()}`);
                         toast.success("New image loaded!");
                       }}
                     >

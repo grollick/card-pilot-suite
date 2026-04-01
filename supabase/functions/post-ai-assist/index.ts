@@ -143,8 +143,9 @@ Generate social media content suggestions for this post template.`;
       const images = await Promise.all(
         result.queries.map(async (q: { query: string; description: string }) => {
           try {
-            // Use Unsplash source for free images (no API key needed)
-            const unsplashUrl = `https://source.unsplash.com/800x600/?${encodeURIComponent(q.query)}`;
+            // Use a stable stock-photo source without an API key
+            const safeQuery = q.query.toLowerCase().replace(/[^a-z0-9]+/g, ",").replace(/^,+|,+$/g, "") || "professional,service";
+            const unsplashUrl = `https://loremflickr.com/800/600/${safeQuery}`;
             return {
               url: unsplashUrl,
               query: q.query,

@@ -156,12 +156,13 @@ For each post, also suggest a specific stock photo search query that would pair 
 
     const result = JSON.parse(toolCall.function.arguments);
 
-    // Attach profession-relevant image URLs using Unsplash source
+    // Attach profession-relevant image URLs using a stable stock-photo source
     if (result.posts) {
       for (let i = 0; i < result.posts.length; i++) {
         const post = result.posts[i];
-        const query = encodeURIComponent(post.image_query || `${professionName} ${professionCategory}`);
-        post.image_url = `https://source.unsplash.com/800x600/?${query}`;
+        const rawQuery = (post.image_query || `${professionName} ${professionCategory}`).toLowerCase();
+        const tagQuery = rawQuery.replace(/[^a-z0-9]+/g, ",").replace(/^,+|,+$/g, "") || "professional,service";
+        post.image_url = `https://loremflickr.com/800/600/${tagQuery}?lock=${i + 1}`;
       }
     }
 
