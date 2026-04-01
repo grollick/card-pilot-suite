@@ -296,3 +296,87 @@ export function useSaveInvoiceLineItems() {
     onError: (e: any) => toast.error(e.message),
   });
 }
+
+export function useCreateInvoiceFromEstimate() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (estimateId: string) => {
+      // Fetch estimate with line items
+      const { data: estimate, error: estErr } = await supabase
+        .from("estimates")
+        .select("*, estimate_line_items(*)")
+        .eq("id", estimateId)
+        .single();
+      if (estErr) throw estErr;
+
+      const est = estimate as any;
+      const lineItems = (est.estimate_line_items ?? []).sort((a: any, b: any) => a.sort_order - b.sort_order);
+
+      const subtotal = lineItems.reduce((s: number, li: any) => s + Number(li.line_total || 0), 0);
+      const discountAmt = Number(est.discount_amount || 0) + subtotal * (Number(est.discount_percent || 0) / 100);
+      const grandTotal = Math.max(0, subtotal - discountAmt);
+
+      const invoiceNumber = generateInvoiceNumber();
+      const dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + 14);
+
+      const { data: inv, error: invErr } = await supabase
+        .from("invoices")
+        .insert({
+          user_id: user!.id,
+          lead_id: est.lead_id ?? null,
+          invoice_number: invoiceNumber,
+          status: "draft" as any,
+          due_date: dueDate.toISOString().split("T")[0],
+          subtotal,
+          discount_amount: discountAmt,
+          grand_total: grandTotal,
+          notes: est.notes || null,
+          terms: est.terms_conditions || null,
+        })
+        .select()
+        .single();
+      if (invErr) throw invErr;
+
+      // Convert estimate line items to invoice line items (skip optional items)
+      const invoiceItems = lineItems
+        .filter((li: any) => !li.is_optional)
+        .map((li: any, i: number) => ({
+          invoice_id: (inv as any).id,
+          title: li.title,
+          description: li.description || null,
+          quantity: Number(li.quantity),
+          unit_price: Number(li.unit_price) + Number(li.labor_hours || 0) * Number(li.labor_rate || 0) + Number(li.material_cost || 0),
+          line_total: Number(li.line_total),
+          sort_order: i,
+        }));
+
+      if (invoiceItems.length) {
+        const { error: liErr } = await supabase
+          .from("invoice_line_items")
+          .insert(invoiceItems);
+        if (liErr) throw liErr;
+      }
+
+      // Log CRM activity
+      if (est.lead_id) {
+        await supabase.from("contact_activities").insert({
+          lead_id: est.lead_id,
+          user_id: user!.id,
+          activity_type: "invoice_created",
+          title: `Invoice ${invoiceNumber} created from estimate ${est.estimate_number}`,
+          related_id: (inv as any).id,
+        });
+      }
+
+      return inv;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["invoices"] });
+      qc.invalidateQueries({ queryKey: ["contact-activities"] });
+      toast.success("Invoice created from estimate");
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+}
