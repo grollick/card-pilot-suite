@@ -100,18 +100,26 @@ export default function InvoicesPage() {
             Manage billing and track payments
           </p>
         </div>
-        <Button
-          className="shadow-glow"
-          onClick={() => {
-            if (invoiceLimitReached) {
-              setShowUpgrade(true);
-            } else {
-              navigate("/app/invoices/new");
-            }
-          }}
-        >
-          <Plus className="h-4 w-4 mr-2" /> New Invoice
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowFromEstimate(true)}
+          >
+            <FileInput className="h-4 w-4 mr-2" /> From Estimate
+          </Button>
+          <Button
+            className="shadow-glow"
+            onClick={() => {
+              if (invoiceLimitReached) {
+                setShowUpgrade(true);
+              } else {
+                navigate("/app/invoices/new");
+              }
+            }}
+          >
+            <Plus className="h-4 w-4 mr-2" /> New Invoice
+          </Button>
+        </div>
       </motion.div>
 
       {/* KPI Cards */}
