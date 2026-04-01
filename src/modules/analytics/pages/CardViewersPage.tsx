@@ -37,10 +37,10 @@ export default function CardViewersPage() {
   const stats = useViewerStats(days);
 
   const kpis = [
-    { label: "Total Views", value: stats.totalViews, icon: Eye, color: "text-primary bg-primary/10" },
-    { label: "Returning Visitors", value: stats.returningCount, icon: RotateCw, color: "text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10" },
-    { label: "Unique Visitors", value: stats.uniqueVisitors, icon: UserCheck, color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10" },
-    { label: "Unique Locations", value: stats.uniqueLocations, icon: MapPin, color: "text-accent-foreground bg-accent" },
+    { label: "Total Views", value: stats.totalViews, icon: Eye, color: "text-primary bg-primary/10", path: "/app/analytics" },
+    { label: "Returning Visitors", value: stats.returningCount, icon: RotateCw, color: "text-[hsl(var(--warning))] bg-[hsl(var(--warning))]/10", path: "/app/viewers" },
+    { label: "Unique Visitors", value: stats.uniqueVisitors, icon: UserCheck, color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10", path: "/app/analytics" },
+    { label: "Unique Locations", value: stats.uniqueLocations, icon: MapPin, color: "text-accent-foreground bg-accent", path: "/app/analytics" },
   ];
 
   if (isGated) {
