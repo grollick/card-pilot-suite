@@ -156,13 +156,17 @@ For each post, also suggest a specific stock photo search query that would pair 
 
     const result = JSON.parse(toolCall.function.arguments);
 
-    // Attach profession-relevant image URLs using a stable stock-photo source
+    // Attach profession-relevant image URLs — each post gets a unique image
     if (result.posts) {
       for (let i = 0; i < result.posts.length; i++) {
         const post = result.posts[i];
-        const rawQuery = (post.image_query || `${professionName} ${professionCategory}`).toLowerCase();
-        const tagQuery = rawQuery.replace(/[^a-z0-9]+/g, ",").replace(/^,+|,+$/g, "") || "professional,service";
-        post.image_url = `https://loremflickr.com/800/600/${tagQuery}?lock=${i + 1}`;
+        // Use the specific image_query per post (each is different) + a unique lock seed
+        const rawQuery = (post.image_query || `${professionName} ${post.style || professionCategory}`).toLowerCase();
+        const words = rawQuery.split(/[^a-z0-9]+/).filter(Boolean).slice(0, 3);
+        const tagQuery = words.join(",") || "professional,service";
+        // Use a large random lock value so each tile gets a distinct image
+        const lockSeed = i * 1000 + Math.floor(Math.random() * 999);
+        post.image_url = `https://loremflickr.com/800/600/${tagQuery}?lock=${lockSeed}`;
       }
     }
 
