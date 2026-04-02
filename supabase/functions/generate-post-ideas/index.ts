@@ -8,8 +8,8 @@ const corsHeaders = {
 };
 
 const IMAGE_MODELS = [
-  "google/gemini-3.1-flash-image-preview",
   "google/gemini-3-pro-image-preview",
+  "google/gemini-3.1-flash-image-preview",
 ];
 
 function extractImageUrl(choice: any): string | undefined {
@@ -47,23 +47,42 @@ function buildFallbackImageUrl(parts: Array<string | undefined | null>, index: n
   return `https://loremflickr.com/1200/900/${tagQuery}?lock=${Date.now()}-${index}-${crypto.randomUUID()}`;
 }
 
+function buildReferenceMessageContent(prompt: string, avatarUrl?: string, ownerLabel = "the business owner") {
+  if (!avatarUrl) return prompt;
+
+  return [
+    {
+      type: "image_url",
+      image_url: { url: avatarUrl },
+    },
+    {
+      type: "text",
+      text: `This is a reference photo of ${ownerLabel}. ${prompt} IMPORTANT: Use the reference photo as a strict identity anchor. The generated person must unmistakably be the same individual — same face shape, skin tone, hair or hairline, eyebrows, eyes, nose, smile, jawline, and age range. Do not create a generic lookalike, a different ethnicity, or a noticeably different person. Make the scene photorealistic and natural. Change the pose, outfit, expression, camera angle, and background to fit the post so each image feels different, but keep the identity clearly consistent. No pasted-on face, no collage effect, no duplicate people.`,
+    },
+  ];
+}
+
 async function generateBusinessImage({
   LOVABLE_API_KEY,
   businessName,
+  ownerName,
   professionName,
   locationLabel,
   businessDescription,
   servicesList,
+  avatarUrl,
   post,
   index,
   total,
 }: {
   LOVABLE_API_KEY: string;
   businessName: string;
+  ownerName: string;
   professionName: string;
   locationLabel: string;
   businessDescription: string;
   servicesList: string[];
+  avatarUrl?: string | null;
   post: any;
   index: number;
   total: number;
@@ -80,6 +99,7 @@ async function generateBusinessImage({
     `This image is variation ${index + 1} of ${total}, so it must look visually distinct from the other images in the batch.`,
     `Post style: ${post.style}.`,
     `Image concept: ${post.image_description || post.image_query || post.title}.`,
+    avatarUrl ? `Feature ${ownerName || businessName} naturally as the main subject using the provided reference photo.` : "",
     `Match the actual business context; do not default to construction, hard hats, or trade imagery unless the business context clearly supports it.`,
     `Avoid generic stock-photo poses. No text, no logos, no watermarks, no UI screenshots, no split panels. Landscape composition for a social media tile.`,
   ]
@@ -96,7 +116,7 @@ async function generateBusinessImage({
         },
         body: JSON.stringify({
           model,
-          messages: [{ role: "user", content: prompt }],
+          messages: [{ role: "user", content: buildReferenceMessageContent(prompt, avatarUrl || undefined, ownerName || businessName) }],
           modalities: ["image", "text"],
         }),
       });
@@ -151,7 +171,7 @@ serve(async (req) => {
 
     const [profileResult, servicesResult, businessResult] = await Promise.all([
       sb.from("profiles")
-        .select("name, company, city, bio, profession_id, professions(name, category)")
+        .select("name, company, city, bio, avatar_url, profession_id, professions(name, category)")
         .eq("id", user.id)
         .single(),
       sb.from("booking_services")
@@ -172,6 +192,7 @@ serve(async (req) => {
     const professionName = profile?.professions?.name ?? "service professional";
     const professionCategory = profile?.professions?.category ?? "general";
     const userName = profile?.name?.trim() ?? "";
+    const avatarUrl = profile?.avatar_url?.trim() ?? "";
     const businessName = business?.business_name?.trim() || profile?.company?.trim() || userName || professionName;
     const locationCity = business?.location_city?.trim() || profile?.city?.trim() || "";
     const locationRegion = business?.location_region?.trim() || "";
@@ -303,10 +324,12 @@ For every post:
           generateBusinessImage({
             LOVABLE_API_KEY,
             businessName,
+            ownerName: userName,
             professionName,
             locationLabel,
             businessDescription,
             servicesList,
+            avatarUrl,
             post,
             index,
             total: result.posts.length,

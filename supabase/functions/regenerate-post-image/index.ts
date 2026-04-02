@@ -8,8 +8,8 @@ const corsHeaders = {
 };
 
 const IMAGE_MODELS = [
-  "google/gemini-3.1-flash-image-preview",
   "google/gemini-3-pro-image-preview",
+  "google/gemini-3.1-flash-image-preview",
 ];
 
 function extractImageUrl(choice: any): string | undefined {
@@ -24,6 +24,21 @@ function extractImageUrl(choice: any): string | undefined {
     return img.image_url?.url || img.url || (img.data ? `data:image/png;base64,${img.data}` : undefined);
   }
   return undefined;
+}
+
+function buildReferenceMessageContent(prompt: string, avatarUrl?: string, ownerLabel = "the business owner") {
+  if (!avatarUrl) return [{ type: "text", text: prompt }];
+
+  return [
+    {
+      type: "image_url",
+      image_url: { url: avatarUrl },
+    },
+    {
+      type: "text",
+      text: `This is a reference photo of ${ownerLabel}. ${prompt} IMPORTANT: Use the reference photo as a strict identity anchor. The generated person must unmistakably be the same individual — same face shape, skin tone, hair or hairline, eyebrows, eyes, nose, smile, jawline, and age range. Do not create a generic lookalike, a different ethnicity, or a noticeably different person. Make the scene photorealistic and natural. Change the pose, outfit, expression, camera angle, and background to fit the post so each image feels different, but keep the identity clearly consistent. No pasted-on face, no collage effect, no duplicate people.`,
+    },
+  ];
 }
 
 serve(async (req) => {
@@ -68,6 +83,7 @@ serve(async (req) => {
     const locationRegion = business?.location_region?.trim() || "";
     const locationLabel = [locationCity, locationRegion].filter(Boolean).join(", ");
     const businessDescription = business?.description?.trim() || profile?.bio?.trim() || "";
+    const ownerLabel = profile?.name?.trim() || businessName;
 
     const prompt = [
       `Create a photorealistic social media marketing image for ${businessName}.`,
@@ -75,6 +91,7 @@ serve(async (req) => {
       businessDescription ? `Business context: ${businessDescription}` : "",
       `Post style: ${post_style || "showcase"}.`,
       `Image concept: ${image_description || image_query || post_title || "professional business imagery"}.`,
+      avatarUrl ? `Feature ${ownerLabel} naturally as the main subject using the provided reference photo.` : "",
       `Match the actual business context; do not default to construction or trade imagery unless the business explicitly supports it.`,
       `No text, no logos, no watermarks, no UI screenshots. Landscape composition for a social media tile.`,
       `Make this image unique — avoid generic stock-photo poses.`,
@@ -87,19 +104,7 @@ serve(async (req) => {
         console.log(`Trying model: ${model}`);
 
         // Build message content — include avatar if available
-        const messageContent: any[] = [];
-        if (avatarUrl) {
-          messageContent.push({
-            type: "image_url",
-            image_url: { url: avatarUrl },
-          });
-          messageContent.push({
-            type: "text",
-            text: `This is a photo of the business owner. ${prompt} IMPORTANT: Feature this exact person naturally in the generated image — same face, same features. Make it look like a real candid photo of them at work, not a collage or overlay.`,
-          });
-        } else {
-          messageContent.push({ type: "text", text: prompt });
-        }
+        const messageContent: any[] = buildReferenceMessageContent(prompt, avatarUrl || undefined, ownerLabel);
 
         const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
