@@ -3,7 +3,7 @@ import {
   Sparkles, Loader2, RefreshCw, ArrowRight, Send, Save, Clock, Hash,
   Image, Upload, Check, Wand2, X, CalendarDays, BarChart3, Eye,
   FileText, CheckCircle, AlertCircle, MoreHorizontal, Trash2, Edit3, Copy,
-  Zap, Star, Repeat, Smartphone, Monitor, Layout
+  Zap, Star, Repeat, Smartphone, Monitor, Layout, ExternalLink, Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
