@@ -76,13 +76,11 @@ export default function AIPostGenerator({ platforms, onSelectPost }: Props) {
     if (!idea) return;
     setRegeneratingIdx(idx);
     try {
-      const { data, error } = await supabase.functions.invoke("regenerate-post-image", {
-        body: {
+      const { data, error } = await invokeLongRunning("regenerate-post-image", {
           image_description: idea.image_description || idea.image_query || idea.title,
           image_query: idea.image_query,
           post_style: idea.style,
           post_title: idea.title,
-        },
       });
       if (error || !data?.image_url) throw new Error(data?.error || "No image returned");
       setIdeas(prev => prev.map((currentIdea, i) =>
