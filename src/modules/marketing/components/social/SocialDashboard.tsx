@@ -577,8 +577,9 @@ export default function SocialDashboard() {
 
         <Card className="border-border/60 shadow-sm">
           <CardContent className="p-5 space-y-5">
-            {/* Platforms */}
+            {/* Optimize for platforms */}
             <div className="flex gap-1.5 flex-wrap items-center">
+              <span className="text-[10px] text-muted-foreground mr-0.5">Optimize for:</span>
               {PLATFORMS.map(p => (
                 <button
                   key={p.id}
