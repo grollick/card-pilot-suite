@@ -582,11 +582,46 @@ export default function SocialDashboard() {
                       className="w-full h-full object-cover"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                     />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                      <Button variant="secondary" size="sm" className="h-7 text-[10px]" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        className="h-8 text-[11px] gap-1"
+                        disabled={regeneratingComposeImage}
+                        onClick={async () => {
+                          setRegeneratingComposeImage(true);
+                          try {
+                            const { data, error } = await supabase.functions.invoke("regenerate-post-image", {
+                              body: {
+                                image_description: content?.slice(0, 200) || "professional business imagery",
+                                post_style: "showcase",
+                                post_title: content?.slice(0, 80),
+                              },
+                            });
+                            if (error) throw error;
+                            if (data?.image_url) {
+                              setImageUrl(data.image_url);
+                              toast.success("New image generated!");
+                            } else {
+                              toast.error("Could not generate image. Try again.");
+                            }
+                          } catch {
+                            toast.error("Image generation failed.");
+                          } finally {
+                            setRegeneratingComposeImage(false);
+                          }
+                        }}
+                      >
+                        {regeneratingComposeImage ? (
+                          <><Loader2 className="h-3 w-3 animate-spin" /> Generating…</>
+                        ) : (
+                          <><RefreshCw className="h-3 w-3" /> New Image</>
+                        )}
+                      </Button>
+                      <Button variant="secondary" size="sm" className="h-8 text-[11px]" onClick={() => fileInputRef.current?.click()} disabled={uploading}>
                         <Upload className="h-3 w-3" />
                       </Button>
-                      <Button variant="secondary" size="sm" className="h-7 text-[10px]" onClick={() => setImageUrl("")}>
+                      <Button variant="secondary" size="sm" className="h-8 text-[11px]" onClick={() => setImageUrl("")}>
                         <X className="h-3 w-3" />
                       </Button>
                     </div>
