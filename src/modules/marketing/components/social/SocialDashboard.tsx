@@ -886,7 +886,7 @@ export default function SocialDashboard() {
                     className="h-8 text-xs gap-1 bg-gradient-to-r from-primary to-primary/80"
                     disabled={!content.trim()}
                   >
-                    <ExternalLink className="h-3.5 w-3.5" /> Post Now
+                    <ExternalLink className="h-3.5 w-3.5" /> Copy & Post
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
