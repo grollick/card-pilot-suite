@@ -307,6 +307,7 @@ export const POST_TEMPLATES: PostTemplate[] = [
     format: "square",
     bgColor: "#7f1d1d",
     accentColor: "#fecaca",
+    appSource: "canva-real-estate-templates",
     elements: [
       bgBlock("#7f1d1d"),
       headlineEl("PRICE\nREDUCED", { fontSize: 58, y: 12, textAlign: "center", x: 5, width: 90, color: "#FFFFFF" }),
