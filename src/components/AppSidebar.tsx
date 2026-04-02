@@ -4,7 +4,7 @@ import {
   Inbox, FileText, Calendar, Kanban,
   ClipboardList, RefreshCw, DollarSign,
   UserCircle, Star, ScanLine,
-  Mail, Share2, Gift, BarChart3, QrCode, Tag, Zap,
+  Mail, Share2, Gift, BarChart3, QrCode, Tag, Zap, Palette,
   Bot, Eye, CreditCard, Package, Building2, CheckSquare,
   Shield, Sparkles, ExternalLink, Bell, MapPin, Bug,
 } from "lucide-react";
