@@ -58,6 +58,7 @@ const moneyItems = [
 const marketingItems = [
   { title: "Growth Hub", url: "/app/growth", icon: BarChart3 },
   { title: "Social Media", url: "/app/social", icon: Share2 },
+  { title: "Post Designer", url: "/app/post-designer", icon: Palette },
   { title: "Email", url: "/app/email", icon: Mail },
   { title: "Campaigns", url: "/app/auto-campaigns", icon: Zap },
   { title: "Promotions", url: "/app/promotions", icon: Tag },
