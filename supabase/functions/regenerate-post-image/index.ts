@@ -46,10 +46,10 @@ serve(async (req) => {
     const { image_description, image_query, post_style, post_title } = await req.json();
     if (!image_description && !image_query) throw new Error("image_description or image_query is required");
 
-    // Fetch business context
+    // Fetch business context + avatar
     const [profileResult, businessResult] = await Promise.all([
       sb.from("profiles")
-        .select("name, company, city, bio, profession_id, professions(name, category)")
+        .select("name, company, city, bio, avatar_url, profession_id, professions(name, category)")
         .eq("id", user.id)
         .single(),
       sb.from("businesses")
@@ -60,6 +60,7 @@ serve(async (req) => {
 
     const profile = profileResult.data as any;
     const business = businessResult.data as any;
+    const avatarUrl = profile?.avatar_url || null;
 
     const professionName = profile?.professions?.name ?? "service professional";
     const businessName = business?.business_name?.trim() || profile?.company?.trim() || profile?.name?.trim() || professionName;
@@ -84,6 +85,22 @@ serve(async (req) => {
     for (const model of IMAGE_MODELS) {
       try {
         console.log(`Trying model: ${model}`);
+
+        // Build message content — include avatar if available
+        const messageContent: any[] = [];
+        if (avatarUrl) {
+          messageContent.push({
+            type: "image_url",
+            image_url: { url: avatarUrl },
+          });
+          messageContent.push({
+            type: "text",
+            text: `This is a photo of the business owner. ${prompt} IMPORTANT: Feature this exact person naturally in the generated image — same face, same features. Make it look like a real candid photo of them at work, not a collage or overlay.`,
+          });
+        } else {
+          messageContent.push({ type: "text", text: prompt });
+        }
+
         const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: {
@@ -92,7 +109,7 @@ serve(async (req) => {
           },
           body: JSON.stringify({
             model,
-            messages: [{ role: "user", content: prompt }],
+            messages: [{ role: "user", content: messageContent }],
             modalities: ["image", "text"],
           }),
         });
