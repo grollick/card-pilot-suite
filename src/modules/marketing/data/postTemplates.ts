@@ -39,6 +39,8 @@ export interface PostTemplate {
   accentColor: string;
   elements: CanvasElement[];
   thumbnail?: string;
+  /** Slug of the marketplace app that provides this template */
+  appSource?: string;
 }
 
 export const FORMAT_DIMENSIONS: Record<PostFormat, { w: number; h: number; label: string }> = {
