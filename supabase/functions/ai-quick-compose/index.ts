@@ -6,8 +6,8 @@ const corsHeaders = {
 };
 
 const IMAGE_MODELS = [
-  "google/gemini-3.1-flash-image-preview",
   "google/gemini-3-pro-image-preview",
+  "google/gemini-3.1-flash-image-preview",
 ];
 
 function extractImageUrl(choice: any): string | undefined {
@@ -24,24 +24,25 @@ function extractImageUrl(choice: any): string | undefined {
   return undefined;
 }
 
+function buildReferenceMessageContent(prompt: string, avatarUrl?: string, ownerLabel = "the business owner") {
+  if (!avatarUrl) return [{ type: "text", text: prompt }];
+
+  return [
+    {
+      type: "image_url",
+      image_url: { url: avatarUrl },
+    },
+    {
+      type: "text",
+      text: `This is a reference photo of ${ownerLabel}. ${prompt} IMPORTANT: Use the reference photo as a strict identity anchor. The generated person must unmistakably be the same individual — same face shape, skin tone, hair or hairline, eyebrows, eyes, nose, smile, jawline, and age range. Do not create a generic lookalike, a different ethnicity, or a noticeably different person. Make the result photorealistic and natural. Change the pose, outfit, camera angle, expression, and background to fit the scene so every image feels fresh, but keep the identity clearly consistent. No pasted-on face, no collage effect, no duplicate people.`,
+    },
+  ];
+}
+
 async function generateImage(LOVABLE_API_KEY: string, prompt: string, avatarUrl?: string): Promise<string | null> {
   for (const model of IMAGE_MODELS) {
     try {
-      // Build message content — if avatar provided, include it as reference
-      const messageContent: any[] = [];
-      
-      if (avatarUrl) {
-        messageContent.push({
-          type: "image_url",
-          image_url: { url: avatarUrl },
-        });
-        messageContent.push({
-          type: "text",
-          text: `This is a photo of the business owner. ${prompt} IMPORTANT: Feature this exact person naturally in the generated image — same face, same features. Make it look like a real candid photo of them at work, not a collage or overlay.`,
-        });
-      } else {
-        messageContent.push({ type: "text", text: prompt });
-      }
+      const messageContent: any[] = buildReferenceMessageContent(prompt, avatarUrl);
 
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
@@ -150,7 +151,7 @@ serve(async (req) => {
     // Generate an AI image based on the image_prompt, including user's avatar if available
     if (result.image_prompt) {
       const businessContext = company ? `for ${company}` : professionStr;
-      const fullPrompt = `Create a photorealistic social media marketing image ${businessContext}${cityStr}. ${result.image_prompt} Landscape composition, no text, no logos, no watermarks.`;
+      const fullPrompt = `Create a photorealistic social media marketing image ${businessContext}${cityStr}. ${result.image_prompt} If a reference image is provided, feature that exact person naturally as the main subject. Landscape composition, no text, no logos, no watermarks.`;
       const imageUrl = await generateImage(LOVABLE_API_KEY, fullPrompt, avatar_url || undefined);
       if (imageUrl) result.image_url = imageUrl;
     }
