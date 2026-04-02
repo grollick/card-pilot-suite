@@ -5,6 +5,49 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const IMAGE_MODELS = [
+  "google/gemini-3.1-flash-image-preview",
+  "google/gemini-3-pro-image-preview",
+];
+
+function extractImageUrl(choice: any): string | undefined {
+  if (choice?.content && Array.isArray(choice.content)) {
+    for (const part of choice.content) {
+      if (part?.type === "image_url" && part.image_url?.url) return part.image_url.url;
+      if (part?.inline_data?.data) return `data:${part.inline_data.mime_type || "image/png"};base64,${part.inline_data.data}`;
+    }
+  }
+  if (choice?.images?.[0]) {
+    const img = choice.images[0];
+    return img.image_url?.url || img.url || (img.data ? `data:image/png;base64,${img.data}` : undefined);
+  }
+  return undefined;
+}
+
+async function generateImage(LOVABLE_API_KEY: string, prompt: string): Promise<string | null> {
+  for (const model of IMAGE_MODELS) {
+    try {
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          messages: [{ role: "user", content: prompt }],
+          modalities: ["image", "text"],
+        }),
+      });
+      if (!response.ok) { console.error(`Image gen failed ${model}:`, response.status); continue; }
+      const result = await response.json();
+      const url = extractImageUrl(result.choices?.[0]?.message);
+      if (url) return url;
+    } catch (e) { console.error(`Image gen error ${model}:`, e); }
+  }
+  return null;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -35,7 +78,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a social media copywriter for tradespeople and small businesses. Write punchy, authentic posts that feel human — not corporate. Include emojis naturally. Keep captions under 280 chars for Twitter compatibility but engaging for all platforms. Always end with a clear CTA.`,
+            content: `You are a social media copywriter for contractors, tradespeople, and service business owners. Write punchy, authentic posts that feel human — not corporate. Use language like "contractor", "service pro", "service owner", "local pro" naturally. Include emojis naturally. Keep captions under 280 chars for Twitter compatibility but engaging for all platforms. Always end with a clear CTA.`,
           },
           { role: "user", content: userPrompt },
         ],
@@ -44,7 +87,7 @@ serve(async (req) => {
             type: "function",
             function: {
               name: "compose_post",
-              description: "Return the composed social media post content",
+              description: "Return the composed social media post content with an image description",
               parameters: {
                 type: "object",
                 properties: {
@@ -54,8 +97,9 @@ serve(async (req) => {
                     items: { type: "string" },
                     description: "5-8 relevant hashtags without # prefix",
                   },
+                  image_prompt: { type: "string", description: "A detailed prompt to generate a photorealistic social media image that matches this post. Describe the scene, setting, and mood. No text or logos in the image." },
                 },
-                required: ["content", "hashtags"],
+                required: ["content", "hashtags", "image_prompt"],
                 additionalProperties: false,
               },
             },
@@ -86,6 +130,14 @@ serve(async (req) => {
     if (!toolCall) throw new Error("No tool call returned");
 
     const result = JSON.parse(toolCall.function.arguments);
+
+    // Generate an AI image based on the image_prompt
+    if (result.image_prompt) {
+      const businessContext = company ? `for ${company}` : professionStr;
+      const fullPrompt = `Create a photorealistic social media marketing image ${businessContext}${cityStr}. ${result.image_prompt} Landscape composition, no text, no logos, no watermarks.`;
+      const imageUrl = await generateImage(LOVABLE_API_KEY, fullPrompt);
+      if (imageUrl) result.image_url = imageUrl;
+    }
 
     return new Response(JSON.stringify(result), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

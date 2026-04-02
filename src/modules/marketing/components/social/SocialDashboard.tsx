@@ -166,8 +166,9 @@ export default function SocialDashboard() {
         .maybeSingle();
 
       const { data: svcData } = await supabase
-        .from("services")
-        .select("title")
+        .from("booking_services")
+        .select("name")
+        .eq("active", true)
         .limit(10);
 
       const { data, error } = await supabase.functions.invoke("ai-quick-compose", {
@@ -176,13 +177,14 @@ export default function SocialDashboard() {
           platforms: selectedPlatforms,
           company: bizData?.business_name,
           city: bizData?.location_city,
-          services: svcData?.map(s => s.title) ?? [],
+          services: svcData?.map((s: any) => s.name) ?? [],
         },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       if (data?.content) setContent(data.content);
       if (data?.hashtags) setHashtags(data.hashtags.join(", "));
+      if (data?.image_url) setImageUrl(data.image_url);
       toast.success("AI draft ready — edit to your liking!");
     } catch (err: any) {
       console.error("AI compose error:", err);
