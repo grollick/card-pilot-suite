@@ -5,6 +5,7 @@ import {
   FileText, CheckCircle, AlertCircle, MoreHorizontal, Trash2, Edit3, Copy,
   Zap, Star, Repeat, Smartphone, Monitor, Layout, ExternalLink, Download
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,14 @@ import type { SocialPost } from "@/hooks/useSocialPosts";
 import { PLATFORMS, getPlatformConfig, getStatusConfig, deriveDbStatus } from "./constants";
 import { useSocialPostLimits } from "./SocialPlanGate";
 import PostDetailDrawer from "./PostDetailDrawer";
+
+// ── Tone options for AI generation ──
+const TONE_OPTIONS = [
+  { id: "professional", label: "Professional", emoji: "💼" },
+  { id: "casual", label: "Casual", emoji: "😊" },
+  { id: "bold", label: "Bold", emoji: "🔥" },
+  { id: "friendly", label: "Friendly", emoji: "👋" },
+] as const;
 
 interface PostIdea {
   title: string;
@@ -94,6 +103,7 @@ export default function SocialDashboard() {
   const [previewPlatform, setPreviewPlatform] = useState<string | null>(null);
   const [aiComposing, setAiComposing] = useState(false);
   const [regeneratingComposeImage, setRegeneratingComposeImage] = useState(false);
+  const [selectedTone, setSelectedTone] = useState("professional");
 
   // Detail drawer
   const [detailPost, setDetailPost] = useState<SocialPost | null>(null);
@@ -116,6 +126,31 @@ export default function SocialDashboard() {
       published: thisWeek.filter(p => p.status === "published").length,
     };
   }, [posts]);
+
+  // ── Keyboard shortcuts ──
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+        e.preventDefault();
+        if (content.trim()) handlePublish(false);
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === "s") {
+        e.preventDefault();
+        if (content.trim()) handlePublish(true);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [content]);
+
+  // ── Copy to clipboard helper ──
+  const copyToClipboard = useCallback(async () => {
+    const hashtagArr = hashtags.split(",").map(s => s.trim()).filter(Boolean);
+    const hashtagStr = hashtagArr.map(h => `#${h}`).join(" ");
+    const fullText = hashtagStr ? `${content}\n\n${hashtagStr}` : content;
+    await navigator.clipboard.writeText(fullText);
+    toast.success("Caption & hashtags copied to clipboard! 📋");
+  }, [content, hashtags]);
 
   const fetchSuggestions = useCallback(async () => {
     setSuggestionsLoading(true);
@@ -315,10 +350,10 @@ export default function SocialDashboard() {
 
   if (postsLoading) {
     return (
-      <div className="max-w-5xl mx-auto space-y-8">
-        <div className="grid grid-cols-3 gap-3">
+      <div className="max-w-6xl mx-auto space-y-8 px-1">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[1, 2, 3].map(i => (
-            <Card key={i} className="p-3">
+            <Card key={i} className="p-4">
               <Skeleton className="h-8 w-16 mb-1" />
               <Skeleton className="h-3 w-24" />
             </Card>
@@ -339,27 +374,42 @@ export default function SocialDashboard() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-10 px-1">
 
       {/* ─── Quick Stats Bar ─── */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
-          { label: "Created This Week", value: weekStats.created, icon: FileText, color: "text-primary" },
-          { label: "Scheduled", value: weekStats.scheduled, icon: Clock, color: "text-amber-500" },
-          { label: "Published This Week", value: weekStats.published, icon: CheckCircle, color: "text-emerald-500" },
-        ].map(stat => (
-          <Card key={stat.label} className="p-3">
-            <div className="flex items-center gap-2">
-              <stat.icon className={cn("h-4 w-4", stat.color)} />
-              <span className="text-2xl font-bold">{stat.value}</span>
-            </div>
-            <p className="text-[11px] text-muted-foreground mt-0.5">{stat.label}</p>
-          </Card>
+          { label: "Created This Week", value: weekStats.created, icon: FileText, gradient: "from-primary/15 to-primary/5", iconColor: "text-primary", borderColor: "border-primary/20" },
+          { label: "Scheduled", value: weekStats.scheduled, icon: Clock, gradient: "from-amber-500/15 to-amber-500/5", iconColor: "text-amber-500", borderColor: "border-amber-500/20" },
+          { label: "Published This Week", value: weekStats.published, icon: CheckCircle, gradient: "from-emerald-500/15 to-emerald-500/5", iconColor: "text-emerald-500", borderColor: "border-emerald-500/20" },
+        ].map((stat, idx) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: idx * 0.08, duration: 0.4 }}
+          >
+            <Card className={cn(
+              "relative overflow-hidden p-4 border backdrop-blur-sm",
+              stat.borderColor,
+              `bg-gradient-to-br ${stat.gradient}`
+            )}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
+                  <p className="text-[11px] text-muted-foreground mt-1 font-medium">{stat.label}</p>
+                </div>
+                <div className={cn("h-10 w-10 rounded-xl flex items-center justify-center bg-background/60 backdrop-blur-sm shadow-sm", stat.borderColor, "border")}>
+                  <stat.icon className={cn("h-5 w-5", stat.iconColor)} />
+                </div>
+              </div>
+            </Card>
+          </motion.div>
         ))}
       </div>
 
       {/* ─── Post Templates ─── */}
-      <section>
+      <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.25 }}>
         <div className="flex items-center gap-2 mb-3">
           <Zap className="h-4 w-4 text-primary" />
           <h3 className="text-sm font-semibold">Quick Templates</h3>
@@ -376,17 +426,21 @@ export default function SocialDashboard() {
             </button>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       <Separator />
 
       {/* ─── AI Suggestions ─── */}
-      <section>
+      <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-bold">Ready to Post</h2>
-            <Badge variant="secondary" className="text-[10px]">AI</Badge>
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center">
+              <Sparkles className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold leading-tight">Ready to Post</h2>
+              <p className="text-[10px] text-muted-foreground">AI-crafted for your business</p>
+            </div>
           </div>
           <Button
             variant="outline"
@@ -401,7 +455,7 @@ export default function SocialDashboard() {
         </div>
 
         {suggestionsLoading && suggestions.length === 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map(i => (
               <Card key={i} className="overflow-hidden">
                 <Skeleton className="aspect-video w-full" />
@@ -415,10 +469,16 @@ export default function SocialDashboard() {
             ))}
           </div>
         ) : suggestions.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {suggestions.map((idea, idx) => (
-              <Card key={idx} className="overflow-hidden hover:shadow-md transition-shadow group cursor-pointer border-border hover:border-primary/30" onClick={() => useSuggestion(idea)}>
-                <div className="relative aspect-video bg-muted overflow-hidden">
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1, duration: 0.4 }}
+              >
+              <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer border-border hover:border-primary/30 hover:-translate-y-0.5" onClick={() => useSuggestion(idea)}>
+                <div className="relative aspect-[4/3] bg-muted overflow-hidden">
                   <img
                     src={idea.image_url}
                     alt={idea.title}
@@ -463,12 +523,12 @@ export default function SocialDashboard() {
                     )}
                   </button>
                 </div>
-                <CardContent className="p-3 space-y-2">
-                  <p className="text-sm font-semibold leading-tight line-clamp-1">{idea.title}</p>
+                <CardContent className="p-3.5 space-y-2.5">
+                  <p className="text-sm font-semibold leading-tight line-clamp-1 tracking-tight">{idea.title}</p>
                   <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">{idea.caption}</p>
                   <div className="flex flex-wrap gap-1">
                     {idea.hashtags.slice(0, 3).map(h => (
-                      <span key={h} className="text-[9px] text-primary/70">#{h}</span>
+                      <span key={h} className="text-[9px] text-primary/60 bg-primary/5 px-1.5 py-0.5 rounded-full">#{h}</span>
                     ))}
                     {idea.hashtags.length > 3 && (
                       <span className="text-[9px] text-muted-foreground">+{idea.hashtags.length - 3}</span>
@@ -476,13 +536,14 @@ export default function SocialDashboard() {
                   </div>
                   <Button
                     size="sm"
-                    className="w-full h-8 text-xs gap-1.5"
+                    className="w-full h-8 text-xs gap-1.5 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
                     onClick={() => useSuggestion(idea)}
                   >
                     <ArrowRight className="h-3.5 w-3.5" /> Use This Post
                   </Button>
                 </CardContent>
               </Card>
+              </motion.div>
             ))}
           </div>
         ) : (
@@ -491,17 +552,22 @@ export default function SocialDashboard() {
             <p className="text-sm text-muted-foreground">Click "New Ideas" to get AI-crafted posts tailored to your business</p>
           </Card>
         )}
-      </section>
+      </motion.section>
 
       <Separator />
 
       {/* ─── Quick Compose ─── */}
-      <section id="quick-compose">
+      <motion.section id="quick-compose" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold flex items-center gap-2">
-            <Edit3 className="h-5 w-5 text-primary" />
-            {editingPost ? "Edit Post" : "Quick Compose"}
-          </h2>
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center">
+              <Edit3 className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold leading-tight">{editingPost ? "Edit Post" : "Quick Compose"}</h2>
+              <p className="text-[10px] text-muted-foreground">⌘+Enter to publish · ⌘+S to save draft</p>
+            </div>
+          </div>
           {editingPost && (
             <Button variant="ghost" size="sm" className="text-xs" onClick={resetCompose}>
               <X className="h-3 w-3 mr-1" /> Cancel Edit
@@ -509,10 +575,10 @@ export default function SocialDashboard() {
           )}
         </div>
 
-        <Card>
-          <CardContent className="p-4 space-y-4">
+        <Card className="border-border/60 shadow-sm">
+          <CardContent className="p-5 space-y-5">
             {/* Platforms */}
-            <div className="flex gap-1.5 flex-wrap">
+            <div className="flex gap-1.5 flex-wrap items-center">
               {PLATFORMS.map(p => (
                 <button
                   key={p.id}
@@ -528,33 +594,63 @@ export default function SocialDashboard() {
                   {p.id}
                 </button>
               ))}
+              <Separator orientation="vertical" className="h-5 mx-1" />
+              <span className="text-[10px] text-muted-foreground mr-1">Tone:</span>
+              {TONE_OPTIONS.map(t => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setSelectedTone(t.id)}
+                  className={cn(
+                    "text-[11px] px-2.5 py-1 rounded-full border transition-all",
+                    selectedTone === t.id
+                      ? "border-primary/40 bg-primary/10 text-primary font-medium"
+                      : "border-border text-muted-foreground hover:border-primary/30"
+                  )}
+                >
+                  {t.emoji} {t.label}
+                </button>
+              ))}
             </div>
 
             {/* Content area */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_200px] gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-4">
               <div className="space-y-3">
                 <div className="relative">
                   <Textarea
                     value={content}
                     onChange={e => setContent(e.target.value)}
                     placeholder="What do you want to share? Type a topic and hit ✨ Write with AI, or write your own..."
-                    rows={4}
-                    className="text-sm resize-none pr-2 pb-12"
+                    rows={5}
+                    className="text-sm resize-none pr-2 pb-14 border-border/60 focus:border-primary/40"
                   />
-                  <Button
-                    size="sm"
-                    onClick={aiCompose}
-                    disabled={aiComposing}
-                    className="absolute bottom-3 right-3 z-10 h-8 text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 animate-glow-pulse shadow-glow"
-                    title="Let AI write a post for you based on your business"
-                  >
-                    {aiComposing ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <Sparkles className="h-3.5 w-3.5" />
+                  <div className="absolute bottom-3 right-3 z-10 flex items-center gap-2">
+                    {content.trim() && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={copyToClipboard}
+                        className="h-8 text-xs gap-1 text-muted-foreground hover:text-foreground"
+                        title="Copy caption to clipboard"
+                      >
+                        <Copy className="h-3.5 w-3.5" /> Copy
+                      </Button>
                     )}
-                    {aiComposing ? "Writing…" : "✨ Write with AI"}
-                  </Button>
+                    <Button
+                      size="sm"
+                      onClick={aiCompose}
+                      disabled={aiComposing}
+                      className="h-8 text-xs gap-1.5 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground hover:from-primary/90 hover:to-primary/70 shadow-md animate-glow-pulse shadow-glow"
+                      title="Let AI write a post for you based on your business"
+                    >
+                      {aiComposing ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-3.5 w-3.5" />
+                      )}
+                      {aiComposing ? "Writing…" : "✨ Write with AI"}
+                    </Button>
+                  </div>
                 </div>
                 <div className="flex gap-2">
                   <div className="flex-1">
@@ -703,7 +799,7 @@ export default function SocialDashboard() {
             )}
 
             {/* Schedule + Actions */}
-            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border">
+            <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-border/60">
               {socialLimits.canSchedule && (
                 <Popover>
                   <PopoverTrigger asChild>
@@ -768,6 +864,13 @@ export default function SocialDashboard() {
                 </Button>
               )}
 
+              {/* One-click copy */}
+              {content.trim() && (
+                <Button variant="outline" size="sm" className="h-8 text-xs gap-1" onClick={copyToClipboard}>
+                  <Copy className="h-3.5 w-3.5" /> Copy All
+                </Button>
+              )}
+
               <div className="flex-1" />
 
               <Button variant="outline" size="sm" className="h-8 text-xs gap-1" onClick={() => handlePublish(true)}>
@@ -821,8 +924,7 @@ export default function SocialDashboard() {
 
               <Button
                 size="sm"
-                variant="outline"
-                className="h-8 text-xs gap-1"
+                className="h-8 text-xs gap-1.5 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
                 onClick={() => handlePublish(false)}
                 disabled={createPost.isPending || updatePost.isPending || !content.trim()}
               >
@@ -838,17 +940,19 @@ export default function SocialDashboard() {
             </div>
           </CardContent>
         </Card>
-      </section>
+      </motion.section>
 
       <Separator />
 
       {/* ─── Your Posts ─── */}
-      <section>
+      <motion.section initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold flex items-center gap-2">
-            <FileText className="h-5 w-5 text-primary" />
-            Your Posts
-          </h2>
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center">
+              <FileText className="h-4 w-4 text-primary" />
+            </div>
+            <h2 className="text-lg font-bold">Your Posts</h2>
+          </div>
           {socialLimits.monthlyLimit !== -1 && (
             <span className={cn("text-xs", socialLimits.isAtLimit ? "text-destructive font-medium" : "text-muted-foreground")}>
               {socialLimits.postsThisMonth}/{socialLimits.monthlyLimit} this month
@@ -890,9 +994,11 @@ export default function SocialDashboard() {
                   const platforms = ((post.platforms_json as any) || []) as string[];
                   const statusCfg = getStatusConfig(post.approval_status || "draft");
                   return (
-                    <div
+                    <motion.div
                       key={post.id}
-                      className="flex items-start gap-3 p-3 rounded-lg border border-border bg-card hover:bg-accent/30 transition-colors cursor-pointer group"
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="flex items-start gap-3 p-3 rounded-xl border border-border bg-card hover:bg-accent/30 hover:border-primary/20 transition-all cursor-pointer group"
                       onClick={() => setDetailPost(post)}
                     >
                       {post.media_urls?.[0] && (
@@ -946,7 +1052,7 @@ export default function SocialDashboard() {
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </div>
+                    </motion.div>
                   );
                 })}
                 {filteredPosts.length > 20 && (
@@ -958,7 +1064,7 @@ export default function SocialDashboard() {
             )}
           </TabsContent>
         </Tabs>
-      </section>
+      </motion.section>
 
       <PostDetailDrawer
         post={detailPost}

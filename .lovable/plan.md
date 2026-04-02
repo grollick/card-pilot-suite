@@ -1,31 +1,31 @@
-## Social Tool Overhaul
 
-### Problem
-The current social tool has 10+ tabs (Streams, Compose, Calendar, Planner, Bulk, Inbox, Campaigns, Feed, Analytics, DFY) that feel disconnected, overwhelming, and slow. Content isn't personalized enough.
+# Social Dashboard Overhaul
 
-### Solution: One-Screen Dashboard
+## 1. Visual Design & Layout
+- **Hero stats bar** — Replace plain stats with glassmorphic stat cards with gradient accents and micro-animations
+- **Ready to Post grid** — Larger image previews with hover overlays, better typography hierarchy, and staggered entrance animations
+- **Quick Compose** — Cleaner editor with a side-by-side preview, better platform selector chips, and a floating AI toolbar
+- **Consistent spacing** — Apply the premium card system (rounded-xl, subtle borders, depth shadows) throughout
+- **Dark mode polish** — Ensure all elements look refined in Night Mode
 
-**1. Update edge function to include user's services in AI prompts**
-- Fetch services from DB alongside profession/city/company
-- Include service names and descriptions in the system prompt so generated content actually promotes what the user offers
+## 2. AI Image Quality
+- **Already upgraded** — We just deployed stronger face-reference prompts using the Pro model as primary (higher fidelity)
+- **Add image style selector** — Let you choose between "Photorealistic", "Lifestyle", "Editorial", or "Behind the Scenes" styles when generating
+- **Retry with feedback** — Add a "Not quite right? Try again" button with a quick style hint input
 
-**2. Build new `SocialDashboard` component** replacing the current multi-tab layout:
-- **Top section**: "Ready to Post" — 3-4 AI-generated post cards personalized to user's profession, location, and services. One-tap to edit or schedule.
-- **Middle section**: Quick Compose — inline composer (not a separate tab). Write, pick platform, schedule, done.
-- **Bottom section**: "Your Posts" — compact list/grid of recent drafts, scheduled, and published posts with status badges and quick actions.
+## 3. Content Generation
+- **Smarter prompts** — Inject your active services, recent reviews, and seasonal context into AI copy
+- **Tone selector** — Add options like "Professional", "Casual", "Bold", or "Friendly" before generating
+- **Better hashtag strategy** — Generate location-specific and trending hashtags, not just generic ones
+- **Multi-post batch** — Generate a week's worth of content in one click
 
-**3. Simplify SocialScheduler.tsx**
-- Remove the sidebar navigation and multi-view switching
-- Replace with the single dashboard view
-- Keep PostDetailDrawer for viewing post details
-- Move Calendar/Analytics/Campaigns to secondary access (dropdown or tabs within sections) rather than primary navigation
+## 4. Workflow & UX
+- **One-click copy** — Copy caption + hashtags to clipboard instantly for pasting into social apps
+- **Drag-to-schedule** — Visual calendar view where you can drag posts to schedule them
+- **Post status indicators** — Clear visual badges (Draft, Scheduled, Published) with quick actions
+- **Keyboard shortcuts** — Ctrl+Enter to generate, Ctrl+S to save draft
+- **Mobile-optimized compose** — Full-screen compose mode on smaller screens
 
-**4. Speed improvements**
-- Lazy-load AI suggestions with skeleton loading
-- Remove unused imports and components from the critical path
-- Use `staleTime` on queries to avoid re-fetching
+---
 
-### Files Changed
-- `supabase/functions/generate-post-ideas/index.ts` — add services to prompt
-- `src/modules/marketing/components/social/SocialDashboard.tsx` — new unified view
-- `src/modules/marketing/pages/SocialScheduler.tsx` — simplified to use new dashboard
+**Estimated scope**: This is a significant upgrade. I'll tackle it in phases, starting with the visual redesign and workflow improvements, then content generation and image enhancements.
