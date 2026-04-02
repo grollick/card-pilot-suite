@@ -565,7 +565,7 @@ export default function SocialDashboard() {
             </div>
             <div>
               <h2 className="text-lg font-bold leading-tight">{editingPost ? "Edit Post" : "Quick Compose"}</h2>
-              <p className="text-[10px] text-muted-foreground">⌘+Enter to publish · ⌘+S to save draft</p>
+              <p className="text-[10px] text-muted-foreground">AI writes it → you copy & paste to your platforms</p>
             </div>
           </div>
           {editingPost && (
