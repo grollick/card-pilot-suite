@@ -290,6 +290,7 @@ export const POST_TEMPLATES: PostTemplate[] = [
     format: "square",
     bgColor: "#1c1917",
     accentColor: "#d4af37",
+    appSource: "canva-real-estate-templates",
     elements: [
       bgBlock("#1c1917"),
       { id: uid(), type: "text", x: 10, y: 8, width: 80, height: 6, rotation: 0, zIndex: 10, text: "★★★★★", fontSize: 28, fontWeight: "400", color: "#d4af37", textAlign: "center" },
