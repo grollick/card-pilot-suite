@@ -565,7 +565,7 @@ export default function SocialDashboard() {
             </div>
             <div>
               <h2 className="text-lg font-bold leading-tight">{editingPost ? "Edit Post" : "Quick Compose"}</h2>
-              <p className="text-[10px] text-muted-foreground">⌘+Enter to publish · ⌘+S to save draft</p>
+              <p className="text-[10px] text-muted-foreground">AI writes it → you copy & paste to your platforms</p>
             </div>
           </div>
           {editingPost && (
@@ -577,8 +577,9 @@ export default function SocialDashboard() {
 
         <Card className="border-border/60 shadow-sm">
           <CardContent className="p-5 space-y-5">
-            {/* Platforms */}
+            {/* Optimize for platforms */}
             <div className="flex gap-1.5 flex-wrap items-center">
+              <span className="text-[10px] text-muted-foreground mr-0.5">Optimize for:</span>
               {PLATFORMS.map(p => (
                 <button
                   key={p.id}
@@ -885,7 +886,7 @@ export default function SocialDashboard() {
                     className="h-8 text-xs gap-1 bg-gradient-to-r from-primary to-primary/80"
                     disabled={!content.trim()}
                   >
-                    <ExternalLink className="h-3.5 w-3.5" /> Post Now
+                    <ExternalLink className="h-3.5 w-3.5" /> Copy & Post
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
