@@ -156,6 +156,43 @@ export default function SocialDashboard() {
     document.getElementById("quick-compose")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const aiCompose = useCallback(async () => {
+    setAiComposing(true);
+    try {
+      const { data: bizData } = await supabase
+        .from("businesses")
+        .select("business_name, profession, city")
+        .limit(1)
+        .maybeSingle();
+
+      const { data: svcData } = await supabase
+        .from("services")
+        .select("name")
+        .limit(10);
+
+      const { data, error } = await supabase.functions.invoke("ai-quick-compose", {
+        body: {
+          topic: content.trim() || undefined,
+          platforms: selectedPlatforms,
+          profession: bizData?.profession,
+          company: bizData?.business_name,
+          city: bizData?.city,
+          services: svcData?.map(s => s.name) ?? [],
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      if (data?.content) setContent(data.content);
+      if (data?.hashtags) setHashtags(data.hashtags.join(", "));
+      toast.success("AI draft ready — edit to your liking!");
+    } catch (err: any) {
+      console.error("AI compose error:", err);
+      toast.error(err.message || "Couldn't generate content");
+    } finally {
+      setAiComposing(false);
+    }
+  }, [content, selectedPlatforms]);
+
   const handleFileUpload = useCallback(async (file: File) => {
     if (!user) return;
     if (!file.type.startsWith("image/")) { toast.error("Select an image file"); return; }
