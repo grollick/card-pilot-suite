@@ -718,12 +718,10 @@ export default function SocialDashboard() {
                         onClick={async () => {
                           setRegeneratingComposeImage(true);
                           try {
-                            const { data, error } = await supabase.functions.invoke("regenerate-post-image", {
-                              body: {
+                            const { data, error } = await invokeLongRunning("regenerate-post-image", {
                                 image_description: content?.slice(0, 200) || "professional business imagery",
                                 post_style: "showcase",
                                 post_title: content?.slice(0, 80),
-                              },
                             });
                             if (error) throw error;
                             if (data?.image_url) {
