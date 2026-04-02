@@ -200,8 +200,8 @@ Business description: ${businessDescription || "not provided"}${servicesContext}
 CRITICAL RULES:
 - Every post must be clearly about this exact business.
 - Keep the content grounded in the provided business context.
-- Do not default to contractor, home service, or blue-collar imagery unless the business context explicitly supports it.
-- If this is a software, consulting, coaching, marketing, or platform business, reflect that directly.
+- Lean into the profession: if this is a contractor, tradesperson, or service owner, use language like "contractor", "service pro", "service owner", "local pro" naturally in captions.
+- Reflect the real trade, craft, or industry this business operates in — don't sanitize it into generic corporate speak.
 - Use the company name naturally where it helps the post feel specific.
 - Make each post angle noticeably different from the others.
 - Each image_query must describe a visually distinct scene that matches the post and the business.`;
