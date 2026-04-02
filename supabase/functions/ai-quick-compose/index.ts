@@ -79,13 +79,14 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const { topic, platforms, profession, company, city, services, avatar_url } = await req.json();
+    const { topic, platforms, profession, company, city, services, avatar_url, owner_name } = await req.json();
 
     const platformStr = (platforms && platforms.length > 0) ? platforms.join(", ") : "social media";
     const professionStr = profession || "small business owner";
     const companyStr = company ? ` for ${company}` : "";
     const cityStr = city ? ` in ${city}` : "";
     const servicesStr = (services && services.length > 0) ? `\nServices offered: ${services.join(", ")}` : "";
+    const ownerLabel = owner_name || company || professionStr || "the business owner";
 
     const userPrompt = topic?.trim()
       ? `Write a social media post about: "${topic}" for a ${professionStr}${companyStr}${cityStr} posting on ${platformStr}.${servicesStr}`
