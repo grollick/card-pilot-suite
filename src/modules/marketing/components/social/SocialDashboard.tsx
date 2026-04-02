@@ -930,12 +930,12 @@ export default function SocialDashboard() {
                         key={platform}
                         className="text-xs gap-2 cursor-pointer"
                         onClick={async () => {
-                          const hashtagArr = hashtags.split(",").map(s => s.trim()).filter(Boolean);
-                          const hashtagStr = hashtagArr.map(h => `#${h}`).join(" ");
-                          const fullText = hashtagStr ? `${content}\n\n${hashtagStr}` : content;
-                          await navigator.clipboard.writeText(fullText);
-                          toast.success(`Caption copied! Opening ${platform}…`);
-                          // Save as published
+                          const ok = await copyText(buildFullText());
+                          if (ok) {
+                            toast.success(`Caption copied! Opening ${platform}…`);
+                          } else {
+                            toast.error("Couldn't copy — please copy manually, then we'll open the page.");
+                          }
                           handlePublish(false);
                           window.open(urls[platform] || "https://www.facebook.com/", "_blank");
                         }}
