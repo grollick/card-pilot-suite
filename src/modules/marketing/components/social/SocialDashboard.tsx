@@ -239,8 +239,7 @@ export default function SocialDashboard() {
           .maybeSingle(),
       ]);
 
-      const { data, error } = await supabase.functions.invoke("ai-quick-compose", {
-        body: {
+      const { data, error } = await invokeLongRunning("ai-quick-compose", {
           topic: content.trim() || undefined,
           platforms: selectedPlatforms,
           company: bizData?.business_name,
@@ -248,7 +247,6 @@ export default function SocialDashboard() {
           services: svcData?.map((s: any) => s.name) ?? [],
           owner_name: profileData?.name || undefined,
           avatar_url: profileData?.avatar_url || undefined,
-        },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
