@@ -68,7 +68,6 @@ serve(async (req) => {
     const { image_description, image_query, post_style, post_title } = await req.json();
     if (!image_description && !image_query) throw new Error("image_description or image_query is required");
 
-    // Fetch business context + avatar
     const [profileResult, businessResult] = await Promise.all([
       sb.from("profiles")
         .select("name, company, city, bio, avatar_url, profession_id, professions(name, category)")
@@ -110,8 +109,6 @@ serve(async (req) => {
     for (const model of IMAGE_MODELS) {
       try {
         console.log(`Trying model: ${model}`);
-
-        // Build message content — include avatar if available
         const messageContent: any[] = buildReferenceMessageContent(prompt, avatarUrl || undefined, ownerLabel);
 
         const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
