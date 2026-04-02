@@ -159,8 +159,8 @@ serve(async (req) => {
     // Generate an AI image based on the image_prompt, including user's avatar if available
     if (result.image_prompt) {
       const businessContext = company ? `for ${company}` : professionStr;
-      const fullPrompt = `Create a photorealistic social media marketing image ${businessContext}${cityStr}. ${result.image_prompt} If a reference image is provided, feature that exact person naturally as the main subject. Landscape composition, no text, no logos, no watermarks.`;
-      const imageUrl = await generateImage(LOVABLE_API_KEY, fullPrompt, avatar_url || undefined);
+      const fullPrompt = `Create a photorealistic social media marketing image ${businessContext}${cityStr}. ${result.image_prompt} Feature ${ownerLabel} as the clear main subject when a reference photo is provided. Keep the framing natural but close enough that the face is recognizable. Identity accuracy matters more than scene variety. Landscape composition, no text, no logos, no watermarks.`;
+      const imageUrl = await generateImage(LOVABLE_API_KEY, fullPrompt, avatar_url || undefined, ownerLabel);
       if (imageUrl) result.image_url = imageUrl;
     }
 

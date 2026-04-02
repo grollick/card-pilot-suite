@@ -92,6 +92,7 @@ serve(async (req) => {
       `Post style: ${post_style || "showcase"}.`,
       `Image concept: ${image_description || image_query || post_title || "professional business imagery"}.`,
       avatarUrl ? `Feature ${ownerLabel} naturally as the main subject using the provided reference photo.` : "",
+      `Keep the framing natural but close enough that the face is recognizable. Identity accuracy matters more than scene variety.`,
       `Match the actual business context; do not default to construction or trade imagery unless the business explicitly supports it.`,
       `No text, no logos, no watermarks, no UI screenshots. Landscape composition for a social media tile.`,
       `Make this image unique — avoid generic stock-photo poses.`,
