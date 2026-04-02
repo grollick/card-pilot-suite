@@ -529,13 +529,13 @@ export default function SocialDashboard() {
                     onChange={e => setContent(e.target.value)}
                     placeholder="What do you want to share? Type a topic and hit ✨ Write with AI, or write your own..."
                     rows={4}
-                    className="text-sm resize-none pr-2"
+                    className="text-sm resize-none pr-2 pb-12"
                   />
                   <Button
                     size="sm"
                     onClick={aiCompose}
                     disabled={aiComposing}
-                    className="absolute bottom-2 right-2 h-8 text-xs gap-1.5 animate-glow-pulse shadow-glow"
+                    className="absolute bottom-3 right-3 z-10 h-8 text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 animate-glow-pulse shadow-glow"
                     title="Let AI write a post for you based on your business"
                   >
                     {aiComposing ? (
@@ -543,7 +543,7 @@ export default function SocialDashboard() {
                     ) : (
                       <Sparkles className="h-3.5 w-3.5" />
                     )}
-                    {aiComposing ? "Writing…" : "Write with AI"}
+                    {aiComposing ? "Writing…" : "✨ Write with AI"}
                   </Button>
                 </div>
                 <div className="flex gap-2">
