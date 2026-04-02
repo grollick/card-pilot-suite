@@ -255,6 +255,7 @@ export const POST_TEMPLATES: PostTemplate[] = [
     format: "square",
     bgColor: "#0f172a",
     accentColor: "#60a5fa",
+    appSource: "canva-real-estate-templates",
     elements: [
       bgBlock("#0f172a"),
       { id: uid(), type: "badge", x: 6, y: 6, width: 30, height: 7, rotation: 0, zIndex: 11, badgeText: "📊 MARKET UPDATE", badgeColor: "#60a5fa", borderRadius: 20 },
