@@ -523,13 +523,29 @@ export default function SocialDashboard() {
             {/* Content area */}
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_200px] gap-4">
               <div className="space-y-3">
-                <Textarea
-                  value={content}
-                  onChange={e => setContent(e.target.value)}
-                  placeholder="What do you want to share? Write your post or use an AI suggestion above..."
-                  rows={4}
-                  className="text-sm resize-none"
-                />
+                <div className="relative">
+                  <Textarea
+                    value={content}
+                    onChange={e => setContent(e.target.value)}
+                    placeholder="What do you want to share? Type a topic and hit ✨ Write with AI, or write your own..."
+                    rows={4}
+                    className="text-sm resize-none pr-2"
+                  />
+                  <Button
+                    size="sm"
+                    onClick={aiCompose}
+                    disabled={aiComposing}
+                    className="absolute bottom-2 right-2 h-8 text-xs gap-1.5 animate-glow-pulse shadow-glow"
+                    title="Let AI write a post for you based on your business"
+                  >
+                    {aiComposing ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <Sparkles className="h-3.5 w-3.5" />
+                    )}
+                    {aiComposing ? "Writing…" : "Write with AI"}
+                  </Button>
+                </div>
                 <div className="flex gap-2">
                   <div className="flex-1">
                     <Input
