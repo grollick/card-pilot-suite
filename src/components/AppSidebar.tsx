@@ -4,7 +4,7 @@ import {
   Inbox, FileText, Calendar, Kanban,
   ClipboardList, RefreshCw, DollarSign,
   UserCircle, Star, ScanLine,
-  Mail, Share2, Gift, BarChart3, QrCode, Tag, Zap,
+  Mail, Share2, Gift, BarChart3, QrCode, Tag, Zap, Palette,
   Bot, Eye, CreditCard, Package, Building2, CheckSquare,
   Shield, Sparkles, ExternalLink, Bell, MapPin, Bug,
 } from "lucide-react";
@@ -58,6 +58,7 @@ const moneyItems = [
 const marketingItems = [
   { title: "Growth Hub", url: "/app/growth", icon: BarChart3 },
   { title: "Social Media", url: "/app/social", icon: Share2 },
+  { title: "Post Designer", url: "/app/post-designer", icon: Palette },
   { title: "Email", url: "/app/email", icon: Mail },
   { title: "Campaigns", url: "/app/auto-campaigns", icon: Zap },
   { title: "Promotions", url: "/app/promotions", icon: Tag },
