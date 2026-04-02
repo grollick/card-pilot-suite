@@ -873,16 +873,31 @@ export default function SocialDashboard() {
                   className="h-8 text-xs gap-1"
                   onClick={async () => {
                     try {
-                      const res = await fetch(imageUrl);
-                      const blob = await res.blob();
-                      const url = URL.createObjectURL(blob);
+                      let blobUrl: string;
+                      if (imageUrl.startsWith("data:")) {
+                        // Convert data URI to blob
+                        const [header, b64] = imageUrl.split(",");
+                        const mime = header.match(/:(.*?);/)?.[1] || "image/png";
+                        const bin = atob(b64);
+                        const arr = new Uint8Array(bin.length);
+                        for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+                        const blob = new Blob([arr], { type: mime });
+                        blobUrl = URL.createObjectURL(blob);
+                      } else {
+                        const res = await fetch(imageUrl);
+                        const blob = await res.blob();
+                        blobUrl = URL.createObjectURL(blob);
+                      }
                       const a = document.createElement("a");
-                      a.href = url;
+                      a.href = blobUrl;
                       a.download = `post-image-${Date.now()}.png`;
+                      document.body.appendChild(a);
                       a.click();
-                      URL.revokeObjectURL(url);
+                      document.body.removeChild(a);
+                      URL.revokeObjectURL(blobUrl);
                       toast.success("Image downloaded!");
-                    } catch {
+                    } catch (err) {
+                      console.error("Download failed:", err);
                       toast.error("Could not download image");
                     }
                   }}
