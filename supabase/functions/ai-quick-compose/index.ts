@@ -24,9 +24,25 @@ function extractImageUrl(choice: any): string | undefined {
   return undefined;
 }
 
-async function generateImage(LOVABLE_API_KEY: string, prompt: string): Promise<string | null> {
+async function generateImage(LOVABLE_API_KEY: string, prompt: string, avatarUrl?: string): Promise<string | null> {
   for (const model of IMAGE_MODELS) {
     try {
+      // Build message content — if avatar provided, include it as reference
+      const messageContent: any[] = [];
+      
+      if (avatarUrl) {
+        messageContent.push({
+          type: "image_url",
+          image_url: { url: avatarUrl },
+        });
+        messageContent.push({
+          type: "text",
+          text: `This is a photo of the business owner. ${prompt} IMPORTANT: Feature this exact person naturally in the generated image — same face, same features. Make it look like a real candid photo of them at work, not a collage or overlay.`,
+        });
+      } else {
+        messageContent.push({ type: "text", text: prompt });
+      }
+
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -35,7 +51,7 @@ async function generateImage(LOVABLE_API_KEY: string, prompt: string): Promise<s
         },
         body: JSON.stringify({
           model,
-          messages: [{ role: "user", content: prompt }],
+          messages: [{ role: "user", content: messageContent }],
           modalities: ["image", "text"],
         }),
       });
@@ -55,7 +71,7 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const { topic, platforms, profession, company, city, services } = await req.json();
+    const { topic, platforms, profession, company, city, services, avatar_url } = await req.json();
 
     const platformStr = (platforms && platforms.length > 0) ? platforms.join(", ") : "social media";
     const professionStr = profession || "small business owner";
@@ -97,7 +113,7 @@ serve(async (req) => {
                     items: { type: "string" },
                     description: "5-8 relevant hashtags without # prefix",
                   },
-                  image_prompt: { type: "string", description: "A detailed prompt to generate a photorealistic social media image that matches this post. Describe the scene, setting, and mood. No text or logos in the image." },
+                  image_prompt: { type: "string", description: "A detailed prompt to generate a photorealistic social media image that matches this post. Describe the scene, setting, and mood. The image should feature the business owner naturally at work or interacting with clients. No text or logos in the image." },
                 },
                 required: ["content", "hashtags", "image_prompt"],
                 additionalProperties: false,
@@ -131,11 +147,11 @@ serve(async (req) => {
 
     const result = JSON.parse(toolCall.function.arguments);
 
-    // Generate an AI image based on the image_prompt
+    // Generate an AI image based on the image_prompt, including user's avatar if available
     if (result.image_prompt) {
       const businessContext = company ? `for ${company}` : professionStr;
       const fullPrompt = `Create a photorealistic social media marketing image ${businessContext}${cityStr}. ${result.image_prompt} Landscape composition, no text, no logos, no watermarks.`;
-      const imageUrl = await generateImage(LOVABLE_API_KEY, fullPrompt);
+      const imageUrl = await generateImage(LOVABLE_API_KEY, fullPrompt, avatar_url || undefined);
       if (imageUrl) result.image_url = imageUrl;
     }
 

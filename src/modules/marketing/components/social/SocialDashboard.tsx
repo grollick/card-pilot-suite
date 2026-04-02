@@ -160,17 +160,23 @@ export default function SocialDashboard() {
   const aiCompose = useCallback(async () => {
     setAiComposing(true);
     try {
-      const { data: bizData } = await supabase
-        .from("businesses")
-        .select("business_name, description, location_city")
-        .limit(1)
-        .maybeSingle();
-
-      const { data: svcData } = await supabase
-        .from("booking_services")
-        .select("name")
-        .eq("active", true)
-        .limit(10);
+      const [{ data: bizData }, { data: svcData }, { data: profileData }] = await Promise.all([
+        supabase
+          .from("businesses")
+          .select("business_name, description, location_city")
+          .limit(1)
+          .maybeSingle(),
+        supabase
+          .from("booking_services")
+          .select("name")
+          .eq("active", true)
+          .limit(10),
+        supabase
+          .from("profiles")
+          .select("avatar_url")
+          .limit(1)
+          .maybeSingle(),
+      ]);
 
       const { data, error } = await supabase.functions.invoke("ai-quick-compose", {
         body: {
@@ -179,6 +185,7 @@ export default function SocialDashboard() {
           company: bizData?.business_name,
           city: bizData?.location_city,
           services: svcData?.map((s: any) => s.name) ?? [],
+          avatar_url: profileData?.avatar_url || undefined,
         },
       });
       if (error) throw error;
