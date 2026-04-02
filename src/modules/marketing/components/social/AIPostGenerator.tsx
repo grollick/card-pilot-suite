@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { invokeLongRunning } from "@/lib/invokeLongRunning";
 import { toast } from "sonner";
 
 interface PostIdea {
