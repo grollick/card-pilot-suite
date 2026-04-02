@@ -39,6 +39,8 @@ export interface PostTemplate {
   accentColor: string;
   elements: CanvasElement[];
   thumbnail?: string;
+  /** Slug of the marketplace app that provides this template */
+  appSource?: string;
 }
 
 export const FORMAT_DIMENSIONS: Record<PostFormat, { w: number; h: number; label: string }> = {
@@ -235,6 +237,7 @@ export const POST_TEMPLATES: PostTemplate[] = [
     format: "vertical",
     bgColor: "#1a1a2e",
     accentColor: "#e2b04a",
+    appSource: "canva-real-estate-templates",
     elements: [
       bgBlock("#1a1a2e"),
       { id: uid(), type: "badge", x: 6, y: 5, width: 28, height: 6, rotation: 0, zIndex: 11, badgeText: "🏡 OPEN HOUSE", badgeColor: "#e2b04a", borderRadius: 4 },
@@ -252,6 +255,7 @@ export const POST_TEMPLATES: PostTemplate[] = [
     format: "square",
     bgColor: "#0f172a",
     accentColor: "#60a5fa",
+    appSource: "canva-real-estate-templates",
     elements: [
       bgBlock("#0f172a"),
       { id: uid(), type: "badge", x: 6, y: 6, width: 30, height: 7, rotation: 0, zIndex: 11, badgeText: "📊 MARKET UPDATE", badgeColor: "#60a5fa", borderRadius: 20 },
@@ -268,6 +272,7 @@ export const POST_TEMPLATES: PostTemplate[] = [
     format: "vertical",
     bgColor: "#0a0a0a",
     accentColor: "#d4af37",
+    appSource: "canva-real-estate-templates",
     elements: [
       bgBlock("#0a0a0a"),
       imagePlaceholder({ x: 0, y: 0, width: 100, height: 55, borderRadius: 0, fill: "#d4af3710" }),
@@ -285,6 +290,7 @@ export const POST_TEMPLATES: PostTemplate[] = [
     format: "square",
     bgColor: "#1c1917",
     accentColor: "#d4af37",
+    appSource: "canva-real-estate-templates",
     elements: [
       bgBlock("#1c1917"),
       { id: uid(), type: "text", x: 10, y: 8, width: 80, height: 6, rotation: 0, zIndex: 10, text: "★★★★★", fontSize: 28, fontWeight: "400", color: "#d4af37", textAlign: "center" },
@@ -301,6 +307,7 @@ export const POST_TEMPLATES: PostTemplate[] = [
     format: "square",
     bgColor: "#7f1d1d",
     accentColor: "#fecaca",
+    appSource: "canva-real-estate-templates",
     elements: [
       bgBlock("#7f1d1d"),
       headlineEl("PRICE\nREDUCED", { fontSize: 58, y: 12, textAlign: "center", x: 5, width: 90, color: "#FFFFFF" }),
@@ -316,6 +323,7 @@ export const POST_TEMPLATES: PostTemplate[] = [
     format: "landscape",
     bgColor: "#1e293b",
     accentColor: "#c084fc",
+    appSource: "canva-real-estate-templates",
     elements: [
       bgBlock("#1e293b"),
       { id: uid(), type: "badge", x: 4, y: 10, width: 24, height: 9, rotation: 0, zIndex: 11, badgeText: "COMING SOON", badgeColor: "#c084fc", borderRadius: 4 },
