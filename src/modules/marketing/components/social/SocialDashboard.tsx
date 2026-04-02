@@ -93,6 +93,7 @@ export default function SocialDashboard() {
   const [isEvergreen, setIsEvergreen] = useState(false);
   const [previewPlatform, setPreviewPlatform] = useState<string | null>(null);
   const [aiComposing, setAiComposing] = useState(false);
+  const [regeneratingComposeImage, setRegeneratingComposeImage] = useState(false);
 
   // Detail drawer
   const [detailPost, setDetailPost] = useState<SocialPost | null>(null);
