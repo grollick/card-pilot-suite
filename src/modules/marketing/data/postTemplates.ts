@@ -272,6 +272,7 @@ export const POST_TEMPLATES: PostTemplate[] = [
     format: "vertical",
     bgColor: "#0a0a0a",
     accentColor: "#d4af37",
+    appSource: "canva-real-estate-templates",
     elements: [
       bgBlock("#0a0a0a"),
       imagePlaceholder({ x: 0, y: 0, width: 100, height: 55, borderRadius: 0, fill: "#d4af3710" }),
