@@ -233,8 +233,8 @@ export default function SocialDashboard() {
           .limit(10),
         supabase
           .from("profiles")
-          .select("avatar_url")
-          .limit(1)
+          .select("name, avatar_url")
+          .eq("id", user?.id)
           .maybeSingle(),
       ]);
 
@@ -245,6 +245,7 @@ export default function SocialDashboard() {
           company: bizData?.business_name,
           city: bizData?.location_city,
           services: svcData?.map((s: any) => s.name) ?? [],
+          owner_name: profileData?.name || undefined,
           avatar_url: profileData?.avatar_url || undefined,
         },
       });

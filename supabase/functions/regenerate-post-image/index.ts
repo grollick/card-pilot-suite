@@ -36,7 +36,14 @@ function buildReferenceMessageContent(prompt: string, avatarUrl?: string, ownerL
     },
     {
       type: "text",
-      text: `This is a reference photo of ${ownerLabel}. ${prompt} IMPORTANT: Use the reference photo as a strict identity anchor. The generated person must unmistakably be the same individual — same face shape, skin tone, hair or hairline, eyebrows, eyes, nose, smile, jawline, and age range. Do not create a generic lookalike, a different ethnicity, or a noticeably different person. Make the scene photorealistic and natural. Change the pose, outfit, expression, camera angle, and background to fit the post so each image feels different, but keep the identity clearly consistent. No pasted-on face, no collage effect, no duplicate people.`,
+      text: `This is the real reference photo of ${ownerLabel}. Generate the SAME exact person from this photo — not a lookalike, not a generic model. ${prompt}
+
+IDENTITY RULES:
+- Preserve the exact facial identity from the reference: face shape, skin tone, age range, hairstyle or hairline, eyebrows, eyes, nose, lips, smile, jawline, and overall facial proportions.
+- Do not beautify, de-age, re-cast, change ethnicity, or turn this into a different person.
+- Keep the face clearly visible and recognizable in the frame.
+- You may change clothing, pose, expression, camera angle, lighting, and background to fit the post, but the person must still be instantly recognizable as ${ownerLabel}.
+- Use one single person only. No duplicate people, no face collage, no pasted-on face, no heavy stylization. Photorealistic only.`,
     },
   ];
 }
@@ -61,7 +68,6 @@ serve(async (req) => {
     const { image_description, image_query, post_style, post_title } = await req.json();
     if (!image_description && !image_query) throw new Error("image_description or image_query is required");
 
-    // Fetch business context + avatar
     const [profileResult, businessResult] = await Promise.all([
       sb.from("profiles")
         .select("name, company, city, bio, avatar_url, profession_id, professions(name, category)")
@@ -92,6 +98,7 @@ serve(async (req) => {
       `Post style: ${post_style || "showcase"}.`,
       `Image concept: ${image_description || image_query || post_title || "professional business imagery"}.`,
       avatarUrl ? `Feature ${ownerLabel} naturally as the main subject using the provided reference photo.` : "",
+      `Keep the framing natural but close enough that the face is recognizable. Identity accuracy matters more than scene variety.`,
       `Match the actual business context; do not default to construction or trade imagery unless the business explicitly supports it.`,
       `No text, no logos, no watermarks, no UI screenshots. Landscape composition for a social media tile.`,
       `Make this image unique — avoid generic stock-photo poses.`,
@@ -102,8 +109,6 @@ serve(async (req) => {
     for (const model of IMAGE_MODELS) {
       try {
         console.log(`Trying model: ${model}`);
-
-        // Build message content — include avatar if available
         const messageContent: any[] = buildReferenceMessageContent(prompt, avatarUrl || undefined, ownerLabel);
 
         const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
