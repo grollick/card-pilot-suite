@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { format, startOfWeek, endOfWeek, isWithinInterval } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { invokeLongRunning } from "@/lib/invokeLongRunning";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSocialPosts, useCreatePost, useUpdatePost, useDeletePost } from "@/hooks/useSocialPosts";
 import type { SocialPost } from "@/hooks/useSocialPosts";
