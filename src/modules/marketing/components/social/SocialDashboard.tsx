@@ -417,7 +417,7 @@ export default function SocialDashboard() {
         ) : suggestions.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {suggestions.map((idea, idx) => (
-              <Card key={idx} className="overflow-hidden hover:shadow-md transition-shadow group cursor-pointer border-border hover:border-primary/30">
+              <Card key={idx} className="overflow-hidden hover:shadow-md transition-shadow group cursor-pointer border-border hover:border-primary/30" onClick={() => useSuggestion(idea)}>
                 <div className="relative aspect-video bg-muted overflow-hidden">
                   <img
                     src={idea.image_url}
