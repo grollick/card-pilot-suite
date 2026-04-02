@@ -521,13 +521,11 @@ export default function SocialDashboard() {
                     onClick={(e) => {
                       e.stopPropagation();
                       setRegeneratingImageIdx(idx);
-                      supabase.functions.invoke("regenerate-post-image", {
-                        body: {
+                      invokeLongRunning("regenerate-post-image", {
                           image_description: idea.image_query || idea.title,
                           image_query: idea.image_query,
                           post_style: idea.style,
                           post_title: idea.title,
-                        },
                       }).then(({ data, error }) => {
                         if (error || !data?.image_url) {
                           toast.error("Couldn't generate a new image. Try again.");
