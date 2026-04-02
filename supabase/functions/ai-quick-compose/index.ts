@@ -34,15 +34,22 @@ function buildReferenceMessageContent(prompt: string, avatarUrl?: string, ownerL
     },
     {
       type: "text",
-      text: `This is a reference photo of ${ownerLabel}. ${prompt} IMPORTANT: Use the reference photo as a strict identity anchor. The generated person must unmistakably be the same individual — same face shape, skin tone, hair or hairline, eyebrows, eyes, nose, smile, jawline, and age range. Do not create a generic lookalike, a different ethnicity, or a noticeably different person. Make the result photorealistic and natural. Change the pose, outfit, camera angle, expression, and background to fit the scene so every image feels fresh, but keep the identity clearly consistent. No pasted-on face, no collage effect, no duplicate people.`,
+      text: `This is the real reference photo of ${ownerLabel}. Generate the SAME exact person from this photo — not a lookalike, not a generic model. ${prompt}
+
+IDENTITY RULES:
+- Preserve the exact facial identity from the reference: face shape, skin tone, age range, hairstyle or hairline, eyebrows, eyes, nose, lips, smile, jawline, and overall facial proportions.
+- Do not beautify, de-age, re-cast, change ethnicity, or turn this into a different person.
+- Keep the face clearly visible and recognizable in the frame.
+- You may change clothing, pose, expression, camera angle, lighting, and background to fit the post, but the person must still be instantly recognizable as ${ownerLabel}.
+- Use one single person only. No duplicate people, no face collage, no pasted-on face, no heavy stylization. Photorealistic only.`,
     },
   ];
 }
 
-async function generateImage(LOVABLE_API_KEY: string, prompt: string, avatarUrl?: string): Promise<string | null> {
+async function generateImage(LOVABLE_API_KEY: string, prompt: string, avatarUrl?: string, ownerLabel = "the business owner"): Promise<string | null> {
   for (const model of IMAGE_MODELS) {
     try {
-      const messageContent: any[] = buildReferenceMessageContent(prompt, avatarUrl);
+      const messageContent: any[] = buildReferenceMessageContent(prompt, avatarUrl, ownerLabel);
 
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
