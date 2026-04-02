@@ -161,23 +161,22 @@ export default function SocialDashboard() {
     try {
       const { data: bizData } = await supabase
         .from("businesses")
-        .select("business_name, profession, city")
+        .select("business_name, description, location_city")
         .limit(1)
         .maybeSingle();
 
       const { data: svcData } = await supabase
         .from("services")
-        .select("name")
+        .select("title")
         .limit(10);
 
       const { data, error } = await supabase.functions.invoke("ai-quick-compose", {
         body: {
           topic: content.trim() || undefined,
           platforms: selectedPlatforms,
-          profession: bizData?.profession,
           company: bizData?.business_name,
-          city: bizData?.city,
-          services: svcData?.map(s => s.name) ?? [],
+          city: bizData?.location_city,
+          services: svcData?.map(s => s.title) ?? [],
         },
       });
       if (error) throw error;
