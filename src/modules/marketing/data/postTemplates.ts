@@ -323,6 +323,7 @@ export const POST_TEMPLATES: PostTemplate[] = [
     format: "landscape",
     bgColor: "#1e293b",
     accentColor: "#c084fc",
+    appSource: "canva-real-estate-templates",
     elements: [
       bgBlock("#1e293b"),
       { id: uid(), type: "badge", x: 4, y: 10, width: 24, height: 9, rotation: 0, zIndex: 11, badgeText: "COMING SOON", badgeColor: "#c084fc", borderRadius: 4 },
