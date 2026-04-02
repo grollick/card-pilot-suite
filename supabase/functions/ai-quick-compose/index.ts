@@ -5,9 +5,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Fast model first — flash is much quicker for image gen
 const IMAGE_MODELS = [
-  "google/gemini-3-pro-image-preview",
   "google/gemini-3.1-flash-image-preview",
+  "google/gemini-3-pro-image-preview",
 ];
 
 function extractImageUrl(choice: any): string | undefined {
@@ -24,36 +25,20 @@ function extractImageUrl(choice: any): string | undefined {
   return undefined;
 }
 
-const IDENTITY_REF_URLS = [
-  "https://yxsnqhuilqdvqrmkjxzf.supabase.co/storage/v1/object/public/card-assets/identity-refs/gary-ref-1.jpg",
-  "https://yxsnqhuilqdvqrmkjxzf.supabase.co/storage/v1/object/public/card-assets/identity-refs/gary-ref-2.jpg",
-  "https://yxsnqhuilqdvqrmkjxzf.supabase.co/storage/v1/object/public/card-assets/identity-refs/gary-ref-3.jpg",
-  "https://yxsnqhuilqdvqrmkjxzf.supabase.co/storage/v1/object/public/card-assets/identity-refs/gary-ref-4.jpg",
-];
+// Only use 1 best reference image + avatar (2 total) to keep generation fast
+const IDENTITY_REF_URL = "https://yxsnqhuilqdvqrmkjxzf.supabase.co/storage/v1/object/public/card-assets/identity-refs/gary-ref-1.jpg";
 
 function buildReferenceMessageContent(prompt: string, avatarUrl?: string, ownerLabel = "the business owner") {
   if (!avatarUrl) return [{ type: "text", text: prompt }];
 
-  const refImages = IDENTITY_REF_URLS.map((url) => ({
-    type: "image_url",
-    image_url: { url },
-  }));
-
   return [
     { type: "image_url", image_url: { url: avatarUrl } },
-    ...refImages,
+    { type: "image_url", image_url: { url: IDENTITY_REF_URL } },
     {
       type: "text",
-      text: `These are 5 real reference photos of ${ownerLabel} from multiple angles (front, close-up, left profile, right profile). Study ALL of them carefully. Generate the SAME exact person — not a lookalike, not a generic model. ${prompt}
+      text: `These are 2 reference photos of ${ownerLabel}. Generate the SAME exact person. ${prompt}
 
-IDENTITY RULES (STRICT):
-- You have front-facing, close-up, left-profile, and right-profile reference photos. Use ALL of them to understand the full 3D structure of this person's face.
-- This person is a middle-aged man with a receding hairline, grey/salt-and-pepper short hair on the sides, a full dark beard with grey, strong brow, and a sturdy build.
-- Preserve the exact facial identity: face shape, skin tone, age range (~45-50), hairline pattern, eyebrows, eye shape, nose shape, lip shape, jawline, beard style, and overall facial proportions.
-- Do not beautify, slim down, de-age, add hair, remove beard, change ethnicity, or turn this into a different person.
-- Keep the face clearly visible, well-lit, and recognizable in the frame.
-- You may change clothing, pose, expression, camera angle, lighting, and background to fit the post scenario, but the person must be INSTANTLY recognizable as ${ownerLabel}.
-- One single person only. No duplicate people, no face collage, no pasted-on face, no heavy stylization. Photorealistic only.`,
+IDENTITY RULES: Preserve face shape, skin tone, age (~45-50), receding hairline, salt-and-pepper hair, full dark beard. Do not beautify or de-age. The person must be instantly recognizable. Photorealistic only, no text/logos.`,
     },
   ];
 }
@@ -61,6 +46,7 @@ IDENTITY RULES (STRICT):
 async function generateImage(LOVABLE_API_KEY: string, prompt: string, avatarUrl?: string, ownerLabel = "the business owner"): Promise<string | null> {
   for (const model of IMAGE_MODELS) {
     try {
+      console.log(`Trying image model: ${model}`);
       const messageContent: any[] = buildReferenceMessageContent(prompt, avatarUrl, ownerLabel);
 
       const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -78,7 +64,7 @@ async function generateImage(LOVABLE_API_KEY: string, prompt: string, avatarUrl?
       if (!response.ok) { console.error(`Image gen failed ${model}:`, response.status); continue; }
       const result = await response.json();
       const url = extractImageUrl(result.choices?.[0]?.message);
-      if (url) return url;
+      if (url) { console.log(`Success with model: ${model}`); return url; }
     } catch (e) { console.error(`Image gen error ${model}:`, e); }
   }
   return null;
@@ -104,6 +90,7 @@ serve(async (req) => {
       ? `Write a social media post about: "${topic}" for a ${professionStr}${companyStr}${cityStr} posting on ${platformStr}.${servicesStr}`
       : `Write an engaging social media post for a ${professionStr}${companyStr}${cityStr} posting on ${platformStr}.${servicesStr}\nPick a creative angle — could be a tip, promotion, behind-the-scenes, testimonial prompt, or seasonal content.`;
 
+    // Step 1: Generate text (fast)
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -134,7 +121,7 @@ serve(async (req) => {
                     items: { type: "string" },
                     description: "5-8 relevant hashtags without # prefix",
                   },
-                  image_prompt: { type: "string", description: "A detailed prompt to generate a photorealistic social media image that matches this post. Describe the scene, setting, and mood. The image should feature the business owner naturally at work or interacting with clients. No text or logos in the image." },
+                  image_prompt: { type: "string", description: "A short prompt to generate a social media image for this post. Describe the scene briefly." },
                 },
                 required: ["content", "hashtags", "image_prompt"],
                 additionalProperties: false,
@@ -168,10 +155,9 @@ serve(async (req) => {
 
     const result = JSON.parse(toolCall.function.arguments);
 
-    // Generate an AI image based on the image_prompt, including user's avatar if available
+    // Step 2: Generate image (can be slow — but flash model is much faster)
     if (result.image_prompt) {
-      const businessContext = company ? `for ${company}` : professionStr;
-      const fullPrompt = `Create a photorealistic social media marketing image ${businessContext}${cityStr}. ${result.image_prompt} Feature ${ownerLabel} as the clear main subject when a reference photo is provided. Keep the framing natural but close enough that the face is recognizable. Identity accuracy matters more than scene variety. Landscape composition, no text, no logos, no watermarks.`;
+      const fullPrompt = `Social media image: ${result.image_prompt}. Feature ${ownerLabel} as the main subject. Landscape, photorealistic.`;
       const imageUrl = await generateImage(LOVABLE_API_KEY, fullPrompt, avatar_url || undefined, ownerLabel);
       if (imageUrl) result.image_url = imageUrl;
     }

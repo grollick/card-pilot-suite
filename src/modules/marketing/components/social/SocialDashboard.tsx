@@ -23,6 +23,7 @@ import { cn } from "@/lib/utils";
 import { format, startOfWeek, endOfWeek, isWithinInterval } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { invokeLongRunning } from "@/lib/invokeLongRunning";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSocialPosts, useCreatePost, useUpdatePost, useDeletePost } from "@/hooks/useSocialPosts";
 import type { SocialPost } from "@/hooks/useSocialPosts";
@@ -238,8 +239,7 @@ export default function SocialDashboard() {
           .maybeSingle(),
       ]);
 
-      const { data, error } = await supabase.functions.invoke("ai-quick-compose", {
-        body: {
+      const { data, error } = await invokeLongRunning("ai-quick-compose", {
           topic: content.trim() || undefined,
           platforms: selectedPlatforms,
           company: bizData?.business_name,
@@ -247,7 +247,6 @@ export default function SocialDashboard() {
           services: svcData?.map((s: any) => s.name) ?? [],
           owner_name: profileData?.name || undefined,
           avatar_url: profileData?.avatar_url || undefined,
-        },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -522,13 +521,11 @@ export default function SocialDashboard() {
                     onClick={(e) => {
                       e.stopPropagation();
                       setRegeneratingImageIdx(idx);
-                      supabase.functions.invoke("regenerate-post-image", {
-                        body: {
+                      invokeLongRunning("regenerate-post-image", {
                           image_description: idea.image_query || idea.title,
                           image_query: idea.image_query,
                           post_style: idea.style,
                           post_title: idea.title,
-                        },
                       }).then(({ data, error }) => {
                         if (error || !data?.image_url) {
                           toast.error("Couldn't generate a new image. Try again.");
@@ -721,12 +718,10 @@ export default function SocialDashboard() {
                         onClick={async () => {
                           setRegeneratingComposeImage(true);
                           try {
-                            const { data, error } = await supabase.functions.invoke("regenerate-post-image", {
-                              body: {
+                            const { data, error } = await invokeLongRunning("regenerate-post-image", {
                                 image_description: content?.slice(0, 200) || "professional business imagery",
                                 post_style: "showcase",
                                 post_title: content?.slice(0, 80),
-                              },
                             });
                             if (error) throw error;
                             if (data?.image_url) {

@@ -7,9 +7,10 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// Fast model first
 const IMAGE_MODELS = [
-  "google/gemini-3-pro-image-preview",
   "google/gemini-3.1-flash-image-preview",
+  "google/gemini-3-pro-image-preview",
 ];
 
 function extractImageUrl(choice: any): string | undefined {
@@ -26,36 +27,20 @@ function extractImageUrl(choice: any): string | undefined {
   return undefined;
 }
 
-const IDENTITY_REF_URLS = [
-  "https://yxsnqhuilqdvqrmkjxzf.supabase.co/storage/v1/object/public/card-assets/identity-refs/gary-ref-1.jpg",
-  "https://yxsnqhuilqdvqrmkjxzf.supabase.co/storage/v1/object/public/card-assets/identity-refs/gary-ref-2.jpg",
-  "https://yxsnqhuilqdvqrmkjxzf.supabase.co/storage/v1/object/public/card-assets/identity-refs/gary-ref-3.jpg",
-  "https://yxsnqhuilqdvqrmkjxzf.supabase.co/storage/v1/object/public/card-assets/identity-refs/gary-ref-4.jpg",
-];
+// Only 1 best reference + avatar for speed
+const IDENTITY_REF_URL = "https://yxsnqhuilqdvqrmkjxzf.supabase.co/storage/v1/object/public/card-assets/identity-refs/gary-ref-1.jpg";
 
 function buildReferenceMessageContent(prompt: string, avatarUrl?: string, ownerLabel = "the business owner") {
   if (!avatarUrl) return [{ type: "text", text: prompt }];
 
-  const refImages = IDENTITY_REF_URLS.map((url) => ({
-    type: "image_url",
-    image_url: { url },
-  }));
-
   return [
     { type: "image_url", image_url: { url: avatarUrl } },
-    ...refImages,
+    { type: "image_url", image_url: { url: IDENTITY_REF_URL } },
     {
       type: "text",
-      text: `These are 5 real reference photos of ${ownerLabel} from multiple angles (front, close-up, left profile, right profile). Study ALL of them carefully. Generate the SAME exact person — not a lookalike, not a generic model. ${prompt}
+      text: `These are 2 reference photos of ${ownerLabel}. Generate the SAME exact person. ${prompt}
 
-IDENTITY RULES (STRICT):
-- You have front-facing, close-up, left-profile, and right-profile reference photos. Use ALL of them to understand the full 3D structure of this person's face.
-- This person is a middle-aged man with a receding hairline, grey/salt-and-pepper short hair on the sides, a full dark beard with grey, strong brow, and a sturdy build.
-- Preserve the exact facial identity: face shape, skin tone, age range (~45-50), hairline pattern, eyebrows, eye shape, nose shape, lip shape, jawline, beard style, and overall facial proportions.
-- Do not beautify, slim down, de-age, add hair, remove beard, change ethnicity, or turn this into a different person.
-- Keep the face clearly visible, well-lit, and recognizable in the frame.
-- You may change clothing, pose, expression, camera angle, lighting, and background to fit the post scenario, but the person must be INSTANTLY recognizable as ${ownerLabel}.
-- One single person only. No duplicate people, no face collage, no pasted-on face, no heavy stylization. Photorealistic only.`,
+IDENTITY RULES: Preserve face shape, skin tone, age (~45-50), receding hairline, salt-and-pepper hair, full dark beard. Do not beautify or de-age. The person must be instantly recognizable. Photorealistic only, no text/logos.`,
     },
   ];
 }
@@ -98,23 +83,9 @@ serve(async (req) => {
     const professionName = profile?.professions?.name ?? "service professional";
     const businessName = business?.business_name?.trim() || profile?.company?.trim() || profile?.name?.trim() || professionName;
     const locationCity = business?.location_city?.trim() || profile?.city?.trim() || "";
-    const locationRegion = business?.location_region?.trim() || "";
-    const locationLabel = [locationCity, locationRegion].filter(Boolean).join(", ");
-    const businessDescription = business?.description?.trim() || profile?.bio?.trim() || "";
     const ownerLabel = profile?.name?.trim() || businessName;
 
-    const prompt = [
-      `Create a photorealistic social media marketing image for ${businessName}.`,
-      `${businessName} is a ${professionName}${locationLabel ? ` based in ${locationLabel}` : ""}.`,
-      businessDescription ? `Business context: ${businessDescription}` : "",
-      `Post style: ${post_style || "showcase"}.`,
-      `Image concept: ${image_description || image_query || post_title || "professional business imagery"}.`,
-      avatarUrl ? `Feature ${ownerLabel} naturally as the main subject using the provided reference photo.` : "",
-      `Keep the framing natural but close enough that the face is recognizable. Identity accuracy matters more than scene variety.`,
-      `Match the actual business context; do not default to construction or trade imagery unless the business explicitly supports it.`,
-      `No text, no logos, no watermarks, no UI screenshots. Landscape composition for a social media tile.`,
-      `Make this image unique — avoid generic stock-photo poses.`,
-    ].filter(Boolean).join(" ");
+    const prompt = `Social media image for ${businessName}${locationCity ? ` in ${locationCity}` : ""}. Concept: ${image_description || image_query || post_title || "professional business imagery"}. Feature ${ownerLabel} as the main subject. Landscape, photorealistic, no text/logos.`;
 
     let lastError = "";
 
