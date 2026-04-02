@@ -143,14 +143,39 @@ export default function SocialDashboard() {
     return () => window.removeEventListener("keydown", handler);
   }, [content]);
 
-  // ── Copy to clipboard helper ──
-  const copyToClipboard = useCallback(async () => {
+  // ── Copy to clipboard helper with fallback ──
+  const copyText = useCallback(async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+  }, []);
+
+  const buildFullText = useCallback(() => {
     const hashtagArr = hashtags.split(",").map(s => s.trim()).filter(Boolean);
     const hashtagStr = hashtagArr.map(h => `#${h}`).join(" ");
-    const fullText = hashtagStr ? `${content}\n\n${hashtagStr}` : content;
-    await navigator.clipboard.writeText(fullText);
-    toast.success("Caption & hashtags copied to clipboard! 📋");
+    return hashtagStr ? `${content}\n\n${hashtagStr}` : content;
   }, [content, hashtags]);
+
+  const copyToClipboard = useCallback(async () => {
+    const ok = await copyText(buildFullText());
+    if (ok) toast.success("Caption & hashtags copied to clipboard! 📋");
+    else toast.error("Couldn't copy — please select and copy manually.");
+  }, [copyText, buildFullText]);
 
   const fetchSuggestions = useCallback(async () => {
     setSuggestionsLoading(true);
@@ -905,12 +930,12 @@ export default function SocialDashboard() {
                         key={platform}
                         className="text-xs gap-2 cursor-pointer"
                         onClick={async () => {
-                          const hashtagArr = hashtags.split(",").map(s => s.trim()).filter(Boolean);
-                          const hashtagStr = hashtagArr.map(h => `#${h}`).join(" ");
-                          const fullText = hashtagStr ? `${content}\n\n${hashtagStr}` : content;
-                          await navigator.clipboard.writeText(fullText);
-                          toast.success(`Caption copied! Opening ${platform}…`);
-                          // Save as published
+                          const ok = await copyText(buildFullText());
+                          if (ok) {
+                            toast.success(`Caption copied! Opening ${platform}…`);
+                          } else {
+                            toast.error("Couldn't copy — please copy manually, then we'll open the page.");
+                          }
                           handlePublish(false);
                           window.open(urls[platform] || "https://www.facebook.com/", "_blank");
                         }}
