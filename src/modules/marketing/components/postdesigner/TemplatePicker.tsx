@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Grid3X3, Rows3 } from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,17 +10,25 @@ interface Props {
   onSelect: (template: PostTemplate) => void;
 }
 
+const APP_SOURCE_LABELS: Record<string, string> = {
+  "canva-real-estate-templates": "Canva",
+};
+
 export default function TemplatePicker({ onSelect }: Props) {
   const [profession, setProfession] = useState<TemplateProfession | "all">("all");
   const [category, setCategory] = useState<TemplateCategory | "all">("all");
   const [search, setSearch] = useState("");
+  const [showAppOnly, setShowAppOnly] = useState(false);
 
   const filtered = POST_TEMPLATES.filter((t) => {
     if (profession !== "all" && t.profession !== profession && t.profession !== "general") return false;
     if (category !== "all" && t.category !== category) return false;
     if (search && !t.name.toLowerCase().includes(search.toLowerCase())) return false;
+    if (showAppOnly && !t.appSource) return false;
     return true;
   });
+
+  const hasAppTemplates = POST_TEMPLATES.some((t) => t.appSource);
 
   return (
     <div className="h-full flex flex-col">
@@ -35,6 +43,20 @@ export default function TemplatePicker({ onSelect }: Props) {
             className="h-8 pl-8 text-xs"
           />
         </div>
+
+        {/* App source filter */}
+        {hasAppTemplates && (
+          <div className="flex items-center gap-1.5">
+            <Badge
+              variant={showAppOnly ? "default" : "outline"}
+              className="cursor-pointer text-[10px] h-5 gap-1"
+              onClick={() => setShowAppOnly(!showAppOnly)}
+            >
+              <Sparkles className="h-2.5 w-2.5" />
+              Installed App Templates
+            </Badge>
+          </div>
+        )}
 
         {/* Profession filter */}
         <div className="flex flex-wrap gap-1">
@@ -83,12 +105,21 @@ export default function TemplatePicker({ onSelect }: Props) {
         <div className="p-3 grid grid-cols-2 gap-2">
           {filtered.map((t) => {
             const dim = FORMAT_DIMENSIONS[t.format];
+            const appLabel = t.appSource ? APP_SOURCE_LABELS[t.appSource] : null;
             return (
               <button
                 key={t.id}
                 onClick={() => onSelect(t)}
                 className="group relative rounded-lg overflow-hidden border border-border hover:ring-2 hover:ring-primary/50 transition-all text-left"
               >
+                {appLabel && (
+                  <div className="absolute top-1 right-1 z-10">
+                    <span className="inline-flex items-center gap-0.5 rounded bg-primary/90 px-1.5 py-0.5 text-[8px] font-semibold text-primary-foreground">
+                      <Sparkles className="h-2 w-2" />
+                      {appLabel}
+                    </span>
+                  </div>
+                )}
                 <div
                   className="w-full"
                   style={{
