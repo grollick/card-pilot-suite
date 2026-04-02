@@ -108,9 +108,10 @@ serve(async (req) => {
         });
 
         if (response.status === 429) {
-          return new Response(JSON.stringify({ error: "Rate limited. Please wait a moment and try again." }), {
-            status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
+          console.warn(`Model ${model} rate limited, trying next model...`);
+          lastError = `${model}: rate limited (429)`;
+          await new Promise(r => setTimeout(r, 2000));
+          continue;
         }
         if (response.status === 402) {
           return new Response(JSON.stringify({ error: "AI credits exhausted. Add credits in Settings." }), {
