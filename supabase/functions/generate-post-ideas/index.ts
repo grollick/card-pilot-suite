@@ -47,24 +47,36 @@ function buildFallbackImageUrl(parts: Array<string | undefined | null>, index: n
   return `https://loremflickr.com/1200/900/${tagQuery}?lock=${Date.now()}-${index}-${crypto.randomUUID()}`;
 }
 
+const IDENTITY_REF_URLS = [
+  "https://yxsnqhuilqdvqrmkjxzf.supabase.co/storage/v1/object/public/card-assets/identity-refs/gary-ref-1.jpg",
+  "https://yxsnqhuilqdvqrmkjxzf.supabase.co/storage/v1/object/public/card-assets/identity-refs/gary-ref-2.jpg",
+  "https://yxsnqhuilqdvqrmkjxzf.supabase.co/storage/v1/object/public/card-assets/identity-refs/gary-ref-3.jpg",
+  "https://yxsnqhuilqdvqrmkjxzf.supabase.co/storage/v1/object/public/card-assets/identity-refs/gary-ref-4.jpg",
+];
+
 function buildReferenceMessageContent(prompt: string, avatarUrl?: string, ownerLabel = "the business owner") {
   if (!avatarUrl) return prompt;
 
+  const refImages = IDENTITY_REF_URLS.map((url) => ({
+    type: "image_url",
+    image_url: { url },
+  }));
+
   return [
-    {
-      type: "image_url",
-      image_url: { url: avatarUrl },
-    },
+    { type: "image_url", image_url: { url: avatarUrl } },
+    ...refImages,
     {
       type: "text",
-      text: `This is the real reference photo of ${ownerLabel}. Generate the SAME exact person from this photo — not a lookalike, not a generic model. ${prompt}
+      text: `These are 5 real reference photos of ${ownerLabel} from multiple angles (front, close-up, left profile, right profile). Study ALL of them carefully. Generate the SAME exact person — not a lookalike, not a generic model. ${prompt}
 
-IDENTITY RULES:
-- Preserve the exact facial identity from the reference: face shape, skin tone, age range, hairstyle or hairline, eyebrows, eyes, nose, lips, smile, jawline, and overall facial proportions.
-- Do not beautify, de-age, re-cast, change ethnicity, or turn this into a different person.
-- Keep the face clearly visible and recognizable in the frame.
-- You may change clothing, pose, expression, camera angle, lighting, and background to fit the post, but the person must still be instantly recognizable as ${ownerLabel}.
-- Use one single person only. No duplicate people, no face collage, no pasted-on face, no heavy stylization. Photorealistic only.`,
+IDENTITY RULES (STRICT):
+- You have front-facing, close-up, left-profile, and right-profile reference photos. Use ALL of them to understand the full 3D structure of this person's face.
+- This person is a middle-aged man with a receding hairline, grey/salt-and-pepper short hair on the sides, a full dark beard with grey, strong brow, and a sturdy build.
+- Preserve the exact facial identity: face shape, skin tone, age range (~45-50), hairline pattern, eyebrows, eye shape, nose shape, lip shape, jawline, beard style, and overall facial proportions.
+- Do not beautify, slim down, de-age, add hair, remove beard, change ethnicity, or turn this into a different person.
+- Keep the face clearly visible, well-lit, and recognizable in the frame.
+- You may change clothing, pose, expression, camera angle, lighting, and background to fit the post scenario, but the person must be INSTANTLY recognizable as ${ownerLabel}.
+- One single person only. No duplicate people, no face collage, no pasted-on face, no heavy stylization. Photorealistic only.`,
     },
   ];
 }
