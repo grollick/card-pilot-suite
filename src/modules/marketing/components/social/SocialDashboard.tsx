@@ -3,7 +3,7 @@ import {
   Sparkles, Loader2, RefreshCw, ArrowRight, Send, Save, Clock, Hash,
   Image, Upload, Check, Wand2, X, CalendarDays, BarChart3, Eye,
   FileText, CheckCircle, AlertCircle, MoreHorizontal, Trash2, Edit3, Copy,
-  Zap, Star, Repeat, Smartphone, Monitor, Layout
+  Zap, Star, Repeat, Smartphone, Monitor, Layout, ExternalLink, Download
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -735,13 +735,86 @@ export default function SocialDashboard() {
                 </Popover>
               )}
 
+              {/* Download image */}
+              {imageUrl && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs gap-1"
+                  onClick={async () => {
+                    try {
+                      const res = await fetch(imageUrl);
+                      const blob = await res.blob();
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = `post-image-${Date.now()}.png`;
+                      a.click();
+                      URL.revokeObjectURL(url);
+                      toast.success("Image downloaded!");
+                    } catch {
+                      toast.error("Could not download image");
+                    }
+                  }}
+                >
+                  <Download className="h-3.5 w-3.5" /> Image
+                </Button>
+              )}
+
               <div className="flex-1" />
 
               <Button variant="outline" size="sm" className="h-8 text-xs gap-1" onClick={() => handlePublish(true)}>
                 <Save className="h-3.5 w-3.5" /> Save Draft
               </Button>
+
+              {/* Post Now — copy text + open platform */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    size="sm"
+                    className="h-8 text-xs gap-1 bg-gradient-to-r from-primary to-primary/80"
+                    disabled={!content.trim()}
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" /> Post Now
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {selectedPlatforms.map(platform => {
+                    const urls: Record<string, string> = {
+                      Facebook: "https://www.facebook.com/",
+                      Instagram: "https://www.instagram.com/",
+                      LinkedIn: "https://www.linkedin.com/feed/",
+                      Twitter: "https://twitter.com/compose/tweet",
+                      TikTok: "https://www.tiktok.com/upload",
+                      "Google Business": "https://business.google.com/",
+                    };
+                    const platformConfig = getPlatformConfig(platform);
+                    return (
+                      <DropdownMenuItem
+                        key={platform}
+                        className="text-xs gap-2 cursor-pointer"
+                        onClick={async () => {
+                          const hashtagArr = hashtags.split(",").map(s => s.trim()).filter(Boolean);
+                          const hashtagStr = hashtagArr.map(h => `#${h}`).join(" ");
+                          const fullText = hashtagStr ? `${content}\n\n${hashtagStr}` : content;
+                          await navigator.clipboard.writeText(fullText);
+                          toast.success(`Caption copied! Opening ${platform}…`);
+                          // Save as published
+                          handlePublish(false);
+                          window.open(urls[platform] || "https://www.facebook.com/", "_blank");
+                        }}
+                      >
+                        <span className={cn("w-2 h-2 rounded-full", platformConfig?.color?.split(" ")[0]?.replace("/10", ""))} />
+                        Post to {platform}
+                      </DropdownMenuItem>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <Button
                 size="sm"
+                variant="outline"
                 className="h-8 text-xs gap-1"
                 onClick={() => handlePublish(false)}
                 disabled={createPost.isPending || updatePost.isPending || !content.trim()}
@@ -753,7 +826,7 @@ export default function SocialDashboard() {
                 ) : (
                   <Send className="h-3.5 w-3.5" />
                 )}
-                {editingPost ? "Update" : scheduledDate ? "Schedule" : "Publish"}
+                {editingPost ? "Update" : scheduledDate ? "Schedule" : "Save"}
               </Button>
             </div>
           </CardContent>
