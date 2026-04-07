@@ -48,7 +48,7 @@ export const aiMarkdownComponents = {
     return (
       <h1
         className="flex items-center gap-3 text-2xl font-black mt-6 mb-4 pb-3 border-b border-primary/15 text-foreground tracking-tight"
-        style={{ fontFamily: "'DM Sans', sans-serif" }}
+        style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
       >
         <span className="h-11 w-11 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shrink-0 shadow-lg shadow-primary/20">
           <Icon className="h-5 w-5 text-primary-foreground" />
@@ -62,7 +62,7 @@ export const aiMarkdownComponents = {
     return (
       <h2
         className="flex items-center gap-3 text-lg font-extrabold mt-8 mb-3 pb-3 border-b border-border/30 text-foreground tracking-tight"
-        style={{ fontFamily: "'DM Sans', sans-serif" }}
+        style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
       >
         <span className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center shrink-0 shadow-md ring-1 ring-primary/15">
           <Icon className="h-5 w-5 text-primary" />
@@ -76,7 +76,7 @@ export const aiMarkdownComponents = {
     return (
       <h3
         className="flex items-center gap-2.5 text-base font-bold mt-6 mb-2.5 text-foreground tracking-tight"
-        style={{ fontFamily: "'DM Sans', sans-serif" }}
+        style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
       >
         <span className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary/12 to-transparent flex items-center justify-center shrink-0 ring-1 ring-primary/10">
           <Icon className="h-4 w-4 text-primary/80" />
@@ -90,7 +90,7 @@ export const aiMarkdownComponents = {
     return (
       <li
         className="flex items-start gap-3.5 my-3.5 list-none text-[15px] leading-[1.75] group"
-        style={{ fontFamily: "'DM Sans', sans-serif" }}
+        style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
       >
         <span className="h-8 w-8 rounded-xl bg-gradient-to-br from-success/15 to-success/5 flex items-center justify-center shrink-0 mt-0.5 shadow-sm ring-1 ring-success/15 group-hover:ring-success/30 group-hover:shadow-md transition-all duration-200">
           <Icon className="h-4 w-4 text-success" />
@@ -102,7 +102,7 @@ export const aiMarkdownComponents = {
   blockquote: ({ children }: any) => (
     <blockquote
       className="flex items-start gap-3.5 border-l-[3px] border-warning/50 bg-gradient-to-r from-warning/8 via-warning/4 to-transparent rounded-r-xl px-5 py-4 my-6 not-italic text-[15px] shadow-sm backdrop-blur-sm"
-      style={{ fontFamily: "'DM Sans', sans-serif" }}
+      style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
     >
       <span className="h-9 w-9 rounded-xl bg-warning/15 flex items-center justify-center shrink-0 mt-0.5 ring-1 ring-warning/20">
         <Lightbulb className="h-4.5 w-4.5 text-warning" />
@@ -111,7 +111,7 @@ export const aiMarkdownComponents = {
     </blockquote>
   ),
   strong: ({ children }: any) => (
-    <strong className="font-bold text-foreground" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+    <strong className="font-bold text-foreground" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
       {children}
     </strong>
   ),
