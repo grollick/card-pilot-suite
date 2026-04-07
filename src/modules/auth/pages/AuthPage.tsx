@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link, useSearchParams, Navigate } from "react-router-dom";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { motion, AnimatePresence } from "framer-motion";
@@ -92,7 +93,7 @@ export default function Auth() {
           className="relative z-10 max-w-md"
         >
           <Link to="/">
-            <h2 className="text-3xl font-bold text-primary-foreground mb-2"><span className="font-extrabold text-white">guzzl</span><span className="font-normal">.pro</span></h2>
+            <GuzzlLogo size="lg" to={null} className="text-white [&>span:last-child]:text-white/90" />
           </Link>
           <p className="text-primary-foreground/80 text-lg mb-10 leading-relaxed">
             Join thousands of service professionals using guzzl.pro to grow their business.
@@ -161,9 +162,7 @@ export default function Auth() {
             >
               {/* Mobile logo */}
               <div className="lg:hidden text-center mb-6">
-                <Link to="/">
-                  <h1 className="text-2xl font-bold"><span className="font-black text-primary text-4xl">guzzl</span><span className="text-foreground font-normal">.pro</span></h1>
-                </Link>
+                <GuzzlLogo size="xl" />
               </div>
 
               {/* Headline */}

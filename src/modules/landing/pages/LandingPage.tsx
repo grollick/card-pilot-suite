@@ -1,6 +1,7 @@
 import { useState, useRef, useMemo } from "react";
 import { useABTest } from "@/hooks/useABTest";
 import { Link, useSearchParams } from "react-router-dom";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
   ArrowRight,
@@ -202,9 +203,7 @@ export default function LandingPage() {
       {/* ─── NAV ─── */}
       <nav className="border-b border-border/40 bg-background/70 backdrop-blur-2xl sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link to="/" className="text-xl font-extrabold tracking-tight shrink-0">
-            <span className="text-primary font-extrabold">guzzl</span><span className="text-foreground font-normal">.pro</span>
-          </Link>
+          <GuzzlLogo size="lg" />
           <div className="hidden md:flex items-center gap-8">
             {NAV_LINKS.map((l) => (
               <a key={l.label} href={l.href} className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">{l.label}</a>
