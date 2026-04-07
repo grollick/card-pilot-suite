@@ -381,7 +381,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="mt-3 mx-0.5 p-3 rounded-xl bg-gradient-to-b from-muted/50 to-muted/20 border border-border/30 flex items-center gap-2.5">
               {profile?.avatar_url ? (
-                <img src={profile.avatar_url} alt="" className="h-9 w-9 rounded-full object-cover ring-2 ring-background shadow-sm" style={profile.avatar_rotation ? { transform: `rotate(${profile.avatar_rotation}deg)` } : undefined} />
+                <img src={profile.avatar_url} alt="" className="h-9 w-9 rounded-full object-cover ring-2 ring-background shadow-sm" <img src={profile.avatar_url} alt="" className="h-9 w-9 rounded-full object-cover ring-2 ring-background shadow-sm" />
               ) : (
                 <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary shadow-sm">
                   {initials}
