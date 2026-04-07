@@ -273,17 +273,23 @@ export default function LandingPage() {
                 <motion.div initial="hidden" animate="visible" variants={fade} custom={0} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/8 border border-primary/15 text-primary text-xs font-semibold mb-6">
                   <Zap className="h-3 w-3" /> The all-in-one platform for service professionals
                 </motion.div>
-                <motion.h1 initial="hidden" animate="visible" variants={fade} custom={1} className="text-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] mb-6">
-                  {heroHeadlineAccent.main}{" "}
-                  {heroHeadlineAccent.accent && (
-                    <motion.span
-                      className="gradient-text inline-block origin-center"
-                      initial={{ scale: 1.15, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
-                    >{heroHeadlineAccent.accent}</motion.span>
-                  )}
-                </motion.h1>
+                <div className="text-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] mb-6 min-h-[1.2em] sm:min-h-[2.4em]">
+                  <AnimatePresence mode="wait">
+                    <motion.h1
+                      key={`${heroHeadlineAccent.main}-${heroHeadlineAccent.accent}`}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="text-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem]"
+                    >
+                      {heroHeadlineAccent.main}{" "}
+                      {heroHeadlineAccent.accent && (
+                        <span className="gradient-text">{heroHeadlineAccent.accent}</span>
+                      )}
+                    </motion.h1>
+                  </AnimatePresence>
+                </div>
                 <motion.p initial="hidden" animate="visible" variants={fade} custom={2} className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8">
                   {heroSubheadline}
                 </motion.p>
