@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { useABTest } from "@/hooks/useABTest";
 import { Link, useSearchParams } from "react-router-dom";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
@@ -40,6 +40,7 @@ import {
 import { Button } from "@/components/ui/button";
 import FooterSection from "@/modules/landing/components/FooterSection";
 import HeroPhoneAnimation from "@/modules/landing/components/HeroPhoneAnimation";
+import MarketplaceSection from "@/modules/landing/components/MarketplaceSection";
 import { DEMO_CARDS } from "@/lib/demoCards";
 import InteractiveCardShowcase from "@/components/InteractiveCardShowcase";
 import SuccessStoryBanner from "@/components/SuccessStoryBanner";
@@ -157,6 +158,26 @@ export default function LandingPage() {
 
   const { variant: abVariant, trackClick: abTrackClick, hasTest: hasABTest } = useABTest("hero");
 
+  // ── Rotating headline system ──
+  const ROTATING_HEADLINES = useMemo(() => [
+    { main: "Turn Every Connection", accent: "Into a Customer" },
+    { main: "Your Business.", accent: "On Demand." },
+    { main: "Get Found. Get Booked.", accent: "Get Paid." },
+    { main: "Get More Local Customers —", accent: "All From One Simple Card" },
+    { main: "More Leads. More Bookings.", accent: "More Revenue." },
+  ], []);
+
+  const [headlineIdx, setHeadlineIdx] = useState(0);
+
+  useEffect(() => {
+    // Don't rotate if A/B test or profession param is active
+    if (abVariant?.headline || professionParam) return;
+    const interval = setInterval(() => {
+      setHeadlineIdx((i) => (i + 1) % ROTATING_HEADLINES.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [abVariant, ROTATING_HEADLINES]);
+
   // ── Profession-based dynamic headlines ──
   const [searchParams] = useSearchParams();
   const professionParam = searchParams.get("profession")?.toLowerCase().trim() || "";
@@ -181,9 +202,7 @@ export default function LandingPage() {
     "personal trainer": { main: "Fill Your Client Roster —", accent: "Without Chasing Leads" },
   }), []);
 
-  const defaultHeadline = { main: "Get More Local Customers —", accent: "All From One Simple Business Card" };
-
-  // Priority: A/B test > profession param > default
+  // Priority: A/B test > profession param > rotating
   const heroHeadlineAccent = useMemo(() => {
     if (abVariant?.headline) {
       const parts = abVariant.headline.split(" — ");
@@ -192,11 +211,11 @@ export default function LandingPage() {
     if (professionParam && professionHeadlines[professionParam]) {
       return professionHeadlines[professionParam];
     }
-    return defaultHeadline;
-  }, [abVariant, professionParam, professionHeadlines]);
+    return ROTATING_HEADLINES[headlineIdx];
+  }, [abVariant, professionParam, professionHeadlines, ROTATING_HEADLINES, headlineIdx]);
 
-  const heroSubheadline = abVariant?.subheadline || "Create a premium business card that captures leads, books jobs, and manages your customers — all in one place.";
-  const heroCta = abVariant?.cta_text || "Start Free";
+  const heroSubheadline = abVariant?.subheadline || "A smart digital business card + CRM + marketplace for local professionals.";
+  const heroCta = abVariant?.cta_text || "Get Your Card";
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -254,17 +273,23 @@ export default function LandingPage() {
                 <motion.div initial="hidden" animate="visible" variants={fade} custom={0} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/8 border border-primary/15 text-primary text-xs font-semibold mb-6">
                   <Zap className="h-3 w-3" /> The all-in-one platform for service professionals
                 </motion.div>
-                <motion.h1 initial="hidden" animate="visible" variants={fade} custom={1} className="text-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] mb-6">
-                  {heroHeadlineAccent.main}{" "}
-                  {heroHeadlineAccent.accent && (
-                    <motion.span
-                      className="gradient-text inline-block origin-center"
-                      initial={{ scale: 1.15, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
-                    >{heroHeadlineAccent.accent}</motion.span>
-                  )}
-                </motion.h1>
+                <div className="text-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] mb-6 min-h-[1.2em] sm:min-h-[2.4em]">
+                  <AnimatePresence mode="wait">
+                    <motion.h1
+                      key={`${heroHeadlineAccent.main}-${heroHeadlineAccent.accent}`}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      className="text-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem]"
+                    >
+                      {heroHeadlineAccent.main}{" "}
+                      {heroHeadlineAccent.accent && (
+                        <span className="gradient-text">{heroHeadlineAccent.accent}</span>
+                      )}
+                    </motion.h1>
+                  </AnimatePresence>
+                </div>
                 <motion.p initial="hidden" animate="visible" variants={fade} custom={2} className="text-lg sm:text-xl text-muted-foreground leading-relaxed max-w-xl mx-auto lg:mx-0 mb-8">
                   {heroSubheadline}
                 </motion.p>
@@ -275,9 +300,9 @@ export default function LandingPage() {
                       <ArrowRight className="h-4 w-4 ml-1.5 group-hover:translate-x-0.5 transition-transform" />
                     </Button>
                   </Link>
-                  <a href="#examples">
+                  <a href="#how-it-works">
                     <Button variant="outline" size="lg" className="text-base h-13 px-6 rounded-xl">
-                      <ExternalLink className="h-4 w-4 mr-1.5" /> View Demo
+                      <ExternalLink className="h-4 w-4 mr-1.5" /> See How It Works
                     </Button>
                   </a>
                 </motion.div>
@@ -415,7 +440,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── 4. HOW IT WORKS ─── */}
-      <section className="py-20 md:py-28 relative">
+      <section id="how-it-works" className="py-20 md:py-28 relative">
         <div className="absolute inset-0 -z-10 gradient-mesh" />
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
@@ -450,6 +475,10 @@ export default function LandingPage() {
       {/* ─── 5. DEMO CARDS ─── */}
       <DemoCardsSection />
 
+      <div className="glow-line" />
+
+      {/* ─── 5.5 MARKETPLACE / LOCAL DISCOVERY ─── */}
+      <MarketplaceSection />
 
       {/* ─── 6. RESULTS ─── */}
       <section className="py-20 md:py-28 relative">
