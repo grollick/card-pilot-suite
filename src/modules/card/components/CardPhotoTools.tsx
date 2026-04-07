@@ -234,6 +234,7 @@ export default function CardPhotoTools({
       const url = await uploadFile(file, path);
       await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
       onAvatarChange(url);
+      onAvatarRotationChange?.(0);
       setBgRemoved(true);
       toast.success("Background removed!");
     } catch (err: any) {
@@ -291,6 +292,7 @@ export default function CardPhotoTools({
       const url = await uploadFile(file, path);
       await supabase.from("profiles").update({ avatar_url: url }).eq("id", user.id);
       onAvatarChange(url);
+      onAvatarRotationChange?.(0);
       toast.success("Avatar cartoonized!");
     } catch (err: any) {
       toast.error(err.message || "Failed to cartoonize avatar");
