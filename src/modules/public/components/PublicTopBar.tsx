@@ -1,5 +1,6 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 interface PublicTopBarProps {
   /** Label shown on the right side */
@@ -44,10 +45,7 @@ export default function PublicTopBar({ title, icon, backTo, backLabel = "Back", 
             </span>
           )}
           {children}
-          <Link to="/" className="text-sm">
-            <span className="text-primary font-extrabold">guzzl</span>
-            <span className="text-foreground font-normal">.pro</span>
-          </Link>
+          <GuzzlLogo size="sm" />
         </div>
       </div>
     </nav>
