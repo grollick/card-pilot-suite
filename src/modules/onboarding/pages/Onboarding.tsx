@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -320,9 +321,7 @@ export default function Onboarding() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold">
-            <span className="font-black text-primary text-4xl">guzzl</span><span className="text-foreground font-normal">.pro</span>
-          </h1>
+          <GuzzlLogo size="xl" />
         </div>
 
         {/* Progress */}
