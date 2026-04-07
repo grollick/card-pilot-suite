@@ -165,7 +165,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     @apply tracking-tight font-semibold text-foreground;
   }
 }
@@ -201,7 +201,7 @@
     background:
       radial-gradient(ellipse 80% 50% at 20% 40%, hsl(var(--primary) / 0.12), transparent),
       radial-gradient(ellipse 60% 80% at 80% 20%, hsl(var(--accent) / 0.1), transparent),
-      radial-gradient(ellipse 50% 60% at 50% 80%, hsl(230 76% 55% / 0.06), transparent);
+      radial-gradient(ellipse 50% 60% at 50% 80%, hsl(217 91% 60% / 0.06), transparent);
   }
 
   /* ── Animated gradient orb ── */
@@ -254,12 +254,12 @@
   /* ── Typography hierarchy ── */
   .text-page-title {
     @apply text-2xl font-bold tracking-tight;
-    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   .text-section-header {
     @apply text-lg font-semibold tracking-tight;
-    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   .text-card-title {
@@ -281,7 +281,7 @@
   /* ── Hero display text ── */
   .text-display {
     @apply font-extrabold tracking-tighter;
-    font-family: 'DM Sans', 'Inter', system-ui, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     line-height: 1.04;
   }
 
