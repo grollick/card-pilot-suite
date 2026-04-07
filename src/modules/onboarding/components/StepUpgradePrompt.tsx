@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowRight, TrendingUp, BarChart3, Zap, Eye, Crown, Check } from "lucide-react";
+import { ArrowRight, TrendingUp, BarChart3, Zap, Eye, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import OnboardingStepWrapper from "./OnboardingStepWrapper";
 
