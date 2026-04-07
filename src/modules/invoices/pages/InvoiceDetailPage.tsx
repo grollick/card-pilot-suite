@@ -201,7 +201,7 @@ export default function InvoiceDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-             <h1 className="text-xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="{isNew ? "New Invoice" : invoice?.invoice_number}" /></h1>
+             <h1 className="text-xl font-bold tracking-tight flex items-center gap-2"><GuzzlLogo to={null} size="lg" suffix={isNew ? "New Invoice" : invoice?.invoice_number} /></h1>
             {!isNew && invoice && (
               <DocumentStatusBadge status={invoice.status} size="sm" />
             )}
