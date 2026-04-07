@@ -559,6 +559,58 @@
   .notification-exit {
     animation: notification-slide-out var(--duration-base) var(--ease-out);
   }
+
+  /* ── Page content wrapper ── */
+  .page-content {
+    @apply max-w-6xl mx-auto px-4 sm:px-6 py-6;
+  }
+
+  /* ── Section spacing (dashboard) ── */
+  .section-gap {
+    @apply space-y-6;
+  }
+
+  /* ── Consistent form group spacing ── */
+  .form-group {
+    @apply space-y-2;
+  }
+
+  .form-label {
+    @apply text-sm font-medium text-foreground;
+  }
+
+  .form-description {
+    @apply text-xs text-muted-foreground mt-1;
+  }
+
+  /* ── Smooth scroll ── */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* ── Focus-within cards (accessibility lift) ── */
+  .focus-card:focus-within {
+    @apply ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* ── Subtle divider ── */
+  .divider-subtle {
+    @apply h-px w-full bg-border/50;
+  }
+
+  /* ── Empty state ── */
+  .empty-state {
+    @apply flex flex-col items-center justify-center text-center py-12 px-4;
+  }
+  .empty-state-icon {
+    @apply h-12 w-12 rounded-2xl bg-muted flex items-center justify-center mb-4 text-muted-foreground;
+  }
+  .empty-state-title {
+    @apply text-sm font-semibold text-foreground mb-1;
+  }
+  .empty-state-desc {
+    @apply text-xs text-muted-foreground max-w-xs;
+  }
 }
 
 @keyframes ping-ring {
