@@ -20,9 +20,9 @@ import {
 } from "lucide-react";
 import { LiveAvailabilityCounter } from "@/components/activity/LiveActivityIndicators";
 import {
-import GuzzlLogo from "@/components/brand/GuzzlLogo";
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const POPULAR_PROFESSIONS = [
   "Barber", "Plumber", "Photographer", "Realtor", "Personal Trainer",

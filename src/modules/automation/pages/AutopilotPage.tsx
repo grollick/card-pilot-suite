@@ -12,13 +12,13 @@ import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import {
-import GuzzlLogo from "@/components/brand/GuzzlLogo";
   useAutopilotSettings,
   useUpsertAutopilotSettings,
   useAutopilotLog,
   useAutopilotStats,
   useRunAutopilot,
 } from "@/hooks/useAutopilot";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const fade = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } };
 

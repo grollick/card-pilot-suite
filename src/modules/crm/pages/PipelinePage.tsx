@@ -10,9 +10,9 @@ import { useCreateTask } from "@/hooks/useTasks";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import {
-import GuzzlLogo from "@/components/brand/GuzzlLogo";
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 export default function PipelinePage() {
   const navigate = useNavigate();

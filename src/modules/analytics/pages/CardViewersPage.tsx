@@ -13,13 +13,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCardViewers, useViewerStats } from "@/hooks/useCardViewers";
 import {
-import GuzzlLogo from "@/components/brand/GuzzlLogo";
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const deviceIcons: Record<string, typeof Monitor> = {
   Mobile: Smartphone,

@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
-import GuzzlLogo from "@/components/brand/GuzzlLogo";
   ArrowRight,
   Check,
   X,
@@ -23,6 +22,7 @@ import GuzzlLogo from "@/components/brand/GuzzlLogo";
   UserCheck,
   Mail,
 } from "lucide-react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
