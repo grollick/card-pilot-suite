@@ -300,9 +300,9 @@ export default function LandingPage() {
                       <ArrowRight className="h-4 w-4 ml-1.5 group-hover:translate-x-0.5 transition-transform" />
                     </Button>
                   </Link>
-                  <a href="#examples">
+                  <a href="#how-it-works">
                     <Button variant="outline" size="lg" className="text-base h-13 px-6 rounded-xl">
-                      <ExternalLink className="h-4 w-4 mr-1.5" /> View Demo
+                      <ExternalLink className="h-4 w-4 mr-1.5" /> See How It Works
                     </Button>
                   </a>
                 </motion.div>
