@@ -26,6 +26,7 @@ import {
   type RecoveryMode,
 } from "@/hooks/useLeadAssignment";
 import { useTeamMembers, ROLE_LABELS } from "@/hooks/useTeam";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const MODES: { value: AssignmentMode; label: string; icon: any; desc: string }[] = [
   { value: "round_robin", label: "Round Robin", icon: Shuffle, desc: "Distribute leads evenly across all staff in rotation" },
@@ -109,7 +110,7 @@ export default function LeadRoutingPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Route className="h-6 w-6 text-primary" /> <span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Lead Routing</span>
+            <Route className="h-6 w-6 text-primary" /> <GuzzlLogo to={null} size="lg" suffix="Lead Routing" />
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             Configure assignment, recovery, and distribution

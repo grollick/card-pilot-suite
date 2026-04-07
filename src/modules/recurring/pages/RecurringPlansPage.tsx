@@ -16,6 +16,7 @@ import {
   type RecurringPlanStatus,
 } from "@/hooks/useRecurringPlans";
 import { format } from "date-fns";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const STATUS_TABS = [
   { value: "all", label: "All" },
@@ -51,7 +52,7 @@ export default function RecurringPlansPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Recurring Services</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Recurring Services" /></h1>
           <p className="text-muted-foreground text-sm mt-1">Automate repeat scheduling and billing</p>
         </div>
         <Button className="shadow-glow" onClick={() => navigate("/app/recurring/new")}>

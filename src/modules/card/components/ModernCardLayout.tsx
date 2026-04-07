@@ -31,6 +31,7 @@ import type { ResolvedCardTheme } from "@/lib/cardTokens";
 import type { CardSection } from "@/hooks/useCard";
 import { getHeroBackgroundForProfession, getHeroBackgroundById } from "@/lib/heroBackgrounds";
 import { showsBranding } from "@/lib/plans";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const fade = {
   hidden: { opacity: 0, y: 16 },
@@ -646,7 +647,7 @@ export default function ModernCardLayout({
               className="text-xs text-muted-foreground hover:text-foreground transition-colors"
               onClick={() => onTrackEvent("button_click", { cta: "powered_by_footer", referrer_handle: handle })}
             >
-              Powered by <span className="text-primary font-extrabold">guzzl</span><span className="font-normal">.pro</span>
+              Powered by <GuzzlLogo to={null} size="xs" />
             </a>
             <p className="text-2xs text-muted-foreground">
               <a href={`/auth?ref=card&from=${handle}`} className="text-primary font-medium hover:underline"

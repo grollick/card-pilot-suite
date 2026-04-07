@@ -14,6 +14,7 @@ import {
   useDeleteSalesCrmContact, SALES_CRM_STAGES, type SalesCrmStage, type SalesCrmContact,
 } from "@/hooks/useSalesCrm";
 import { toast } from "sonner";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const STAGE_COLORS: Record<SalesCrmStage, string> = {
   new_lead: "bg-primary/10 border-primary/30",
@@ -196,7 +197,7 @@ export default function SalesCrmPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Sales Pipeline</span></h1>
+        <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Sales Pipeline" /></h1>
         <div className="flex justify-center py-12">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
@@ -208,7 +209,7 @@ export default function SalesCrmPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Sales Pipeline</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Sales Pipeline" /></h1>
           <p className="text-muted-foreground text-sm mt-1">
             Track outreach, conversions, and upsells
           </p>

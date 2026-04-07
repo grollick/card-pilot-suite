@@ -15,6 +15,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useRef, useCallback } from "react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const PLACEMENTS = [
   { value: "truck", label: "Truck / Vehicle" },
@@ -73,7 +74,7 @@ export default function QRCampaignsPage() {
     <div className="space-y-8 max-w-6xl">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">QR Campaigns</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="QR Campaigns" /></h1>
           <p className="text-muted-foreground text-sm mt-1">Track where your leads come from with smart QR codes</p>
         </div>
         <Dialog open={showCreate} onOpenChange={setShowCreate}>

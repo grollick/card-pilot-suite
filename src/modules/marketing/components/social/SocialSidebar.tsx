@@ -4,6 +4,7 @@ import {
   Megaphone, Newspaper, Rocket, Settings, Crown, Layers
 } from "lucide-react";
 import { ProBadge } from "./SocialPlanGate";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 export type SocialView =
   | "streams" | "compose" | "calendar" | "planner"
@@ -57,7 +58,7 @@ export default function SocialSidebar({ activeView, onChangeView, lockedFeatures
         <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center">
           <LayoutGrid className="h-4 w-4 text-primary-foreground" />
         </div>
-        {!collapsed && <span className="text-sm tracking-tight"><span className="font-black text-primary">guzzl</span> <span className="font-normal text-muted-foreground">Social</span></span>}
+        {!collapsed && <span className="text-sm tracking-tight"><GuzzlLogo to={null} size="xs" /> <span className="font-normal text-muted-foreground">Social</span></span>}
       </div>
 
       {/* Navigation */}

@@ -30,6 +30,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 export default function SettingsPage() {
   const navigate = useNavigate();
@@ -98,7 +99,7 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Settings</span></h1>
+        <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Settings" /></h1>
         <p className="text-muted-foreground text-sm mt-1">Manage your account and preferences</p>
       </div>
 

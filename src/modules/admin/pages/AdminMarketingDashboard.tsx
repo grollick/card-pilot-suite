@@ -17,6 +17,7 @@ import AdminReferralAnalytics from "@/modules/admin/components/AdminReferralAnal
 import AdminSeoPerformance from "@/modules/admin/components/AdminSeoPerformance";
 import AdminReengagement from "@/modules/admin/components/AdminReengagement";
 import AdminContentLibrary from "@/modules/admin/components/AdminContentLibrary";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 export default function AdminMarketingDashboard() {
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
@@ -49,7 +50,7 @@ export default function AdminMarketingDashboard() {
         <div className="flex items-center gap-2">
           <Megaphone className="h-5 w-5 text-primary" />
           <div>
-            <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Admin Marketing</span></h1>
+            <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Admin Marketing" /></h1>
             <p className="text-muted-foreground text-sm mt-1">Manage campaigns, templates, and user growth</p>
           </div>
         </div>

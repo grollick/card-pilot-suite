@@ -12,6 +12,7 @@ import { useUpdateContact } from "@/hooks/useContactActions";
 import { toast } from "sonner";
 import JobPipelineMetrics from "../components/JobPipelineMetrics";
 import JobPipelineCard from "../components/JobPipelineCard";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 // Fixed stages representing the service business workflow
 const PIPELINE_STAGES = [
@@ -165,7 +166,7 @@ export default function JobPipelinePage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Job Pipeline</span></h1>
+        <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Job Pipeline" /></h1>
         <div className="flex justify-center py-12">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
@@ -177,7 +178,7 @@ export default function JobPipelinePage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Job Pipeline</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Job Pipeline" /></h1>
           <p className="text-muted-foreground text-sm mt-1">Track leads from first contact to payment</p>
         </div>
         <div className="flex gap-2">

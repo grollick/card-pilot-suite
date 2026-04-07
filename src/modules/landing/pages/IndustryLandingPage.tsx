@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowRight, CheckCircle2, Star, ChevronRight } from "lucide-react";
 import { getIndustryPage, getIndustryDemoCard } from "@/modules/landing/data/industryPages";
 import NotFound from "@/modules/shared/pages/NotFound";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 function authLink(slug: string) {
   return `/auth?mode=signup&profession=${slug}`;
@@ -45,7 +46,7 @@ export default function IndustryLandingPage() {
         {/* ── Nav ── */}
         <nav className="border-b border-border/40 bg-background/80 backdrop-blur-sm sticky top-0 z-50">
           <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-            <Link to="/" className="text-lg font-bold"><span className="text-primary font-extrabold">guzzl</span><span className="text-foreground font-normal">.pro</span></Link>
+            <Link to="/" className="text-lg font-bold"><GuzzlLogo to={null} size="sm" /></Link>
             <div className="flex items-center gap-3">
               <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline">Pricing</Link>
               <Button asChild size="sm">
@@ -452,7 +453,7 @@ export default function IndustryLandingPage() {
         <footer className="border-t border-border/40 py-8 text-center">
           <p className="text-xs text-muted-foreground">
             {page.footerNote && <span className="block mb-1">{page.footerNote}</span>}
-            © {new Date().getFullYear()} <Link to="/" className="text-primary hover:underline"><span className="text-primary font-extrabold">guzzl</span><span className="text-foreground font-normal">.pro</span></Link> — The smart business card platform for local professionals.
+            © {new Date().getFullYear()} <Link to="/" className="text-primary hover:underline"><GuzzlLogo to={null} size="sm" /></Link> — The smart business card platform for local professionals.
           </p>
         </footer>
       </div>

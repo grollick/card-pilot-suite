@@ -12,6 +12,7 @@ import { formatDistanceToNow } from "date-fns";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 export default function PipelinePage() {
   const navigate = useNavigate();
@@ -81,7 +82,7 @@ export default function PipelinePage() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Pipeline</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Pipeline" /></h1>
           <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
         </div>
       </div>
@@ -92,7 +93,7 @@ export default function PipelinePage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Pipeline</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Pipeline" /></h1>
           <p className="text-muted-foreground text-sm mt-1">Drag contacts between stages</p>
         </div>
         <Button className="shadow-glow" onClick={() => navigate("/app/contacts")}>

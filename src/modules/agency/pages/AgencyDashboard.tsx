@@ -20,6 +20,7 @@ import {
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 export default function AgencyDashboard() {
   const { data: isAgency, isLoading: agencyLoading } = useIsAgency();
@@ -98,7 +99,7 @@ export default function AgencyDashboard() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <Building2 className="h-6 w-6 text-primary" />
-            <span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Agency Command Center</span>
+            <GuzzlLogo to={null} size="lg" suffix="Agency Command Center" />
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
             Manage all your client workspaces from one place

@@ -16,6 +16,7 @@ import UserResearchDashboard from "@/modules/admin/components/UserResearchDashbo
 import FunnelVisualizationDashboard from "@/modules/admin/components/FunnelVisualizationDashboard";
 import SourceAttributionDashboard from "@/modules/admin/components/SourceAttributionDashboard";
 import { useState } from "react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 type Section = "command" | "engine" | "automation" | "funnel" | "growth" | "sources" | "research" | "content" | "feedback" | "system" | "abuse";
 
@@ -41,7 +42,7 @@ export default function AdminPage() {
     <div className="space-y-5 max-w-6xl">
       <div className="flex items-center gap-2">
         <Shield className="h-5 w-5 text-primary" />
-        <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Admin</span></h1>
+        <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Admin" /></h1>
       </div>
 
       {/* Section nav */}

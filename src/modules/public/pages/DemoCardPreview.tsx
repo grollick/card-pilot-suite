@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const fade = {
   hidden: { opacity: 0, y: 16 },
@@ -454,7 +455,7 @@ export default function DemoCardPreview() {
         {/* Powered by */}
         <div className="text-center mt-8">
           <Link to="/" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-            Powered by <span className="text-primary font-extrabold">guzzl</span><span className="font-normal">.pro</span>
+            Powered by <GuzzlLogo to={null} size="xs" />
           </Link>
         </div>
       </div>

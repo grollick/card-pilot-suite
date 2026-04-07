@@ -10,6 +10,7 @@ import {
   CheckCircle, Crown, Briefcase,
 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 function capitalize(s: string): string {
   return s.replace(/\b\w/g, (c) => c.toUpperCase());
@@ -179,7 +180,7 @@ export default function SeoLandingPage() {
           <div className="max-w-6xl mx-auto px-4 py-12 md:py-16">
             {/* Breadcrumb */}
             <nav className="flex items-center gap-2 mb-5 text-sm" aria-label="Breadcrumb">
-              <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></Link>
+              <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors"><GuzzlLogo to={null} size="xs" /></Link>
               <span className="text-muted-foreground/50">/</span>
               <Link to="/discover" className="text-muted-foreground hover:text-foreground transition-colors">Discover</Link>
               <span className="text-muted-foreground/50">/</span>
@@ -364,7 +365,7 @@ export default function SeoLandingPage() {
           {/* Footer */}
           <footer className="mt-12 pt-8 border-t border-border/40 text-center">
             <p className="text-xs text-muted-foreground">
-              Powered by <Link to="/" className="text-primary hover:underline"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></Link> — the smart business card platform that helps local businesses get more customers.
+              Powered by <Link to="/" className="text-primary hover:underline"><GuzzlLogo to={null} size="xs" /></Link> — the smart business card platform that helps local businesses get more customers.
             </p>
           </footer>
         </main>

@@ -9,6 +9,7 @@ import { useOrg } from "@/contexts/OrgContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const roleIcons = { owner: Crown, admin: Shield, member: User };
 const roleLabels = { owner: "Owner", admin: "Admin", member: "Member" };
@@ -60,7 +61,7 @@ export default function TeamPage() {
         <div className="flex items-center gap-2">
           <Building2 className="h-5 w-5 text-primary" />
           <div>
-            <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Team & Organization</span></h1>
+            <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Team & Organization" /></h1>
             <p className="text-muted-foreground text-sm mt-1">Manage your team and organization settings</p>
           </div>
         </div>

@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useAnalyticsStats, useCtaBreakdown, useEmailStats, useReferrerBreakdown, useDeviceBreakdown, useConversionFunnel, useLeadResponseTime, useRepeatCustomers } from "@/hooks/useAnalytics";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const DEVICE_ICONS: Record<string, React.ReactNode> = {
   Mobile: <Smartphone className="h-3.5 w-3.5" />,
@@ -56,7 +57,7 @@ export default function Analytics() {
       <DesktopGuidanceNotice toolKey="analytics" />
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Analytics</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Analytics" /></h1>
           <p className="text-muted-foreground text-sm mt-1">Track your card performance and engagement</p>
         </div>
         <Select value={period} onValueChange={setPeriod}>

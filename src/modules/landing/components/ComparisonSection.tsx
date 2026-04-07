@@ -22,6 +22,7 @@ import {
   UserCheck,
   Mail,
 } from "lucide-react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -165,7 +166,7 @@ export default function ComparisonSection() {
                 <Zap className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="text-lg font-bold text-foreground"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></p>
+                <p className="text-lg font-bold text-foreground"><GuzzlLogo to={null} size="xs" /></p>
                 <p className="text-xs text-muted-foreground">Everything in one place</p>
               </div>
             </div>

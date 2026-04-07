@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { useAILeadScores } from "@/hooks/useAICopilot";
 import { LeadScoreBadge, LeadScoreLoading } from "@/components/ai/LeadScoreBadge";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 type SavedView = "all" | "new_leads" | "needs_followup" | "booked" | "won" | "lost";
 
@@ -182,7 +183,7 @@ export default function ContactsPage() {
       />
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Contacts</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Contacts" /></h1>
           <p className="text-muted-foreground text-sm mt-1">{contacts.length} total · {filtered.length} shown</p>
         </div>
         <Dialog open={newOpen} onOpenChange={setNewOpen}>

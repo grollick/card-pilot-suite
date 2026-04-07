@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 function useRevenueData(months = 3) {
   return useQuery({
@@ -84,7 +85,7 @@ export default function RevenueForecast() {
     <div className="space-y-8 max-w-6xl">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Revenue Forecast</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Revenue Forecast" /></h1>
           <p className="text-muted-foreground text-sm mt-1">Track conversions and project monthly revenue</p>
         </div>
         <Select value={period} onValueChange={setPeriod}>

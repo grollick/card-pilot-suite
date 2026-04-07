@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { useMarketplaceApps, useFeaturedApps, useInstalledApps, useInstallApp, AppCategory, MarketplaceApp } from "@/hooks/useMarketplaceApps";
 import AppCard from "../components/AppCard";
 import AppDetailDialog from "../components/AppDetailDialog";
@@ -56,7 +57,7 @@ export default function MarketplacePage() {
     <div className="space-y-6 max-w-6xl">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight"><span className="text-primary font-extrabold">guzzl</span> <span className="font-normal text-muted-foreground">Apps & Integrations</span></h1>
+        <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Apps & Integrations" /></h1>
         <p className="text-sm text-muted-foreground mt-1">Discover and install apps to extend your guzzl.pro workspace.</p>
       </div>
 

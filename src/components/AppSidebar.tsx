@@ -27,6 +27,7 @@ import Tip from "@/components/Tip";
 import {
   Collapsible, CollapsibleContent, CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 /* ── Navigation structure ── */
 
@@ -220,7 +221,7 @@ export function AppSidebar() {
                 </div>
                 <div>
                   <span className="text-sm font-bold tracking-tight">
-                    <span className="font-black text-primary">guzzl</span>
+                    <GuzzlLogo to={null} size="xs" />
                     <span className="text-foreground/60 font-normal">.pro</span>
                   </span>
                 </div>
