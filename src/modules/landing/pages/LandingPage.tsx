@@ -158,6 +158,26 @@ export default function LandingPage() {
 
   const { variant: abVariant, trackClick: abTrackClick, hasTest: hasABTest } = useABTest("hero");
 
+  // ── Rotating headline system ──
+  const ROTATING_HEADLINES = useMemo(() => [
+    { main: "Turn Every Connection", accent: "Into a Customer" },
+    { main: "Your Business.", accent: "On Demand." },
+    { main: "Get Found. Get Booked.", accent: "Get Paid." },
+    { main: "Get More Local Customers —", accent: "All From One Simple Card" },
+    { main: "More Leads. More Bookings.", accent: "More Revenue." },
+  ], []);
+
+  const [headlineIdx, setHeadlineIdx] = useState(0);
+
+  useEffect(() => {
+    // Don't rotate if A/B test or profession param is active
+    if (abVariant?.headline || professionParam) return;
+    const interval = setInterval(() => {
+      setHeadlineIdx((i) => (i + 1) % ROTATING_HEADLINES.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [abVariant, ROTATING_HEADLINES]);
+
   // ── Profession-based dynamic headlines ──
   const [searchParams] = useSearchParams();
   const professionParam = searchParams.get("profession")?.toLowerCase().trim() || "";
@@ -182,9 +202,7 @@ export default function LandingPage() {
     "personal trainer": { main: "Fill Your Client Roster —", accent: "Without Chasing Leads" },
   }), []);
 
-  const defaultHeadline = { main: "Get More Local Customers —", accent: "All From One Simple Business Card" };
-
-  // Priority: A/B test > profession param > default
+  // Priority: A/B test > profession param > rotating
   const heroHeadlineAccent = useMemo(() => {
     if (abVariant?.headline) {
       const parts = abVariant.headline.split(" — ");
@@ -193,11 +211,11 @@ export default function LandingPage() {
     if (professionParam && professionHeadlines[professionParam]) {
       return professionHeadlines[professionParam];
     }
-    return defaultHeadline;
-  }, [abVariant, professionParam, professionHeadlines]);
+    return ROTATING_HEADLINES[headlineIdx];
+  }, [abVariant, professionParam, professionHeadlines, ROTATING_HEADLINES, headlineIdx]);
 
-  const heroSubheadline = abVariant?.subheadline || "Create a premium business card that captures leads, books jobs, and manages your customers — all in one place.";
-  const heroCta = abVariant?.cta_text || "Start Free";
+  const heroSubheadline = abVariant?.subheadline || "A smart digital business card + CRM + marketplace for local professionals.";
+  const heroCta = abVariant?.cta_text || "Get Your Card";
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
