@@ -475,6 +475,10 @@ export default function LandingPage() {
       {/* ─── 5. DEMO CARDS ─── */}
       <DemoCardsSection />
 
+      <div className="glow-line" />
+
+      {/* ─── 5.5 MARKETPLACE / LOCAL DISCOVERY ─── */}
+      <MarketplaceSection />
 
       {/* ─── 6. RESULTS ─── */}
       <section className="py-20 md:py-28 relative">
