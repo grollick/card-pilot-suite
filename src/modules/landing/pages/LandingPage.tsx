@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { useABTest } from "@/hooks/useABTest";
 import { Link, useSearchParams } from "react-router-dom";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
@@ -40,6 +40,7 @@ import {
 import { Button } from "@/components/ui/button";
 import FooterSection from "@/modules/landing/components/FooterSection";
 import HeroPhoneAnimation from "@/modules/landing/components/HeroPhoneAnimation";
+import MarketplaceSection from "@/modules/landing/components/MarketplaceSection";
 import { DEMO_CARDS } from "@/lib/demoCards";
 import InteractiveCardShowcase from "@/components/InteractiveCardShowcase";
 import SuccessStoryBanner from "@/components/SuccessStoryBanner";
