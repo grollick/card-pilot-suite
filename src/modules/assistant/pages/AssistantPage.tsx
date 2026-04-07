@@ -546,7 +546,7 @@ export default function AssistantPage() {
                             <Sparkles className="h-4 w-4 text-primary/60" />
                             <span className="text-[11px] font-semibold uppercase tracking-widest text-primary/50">AI Insight</span>
                           </div>
-                          <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight leading-[1.15]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                          <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight leading-[1.15]" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
                             {formatResultTitle(messages[i - 1].content)}
                           </h2>
                           <div className="h-1 w-16 bg-gradient-to-r from-primary via-primary/60 to-transparent rounded-full mt-3" />

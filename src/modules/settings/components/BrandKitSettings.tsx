@@ -51,9 +51,9 @@ export default function BrandKitSettings() {
   const [uploading, setUploading] = useState(false);
   const [brandKitId, setBrandKitId] = useState<string | null>(null);
 
-  const [primaryColor, setPrimaryColor] = useState("#4361ee");
-  const [secondaryColor, setSecondaryColor] = useState("#818cf8");
-  const [fontFamily, setFontFamily] = useState("DM Sans");
+  const [primaryColor, setPrimaryColor] = useState("#3B82F6");
+  const [secondaryColor, setSecondaryColor] = useState("#1E3A8A");
+  const [fontFamily, setFontFamily] = useState("Inter");
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -66,9 +66,9 @@ export default function BrandKitSettings() {
       .then(({ data }) => {
         if (data) {
           setBrandKitId(data.id);
-          setPrimaryColor(data.primary_color ?? "#4361ee");
-          setSecondaryColor(data.secondary_color ?? "#818cf8");
-          setFontFamily(data.font_family ?? "DM Sans");
+          setPrimaryColor(data.primary_color ?? "#3B82F6");
+          setSecondaryColor(data.secondary_color ?? "#1E3A8A");
+          setFontFamily(data.font_family ?? "Inter");
           setLogoUrl(data.logo_url);
         }
         setLoading(false);
