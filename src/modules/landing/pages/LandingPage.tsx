@@ -440,7 +440,7 @@ export default function LandingPage() {
       </section>
 
       {/* ─── 4. HOW IT WORKS ─── */}
-      <section className="py-20 md:py-28 relative">
+      <section id="how-it-works" className="py-20 md:py-28 relative">
         <div className="absolute inset-0 -z-10 gradient-mesh" />
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
