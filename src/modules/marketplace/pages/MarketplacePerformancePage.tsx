@@ -1,4 +1,5 @@
 import { useState } from "react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -71,7 +72,7 @@ export default function MarketplacePerformancePage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="text-primary font-extrabold">guzzl</span> <span className="font-normal text-muted-foreground">Marketplace Performance</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Marketplace Performance" /></h1>
           <p className="text-muted-foreground text-sm">See how your marketplace presence generates views, leads, and bookings.</p>
         </div>
         <div className="flex items-center gap-2">

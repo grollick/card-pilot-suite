@@ -69,8 +69,8 @@ export default function UnsubscribePage() {
       <div className="w-full max-w-md text-center space-y-6">
         <div className="space-y-1">
           <p className="text-2xl">
-            <span className="font-extrabold text-primary">guzzl</span>
-            <span className="text-foreground">.pro</span>
+            <span className="font-medium text-primary">guzzl</span>
+            <span className="font-bold text-foreground">.pro</span>
           </p>
         </div>
 

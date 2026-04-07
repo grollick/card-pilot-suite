@@ -1,4 +1,5 @@
 import { useState } from "react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, ArrowRight, Loader2, Globe, Check, Wand2, Palette, PenLine } from "lucide-react";
@@ -124,8 +125,7 @@ export default function InstantCardPage() {
         {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold">
-            <span className="font-black text-primary text-4xl">guzzl</span>
-            <span className="text-foreground">.pro</span>
+            <GuzzlLogo to={null} size="xl" />
           </h1>
         </div>
 

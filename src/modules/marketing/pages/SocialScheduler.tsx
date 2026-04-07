@@ -1,6 +1,7 @@
 import { useSocialPostLimits } from "../components/social/SocialPlanGate";
 import SocialDashboard from "../components/social/SocialDashboard";
 import { cn } from "@/lib/utils";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 export default function SocialScheduler() {
   const socialLimits = useSocialPostLimits();
@@ -10,8 +11,7 @@ export default function SocialScheduler() {
       {/* Top bar */}
       <div className="flex items-center justify-between h-14 px-6 border-b border-border bg-background sticky top-0 z-10">
         <h1 className="text-2xl font-bold tracking-tight">
-          <span className="font-black text-primary text-3xl">guzzl</span>{" "}
-          <span className="font-normal text-muted-foreground">Social</span>
+          <GuzzlLogo to={null} size="lg" suffix="Social" />
         </h1>
         {socialLimits.monthlyLimit !== -1 && (
           <div className="text-right">
