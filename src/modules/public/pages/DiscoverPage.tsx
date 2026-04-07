@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { LiveAvailabilityCounter } from "@/components/activity/LiveActivityIndicators";
 import {
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 
@@ -377,7 +378,7 @@ export default function DiscoverPage() {
         <div className="relative max-w-6xl mx-auto px-4 py-14 md:py-20">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 mb-6">
-            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors"><span className="text-primary font-extrabold">guzzl</span><span className="text-foreground font-normal">.pro</span></Link>
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors"><GuzzlLogo to={null} size="sm" /></Link>
             <span className="text-muted-foreground/40">/</span>
             <span className="text-sm text-foreground font-medium">Discover</span>
             {displayProfession && (
@@ -864,7 +865,7 @@ export default function DiscoverPage() {
             Trusted local professionals on a secure platform
           </p>
           <p className="text-xs text-muted-foreground">
-            Powered by <Link to="/" className="text-primary hover:underline"><span className="text-primary font-extrabold">guzzl</span><span className="text-foreground font-normal">.pro</span></Link> — the smart business card platform that helps local businesses get more customers.
+            Powered by <Link to="/" className="text-primary hover:underline"><GuzzlLogo to={null} size="sm" /></Link> — the smart business card platform that helps local businesses get more customers.
           </p>
         </div>
       </div>

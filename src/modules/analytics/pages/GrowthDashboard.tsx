@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useState, useCallback } from "react";
 import { subDays, startOfDay } from "date-fns";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 function useGrowthStats() {
   const { user } = useAuth();
@@ -127,7 +128,7 @@ export default function GrowthDashboard() {
   return (
     <div className="space-y-6 max-w-5xl">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Growth Dashboard</span></h1>
+        <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Growth Dashboard" /></h1>
         <p className="text-muted-foreground text-sm mt-1">Track how your card drives leads, bookings, and referrals</p>
       </div>
 

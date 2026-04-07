@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 export default function ClientAuthPage() {
   const [email, setEmail] = useState("");
@@ -107,7 +108,7 @@ export default function ClientAuthPage() {
         </div>
 
         <p className="text-center text-xs text-muted-foreground mt-4">
-          Powered by <span className="font-medium text-foreground"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></span>
+          Powered by <span className="font-medium text-foreground"><GuzzlLogo to={null} size="xs" /></span>
         </p>
       </motion.div>
     </div>

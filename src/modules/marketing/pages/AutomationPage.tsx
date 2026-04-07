@@ -17,6 +17,7 @@ import {
 } from "@/hooks/useAutomation";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const triggerLabel = (t: string) => TRIGGER_TYPES.find(x => x.value === t)?.label ?? t;
 const actionLabel = (a: string) => ACTION_TYPES.find(x => x.value === a)?.label ?? a;
@@ -111,7 +112,7 @@ export default function AutomationPage() {
     <div className="space-y-6 max-w-4xl">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Automations</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Automations" /></h1>
           <p className="text-muted-foreground text-sm mt-1">Set triggers to automate follow-ups, emails, and tasks</p>
         </div>
         <Button className="shadow-glow" onClick={() => { resetForm(); setOpen(true); }}>

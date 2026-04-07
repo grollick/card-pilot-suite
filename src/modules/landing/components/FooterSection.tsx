@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Globe, Mail, ArrowUpRight } from "lucide-react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const FOOTER_LINKS = {
   Product: [
@@ -29,7 +30,7 @@ export default function FooterSection() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <span className="text-xl font-extrabold tracking-tight">
-              <span className="text-primary font-extrabold">guzzl</span><span className="text-foreground font-normal">.pro</span>
+              <GuzzlLogo to={null} size="sm" />
             </span>
             <p className="text-sm text-muted-foreground mt-3 leading-relaxed max-w-xs">
               The all-in-one platform that turns your business card into a customer-generating machine.

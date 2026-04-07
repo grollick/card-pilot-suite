@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import BeforeAfterSlider from "@/modules/card/components/BeforeAfterSlider";
 import { toast } from "sonner";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 interface ProjectData {
   id: string;
@@ -252,7 +253,7 @@ export default function PublicProjectPage() {
             href="/?ref=project"
             className="text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
-            Powered by <span className="font-bold text-primary"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></span>
+            Powered by <span className="font-bold text-primary"><GuzzlLogo to={null} size="xs" /></span>
           </a>
           <p>
             <a

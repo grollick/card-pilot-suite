@@ -25,6 +25,7 @@ import DocumentStatusBadge from "@/components/DocumentStatusBadge";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 interface LineItem {
   title: string;
@@ -200,7 +201,7 @@ export default function InvoiceDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-             <h1 className="text-xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">{isNew ? "New Invoice" : invoice?.invoice_number}</span></h1>
+             <h1 className="text-xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="{isNew ? "New Invoice" : invoice?.invoice_number}" /></h1>
             {!isNew && invoice && (
               <DocumentStatusBadge status={invoice.status} size="sm" />
             )}

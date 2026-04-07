@@ -30,6 +30,7 @@ import {
 } from "@/hooks/useBookings";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
 import UpgradePrompt from "@/components/UpgradePrompt";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const statusColors: Record<string, string> = {
   requested: "bg-[hsl(var(--warning))]/10 text-[hsl(var(--warning))]",
@@ -164,7 +165,7 @@ export default function BookingManager() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Booking</span></h1>
+        <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Booking" /></h1>
         <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
       </div>
     );
@@ -180,7 +181,7 @@ export default function BookingManager() {
       />
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Booking</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Booking" /></h1>
           <p className="text-muted-foreground text-sm mt-1">
             {bookings.length} total bookings · {services.filter((s) => s.active).length} active services
           </p>

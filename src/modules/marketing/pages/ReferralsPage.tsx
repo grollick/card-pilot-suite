@@ -14,6 +14,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import ReferralShareToolkit from "@/modules/marketing/components/ReferralShareToolkit";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const REWARD_TIERS = [
   { count: 1, reward: "14 days Pro free (both!)", days: 14, icon: "🎁" },
@@ -129,7 +130,7 @@ export default function ReferralsPage() {
   return (
     <div className="space-y-6 max-w-3xl">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Referral Program</span></h1>
+        <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Referral Program" /></h1>
         <p className="text-muted-foreground text-sm mt-1">
           Invite professionals to guzzl.pro — you both earn rewards
         </p>

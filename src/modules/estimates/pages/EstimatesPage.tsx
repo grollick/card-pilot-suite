@@ -39,6 +39,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import EstimateBuilderDialog from "@/modules/estimates/components/EstimateBuilderDialog";
 import DocumentStatusBadge from "@/components/DocumentStatusBadge";
 import { Badge } from "@/components/ui/badge";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const VALID_TRANSITIONS: Record<EstimateStatus, EstimateStatus[]> = {
   draft: ["sent"],
@@ -211,7 +212,7 @@ export default function EstimatesPage() {
         className="flex items-center justify-between flex-wrap gap-3"
       >
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Estimates</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Estimates" /></h1>
           <p className="text-muted-foreground text-sm mt-1">
             Create, send, and track customer estimates
           </p>

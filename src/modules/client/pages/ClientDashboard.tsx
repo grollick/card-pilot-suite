@@ -26,6 +26,7 @@ import PaymentSummaryWidget from "@/modules/client/components/PaymentSummaryWidg
 import ProjectProgressWidget from "@/modules/client/components/ProjectProgressWidget";
 import DocumentVaultWidget from "@/modules/client/components/DocumentVaultWidget";
 import { toast } from "sonner";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const anim = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 } };
 
@@ -376,7 +377,7 @@ export default function ClientDashboard() {
       {/* Footer */}
       <footer className="border-t border-border mt-12 py-4 text-center">
         <p className="text-xs text-muted-foreground">
-          Powered by <span className="font-medium text-foreground"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></span>
+          Powered by <span className="font-medium text-foreground"><GuzzlLogo to={null} size="xs" /></span>
         </p>
       </footer>
     </div>

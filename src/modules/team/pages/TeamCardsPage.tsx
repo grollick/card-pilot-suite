@@ -11,6 +11,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 function useTeamCards(orgId?: string) {
   return useQuery({
@@ -76,7 +77,7 @@ export default function TeamCardsPage() {
     <div className="space-y-6 max-w-5xl">
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <CreditCard className="h-6 w-6 text-primary" /> <span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Team Cards</span>
+          <CreditCard className="h-6 w-6 text-primary" /> <GuzzlLogo to={null} size="lg" suffix="Team Cards" />
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">
           Create individual digital cards for each team member

@@ -16,6 +16,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const anim = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 } };
 
@@ -138,7 +139,7 @@ export default function PlatformAdminDashboard() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <Shield className="h-6 w-6 text-primary" />
-            <span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Platform Admin</span>
+            <GuzzlLogo to={null} size="lg" suffix="Platform Admin" />
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
             Overview of all platform users, plans, revenue, and activity.

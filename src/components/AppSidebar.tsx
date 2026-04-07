@@ -25,6 +25,7 @@ import { Separator } from "@/components/ui/separator";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Tip from "@/components/Tip";
 import {
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
   Collapsible, CollapsibleContent, CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
@@ -220,7 +221,7 @@ export function AppSidebar() {
                 </div>
                 <div>
                   <span className="text-sm font-bold tracking-tight">
-                    <span className="font-black text-primary">guzzl</span>
+                    <GuzzlLogo to={null} size="xs" />
                     <span className="text-foreground/60 font-normal">.pro</span>
                   </span>
                 </div>

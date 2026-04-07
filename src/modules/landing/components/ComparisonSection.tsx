@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
   ArrowRight,
   Check,
   X,
@@ -165,7 +166,7 @@ export default function ComparisonSection() {
                 <Zap className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="text-lg font-bold text-foreground"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></p>
+                <p className="text-lg font-bold text-foreground"><GuzzlLogo to={null} size="xs" /></p>
                 <p className="text-xs text-muted-foreground">Everything in one place</p>
               </div>
             </div>

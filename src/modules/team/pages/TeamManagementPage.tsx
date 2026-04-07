@@ -22,6 +22,7 @@ import ChangeRoleDialog from "../components/ChangeRoleDialog";
 import AvailabilityEditor from "../components/AvailabilityEditor";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const roleColorMap: Record<string, string> = {
   owner: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
@@ -75,7 +76,7 @@ export default function TeamManagementPage() {
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Users className="h-6 w-6 text-primary" /> <span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Team</span>
+            <Users className="h-6 w-6 text-primary" /> <GuzzlLogo to={null} size="lg" suffix="Team" />
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             {currentOrg.name} · {teamMembers.length} member{teamMembers.length !== 1 ? "s" : ""}

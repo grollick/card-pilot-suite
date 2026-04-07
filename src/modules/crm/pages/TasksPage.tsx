@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const priorityColors: Record<string, string> = {
   high: "text-destructive",
@@ -101,7 +102,7 @@ export default function TasksPage() {
     <div className="space-y-6 max-w-3xl">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Tasks</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Tasks" /></h1>
           <p className="text-muted-foreground text-sm mt-1">{openCount} open · {overdueCount > 0 && <span className="text-destructive">{overdueCount} overdue · </span>}{doneCount} done</p>
         </div>
         <Dialog open={newOpen} onOpenChange={setNewOpen}>

@@ -29,6 +29,7 @@ import {
   type JobStatus
 } from "@/hooks/useJobs";
 import { useContacts } from "@/hooks/useContacts";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 export default function JobsPage() {
   const navigate = useNavigate();
@@ -85,7 +86,7 @@ export default function JobsPage() {
     <div className="space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Jobs</span></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Jobs" /></h1>
           <p className="text-muted-foreground text-sm mt-1">Manage and track your active jobs</p>
         </div>
         <div className="flex gap-2">

@@ -14,6 +14,7 @@ import {
   ArrowRight, CheckCircle, Users, Loader2, DollarSign,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const NAV_ITEMS = [
   { id: "home", label: "Home", hash: "" },
@@ -461,7 +462,7 @@ export default function PublicSite() {
               <span className="text-sm font-medium text-foreground">{profile.company || profile.name}</span>
             </div>
             <p className="text-xs text-muted-foreground">
-              Powered by <Link to="/" className="text-primary hover:underline"><span className="font-black text-primary text-4xl">guzzl</span><span className="font-normal">.pro</span></Link>
+              Powered by <Link to="/" className="text-primary hover:underline"><GuzzlLogo to={null} size="xs" /></Link>
             </p>
           </div>
         </footer>

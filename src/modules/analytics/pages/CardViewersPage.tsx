@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCardViewers, useViewerStats } from "@/hooks/useCardViewers";
 import {
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
   Select,
   SelectContent,
   SelectItem,
@@ -52,7 +53,7 @@ export default function CardViewersPage() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
               <Eye className="h-6 w-6 text-primary" />
-              <span className="font-black text-primary text-4xl">guzzl</span> <span className="font-normal text-muted-foreground">Card Viewers</span>
+              <GuzzlLogo to={null} size="lg" suffix="Card Viewers" />
             </h1>
             <p className="text-muted-foreground text-sm mt-1">
               Real-time visitor tracking with device & location data.
