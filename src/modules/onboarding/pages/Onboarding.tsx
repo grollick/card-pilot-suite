@@ -14,12 +14,14 @@ import StepWelcome from "../components/StepWelcome";
 import StepProfession from "../components/StepProfession";
 import StepAutoBuild from "../components/StepAutoBuild";
 import StepCardPreview from "../components/StepCardPreview";
+import StepContactDetails from "../components/StepContactDetails";
+import StepSocialLinks from "../components/StepSocialLinks";
+import StepBookingSetup from "../components/StepBookingSetup";
 import StepYoureLive from "../components/StepYoureLive";
 import StepActionPrompt from "../components/StepActionPrompt";
-import StepSocialLinks from "../components/StepSocialLinks";
 import StepSharing from "../components/StepSharing";
+import StepUpgradePrompt from "../components/StepUpgradePrompt";
 import StepActivationChecklist from "../components/StepActivationChecklist";
-import StepAIPersonality from "../components/StepAIPersonality";
 
 interface Profession {
   id: string;
@@ -62,17 +64,21 @@ const categoryKeyMap: Record<string, string> = {
   "Pet & Other Services": "pet_other",
 };
 
-// Steps:
+// New optimized flow:
 // 0 = Welcome
 // 1 = Profession
-// 2 = AI Personality
-// 3 = Auto-Build (business name + optional URL)
-// 4 = Card Preview (generating / preview)
-// 5 = You're Live (success moment)
-// 6 = Action Prompt
-// 7 = Social Links
-// 8 = Sharing
-// 9 = Activation Checklist
+// 2 = Business Name (Auto-Build)
+// 3 = Card Preview (generating / preview)
+// 4 = Contact + Details (phone, email, services, location)
+// 5 = Social Links (guided)
+// 6 = Booking Setup (optional)
+// 7 = Activate Card — "You're Live!" moment
+// 8 = Action Prompt (Aha Moment triggers)
+// 9 = Sharing
+// 10 = Upgrade Prompt
+// 11 = Activation Checklist (dashboard)
+
+const TOTAL_STEPS = 12;
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -85,11 +91,14 @@ export default function Onboarding() {
   const [selectedProfessionId, setSelectedProfessionId] = useState("");
   const [company, setCompany] = useState("");
   const [externalUrl, setExternalUrl] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [city, setCity] = useState("");
   const [services, setServices] = useState<string[]>([]);
+  const [bookingEnabled, setBookingEnabled] = useState(false);
   const [saving, setSaving] = useState(false);
   const [launched, setLaunched] = useState(false);
   const [socialLinks, setSocialLinks] = useState<{ platform: string; url: string }[]>([]);
-  const [aiPersonality, setAiPersonality] = useState("copilot");
 
   // AI state
   const [aiSetup, setAiSetup] = useState<AISetup | null>(null);
@@ -146,15 +155,13 @@ export default function Onboarding() {
   const generateHandle = (input: string) =>
     input.toLowerCase().replace(/[^a-z0-9]+/g, "").slice(0, 20) + Math.floor(Math.random() * 1000);
 
-  // Generate AI setup and launch card
-  const handleGenerateAndLaunch = async () => {
+  // Generate AI content and show preview (does NOT save yet)
+  const handleGeneratePreview = async () => {
     if (!user || !selectedProfession) return;
-    setStep(4); // Go to card preview/loading
+    setStep(3);
     setAiLoading(true);
-    setSaving(true);
 
     try {
-      // 1. Generate AI content
       let setup: AISetup | null = null;
       try {
         const { data, error } = await supabase.functions.invoke("ai-onboarding-setup", {
@@ -179,64 +186,84 @@ export default function Onboarding() {
       }
 
       // Also try instant-card if URL provided
-      let instantCard: any = null;
       if (externalUrl) {
         try {
           const { data, error } = await supabase.functions.invoke("instant-card", {
             body: { business_name: company, url: externalUrl },
           });
-          if (!error && !data?.error) {
-            instantCard = data.card;
+          if (!error && !data?.error && data.card) {
+            if (data.card.bio && !setup?.bio) setAiSetup(prev => prev ? { ...prev, bio: data.card.bio } : prev);
           }
         } catch {
           // Non-critical
         }
       }
 
-      // 2. Save profile
+      setAiLoading(false);
+    } catch (err: any) {
+      console.error("AI setup error:", err);
+      setAiLoading(false);
+      setStep(2);
+    }
+  };
+
+  // Full save — called when activating the card (step 7)
+  const handleActivateCard = async () => {
+    if (!user || !selectedProfession) return;
+    setSaving(true);
+
+    try {
       const handle = generateHandle(company || user.email || "user");
       const packKey = pickStylePackKey("Modern", categoryKey);
-      const name = company; // Use business name as display name
 
       const { error: profileErr } = await supabase.from("profiles").update({
-        name,
+        name: company,
         company: company || null,
         handle,
         profession_id: selectedProfession.id,
         style_pack: packKey,
         primary_cta: "call",
-        bio: instantCard?.bio || setup?.bio || null,
+        bio: aiSetup?.bio || null,
         onboarding_completed: true,
         marketplace_enabled: true,
-        ai_personality: aiPersonality,
+        phone: phone || null,
+        email: email || null,
+        city: city || null,
       } as any).eq("id", user.id);
       if (profileErr) throw profileErr;
 
-      // 3. Card
-      const bestTemplate = setup?.suggested_template
-        ? (CARD_TEMPLATES.find(t => t.id === setup!.suggested_template) ? setup.suggested_template : getBestTemplateForProfession(selectedProfession.name))
+      // Card
+      const bestTemplate = aiSetup?.suggested_template
+        ? (CARD_TEMPLATES.find(t => t.id === aiSetup!.suggested_template) ? aiSetup.suggested_template : getBestTemplateForProfession(selectedProfession.name))
         : getBestTemplateForProfession(selectedProfession.name);
       const template = getTemplate(bestTemplate);
       const sectionsJson = template
         ? template.sections.map(s => ({ id: s.id, label: s.id.charAt(0).toUpperCase() + s.id.slice(1).replace(/_/g, " "), enabled: s.enabled }))
         : (selectedProfession.default_card_sections || []);
 
+      // Add social links to sections if provided
+      let finalSections = sectionsJson;
+      if (socialLinks.length > 0) {
+        const socialSection = { id: "social", label: "Social", enabled: true, content: { links: socialLinks } };
+        finalSections = [...sectionsJson, socialSection];
+      }
+
       const { error: cardErr } = await supabase.from("cards").upsert({
         user_id: user.id,
         theme_json: {
           style_pack: packKey,
-          primary_cta: instantCard?.cta_text || setup?.cta_text || "call",
-          tagline: instantCard?.tagline || setup?.tagline || "",
-          about: instantCard?.about || setup?.about || "",
-          primary_color: instantCard?.theme?.primary_color,
+          primary_cta: aiSetup?.cta_text || "call",
+          tagline: aiSetup?.tagline || "",
+          about: aiSetup?.about || "",
+          booking_enabled: bookingEnabled,
         },
-        sections_json: sectionsJson,
+        sections_json: finalSections,
         status: "published",
         published_at: new Date().toISOString(),
       }, { onConflict: "user_id" });
       if (cardErr) throw cardErr;
 
-      // 4. Pipeline stages
+      // Pipeline stages
       const stages = (selectedProfession.default_pipeline_stages as string[]) || [];
       if (stages.length > 0) {
         await supabase.from("pipeline_stages").insert(
@@ -244,8 +271,8 @@ export default function Onboarding() {
         );
       }
 
-      // 5. Services
-      const finalServices = setup?.services || instantCard?.services || [];
+      // Services
+      const finalServices = aiSetup?.services || [];
       if (finalServices.length > 0) {
         await supabase.from("booking_services").insert(
           finalServices.map((s: any) => ({
@@ -258,7 +285,7 @@ export default function Onboarding() {
         );
       }
 
-      // 6. Email templates
+      // Email templates
       const templates = (selectedProfession.default_email_templates as any[]) || [];
       if (templates.length > 0) {
         await supabase.from("email_templates").insert(
@@ -271,25 +298,18 @@ export default function Onboarding() {
 
       // Record referral signup
       try {
-        await supabase.functions.invoke("referral-system", {
-          body: { action: "record_signup" },
-        });
+        await supabase.functions.invoke("referral-system", { body: { action: "record_signup" } });
       } catch { /* Non-critical */ }
 
-      // Move to success screen
-      setAiLoading(false);
       setSaving(false);
-      setStep(5);
+      setStep(7); // Show "You're Live!"
     } catch (err: any) {
       console.error("Onboarding error:", err);
       toast({ title: "Something went wrong", description: err.message, variant: "destructive" });
-      setAiLoading(false);
       setSaving(false);
-      setStep(3); // Go back to auto-build
     }
   };
 
-  const totalSteps = 10;
   const handle = (company || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
   const cardUrl = `${window.location.origin}/${handle}`;
   const shareMessage = `Hey! I just set up my digital business card — check it out and let me know if you ever need ${selectedProfession?.name?.toLowerCase() || "my"} services: ${cardUrl}`;
@@ -316,6 +336,10 @@ export default function Onboarding() {
     route: s.route,
   }));
 
+  // Progress bar: show for middle steps only
+  const showProgress = step >= 1 && step <= 10;
+  const progressSteps = TOTAL_STEPS;
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-lg">
@@ -325,9 +349,9 @@ export default function Onboarding() {
         </div>
 
         {/* Progress */}
-        {step > 0 && step < 9 && (
+        {showProgress && (
           <div className="flex gap-1.5 mb-6">
-            {[...Array(totalSteps)].map((_, i) => (
+            {[...Array(progressSteps)].map((_, i) => (
               <div key={i} className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${
                 i < step ? "bg-primary" : i === step ? "bg-primary/50" : "bg-muted"
               }`} />
@@ -335,7 +359,9 @@ export default function Onboarding() {
           </div>
         )}
 
-        <div className={`rounded-2xl border border-border bg-card shadow-lg ${step === 0 || step === 5 || step === 9 ? "p-8" : "p-6"}`}>
+        <div className={`rounded-2xl border border-border bg-card shadow-lg ${
+          step === 0 || step === 7 || step === 11 ? "p-8" : "p-6"
+        }`}>
           <AnimatePresence mode="wait">
             {/* Step 0: Welcome */}
             {step === 0 && (
@@ -378,110 +404,109 @@ export default function Onboarding() {
               />
             )}
 
-            {/* Step 2: AI Personality */}
+            {/* Step 2: Business Name (Auto-Build) */}
             {step === 2 && (
-              <StepAIPersonality
-                selected={aiPersonality}
-                onSelect={setAiPersonality}
-                onNext={() => setStep(3)}
-                onBack={() => setStep(1)}
-              />
-            )}
-
-            {/* Step 3: Auto-Build */}
-            {step === 3 && (
               <StepAutoBuild
                 businessName={company}
                 externalUrl={externalUrl}
                 onBusinessNameChange={setCompany}
                 onExternalUrlChange={setExternalUrl}
-                onGenerate={handleGenerateAndLaunch}
+                onGenerate={handleGeneratePreview}
+                onBack={() => setStep(1)}
+              />
+            )}
+
+            {/* Step 3: Card Preview (generating / preview) */}
+            {step === 3 && (
+              <StepCardPreview
+                name={company}
+                company={company}
+                phone={phone}
+                city={city}
+                tagline={aiSetup?.tagline}
+                services={services}
+                aiLoading={aiLoading}
+                onNext={() => setStep(4)}
                 onBack={() => setStep(2)}
               />
             )}
 
-            {/* Step 4: Card Preview / Generating */}
+            {/* Step 4: Contact + Details */}
             {step === 4 && (
-              <StepCardPreview
-                name={company}
-                company={company}
-                phone=""
-                city=""
-                tagline={aiSetup?.tagline}
+              <StepContactDetails
+                phone={phone}
+                email={email}
+                city={city}
                 services={services}
-                aiLoading={aiLoading || saving}
+                onPhoneChange={setPhone}
+                onEmailChange={setEmail}
+                onCityChange={setCity}
+                onServicesChange={setServices}
                 onNext={() => setStep(5)}
                 onBack={() => setStep(3)}
               />
             )}
 
-            {/* Step 5: You're Live */}
+            {/* Step 5: Social Links */}
             {step === 5 && (
+              <StepSocialLinks
+                onNext={(links) => {
+                  setSocialLinks(links);
+                  setStep(6);
+                }}
+                onBack={() => setStep(4)}
+              />
+            )}
+
+            {/* Step 6: Booking Setup */}
+            {step === 6 && (
+              <StepBookingSetup
+                bookingEnabled={bookingEnabled}
+                onToggleBooking={setBookingEnabled}
+                onNext={() => {
+                  // Now activate the card
+                  handleActivateCard();
+                }}
+                onBack={() => setStep(5)}
+              />
+            )}
+
+            {/* Step 7: You're Live! (Activate Card moment) */}
+            {step === 7 && (
               <StepYoureLive
                 company={company}
-                onNext={() => setStep(6)}
+                onNext={() => setStep(8)}
               />
             )}
 
-            {/* Step 6: Action Prompt */}
-            {step === 6 && (
+            {/* Step 8: Action Prompt (Aha Moment) */}
+            {step === 8 && (
               <StepActionPrompt
                 onTurnOnDuty={() => navigate("/app/duty")}
-                onShareCard={() => setStep(8)}
-                onSkip={() => navigate("/app")}
+                onShareCard={() => setStep(9)}
+                onSkip={() => setStep(10)}
               />
             )}
 
-            {/* Step 7: Social Links */}
-            {step === 7 && (
-              <StepSocialLinks
-                onNext={async (links) => {
-                  setSocialLinks(links);
-                  if (links.length > 0 && user) {
-                    try {
-                      const { data: card } = await supabase
-                        .from("cards")
-                        .select("sections_json")
-                        .eq("user_id", user.id)
-                        .single();
-                      if (card) {
-                        const sections = (card.sections_json as any[]) || [];
-                        const socialIdx = sections.findIndex((s: any) => s.id === "social");
-                        const socialSection = {
-                          id: "social",
-                          label: "Social",
-                          enabled: true,
-                          content: { links },
-                        };
-                        const updatedSections = socialIdx >= 0
-                          ? sections.map((s: any, i: number) => i === socialIdx ? socialSection : s)
-                          : [...sections, socialSection];
-                        await supabase
-                          .from("cards")
-                          .update({ sections_json: updatedSections as any })
-                          .eq("user_id", user.id);
-                      }
-                    } catch (err) {
-                      console.error("Failed to save social links:", err);
-                    }
-                  }
-                  setStep(8);
-                }}
-                onBack={() => setStep(6)}
-              />
-            )}
-
-            {/* Step 8: Sharing */}
-            {step === 8 && (
+            {/* Step 9: Sharing */}
+            {step === 9 && (
               <StepSharing
                 cardUrl={cardUrl}
                 shareMessage={shareMessage}
-                onNext={() => setStep(9)}
+                onNext={() => setStep(10)}
               />
             )}
 
-            {/* Step 9: Activation Checklist */}
-            {step === 9 && (
+            {/* Step 10: Upgrade Prompt */}
+            {step === 10 && (
+              <StepUpgradePrompt
+                onUpgrade={() => navigate("/app/billing")}
+                onSkip={() => setStep(11)}
+              />
+            )}
+
+            {/* Step 11: Activation Checklist */}
+            {step === 11 && (
               <StepActivationChecklist
                 items={checklistItems}
                 headline={checklistTemplate.headline}
