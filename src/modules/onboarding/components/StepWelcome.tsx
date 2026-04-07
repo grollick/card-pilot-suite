@@ -35,7 +35,7 @@ export default function StepWelcome({ onStart, onInstant }: Props) {
           transition={{ delay: 0.3 }}
           className="text-2xl font-bold text-foreground"
         >
-          Get More Local Jobs — Starting Today
+          Let's get your business ready to be discovered
         </motion.h2>
         <motion.p
           initial={{ opacity: 0 }}
@@ -43,7 +43,7 @@ export default function StepWelcome({ onStart, onInstant }: Props) {
           transition={{ delay: 0.5 }}
           className="text-sm text-muted-foreground max-w-xs mx-auto"
         >
-          Create your business card, get discovered, and start receiving leads in minutes.
+          Create your card, get found by customers, and start receiving leads — all in minutes.
         </motion.p>
       </div>
 
