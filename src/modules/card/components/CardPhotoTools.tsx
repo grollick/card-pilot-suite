@@ -631,6 +631,21 @@ export default function CardPhotoTools({
             </Button>
           </div>
         )}
+        {coverUrl && onCoverHeightChange && (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">Backdrop height</span>
+              <span className="text-[10px] text-muted-foreground tabular-nums">{coverHeight}px</span>
+            </div>
+            <Slider
+              value={[coverHeight]}
+              onValueChange={([v]) => onCoverHeightChange(v)}
+              min={80}
+              max={280}
+              step={4}
+            />
+          </div>
+        )}
       </div>
 
       {/* Logo Upload */}
