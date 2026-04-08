@@ -2,9 +2,9 @@ import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
-  Search, Crown, Lock, Check, Sparkles, Star, Calendar,
+  Search, Crown, Lock, Check, Star, Calendar,
   FileText, Phone, MessageSquare, Image, Eye, ArrowRight,
-  LayoutGrid, List, Filter,
+  LayoutGrid, List,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -14,11 +14,10 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  CARD_TEMPLATES, TEMPLATE_CATEGORIES, STYLE_PRESETS,
+  CARD_TEMPLATES, TEMPLATE_CATEGORIES,
   type CardTemplate, type TemplateCategory,
 } from "@/lib/cardTemplates";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
-import { useProfileCache } from "@/hooks/useProfileCache";
 import { toast } from "sonner";
 
 const STYLE_COLORS: Record<string, string> = {
@@ -46,7 +45,6 @@ const CTA_ICONS: Record<string, typeof Phone> = {
 export default function TemplateGalleryPage() {
   const navigate = useNavigate();
   const { hasFeature } = usePlanLimits();
-  const { profile } = useProfileCache();
   const hasPremium = hasFeature("premium_templates");
 
   const [search, setSearch] = useState("");
