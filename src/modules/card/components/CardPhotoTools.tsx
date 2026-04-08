@@ -42,8 +42,8 @@ interface CardPhotoToolsProps {
   onLogoGlowChange?: (val: boolean) => void;
   logoPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name" | "beside-name-right";
   onLogoPositionChange?: (pos: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name" | "beside-name-right") => void;
-  logoSize?: "small" | "medium" | "large";
-  onLogoSizeChange?: (size: "small" | "medium" | "large") => void;
+  logoSize?: "small" | "medium" | "large" | "xl" | "xxl";
+  onLogoSizeChange?: (size: "small" | "medium" | "large" | "xl" | "xxl") => void;
   logoOpacity?: number;
   onLogoOpacityChange?: (val: number) => void;
   logoPadding?: number;
