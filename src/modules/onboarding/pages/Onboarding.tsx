@@ -9,6 +9,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { pickStylePackKey } from "@/lib/stylePackSelection";
 import { getBestTemplateForProfession, getTemplate, CARD_TEMPLATES } from "@/lib/cardTemplates";
 import { getChecklistTemplate } from "@/lib/checklistTemplates";
+import { getProfessionCardDefaults } from "@/lib/professionCardDefaults";
 
 import StepWelcome from "../components/StepWelcome";
 import StepProfession from "../components/StepProfession";
