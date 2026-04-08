@@ -351,6 +351,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
             objectPosition: `center ${coverOffsetY}%`,
             y: coverY,
             scale: coverScale,
+            scaleX: coverFlipX ? -1 : 1,
             position: "absolute",
             top: 0,
             left: 0,
@@ -514,6 +515,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
                 objectPosition: `center ${coverOffsetY}%`,
                 y: coverY,
                 scale: coverScale,
+                scaleX: coverFlipX ? -1 : 1,
                 zIndex: 0,
               }}
             />
