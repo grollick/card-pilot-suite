@@ -34,6 +34,8 @@ interface CardPhotoToolsProps {
   onAvatarRotationChange?: (deg: number) => void;
   coverOffsetY?: number;
   onCoverOffsetYChange?: (y: number) => void;
+  coverFlipX?: boolean;
+  onCoverFlipXChange?: (flip: boolean) => void;
   logoUrl?: string | null;
   onLogoChange?: (url: string | null) => void;
   logoFrostedBg?: boolean;
@@ -80,6 +82,8 @@ export default function CardPhotoTools({
   onAvatarRotationChange,
   coverOffsetY = 0,
   onCoverOffsetYChange,
+  coverFlipX = false,
+  onCoverFlipXChange,
   logoUrl = null,
   onLogoChange,
   logoFrostedBg = true,
