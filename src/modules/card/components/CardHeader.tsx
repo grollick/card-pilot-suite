@@ -441,14 +441,14 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
 
 
   // Shared cover/backdrop banner element for non-cover layouts
-  const coverBanner = (coverUrl || logoUrl || heroBackground) ? parallaxCover(120, true) : null;
+  const coverBanner = (coverUrl || logoUrl || heroBackground) ? parallaxCover(coverHeight * 0.83, true) : null;
 
   switch (header.layout) {
     // ─── Cover: full-width cover image, avatar overlapping ─────
     case "cover":
       return (
         <div style={{ position: "relative" }}>
-          {parallaxCover(160, true)}
+          {parallaxCover(coverHeight, true)}
           <div style={{ padding: "0 24px", marginTop: -40, display: "flex", flexDirection: "column", position: "relative", zIndex: 2 }}>
             {avatarEl}
             <motion.div style={{ display: "flex", alignItems: inlineAlignItems, gap: logoNameGap, marginTop: 12 }} {...heroEntrance(0.15)}>
