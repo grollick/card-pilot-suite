@@ -126,17 +126,57 @@ export default function FirstFiveMinutes() {
                       <CheckCircle2 className="h-8 w-8 text-primary" />
                     </motion.div>
                     <div>
-                      <h2 className="text-xl font-bold text-foreground">Your card is live! 🎉</h2>
+                      <h2 className="text-xl font-bold text-foreground">Your card is ready to share! 🎉</h2>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {company} is now discoverable by customers nearby.
+                        {company} now has a beautiful, professional digital card — ready for customers.
                       </p>
                     </div>
+
+                    {/* Mini card preview */}
+                    {handle && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="mx-auto max-w-[280px] rounded-xl border border-border bg-gradient-to-br from-primary/5 to-primary/10 p-4 text-left"
+                      >
+                        <div className="flex items-center gap-3">
+                          {(profile as any)?.avatar_url ? (
+                            <img
+                              src={(profile as any).avatar_url}
+                              alt={company}
+                              className="h-12 w-12 rounded-full object-cover ring-2 ring-primary/20"
+                            />
+                          ) : (
+                            <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-lg">
+                              {(company || "G").charAt(0)}
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold text-foreground truncate">{company || "Your Business"}</p>
+                            <p className="text-[11px] text-muted-foreground truncate">guzzl.pro/{handle}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-1.5 mt-3">
+                          <div className="flex-1 h-7 rounded-md bg-primary/15 flex items-center justify-center">
+                            <span className="text-[10px] font-medium text-primary">📞 Call</span>
+                          </div>
+                          <div className="flex-1 h-7 rounded-md bg-primary/15 flex items-center justify-center">
+                            <span className="text-[10px] font-medium text-primary">💬 Text</span>
+                          </div>
+                          <div className="flex-1 h-7 rounded-md bg-primary/15 flex items-center justify-center">
+                            <span className="text-[10px] font-medium text-primary">📧 Email</span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
                     {handle && (
                       <button
                         onClick={() => window.open(`/${handle}`, "_blank")}
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-muted hover:bg-muted/80 transition-colors text-sm font-medium text-foreground cursor-pointer"
                       >
-                        <Eye className="h-3.5 w-3.5" /> View your card
+                        <Eye className="h-3.5 w-3.5" /> View full card
                       </button>
                     )}
                     <Button
