@@ -244,6 +244,21 @@ export default function LogoUploader({
               <Switch checked={logoFrostedBg} onCheckedChange={onLogoFrostedBgChange} />
             </div>
           )}
+          {logoFrostedBg && onLogoPaddingChange && (
+            <div className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Background size</span>
+                <span className="text-[10px] text-muted-foreground tabular-nums">{logoPadding}px</span>
+              </div>
+              <Slider
+                value={[logoPadding]}
+                onValueChange={([v]) => onLogoPaddingChange(v)}
+                min={0}
+                max={32}
+                step={1}
+              />
+            </div>
+          )}
           {onLogoGlowChange && (
             <div className="flex items-center justify-between">
               <span className="text-xs text-muted-foreground">Glow effect</span>
