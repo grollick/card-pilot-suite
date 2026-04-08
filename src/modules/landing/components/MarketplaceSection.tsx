@@ -47,6 +47,47 @@ const highlights = [
 ];
 
 export default function MarketplaceSection() {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
+
+  useEffect(() => {
+    if (!mapContainer.current || mapRef.current) return;
+    const map = new maplibregl.Map({
+      container: mapContainer.current,
+      style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      center: [-89.2477, 48.3809],
+      zoom: 12,
+      interactive: false,
+      attributionControl: false,
+    });
+    const pins = [
+      { lng: -89.27, lat: 48.39, name: "Jake M.", role: "Plumber" },
+      { lng: -89.23, lat: 48.37, name: "Sarah L.", role: "Painter" },
+      { lng: -89.26, lat: 48.36, name: "Marco R.", role: "Electrician" },
+      { lng: -89.22, lat: 48.40, name: "Lisa K.", role: "Cleaner" },
+      { lng: -89.21, lat: 48.38, name: "Tom B.", role: "Landscaper" },
+    ];
+    map.on("load", () => {
+      pins.forEach((pin) => {
+        const el = document.createElement("div");
+        el.style.display = "flex";
+        el.style.flexDirection = "column";
+        el.style.alignItems = "center";
+        el.innerHTML = `
+          <div style="width:14px;height:14px;border-radius:50%;border:2px solid white;background:#22c55e;box-shadow:0 1px 3px rgba(0,0,0,.2);"></div>
+          <div style="margin-top:4px;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.92);border:1px solid #e5e7eb;backdrop-filter:blur(4px);box-shadow:0 1px 2px rgba(0,0,0,.08);">
+            <p style="font-size:9px;font-weight:600;color:#111;line-height:1.2;">${pin.name}</p>
+            <p style="font-size:8px;color:#6b7280;">${pin.role}</p>
+          </div>
+        `;
+        new maplibregl.Marker({ element: el, anchor: "top" })
+          .setLngLat([pin.lng, pin.lat])
+          .addTo(map);
+      });
+    });
+    mapRef.current = map;
+    return () => { map.remove(); mapRef.current = null; };
+  }, []);
   return (
     <section className="py-20 md:py-28 relative">
       <div className="absolute inset-0 -z-10 gradient-mesh" />
