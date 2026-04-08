@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { X, Lightbulb, PlayCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
 interface PageHelpBannerProps {
   storageKey: string;
@@ -48,7 +49,10 @@ export default function PageHelpBanner({
         <div className="flex-1 min-w-0">
           <p className="text-sm text-foreground">{tooltip}</p>
           {videoTitle && (
-            <button className="flex items-center gap-1.5 mt-2 text-xs text-primary hover:underline font-medium">
+            <button
+              onClick={() => toast.info("Video tutorial coming soon!", { description: "We're working on helpful walkthroughs for every feature." })}
+              className="flex items-center gap-1.5 mt-2 text-xs text-primary hover:underline font-medium"
+            >
               <PlayCircle className="h-3.5 w-3.5" />
               {videoTitle}
               {videoDuration && <span className="text-muted-foreground">({videoDuration})</span>}
