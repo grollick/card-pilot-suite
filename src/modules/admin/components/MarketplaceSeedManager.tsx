@@ -11,11 +11,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { toast } from "sonner";
 import { Store, Plus, MapPin, Star, Eye, EyeOff } from "lucide-react";
 
-interface DemoMetrics {
-  avg_rating: number;
-  review_count: number;
-  marketplace_score: number;
-}
 
 interface DemoBusiness {
   id: string;
