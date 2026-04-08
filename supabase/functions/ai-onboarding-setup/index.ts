@@ -6,6 +6,45 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const PROFESSION_TONE: Record<string, string> = {
+  contractor: "Emphasize reliability, craftsmanship, on-time delivery, and licensed/insured status. Customers want trust and quality.",
+  electrician: "Emphasize safety, fast response, emergency availability, and code compliance. Customers want someone reliable and quick.",
+  plumber: "Emphasize speed, clean work, upfront pricing, and same-day availability. Customers want problems solved fast.",
+  landscaper: "Emphasize visual transformation, curb appeal, and seasonal expertise. Customers want their outdoor space to look stunning.",
+  painter: "Emphasize clean lines, attention to detail, and color expertise. Customers want flawless, lasting results.",
+  realtor: "Emphasize trust, local market knowledge, negotiation skills, and client relationships. Customers want a partner, not a salesperson.",
+  "real estate agent": "Emphasize trust, local market knowledge, negotiation skills, and client relationships. Customers want a partner, not a salesperson.",
+  barber: "Emphasize precision cuts, modern styles, and a premium grooming experience. Clients want to walk out feeling confident.",
+  stylist: "Emphasize personalized looks, color expertise, and a luxurious experience. Clients want to feel beautiful and understood.",
+  photographer: "Emphasize storytelling, artistic vision, and capturing authentic moments. Clients want photos that move them.",
+  "personal trainer": "Emphasize results, accountability, and customized programs. Clients want transformation and confidence.",
+  mechanic: "Emphasize honesty, transparent pricing, and expertise. Customers want someone they trust with their vehicle.",
+  "auto detailer": "Emphasize showroom results, paint protection, and meticulous attention to detail. Customers want their car looking brand new.",
+  consultant: "Emphasize strategic insight, measurable results, and ROI. Clients want a clear path to growth.",
+  cleaner: "Emphasize thoroughness, reliability, and trust. Customers want a spotless home without worry.",
+  lawyer: "Emphasize expertise, discretion, and client advocacy. Clients want someone fighting for their best interests.",
+  accountant: "Emphasize accuracy, tax savings, and proactive financial advice. Clients want peace of mind with their finances.",
+  therapist: "Emphasize a safe space, empathy, and evidence-based approaches. Clients want to feel heard and supported.",
+  dentist: "Emphasize gentle care, modern technology, and a comfortable experience. Patients want a dentist they're not afraid to visit.",
+  tutor: "Emphasize personalized learning, patience, and measurable progress. Parents want their child to succeed confidently.",
+  chef: "Emphasize fresh ingredients, creative menus, and memorable dining experiences. Clients want food that impresses.",
+  "dog trainer": "Emphasize positive methods, patience, and lasting behavior change. Pet owners want a well-behaved, happy dog.",
+  "wedding planner": "Emphasize attention to detail, stress-free execution, and creating magical moments. Couples want their dream day without the worry.",
+  dj: "Emphasize reading the crowd, high-energy sets, and professional equipment. Clients want an unforgettable party.",
+  "insurance agent": "Emphasize protection, savings, and personalized coverage. Clients want the right coverage at the best price.",
+  "mortgage broker": "Emphasize best rates, fast approvals, and guiding clients through the process. Buyers want a smooth path to homeownership.",
+  "graphic designer": "Emphasize brand identity, creative solutions, and visual impact. Clients want designs that stand out and convert.",
+  "web developer": "Emphasize fast, responsive websites that drive results. Clients want a professional online presence that works.",
+  "fitness instructor": "Emphasize energy, community, and fun workouts that get results. Clients want to enjoy getting fit.",
+  massage: "Emphasize relaxation, pain relief, and therapeutic expertise. Clients want to leave feeling renewed.",
+  esthetician: "Emphasize glowing skin, personalized treatments, and a luxurious experience. Clients want to look and feel radiant.",
+  "nail technician": "Emphasize precision, creativity, and long-lasting results. Clients want nails that are a work of art.",
+  hvac: "Emphasize comfort, efficiency, and fast response for heating and cooling emergencies. Customers want reliable climate control.",
+  roofer: "Emphasize durability, storm readiness, and expert installation. Homeowners want a roof they never have to worry about.",
+  "pest control": "Emphasize thorough treatment, prevention, and family-safe methods. Customers want pests gone for good.",
+  "moving company": "Emphasize care, efficiency, and stress-free relocation. Customers want their belongings handled with respect.",
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -34,19 +73,36 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are an expert business setup consultant for digital business cards. Given a profession and optionally a business description, generate a complete business card setup with realistic, industry-specific content.
+    const profLower = profession.toLowerCase();
+    const toneGuide = PROFESSION_TONE[profLower] || `Focus on what makes a ${profession} trustworthy and valuable. Write from the customer's perspective — what do they want to hear?`;
 
-Be specific to the profession. Use real-world service names and realistic pricing for the market. Content should be professional but approachable.
-${business_description ? "The user has described their business — use their description to make the content highly personalized and specific to their niche, specialties, and unique selling points." : ""}`;
+    const systemPrompt = `You are an elite copywriter who creates digital business card content for local professionals. Your copy converts visitors into customers.
 
-    const userPrompt = `Generate a complete card setup for:
+PROFESSION TONE GUIDE:
+${toneGuide}
+
+QUALITY RULES — FOLLOW STRICTLY:
+1. NO generic fluff: never use "passionate professional", "years of experience", "dedicated to excellence", "committed to quality" or similar clichés
+2. NO placeholders or brackets like [Your City]
+3. NO repetition — each field must say something different
+4. Be SPECIFIC to the profession — use real service names, real outcomes, real customer benefits
+5. Write like a human, not a corporate brochure
+6. Every sentence must pass the "so what?" test — if a customer wouldn't care, don't write it
+7. The tagline should be punchy and memorable, not a mission statement
+8. Services must be real offerings with actual descriptions, not vague categories
+9. CTA text should create urgency without being pushy
+10. Focus on CUSTOMER OUTCOMES, not self-praise
+
+${business_description ? "IMPORTANT: The user has described their business. Use their exact specialties, niche, and unique selling points to make content highly personalized." : ""}`;
+
+    const userPrompt = `Generate card content for:
 - Profession: ${profession}
 - Name: ${name || "Not provided"}
-- Company: ${company || "Not provided"}  
+- Company: ${company || "Not provided"}
 - City: ${city || "Not provided"}
 ${business_description ? `- Business Description: "${business_description}"` : ""}
 
-Create realistic, specific content for this exact profession${business_description ? " and business description" : ""}.`;
+Write content that would make a potential customer think "I need to contact this person right now."`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -69,25 +125,25 @@ Create realistic, specific content for this exact profession${business_descripti
               parameters: {
                 type: "object",
                 properties: {
-                  tagline: { type: "string", description: "Short professional tagline, max 80 chars" },
-                  bio: { type: "string", description: "1-2 sentence professional bio, max 160 chars" },
-                  about: { type: "string", description: "2-3 sentence about section, max 300 chars" },
-                  cta_text: { type: "string", description: "Call-to-action button text, max 30 chars" },
-                  marketplace_summary: { type: "string", description: "A 1-2 sentence summary for a public marketplace listing, max 200 chars. Highlight what makes this business stand out." },
+                  tagline: { type: "string", description: "Punchy, memorable headline — max 60 chars. NOT a mission statement. Example: 'Sharp Cuts. Clean Fades. Walk Out Confident.'" },
+                  bio: { type: "string", description: "1-2 sentence professional bio focused on what the customer gets — max 160 chars. No clichés." },
+                  about: { type: "string", description: "2-3 sentence about section that tells the customer WHY to choose this person — max 300 chars. Specific to profession." },
+                  cta_text: { type: "string", description: "Action-driven button text — max 25 chars. Examples: 'Get a Free Quote', 'Book Now', 'Schedule a Call'" },
+                  marketplace_summary: { type: "string", description: "1-2 sentence marketplace listing that highlights the unique value — max 200 chars." },
                   services: {
                     type: "array",
                     items: {
                       type: "object",
                       properties: {
-                        name: { type: "string", description: "Service name" },
-                        description: { type: "string", description: "Brief description, max 80 chars" },
-                        duration_min: { type: "number", description: "Typical duration in minutes" },
-                        price_range: { type: "string", description: "Price range like '$50-$100' or 'From $75'" },
+                        name: { type: "string", description: "Real service name specific to profession" },
+                        description: { type: "string", description: "What the customer gets — max 80 chars" },
+                        duration_min: { type: "number", description: "Realistic duration in minutes" },
+                        price_range: { type: "string", description: "Realistic price range like '$50-$100' or 'From $75'" },
                       },
                       required: ["name", "description", "duration_min", "price_range"],
                       additionalProperties: false,
                     },
-                    description: "5-6 profession-specific services with details",
+                    description: "4-6 real, specific services this profession actually offers",
                   },
                   suggested_template: {
                     type: "string",
@@ -97,7 +153,7 @@ Create realistic, specific content for this exact profession${business_descripti
                   setup_tips: {
                     type: "array",
                     items: { type: "string" },
-                    description: "2-3 short tips for this profession's card setup",
+                    description: "2-3 actionable tips for optimizing this profession's card",
                   },
                 },
                 required: ["tagline", "bio", "about", "cta_text", "marketplace_summary", "services", "suggested_template", "setup_tips"],
