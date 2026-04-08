@@ -1,7 +1,8 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Star, Calendar, FileText, Phone, Image, MessageSquare, Sparkles } from "lucide-react";
+import { Check, Star, Calendar, FileText, Phone, Image, MessageSquare, Sparkles, Crown, Lock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   CARD_TEMPLATES,
   TEMPLATE_CATEGORIES,
@@ -10,6 +11,7 @@ import {
   type CardTemplate,
   type TemplateCategory,
 } from "@/lib/cardTemplates";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
 
 interface TemplateSelectorProps {
   selectedTemplateId: string | null;
@@ -41,6 +43,11 @@ export default function TemplateSelector({
   compact = false,
 }: TemplateSelectorProps) {
   const [activeCategory, setActiveCategory] = useState<TemplateCategory>("general");
+  const [showUpgrade, setShowUpgrade] = useState(false);
+  const [lockedName, setLockedName] = useState("");
+  const { hasFeature } = usePlanLimits();
+  const hasPremium = hasFeature("premium_templates");
+
   const bestTemplateId = useMemo(
     () => getBestTemplateForProfession(professionName),
     [professionName]
@@ -51,6 +58,15 @@ export default function TemplateSelector({
     if (activeCategory === "general") return sorted;
     return sorted.filter(t => t.category === activeCategory);
   }, [professionCategoryKey, activeCategory]);
+
+  const handleSelect = (template: CardTemplate) => {
+    if (template.premium && !hasPremium) {
+      setLockedName(template.name);
+      setShowUpgrade(true);
+      return;
+    }
+    onSelect(template.id);
+  };
 
   return (
     <div className="space-y-3">
@@ -80,7 +96,8 @@ export default function TemplateSelector({
               template={template}
               isSelected={selectedTemplateId === template.id}
               isRecommended={template.id === bestTemplateId}
-              onSelect={() => onSelect(template.id)}
+              isLocked={!!template.premium && !hasPremium}
+              onSelect={() => handleSelect(template)}
               index={i}
               compact={compact}
             />
@@ -93,6 +110,55 @@ export default function TemplateSelector({
           No templates in this category yet.
         </p>
       )}
+
+      {/* Inline upgrade prompt */}
+      <AnimatePresence>
+        {showUpgrade && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="rounded-xl border border-primary/20 bg-gradient-to-br from-primary/5 to-primary/[0.02] p-4 space-y-2.5">
+              <div className="flex items-center gap-2">
+                <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Crown className="h-3.5 w-3.5 text-primary" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-semibold">Unlock {lockedName}</h4>
+                  <p className="text-[10px] text-muted-foreground">Premium templates convert 2x better</p>
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                {["Professionally designed layouts", "Advanced sections & animations", "Higher conversion rates"].map(t => (
+                  <div key={t} className="flex items-center gap-2">
+                    <Check className="h-3 w-3 text-primary shrink-0" />
+                    <span className="text-[11px] text-foreground/80">{t}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  className="flex-1 h-8 text-[11px] gap-1.5"
+                  onClick={() => window.location.href = "/app/pricing"}
+                >
+                  <Crown className="h-3 w-3" /> Upgrade to Pro
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-[11px] text-muted-foreground"
+                  onClick={() => setShowUpgrade(false)}
+                >
+                  Dismiss
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -101,6 +167,7 @@ function TemplateCard({
   template,
   isSelected,
   isRecommended,
+  isLocked,
   onSelect,
   index,
   compact,
@@ -108,13 +175,13 @@ function TemplateCard({
   template: CardTemplate;
   isSelected: boolean;
   isRecommended: boolean;
+  isLocked: boolean;
   onSelect: () => void;
   index: number;
   compact: boolean;
 }) {
   const styleColor = STYLE_COLORS[template.style] || STYLE_COLORS.Modern;
 
-  // Build feature pills from emphasis
   const features = Object.entries(template.emphasis)
     .filter(([key, val]) => val === true && key !== "heroStyle")
     .map(([key]) => {
@@ -128,7 +195,6 @@ function TemplateCard({
       return { key, Icon, label: labels[key] || key };
     });
 
-  // CTA preview
   const ctaIcons: Record<string, typeof Phone> = {
     call: Phone,
     text: MessageSquare,
@@ -147,6 +213,8 @@ function TemplateCard({
       className={`relative text-left rounded-xl border p-4 transition-all ${
         isSelected
           ? "border-primary bg-primary/5 shadow-md ring-1 ring-primary/20"
+          : isLocked
+          ? "border-border/30 bg-muted/10 hover:border-border/50"
           : "border-border hover:border-primary/30 hover:shadow-sm"
       }`}
     >
@@ -157,17 +225,22 @@ function TemplateCard({
             <Sparkles className="h-2.5 w-2.5" /> Best fit
           </Badge>
         )}
+        {isLocked && (
+          <Badge variant="outline" className="text-[9px] px-1.5 py-0 gap-0.5 h-4 border-primary/30 text-primary">
+            <Crown className="h-2.5 w-2.5" /> PRO
+          </Badge>
+        )}
         <Badge
           variant="outline"
           className="text-[9px] px-1.5 py-0 h-4"
-          style={{ borderColor: `${styleColor}40`, color: styleColor }}
+          style={{ borderColor: `${styleColor}40`, color: isLocked ? undefined : styleColor }}
         >
           {template.style}
         </Badge>
       </div>
 
       {/* Template preview strip */}
-      <div className="flex gap-1 mb-2.5">
+      <div className={`flex gap-1 mb-2.5 ${isLocked ? "opacity-50" : ""}`}>
         <div
           className="h-8 flex-1 rounded-md"
           style={{
@@ -192,9 +265,11 @@ function TemplateCard({
       </div>
 
       {/* Info */}
-      <h4 className="text-sm font-semibold text-foreground mb-0.5">{template.name}</h4>
+      <h4 className={`text-sm font-semibold mb-0.5 ${isLocked ? "text-muted-foreground" : "text-foreground"}`}>
+        {template.name}
+      </h4>
       {!compact && (
-        <p className="text-xs text-muted-foreground leading-relaxed mb-2.5">
+        <p className={`text-xs leading-relaxed mb-2.5 ${isLocked ? "text-muted-foreground/50" : "text-muted-foreground"}`}>
           {template.description}
         </p>
       )}
@@ -205,7 +280,7 @@ function TemplateCard({
           {features.map(({ key, Icon, label }) => (
             <span
               key={key}
-              className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-md bg-muted text-muted-foreground"
+              className={`inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-md ${isLocked ? "bg-muted/30 text-muted-foreground/40" : "bg-muted text-muted-foreground"}`}
             >
               {Icon && <Icon className="h-2.5 w-2.5" />}
               {label}
@@ -216,17 +291,21 @@ function TemplateCard({
 
       {/* Preview quote */}
       {!compact && template.preview.tagline && (
-        <p className="text-[10px] italic text-muted-foreground/70 mt-2 border-t border-border/40 pt-2">
+        <p className={`text-[10px] italic mt-2 border-t border-border/40 pt-2 ${isLocked ? "text-muted-foreground/30" : "text-muted-foreground/70"}`}>
           "{template.preview.tagline}"
         </p>
       )}
 
-      {/* Selection indicator */}
-      {isSelected && (
+      {/* Lock / selection indicator */}
+      {isLocked ? (
+        <div className="absolute top-3 right-3 h-5 w-5 rounded-full bg-muted/60 flex items-center justify-center">
+          <Lock className="h-2.5 w-2.5 text-muted-foreground/50" />
+        </div>
+      ) : isSelected ? (
         <div className="absolute top-3 right-3 h-5 w-5 rounded-full bg-primary flex items-center justify-center">
           <Check className="h-3 w-3 text-primary-foreground" />
         </div>
-      )}
+      ) : null}
     </motion.button>
   );
 }
