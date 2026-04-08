@@ -407,7 +407,7 @@ export default function CardBuilder() {
   const previewProps = {
     profile: s.profile, previewTheme: s.previewTheme,
     currentThemeOverrides: s.currentThemeOverrides, sections: s.sections,
-    coverUrl: s.coverUrl, coverOffsetY: s.coverOffsetY,
+    coverUrl: s.coverUrl, coverOffsetY: s.coverOffsetY, coverFlipX: s.coverFlipX,
     avatarUrl: s.avatarUrl, avatarBgColor: s.avatarBgColor, avatarRotation: s.avatarRotation,
     logoUrl: s.logoUrl, logoFrostedBg: s.logoFrostedBg, logoPosition: s.logoPosition,
     logoSize: s.logoSize, logoOpacity: s.logoOpacity, logoPadding: s.logoPadding,
@@ -575,6 +575,7 @@ export default function CardBuilder() {
             onAvatarBgColorChange={s.handleAvatarBgColorChange}
             onAvatarRotationChange={s.handleAvatarRotationChange}
             coverOffsetY={s.coverOffsetY} onCoverOffsetYChange={s.handleCoverOffsetYChange}
+            coverFlipX={s.coverFlipX} onCoverFlipXChange={s.handleCoverFlipXChange}
             logoUrl={s.logoUrl} onLogoChange={s.handleLogoChange}
             logoFrostedBg={s.logoFrostedBg} onLogoFrostedBgChange={s.handleLogoFrostedBgChange}
             logoGlow={s.logoGlow} onLogoGlowChange={s.handleLogoGlowChange}
@@ -905,6 +906,7 @@ export default function CardBuilder() {
                     onAvatarBgColorChange={s.handleAvatarBgColorChange}
                     onAvatarRotationChange={s.handleAvatarRotationChange}
                     coverOffsetY={s.coverOffsetY} onCoverOffsetYChange={s.handleCoverOffsetYChange}
+                    coverFlipX={s.coverFlipX} onCoverFlipXChange={s.handleCoverFlipXChange}
                     logoUrl={s.logoUrl} onLogoChange={s.handleLogoChange}
                     logoFrostedBg={s.logoFrostedBg} onLogoFrostedBgChange={s.handleLogoFrostedBgChange}
                     logoGlow={s.logoGlow} onLogoGlowChange={s.handleLogoGlowChange}
