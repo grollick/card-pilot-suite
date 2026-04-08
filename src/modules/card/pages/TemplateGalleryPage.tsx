@@ -69,9 +69,6 @@ export default function TemplateGalleryPage() {
     });
   }, [category, styleFilter, search]);
 
-  const freeCount = filtered.filter(t => !t.premium).length;
-  const premiumCount = filtered.filter(t => t.premium).length;
-
   const handleApply = (template: CardTemplate) => {
     if (template.premium && !hasPremium) {
       navigate("/app/pricing");
