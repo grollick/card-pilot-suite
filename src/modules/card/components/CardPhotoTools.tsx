@@ -36,6 +36,8 @@ interface CardPhotoToolsProps {
   onCoverOffsetYChange?: (y: number) => void;
   coverFlipX?: boolean;
   onCoverFlipXChange?: (flip: boolean) => void;
+  coverHeight?: number;
+  onCoverHeightChange?: (h: number) => void;
   logoUrl?: string | null;
   onLogoChange?: (url: string | null) => void;
   logoFrostedBg?: boolean;
@@ -84,6 +86,8 @@ export default function CardPhotoTools({
   onCoverOffsetYChange,
   coverFlipX = false,
   onCoverFlipXChange,
+  coverHeight = 144,
+  onCoverHeightChange,
   logoUrl = null,
   onLogoChange,
   logoFrostedBg = true,
