@@ -284,8 +284,9 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
         borderRadius: 8,
         background: logoFrostedBg ? "rgba(255,255,255,0.85)" : "transparent",
         backdropFilter: logoFrostedBg ? "blur(4px)" : undefined,
+        overflow: "hidden",
         display: "flex", alignItems: "center", justifyContent: "center",
-        padding: logoFrostedBg ? logoPadding : 0,
+        padding: logoFrostedBg && logoPadding > 0 ? logoPadding : 0,
         zIndex: 2,
         opacity: logoOpacity / 100,
       }}
@@ -311,8 +312,9 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
         borderRadius: 8,
         background: logoFrostedBg ? "rgba(255,255,255,0.85)" : "transparent",
         backdropFilter: logoFrostedBg ? "blur(4px)" : undefined,
+        overflow: "hidden",
         display: "inline-flex", alignItems: "center", justifyContent: "center",
-        padding: logoFrostedBg ? logoPadding : 0,
+        padding: logoFrostedBg && logoPadding > 0 ? logoPadding : 0,
         opacity: logoOpacity / 100,
         flexShrink: 0,
       }}
