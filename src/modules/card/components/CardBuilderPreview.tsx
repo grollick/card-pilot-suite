@@ -387,7 +387,7 @@ export default function CardBuilderPreview({
     onLogoCustomPositionChange?.(null);
   }, [onLogoCustomPositionChange]);
 
-  const logoPx = logoSize === "small" ? 36 : logoSize === "large" ? 64 : 48;
+  const logoPx = logoSize === "small" ? 36 : logoSize === "xl" ? 80 : logoSize === "xxl" ? 100 : logoSize === "large" ? 64 : 48;
   const posMap: Record<string, string> = {
     "top-left": "top-2 left-2", "top-right": "top-2 right-2",
     "bottom-left": "bottom-2 left-2", "bottom-right": "bottom-2 right-2",

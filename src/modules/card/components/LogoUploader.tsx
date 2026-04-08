@@ -9,7 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 export type LogoPosition = "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name" | "beside-name-right";
-export type LogoSize = "small" | "medium" | "large";
+export type LogoSize = "small" | "medium" | "large" | "xl" | "xxl";
 export type LogoVerticalAlign = "top" | "center" | "bottom";
 
 interface LogoUploaderProps {
@@ -46,6 +46,8 @@ const SIZES: { value: LogoSize; label: string }[] = [
   { value: "small", label: "S" },
   { value: "medium", label: "M" },
   { value: "large", label: "L" },
+  { value: "xl", label: "XL" },
+  { value: "xxl", label: "XXL" },
 ];
 
 export default function LogoUploader({
