@@ -1,4 +1,7 @@
 import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import { MapPin, Radio, Search, Users, Eye, Star } from "lucide-react";
 
 const fadeUp = {
