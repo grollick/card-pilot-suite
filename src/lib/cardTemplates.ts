@@ -583,8 +583,8 @@ const PROFESSION_TEMPLATE_MAP: Record<string, string> = {
   "personal trainer": "booking_first",
   "yoga instructor": "booking_first",
   therapist: "booking_first",
-  consultant: "modern_professional",
-  coach: "modern_professional",
+  consultant: "consultant_authority",
+  coach: "consultant_authority",
   tutor: "modern_professional",
   chef: "portfolio_showcase",
   caterer: "service_pro",
@@ -592,8 +592,12 @@ const PROFESSION_TEMPLATE_MAP: Record<string, string> = {
   florist: "portfolio_showcase",
   baker: "portfolio_showcase",
   "wedding planner": "portfolio_showcase",
-  mechanic: "service_pro",
+  mechanic: "trades_emergency",
   "auto detailer": "service_pro",
+  esthetician: "beauty_luxe",
+  "nail tech": "beauty_luxe",
+  "lash tech": "beauty_luxe",
+  "makeup artist": "beauty_luxe",
 };
 
 /**
