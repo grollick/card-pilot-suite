@@ -44,94 +44,29 @@ const highlights = [
 ];
 
 const marketplacePins = [
-  { top: "28%", left: "24%", name: "Jake M.", role: "Plumber", active: true },
-  { top: "43%", left: "56%", name: "Sarah L.", role: "Painter", active: true },
-  { top: "64%", left: "39%", name: "Marco R.", role: "Electrician", active: false },
-  { top: "31%", left: "74%", name: "Lisa K.", role: "Cleaner", active: true },
-  { top: "72%", left: "67%", name: "Tom B.", role: "Landscaper", active: true },
+  { top: "32%", left: "30%", name: "Jake M.", role: "Plumber", active: true },
+  { top: "48%", left: "50%", name: "Sarah L.", role: "Painter", active: true },
+  { top: "55%", left: "35%", name: "Marco R.", role: "Electrician", active: false },
+  { top: "38%", left: "65%", name: "Lisa K.", role: "Cleaner", active: true },
+  { top: "60%", left: "60%", name: "Tom B.", role: "Landscaper", active: true },
 ];
 
 function ThunderBayMapPreview() {
   return (
     <div className="absolute inset-0 rounded-xl overflow-hidden bg-card">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,hsl(var(--primary)/0.12),transparent_32%),radial-gradient(circle_at_74%_68%,hsl(var(--accent)/0.10),transparent_28%),linear-gradient(180deg,hsl(var(--background)),hsl(var(--muted)/0.85))]" />
+      {/* Real OSM embed of Thunder Bay */}
+      <iframe
+        title="Thunder Bay Map"
+        src="https://www.openstreetmap.org/export/embed.html?bbox=-89.35%2C48.34%2C-89.15%2C48.44&layer=mapnik"
+        className="absolute inset-0 w-full h-full border-0 pointer-events-none"
+        loading="lazy"
+      />
 
-      <svg
-        aria-hidden="true"
-        className="absolute inset-0 h-full w-full"
-        viewBox="0 0 100 100"
-        preserveAspectRatio="none"
-      >
-        <rect width="100" height="100" style={{ fill: "hsl(var(--card))" }} />
-        <path
-          d="M0 0H37C44 4 48 10 49 18C50 26 46 32 42 37C37 43 33 48 31 55C28 65 31 79 36 100H0Z"
-          style={{ fill: "hsl(var(--accent) / 0.16)" }}
-        />
-        <path
-          d="M10 12C18 18 24 23 30 31C35 38 36 46 33 55"
-          fill="none"
-          style={{ stroke: "hsl(var(--border))" }}
-          strokeWidth="0.7"
-          strokeLinecap="round"
-        />
-        <path
-          d="M23 8C34 16 44 28 49 40C53 50 57 60 66 68C74 75 83 79 95 82"
-          fill="none"
-          style={{ stroke: "hsl(var(--border))" }}
-          strokeWidth="0.9"
-          strokeLinecap="round"
-        />
-        <path
-          d="M18 61C28 57 38 55 49 56C61 57 74 61 89 70"
-          fill="none"
-          style={{ stroke: "hsl(var(--border))" }}
-          strokeWidth="0.8"
-          strokeLinecap="round"
-        />
-        <path
-          d="M54 23C61 29 68 34 77 39C83 42 90 44 100 45"
-          fill="none"
-          style={{ stroke: "hsl(var(--border))" }}
-          strokeWidth="0.65"
-          strokeLinecap="round"
-        />
-        <path
-          d="M58 12C62 22 64 32 64 43C64 54 68 64 76 74"
-          fill="none"
-          style={{ stroke: "hsl(var(--border))" }}
-          strokeWidth="0.55"
-          strokeLinecap="round"
-          strokeDasharray="2.5 2"
-        />
-        <path
-          d="M70 16C73 27 74 38 78 48C82 58 88 67 96 75"
-          fill="none"
-          style={{ stroke: "hsl(var(--border))" }}
-          strokeWidth="0.55"
-          strokeLinecap="round"
-          strokeDasharray="2.5 2"
-        />
-      </svg>
-
-      <div className="absolute left-5 top-16 rounded-full border border-border bg-background/90 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground shadow-card backdrop-blur-sm">
-        Thunder Bay, Ontario
-      </div>
-      <div className="absolute left-8 top-[36%] text-[10px] font-medium uppercase tracking-[0.28em] text-muted-foreground/80">
-        Lake Superior
-      </div>
-      <div className="absolute right-8 top-[23%] text-[9px] font-semibold text-muted-foreground/80">
-        Port Arthur
-      </div>
-      <div className="absolute right-10 bottom-[22%] text-[9px] font-semibold text-muted-foreground/80">
-        Fort William
-      </div>
-
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.22)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.22)_1px,transparent_1px)] bg-[size:48px_48px] opacity-30" />
-
+      {/* Pins overlay */}
       {marketplacePins.map((pin) => (
         <div
           key={pin.name}
-          className="absolute flex flex-col items-center"
+          className="absolute flex flex-col items-center z-10"
           style={{ top: pin.top, left: pin.left }}
         >
           <div
@@ -146,6 +81,7 @@ function ThunderBayMapPreview() {
         </div>
       ))}
 
+      {/* Search bar */}
       <div className="absolute top-4 left-4 right-4 z-10">
         <div className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 shadow-card">
           <Search className="h-3.5 w-3.5 text-muted-foreground" />
@@ -153,6 +89,7 @@ function ThunderBayMapPreview() {
         </div>
       </div>
 
+      {/* On Duty badge */}
       <div className="absolute bottom-4 left-4 z-10 flex items-center gap-2 rounded-full border border-success/20 bg-success/10 px-3 py-1.5 backdrop-blur-sm">
         <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
         <span className="text-[10px] font-semibold text-success">4 Pros On Duty</span>
@@ -160,7 +97,7 @@ function ThunderBayMapPreview() {
 
       <div className="absolute bottom-4 right-4 z-10 flex items-center gap-1 rounded-full border border-border bg-background/90 px-2.5 py-1 text-[10px] font-medium text-muted-foreground shadow-sm backdrop-blur-sm">
         <MapPin className="h-3 w-3 text-primary" />
-        Local visibility map
+        Thunder Bay, ON
       </div>
     </div>
   );
