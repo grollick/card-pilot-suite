@@ -278,11 +278,13 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
         ...(logoCustomPosition
           ? { left: `${logoCustomPosition.x}%`, top: `${logoCustomPosition.y}%` }
           : logoPosStyle[logoPosition]),
-        height: logoPx, width: logoPx, borderRadius: 8,
+        height: logoPx + (logoFrostedBg ? logoPadding * 2 : 0),
+        width: logoPx + (logoFrostedBg ? logoPadding * 2 : 0),
+        borderRadius: 8,
         background: logoFrostedBg ? "rgba(255,255,255,0.85)" : "transparent",
         backdropFilter: logoFrostedBg ? "blur(4px)" : undefined,
         display: "flex", alignItems: "center", justifyContent: "center",
-        padding: logoPadding,
+        padding: logoFrostedBg ? logoPadding : 0,
         zIndex: 2,
         opacity: logoOpacity / 100,
       }}
