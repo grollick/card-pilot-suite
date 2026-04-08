@@ -301,7 +301,7 @@ function ThemedSectionPreview({ section, theme, metallicEffect, index }: {
 
 export default function CardBuilderPreview({
   profile, previewTheme, currentThemeOverrides, sections,
-  coverUrl, coverOffsetY, coverFlipX, avatarUrl, avatarBgColor, avatarRotation,
+  coverUrl, coverOffsetY, coverFlipX, coverHeight, avatarUrl, avatarBgColor, avatarRotation,
   logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap = 8, logoVerticalAlign = "center",
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
   boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, subtitleItalic, subtitleSpacing, showCompany = true, companyColor, nameLineHeight, nameTextStroke, nameTextStrokeWidth, onAvatarChange, setEditingSection,
