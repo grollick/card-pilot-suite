@@ -38,7 +38,7 @@ export function useCardBuilderState() {
   const [logoFrostedBg, setLogoFrostedBg] = useState(true);
   const [logoGlow, setLogoGlow] = useState(false);
   const [logoPosition, setLogoPosition] = useState<"top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name" | "beside-name-right">("top-right");
-  const [logoSize, setLogoSize] = useState<"small" | "medium" | "large">("medium");
+  const [logoSize, setLogoSize] = useState<"small" | "medium" | "large" | "xl" | "xxl">("medium");
   const [logoOpacity, setLogoOpacity] = useState(100);
   const [logoPadding, setLogoPadding] = useState(4);
   const [logoNameGap, setLogoNameGap] = useState(8);
