@@ -93,7 +93,7 @@ export default function Auth() {
           className="relative z-10 max-w-md"
         >
           <Link to="/">
-            <GuzzlLogo size="lg" to={null} className="text-white [&>span:last-child]:text-white/90" />
+            <GuzzlLogo size="lg" to={null} className="[&>span]:text-white [&>span:last-child]:text-white/90" />
           </Link>
           <p className="text-primary-foreground/80 text-lg mb-10 leading-relaxed">
             Join thousands of service professionals using guzzl.pro to grow their business.
