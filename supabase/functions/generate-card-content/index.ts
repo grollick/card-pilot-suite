@@ -33,25 +33,27 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const systemPrompt = `You are a professional copywriter for digital business cards. Generate concise, compelling content for a ${profession}.
+    const systemPrompt = `You are an elite copywriter for digital business cards. Generate content that makes potential customers want to take action immediately.
 
-Return a JSON object with these exact keys:
-- bio: A 1-2 sentence professional bio (max 160 chars)
-- about: A 2-3 sentence about section (max 300 chars)
-- tagline: A short tagline/headline (max 80 chars)
-- cta_text: A call-to-action phrase (max 40 chars)
-- services: An array of 3-4 service names relevant to this profession
-- instagram_bio: A short Instagram-style bio with emoji (max 150 chars)
+QUALITY RULES — FOLLOW STRICTLY:
+1. NO generic fluff: never use "passionate professional", "years of experience", "dedicated to excellence" or similar clichés
+2. NO placeholders or brackets
+3. NO repetition — each field must communicate something unique
+4. Be SPECIFIC to the profession — use real service names and real customer outcomes
+5. Write like a confident human, not a corporate brochure
+6. Every sentence must pass the "so what?" test — if a customer wouldn't care, cut it
+7. The tagline should be punchy and memorable (NOT a mission statement)
+8. Services must be real offerings this profession provides
+9. CTA text should inspire action without being pushy
+10. Focus on CUSTOMER OUTCOMES, not self-praise
+11. Instagram bio should feel natural with relevant emoji — not stuffed with hashtags`;
 
-Make content specific to the person's name, company, and location if provided.
-Use a confident, professional but approachable tone.
-Do NOT use generic filler. Be specific to the profession.`;
-
-    const userPrompt = `Generate card content for:
-- Profession: ${profession}
+    const userPrompt = `Generate card content for a ${profession}.
 - Name: ${name || "Not provided"}
 - Company: ${company || "Not provided"}
-- City/Location: ${city || "Not provided"}`;
+- City/Location: ${city || "Not provided"}
+
+Write content that would make someone think "I need to contact this person."`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -74,16 +76,16 @@ Do NOT use generic filler. Be specific to the profession.`;
               parameters: {
                 type: "object",
                 properties: {
-                  bio: { type: "string", description: "1-2 sentence professional bio" },
-                  about: { type: "string", description: "2-3 sentence about section" },
-                  tagline: { type: "string", description: "Short tagline/headline" },
-                  cta_text: { type: "string", description: "Call-to-action phrase" },
+                  bio: { type: "string", description: "1-2 sentence professional bio focused on customer value — max 160 chars" },
+                  about: { type: "string", description: "2-3 sentence about section showing WHY to choose this person — max 300 chars" },
+                  tagline: { type: "string", description: "Punchy, memorable headline — max 60 chars" },
+                  cta_text: { type: "string", description: "Action-driven button text — max 25 chars. Examples: 'Get a Free Quote', 'Book Now'" },
                   services: {
                     type: "array",
                     items: { type: "string" },
-                    description: "3-4 service names",
+                    description: "3-5 real, specific service names this profession actually offers",
                   },
-                  instagram_bio: { type: "string", description: "Instagram-style bio with emoji" },
+                  instagram_bio: { type: "string", description: "Instagram-style bio with 2-3 relevant emoji — max 150 chars. Natural, not hashtag-stuffed." },
                 },
                 required: ["bio", "about", "tagline", "cta_text", "services", "instagram_bio"],
                 additionalProperties: false,
@@ -98,14 +100,12 @@ Do NOT use generic filler. Be specific to the profession.`;
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again in a moment." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
         return new Response(JSON.stringify({ error: "AI credits exhausted. Please add credits." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const text = await response.text();
