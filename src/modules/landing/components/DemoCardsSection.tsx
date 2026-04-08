@@ -173,7 +173,7 @@ function PhoneMockupCard({ card }: { card: DemoCard }) {
 }
 
 export default function DemoCardsSection() {
-  const [viewMode, setViewMode] = useState<"grid" | "phone">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "phone">("phone");
   const [phoneIndex, setPhoneIndex] = useState(0);
 
   return (
