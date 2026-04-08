@@ -28,6 +28,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useSocialPosts, useCreatePost, useUpdatePost, useDeletePost } from "@/hooks/useSocialPosts";
 import type { SocialPost } from "@/hooks/useSocialPosts";
 import { PLATFORMS, getPlatformConfig, getStatusConfig, deriveDbStatus } from "./constants";
+import SchedulePostDialog from "./SchedulePostDialog";
 import { useSocialPostLimits } from "./SocialPlanGate";
 import PostDetailDrawer from "./PostDetailDrawer";
 
@@ -111,6 +112,11 @@ export default function SocialDashboard() {
 
   // Posts filter
   const [postsTab, setPostsTab] = useState("all");
+
+  // Schedule dialog
+  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
+  const [scheduleContent, setScheduleContent] = useState("");
+  const [scheduleImageUrl, setScheduleImageUrl] = useState("");
 
   // ── Quick Stats ──
   const weekStats = useMemo(() => {
@@ -557,13 +563,28 @@ export default function SocialDashboard() {
                       <span className="text-[9px] text-muted-foreground">+{idea.hashtags.length - 3}</span>
                     )}
                   </div>
-                  <Button
-                    size="sm"
-                    className="w-full h-8 text-xs gap-1.5 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-                    onClick={() => useSuggestion(idea)}
-                  >
-                    <ArrowRight className="h-3.5 w-3.5" /> Use This Post
-                  </Button>
+                  <div className="flex gap-1.5">
+                    <Button
+                      size="sm"
+                      className="flex-1 h-8 text-xs gap-1.5 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
+                      onClick={(e) => { e.stopPropagation(); useSuggestion(idea); }}
+                    >
+                      <ArrowRight className="h-3.5 w-3.5" /> Use
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="h-8 text-xs gap-1 px-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setScheduleContent(`${idea.caption}\n\n${idea.cta}\n\n${idea.hashtags.map(h => `#${h}`).join(" ")}`);
+                        setScheduleImageUrl(idea.image_url);
+                        setScheduleDialogOpen(true);
+                      }}
+                    >
+                      <Clock className="h-3 w-3" /> Schedule
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
               </motion.div>
@@ -1107,6 +1128,12 @@ export default function SocialDashboard() {
         post={detailPost}
         onClose={() => setDetailPost(null)}
         onEdit={(post) => { setDetailPost(null); handleEditPost(post); }}
+      />
+      <SchedulePostDialog
+        open={scheduleDialogOpen}
+        onOpenChange={setScheduleDialogOpen}
+        prefillContent={scheduleContent}
+        prefillImageUrl={scheduleImageUrl}
       />
     </div>
   );

@@ -9,6 +9,7 @@ import { CATEGORIES } from "../data/mockData";
 import { FeaturedBadge, PremiumBadge, BoostedBadge } from "../components/MarketplaceBadges";
 import { useUserLocation } from "../hooks/useUserLocation";
 import { useMarketplaceSearch, type MarketplaceResult } from "../hooks/useMarketplaceSearch";
+import AvailableNearYou from "../components/AvailableNearYou";
 
 function ProviderCard({ biz, onView }: { biz: MarketplaceResult; onView: () => void }) {
   const logoFallback = `https://ui-avatars.com/api/?name=${encodeURIComponent(biz.business_name.slice(0, 2))}&background=6366f1&color=fff&size=128`;
@@ -190,6 +191,9 @@ export default function MarketplaceHome() {
             ))}
           </div>
         </section>
+
+        {/* ── Available Now Near You ── */}
+        <AvailableNearYou city={location.city} />
 
         {/* ── Featured ── */}
         <ProviderRow title="⭐ Featured Providers" results={featured} isLoading={featuredLoading} />

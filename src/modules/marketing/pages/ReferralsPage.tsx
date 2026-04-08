@@ -14,6 +14,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import ReferralShareToolkit from "@/modules/marketing/components/ReferralShareToolkit";
+import ReferralLeaderboard from "@/modules/marketing/components/ReferralLeaderboard";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const REWARD_TIERS = [
@@ -313,11 +314,20 @@ export default function ReferralsPage() {
         </div>
       </motion.div>
 
-      {/* Fraud Prevention Info */}
+      {/* Leaderboard */}
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.12 }}
+      >
+        <ReferralLeaderboard />
+      </motion.div>
+
+      {/* Fraud Prevention Info */}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.14 }}
         className="rounded-xl border bg-muted/30 p-4 flex items-start gap-3"
       >
         <Shield className="h-5 w-5 text-muted-foreground shrink-0 mt-0.5" />

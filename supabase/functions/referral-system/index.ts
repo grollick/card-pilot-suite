@@ -139,6 +139,15 @@ serve(async (req) => {
       const flagged = all.filter(r => r.status === "flagged");
       const totalRewardDays = completed.reduce((sum, r) => sum + (r.reward_days || 0), 0);
 
+      // Tiered milestones
+      const completedCount = completed.length;
+      const milestones = [
+        { count: 1, reward: "analytics_preview", label: "Analytics Preview", unlocked: completedCount >= 1, days: 14 },
+        { count: 3, reward: "free_month", label: "1 Month Pro Free", unlocked: completedCount >= 3, days: 30 },
+        { count: 5, reward: "two_months", label: "2 Months Pro Free", unlocked: completedCount >= 5, days: 60 },
+        { count: 10, reward: "six_months", label: "6 Months Pro Free", unlocked: completedCount >= 10, days: 180 },
+      ];
+
       return new Response(
         JSON.stringify({
           total: all.length,
@@ -146,6 +155,7 @@ serve(async (req) => {
           completed: completed.length,
           flagged: flagged.length,
           total_reward_days: totalRewardDays,
+          milestones,
           referrals: all,
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
