@@ -69,6 +69,7 @@ const marketingItems = [
 
 const brandItems = [
   { title: "Card Editor", url: "/app/card", icon: CreditCard },
+  { title: "Templates", url: "/app/templates", icon: Palette },
   { title: "Page Builder", url: "/app/page-builder", icon: Globe },
   { title: "QR Campaigns", url: "/app/qr-campaigns", icon: QrCode },
   { title: "Card Viewers", url: "/app/viewers", icon: Eye },

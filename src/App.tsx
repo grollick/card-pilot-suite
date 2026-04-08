@@ -70,6 +70,7 @@ const LoyaltyPage = lazy(() => import("@/modules/dashboard/pages/LoyaltyPage"));
 const CardBuilder = lazy(() => import("@/modules/card/pages/CardBuilder"));
 const QRBusinessCard = lazy(() => import("@/modules/card/pages/QRBusinessCard"));
 const InstantCardPage = lazy(() => import("@/modules/card/pages/InstantCardPage"));
+const TemplateGalleryPage = lazy(() => import("@/modules/card/pages/TemplateGalleryPage"));
 
 // CRM
 const ContactsPage = lazy(() => import("@/modules/crm/pages/ContactsPage"));
@@ -288,6 +289,7 @@ const App = () => (
               <Route path="card/qr" element={<LazyRoute><QRBusinessCard /></LazyRoute>} />
               <Route path="card/instant" element={<LazyRoute><InstantCardPage /></LazyRoute>} />
               <Route path="card" element={<LazyRoute><CardBuilder /></LazyRoute>} />
+              <Route path="templates" element={<LazyRoute><TemplateGalleryPage /></LazyRoute>} />
               <Route path="contacts" element={<LazyRoute><ContactsPage /></LazyRoute>} />
               <Route path="contacts/:id" element={<LazyRoute><ContactDetail /></LazyRoute>} />
               <Route path="pipeline" element={<LazyRoute><PipelinePage /></LazyRoute>} />
