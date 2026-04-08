@@ -481,10 +481,10 @@ export default function CardBuilderPreview({
                               ? { left: `${logoCustomPosition.x}%`, top: `${logoCustomPosition.y}%` }
                               : (() => {
                                   const base: Record<string, React.CSSProperties> = {
-                                    "top-left": { top: 8, left: 8 },
-                                    "top-right": { top: 8, right: 8 },
-                                    "bottom-left": { bottom: 8, left: 8 },
-                                    "bottom-right": { bottom: 8, right: 8 },
+                                    "top-left": { top: 4, left: 4 },
+                                    "top-right": { top: 4, right: 4 },
+                                    "bottom-left": { bottom: 4, left: 4 },
+                                    "bottom-right": { bottom: 4, right: 4 },
                                   };
                                   return base[logoPosition] ?? { top: 8, right: 8 };
                                 })()),
