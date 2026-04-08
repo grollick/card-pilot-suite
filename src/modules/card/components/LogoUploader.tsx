@@ -180,22 +180,6 @@ export default function LogoUploader({
               />
             </div>
           )}
-          {/* Padding slider */}
-          {onLogoPaddingChange && (
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-muted-foreground">Padding</span>
-                <span className="text-[10px] text-muted-foreground tabular-nums">{logoPadding}px</span>
-              </div>
-              <Slider
-                value={[logoPadding]}
-                onValueChange={([v]) => onLogoPaddingChange(v)}
-                min={0}
-                max={24}
-                step={1}
-              />
-            </div>
-          )}
           {/* Name gap slider — only for beside-name positions */}
           {onLogoNameGapChange && (logoPosition === "beside-name" || logoPosition === "beside-name-right") && (
             <div className="space-y-1">
