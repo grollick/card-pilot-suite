@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Eye, MapPin, Radio, Search, Users } from "lucide-react";
+import thunderBayMap from "@/assets/thunder-bay-map.jpg";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
