@@ -42,7 +42,7 @@ interface CardHeaderProps {
   logoFrostedBg?: boolean;
   logoGlow?: boolean;
   logoPosition?: "top-left" | "top-right" | "bottom-left" | "bottom-right" | "beside-name" | "beside-name-right";
-  logoSize?: "small" | "medium" | "large";
+  logoSize?: "small" | "medium" | "large" | "xl" | "xxl";
   logoOpacity?: number;
   logoPadding?: number;
   logoNameGap?: number;
