@@ -45,11 +45,11 @@ const highlights = [
 ];
 
 const marketplacePins = [
-  { top: "32%", left: "30%", name: "Jake M.", role: "Plumber", active: true },
-  { top: "48%", left: "50%", name: "Sarah L.", role: "Painter", active: true },
-  { top: "55%", left: "35%", name: "Marco R.", role: "Electrician", active: false },
-  { top: "38%", left: "65%", name: "Lisa K.", role: "Cleaner", active: true },
-  { top: "60%", left: "60%", name: "Tom B.", role: "Landscaper", active: true },
+  { top: "18%", left: "52%", name: "Jake M.", role: "Plumber", active: true },
+  { top: "28%", left: "42%", name: "Sarah L.", role: "Painter", active: true },
+  { top: "22%", left: "62%", name: "Marco R.", role: "Electrician", active: false },
+  { top: "12%", left: "68%", name: "Lisa K.", role: "Cleaner", active: true },
+  { top: "35%", left: "55%", name: "Tom B.", role: "Landscaper", active: true },
 ];
 
 function ThunderBayMapPreview() {
