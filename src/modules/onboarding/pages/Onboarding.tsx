@@ -233,30 +233,61 @@ export default function Onboarding() {
       } as any).eq("id", user.id);
       if (profileErr) throw profileErr;
 
-      // Card
+      // Card — build rich default content
+      const profDefaults = getProfessionCardDefaults(selectedProfession.name);
       const bestTemplate = aiSetup?.suggested_template
         ? (CARD_TEMPLATES.find(t => t.id === aiSetup!.suggested_template) ? aiSetup.suggested_template : getBestTemplateForProfession(selectedProfession.name))
         : getBestTemplateForProfession(selectedProfession.name);
       const template = getTemplate(bestTemplate);
-      const sectionsJson = template
+
+      // Build sections with pre-populated content so the card never looks empty
+      const rawSections = template
         ? template.sections.map(s => ({ id: s.id, label: s.id.charAt(0).toUpperCase() + s.id.slice(1).replace(/_/g, " "), enabled: s.enabled }))
         : (selectedProfession.default_card_sections || []);
 
+      const enrichedSections = rawSections.map((sec: any) => {
+        switch (sec.id) {
+          case "hero":
+            return { ...sec, content: { tagline: aiSetup?.tagline || profDefaults.tagline } };
+          case "about":
+            return { ...sec, content: { text: aiSetup?.about || profDefaults.about } };
+          case "services": {
+            const aiServices = aiSetup?.services?.map((s: any) => ({ name: s.name, description: s.description || "", price: "" }));
+            return { ...sec, content: { items: aiServices && aiServices.length > 0 ? aiServices : profDefaults.services } };
+          }
+          case "testimonials":
+            return { ...sec, content: { testimonials: profDefaults.testimonials } };
+          case "contact":
+            return { ...sec, content: { heading: "Get in Touch", description: `Ready to work with ${company || "us"}? Send a message and we'll get back to you quickly.` } };
+          case "booking":
+            return { ...sec, content: { bookingHeading: "Book an Appointment" } };
+          default:
+            return sec;
+        }
+      });
+
       // Add social links to sections if provided
-      let finalSections = sectionsJson;
+      let finalSections = enrichedSections;
       if (socialLinks.length > 0) {
-        const socialSection = { id: "social", label: "Social", enabled: true, content: { links: socialLinks } };
-        finalSections = [...sectionsJson, socialSection];
+        const existingSocial = enrichedSections.findIndex((s: any) => s.id === "social");
+        if (existingSocial >= 0) {
+          finalSections = enrichedSections.map((s: any, i: number) =>
+            i === existingSocial ? { ...s, enabled: true, content: { links: socialLinks } } : s
+          );
+        } else {
+          finalSections = [...enrichedSections, { id: "social", label: "Social", enabled: true, content: { links: socialLinks } }];
+        }
       }
 
       const { error: cardErr } = await supabase.from("cards").upsert({
         user_id: user.id,
         theme_json: {
           style_pack: packKey,
-          primary_cta: aiSetup?.cta_text || "call",
-          tagline: aiSetup?.tagline || "",
-          about: aiSetup?.about || "",
+          primary_cta: aiSetup?.cta_text || profDefaults.ctaPriority[0] || "call",
+          tagline: aiSetup?.tagline || profDefaults.tagline,
+          about: aiSetup?.about || profDefaults.about,
           booking_enabled: bookingEnabled,
+          ...(profDefaults.palette ? { palette: profDefaults.palette } : {}),
         },
         sections_json: finalSections,
         status: "published",
