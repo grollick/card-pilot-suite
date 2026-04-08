@@ -72,29 +72,40 @@ serve(async (req) => {
       );
     }
 
-    // ── Recipient validation: non-service-role callers can only email their own leads ──
+    // ── Recipient validation: non-service-role callers can only email their own leads (admins exempt) ──
     if (!isServiceRole && userId) {
-      const recipients = Array.isArray(to) ? to : [to];
       const svcClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-      
-      for (const recipient of recipients) {
-        const { data: lead } = await svcClient
-          .from("leads")
-          .select("id")
-          .eq("user_id", userId)
-          .eq("email", recipient)
-          .limit(1)
-          .maybeSingle();
-        
-        if (!lead) {
-          return new Response(
-            JSON.stringify({ error: "Recipient not found in your contacts" }),
-            { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+
+      // Check if user is admin — admins can email anyone
+      const { data: adminRole } = await svcClient
+        .from("user_roles")
+        .select("id")
+        .eq("user_id", userId)
+        .eq("role", "admin")
+        .maybeSingle();
+
+      if (!adminRole) {
+        const recipients = Array.isArray(to) ? to : [to];
+        for (const recipient of recipients) {
+          const { data: lead } = await svcClient
+            .from("leads")
+            .select("id")
+            .eq("user_id", userId)
+            .eq("email", recipient)
+            .limit(1)
+            .maybeSingle();
+          
+          if (!lead) {
+            return new Response(
+              JSON.stringify({ error: "Recipient not found in your contacts" }),
+              { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+          }
         }
       }
 
-      // ── Rate limit: max 50 emails per hour per user ──
+      // ── Rate limit: max 50 emails per hour per user (200 for admins) ──
+      const maxPerHour = adminRole ? 200 : 50;
       const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
       const { count } = await svcClient
         .from("email_send_log")
@@ -103,7 +114,7 @@ serve(async (req) => {
         .eq("status", "sent")
         .like("metadata->>user_id", userId);
       
-      if ((count ?? 0) >= 50) {
+      if ((count ?? 0) >= maxPerHour) {
         return new Response(
           JSON.stringify({ error: "Hourly email limit reached. Please try again later." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
