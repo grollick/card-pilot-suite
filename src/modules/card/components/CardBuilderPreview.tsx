@@ -20,6 +20,7 @@ interface Props {
   coverUrl: string | null;
   coverOffsetY: number;
   coverFlipX: boolean;
+  coverHeight: number;
   avatarUrl: string | null;
   avatarBgColor: string;
   avatarRotation: number;
