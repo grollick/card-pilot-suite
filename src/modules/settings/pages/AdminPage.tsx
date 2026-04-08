@@ -84,6 +84,9 @@ export default function AdminPage() {
       {/* Abuse Monitor */}
       {section === "abuse" && <AbuseMonitorDashboard />}
 
+      {/* Marketplace Seed */}
+      {section === "marketplace" && <MarketplaceSeedManager />}
+
       {/* Research */}
       {section === "research" && <UserResearchDashboard />}
 
