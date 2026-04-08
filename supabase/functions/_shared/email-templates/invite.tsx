@@ -8,10 +8,9 @@ import {
   Container,
   Head,
   Heading,
-  Hr,
   Html,
+  Link,
   Preview,
-  Section,
   Text,
 } from 'npm:@react-email/components@0.0.22'
 
@@ -28,35 +27,25 @@ export const InviteEmail = ({
 }: InviteEmailProps) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>You've been invited to join guzzl.pro</Preview>
+    <Preview>You've been invited to join {siteName}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Text style={brand}>
-          <span style={brandBold}>guzzl</span>
-          <span style={brandDot}>.pro</span>
-        </Text>
-        <Heading style={h1}>You've been invited!</Heading>
+        <Heading style={h1}>You've been invited</Heading>
         <Text style={text}>
-          Someone has invited you to join their team on guzzl.pro — the smart
-          business card and growth platform for service professionals.
-        </Text>
-        <Text style={text}>
-          Click the button below to accept and create your account:
+          You've been invited to join{' '}
+          <Link href={siteUrl} style={link}>
+            <strong>{siteName}</strong>
+          </Link>
+          . Click the button below to accept the invitation and create your
+          account.
         </Text>
         <Button style={button} href={confirmationUrl}>
-          Accept Invitation →
+          Accept Invitation
         </Button>
         <Text style={footer}>
           If you weren't expecting this invitation, you can safely ignore this
           email.
         </Text>
-        <Hr style={hr} />
-        <Section style={ctaBanner}>
-          <Text style={ctaText}>Are you a service professional?</Text>
-          <Button style={ctaButton} href="https://guzzl.pro/onboarding">
-            Get Your Free guzzl.pro Business Card →
-          </Button>
-        </Section>
       </Container>
     </Body>
   </Html>
@@ -64,72 +53,27 @@ export const InviteEmail = ({
 
 export default InviteEmail
 
-const main = {
-  backgroundColor: '#ffffff',
-  fontFamily: "'Inter', 'DM Sans', Arial, sans-serif",
-}
-const container = { padding: '40px 32px' }
-const brand = {
-  fontSize: '24px',
-  fontWeight: '400' as const,
-  margin: '0 0 32px',
-}
-const brandBold = {
-  fontWeight: '800' as const,
-  color: 'hsl(230, 76%, 55%)',
-}
-const brandDot = {
-  color: 'hsl(222, 47%, 11%)',
-}
+const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, sans-serif' }
+const container = { padding: '20px 25px' }
 const h1 = {
-  fontSize: '24px',
+  fontSize: '22px',
   fontWeight: 'bold' as const,
-  color: 'hsl(222, 47%, 11%)',
-  margin: '0 0 16px',
-}
-const text = {
-  fontSize: '15px',
-  color: 'hsl(220, 9%, 46%)',
-  lineHeight: '1.6',
+  color: '#000000',
   margin: '0 0 20px',
 }
-const button = {
-  backgroundColor: 'hsl(230, 76%, 55%)',
-  color: '#ffffff',
-  fontSize: '15px',
-  fontWeight: '600' as const,
-  borderRadius: '10px',
-  padding: '14px 28px',
-  textDecoration: 'none',
-}
-const footer = {
-  fontSize: '13px',
-  color: '#999999',
-  margin: '32px 0 0',
-  lineHeight: '1.5',
-}
-const hr = {
-  borderColor: '#eaeaea',
-  margin: '24px 0',
-}
-const ctaBanner = {
-  backgroundColor: '#f0f2ff',
-  borderRadius: '10px',
-  padding: '20px 24px',
-  textAlign: 'center' as const,
-}
-const ctaText = {
+const text = {
   fontSize: '14px',
-  color: 'hsl(222, 47%, 11%)',
-  fontWeight: '600' as const,
-  margin: '0 0 12px',
+  color: '#55575d',
+  lineHeight: '1.5',
+  margin: '0 0 25px',
 }
-const ctaButton = {
-  backgroundColor: 'hsl(230, 76%, 55%)',
+const link = { color: 'inherit', textDecoration: 'underline' }
+const button = {
+  backgroundColor: '#000000',
   color: '#ffffff',
-  fontSize: '13px',
-  fontWeight: '600' as const,
+  fontSize: '14px',
   borderRadius: '8px',
-  padding: '10px 20px',
+  padding: '12px 20px',
   textDecoration: 'none',
 }
+const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
