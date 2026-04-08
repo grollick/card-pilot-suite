@@ -1,4 +1,4 @@
-import { Shield, Edit, LayoutGrid, Settings2, MessageSquare, TrendingUp, ShieldAlert, Rocket, Flame, ClipboardList, Workflow, Target, BarChart3 } from "lucide-react";
+import { Shield, Edit, LayoutGrid, Settings2, MessageSquare, TrendingUp, ShieldAlert, Rocket, Flame, ClipboardList, Workflow, Target, BarChart3, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { professions, professionCategories, getProfessionsByCategory } from "@/data/professions";
@@ -15,10 +15,11 @@ import GrowthAutomationDashboard from "@/modules/admin/components/GrowthAutomati
 import UserResearchDashboard from "@/modules/admin/components/UserResearchDashboard";
 import FunnelVisualizationDashboard from "@/modules/admin/components/FunnelVisualizationDashboard";
 import SourceAttributionDashboard from "@/modules/admin/components/SourceAttributionDashboard";
+import MarketplaceSeedManager from "@/modules/admin/components/MarketplaceSeedManager";
 import { useState } from "react";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
-type Section = "command" | "engine" | "automation" | "funnel" | "growth" | "sources" | "research" | "content" | "feedback" | "system" | "abuse";
+type Section = "command" | "engine" | "automation" | "funnel" | "growth" | "sources" | "research" | "content" | "feedback" | "system" | "abuse" | "marketplace";
 
 const sections: { id: Section; label: string; icon: typeof Shield }[] = [
   { id: "command", label: "Command Center", icon: Rocket },
@@ -29,6 +30,7 @@ const sections: { id: Section; label: string; icon: typeof Shield }[] = [
   { id: "sources", label: "Sources", icon: BarChart3 },
   { id: "research", label: "Research", icon: ClipboardList },
   { id: "abuse", label: "Abuse Monitor", icon: ShieldAlert },
+  { id: "marketplace", label: "Marketplace Seed", icon: Store },
   { id: "content", label: "Content & Professions", icon: LayoutGrid },
   { id: "feedback", label: "Feedback & Bugs", icon: MessageSquare },
   { id: "system", label: "System", icon: Settings2 },
