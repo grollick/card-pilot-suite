@@ -108,7 +108,7 @@ export default function MarketplaceSeedManager() {
       ) : (
         <div className="space-y-2">
           {businesses.map(biz => {
-            const metrics = biz.marketplace_metrics?.[0];
+            const metrics = biz.marketplace_metrics;
             return (
               <div
                 key={biz.id}
