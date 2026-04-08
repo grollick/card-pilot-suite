@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,13 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { Store, Plus, MapPin, Star, Eye, EyeOff, Trash2, Pencil } from "lucide-react";
+import { Store, Plus, MapPin, Star, Eye, EyeOff } from "lucide-react";
+
+interface DemoMetrics {
+  avg_rating: number;
+  review_count: number;
+  marketplace_score: number;
+}
 
 interface DemoBusiness {
   id: string;
