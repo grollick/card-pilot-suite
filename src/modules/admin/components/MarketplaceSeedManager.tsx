@@ -25,7 +25,7 @@ interface DemoBusiness {
   longitude: number | null;
   phone: string | null;
   email: string | null;
-  marketplace_metrics: { avg_rating: number; review_count: number; marketplace_score: number }[];
+  marketplace_metrics: { avg_rating: number; review_count: number; marketplace_score: number } | null;
 }
 
 function useDemoBusinesses() {
