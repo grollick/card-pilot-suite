@@ -774,6 +774,7 @@ export default function PublicCard() {
                     avatarBannerAnimation={(themeJson.tokens as any)?.header?.avatarBannerAnimation ?? "none"}
                     coverOffsetY={themeJson.cover_offset_y as number | undefined}
                     coverFlipX={themeJson.cover_flip_x as boolean | undefined}
+                    coverHeight={themeJson.cover_height as number | undefined}
                     logoUrl={themeJson.logo_url as string | undefined}
                     logoFrostedBg={themeJson.logo_frosted_bg !== false}
                     logoGlow={themeJson.logo_glow === true}
