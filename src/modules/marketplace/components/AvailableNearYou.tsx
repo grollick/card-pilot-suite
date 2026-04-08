@@ -20,7 +20,7 @@ function useOnDutyProviders(city?: string | null) {
     queryKey: ["on-duty-near", city],
     staleTime: 30_000,
     queryFn: async () => {
-      let q = supabase
+      let q = (supabase as any)
         .from("profiles")
         .select("id, name, avatar_url, city, handle, company")
         .eq("is_on_duty", true)
