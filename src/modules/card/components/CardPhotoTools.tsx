@@ -36,6 +36,8 @@ interface CardPhotoToolsProps {
   onCoverOffsetYChange?: (y: number) => void;
   coverFlipX?: boolean;
   onCoverFlipXChange?: (flip: boolean) => void;
+  coverHeight?: number;
+  onCoverHeightChange?: (h: number) => void;
   logoUrl?: string | null;
   onLogoChange?: (url: string | null) => void;
   logoFrostedBg?: boolean;
@@ -84,6 +86,8 @@ export default function CardPhotoTools({
   onCoverOffsetYChange,
   coverFlipX = false,
   onCoverFlipXChange,
+  coverHeight = 144,
+  onCoverHeightChange,
   logoUrl = null,
   onLogoChange,
   logoFrostedBg = true,
@@ -625,6 +629,21 @@ export default function CardPhotoTools({
             >
               <FlipHorizontal className="h-3.5 w-3.5" />
             </Button>
+          </div>
+        )}
+        {coverUrl && onCoverHeightChange && (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-muted-foreground">Backdrop height</span>
+              <span className="text-[10px] text-muted-foreground tabular-nums">{coverHeight}px</span>
+            </div>
+            <Slider
+              value={[coverHeight]}
+              onValueChange={([v]) => onCoverHeightChange(v)}
+              min={80}
+              max={280}
+              step={4}
+            />
           </div>
         )}
       </div>

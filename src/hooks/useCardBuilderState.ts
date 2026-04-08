@@ -35,6 +35,7 @@ export function useCardBuilderState() {
   const [avatarRotation, setAvatarRotation] = useState(0);
   const [coverOffsetY, setCoverOffsetY] = useState(0);
   const [coverFlipX, setCoverFlipX] = useState(false);
+  const [coverHeight, setCoverHeight] = useState(144);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoFrostedBg, setLogoFrostedBg] = useState(true);
   const [logoGlow, setLogoGlow] = useState(false);
@@ -100,6 +101,7 @@ export function useCardBuilderState() {
       if (typeof t?.avatar_rotation === "number") setAvatarRotation(t.avatar_rotation);
       if (typeof t?.cover_offset_y === "number") setCoverOffsetY(t.cover_offset_y);
       if (typeof t?.cover_flip_x === "boolean") setCoverFlipX(t.cover_flip_x);
+      if (typeof t?.cover_height === "number") setCoverHeight(t.cover_height);
       if (typeof t?.logo_url === "string") setLogoUrl(t.logo_url || null);
       if (typeof t?.logo_frosted_bg === "boolean") setLogoFrostedBg(t.logo_frosted_bg);
       if (typeof t?.logo_glow === "boolean") setLogoGlow(t.logo_glow);
@@ -311,6 +313,7 @@ export function useCardBuilderState() {
   const handleAvatarRotationChange = makeThemeHandler("avatar_rotation", setAvatarRotation);
   const handleCoverOffsetYChange = makeThemeHandler("cover_offset_y", setCoverOffsetY);
   const handleCoverFlipXChange = makeThemeHandler("cover_flip_x", setCoverFlipX);
+  const handleCoverHeightChange = makeThemeHandler("cover_height", setCoverHeight);
   const handleLogoChange = makeThemeHandler("logo_url", setLogoUrl);
   const handleLogoFrostedBgChange = makeThemeHandler("logo_frosted_bg", setLogoFrostedBg);
   const handleLogoGlowChange = makeThemeHandler("logo_glow", setLogoGlow);
@@ -484,10 +487,10 @@ export function useCardBuilderState() {
     companyColor, setCompanyColor,
     identitySaveTimers, identitySaveState, setIdentitySaveState,
     // Photos / Logo
-    avatarUrl, coverUrl, avatarBgColor, avatarRotation, coverOffsetY, coverFlipX,
+    avatarUrl, coverUrl, avatarBgColor, avatarRotation, coverOffsetY, coverFlipX, coverHeight,
     logoUrl, logoFrostedBg, logoGlow, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap, logoVerticalAlign, logoCustomPosition,
     handleAvatarChange, handleCoverChange,
-    handleAvatarBgColorChange, handleAvatarRotationChange, handleCoverOffsetYChange, handleCoverFlipXChange,
+    handleAvatarBgColorChange, handleAvatarRotationChange, handleCoverOffsetYChange, handleCoverFlipXChange, handleCoverHeightChange,
     handleLogoChange, handleLogoFrostedBgChange, handleLogoGlowChange,
     handleLogoOpacityChange, handleLogoPaddingChange, handleLogoPositionChange, handleLogoSizeChange, handleLogoNameGapChange, handleLogoVerticalAlignChange, handleLogoCustomPositionChange,
     // CTA & Social

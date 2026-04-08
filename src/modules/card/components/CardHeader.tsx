@@ -39,6 +39,7 @@ interface CardHeaderProps {
   avatarBannerAnimation?: "none" | "pulse" | "bounce" | "shimmer";
   coverOffsetY?: number;
   coverFlipX?: boolean;
+  coverHeight?: number;
   logoUrl?: string | null;
   logoFrostedBg?: boolean;
   logoGlow?: boolean;
@@ -83,7 +84,7 @@ function renderName(name: string, bold?: boolean, uppercase?: boolean, firstName
  * cover | split | classic | hero
  * Cover images include a parallax scroll effect.
  */
-export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, nameFontSize, nameLineHeight, nameTextStroke, nameTextStrokeWidth = 1, subtitleFontSize, subtitleItalic = false, subtitleSpacing, showCompany = true, companyColor, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, coverFlipX = false, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4, logoNameGap = 8, logoVerticalAlign = "center", logoCustomPosition, metallicEffect, heroBackground, ctaChildren, glassHero = false, verificationLevel, isAvailable }: CardHeaderProps) {
+export default function CardHeader({ theme, name, boldLastName, uppercaseName, nameLetterSpacing = 0, nameFontWeight = 700, firstNameFontWeight, nameItalic = false, nameFontSize, nameLineHeight, nameTextStroke, nameTextStrokeWidth = 1, subtitleFontSize, subtitleItalic = false, subtitleSpacing, showCompany = true, companyColor, profession, company, avatarUrl, coverUrl, avatarBgColor = "transparent", avatarRotation = 0, avatarBorderWidth = 3, avatarSize = 80, avatarBannerText, avatarBannerColor = "#FFFFFF", avatarBannerBg, avatarBannerPosition = "bottom", avatarBannerAnimation = "none", coverOffsetY = 0, coverFlipX = false, coverHeight = 144, logoUrl, logoFrostedBg = true, logoGlow = false, logoPosition = "top-right", logoSize = "medium", logoOpacity = 100, logoPadding = 4, logoNameGap = 8, logoVerticalAlign = "center", logoCustomPosition, metallicEffect, heroBackground, ctaChildren, glassHero = false, verificationLevel, isAvailable }: CardHeaderProps) {
   const { header, palette, radii, fonts } = theme;
   const avatarBorderRadius = getAvatarRadius(header.avatarShape);
   const coverRef = useRef<HTMLDivElement>(null);
@@ -440,14 +441,14 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
 
 
   // Shared cover/backdrop banner element for non-cover layouts
-  const coverBanner = (coverUrl || logoUrl || heroBackground) ? parallaxCover(120, true) : null;
+  const coverBanner = (coverUrl || logoUrl || heroBackground) ? parallaxCover(coverHeight * 0.83, true) : null;
 
   switch (header.layout) {
     // ─── Cover: full-width cover image, avatar overlapping ─────
     case "cover":
       return (
         <div style={{ position: "relative" }}>
-          {parallaxCover(160, true)}
+          {parallaxCover(coverHeight, true)}
           <div style={{ padding: "0 24px", marginTop: -40, display: "flex", flexDirection: "column", position: "relative", zIndex: 2 }}>
             {avatarEl}
             <motion.div style={{ display: "flex", alignItems: inlineAlignItems, gap: logoNameGap, marginTop: 12 }} {...heroEntrance(0.15)}>
