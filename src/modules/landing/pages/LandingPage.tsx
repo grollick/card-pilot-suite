@@ -453,11 +453,11 @@ export default function LandingPage() {
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-3 gap-8">
               {steps.map((s) => (
                 <motion.div key={s.title} variants={scaleIn} className="text-center">
-                  <div className="relative mx-auto mb-5">
-                    <div className="h-[68px] w-[68px] mx-auto rounded-2xl bg-card border border-border shadow-card flex items-center justify-center group-hover:shadow-elevated transition-all">
+                  <div className="relative inline-block mb-5">
+                    <div className="h-[68px] w-[68px] rounded-2xl bg-card border border-border shadow-card flex items-center justify-center group-hover:shadow-elevated transition-all">
                       <s.icon className="h-7 w-7 text-primary" />
                     </div>
-                    <div className="absolute -top-2 -left-2 h-7 w-7 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shadow-glow">
+                    <div className="absolute -top-3 -left-3 h-7 w-7 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center shadow-glow z-10">
                       {s.num}
                     </div>
                   </div>
