@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import { Camera, Eraser, ImagePlus, Loader2, RotateCw, Wand2, Paintbrush, Sparkles } from "lucide-react";
+import { Camera, Eraser, ImagePlus, Loader2, RotateCw, Wand2, Paintbrush, Sparkles, FlipHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -608,11 +608,24 @@ export default function CardPhotoTools({
           </Button>
         </div>
         {coverUrl && (
-          <CoverPositioner
-            coverUrl={coverUrl}
-            offsetY={coverOffsetY}
-            onOffsetChange={(y) => onCoverOffsetYChange?.(y)}
-          />
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <CoverPositioner
+                coverUrl={coverUrl}
+                offsetY={coverOffsetY}
+                onOffsetChange={(y) => onCoverOffsetYChange?.(y)}
+              />
+            </div>
+            <Button
+              variant={coverFlipX ? "default" : "outline"}
+              size="sm"
+              className="h-8 px-2.5 shrink-0"
+              onClick={() => onCoverFlipXChange?.(!coverFlipX)}
+              title="Flip cover horizontally"
+            >
+              <FlipHorizontal className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         )}
       </div>
 
