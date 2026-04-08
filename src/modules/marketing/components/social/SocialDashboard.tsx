@@ -1129,6 +1129,12 @@ export default function SocialDashboard() {
         onClose={() => setDetailPost(null)}
         onEdit={(post) => { setDetailPost(null); handleEditPost(post); }}
       />
+      <SchedulePostDialog
+        open={scheduleDialogOpen}
+        onOpenChange={setScheduleDialogOpen}
+        prefillContent={scheduleContent}
+        prefillImageUrl={scheduleImageUrl}
+      />
     </div>
   );
 }
