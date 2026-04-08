@@ -608,8 +608,8 @@ export default function CardBuilderPreview({
                           <div style={{ display: "flex", alignItems: logoVerticalAlign === "top" ? "flex-start" : logoVerticalAlign === "bottom" ? "flex-end" : "center", gap: logoNameGap }}>
                             {logoUrl && logoPosition === "beside-name" && (
                               <div
-                                className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
-                                style={{ height: logoPx + (logoFrostedBg ? logoPadding * 2 : 0), width: logoPx + (logoFrostedBg ? logoPadding * 2 : 0), opacity: logoOpacity / 100, padding: logoFrostedBg ? logoPadding : 0 }}
+                                className={`rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
+                                style={{ height: logoPx + (logoFrostedBg ? logoPadding * 2 : 0), width: logoPx + (logoFrostedBg ? logoPadding * 2 : 0), opacity: logoOpacity / 100, padding: logoFrostedBg && logoPadding > 0 ? logoPadding : 0 }}
                               >
                                 <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
                               </div>
@@ -645,8 +645,8 @@ export default function CardBuilderPreview({
                             </h3>
                             {logoUrl && logoPosition === "beside-name-right" && (
                               <div
-                                className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
-                                style={{ height: logoPx + (logoFrostedBg ? logoPadding * 2 : 0), width: logoPx + (logoFrostedBg ? logoPadding * 2 : 0), opacity: logoOpacity / 100, padding: logoFrostedBg ? logoPadding : 0 }}
+                                className={`rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
+                                style={{ height: logoPx + (logoFrostedBg ? logoPadding * 2 : 0), width: logoPx + (logoFrostedBg ? logoPadding * 2 : 0), opacity: logoOpacity / 100, padding: logoFrostedBg && logoPadding > 0 ? logoPadding : 0 }}
                               >
                                 <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
                               </div>
