@@ -28,6 +28,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useSocialPosts, useCreatePost, useUpdatePost, useDeletePost } from "@/hooks/useSocialPosts";
 import type { SocialPost } from "@/hooks/useSocialPosts";
 import { PLATFORMS, getPlatformConfig, getStatusConfig, deriveDbStatus } from "./constants";
+import SchedulePostDialog from "./SchedulePostDialog";
 import { useSocialPostLimits } from "./SocialPlanGate";
 import PostDetailDrawer from "./PostDetailDrawer";
 
