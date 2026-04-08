@@ -300,7 +300,7 @@ function ThemedSectionPreview({ section, theme, metallicEffect, index }: {
 
 export default function CardBuilderPreview({
   profile, previewTheme, currentThemeOverrides, sections,
-  coverUrl, coverOffsetY, avatarUrl, avatarBgColor, avatarRotation,
+  coverUrl, coverOffsetY, coverFlipX, avatarUrl, avatarBgColor, avatarRotation,
   logoUrl, logoFrostedBg, logoPosition, logoSize, logoOpacity, logoPadding, logoNameGap = 8, logoVerticalAlign = "center",
   ctaConfig, ctaIconsOnly, editName, editCompany, displayJobTitle,
   boldLastName, uppercaseName, nameLetterSpacing, nameFontWeight, firstNameFontWeight, nameItalic, nameFontSize, subtitleFontSize, subtitleItalic, subtitleSpacing, showCompany = true, companyColor, nameLineHeight, nameTextStroke, nameTextStrokeWidth, onAvatarChange, setEditingSection,
@@ -470,7 +470,7 @@ export default function CardBuilderPreview({
                       background: coverUrl ? undefined : `linear-gradient(135deg, ${previewTheme.palette.primary}33, ${previewTheme.palette.primary}0D)`,
                     }}>
                       {coverUrl && (
-                        <img src={coverUrl} alt="cover" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: `center ${coverOffsetY}%` }} />
+                        <img src={coverUrl} alt="cover" className="absolute inset-0 w-full h-full object-cover" style={{ objectPosition: `center ${coverOffsetY}%`, transform: coverFlipX ? 'scaleX(-1)' : undefined }} />
                       )}
                       {logoUrl && logoPosition !== "beside-name" && logoPosition !== "beside-name-right" && (
                         <div
