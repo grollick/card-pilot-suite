@@ -575,6 +575,7 @@ export default function CardBuilder() {
             onAvatarBgColorChange={s.handleAvatarBgColorChange}
             onAvatarRotationChange={s.handleAvatarRotationChange}
             coverOffsetY={s.coverOffsetY} onCoverOffsetYChange={s.handleCoverOffsetYChange}
+            coverFlipX={s.coverFlipX} onCoverFlipXChange={s.handleCoverFlipXChange}
             logoUrl={s.logoUrl} onLogoChange={s.handleLogoChange}
             logoFrostedBg={s.logoFrostedBg} onLogoFrostedBgChange={s.handleLogoFrostedBgChange}
             logoGlow={s.logoGlow} onLogoGlowChange={s.handleLogoGlowChange}
@@ -905,6 +906,7 @@ export default function CardBuilder() {
                     onAvatarBgColorChange={s.handleAvatarBgColorChange}
                     onAvatarRotationChange={s.handleAvatarRotationChange}
                     coverOffsetY={s.coverOffsetY} onCoverOffsetYChange={s.handleCoverOffsetYChange}
+                    coverFlipX={s.coverFlipX} onCoverFlipXChange={s.handleCoverFlipXChange}
                     logoUrl={s.logoUrl} onLogoChange={s.handleLogoChange}
                     logoFrostedBg={s.logoFrostedBg} onLogoFrostedBgChange={s.handleLogoFrostedBgChange}
                     logoGlow={s.logoGlow} onLogoGlowChange={s.handleLogoGlowChange}
