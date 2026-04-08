@@ -122,38 +122,13 @@ export default function MarketplaceSection() {
             variants={scaleIn}
             className="lg:col-span-2 landing-card rounded-2xl p-1 relative overflow-hidden min-h-[320px]"
           >
-            {/* Map placeholder with dots */}
-            <div className="absolute inset-0 bg-muted/50 rounded-xl">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,hsl(var(--primary)/0.08)_0%,transparent_50%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,hsl(var(--accent)/0.06)_0%,transparent_40%)]" />
-
-              {/* Simulated map pins */}
-              {[
-                { top: "25%", left: "20%", name: "Jake M.", role: "Plumber", active: true },
-                { top: "40%", left: "55%", name: "Sarah L.", role: "Painter", active: true },
-                { top: "60%", left: "35%", name: "Marco R.", role: "Electrician", active: false },
-                { top: "30%", left: "70%", name: "Lisa K.", role: "Cleaner", active: true },
-                { top: "70%", left: "65%", name: "Tom B.", role: "Landscaper", active: true },
-              ].map((pin) => (
-                <div
-                  key={pin.name}
-                  className="absolute flex flex-col items-center"
-                  style={{ top: pin.top, left: pin.left }}
-                >
-                  <div
-                    className={`h-3.5 w-3.5 rounded-full border-2 border-card shadow-sm ${
-                      pin.active ? "bg-success animate-pulse" : "bg-muted-foreground/40"
-                    }`}
-                  />
-                  <div className="mt-1 px-2 py-0.5 rounded-md bg-card/90 border border-border shadow-sm backdrop-blur-sm">
-                    <p className="text-[9px] font-semibold text-foreground leading-tight">{pin.name}</p>
-                    <p className="text-[8px] text-muted-foreground">{pin.role}</p>
-                  </div>
-                </div>
-              ))}
+            {/* Real map */}
+            <div className="absolute inset-0 rounded-xl overflow-hidden">
+              <div ref={mapContainer} className="w-full h-full" />
+            </div>
 
               {/* Search bar mock */}
-              <div className="absolute top-4 left-4 right-4">
+              <div className="absolute top-4 left-4 right-4 z-10">
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border shadow-card">
                   <Search className="h-3.5 w-3.5 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">Search pros near you…</span>
@@ -161,13 +136,12 @@ export default function MarketplaceSection() {
               </div>
 
               {/* On Duty indicator */}
-              <div className="absolute bottom-4 left-4">
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-success/10 border border-success/20">
+              <div className="absolute bottom-4 left-4 z-10">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-success/10 border border-success/20 backdrop-blur-sm">
                   <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
                   <span className="text-[10px] font-semibold text-success">4 Pros On Duty</span>
                 </div>
               </div>
-            </div>
           </motion.div>
 
           {/* Feature cards */}
