@@ -407,7 +407,7 @@ export default function CardBuilder() {
   const previewProps = {
     profile: s.profile, previewTheme: s.previewTheme,
     currentThemeOverrides: s.currentThemeOverrides, sections: s.sections,
-    coverUrl: s.coverUrl, coverOffsetY: s.coverOffsetY,
+    coverUrl: s.coverUrl, coverOffsetY: s.coverOffsetY, coverFlipX: s.coverFlipX,
     avatarUrl: s.avatarUrl, avatarBgColor: s.avatarBgColor, avatarRotation: s.avatarRotation,
     logoUrl: s.logoUrl, logoFrostedBg: s.logoFrostedBg, logoPosition: s.logoPosition,
     logoSize: s.logoSize, logoOpacity: s.logoOpacity, logoPadding: s.logoPadding,
