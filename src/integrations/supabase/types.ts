@@ -8146,6 +8146,17 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_leaderboard: {
+        Row: {
+          avatar_url: string | null
+          completed_referrals: number | null
+          referrer_id: string | null
+          referrer_name: string | null
+          total_referrals: number | null
+          total_reward_days: number | null
+        }
+        Relationships: []
+      }
       sms_delivery_summary: {
         Row: {
           business_id: string | null
