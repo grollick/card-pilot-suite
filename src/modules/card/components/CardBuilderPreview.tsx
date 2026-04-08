@@ -19,6 +19,7 @@ interface Props {
   sections: CardSection[];
   coverUrl: string | null;
   coverOffsetY: number;
+  coverFlipX: boolean;
   avatarUrl: string | null;
   avatarBgColor: string;
   avatarRotation: number;
