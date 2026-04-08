@@ -46,6 +46,8 @@ const SIZES: { value: LogoSize; label: string }[] = [
   { value: "small", label: "S" },
   { value: "medium", label: "M" },
   { value: "large", label: "L" },
+  { value: "xl", label: "XL" },
+  { value: "xxl", label: "XXL" },
 ];
 
 export default function LogoUploader({
