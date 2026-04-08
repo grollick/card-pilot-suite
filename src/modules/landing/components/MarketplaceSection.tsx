@@ -55,11 +55,11 @@ const marketplacePins = [
 function ThunderBayMapPreview() {
   return (
     <div className="absolute inset-0 rounded-xl overflow-hidden bg-card">
-      {/* Real OSM embed of Thunder Bay */}
-      <iframe
-        title="Thunder Bay Map"
-        src="https://www.openstreetmap.org/export/embed.html?bbox=-89.35%2C48.34%2C-89.15%2C48.44&layer=mapnik"
-        className="absolute inset-0 w-full h-full border-0 pointer-events-none"
+      {/* Static map image of Thunder Bay */}
+      <img
+        src={thunderBayMap}
+        alt="Map of Thunder Bay, Ontario"
+        className="absolute inset-0 w-full h-full object-cover"
         loading="lazy"
       />
 
