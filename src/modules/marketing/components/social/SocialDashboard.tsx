@@ -113,6 +113,11 @@ export default function SocialDashboard() {
   // Posts filter
   const [postsTab, setPostsTab] = useState("all");
 
+  // Schedule dialog
+  const [scheduleDialogOpen, setScheduleDialogOpen] = useState(false);
+  const [scheduleContent, setScheduleContent] = useState("");
+  const [scheduleImageUrl, setScheduleImageUrl] = useState("");
+
   // ── Quick Stats ──
   const weekStats = useMemo(() => {
     const now = new Date();
