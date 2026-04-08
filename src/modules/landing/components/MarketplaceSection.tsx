@@ -1,4 +1,7 @@
 import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
 import { MapPin, Radio, Search, Users, Eye, Star } from "lucide-react";
 
 const fadeUp = {
@@ -44,6 +47,47 @@ const highlights = [
 ];
 
 export default function MarketplaceSection() {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
+
+  useEffect(() => {
+    if (!mapContainer.current || mapRef.current) return;
+    const map = new maplibregl.Map({
+      container: mapContainer.current,
+      style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+      center: [-89.2477, 48.3809],
+      zoom: 12,
+      interactive: false,
+      attributionControl: false,
+    });
+    const pins = [
+      { lng: -89.27, lat: 48.39, name: "Jake M.", role: "Plumber" },
+      { lng: -89.23, lat: 48.37, name: "Sarah L.", role: "Painter" },
+      { lng: -89.26, lat: 48.36, name: "Marco R.", role: "Electrician" },
+      { lng: -89.22, lat: 48.40, name: "Lisa K.", role: "Cleaner" },
+      { lng: -89.21, lat: 48.38, name: "Tom B.", role: "Landscaper" },
+    ];
+    map.on("load", () => {
+      pins.forEach((pin) => {
+        const el = document.createElement("div");
+        el.style.display = "flex";
+        el.style.flexDirection = "column";
+        el.style.alignItems = "center";
+        el.innerHTML = `
+          <div style="width:14px;height:14px;border-radius:50%;border:2px solid white;background:#22c55e;box-shadow:0 1px 3px rgba(0,0,0,.2);"></div>
+          <div style="margin-top:4px;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.92);border:1px solid #e5e7eb;backdrop-filter:blur(4px);box-shadow:0 1px 2px rgba(0,0,0,.08);">
+            <p style="font-size:9px;font-weight:600;color:#111;line-height:1.2;">${pin.name}</p>
+            <p style="font-size:8px;color:#6b7280;">${pin.role}</p>
+          </div>
+        `;
+        new maplibregl.Marker({ element: el, anchor: "top" })
+          .setLngLat([pin.lng, pin.lat])
+          .addTo(map);
+      });
+    });
+    mapRef.current = map;
+    return () => { map.remove(); mapRef.current = null; };
+  }, []);
   return (
     <section className="py-20 md:py-28 relative">
       <div className="absolute inset-0 -z-10 gradient-mesh" />
@@ -78,38 +122,13 @@ export default function MarketplaceSection() {
             variants={scaleIn}
             className="lg:col-span-2 landing-card rounded-2xl p-1 relative overflow-hidden min-h-[320px]"
           >
-            {/* Map placeholder with dots */}
-            <div className="absolute inset-0 bg-muted/50 rounded-xl">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,hsl(var(--primary)/0.08)_0%,transparent_50%)]" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,hsl(var(--accent)/0.06)_0%,transparent_40%)]" />
-
-              {/* Simulated map pins */}
-              {[
-                { top: "25%", left: "20%", name: "Jake M.", role: "Plumber", active: true },
-                { top: "40%", left: "55%", name: "Sarah L.", role: "Painter", active: true },
-                { top: "60%", left: "35%", name: "Marco R.", role: "Electrician", active: false },
-                { top: "30%", left: "70%", name: "Lisa K.", role: "Cleaner", active: true },
-                { top: "70%", left: "65%", name: "Tom B.", role: "Landscaper", active: true },
-              ].map((pin) => (
-                <div
-                  key={pin.name}
-                  className="absolute flex flex-col items-center"
-                  style={{ top: pin.top, left: pin.left }}
-                >
-                  <div
-                    className={`h-3.5 w-3.5 rounded-full border-2 border-card shadow-sm ${
-                      pin.active ? "bg-success animate-pulse" : "bg-muted-foreground/40"
-                    }`}
-                  />
-                  <div className="mt-1 px-2 py-0.5 rounded-md bg-card/90 border border-border shadow-sm backdrop-blur-sm">
-                    <p className="text-[9px] font-semibold text-foreground leading-tight">{pin.name}</p>
-                    <p className="text-[8px] text-muted-foreground">{pin.role}</p>
-                  </div>
-                </div>
-              ))}
+            {/* Real map */}
+            <div className="absolute inset-0 rounded-xl overflow-hidden">
+              <div ref={mapContainer} className="w-full h-full" />
+            </div>
 
               {/* Search bar mock */}
-              <div className="absolute top-4 left-4 right-4">
+              <div className="absolute top-4 left-4 right-4 z-10">
                 <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card border border-border shadow-card">
                   <Search className="h-3.5 w-3.5 text-muted-foreground" />
                   <span className="text-xs text-muted-foreground">Search pros near you…</span>
@@ -117,13 +136,12 @@ export default function MarketplaceSection() {
               </div>
 
               {/* On Duty indicator */}
-              <div className="absolute bottom-4 left-4">
-                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-success/10 border border-success/20">
+              <div className="absolute bottom-4 left-4 z-10">
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-success/10 border border-success/20 backdrop-blur-sm">
                   <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
                   <span className="text-[10px] font-semibold text-success">4 Pros On Duty</span>
                 </div>
               </div>
-            </div>
           </motion.div>
 
           {/* Feature cards */}
