@@ -465,7 +465,8 @@ export default function CardBuilderPreview({
                   <div className="px-5 pt-5 relative z-[2]">
                   <CardSectionWrapper theme={previewTheme} index={0} metallicEffect={currentThemeOverrides.metallicEffect} className="overflow-hidden">
                     {/* Cover */}
-                    <div ref={coverRef} className="h-36 relative overflow-hidden" style={{
+                    <div ref={coverRef} className="relative overflow-hidden" style={{
+                      height: coverHeight,
                       margin: `-${previewTheme.spacing.inner}px`,
                       marginBottom: 0,
                       background: coverUrl ? undefined : `linear-gradient(135deg, ${previewTheme.palette.primary}33, ${previewTheme.palette.primary}0D)`,
