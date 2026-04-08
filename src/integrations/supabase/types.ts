@@ -2243,6 +2243,7 @@ export type Database = {
           email: string | null
           id: string
           is_active: boolean | null
+          is_demo: boolean
           is_marketplace_visible: boolean | null
           latitude: number | null
           location_city: string | null
@@ -2264,6 +2265,7 @@ export type Database = {
           email?: string | null
           id?: string
           is_active?: boolean | null
+          is_demo?: boolean
           is_marketplace_visible?: boolean | null
           latitude?: number | null
           location_city?: string | null
@@ -2285,6 +2287,7 @@ export type Database = {
           email?: string | null
           id?: string
           is_active?: boolean | null
+          is_demo?: boolean
           is_marketplace_visible?: boolean | null
           latitude?: number | null
           location_city?: string | null
