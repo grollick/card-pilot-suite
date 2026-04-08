@@ -476,7 +476,7 @@ export default function CardBuilderPreview({
                         <div
                           className={`absolute group/logo rounded-lg flex items-center justify-center ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
                           style={{
-                            height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding,
+                            height: logoPx + (logoFrostedBg ? logoPadding * 2 : 0), width: logoPx + (logoFrostedBg ? logoPadding * 2 : 0), opacity: logoOpacity / 100, padding: logoFrostedBg ? logoPadding : 0,
                             ...(logoCustomPosition
                               ? { left: `${logoCustomPosition.x}%`, top: `${logoCustomPosition.y}%` }
                               : (() => {
@@ -609,7 +609,7 @@ export default function CardBuilderPreview({
                             {logoUrl && logoPosition === "beside-name" && (
                               <div
                                 className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
-                                style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
+                                style={{ height: logoPx + (logoFrostedBg ? logoPadding * 2 : 0), width: logoPx + (logoFrostedBg ? logoPadding * 2 : 0), opacity: logoOpacity / 100, padding: logoFrostedBg ? logoPadding : 0 }}
                               >
                                 <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
                               </div>
@@ -646,7 +646,7 @@ export default function CardBuilderPreview({
                             {logoUrl && logoPosition === "beside-name-right" && (
                               <div
                                 className={`rounded-lg flex items-center justify-center flex-shrink-0 ${logoFrostedBg ? 'bg-white/80 backdrop-blur-sm shadow-sm' : ''}`}
-                                style={{ height: logoPx, width: logoPx, opacity: logoOpacity / 100, padding: logoPadding }}
+                                style={{ height: logoPx + (logoFrostedBg ? logoPadding * 2 : 0), width: logoPx + (logoFrostedBg ? logoPadding * 2 : 0), opacity: logoOpacity / 100, padding: logoFrostedBg ? logoPadding : 0 }}
                               >
                                 <img src={logoUrl} alt="logo" className="max-h-full max-w-full object-contain" />
                               </div>
