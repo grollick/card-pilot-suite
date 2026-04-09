@@ -1,7 +1,9 @@
-import { Pencil, Loader2, Check } from "lucide-react";
+import { useState } from "react";
+import { Pencil, Loader2, Check, ChevronDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { toast } from "sonner";
 
 interface Props {
@@ -79,6 +81,8 @@ export default function CardBuilderIdentity({
   professionName, identitySaveTimers, identitySaveState, setIdentitySaveState,
   saveThemeField, qc, hideWrapper,
 }: Props) {
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+
   const makeHandler = (field: string, dbField: string, setter: (v: string | null) => void) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const val = e.target.value;
@@ -117,205 +121,28 @@ export default function CardBuilderIdentity({
           <h2 className="font-semibold">Identity</h2>
         </div>
       )}
+
+      {/* ── Basic Fields ── */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label className="text-xs text-muted-foreground">Display Name</label>
           <SaveIndicator state={identitySaveState.name ?? null} />
         </div>
         <Input value={editName ?? profile?.name ?? ""} onChange={makeHandler("name", "name", setEditName)} placeholder="Your Name" className="text-sm" />
-        <div className="flex items-center justify-between mt-1">
-          <label className="text-[11px] text-muted-foreground">Bold last name</label>
-          <Switch
-            checked={boldLastName}
-            onCheckedChange={(v) => { setBoldLastName(v); saveThemeField({ bold_last_name: v }); }}
-            className="scale-75 origin-right"
-          />
-        </div>
-        <div className="flex items-center justify-between mt-1">
-          <label className="text-[11px] text-muted-foreground">Uppercase name</label>
-          <Switch
-            checked={uppercaseName}
-            onCheckedChange={(v) => { setUppercaseName(v); saveThemeField({ uppercase_name: v }); }}
-            className="scale-75 origin-right"
-          />
-        </div>
-        <div className="mt-1.5">
-          <div className="flex items-center justify-between mb-1">
-            <label className="text-[11px] text-muted-foreground">Letter spacing</label>
-            <span className="text-[10px] text-muted-foreground tabular-nums">{nameLetterSpacing > 0 ? `+${nameLetterSpacing}` : nameLetterSpacing}px</span>
-          </div>
-          <Slider
-            min={-2}
-            max={12}
-            step={0.5}
-            value={[nameLetterSpacing]}
-            onValueChange={([v]) => { setNameLetterSpacing(v); saveThemeField({ name_letter_spacing: v }); }}
-            className="w-full"
-          />
-        </div>
-        <div className="mt-1.5">
-          <div className="flex items-center justify-between mb-1">
-            <label className="text-[11px] text-muted-foreground">Font weight</label>
-            <span className="text-[10px] text-muted-foreground tabular-nums">{nameFontWeight}</span>
-          </div>
-          <Slider
-            min={100}
-            max={900}
-            step={100}
-            value={[nameFontWeight]}
-            onValueChange={([v]) => { setNameFontWeight(v); saveThemeField({ name_font_weight: v }); }}
-            className="w-full"
-          />
-        </div>
-        <div className="mt-1.5">
-          <div className="flex items-center justify-between mb-1">
-            <label className="text-[11px] text-muted-foreground">First name weight</label>
-            <span className="text-[10px] text-muted-foreground tabular-nums">{firstNameFontWeight ?? "Same"}</span>
-          </div>
-          <Slider
-            min={100}
-            max={900}
-            step={100}
-            value={[firstNameFontWeight ?? nameFontWeight]}
-            onValueChange={([v]) => { setFirstNameFontWeight(v); saveThemeField({ first_name_font_weight: v }); }}
-            className="w-full"
-          />
-          {firstNameFontWeight !== null && (
-            <button
-              type="button"
-              onClick={() => { setFirstNameFontWeight(null); saveThemeField({ first_name_font_weight: null }); }}
-              className="text-[10px] text-primary hover:underline mt-0.5"
-            >Reset to same</button>
-          )}
-        </div>
-        <div className="flex items-center justify-between mt-1">
-          <label className="text-[11px] text-muted-foreground">Italic name</label>
-          <Switch
-            checked={nameItalic}
-            onCheckedChange={(v) => { setNameItalic(v); saveThemeField({ name_italic: v }); }}
-            className="scale-75 origin-right"
-          />
-        </div>
-        <div className="mt-1.5">
-          <div className="flex items-center justify-between mb-1">
-            <label className="text-[11px] text-muted-foreground">Font size</label>
-            <span className="text-[10px] text-muted-foreground tabular-nums">{nameFontSize ?? "Auto"}</span>
-          </div>
-          <Slider
-            min={14}
-            max={48}
-            step={1}
-            value={[nameFontSize ?? 22]}
-            onValueChange={([v]) => { setNameFontSize(v); saveThemeField({ name_font_size: v }); }}
-            className="w-full"
-          />
-          {nameFontSize !== null && (
-            <button
-              type="button"
-              onClick={() => { setNameFontSize(null); saveThemeField({ name_font_size: null }); }}
-              className="text-[10px] text-primary hover:underline mt-0.5"
-            >Reset to auto</button>
-          )}
-        </div>
-        <div className="mt-1.5">
-          <div className="flex items-center justify-between mb-1">
-            <label className="text-[11px] text-muted-foreground">Subtitle font size</label>
-            <span className="text-[10px] text-muted-foreground tabular-nums">{subtitleFontSize ?? "Auto"}</span>
-          </div>
-          <Slider
-            min={10}
-            max={24}
-            step={1}
-            value={[subtitleFontSize ?? 14]}
-            onValueChange={([v]) => { setSubtitleFontSize(v); saveThemeField({ subtitle_font_size: v }); }}
-            className="w-full"
-          />
-          {subtitleFontSize !== null && (
-            <button
-              type="button"
-              onClick={() => { setSubtitleFontSize(null); saveThemeField({ subtitle_font_size: null }); }}
-              className="text-[10px] text-primary hover:underline mt-0.5"
-            >Reset to auto</button>
-          )}
-        </div>
-        <div className="flex items-center justify-between mt-1">
-          <label className="text-[11px] text-muted-foreground">Italic job title</label>
-          <Switch
-            checked={subtitleItalic}
-            onCheckedChange={(v) => { setSubtitleItalic(v); saveThemeField({ subtitle_italic: v }); }}
-            className="scale-75 origin-right"
-          />
-        </div>
-        <div className="mt-1.5">
-          <div className="flex items-center justify-between mb-1">
-            <label className="text-[11px] text-muted-foreground">Title–company spacing</label>
-            <span className="text-[10px] text-muted-foreground tabular-nums">{subtitleSpacing ?? "Auto"}</span>
-          </div>
-          <Slider
-            min={0}
-            max={24}
-            step={1}
-            value={[subtitleSpacing ?? 4]}
-            onValueChange={([v]) => { setSubtitleSpacing(v); saveThemeField({ subtitle_spacing: v }); }}
-            className="w-full"
-          />
-          {subtitleSpacing !== null && (
-            <button
-              type="button"
-              onClick={() => { setSubtitleSpacing(null); saveThemeField({ subtitle_spacing: null }); }}
-              className="text-[10px] text-primary hover:underline mt-0.5"
-            >Reset to auto</button>
-          )}
-        </div>
-        <div className="mt-1.5">
-          <div className="flex items-center justify-between mb-1">
-            <label className="text-[11px] text-muted-foreground">Line spacing</label>
-            <span className="text-[10px] text-muted-foreground tabular-nums">{nameLineHeight != null ? `${nameLineHeight}` : "Auto"}</span>
-          </div>
-          <Slider
-            min={0.8}
-            max={3}
-            step={0.1}
-            value={[nameLineHeight ?? 1.4]}
-            onValueChange={([v]) => { setNameLineHeight(v); saveThemeField({ name_line_height: v }); }}
-            className="w-full"
-          />
-          {nameLineHeight !== null && (
-            <button
-              type="button"
-              onClick={() => { setNameLineHeight(null); saveThemeField({ name_line_height: null }); }}
-              className="text-[10px] text-primary hover:underline mt-0.5"
-            >Reset to auto</button>
-          )}
-        </div>
-        <div className="flex items-center justify-between mt-1">
-          <label className="text-[11px] text-muted-foreground">White text border</label>
-          <Switch
-            checked={nameTextStroke}
-            onCheckedChange={(v) => { setNameTextStroke(v); saveThemeField({ name_text_stroke: v }); }}
-            className="scale-75 origin-right"
-          />
-        </div>
-        {nameTextStroke && (
-          <div className="mt-1.5">
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-[11px] text-muted-foreground">Border weight</label>
-              <span className="text-[10px] text-muted-foreground tabular-nums">{nameTextStrokeWidth}px</span>
-            </div>
-            <Slider
-              min={0.5}
-              max={4}
-              step={0.5}
-              value={[nameTextStrokeWidth]}
-              onValueChange={([v]) => { setNameTextStrokeWidth(v); saveThemeField({ name_text_stroke_width: v }); }}
-              className="w-full"
-            />
-          </div>
-        )}
       </div>
+
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <label className="text-xs text-muted-foreground">Company / Title</label>
+          <label className="text-xs text-muted-foreground">Job Title</label>
+          <SaveIndicator state={identitySaveState.jobTitle ?? null} />
+        </div>
+        <Input value={editJobTitle ?? jobTitle ?? ""} onChange={makeHandler("jobTitle", "job_title", setEditJobTitle)} placeholder={professionName} className="text-sm" />
+        {jobTitle && <p className="text-[10px] text-muted-foreground">Clear to use default: {professionName}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="text-xs text-muted-foreground">Company</label>
           <div className="flex items-center gap-2">
             <SaveIndicator state={identitySaveState.company ?? null} />
             <Switch
@@ -326,8 +153,112 @@ export default function CardBuilderIdentity({
           </div>
         </div>
         {showCompany && (
-          <>
-            <Input value={editCompany ?? profile?.company ?? ""} onChange={makeHandler("company", "company", setEditCompany)} placeholder="Your Company" className="text-sm" />
+          <Input value={editCompany ?? profile?.company ?? ""} onChange={makeHandler("company", "company", setEditCompany)} placeholder="Your Company" className="text-sm" />
+        )}
+      </div>
+
+      {/* ── Advanced Typography ── */}
+      <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+        <CollapsibleTrigger className="w-full flex items-center justify-between py-1.5 px-1 group rounded-lg hover:bg-accent/30 transition-colors duration-150 mt-1">
+          <span className="text-[11px] font-medium text-muted-foreground group-hover:text-foreground transition-colors">Advanced Typography</span>
+          <ChevronDown className={`h-3 w-3 text-muted-foreground/50 transition-transform duration-200 ${advancedOpen ? "rotate-180" : ""}`} />
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-2 space-y-2">
+          {/* Name styling */}
+          <div className="flex items-center justify-between">
+            <label className="text-[11px] text-muted-foreground">Bold last name</label>
+            <Switch checked={boldLastName} onCheckedChange={(v) => { setBoldLastName(v); saveThemeField({ bold_last_name: v }); }} className="scale-75 origin-right" />
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="text-[11px] text-muted-foreground">Uppercase name</label>
+            <Switch checked={uppercaseName} onCheckedChange={(v) => { setUppercaseName(v); saveThemeField({ uppercase_name: v }); }} className="scale-75 origin-right" />
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="text-[11px] text-muted-foreground">Italic name</label>
+            <Switch checked={nameItalic} onCheckedChange={(v) => { setNameItalic(v); saveThemeField({ name_italic: v }); }} className="scale-75 origin-right" />
+          </div>
+
+          <div className="mt-1.5">
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px] text-muted-foreground">Name size</label>
+              <span className="text-[10px] text-muted-foreground tabular-nums">{nameFontSize ?? "Auto"}</span>
+            </div>
+            <Slider min={14} max={48} step={1} value={[nameFontSize ?? 22]} onValueChange={([v]) => { setNameFontSize(v); saveThemeField({ name_font_size: v }); }} className="w-full" />
+            {nameFontSize !== null && (
+              <button type="button" onClick={() => { setNameFontSize(null); saveThemeField({ name_font_size: null }); }} className="text-[10px] text-primary hover:underline mt-0.5">Reset</button>
+            )}
+          </div>
+
+          <div className="mt-1.5">
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px] text-muted-foreground">Name weight</label>
+              <span className="text-[10px] text-muted-foreground tabular-nums">{nameFontWeight}</span>
+            </div>
+            <Slider min={100} max={900} step={100} value={[nameFontWeight]} onValueChange={([v]) => { setNameFontWeight(v); saveThemeField({ name_font_weight: v }); }} className="w-full" />
+          </div>
+
+          <div className="mt-1.5">
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px] text-muted-foreground">First name weight</label>
+              <span className="text-[10px] text-muted-foreground tabular-nums">{firstNameFontWeight ?? "Same"}</span>
+            </div>
+            <Slider min={100} max={900} step={100} value={[firstNameFontWeight ?? nameFontWeight]} onValueChange={([v]) => { setFirstNameFontWeight(v); saveThemeField({ first_name_font_weight: v }); }} className="w-full" />
+            {firstNameFontWeight !== null && (
+              <button type="button" onClick={() => { setFirstNameFontWeight(null); saveThemeField({ first_name_font_weight: null }); }} className="text-[10px] text-primary hover:underline mt-0.5">Reset</button>
+            )}
+          </div>
+
+          <div className="mt-1.5">
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px] text-muted-foreground">Letter spacing</label>
+              <span className="text-[10px] text-muted-foreground tabular-nums">{nameLetterSpacing > 0 ? `+${nameLetterSpacing}` : nameLetterSpacing}px</span>
+            </div>
+            <Slider min={-2} max={12} step={0.5} value={[nameLetterSpacing]} onValueChange={([v]) => { setNameLetterSpacing(v); saveThemeField({ name_letter_spacing: v }); }} className="w-full" />
+          </div>
+
+          <div className="mt-1.5">
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px] text-muted-foreground">Line spacing</label>
+              <span className="text-[10px] text-muted-foreground tabular-nums">{nameLineHeight != null ? `${nameLineHeight}` : "Auto"}</span>
+            </div>
+            <Slider min={0.8} max={3} step={0.1} value={[nameLineHeight ?? 1.4]} onValueChange={([v]) => { setNameLineHeight(v); saveThemeField({ name_line_height: v }); }} className="w-full" />
+            {nameLineHeight !== null && (
+              <button type="button" onClick={() => { setNameLineHeight(null); saveThemeField({ name_line_height: null }); }} className="text-[10px] text-primary hover:underline mt-0.5">Reset</button>
+            )}
+          </div>
+
+          {/* Subtitle styling */}
+          <div className="h-px bg-border/30 my-2" />
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground/60">Subtitle</span>
+
+          <div className="mt-1.5">
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px] text-muted-foreground">Subtitle size</label>
+              <span className="text-[10px] text-muted-foreground tabular-nums">{subtitleFontSize ?? "Auto"}</span>
+            </div>
+            <Slider min={10} max={24} step={1} value={[subtitleFontSize ?? 14]} onValueChange={([v]) => { setSubtitleFontSize(v); saveThemeField({ subtitle_font_size: v }); }} className="w-full" />
+            {subtitleFontSize !== null && (
+              <button type="button" onClick={() => { setSubtitleFontSize(null); saveThemeField({ subtitle_font_size: null }); }} className="text-[10px] text-primary hover:underline mt-0.5">Reset</button>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between">
+            <label className="text-[11px] text-muted-foreground">Italic subtitle</label>
+            <Switch checked={subtitleItalic} onCheckedChange={(v) => { setSubtitleItalic(v); saveThemeField({ subtitle_italic: v }); }} className="scale-75 origin-right" />
+          </div>
+
+          <div className="mt-1.5">
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-[11px] text-muted-foreground">Title–company gap</label>
+              <span className="text-[10px] text-muted-foreground tabular-nums">{subtitleSpacing ?? "Auto"}</span>
+            </div>
+            <Slider min={0} max={24} step={1} value={[subtitleSpacing ?? 4]} onValueChange={([v]) => { setSubtitleSpacing(v); saveThemeField({ subtitle_spacing: v }); }} className="w-full" />
+            {subtitleSpacing !== null && (
+              <button type="button" onClick={() => { setSubtitleSpacing(null); saveThemeField({ subtitle_spacing: null }); }} className="text-[10px] text-primary hover:underline mt-0.5">Reset</button>
+            )}
+          </div>
+
+          {showCompany && (
             <div className="flex items-center justify-between mt-1">
               <label className="text-[11px] text-muted-foreground">Company color</label>
               <div className="flex items-center gap-2">
@@ -339,25 +270,29 @@ export default function CardBuilderIdentity({
                   style={{ WebkitAppearance: "none", appearance: "none", background: "none" }}
                 />
                 {companyColor && (
-                  <button
-                    type="button"
-                    onClick={() => { setCompanyColor(null); saveThemeField({ company_color: null }); }}
-                    className="text-[10px] text-primary hover:underline"
-                  >Reset</button>
+                  <button type="button" onClick={() => { setCompanyColor(null); saveThemeField({ company_color: null }); }} className="text-[10px] text-primary hover:underline">Reset</button>
                 )}
               </div>
             </div>
-          </>
-        )}
-      </div>
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <label className="text-xs text-muted-foreground">Job Title</label>
-          <SaveIndicator state={identitySaveState.jobTitle ?? null} />
-        </div>
-        <Input value={editJobTitle ?? jobTitle ?? ""} onChange={makeHandler("jobTitle", "job_title", setEditJobTitle)} placeholder={professionName} className="text-sm" />
-        {jobTitle && <p className="text-[10px] text-muted-foreground">Clear to use default: {professionName}</p>}
-      </div>
+          )}
+
+          {/* Text stroke */}
+          <div className="h-px bg-border/30 my-2" />
+          <div className="flex items-center justify-between">
+            <label className="text-[11px] text-muted-foreground">Text outline</label>
+            <Switch checked={nameTextStroke} onCheckedChange={(v) => { setNameTextStroke(v); saveThemeField({ name_text_stroke: v }); }} className="scale-75 origin-right" />
+          </div>
+          {nameTextStroke && (
+            <div className="mt-1.5">
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-[11px] text-muted-foreground">Outline weight</label>
+                <span className="text-[10px] text-muted-foreground tabular-nums">{nameTextStrokeWidth}px</span>
+              </div>
+              <Slider min={0.5} max={4} step={0.5} value={[nameTextStrokeWidth]} onValueChange={([v]) => { setNameTextStrokeWidth(v); saveThemeField({ name_text_stroke_width: v }); }} className="w-full" />
+            </div>
+          )}
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 }
