@@ -60,6 +60,10 @@ export default function FloatingHelpButton() {
   const location = useLocation();
 
   const currentPath = location.pathname;
+
+  // Hide on card builder to avoid obstructing editing controls
+  if (currentPath === "/app/card") return null;
+
   const help = contextualHelp[currentPath] || contextualHelp["/app"];
 
   const items: HelpItem[] = [
