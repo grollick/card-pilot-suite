@@ -1,4 +1,5 @@
 import { useState, useCallback } from "react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Globe, FileText, Eye, Pencil, GripVertical,
@@ -739,9 +740,7 @@ export default function LandingPageManager({ adminOnly = true }: LandingPageMana
     return (
       <div className="space-y-6 max-w-5xl">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-            <Globe className="h-6 w-6 text-primary" /> Page Builder
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Page Builder" /></h1>
           <p className="text-muted-foreground text-sm mt-1">Create and edit pages with the visual drag-and-drop editor.</p>
         </div>
         {PAGE_GROUPS.map((group) => {

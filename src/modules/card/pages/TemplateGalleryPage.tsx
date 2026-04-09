@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
@@ -83,7 +84,7 @@ export default function TemplateGalleryPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold tracking-tight">Template Gallery</h1>
+        <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Template Gallery" /></h1>
         <p className="text-sm text-muted-foreground">
           Browse professionally designed card templates. Find the perfect layout for your business.
         </p>
