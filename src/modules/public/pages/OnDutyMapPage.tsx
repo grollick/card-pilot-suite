@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CATEGORIES } from "@/modules/marketplace/data/mockData";
-import { useMarketplaceSearch, type MarketplaceResult } from "@/modules/marketplace/hooks/useMarketplaceSearch";
+import { useMarketplaceSearch } from "@/modules/marketplace/hooks/useMarketplaceSearch";
 import { useUserLocation } from "@/modules/marketplace/hooks/useUserLocation";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
