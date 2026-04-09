@@ -216,17 +216,7 @@ export function AppSidebar() {
         <SidebarHeader className="px-4 pt-4 pb-3">
           <div className="flex items-center justify-between">
             {!collapsed && (
-              <div className="flex items-center gap-2.5">
-                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/20">
-                  <span className="text-sm font-black text-primary-foreground">G</span>
-                </div>
-                <div>
-                  <span className="text-sm font-bold tracking-tight">
-                    <GuzzlLogo to={null} size="xs" />
-                    <span className="text-foreground/60 font-normal">.pro</span>
-                  </span>
-                </div>
-              </div>
+              <GuzzlLogo to={null} size="sm" />
             )}
             <Tip label={collapsed ? "Expand" : "Collapse"} side="right">
               <Button
