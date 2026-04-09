@@ -31,8 +31,8 @@ export default function BetaFeedbackWidget() {
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Only show for authenticated users with beta access
-  if (!user || !beta) return null;
+  // Only show for authenticated users with beta access; hide on card builder
+  if (!user || !beta || location.pathname === "/app/card") return null;
 
   const handleScreenshot = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
