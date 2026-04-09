@@ -490,8 +490,8 @@ export default function CardBuilderPreview({
                         coverUrl={coverUrl}
                         avatarBgColor={avatarBgColor}
                         avatarRotation={avatarRotation}
-                        avatarBorderWidth={previewTheme.header.avatarBorderWidth ?? 3}
-                        avatarSize={previewTheme.header.avatarSize ?? 80}
+                        avatarBorderWidth={(previewTheme.header as any).avatarBorderWidth ?? 3}
+                        avatarSize={(previewTheme.header as any).avatarSize ?? 80}
                         coverOffsetY={coverOffsetY}
                         coverFlipX={coverFlipX}
                         coverHeight={coverHeight}
