@@ -1,13 +1,18 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
-import { MapPin, List, Radio, ArrowRight, Map, Phone, ArrowLeft } from "lucide-react";
+import { MapPin, List, Radio, ArrowRight, Map, Phone, ArrowLeft, Search, Star, Crosshair } from "lucide-react";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { useOnDutyProfessionals } from "@/hooks/useOnDutyMap";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { CATEGORIES } from "@/modules/marketplace/data/mockData";
+import { useMarketplaceSearch, type MarketplaceResult } from "@/modules/marketplace/hooks/useMarketplaceSearch";
+import { useUserLocation } from "@/modules/marketplace/hooks/useUserLocation";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
