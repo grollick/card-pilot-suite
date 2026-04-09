@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from "react";
 import html2canvas from "html2canvas";
 import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import { ArrowLeft, Download, Send, Sparkles, Wand2, PanelRightOpen, PanelRightClose } from "lucide-react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -184,7 +185,7 @@ export default function PostDesigner() {
           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => navigate("/app/social")}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="font-semibold text-sm">Post Designer</h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Post Designer" /></h1>
         </div>
         <div className="flex items-center gap-2">
           <Button

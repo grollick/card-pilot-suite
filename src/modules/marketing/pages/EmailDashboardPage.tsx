@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { format, subDays, startOfDay, endOfDay } from "date-fns";
@@ -115,7 +116,7 @@ export default function EmailDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Email Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Email Dashboard" /></h1>
         <p className="text-sm text-muted-foreground">Monitor email delivery across all templates</p>
       </div>
 

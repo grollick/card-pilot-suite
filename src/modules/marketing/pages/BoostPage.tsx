@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { useProfile } from "@/hooks/useCard";
 import { useBoosts, useActiveBoosts, useCreateBoost, useCancelBoost, type NeighborhoodBoost } from "@/hooks/useBoosts";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
@@ -70,10 +71,7 @@ export default function BoostPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Rocket className="h-6 w-6 text-primary" />
-            Neighborhood Boost
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Neighborhood Boost" /></h1>
           <p className="text-sm text-muted-foreground mt-1">
             Promote your business to nearby customers searching for services
           </p>

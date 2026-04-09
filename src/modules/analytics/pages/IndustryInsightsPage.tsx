@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { useIndustryInsights } from "@/hooks/useIndustryInsights";
 import { Loader2, TrendingUp, DollarSign, Clock, BarChart3, Users, Zap, Globe } from "lucide-react";
 import { motion } from "framer-motion";
@@ -67,7 +68,7 @@ export default function IndustryInsightsPage() {
       <div className="space-y-6">
         {/* Header */}
         <motion.div {...fade} className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">{insights.professionName} Insights</h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix={`${insights.professionName} Insights`} /></h1>
           <p className="text-sm text-muted-foreground">
             Anonymized trends from {insights.peerCount} businesses in your industry
           </p>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { Search, BookOpen, Users, Calendar, Rocket, TrendingUp, ChevronRight, PlayCircle, HelpCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
@@ -127,7 +128,7 @@ export default function HelpCenter() {
             <HelpCircle className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="page-title">Help Center</h1>
+            <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Help Center" /></h1>
             <p className="page-description">Learn how to generate leads and grow your business with guzzl.pro.</p>
           </div>
         </div>

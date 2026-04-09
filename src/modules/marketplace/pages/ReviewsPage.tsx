@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { motion } from "framer-motion";
 import {
   Star, Trash2, Loader2, MessageSquareQuote, Copy, Reply, Flag,
@@ -112,7 +113,7 @@ export default function ReviewsPage() {
       {/* Header */}
       <div className="flex items-center justify-between page-header">
         <div>
-          <h1 className="page-title">Local Reputation Engine</h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Local Reputation Engine" /></h1>
           <p className="page-description">Collect, manage, and showcase customer reviews</p>
         </div>
         <Button variant="outline" className="gap-1.5" onClick={copyReviewLink}>
