@@ -1,13 +1,17 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { MapPin, List, Radio, ArrowRight, Map, Phone, ArrowLeft } from "lucide-react";
+import { MapPin, List, ArrowRight, Map, ArrowLeft, Star, Radio } from "lucide-react";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { useOnDutyProfessionals } from "@/hooks/useOnDutyMap";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { CATEGORIES } from "@/modules/marketplace/data/mockData";
+import { useMarketplaceSearch } from "@/modules/marketplace/hooks/useMarketplaceSearch";
+import { useUserLocation } from "@/modules/marketplace/hooks/useUserLocation";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -23,44 +27,152 @@ export default function OnDutyMapPage() {
   const navigate = useNavigate();
   const { data: professionals = [], isLoading } = useOnDutyProfessionals();
   const [activeTab, setActiveTab] = useState("list");
+  const { location } = useUserLocation();
+
+  const { data: featuredData, isLoading: featuredLoading } = useMarketplaceSearch({
+    city: location.city,
+    lat: location.lat,
+    lon: location.lon,
+    limit: 8,
+  });
+
+  const featured = (featuredData?.results || []).filter((b) => b.is_featured || b.avg_rating >= 4.0).slice(0, 6);
 
   return (
     <div className="min-h-screen w-full bg-background">
       <Helmet>
-        <title>On Duty Professionals | CardPilot</title>
-        <meta name="description" content="Find available professionals near you who are on duty right now." />
+        <title>Marketplace — Find Local Professionals | guzzl.pro</title>
+        <meta name="description" content="Find available professionals near you. Browse categories, view ratings, and book services." />
       </Helmet>
 
-      <main className="mx-auto w-full max-w-4xl px-4 py-6 md:px-6">
-        <div className="flex items-center gap-3 mb-6">
+      <main className="mx-auto w-full max-w-5xl px-4 py-6 md:px-6 space-y-10">
+        {/* Header */}
+        <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Available Now" /></h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Marketplace" /></h1>
         </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="list" className="gap-1.5">
-              <List className="h-4 w-4" /> List View
-            </TabsTrigger>
-            <TabsTrigger value="map" className="gap-1.5">
-              <Map className="h-4 w-4" /> Map View
-            </TabsTrigger>
-          </TabsList>
+        {/* On Duty Section */}
+        <section>
+          <h2 className="text-xl font-bold text-foreground mb-4 flex items-center gap-2">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500" />
+            </span>
+            Available Now
+          </h2>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="mb-4">
+              <TabsTrigger value="list" className="gap-1.5">
+                <List className="h-4 w-4" /> List View
+              </TabsTrigger>
+              <TabsTrigger value="map" className="gap-1.5">
+                <Map className="h-4 w-4" /> Map View
+              </TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="list">
-            <ProfessionalList professionals={professionals} isLoading={isLoading} navigate={navigate} />
-          </TabsContent>
-
-          <TabsContent value="map">
-            <MapPanel professionals={professionals} onSwitchToList={() => setActiveTab("list")} navigate={navigate} />
-            {/* Also show list below map for redundancy */}
-            <div className="mt-8">
+            <TabsContent value="list">
               <ProfessionalList professionals={professionals} isLoading={isLoading} navigate={navigate} />
+            </TabsContent>
+
+            <TabsContent value="map">
+              <MapPanel professionals={professionals} onSwitchToList={() => setActiveTab("list")} navigate={navigate} />
+              <div className="mt-8">
+                <ProfessionalList professionals={professionals} isLoading={isLoading} navigate={navigate} />
+              </div>
+            </TabsContent>
+          </Tabs>
+        </section>
+
+        {/* Browse by Category */}
+        <section>
+          <h2 className="text-xl font-bold text-foreground mb-4">Browse by Category</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.key}
+                onClick={() => navigate(`/marketplace/category/${cat.key}`)}
+                className="flex flex-col items-center gap-2 p-5 rounded-xl border border-border bg-card hover:border-primary/30 hover:shadow-sm transition-all group"
+              >
+                <span className="text-3xl">{cat.icon}</span>
+                <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{cat.label}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Featured / Top Rated Providers */}
+        {(featuredLoading || featured.length > 0) && (
+          <section>
+            <h2 className="text-xl font-bold text-foreground mb-4">⭐ Top Rated Providers</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {featuredLoading
+                ? Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="rounded-xl border border-border bg-card p-5">
+                      <div className="flex items-center gap-3 mb-3">
+                        <Skeleton className="w-12 h-12 rounded-xl" />
+                        <div className="space-y-2 flex-1">
+                          <Skeleton className="h-4 w-32" />
+                          <Skeleton className="h-3 w-20" />
+                        </div>
+                      </div>
+                      <Skeleton className="h-3 w-24 mb-2" />
+                      <Skeleton className="h-8 w-full rounded-md" />
+                    </div>
+                  ))
+                : featured.map((biz) => (
+                    <div
+                      key={biz.business_id}
+                      className="rounded-xl border border-border bg-card p-5 hover:shadow-md transition-shadow cursor-pointer"
+                      onClick={() => navigate(`/marketplace/${biz.slug}`)}
+                    >
+                      <div className="flex items-center gap-3 mb-3">
+                        <img
+                          src={biz.logo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(biz.business_name.slice(0, 2))}&background=6366f1&color=fff&size=128`}
+                          alt={biz.business_name}
+                          className="w-12 h-12 rounded-xl object-cover"
+                        />
+                        <div className="min-w-0">
+                          <h3 className="font-semibold text-sm text-foreground truncate">{biz.business_name}</h3>
+                          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <MapPin className="h-3 w-3" />
+                            {biz.location_city}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1 mb-2">
+                        <Star className="h-3.5 w-3.5 fill-warning text-warning" />
+                        <span className="text-sm font-medium">{Number(biz.avg_rating).toFixed(1)}</span>
+                        <span className="text-xs text-muted-foreground">({biz.review_count} reviews)</span>
+                      </div>
+                      {biz.description && (
+                        <p className="text-xs text-muted-foreground line-clamp-2">{biz.description}</p>
+                      )}
+                    </div>
+                  ))}
             </div>
-          </TabsContent>
-        </Tabs>
+          </section>
+        )}
+
+        {/* CTA Banner */}
+        <section className="pb-6">
+          <div className="rounded-2xl bg-gradient-to-r from-primary to-accent p-8 sm:p-12 text-center text-primary-foreground">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-2">Are you a service provider?</h2>
+            <p className="text-primary-foreground/80 mb-6 max-w-md mx-auto">
+              Get discovered by local customers and grow your business with guzzl.pro
+            </p>
+            <Button
+              size="lg"
+              variant="secondary"
+              className="font-semibold"
+              onClick={() => navigate("/auth")}
+            >
+              Create Your Free Card <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </section>
       </main>
     </div>
   );
