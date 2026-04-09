@@ -1,4 +1,5 @@
 import { useState } from "react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { Helmet } from "react-helmet-async";
 import { Eye, Users, CalendarCheck, Star, TrendingUp, CheckCircle2, AlertCircle, Plus, Pencil, Trash2, Rocket, ArrowUpRight, ShieldCheck, Zap, Crown } from "lucide-react";
 import { ReviewDashboard } from "../components/ReviewDashboard";
@@ -94,7 +95,7 @@ export default function ProviderDashboard() {
       {/* Header with plan badge */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold text-foreground">Marketplace</h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Marketplace" /></h1>
           <Badge className={`text-xs capitalize gap-1 ${planColor}`}>
             <Crown className="h-3 w-3" />
             {plan.plan_name} plan

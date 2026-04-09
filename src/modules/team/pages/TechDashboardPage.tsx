@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { useNavigate } from "react-router-dom";
 import {
   Briefcase, Camera, MapPin, Phone, MessageSquare, CheckCircle2,
@@ -87,7 +88,7 @@ export default function TechDashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold">My Jobs</h1>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="My Jobs" /></h1>
           <p className="text-sm text-muted-foreground">
             {todaysJobs.length} job{todaysJobs.length !== 1 ? "s" : ""} today
           </p>
