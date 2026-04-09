@@ -46,7 +46,7 @@ export default function GuzzlLogo({
         className={cn("w-auto object-contain", heightMap[size])}
       />
       {suffix && (
-        <span className={cn("ml-2 font-semibold text-foreground text-xl", suffixClassName)}>
+        <span className={cn("ml-2 font-semibold text-muted-foreground text-xl", suffixClassName)}>
           {suffix}
         </span>
       )}
