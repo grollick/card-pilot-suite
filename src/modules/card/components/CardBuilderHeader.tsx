@@ -2,6 +2,7 @@ import {
   Globe, Loader2, Cloud, CloudOff, Link2, Eye, ChevronLeft, Wifi,
   Smartphone, Tablet, Save,
 } from "lucide-react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
@@ -56,9 +57,7 @@ export default function CardBuilderHeader({
           <Separator orientation="vertical" className="h-5 hidden sm:block" />
 
           <div className="flex items-center gap-2.5 min-w-0">
-            <h1 className="text-[13px] font-semibold truncate max-w-[180px] text-foreground">
-              {name || "Untitled Card"}
-            </h1>
+            <GuzzlLogo to={null} size="xs" suffix="Card Editor" />
             <div className={`flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 transition-colors ${
               globalSaveState === "saving" ? "text-primary bg-primary/5"
               : globalSaveState === "saved" ? "text-emerald-600 bg-emerald-500/5"
