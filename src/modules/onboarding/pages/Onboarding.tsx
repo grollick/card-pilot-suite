@@ -287,6 +287,7 @@ export default function Onboarding() {
           tagline: aiSetup?.tagline || profDefaults.tagline,
           about: aiSetup?.about || profDefaults.about,
           booking_enabled: bookingEnabled,
+          cardLayout: "modern",
           ...(profDefaults.palette ? { palette: profDefaults.palette } : {}),
         },
         sections_json: finalSections,
