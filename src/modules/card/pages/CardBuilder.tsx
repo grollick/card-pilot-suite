@@ -509,25 +509,28 @@ export default function CardBuilder() {
   );
 
   // ════════════════════════════════════════════════
-  //  RIGHT PANEL — Content / Style / Layout tabs
+  //  RIGHT PANEL — Info / Photos / Design / Layout
   // ════════════════════════════════════════════════
   const rightPanel = (
     <Tabs value={rightTab} onValueChange={setRightTab} className="w-full">
-      <TabsList className="w-full grid grid-cols-3 h-11 mb-4 bg-muted/15 rounded-xl p-1 border border-border/10 shadow-sm">
-        <TabsTrigger value="content" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-border/10 transition-all duration-200">
-          <Pencil className="h-3 w-3" /> Content
+      <TabsList className="w-full grid grid-cols-4 h-11 mb-4 bg-muted/15 rounded-xl p-1 border border-border/10 shadow-sm">
+        <TabsTrigger value="info" className="text-[10px] gap-1 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-border/10 transition-all duration-200">
+          <Pencil className="h-3 w-3" /> Info
         </TabsTrigger>
-        <TabsTrigger value="style" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-border/10 transition-all duration-200">
-          <PaintBucket className="h-3 w-3" /> Style
+        <TabsTrigger value="photos" className="text-[10px] gap-1 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-border/10 transition-all duration-200">
+          <Camera className="h-3 w-3" /> Photos
         </TabsTrigger>
-        <TabsTrigger value="layout" className="text-[11px] gap-1.5 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-border/10 transition-all duration-200">
+        <TabsTrigger value="design" className="text-[10px] gap-1 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-border/10 transition-all duration-200">
+          <PaintBucket className="h-3 w-3" /> Design
+        </TabsTrigger>
+        <TabsTrigger value="layout" className="text-[10px] gap-1 h-full rounded-lg font-semibold data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:ring-1 data-[state=active]:ring-border/10 transition-all duration-200">
           <LayoutGrid className="h-3 w-3" /> Layout
         </TabsTrigger>
       </TabsList>
 
-      {/* ── Content Tab ── */}
-      <TabsContent value="content" className="mt-0 space-y-3">
-        <PanelSection title="Identity" icon={Type}>
+      {/* ── Info Tab — Name, title, company, CTAs ── */}
+      <TabsContent value="info" className="mt-0 space-y-3">
+        <PanelSection title="Your Details" icon={Type} defaultOpen>
           <CardBuilderIdentity
             profile={s.profile} editName={s.editName} setEditName={s.setEditName}
             editCompany={s.editCompany} setEditCompany={s.setEditCompany}
@@ -555,8 +558,7 @@ export default function CardBuilder() {
           />
         </PanelSection>
 
-        {/* CTA Buttons */}
-        <PanelSection title="CTA Buttons" icon={MousePointerClick}>
+        <PanelSection title="Action Buttons" icon={MousePointerClick} defaultOpen>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[11px] text-muted-foreground">Icons only</span>
@@ -565,44 +567,43 @@ export default function CardBuilder() {
             <CtaEditor ctas={s.ctaConfig} onChange={s.handleCtaConfigChange} />
           </div>
         </PanelSection>
-
-        {/* Media */}
-        <PanelSection title="Photos & Media" icon={Camera}>
-          <CardPhotoTools
-            avatarUrl={s.avatarUrl} coverUrl={s.coverUrl} profession={s.professionName}
-            onAvatarChange={s.handleAvatarChange} onCoverChange={s.handleCoverChange}
-            avatarBgColor={s.avatarBgColor} avatarRotation={s.avatarRotation}
-            onAvatarBgColorChange={s.handleAvatarBgColorChange}
-            onAvatarRotationChange={s.handleAvatarRotationChange}
-            coverOffsetY={s.coverOffsetY} onCoverOffsetYChange={s.handleCoverOffsetYChange}
-            coverFlipX={s.coverFlipX} onCoverFlipXChange={s.handleCoverFlipXChange}
-            coverHeight={s.coverHeight} onCoverHeightChange={s.handleCoverHeightChange}
-            logoUrl={s.logoUrl} onLogoChange={s.handleLogoChange}
-            logoFrostedBg={s.logoFrostedBg} onLogoFrostedBgChange={s.handleLogoFrostedBgChange}
-            logoGlow={s.logoGlow} onLogoGlowChange={s.handleLogoGlowChange}
-            logoPosition={s.logoPosition} onLogoPositionChange={s.handleLogoPositionChange}
-            logoSize={s.logoSize} onLogoSizeChange={s.handleLogoSizeChange}
-            logoOpacity={s.logoOpacity} onLogoOpacityChange={s.handleLogoOpacityChange}
-            logoPadding={s.logoPadding} onLogoPaddingChange={s.handleLogoPaddingChange}
-            logoNameGap={s.logoNameGap} onLogoNameGapChange={s.handleLogoNameGapChange}
-            logoVerticalAlign={s.logoVerticalAlign} onLogoVerticalAlignChange={s.handleLogoVerticalAlignChange}
-            {...avatarThemeProps}
-          />
-          <div className="flex gap-1.5 mt-2">
-            <Button variant="outline" size="sm" className="flex-1 h-7 text-[11px]" onClick={() => setPhotoImportOpen(true)}>
-              <Camera className="h-3 w-3 mr-1" /> Photos
-            </Button>
-            <Button variant="outline" size="sm" className="flex-1 h-7 text-[11px]" onClick={() => setContentImportOpen(true)}>
-              <Download className="h-3 w-3 mr-1" /> Import Content
-            </Button>
-          </div>
-        </PanelSection>
       </TabsContent>
 
-      {/* ── Style Tab ── */}
-      <TabsContent value="style" className="mt-0 space-y-3">
-        {/* Style Presets */}
-        <PanelSection title="Style Presets" icon={Sparkles}>
+      {/* ── Photos Tab — Avatar, cover, logo ── */}
+      <TabsContent value="photos" className="mt-0 space-y-3">
+        <CardPhotoTools
+          avatarUrl={s.avatarUrl} coverUrl={s.coverUrl} profession={s.professionName}
+          onAvatarChange={s.handleAvatarChange} onCoverChange={s.handleCoverChange}
+          avatarBgColor={s.avatarBgColor} avatarRotation={s.avatarRotation}
+          onAvatarBgColorChange={s.handleAvatarBgColorChange}
+          onAvatarRotationChange={s.handleAvatarRotationChange}
+          coverOffsetY={s.coverOffsetY} onCoverOffsetYChange={s.handleCoverOffsetYChange}
+          coverFlipX={s.coverFlipX} onCoverFlipXChange={s.handleCoverFlipXChange}
+          coverHeight={s.coverHeight} onCoverHeightChange={s.handleCoverHeightChange}
+          logoUrl={s.logoUrl} onLogoChange={s.handleLogoChange}
+          logoFrostedBg={s.logoFrostedBg} onLogoFrostedBgChange={s.handleLogoFrostedBgChange}
+          logoGlow={s.logoGlow} onLogoGlowChange={s.handleLogoGlowChange}
+          logoPosition={s.logoPosition} onLogoPositionChange={s.handleLogoPositionChange}
+          logoSize={s.logoSize} onLogoSizeChange={s.handleLogoSizeChange}
+          logoOpacity={s.logoOpacity} onLogoOpacityChange={s.handleLogoOpacityChange}
+          logoPadding={s.logoPadding} onLogoPaddingChange={s.handleLogoPaddingChange}
+          logoNameGap={s.logoNameGap} onLogoNameGapChange={s.handleLogoNameGapChange}
+          logoVerticalAlign={s.logoVerticalAlign} onLogoVerticalAlignChange={s.handleLogoVerticalAlignChange}
+          {...avatarThemeProps}
+        />
+        <div className="flex gap-1.5 mt-2">
+          <Button variant="outline" size="sm" className="flex-1 h-7 text-[11px]" onClick={() => setPhotoImportOpen(true)}>
+            <Camera className="h-3 w-3 mr-1" /> Import Photos
+          </Button>
+          <Button variant="outline" size="sm" className="flex-1 h-7 text-[11px]" onClick={() => setContentImportOpen(true)}>
+            <Download className="h-3 w-3 mr-1" /> Import Content
+          </Button>
+        </div>
+      </TabsContent>
+
+      {/* ── Design Tab — Presets, colors, typography, social style ── */}
+      <TabsContent value="design" className="mt-0 space-y-3">
+        <PanelSection title="Style Presets" icon={Sparkles} defaultOpen>
           <StylePresetSelector
             activePresetId={activePresetId}
             isPro={isPro}
@@ -620,10 +621,9 @@ export default function CardBuilder() {
         </PanelSection>
 
         <Button variant="outline" className="w-full h-10 text-[12px] gap-2 border-border/20 hover:border-primary/25 hover:bg-primary/[0.03] rounded-xl shadow-sm transition-all duration-200" onClick={() => s.setThemeEditorOpen(true)}>
-          <Sliders className="h-3.5 w-3.5" /> Open Full Theme Editor
+          <Sliders className="h-3.5 w-3.5" /> Full Theme Editor
         </Button>
 
-        {/* Color Palette */}
         <PanelSection title="Colors" icon={Palette}>
           <div className="grid grid-cols-4 gap-2.5">
             {[
@@ -643,7 +643,6 @@ export default function CardBuilder() {
           </div>
         </PanelSection>
 
-        {/* Typography */}
         <PanelSection title="Typography" icon={Type}>
           <div className="rounded-xl border border-border/15 p-3.5 space-y-3 bg-gradient-to-b from-muted/10 to-transparent">
             <div className="flex items-center justify-between text-[11px]">
@@ -658,7 +657,6 @@ export default function CardBuilder() {
           </div>
         </PanelSection>
 
-        {/* Social Button Style */}
         <PanelSection title="Social Links" icon={Globe} defaultOpen={false}>
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
@@ -692,10 +690,9 @@ export default function CardBuilder() {
         </PanelSection>
       </TabsContent>
 
-      {/* ── Layout Tab ── */}
+      {/* ── Layout Tab — Display toggles + section order ── */}
       <TabsContent value="layout" className="mt-0 space-y-3">
-        {/* Quick settings */}
-        <PanelSection title="Display Settings" icon={Settings2}>
+        <PanelSection title="Display Settings" icon={Settings2} defaultOpen>
           <div className="space-y-1 rounded-xl border border-border/15 p-3.5 bg-gradient-to-b from-muted/10 to-transparent">
             {[
               { label: "Section icons", checked: s.showSectionIcons, onChange: (val: boolean) => { s.setShowSectionIcons(val); s.saveThemeField({ section_icons: val }); } },
@@ -711,8 +708,7 @@ export default function CardBuilder() {
           </div>
         </PanelSection>
 
-        {/* Section order management */}
-        <PanelSection title="Section Order" icon={Layers}>
+        <PanelSection title="Section Order" icon={Layers} defaultOpen>
           <CardBuilderSections
             sections={s.sections} setSections={s.setSections}
             toggleSection={s.toggleSection} setEditingSection={s.setEditingSection}
