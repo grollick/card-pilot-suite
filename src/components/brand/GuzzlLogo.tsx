@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
+import guzzlLogoImg from "@/assets/guzzl-logo.png";
 
 interface GuzzlLogoProps {
   /** Size variant */
@@ -16,36 +17,36 @@ interface GuzzlLogoProps {
   suffixClassName?: string;
 }
 
-const sizeMap = {
-  xs: "text-xs",
-  sm: "text-sm",
-  md: "text-lg",
-  lg: "text-2xl",
-  xl: "text-4xl",
+const heightMap = {
+  xs: "h-5",
+  sm: "h-7",
+  md: "h-9",
+  lg: "h-12",
+  xl: "h-16",
 } as const;
 
 /**
- * Brand-consistent logo text for guzzl.pro
+ * Brand-consistent image logo for guzzl.pro
  *
- * Rules (from brand spec):
- * - "guzzl" = medium weight (font-medium), primary color
- * - ".pro"  = bold weight (font-bold), visually stronger
- * - Always horizontal, never stacked
+ * Uses the official logo asset with icon + wordmark.
+ * Always horizontal, never stacked.
  */
 export default function GuzzlLogo({
   size = "md",
   to = "/",
   className,
-  brandOnly = false,
   suffix,
   suffixClassName,
 }: GuzzlLogoProps) {
   const content = (
-    <span className={cn("inline-flex items-baseline tracking-tight", sizeMap[size], className)}>
-      <span className="font-medium text-primary">guzzl</span>
-      {!brandOnly && <span className="font-bold text-foreground">.pro</span>}
+    <span className={cn("inline-flex items-center", className)}>
+      <img
+        src={guzzlLogoImg}
+        alt="guzzl.pro"
+        className={cn("w-auto object-contain", heightMap[size])}
+      />
       {suffix && (
-        <span className={cn("ml-1.5 font-normal text-muted-foreground", suffixClassName)}>
+        <span className={cn("ml-1.5 font-normal text-muted-foreground text-sm", suffixClassName)}>
           {suffix}
         </span>
       )}
