@@ -974,7 +974,7 @@ export default function CardBuilder() {
 
         {/* Bottom tab bar */}
         <div className="shrink-0 border-t border-border/40 bg-background/95 backdrop-blur-sm safe-area-bottom">
-          <div className="grid grid-cols-4 h-13">
+          <div className="grid grid-cols-5 h-13">
             {mobileTabs.map((tab) => (
               <button
                 key={tab.id}
