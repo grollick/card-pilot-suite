@@ -82,7 +82,7 @@ export default function CardBuilder() {
   const [showTemplateChooser, setShowTemplateChooser] = useState(false);
   const [photoImportOpen, setPhotoImportOpen] = useState(false);
   const [contentImportOpen, setContentImportOpen] = useState(false);
-  const [rightTab, setRightTab] = useState("content");
+  const [rightTab, setRightTab] = useState("info");
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
   const [blockMarketOpen, setBlockMarketOpen] = useState(false);
   const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
@@ -731,8 +731,9 @@ export default function CardBuilder() {
   const mobileTabs = [
     { id: "preview" as const, label: "Preview", icon: Smartphone },
     { id: "sections" as const, label: "Sections", icon: Layers },
-    { id: "content" as const, label: "Content", icon: Pencil },
-    { id: "style" as const, label: "Style", icon: Palette },
+    { id: "info" as const, label: "Info", icon: Pencil },
+    { id: "photos" as const, label: "Photos", icon: Camera },
+    { id: "design" as const, label: "Design", icon: Palette },
   ];
 
   return (
