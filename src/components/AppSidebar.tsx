@@ -84,7 +84,7 @@ const teamItems = [
 ];
 
 const discoverItems = [
-  { title: "Marketplace", url: "/discover/map", icon: MapPin },
+  { title: "Marketplace", url: "/app/discover-map", icon: MapPin },
   { title: "App Store", url: "/app/marketplace", icon: Package },
 ];
 
