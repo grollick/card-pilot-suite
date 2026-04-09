@@ -869,8 +869,8 @@ export default function CardBuilder() {
               </motion.div>
             )}
 
-            {mobileTab === "content" && (
-              <motion.div key="content" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="p-4">
+            {mobileTab === "info" && (
+              <motion.div key="info" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="p-4 space-y-4">
                 <CardBuilderIdentity
                   profile={s.profile} editName={s.editName} setEditName={s.setEditName}
                   editCompany={s.editCompany} setEditCompany={s.setEditCompany}
@@ -896,33 +896,43 @@ export default function CardBuilder() {
                   nameTextStrokeWidth={s.nameTextStrokeWidth} setNameTextStrokeWidth={s.setNameTextStrokeWidth}
                   saveThemeField={s.saveThemeField} qc={s.qc} hideWrapper
                 />
-                <div className="mt-4">
-                  <CardPhotoTools
-                    avatarUrl={s.avatarUrl} coverUrl={s.coverUrl} profession={s.professionName}
-                    onAvatarChange={s.handleAvatarChange} onCoverChange={s.handleCoverChange}
-                    avatarBgColor={s.avatarBgColor} avatarRotation={s.avatarRotation}
-                    onAvatarBgColorChange={s.handleAvatarBgColorChange}
-                    onAvatarRotationChange={s.handleAvatarRotationChange}
-                    coverOffsetY={s.coverOffsetY} onCoverOffsetYChange={s.handleCoverOffsetYChange}
-                    coverFlipX={s.coverFlipX} onCoverFlipXChange={s.handleCoverFlipXChange}
-                    coverHeight={s.coverHeight} onCoverHeightChange={s.handleCoverHeightChange}
-                    logoUrl={s.logoUrl} onLogoChange={s.handleLogoChange}
-                    logoFrostedBg={s.logoFrostedBg} onLogoFrostedBgChange={s.handleLogoFrostedBgChange}
-                    logoGlow={s.logoGlow} onLogoGlowChange={s.handleLogoGlowChange}
-                    logoPosition={s.logoPosition} onLogoPositionChange={s.handleLogoPositionChange}
-                    logoSize={s.logoSize} onLogoSizeChange={s.handleLogoSizeChange}
-                    logoOpacity={s.logoOpacity} onLogoOpacityChange={s.handleLogoOpacityChange}
-                    logoPadding={s.logoPadding} onLogoPaddingChange={s.handleLogoPaddingChange}
-                    logoNameGap={s.logoNameGap} onLogoNameGapChange={s.handleLogoNameGapChange}
-                    logoVerticalAlign={s.logoVerticalAlign} onLogoVerticalAlignChange={s.handleLogoVerticalAlignChange}
-                    {...avatarThemeProps}
-                  />
+                <div className="space-y-2 mt-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] text-muted-foreground">CTA icons only</span>
+                    <Switch checked={s.ctaIconsOnly} onCheckedChange={(v) => { s.setCtaIconsOnly(v); s.saveThemeField({ cta_icons_only: v }); }} className="scale-[0.7]" />
+                  </div>
+                  <CtaEditor ctas={s.ctaConfig} onChange={s.handleCtaConfigChange} />
                 </div>
               </motion.div>
             )}
 
-            {mobileTab === "style" && (
-              <motion.div key="style" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="p-4 space-y-4">
+            {mobileTab === "photos" && (
+              <motion.div key="photos" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="p-4">
+                <CardPhotoTools
+                  avatarUrl={s.avatarUrl} coverUrl={s.coverUrl} profession={s.professionName}
+                  onAvatarChange={s.handleAvatarChange} onCoverChange={s.handleCoverChange}
+                  avatarBgColor={s.avatarBgColor} avatarRotation={s.avatarRotation}
+                  onAvatarBgColorChange={s.handleAvatarBgColorChange}
+                  onAvatarRotationChange={s.handleAvatarRotationChange}
+                  coverOffsetY={s.coverOffsetY} onCoverOffsetYChange={s.handleCoverOffsetYChange}
+                  coverFlipX={s.coverFlipX} onCoverFlipXChange={s.handleCoverFlipXChange}
+                  coverHeight={s.coverHeight} onCoverHeightChange={s.handleCoverHeightChange}
+                  logoUrl={s.logoUrl} onLogoChange={s.handleLogoChange}
+                  logoFrostedBg={s.logoFrostedBg} onLogoFrostedBgChange={s.handleLogoFrostedBgChange}
+                  logoGlow={s.logoGlow} onLogoGlowChange={s.handleLogoGlowChange}
+                  logoPosition={s.logoPosition} onLogoPositionChange={s.handleLogoPositionChange}
+                  logoSize={s.logoSize} onLogoSizeChange={s.handleLogoSizeChange}
+                  logoOpacity={s.logoOpacity} onLogoOpacityChange={s.handleLogoOpacityChange}
+                  logoPadding={s.logoPadding} onLogoPaddingChange={s.handleLogoPaddingChange}
+                  logoNameGap={s.logoNameGap} onLogoNameGapChange={s.handleLogoNameGapChange}
+                  logoVerticalAlign={s.logoVerticalAlign} onLogoVerticalAlignChange={s.handleLogoVerticalAlignChange}
+                  {...avatarThemeProps}
+                />
+              </motion.div>
+            )}
+
+            {mobileTab === "design" && (
+              <motion.div key="design" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} className="p-4 space-y-4">
                 <Button variant="outline" className="w-full gap-2" onClick={() => s.setThemeEditorOpen(true)}>
                   <Sliders className="h-4 w-4" /> Theme Editor
                 </Button>
