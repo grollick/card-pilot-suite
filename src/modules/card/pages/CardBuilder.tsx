@@ -86,7 +86,7 @@ export default function CardBuilder() {
   const [previewDevice, setPreviewDevice] = useState<"phone" | "tablet">("phone");
   const [blockMarketOpen, setBlockMarketOpen] = useState(false);
   const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
-  const [mobileTab, setMobileTab] = useState<"preview" | "sections" | "content" | "style">("preview");
+  const [mobileTab, setMobileTab] = useState<"preview" | "sections" | "info" | "photos" | "design">("preview");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [activePresetId, setActivePresetId] = useState<string | null>(
     () => (s.card?.theme_json as any)?.style_preset_id ?? null
