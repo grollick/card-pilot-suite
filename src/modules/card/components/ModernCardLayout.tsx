@@ -291,7 +291,7 @@ export default function ModernCardLayout({
                 else setShowBooking(true);
               } else setShowBooking(true);
             }},
-            { icon: FileText, label: "Estimate", color: "hsl(25, 95%, 53%)", onClick: () => {
+            { icon: FileText, label: "Quote", color: "hsl(25, 95%, 53%)", onClick: () => {
               const el = document.getElementById("quote-request-section");
               if (el) el.scrollIntoView({ behavior: "smooth" });
               else handleCtaClick("quote");
