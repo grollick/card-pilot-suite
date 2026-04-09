@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Helmet } from "react-helmet-async";
-import { MapPin, List, Radio, ArrowRight, Map, Phone } from "lucide-react";
+import { MapPin, List, Radio, ArrowRight, Map, Phone, ArrowLeft } from "lucide-react";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { useOnDutyProfessionals } from "@/hooks/useOnDutyMap";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -31,9 +32,11 @@ export default function OnDutyMapPage() {
       </Helmet>
 
       <main className="mx-auto w-full max-w-4xl px-4 py-6 md:px-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Radio className="h-5 w-5 text-primary" />
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Available Now Near You</h1>
+        <div className="flex items-center gap-3 mb-6">
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0" onClick={() => navigate(-1)}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Available Now" /></h1>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
