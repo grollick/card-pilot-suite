@@ -49,6 +49,7 @@ interface AISetup {
   marketplace_summary: string;
   services: AIService[];
   suggested_template: string;
+  suggested_categories: string[];
   setup_tips: string[];
 }
 
@@ -230,6 +231,7 @@ export default function Onboarding() {
         phone: phone || null,
         email: email || null,
         city: city || null,
+        marketplace_categories: aiSetup?.suggested_categories || [],
       } as any).eq("id", user.id);
       if (profileErr) throw profileErr;
 
