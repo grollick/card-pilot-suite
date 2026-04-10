@@ -161,7 +161,7 @@ Write content that would make a potential customer think "I need to contact this
                     description: "2-3 actionable tips for optimizing this profession's card",
                   },
                 },
-                required: ["tagline", "bio", "about", "cta_text", "marketplace_summary", "services", "suggested_template", "setup_tips"],
+                required: ["tagline", "bio", "about", "cta_text", "marketplace_summary", "services", "suggested_template", "suggested_categories", "setup_tips"],
                 additionalProperties: false,
               },
             },
