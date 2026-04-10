@@ -5915,6 +5915,7 @@ export type Database = {
           handle: string | null
           id: string
           is_suspended: boolean
+          marketplace_categories: string[] | null
           marketplace_enabled: boolean
           name: string | null
           onboarding_completed: boolean
@@ -5959,6 +5960,7 @@ export type Database = {
           handle?: string | null
           id: string
           is_suspended?: boolean
+          marketplace_categories?: string[] | null
           marketplace_enabled?: boolean
           name?: string | null
           onboarding_completed?: boolean
@@ -6003,6 +6005,7 @@ export type Database = {
           handle?: string | null
           id?: string
           is_suspended?: boolean
+          marketplace_categories?: string[] | null
           marketplace_enabled?: boolean
           name?: string | null
           onboarding_completed?: boolean
