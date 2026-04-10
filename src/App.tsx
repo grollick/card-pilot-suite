@@ -250,7 +250,7 @@ const App = () => (
             <Route path="/security" element={<LazyRoute><SecurityPage /></LazyRoute>} />
             <Route path="/site/:handle" element={<LazyRoute><PublicSite /></LazyRoute>} />
             <Route path="/discover" element={<LazyRoute><DiscoverPage /></LazyRoute>} />
-            <Route path="/discover/map" element={<LazyRoute><OnDutyMapPage /></LazyRoute>} />
+            <Route path="/discover/map" element={<Navigate to="/app/discover-map" replace />} />
             <Route path="/discover/:profession" element={<LazyRoute><DiscoverPage /></LazyRoute>} />
             <Route path="/discover/:profession/:city" element={<LazyRoute><DiscoverPage /></LazyRoute>} />
             <Route path="/request-service" element={<LazyRoute><RequestServicePage /></LazyRoute>} />
