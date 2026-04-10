@@ -91,7 +91,7 @@ export default function OnDutyMapPage() {
         <section>
           <h2 className="text-xl font-bold text-foreground mb-4">Browse by Category</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {CATEGORIES.map((cat) => (
+            {(showAllCategories ? CATEGORIES : CATEGORIES.slice(0, 8)).map((cat) => (
               <button
                 key={cat.key}
                 onClick={() => navigate(`/marketplace/category/${cat.key}`)}
@@ -102,6 +102,18 @@ export default function OnDutyMapPage() {
               </button>
             ))}
           </div>
+          {CATEGORIES.length > 8 && (
+            <div className="flex justify-center mt-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowAllCategories(!showAllCategories)}
+                className="gap-2"
+              >
+                {showAllCategories ? "Show Less" : `View All ${CATEGORIES.length} Categories`}
+                <ArrowRight className={`h-4 w-4 transition-transform ${showAllCategories ? "rotate-90" : ""}`} />
+              </Button>
+            </div>
+          )}
         </section>
 
         {/* Featured / Top Rated Providers */}
