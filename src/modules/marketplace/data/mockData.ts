@@ -315,7 +315,7 @@ export const CATEGORIES = [
   { key: "wiring", label: "Wiring & Rewiring", icon: "⚡" },
   { key: "yard-cleanup", label: "Yard Cleanup", icon: "🍂" },
   { key: "yoga-instructor", label: "Yoga Instructor", icon: "🧘" },
-];
+].sort((a, b) => a.label.localeCompare(b.label));
 
 const svc = (id: string, title: string, desc: string, priceType: MockService["price_type"], price: number | null, dur: number | null): MockService => ({
   id, title, description: desc, price_type: priceType, price_amount: price, duration_minutes: dur,
