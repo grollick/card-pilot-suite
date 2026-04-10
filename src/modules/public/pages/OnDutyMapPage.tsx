@@ -27,6 +27,9 @@ export default function OnDutyMapPage() {
   const navigate = useNavigate();
   const { data: professionals = [], isLoading } = useOnDutyProfessionals();
   const [activeTab, setActiveTab] = useState("list");
+  const [showAllCategories, setShowAllCategories] = useState(false);
+  const { location } = useUserLocation();
+  const [activeTab, setActiveTab] = useState("list");
   const { location } = useUserLocation();
 
   const { data: featuredData, isLoading: featuredLoading } = useMarketplaceSearch({
