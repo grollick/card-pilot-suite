@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Outlet } from "react-router-dom";
@@ -10,7 +11,11 @@ import BetaStatusBanner from "@/components/BetaStatusBanner";
 import BetaFeedbackWidget from "@/components/BetaFeedbackWidget";
 import PullToRefresh from "@/components/PullToRefresh";
 
-export default function DashboardLayout() {
+interface DashboardLayoutProps {
+  children?: ReactNode;
+}
+
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full bg-background">
@@ -20,7 +25,7 @@ export default function DashboardLayout() {
           <PullToRefresh>
             <div className="p-4 md:p-6 lg:p-8">
               <BetaStatusBanner />
-              <Outlet />
+              {children ?? <Outlet />}
             </div>
           </PullToRefresh>
         </div>

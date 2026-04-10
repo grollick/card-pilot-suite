@@ -135,6 +135,7 @@ const PostBookingPage = lazy(() => import("@/modules/marketplace/pages/PostBooki
 const ProviderDashboardPage = lazy(() => import("@/modules/marketplace/pages/ProviderDashboard"));
 const BusinessOnboardingPage = lazy(() => import("@/modules/marketplace/pages/BusinessOnboardingPage"));
 const FirstTimeDashboard = lazy(() => import("@/modules/marketplace/pages/FirstTimeDashboard"));
+const MarketplaceRouteLayout = lazy(() => import("@/modules/marketplace/components/MarketplaceRouteLayout"));
 
 // AI Assistant
 const AssistantPage = lazy(() => import("@/modules/assistant/pages/AssistantPage"));
@@ -262,12 +263,14 @@ const App = () => (
             <Route path="/unsubscribe" element={<LazyRoute><UnsubscribePage /></LazyRoute>} />
 
             {/* Public Marketplace */}
-            <Route path="/marketplace" element={<LazyRoute><MarketplaceHomePage /></LazyRoute>} />
-            <Route path="/marketplace/category/:category" element={<LazyRoute><CategoryResultsPage /></LazyRoute>} />
-            <Route path="/marketplace/search" element={<LazyRoute><CategoryResultsPage /></LazyRoute>} />
-            <Route path="/marketplace/:slug" element={<LazyRoute><BusinessProfilePage /></LazyRoute>} />
-            <Route path="/marketplace/:slug/book" element={<LazyRoute><BookingFlowPage /></LazyRoute>} />
-            <Route path="/marketplace/:slug/post-booking" element={<LazyRoute><PostBookingPage /></LazyRoute>} />
+            <Route path="/marketplace" element={<LazyRoute><MarketplaceRouteLayout /></LazyRoute>}>
+              <Route index element={<LazyRoute><MarketplaceHomePage /></LazyRoute>} />
+              <Route path="category/:category" element={<LazyRoute><CategoryResultsPage /></LazyRoute>} />
+              <Route path="search" element={<LazyRoute><CategoryResultsPage /></LazyRoute>} />
+              <Route path=":slug" element={<LazyRoute><BusinessProfilePage /></LazyRoute>} />
+              <Route path=":slug/book" element={<LazyRoute><BookingFlowPage /></LazyRoute>} />
+              <Route path=":slug/post-booking" element={<LazyRoute><PostBookingPage /></LazyRoute>} />
+            </Route>
 
             {/* Client Portal v2 — authenticated */}
             <Route path="/client/auth" element={<LazyRoute><ClientAuthPage /></LazyRoute>} />
