@@ -49,6 +49,7 @@ interface AISetup {
   marketplace_summary: string;
   services: AIService[];
   suggested_template: string;
+  suggested_categories: string[];
   setup_tips: string[];
 }
 
