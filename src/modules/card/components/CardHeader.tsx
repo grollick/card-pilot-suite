@@ -128,7 +128,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     fontStyle: subtitleItalic ? "italic" : undefined,
     letterSpacing: fonts.taglineLetterSpacing ? `${fonts.taglineLetterSpacing}px` : undefined,
     margin: 0,
-    marginTop: 4,
+    marginTop: 1,
   };
 
   const hasBgColor = avatarBgColor && avatarBgColor !== "transparent";
