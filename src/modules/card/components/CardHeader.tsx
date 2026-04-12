@@ -128,7 +128,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
     fontStyle: subtitleItalic ? "italic" : undefined,
     letterSpacing: fonts.taglineLetterSpacing ? `${fonts.taglineLetterSpacing}px` : undefined,
     margin: 0,
-    marginTop: 4,
+    marginTop: 1,
   };
 
   const hasBgColor = avatarBgColor && avatarBgColor !== "transparent";
@@ -509,7 +509,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
               {logoPosition === "beside-name-right" && inlineLogoEl}
             </motion.div>
             {profession && <motion.p style={subtitleStyle} {...heroEntrance(0.25)}>{profession}</motion.p>}
-            {showCompany && company && <motion.p style={{ ...subtitleStyle, fontSize: 13, opacity: companyColor ? 1 : 0.7, color: companyColor || undefined, marginTop: subtitleSpacing ?? 4 }} {...heroEntrance(0.3)}>{company}</motion.p>}
+            {showCompany && company && <motion.p style={{ ...subtitleStyle, fontSize: 13, opacity: companyColor ? 1 : 0.7, color: companyColor || undefined, marginTop: subtitleSpacing ?? 1 }} {...heroEntrance(0.3)}>{company}</motion.p>}
           </div>
         </div>
       );
@@ -531,7 +531,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
                 {logoPosition === "beside-name-right" && inlineLogoEl}
               </motion.div>
               {profession && <motion.p style={subtitleStyle} {...heroEntrance(0.25)}>{profession}</motion.p>}
-              {showCompany && company && <motion.p style={{ ...subtitleStyle, fontSize: 13, opacity: companyColor ? 1 : 0.7, color: companyColor || undefined, marginTop: subtitleSpacing ?? 4 }} {...heroEntrance(0.3)}>{company}</motion.p>}
+              {showCompany && company && <motion.p style={{ ...subtitleStyle, fontSize: 13, opacity: companyColor ? 1 : 0.7, color: companyColor || undefined, marginTop: subtitleSpacing ?? 1 }} {...heroEntrance(0.3)}>{company}</motion.p>}
             </div>
           </div>
         </div>
@@ -617,7 +617,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
                   </motion.p>
                 )}
                 {showCompany && company && (
-                  <motion.p style={{ ...subtitleStyle, fontSize: 13, color: companyColor || "rgba(255,255,255,0.65)", marginTop: subtitleSpacing ?? 4 }} {...heroEntrance(0.3)}>
+                  <motion.p style={{ ...subtitleStyle, fontSize: 13, color: companyColor || "rgba(255,255,255,0.65)", marginTop: subtitleSpacing ?? 1 }} {...heroEntrance(0.3)}>
                     {company}
                   </motion.p>
                 )}
@@ -693,7 +693,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
               {logoPosition === "beside-name-right" && inlineLogoEl}
             </motion.div>
             {profession && <motion.p style={subtitleStyle} {...heroEntrance(0.25)}>{profession}</motion.p>}
-            {showCompany && company && <motion.p style={{ ...subtitleStyle, fontSize: 13, opacity: companyColor ? 1 : 0.7, color: companyColor || undefined, marginTop: subtitleSpacing ?? 4 }} {...heroEntrance(0.3)}>{company}</motion.p>}
+            {showCompany && company && <motion.p style={{ ...subtitleStyle, fontSize: 13, opacity: companyColor ? 1 : 0.7, color: companyColor || undefined, marginTop: subtitleSpacing ?? 1 }} {...heroEntrance(0.3)}>{company}</motion.p>}
           </div>
         </div>
       );
