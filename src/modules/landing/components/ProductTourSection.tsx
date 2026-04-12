@@ -139,7 +139,10 @@ function MockBooking() {
               {s.booked ? (
                 <span className="text-xs text-muted-foreground">Booked</span>
               ) : (
-                <span className="text-xs text-primary font-medium">Available</span>
+                <span className="text-xs text-green-500 font-medium flex items-center gap-1">
+                  <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" /><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500" /></span>
+                  On Duty
+                </span>
               )}
             </div>
           ))}
