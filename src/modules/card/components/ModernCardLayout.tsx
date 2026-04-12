@@ -228,21 +228,32 @@ export default function ModernCardLayout({
               <div className="absolute inset-0" style={{ background: resolvedHero.overlay }} />
             )}
 
-            {/* Trust badges in cover — frosted glass overlay */}
+            {/* Trust badges in cover — certificate-style overlay */}
             <div className="absolute bottom-2 right-2 flex items-center gap-2 z-10">
               {profile.is_verified && (
-                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-semibold text-white bg-white/15 backdrop-blur-md border border-white/20 shadow-lg">
-                  <ShieldCheck className="h-3 w-3" />
-                  Verified
+                <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/85 px-2.5 py-1 shadow-lg backdrop-blur-md">
+                  <span className="relative flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/15">
+                    <ShieldCheck className="h-3 w-3" />
+                    <span className="absolute -right-0.5 -top-0.5 flex h-2.5 w-2.5 items-center justify-center rounded-full border border-border bg-background text-[6px] font-bold text-primary">✓</span>
+                  </span>
+                  <span className="flex flex-col leading-none">
+                    <span className="text-[7px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Trusted</span>
+                    <span className="text-[10px] font-bold text-foreground">Verified</span>
+                  </span>
                 </span>
               )}
               {profile.is_on_duty && (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-50 bg-[linear-gradient(135deg,rgba(18,28,24,0.76),rgba(10,18,15,0.62))] backdrop-blur-xl border border-emerald-300/20 shadow-lg shadow-black/20">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-70" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.7)]" />
+                <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/85 px-2.5 py-1 shadow-lg backdrop-blur-md">
+                  <span className="relative flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-foreground/60" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-foreground" />
+                    </span>
                   </span>
-                  On Duty
+                  <span className="flex flex-col leading-none">
+                    <span className="text-[7px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Live now</span>
+                    <span className="text-[10px] font-bold text-foreground">On Duty</span>
+                  </span>
                 </span>
               )}
             </div>

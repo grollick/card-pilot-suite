@@ -139,9 +139,17 @@ function MockBooking() {
               {s.booked ? (
                 <span className="text-xs text-muted-foreground">Booked</span>
               ) : (
-                <span className="text-xs text-green-500 font-medium flex items-center gap-1">
-                  <span className="relative flex h-1.5 w-1.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" /><span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-green-500" /></span>
-                  On Duty
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-background/90 px-2 py-1 shadow-sm">
+                  <span className="relative flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-foreground/60" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary-foreground" />
+                    </span>
+                  </span>
+                  <span className="flex flex-col leading-none">
+                    <span className="text-[6px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">Live</span>
+                    <span className="text-[9px] font-bold text-foreground">On Duty</span>
+                  </span>
                 </span>
               )}
             </div>
