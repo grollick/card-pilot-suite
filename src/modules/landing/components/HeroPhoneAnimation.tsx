@@ -286,8 +286,15 @@ export default function HeroPhoneAnimation() {
                         {avatarSrc && <img src={avatarSrc} alt={persona.name} className="h-full w-full object-cover" />}
                       </div>
                     </div>
-                    <div className="absolute top-2 right-3">
-                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold bg-black/40 text-white backdrop-blur-sm">
+                    <div className="absolute top-2 right-3 flex items-center gap-1.5">
+                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold bg-green-500/90 text-white backdrop-blur-sm shadow-sm shadow-green-500/30">
+                        <span className="relative flex h-1.5 w-1.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
+                        </span>
+                        On Duty
+                      </span>
+                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold bg-white/20 text-white backdrop-blur-sm">
                         <CheckCircle2 className="h-2.5 w-2.5" /> Verified
                       </span>
                     </div>
