@@ -237,12 +237,12 @@ export default function ModernCardLayout({
                 </span>
               )}
               {profile.is_on_duty && (
-                <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-semibold text-white bg-white/15 backdrop-blur-md border border-white/20 shadow-lg">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.14em] text-emerald-50 bg-[linear-gradient(135deg,rgba(18,28,24,0.76),rgba(10,18,15,0.62))] backdrop-blur-xl border border-emerald-300/20 shadow-lg shadow-black/20">
                   <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-70" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.7)]" />
                   </span>
-                  Available Now
+                  On Duty
                 </span>
               )}
             </div>

@@ -380,7 +380,7 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
         />
       )}
       {logoEl && <div style={{ position: "relative", zIndex: 2 }}>{logoEl}</div>}
-      {/* Verification & Available badges — bottom right of cover */}
+      {/* Verification & duty badges — bottom right of cover */}
       {(showVerified || isAvailable) && (
         <div style={{
           position: "absolute",
@@ -416,22 +416,25 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
             <span style={{
               display: "inline-flex",
               alignItems: "center",
-              gap: 3,
-              padding: "3px 8px",
-              borderRadius: 20,
-              background: "rgba(0,0,0,0.55)",
-              backdropFilter: "blur(8px)",
-              color: "#4ade80",
+              gap: 6,
+              padding: "4px 10px",
+              borderRadius: 999,
+              background: "linear-gradient(135deg, rgba(18, 28, 24, 0.76), rgba(10, 18, 15, 0.62))",
+              border: "1px solid rgba(74, 222, 128, 0.24)",
+              backdropFilter: "blur(12px)",
+              boxShadow: "0 10px 30px rgba(0, 0, 0, 0.18)",
+              color: "#dcfce7",
               fontSize: 10,
-              fontWeight: 600,
+              fontWeight: 700,
+              letterSpacing: "0.04em",
               lineHeight: 1,
+              textTransform: "uppercase",
             }}>
-              <span className="relative flex h-3 w-3">
-                <span className="absolute inline-flex h-full w-full rounded-full border-2 border-red-500 opacity-0" style={{ animation: 'ping-ring 2s cubic-bezier(0, 0, 0.2, 1) infinite' }} />
-                <span className="absolute inline-flex h-full w-full rounded-full border-2 border-red-500 opacity-0" style={{ animation: 'ping-ring 2s cubic-bezier(0, 0, 0.2, 1) infinite 0.6s' }} />
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.8)]" />
               </span>
-              Available
+              On Duty
             </span>
           )}
         </div>
