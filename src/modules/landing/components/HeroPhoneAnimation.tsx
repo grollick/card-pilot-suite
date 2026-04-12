@@ -313,11 +313,11 @@ export default function HeroPhoneAnimation() {
                   </div>
 
                   {/* Identity */}
-                  <div className="px-4 mt-8">
+                  <div className="px-4 mt-8 space-y-0.5">
                     <h3 className="text-sm font-bold text-foreground">{persona.name}</h3>
                     <p className="text-[11px] text-muted-foreground font-medium">{persona.company}</p>
-                    <p className="text-[10px] font-medium mt-0.5" style={{ color: accentColor }}>{persona.tagline}</p>
-                    <div className="flex items-center gap-2 mt-1">
+                    <p className="text-[10px] font-medium" style={{ color: accentColor }}>{persona.tagline}</p>
+                    <div className="flex items-center gap-2">
                       <p className="text-[10px] text-muted-foreground flex items-center gap-0.5">
                         <MapPin className="h-2.5 w-2.5" /> {persona.city}
                       </p>
