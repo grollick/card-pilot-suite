@@ -286,16 +286,28 @@ export default function HeroPhoneAnimation() {
                         {avatarSrc && <img src={avatarSrc} alt={persona.name} className="h-full w-full object-cover" />}
                       </div>
                     </div>
-                    <div className="absolute top-2 right-3 flex items-center gap-1.5">
-                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold bg-green-500/90 text-white backdrop-blur-sm shadow-sm shadow-green-500/30">
-                        <span className="relative flex h-1.5 w-1.5">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-white" />
+                    <div className="absolute top-2 right-3 flex items-center gap-2">
+                      <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/85 px-2.5 py-1 shadow-lg backdrop-blur-md">
+                        <span className="relative flex h-5 w-5 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
+                          <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-foreground/60" />
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-foreground" />
+                          </span>
                         </span>
-                        On Duty
+                        <span className="flex flex-col leading-none">
+                          <span className="text-[7px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Live now</span>
+                          <span className="text-[10px] font-bold text-foreground">On Duty</span>
+                        </span>
                       </span>
-                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-semibold bg-white/20 text-white backdrop-blur-sm">
-                        <CheckCircle2 className="h-2.5 w-2.5" /> Verified
+                      <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/85 px-2.5 py-1 shadow-lg backdrop-blur-md">
+                        <span className="relative flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/15">
+                          <CheckCircle2 className="h-3 w-3" />
+                          <span className="absolute -right-0.5 -top-0.5 flex h-2.5 w-2.5 items-center justify-center rounded-full border border-border bg-background text-[6px] font-bold text-primary">✓</span>
+                        </span>
+                        <span className="flex flex-col leading-none">
+                          <span className="text-[7px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Trusted</span>
+                          <span className="text-[10px] font-bold text-foreground">Verified</span>
+                        </span>
                       </span>
                     </div>
                   </div>

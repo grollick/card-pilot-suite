@@ -395,46 +395,95 @@ export default function CardHeader({ theme, name, boldLastName, uppercaseName, n
             <span style={{
               display: "inline-flex",
               alignItems: "center",
-              gap: 3,
-              padding: "3px 8px",
-              borderRadius: 20,
-              background: "rgba(0,0,0,0.55)",
-              backdropFilter: "blur(8px)",
-              color: "#fff",
-              fontSize: 10,
-              fontWeight: 600,
-              lineHeight: 1,
+              gap: 8,
+              padding: "4px 10px",
+              borderRadius: 999,
+              background: "hsl(var(--background) / 0.86)",
+              border: "1px solid hsl(var(--border) / 0.65)",
+              backdropFilter: "blur(12px)",
+              boxShadow: "0 10px 24px hsl(var(--foreground) / 0.12)",
             }}>
-              {verificationLevel === "pro_verified"
-                ? <ShieldCheck style={{ width: 12, height: 12, color: "#facc15" }} />
-                : <BadgeCheck style={{ width: 12, height: 12, color: "#60a5fa" }} />
-              }
-              {verificationLevel === "pro_verified" ? "Pro Verified" : "Verified"}
+              <span style={{
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 20,
+                height: 20,
+                borderRadius: 999,
+                background: "hsl(var(--primary) / 0.12)",
+                color: "hsl(var(--primary))",
+                boxShadow: "inset 0 0 0 1px hsl(var(--primary) / 0.14)",
+              }}>
+                {verificationLevel === "pro_verified"
+                  ? <ShieldCheck style={{ width: 12, height: 12 }} />
+                  : <BadgeCheck style={{ width: 12, height: 12 }} />
+                }
+                <span style={{
+                  position: "absolute",
+                  top: -2,
+                  right: -2,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  width: 10,
+                  height: 10,
+                  borderRadius: 999,
+                  background: "hsl(var(--background))",
+                  border: "1px solid hsl(var(--border))",
+                  color: "hsl(var(--primary))",
+                  fontSize: 6,
+                  fontWeight: 800,
+                  lineHeight: 1,
+                }}>✓</span>
+              </span>
+              <span style={{ display: "flex", flexDirection: "column", gap: 2, lineHeight: 1 }}>
+                <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "hsl(var(--muted-foreground))" }}>
+                  {verificationLevel === "pro_verified" ? "Top tier" : "Trusted"}
+                </span>
+                <span style={{ fontSize: 10, fontWeight: 700, color: "hsl(var(--foreground))" }}>
+                  {verificationLevel === "pro_verified" ? "Pro Verified" : "Verified"}
+                </span>
+              </span>
             </span>
           )}
           {isAvailable && (
             <span style={{
               display: "inline-flex",
               alignItems: "center",
-              gap: 6,
+              gap: 8,
               padding: "4px 10px",
               borderRadius: 999,
-              background: "linear-gradient(135deg, rgba(18, 28, 24, 0.76), rgba(10, 18, 15, 0.62))",
-              border: "1px solid rgba(74, 222, 128, 0.24)",
+              background: "hsl(var(--background) / 0.86)",
+              border: "1px solid hsl(var(--border) / 0.65)",
               backdropFilter: "blur(12px)",
-              boxShadow: "0 10px 30px rgba(0, 0, 0, 0.18)",
-              color: "#dcfce7",
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: "0.04em",
-              lineHeight: 1,
-              textTransform: "uppercase",
+              boxShadow: "0 10px 24px hsl(var(--foreground) / 0.12)",
             }}>
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60 animate-ping" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.8)]" />
+              <span style={{
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 20,
+                height: 20,
+                borderRadius: 999,
+                background: "hsl(var(--primary))",
+                color: "hsl(var(--primary-foreground))",
+                boxShadow: "0 4px 12px hsl(var(--primary) / 0.25)",
+              }}>
+                <span style={{ position: "relative", display: "flex", width: 8, height: 8 }}>
+                  <span className="animate-ping" style={{ position: "absolute", inset: 0, borderRadius: 999, background: "hsl(var(--primary-foreground) / 0.55)" }} />
+                  <span style={{ position: "relative", width: 8, height: 8, borderRadius: 999, background: "hsl(var(--primary-foreground))" }} />
+                </span>
               </span>
-              On Duty
+              <span style={{ display: "flex", flexDirection: "column", gap: 2, lineHeight: 1 }}>
+                <span style={{ fontSize: 7, fontWeight: 700, letterSpacing: "0.18em", textTransform: "uppercase", color: "hsl(var(--muted-foreground))" }}>
+                  Live now
+                </span>
+                <span style={{ fontSize: 10, fontWeight: 700, color: "hsl(var(--foreground))" }}>
+                  On Duty
+                </span>
+              </span>
             </span>
           )}
         </div>
