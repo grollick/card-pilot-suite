@@ -11,6 +11,7 @@ import {
   Globe,
   Loader2,
   MapPin,
+  ScanLine,
   Instagram,
   Facebook,
   Linkedin,
@@ -860,6 +861,18 @@ export default function PublicCard() {
 
         <div style={{ padding: `${spacing.section}px`, display: "flex", flexDirection: "column", gap: spacing.section, position: "relative", zIndex: 2 }}>
 
+          {themeJson.scan_to_save !== false && (
+            <CardButton
+              theme={theme}
+              fullWidth
+              metallicEffect={metallicEffect}
+              onClick={() => document.getElementById("scan-to-save-section")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+            >
+              <ScanLine className="h-4 w-4" />
+              <span>Scan Your Card</span>
+            </CardButton>
+          )}
+
           {/* ── Sharing Tools ── */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
             <QRShareDialog url={cardUrl} name={profile.name || "Contact"} />
@@ -1470,7 +1483,7 @@ export default function PublicCard() {
 
           {/* ── Scan to Save ── */}
           {themeJson.scan_to_save !== false && (
-            <div>
+            <div id="scan-to-save-section">
               <SectionTitle id="scan_to_save" label="Scan Your Card" />
               <CardSectionWrapper theme={theme} index={5} metallicEffect={metallicEffect}>
                 <ScanToSaveWidget
