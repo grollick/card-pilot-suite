@@ -1469,7 +1469,7 @@ export default function PublicCard() {
           )}
 
           {/* ── Scan to Save ── */}
-          {themeJson.scan_to_save === true && (
+          {themeJson.scan_to_save !== false && (
             <div>
               <SectionTitle id="scan_to_save" label="Scan Your Card" />
               <CardSectionWrapper theme={theme} index={5} metallicEffect={metallicEffect}>
