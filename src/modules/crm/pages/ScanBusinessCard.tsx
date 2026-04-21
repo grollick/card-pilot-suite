@@ -161,6 +161,7 @@ export default function ScanBusinessCard() {
   // Save Contact
   const handleSaveContact = useCallback(async () => {
     if (!contact?.name?.trim() || saving) return;
+    console.log("[Scanner] save action triggered for:", contact.name);
     setSaving(true);
     setSaveError(null);
     setStep("saving");
