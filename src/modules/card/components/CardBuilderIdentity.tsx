@@ -87,7 +87,7 @@ export default function CardBuilderIdentity({
 
   // ── Card scanner state (Item 3) ──
   type ScanStep = "idle" | "preview" | "running" | "review";
-  const [scanOpen, setScanOpen] = useState(false);
+  
   const [scanStep, setScanStep] = useState<ScanStep>("idle");
   const [scanFile, setScanFile] = useState<File | null>(null);
   const [scanPreview, setScanPreview] = useState<string | null>(null);
