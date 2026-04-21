@@ -589,7 +589,7 @@ export default function ModernCardLayout({
         )}
 
         {/* Scan to Save */}
-        {themeJson.scan_to_save === true && (
+        {themeJson.scan_to_save !== false && (
           <motion.section initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={fade} className="mx-4 mt-6">
             <h2 className="text-lg font-bold text-foreground mb-3">Scan Your Card</h2>
             <div className="rounded-xl border border-border bg-card p-4">
