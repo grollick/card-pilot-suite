@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Upload, Loader2, ScanLine, Check, ArrowLeft, RotateCcw, ImageIcon } from "lucide-react";
+import { Upload, Loader2, ScanLine, Check, ArrowLeft, RotateCcw, ImageIcon, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { captureLead } from "@/lib/captureLead";
 import { Button } from "@/components/ui/button";
@@ -33,6 +33,7 @@ export default function ScanBusinessCard() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [savedLeadId, setSavedLeadId] = useState<string | null>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
   // Rehydrate persisted draft on mount
@@ -247,11 +248,15 @@ export default function ScanBusinessCard() {
               <ImageIcon className="h-7 w-7 text-primary" />
             </div>
             <div className="text-center">
-              <p className="text-sm font-medium text-foreground">Select or capture a business card</p>
-            <p className="text-xs text-muted-foreground mt-1">Choose an image from your gallery</p>
+              <p className="text-sm font-medium text-foreground">Snap or upload a business card</p>
+              <p className="text-xs text-muted-foreground mt-1">We'll extract the contact details for you</p>
             </div>
+            <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileChange} className="hidden" />
             <input ref={galleryInputRef} type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-            <Button type="button" className="w-full gap-2" onClick={() => galleryInputRef.current?.click()}>
+            <Button type="button" className="w-full gap-2" onClick={() => cameraInputRef.current?.click()}>
+              <Camera className="h-4 w-4" /> Take Photo
+            </Button>
+            <Button type="button" variant="outline" className="w-full gap-2" onClick={() => galleryInputRef.current?.click()}>
               <Upload className="h-4 w-4" /> Choose from Gallery
             </Button>
           </CardContent>
