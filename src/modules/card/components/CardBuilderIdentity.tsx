@@ -209,7 +209,7 @@ export default function CardBuilderIdentity({
 
       toast.success("Card details applied — review and tweak below");
       resetScanner();
-      setScanOpen(false);
+      
     } catch (err: any) {
       toast.error(err?.message || "Failed to apply scanned values");
     } finally {
