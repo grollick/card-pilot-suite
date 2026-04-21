@@ -62,8 +62,10 @@ export default function ScanBusinessCard() {
 
   // File selection → preview only
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault?.();
     const selected = e.target.files?.[0];
     if (!selected) return;
+    console.log("[Scanner] image selected:", selected.name, selected.size, "bytes");
     setFile(selected);
     setOcrError(null);
     const url = URL.createObjectURL(selected);
