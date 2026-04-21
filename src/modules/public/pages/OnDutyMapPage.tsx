@@ -281,6 +281,7 @@ function MapPanel({
 }) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
+  const mapLoadedRef = useRef(false);
   const [mapStatus, setMapStatus] = useState<MapStatus>("loading");
   const [mapError, setMapError] = useState<string | null>(null);
 
