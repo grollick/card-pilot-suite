@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { MapPin, List, ArrowRight, Map, ArrowLeft, Star, Radio } from "lucide-react";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
@@ -12,12 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { CATEGORIES } from "@/modules/marketplace/data/mockData";
 import { useMarketplaceSearch } from "@/modules/marketplace/hooks/useMarketplaceSearch";
 import { useUserLocation } from "@/modules/marketplace/hooks/useUserLocation";
-import maplibregl from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
-
-const STATIC_CENTER: [number, number] = [-98.5795, 39.8283];
-
-type MapStatus = "loading" | "ready" | "error";
+import MapPanel from "@/modules/public/components/MapPanel";
 
 export default function OnDutyMapPage() {
   const navigate = useNavigate();
@@ -269,126 +264,3 @@ function ProfessionalList({
   );
 }
 
-/* ── MAP PANEL ── */
-function MapPanel({
-  professionals,
-  onSwitchToList,
-  navigate,
-}: {
-  professionals: any[];
-  onSwitchToList: () => void;
-  navigate: ReturnType<typeof useNavigate>;
-}) {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<maplibregl.Map | null>(null);
-  const mapLoadedRef = useRef(false);
-  const [mapStatus, setMapStatus] = useState<MapStatus>("loading");
-  const [mapError, setMapError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
-
-    setMapStatus("loading");
-    let timeoutId: ReturnType<typeof setTimeout>;
-
-    try {
-      const styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
-      console.info("[Map] init with CartoGL positron style");
-
-      const map = new maplibregl.Map({
-        container: mapContainerRef.current,
-        style: styleUrl,
-        center: STATIC_CENTER,
-        zoom: 4,
-        attributionControl: false,
-      });
-
-      timeoutId = setTimeout(() => {
-        if (!mapLoadedRef.current) {
-          console.error("[Map] timed out 15s");
-          setMapError("Map timed out — check your internet connection.");
-          setMapStatus("error");
-        }
-      }, 15000);
-
-      map.on("load", () => {
-        clearTimeout(timeoutId);
-        mapLoadedRef.current = true;
-        console.info("[Map] ✓ loaded");
-
-        // Add markers for on-duty professionals
-        const pts = professionals.length > 0 ? professionals : [{ lat: STATIC_CENTER[1], lng: STATIC_CENTER[0], name: "Test Pin" }];
-        pts.forEach((p) => {
-          new maplibregl.Marker({ color: "#22c55e" })
-            .setLngLat([p.lng, p.lat])
-            .setPopup(new maplibregl.Popup().setHTML(`<b>${p.name ?? "Professional"}</b>`))
-            .addTo(map);
-        });
-
-        setMapStatus("ready");
-      });
-
-      map.on("error", (e) => {
-        clearTimeout(timeoutId);
-        const msg = e.error?.message ?? "Unknown";
-        console.error("[Map] error:", msg);
-        setMapError(`Provider error: ${msg}`);
-        setMapStatus("error");
-      });
-
-      mapRef.current = map;
-    } catch (err: any) {
-      console.error("[Map] init exception:", err);
-      setMapError(`Init failed: ${err?.message}`);
-      setMapStatus("error");
-    }
-
-    return () => {
-      clearTimeout(timeoutId!);
-      mapRef.current?.remove();
-      mapRef.current = null;
-    };
-  }, []);
-
-  const showFallback = mapStatus === "error";
-
-  return (
-    <section className="relative w-full rounded-xl border border-border bg-muted/30 overflow-hidden" style={{ minHeight: 400 }}>
-      {/* Map container */}
-      <div
-        ref={mapContainerRef}
-        className="absolute inset-0 w-full h-full"
-        style={{ minHeight: 400, display: showFallback ? "none" : "block" }}
-      />
-
-      {/* Loading overlay */}
-      {mapStatus === "loading" && (
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-          <p className="text-sm text-muted-foreground bg-background/80 px-3 py-1 rounded">Loading map…</p>
-        </div>
-      )}
-
-      {/* Fallback */}
-      {showFallback && (
-        <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 px-6 text-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
-            <MapPin className="h-7 w-7 text-muted-foreground" />
-          </div>
-          <div>
-            <p className="text-lg font-semibold text-foreground">Map unavailable right now</p>
-            <p className="mt-1 max-w-sm text-sm text-muted-foreground">
-              Use List View to see available professionals.
-            </p>
-            {mapError && (
-              <p className="mt-2 max-w-md text-[10px] text-muted-foreground/60 font-mono break-all">{mapError}</p>
-            )}
-          </div>
-          <Button variant="outline" size="sm" onClick={onSwitchToList}>
-            <List className="mr-2 h-4 w-4" />
-            Switch to List View
-          </Button>
-        </div>
-      )}
-    </section>
-  );
-}
