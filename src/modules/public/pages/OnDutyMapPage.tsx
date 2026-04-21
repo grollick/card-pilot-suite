@@ -304,15 +304,16 @@ function MapPanel({
       });
 
       timeoutId = setTimeout(() => {
-        if (mapStatus === "loading") {
+        if (!mapLoadedRef.current) {
           console.error("[Map] timed out 15s");
-          setMapError("Map timed out — style may have failed.");
+          setMapError("Map timed out — check your internet connection.");
           setMapStatus("error");
         }
       }, 15000);
 
       map.on("load", () => {
         clearTimeout(timeoutId);
+        mapLoadedRef.current = true;
         console.info("[Map] ✓ loaded");
 
         // Add markers for on-duty professionals
