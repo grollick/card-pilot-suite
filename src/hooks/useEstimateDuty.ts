@@ -114,6 +114,25 @@ export function useEstimateDuty() {
       auto_off_after_hours?: number | null;
       auto_off_outside_hours?: boolean;
     }) => {
+      // Get user's real location when going on duty (with small privacy offset)
+      const getCoords = () =>
+        new Promise<{ lat: number; lng: number } | null>((resolve) => {
+          if (!navigator.geolocation) return resolve(null);
+          navigator.geolocation.getCurrentPosition(
+            (pos) => {
+              const offset = () => (Math.random() - 0.5) * 0.008; // ~±400m
+              resolve({
+                lat: pos.coords.latitude + offset(),
+                lng: pos.coords.longitude + offset(),
+              });
+            },
+            () => resolve(null),
+            { timeout: 5000 }
+          );
+        });
+
+      const coords = params.is_on_duty ? await getCoords() : null;
+
       const payload = {
         user_id: user!.id,
         is_on_duty: params.is_on_duty,
@@ -126,12 +145,14 @@ export function useEstimateDuty() {
         auto_off_outside_hours: params.auto_off_outside_hours ?? false,
         went_on_duty_at: params.is_on_duty ? new Date().toISOString() : null,
         leads_received: params.is_on_duty ? 0 : (statusQuery.data?.leads_received ?? 0),
+        lat: params.is_on_duty ? coords?.lat ?? null : null,
+        lng: params.is_on_duty ? coords?.lng ?? null : null,
         updated_at: new Date().toISOString(),
       };
 
       const { data, error } = await supabase
         .from("estimate_duty_status")
-        .upsert(payload, { onConflict: "user_id" })
+        .upsert(payload as any, { onConflict: "user_id" })
         .select()
         .single();
       if (error) throw error;

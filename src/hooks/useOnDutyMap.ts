@@ -109,7 +109,7 @@ export function useOnDutyProfessionals() {
       const [dutyRes, ratingsRes, professionsRes, cardsRes] = await Promise.all([
         supabase
           .from("estimate_duty_status")
-          .select("user_id, is_on_duty, went_on_duty_at, updated_at")
+          .select("user_id, is_on_duty, went_on_duty_at, updated_at, lat, lng")
           .eq("is_on_duty", true)
           .in("user_id", userIds),
         supabase
@@ -158,7 +158,12 @@ export function useOnDutyProfessionals() {
         .filter((p: any) => onDutySet.has(p.id) && publishedSet.has(p.id))
         .map((p: any) => {
           const duty = dutyMap.get(p.id);
-          const coords = cityToCoords(p.city, p.id, p.service_area);
+          // Prefer real GPS coords stored in duty record; fall back to city-based approximation
+          const realCoords =
+            duty?.lat != null && duty?.lng != null
+              ? { lat: Number(duty.lat), lng: Number(duty.lng) }
+              : null;
+          const coords = realCoords ?? cityToCoords(p.city, p.id, p.service_area);
           if (!coords) return null;
 
           const badges: string[] = ["On Duty"];
