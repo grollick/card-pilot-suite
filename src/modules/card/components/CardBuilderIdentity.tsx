@@ -1,10 +1,12 @@
-import { useState } from "react";
-import { Pencil, Loader2, Check, ChevronDown } from "lucide-react";
+import { useState, useRef } from "react";
+import { Pencil, Loader2, Check, ChevronDown, ScanLine, Camera, Upload, X, RotateCcw } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
   profile: any;
@@ -82,6 +84,138 @@ export default function CardBuilderIdentity({
   saveThemeField, qc, hideWrapper,
 }: Props) {
   const [advancedOpen, setAdvancedOpen] = useState(false);
+
+  // ── Card scanner state (Item 3) ──
+  type ScanStep = "idle" | "preview" | "running" | "review";
+  const [scanOpen, setScanOpen] = useState(false);
+  const [scanStep, setScanStep] = useState<ScanStep>("idle");
+  const [scanFile, setScanFile] = useState<File | null>(null);
+  const [scanPreview, setScanPreview] = useState<string | null>(null);
+  const [scanError, setScanError] = useState<string | null>(null);
+  const [applying, setApplying] = useState(false);
+  const [scanned, setScanned] = useState<{
+    name: string; job_title: string; company: string;
+    phone: string; email: string; website: string;
+  }>({ name: "", job_title: "", company: "", phone: "", email: "", website: "" });
+  const scanCameraRef = useRef<HTMLInputElement>(null);
+  const scanFileRef = useRef<HTMLInputElement>(null);
+
+  const resetScanner = () => {
+    if (scanPreview) URL.revokeObjectURL(scanPreview);
+    setScanFile(null);
+    setScanPreview(null);
+    setScanError(null);
+    setScanStep("idle");
+    setScanned({ name: "", job_title: "", company: "", phone: "", email: "", website: "" });
+  };
+
+  const handleScanFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setScanFile(f);
+    setScanError(null);
+    setScanPreview(URL.createObjectURL(f));
+    setScanStep("preview");
+    e.target.value = "";
+  };
+
+  const prepareBase64 = async (f: File): Promise<string> => {
+    const objectUrl = URL.createObjectURL(f);
+    const img = new Image();
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("Could not load image"));
+      img.src = objectUrl;
+    });
+    const maxDim = 1600;
+    const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(img, 0, 0, w, h);
+    URL.revokeObjectURL(objectUrl);
+    return canvas.toDataURL("image/jpeg", 0.85);
+  };
+
+  const runScan = async () => {
+    if (!scanFile) return;
+    setScanStep("running");
+    setScanError(null);
+    try {
+      const base64 = await prepareBase64(scanFile);
+      const { data, error } = await supabase.functions.invoke("scan-business-card-public", {
+        body: { image: base64 },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const c = data?.contact;
+      if (!c || !c.name) throw new Error("Could not read this card. Try a clearer photo.");
+      setScanned({
+        name: c.name ?? "",
+        job_title: c.job_title ?? "",
+        company: c.company ?? "",
+        phone: c.phone ?? "",
+        email: c.email ?? "",
+        website: c.website ?? "",
+      });
+      setScanStep("review");
+    } catch (err: any) {
+      setScanError(err?.message || "Scan failed");
+      setScanStep("preview");
+    }
+  };
+
+  const applyScan = async () => {
+    if (!profile || applying) return;
+    setApplying(true);
+    try {
+      // 1) Identity fields handled via existing setters / theme (no separate save path)
+      const name = scanned.name.trim();
+      const jt = scanned.job_title.trim();
+      const co = scanned.company.trim();
+
+      const profilePatch: Record<string, any> = {};
+      if (name) profilePatch.name = name;
+      if (co) profilePatch.company = co;
+      // Profiles contact fields — same column names SettingsPage patches
+      const phone = scanned.phone.trim();
+      const email = scanned.email.trim();
+      const website = scanned.website.trim();
+      if (phone) profilePatch.phone = phone;
+      if (email) profilePatch.email = email;
+      if (website) profilePatch.website = website;
+
+      if (Object.keys(profilePatch).length > 0) {
+        const { error } = await supabase.from("profiles").update(profilePatch).eq("id", profile.id);
+        if (error) throw error;
+      }
+
+      // Mirror identity values into the in-memory builder state via existing setters
+      if (name) setEditName(name);
+      if (co) {
+        setEditCompany(co);
+        if (!showCompany) setShowCompany(true);
+      }
+      if (jt) {
+        setJobTitle(jt);
+        setEditJobTitle(null);
+        saveThemeField({ job_title: jt });
+      }
+
+      qc.invalidateQueries({ queryKey: ["profile"] });
+      qc.invalidateQueries({ queryKey: ["public-card"] });
+
+      toast.success("Card details applied — review and tweak below");
+      resetScanner();
+      setScanOpen(false);
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to apply scanned values");
+    } finally {
+      setApplying(false);
+    }
+  };
 
   const makeHandler = (field: string, dbField: string, setter: (v: string | null) => void) =>
     (e: React.ChangeEvent<HTMLInputElement>) => {
