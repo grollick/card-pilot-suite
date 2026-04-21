@@ -53,10 +53,28 @@ export default function FirstFiveMinutes() {
   const handleDuty = useCallback(async () => {
     if (!user) return;
     try {
+      // Try to capture real location (with small privacy offset) for the map
+      const coords = await new Promise<{ lat: number; lng: number } | null>((resolve) => {
+        if (!navigator.geolocation) return resolve(null);
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            const offset = () => (Math.random() - 0.5) * 0.008;
+            resolve({
+              lat: pos.coords.latitude + offset(),
+              lng: pos.coords.longitude + offset(),
+            });
+          },
+          () => resolve(null),
+          { timeout: 5000 }
+        );
+      });
+
       await supabase.from("estimate_duty_status").upsert({
         user_id: user.id,
         is_on_duty: true,
         went_on_duty_at: new Date().toISOString(),
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null,
       } as any, { onConflict: "user_id" });
       setDutyToggled(true);
       setTimeout(() => setCurrentStep("opportunities"), 1200);

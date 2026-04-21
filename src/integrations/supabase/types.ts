@@ -3364,7 +3364,9 @@ export type Database = {
           id: string
           is_on_duty: boolean
           last_response_at: string | null
+          lat: number | null
           leads_received: number
+          lng: number | null
           max_leads: number | null
           missed_leads_count: number
           service_radius_km: number | null
@@ -3385,7 +3387,9 @@ export type Database = {
           id?: string
           is_on_duty?: boolean
           last_response_at?: string | null
+          lat?: number | null
           leads_received?: number
+          lng?: number | null
           max_leads?: number | null
           missed_leads_count?: number
           service_radius_km?: number | null
@@ -3406,7 +3410,9 @@ export type Database = {
           id?: string
           is_on_duty?: boolean
           last_response_at?: string | null
+          lat?: number | null
           leads_received?: number
+          lng?: number | null
           max_leads?: number | null
           missed_leads_count?: number
           service_radius_km?: number | null
