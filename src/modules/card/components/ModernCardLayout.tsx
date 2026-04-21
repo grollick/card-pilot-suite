@@ -8,7 +8,7 @@ import {
   Phone, MessageSquare, Mail, Calendar, Star, MapPin,
   Download, FileText, CheckCircle2, Clock, Globe,
   Instagram, Facebook, Linkedin, Twitter, Youtube,
-  Send, X, Play, Image as ImageIcon, Share2, ShieldCheck,
+  Send, X, Play, Image as ImageIcon, Share2, ShieldCheck, ScanLine,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -322,6 +322,20 @@ export default function ModernCardLayout({
           ))}
         </motion.div>
 
+        {themeJson.scan_to_save !== false && (
+          <motion.div initial="hidden" animate="visible" variants={fade} className="mx-4 mt-3">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full gap-2"
+              onClick={() => document.getElementById("scan-to-save-section")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+            >
+              <ScanLine className="h-4 w-4" />
+              <span>Scan Your Card</span>
+            </Button>
+          </motion.div>
+        )}
+
         {/* Sharing tools */}
         <div className="flex items-center justify-center gap-2 mx-4 mt-4">
           <QRShareDialog url={cardUrl} name={profile.name || "Contact"} />
@@ -590,7 +604,7 @@ export default function ModernCardLayout({
 
         {/* Scan to Save */}
         {themeJson.scan_to_save !== false && (
-          <motion.section initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={fade} className="mx-4 mt-6">
+          <motion.section id="scan-to-save-section" initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={fade} className="mx-4 mt-6">
             <h2 className="text-lg font-bold text-foreground mb-3">Scan Your Card</h2>
             <div className="rounded-xl border border-border bg-card p-4">
               <ScanToSaveWidget ownerId={profile.id} handle={handle} palette={palette} fonts={theme.fonts} radii={theme.radii} />
