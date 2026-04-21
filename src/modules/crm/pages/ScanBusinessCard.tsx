@@ -62,8 +62,10 @@ export default function ScanBusinessCard() {
 
   // File selection → preview only
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault?.();
     const selected = e.target.files?.[0];
     if (!selected) return;
+    console.log("[Scanner] image selected:", selected.name, selected.size, "bytes");
     setFile(selected);
     setOcrError(null);
     const url = URL.createObjectURL(selected);
@@ -97,6 +99,7 @@ export default function ScanBusinessCard() {
   // Manual OCR start
   const handleStartOcr = useCallback(async () => {
     if (!file) return;
+    console.log("[Scanner] OCR starting for", file.name);
     setStep("ocr_running");
     setOcrError(null);
     try {
@@ -107,6 +110,7 @@ export default function ScanBusinessCard() {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       const extracted = data?.contact;
+      console.log("[Scanner] OCR complete, raw extracted:", extracted);
       if (!extracted || typeof extracted !== "object" || !extracted.name) {
         throw new Error("Could not read this card. Try a clearer photo.");
       }
@@ -121,9 +125,11 @@ export default function ScanBusinessCard() {
         notes: extracted.notes ?? "",
       };
       sessionStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      console.log("[Scanner] parsed fields set into state & persisted to sessionStorage");
       setContact(draft);
       setStep("review");
     } catch (err: any) {
+      console.error("[Scanner] OCR failed:", err);
       setOcrError(err?.message || "OCR failed");
       setStep("preview");
     }
@@ -155,6 +161,7 @@ export default function ScanBusinessCard() {
   // Save Contact
   const handleSaveContact = useCallback(async () => {
     if (!contact?.name?.trim() || saving) return;
+    console.log("[Scanner] save action triggered for:", contact.name);
     setSaving(true);
     setSaveError(null);
     setStep("saving");
