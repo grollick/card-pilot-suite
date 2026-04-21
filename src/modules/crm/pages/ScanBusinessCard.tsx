@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { Upload, Loader2, ScanLine, Check, ArrowLeft, RotateCcw, ImageIcon } from "lucide-react";
+import { Upload, Loader2, ScanLine, Check, ArrowLeft, RotateCcw, ImageIcon, Camera } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { captureLead } from "@/lib/captureLead";
 import { Button } from "@/components/ui/button";
