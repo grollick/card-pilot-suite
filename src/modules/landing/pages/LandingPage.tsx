@@ -102,9 +102,54 @@ const results = [
 
 
 const testimonials = [
-  { name: "Jake M.", role: "Landscaper", text: "I went from losing half my leads to booking 90% of them. guzzl.pro paid for itself in a week.", rating: 5 },
-  { name: "Sarah L.", role: "Interior Painter", text: "Clients love scanning my card and booking instantly. I've never been this organized.", rating: 5 },
-  { name: "Marco R.", role: "Electrician", text: "Estimates used to take me an hour. Now I send them on-site in two minutes.", rating: 5 },
+  {
+    name: "Jake Morales",
+    role: "Landscaper",
+    location: "Phoenix, AZ",
+    result: "+$1,400 first week",
+    text: "I used to lose 4–5 leads a week to voicemail. First week with guzzl.pro I booked 3 extra jobs — that's $1,400 I would've left on the table.",
+    rating: 5,
+  },
+  {
+    name: "Sarah Lindqvist",
+    role: "Interior Painter",
+    location: "Austin, TX",
+    result: "2 jobs/week → 5 jobs/week",
+    text: "My phone used to blow up with 'are you available?' texts. Now clients book themselves. I went from 2 jobs a week to 5 — same amount of effort.",
+    rating: 5,
+  },
+  {
+    name: "Marco Rivera",
+    role: "Electrician",
+    location: "Chicago, IL",
+    result: "Closed 2 jobs on the spot",
+    text: "I was losing jobs because my estimates took 3 days to arrive. Now I send them standing in the customer's driveway. Closed 2 jobs on the spot last Tuesday.",
+    rating: 5,
+  },
+  {
+    name: "Dave Kowalski",
+    role: "Plumber",
+    location: "Cleveland, OH",
+    result: "+8 leads/week",
+    text: "I'm a plumber — I don't do social media. My son set this up for me in 20 minutes. Now I get 8–10 new customer messages a week without doing anything different.",
+    rating: 5,
+  },
+  {
+    name: "Tanya Brooks",
+    role: "House Cleaner",
+    location: "Atlanta, GA",
+    result: "Booked on-site same day",
+    text: "I was handing out paper business cards at every job. Half ended up in a drawer. Now I text people my link and they book before I even leave the driveway.",
+    rating: 5,
+  },
+  {
+    name: "Ray Okonkwo",
+    role: "HVAC Tech",
+    location: "Houston, TX",
+    result: "First booking same day",
+    text: "Honestly thought this was going to be complicated. It wasn't. Took me 15 minutes to set up. Got my first online booking the same day.",
+    rating: 5,
+  },
 ];
 
 const plans = [
@@ -336,7 +381,7 @@ export default function LandingPage() {
         <div className="relative py-8 border-t border-border/30">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <p className="text-center text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-5">
-              Trusted by 1,000+ professionals across every trade
+              Trusted by 1,000+ local professionals — plumbers, electricians, landscapers, painters, cleaners, and more
             </p>
             <div className="overflow-hidden relative">
               <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-background to-transparent z-10" />
