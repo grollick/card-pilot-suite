@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
 
@@ -91,10 +91,35 @@ export function useUserLocation() {
 }
 
 export function useOnDutyProfessionals() {
+  const queryClient = useQueryClient();
+
+  // Subscribe to realtime changes on estimate_duty_status
+  useEffect(() => {
+    const channel = supabase
+      .channel("on-duty-realtime")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "estimate_duty_status",
+        },
+        () => {
+          // Immediately refetch when any duty status changes
+          queryClient.invalidateQueries({ queryKey: ["on-duty-map"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+
   return useQuery({
     queryKey: ["on-duty-map"],
     staleTime: 15_000,
-    refetchInterval: 30_000,
+    refetchInterval: 60_000, // Reduced to 60s since realtime handles instant updates
     queryFn: async (): Promise<OnDutyProfessional[]> => {
       // Get all marketplace-enabled profiles using the secure RPC function
       const { data: rpcProfiles } = await supabase.rpc("get_public_profiles");
