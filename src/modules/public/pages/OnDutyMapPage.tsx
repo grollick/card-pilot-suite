@@ -15,13 +15,9 @@ import { useUserLocation } from "@/modules/marketplace/hooks/useUserLocation";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-/* ── token config ── */
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN ?? "pk.eyJ1IjoiZ3JvbGxpY2siLCJhIjoiY21uODFjNjY0MDZpcTMxcTRhZGVjcGZleiJ9.NVS5tdI_TZRyZv0299LCqQ";
-const HAS_TOKEN = Boolean(MAPBOX_TOKEN.trim());
-
 const STATIC_CENTER: [number, number] = [-98.5795, 39.8283];
 
-type MapStatus = "idle" | "loading" | "ready" | "error" | "no-token";
+type MapStatus = "loading" | "ready" | "error";
 
 export default function OnDutyMapPage() {
   const navigate = useNavigate();
@@ -285,23 +281,18 @@ function MapPanel({
 }) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
-  const [mapStatus, setMapStatus] = useState<MapStatus>("idle");
+  const [mapStatus, setMapStatus] = useState<MapStatus>("loading");
   const [mapError, setMapError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!HAS_TOKEN) {
-      console.warn("[Map] no token — skipping init");
-      setMapStatus("no-token");
-      return;
-    }
     if (!mapContainerRef.current || mapRef.current) return;
 
     setMapStatus("loading");
     let timeoutId: ReturnType<typeof setTimeout>;
 
     try {
-      const styleUrl = `https://api.mapbox.com/styles/v1/mapbox/streets-v12?access_token=${MAPBOX_TOKEN}`;
-      console.info("[Map] init with token, style:", styleUrl.slice(0, 70) + "…");
+      const styleUrl = "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
+      console.info("[Map] init with CartoGL positron style");
 
       const map = new maplibregl.Map({
         container: mapContainerRef.current,
@@ -357,7 +348,7 @@ function MapPanel({
     };
   }, []);
 
-  const showFallback = mapStatus === "no-token" || mapStatus === "error";
+  const showFallback = mapStatus === "error";
 
   return (
     <section className="relative w-full rounded-xl border border-border bg-muted/30 overflow-hidden" style={{ minHeight: 400 }}>
