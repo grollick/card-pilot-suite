@@ -32,12 +32,12 @@ const plans = [
     popular: false,
     roiNote: null,
     features: [
-      "Your own digital business card",
-      "Capture leads from every interaction",
-      "Let customers book you online",
-      "See who's viewing your card",
-      "Share via QR code or link",
-      "Up to 3 services listed",
+      "Your own page people can find online",
+      "Collect new customer info automatically",
+      "Customers book jobs while you're on the road",
+      "See who's checking you out",
+      "Share with a scan or a text — no app needed",
+      "List up to 3 of your services",
     ],
   },
   {
