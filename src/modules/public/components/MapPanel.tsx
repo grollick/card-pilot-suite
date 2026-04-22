@@ -411,9 +411,12 @@ export default function MapPanel({
         </div>
       )}
 
+      {/* Legend */}
+      {!showFallback && mapStatus === "ready" && <MapLegend />}
+
       {/* Locating indicator (subtle, near map) */}
       {!showFallback && locating && (
-        <div className="absolute bottom-3 left-3 z-20 flex items-center gap-2 bg-background/95 backdrop-blur px-3 py-1.5 rounded-full shadow-md text-xs text-muted-foreground">
+        <div className="absolute bottom-3 right-16 z-20 flex items-center gap-2 bg-background/95 backdrop-blur px-3 py-1.5 rounded-full shadow-md text-xs text-muted-foreground">
           <Loader2 className="h-3 w-3 animate-spin" />
           Finding your location…
         </div>
