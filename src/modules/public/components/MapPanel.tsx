@@ -5,6 +5,8 @@ import { MapPin, List, Search, Loader2, Locate, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
+import { resolveProfessionIcon, iconToSvgString } from "./professionIcons";
+import MapLegend from "./MapLegend";
 
 const CANADA_CENTER: [number, number] = [-96.8, 56.1304];
 const STORAGE_KEY = "guzzl_map_last_location";
@@ -203,10 +205,29 @@ export default function MapPanel({
 
     professionals.forEach((p) => {
       if (p.lat == null || p.lng == null) return;
-      const marker = new maplibregl.Marker({ color: "#22c55e" })
+      const { icon, color, label } = resolveProfessionIcon(p.profession_name);
+
+      const el = document.createElement("div");
+      el.className = "guzzl-category-marker";
+      el.setAttribute("aria-label", `${p.name ?? "Professional"} — ${label}`);
+      el.style.cssText = [
+        "width:34px",
+        "height:34px",
+        "border-radius:9999px",
+        `background:${color}`,
+        "border:2px solid #FFFFFF",
+        "display:flex",
+        "align-items:center",
+        "justify-content:center",
+        "cursor:pointer",
+        "filter:drop-shadow(0 1px 2px rgba(0,0,0,0.25))",
+      ].join(";");
+      el.innerHTML = iconToSvgString(icon, 18, "#FFFFFF");
+
+      const marker = new maplibregl.Marker({ element: el, anchor: "center" })
         .setLngLat([p.lng, p.lat])
         .setPopup(
-          new maplibregl.Popup({ offset: 18 }).setHTML(
+          new maplibregl.Popup({ offset: 22 }).setHTML(
             `<div style="font-size:12px;"><b>${p.name ?? "Professional"}</b>${
               p.profession_name ? `<br/><span style="color:#666">${p.profession_name}</span>` : ""
             }</div>`
