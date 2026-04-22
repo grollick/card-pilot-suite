@@ -13,13 +13,21 @@ import { CATEGORIES } from "@/modules/marketplace/data/mockData";
 import { useMarketplaceSearch } from "@/modules/marketplace/hooks/useMarketplaceSearch";
 import { useUserLocation } from "@/modules/marketplace/hooks/useUserLocation";
 import MapPanel from "@/modules/public/components/MapPanel";
+import { getDemoOnDutyProfessionals } from "@/modules/public/data/demoOnDutyProfessionals";
 
 export default function OnDutyMapPage() {
   const navigate = useNavigate();
-  const { data: professionals = [], isLoading } = useOnDutyProfessionals();
+  const { data: realProfessionals = [], isLoading } = useOnDutyProfessionals();
   const [activeTab, setActiveTab] = useState("list");
   const [showAllCategories, setShowAllCategories] = useState(false);
   const { location } = useUserLocation();
+
+  // TEMP: inject demo on-duty contractors so users can preview the category icons.
+  // Remove this block (and the import) once enough real on-duty pros exist.
+  const demoProfessionals = getDemoOnDutyProfessionals(
+    location.lat && location.lon ? { lat: location.lat, lng: location.lon } : null
+  );
+  const professionals = [...realProfessionals, ...demoProfessionals];
 
   const { data: featuredData, isLoading: featuredLoading } = useMarketplaceSearch({
     city: location.city,
