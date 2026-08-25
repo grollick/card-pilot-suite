@@ -2243,6 +2243,7 @@ export type Database = {
           email: string | null
           id: string
           is_active: boolean | null
+          is_demo: boolean
           is_marketplace_visible: boolean | null
           latitude: number | null
           location_city: string | null
@@ -2264,6 +2265,7 @@ export type Database = {
           email?: string | null
           id?: string
           is_active?: boolean | null
+          is_demo?: boolean
           is_marketplace_visible?: boolean | null
           latitude?: number | null
           location_city?: string | null
@@ -2285,6 +2287,7 @@ export type Database = {
           email?: string | null
           id?: string
           is_active?: boolean | null
+          is_demo?: boolean
           is_marketplace_visible?: boolean | null
           latitude?: number | null
           location_city?: string | null
@@ -3361,7 +3364,9 @@ export type Database = {
           id: string
           is_on_duty: boolean
           last_response_at: string | null
+          lat: number | null
           leads_received: number
+          lng: number | null
           max_leads: number | null
           missed_leads_count: number
           service_radius_km: number | null
@@ -3382,7 +3387,9 @@ export type Database = {
           id?: string
           is_on_duty?: boolean
           last_response_at?: string | null
+          lat?: number | null
           leads_received?: number
+          lng?: number | null
           max_leads?: number | null
           missed_leads_count?: number
           service_radius_km?: number | null
@@ -3403,7 +3410,9 @@ export type Database = {
           id?: string
           is_on_duty?: boolean
           last_response_at?: string | null
+          lat?: number | null
           leads_received?: number
+          lng?: number | null
           max_leads?: number | null
           missed_leads_count?: number
           service_radius_km?: number | null
@@ -5912,6 +5921,7 @@ export type Database = {
           handle: string | null
           id: string
           is_suspended: boolean
+          marketplace_categories: string[] | null
           marketplace_enabled: boolean
           name: string | null
           onboarding_completed: boolean
@@ -5956,6 +5966,7 @@ export type Database = {
           handle?: string | null
           id: string
           is_suspended?: boolean
+          marketplace_categories?: string[] | null
           marketplace_enabled?: boolean
           name?: string | null
           onboarding_completed?: boolean
@@ -6000,6 +6011,7 @@ export type Database = {
           handle?: string | null
           id?: string
           is_suspended?: boolean
+          marketplace_categories?: string[] | null
           marketplace_enabled?: boolean
           name?: string | null
           onboarding_completed?: boolean
@@ -8146,6 +8158,17 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_leaderboard: {
+        Row: {
+          avatar_url: string | null
+          completed_referrals: number | null
+          referrer_id: string | null
+          referrer_name: string | null
+          total_referrals: number | null
+          total_reward_days: number | null
+        }
+        Relationships: []
+      }
       sms_delivery_summary: {
         Row: {
           business_id: string | null
@@ -8355,6 +8378,7 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      email_queue_dispatch: { Args: never; Returns: undefined }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
