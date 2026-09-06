@@ -473,7 +473,9 @@ export function useCardBuilderState() {
 
   return {
     // Data
-    card, profile, stylePack, cardLoading,
+    card, stylePack, cardLoading, activeCardId,
+    profile: (card as any)?.company ? ({ ...(profile as any), company: (card as any).company }) : profile,
+
     // Sections
     sections, setSections, toggleSection, handleSectionContentSave, handleCopyToSection,
     editingSection, setEditingSection,
