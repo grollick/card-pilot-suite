@@ -18,6 +18,8 @@ import PointerEventsRecovery from "@/components/PointerEventsRecovery";
 // ── Public routes — most eagerly loaded for fast render ──
 import LegalPage from "@/modules/public/pages/LegalPage";
 import HandleOrSeoRoute from "@/modules/public/pages/HandleOrSeoRoute";
+import PublicCard from "@/modules/public/pages/PublicCard";
+
 
 // ── Public routes — lazy loaded (heavier) ──
 const PublicBooking = lazy(() => import("@/modules/public/pages/PublicBooking"));
