@@ -357,6 +357,9 @@ const App = () => (
 
             {/* Public card OR SEO landing — smart routing */}
             <Route path="/:handle" element={<HandleOrSeoRoute />} />
+            {/* Additional cards under the same handle: /handle/plumbing */}
+            <Route path="/:handle/:cardSlug" element={<LazyRoute><PublicCard /></LazyRoute>} />
+
 
             <Route path="*" element={<NotFound />} />
           </Routes>
