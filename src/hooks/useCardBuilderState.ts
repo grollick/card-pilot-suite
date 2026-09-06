@@ -87,6 +87,7 @@ export function useCardBuilderState() {
   const [globalSaveState, setGlobalSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const globalSaveTimer = useRef<ReturnType<typeof setTimeout>>();
   const hydrated = useRef(false);
+  const hydratedCardId = useRef<string | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const coverUrlRef = useRef<string | null>(null);
 
@@ -95,8 +96,10 @@ export function useCardBuilderState() {
 
   // ── Hydrate from DB ──
   useEffect(() => {
-    if (card && !hydrated.current) {
+    if (card && (!hydrated.current || hydratedCardId.current !== (card as any).id)) {
       hydrated.current = true;
+      hydratedCardId.current = (card as any).id;
+
       const dbSections = card.sections_json as unknown as CardSection[] | null;
       if (dbSections && Array.isArray(dbSections) && dbSections.length > 0) setSections(dbSections);
       setPublished(card.status === "published");
