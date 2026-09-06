@@ -11,6 +11,8 @@ import {
   DEFAULT_SECTIONS,
   type CardSection,
 } from "@/hooks/useCard";
+import { useProfessionOptions } from "@/hooks/useCards";
+
 import { useGenerateCardContent } from "@/hooks/useGenerateContent";
 import { resolveCardTheme, type ResolvedCardTheme } from "@/lib/cardTokens";
 import type { CtaItem } from "@/modules/card/components/CtaEditor";
@@ -91,8 +93,11 @@ export function useCardBuilderState() {
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const coverUrlRef = useRef<string | null>(null);
 
-  const professionName = (profile as any)?.professions?.name ?? "Professional";
+  const { data: professionOptions = [] } = useProfessionOptions();
+  const cardProfession = professionOptions.find((p: any) => p.id === (card as any)?.profession_id);
+  const professionName = cardProfession?.name ?? (profile as any)?.professions?.name ?? "Professional";
   const displayJobTitle = jobTitle || professionName;
+
 
   // ── Hydrate from DB ──
   useEffect(() => {
