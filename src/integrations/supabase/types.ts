@@ -2397,12 +2397,17 @@ export type Database = {
       }
       cards: {
         Row: {
+          company: string | null
           created_at: string
           id: string
+          is_primary: boolean
           is_team_card: boolean
+          label: string | null
           org_id: string | null
+          profession_id: string | null
           published_at: string | null
           sections_json: Json
+          slug: string | null
           status: Database["public"]["Enums"]["card_status"]
           team_member_id: string | null
           theme_json: Json
@@ -2410,12 +2415,17 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          company?: string | null
           created_at?: string
           id?: string
+          is_primary?: boolean
           is_team_card?: boolean
+          label?: string | null
           org_id?: string | null
+          profession_id?: string | null
           published_at?: string | null
           sections_json?: Json
+          slug?: string | null
           status?: Database["public"]["Enums"]["card_status"]
           team_member_id?: string | null
           theme_json?: Json
@@ -2423,12 +2433,17 @@ export type Database = {
           user_id: string
         }
         Update: {
+          company?: string | null
           created_at?: string
           id?: string
+          is_primary?: boolean
           is_team_card?: boolean
+          label?: string | null
           org_id?: string | null
+          profession_id?: string | null
           published_at?: string | null
           sections_json?: Json
+          slug?: string | null
           status?: Database["public"]["Enums"]["card_status"]
           team_member_id?: string | null
           theme_json?: Json
@@ -2441,6 +2456,13 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cards_profession_id_fkey"
+            columns: ["profession_id"]
+            isOneToOne: false
+            referencedRelation: "professions"
             referencedColumns: ["id"]
           },
           {
