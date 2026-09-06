@@ -157,9 +157,10 @@ function PromoBanner({ userId, palette, fonts }: { userId: string; palette: any;
 }
 
 export default function PublicCard() {
-  const { handle } = useParams();
+  const { handle, cardSlug } = useParams();
   const { user } = useAuth();
-  const { data, isLoading, isError } = usePublicCard(handle);
+  const { data, isLoading, isError } = usePublicCard(handle, cardSlug);
+
   const [formSent, setFormSent] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
   const [honeypot, setHoneypot] = useState("");

@@ -40,19 +40,19 @@ export interface CardSection {
   content?: Record<string, any>;
 }
 
-// ── Fetch current user's card ──
-export function useCard() {
+// ── Fetch current user's card (optionally a specific one) ──
+export function useCard(cardId?: string | null) {
   const { user } = useAuth();
   return useQuery({
-    queryKey: ["cards"],
+    queryKey: ["cards", cardId ?? "primary"],
     enabled: !!user,
     staleTime: 5 * 60 * 1000, // 5 min cache
     gcTime: 10 * 60 * 1000,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("cards")
-        .select("*")
-        .eq("user_id", user!.id)
+      let q = supabase.from("cards").select("*").eq("user_id", user!.id);
+      if (cardId) q = q.eq("id", cardId);
+      const { data, error } = await q
+        .order("is_primary", { ascending: false })
         .order("updated_at", { ascending: false })
         .limit(1);
       if (error) throw error;
@@ -62,7 +62,7 @@ export function useCard() {
 }
 
 // ── Upsert card (create if missing, update if exists) ──
-export function useUpsertCard() {
+export function useUpsertCard(cardId?: string | null) {
   const qc = useQueryClient();
   const { user } = useAuth();
 
@@ -72,11 +72,11 @@ export function useUpsertCard() {
       theme_json?: Json;
       status?: "draft" | "published" | "unpublished";
     }) => {
-      // Check if card exists
-      const { data: rows } = await supabase
-        .from("cards")
-        .select("id")
-        .eq("user_id", user!.id)
+      // Find the target card
+      let q = supabase.from("cards").select("id").eq("user_id", user!.id);
+      if (cardId) q = q.eq("id", cardId);
+      const { data: rows } = await q
+        .order("is_primary", { ascending: false })
         .order("updated_at", { ascending: false })
         .limit(1);
       const existing = rows?.[0] ?? null;
@@ -95,6 +95,7 @@ export function useUpsertCard() {
           .from("cards")
           .insert({
             user_id: user!.id,
+            is_primary: true,
             sections_json: updates.sections_json ?? (DEFAULT_SECTIONS as unknown as Json),
             theme_json: updates.theme_json ?? ({} as Json),
             status: updates.status ?? "draft",
@@ -105,9 +106,13 @@ export function useUpsertCard() {
         return data;
       }
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["cards"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["cards"] });
+      qc.invalidateQueries({ queryKey: ["my-cards"] });
+    },
   });
 }
+
 
 // ── Fetch user's profile for card builder ──
 export function useProfile() {
@@ -146,10 +151,10 @@ export function useStylePack(key: string | null | undefined) {
   });
 }
 
-// ── Public: Fetch card + profile by handle (parallelized for <500ms) ──
-export function usePublicCard(handle: string | undefined) {
+// ── Public: Fetch card + profile by handle (optionally a specific card slug) ──
+export function usePublicCard(handle: string | undefined, cardSlug?: string | null) {
   return useQuery({
-    queryKey: ["public-card", handle],
+    queryKey: ["public-card", handle, cardSlug ?? "primary"],
     enabled: !!handle,
     staleTime: 0,
     gcTime: 10 * 60 * 1000,
@@ -164,15 +169,26 @@ export function usePublicCard(handle: string | undefined) {
         .single();
       if (pErr) throw pErr;
 
+      const cardQuery = cardSlug
+        ? supabase
+            .from("cards")
+            .select("sections_json, theme_json, status, slug, label, company, profession_id")
+            .eq("user_id", profile.id)
+            .eq("slug", cardSlug)
+            .limit(1)
+            .maybeSingle()
+        : supabase
+            .from("cards")
+            .select("sections_json, theme_json, status, slug, label, company, profession_id")
+            .eq("user_id", profile.id)
+            .order("is_primary", { ascending: false })
+            .order("updated_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
       // Step 2: Fire all dependent queries in parallel
       const [cardResult, servicesResult, stylePackResult, dutyResult, recentViewsResult] = await Promise.all([
-        supabase
-          .from("cards")
-          .select("sections_json, theme_json, status")
-          .eq("user_id", profile.id)
-          .order("updated_at", { ascending: false })
-          .limit(1)
-          .maybeSingle(),
+        cardQuery,
         supabase
           .from("booking_services")
           .select("id, name, price, duration_min")
@@ -199,16 +215,32 @@ export function usePublicCard(handle: string | undefined) {
           .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
       ]);
 
+      const cardRow: any = cardResult.data;
+
+      // Per-card overrides: business name + profession
+      let professionOverride: { name: string; category: string | null } | null = null;
+      if (cardRow?.profession_id && cardRow.profession_id !== profile.profession_id) {
+        const { data: prof } = await supabase
+          .from("professions")
+          .select("name, category")
+          .eq("id", cardRow.profession_id)
+          .maybeSingle();
+        if (prof) professionOverride = prof as any;
+      }
+
       return {
         profile: {
           ...profile,
+          company: cardRow?.company || profile.company,
+          professions: professionOverride ?? profile.professions,
           is_on_duty: dutyResult.data?.is_on_duty ?? false,
         },
-        card: cardResult.data,
+        card: cardRow,
         stylePack: stylePackResult.data,
         services: servicesResult.data ?? [],
         recentViewCount: recentViewsResult.count ?? 0,
       };
+
     },
   });
 }

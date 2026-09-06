@@ -24,6 +24,8 @@ import SectionEditor, { type SectionContent } from "@/modules/card/components/Se
 import CardAssistant from "@/modules/card/components/CardAssistant";
 import CardThemeEditor from "@/modules/card/components/CardThemeEditor";
 import CardBuilderHeader from "@/modules/card/components/CardBuilderHeader";
+import CardSwitcher from "@/modules/card/components/CardSwitcher";
+
 import CardBuilderIdentity from "@/modules/card/components/CardBuilderIdentity";
 import CardBuilderSections from "@/modules/card/components/CardBuilderSections";
 import CardBuilderPreview from "@/modules/card/components/CardBuilderPreview";
@@ -749,7 +751,9 @@ export default function CardBuilder() {
         name={s.profile?.name}
         previewDevice={previewDevice}
         onPreviewDeviceChange={setPreviewDevice}
+        cardSwitcher={<CardSwitcher handle={s.profile?.handle} activeCardId={s.activeCardId} />}
       />
+
 
       {/* ══════════════════════════════════════════════════ */}
       {/*  DESKTOP — Three-panel layout                     */}

@@ -18,6 +18,8 @@ import PointerEventsRecovery from "@/components/PointerEventsRecovery";
 // ── Public routes — most eagerly loaded for fast render ──
 import LegalPage from "@/modules/public/pages/LegalPage";
 import HandleOrSeoRoute from "@/modules/public/pages/HandleOrSeoRoute";
+import PublicCard from "@/modules/public/pages/PublicCard";
+
 
 // ── Public routes — lazy loaded (heavier) ──
 const PublicBooking = lazy(() => import("@/modules/public/pages/PublicBooking"));
@@ -357,6 +359,9 @@ const App = () => (
 
             {/* Public card OR SEO landing — smart routing */}
             <Route path="/:handle" element={<HandleOrSeoRoute />} />
+            {/* Additional cards under the same handle: /handle/plumbing */}
+            <Route path="/:handle/:cardSlug" element={<LazyRoute><PublicCard /></LazyRoute>} />
+
 
             <Route path="*" element={<NotFound />} />
           </Routes>

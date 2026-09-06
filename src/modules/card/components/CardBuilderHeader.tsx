@@ -29,12 +29,14 @@ interface Props {
   name?: string | null;
   previewDevice: "phone" | "tablet";
   onPreviewDeviceChange: (d: "phone" | "tablet") => void;
+  cardSwitcher?: React.ReactNode;
 }
 
 export default function CardBuilderHeader({
   globalSaveState, published, onPublishToggle, handle, name,
-  previewDevice, onPreviewDeviceChange,
+  previewDevice, onPreviewDeviceChange, cardSwitcher,
 }: Props) {
+
   const navigate = useNavigate();
   const [networkingOpen, setNetworkingOpen] = useState(false);
 
@@ -58,6 +60,8 @@ export default function CardBuilderHeader({
 
           <div className="flex items-center gap-2.5 min-w-0">
             <GuzzlLogo to={null} size="lg" suffix="Card Editor" />
+            {cardSwitcher}
+
             <div className={`flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 transition-colors ${
               globalSaveState === "saving" ? "text-primary bg-primary/5"
               : globalSaveState === "saved" ? "text-emerald-600 bg-emerald-500/5"

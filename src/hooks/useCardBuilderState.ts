@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+
 import {
   useCard,
   useUpsertCard,
@@ -9,6 +11,8 @@ import {
   DEFAULT_SECTIONS,
   type CardSection,
 } from "@/hooks/useCard";
+import { useProfessionOptions } from "@/hooks/useCards";
+
 import { useGenerateCardContent } from "@/hooks/useGenerateContent";
 import { resolveCardTheme, type ResolvedCardTheme } from "@/lib/cardTokens";
 import type { CtaItem } from "@/modules/card/components/CtaEditor";
@@ -19,10 +23,13 @@ import type { SectionContent } from "@/modules/card/components/SectionEditor";
 const FALLBACK_PALETTE = { primary: "#4361ee", secondary: "#6b7280", accent: "#7c3aed", background: "#ffffff" };
 
 export function useCardBuilderState() {
-  const { data: card, isLoading: cardLoading } = useCard();
+  const [searchParams] = useSearchParams();
+  const activeCardId = searchParams.get("card");
+  const { data: card, isLoading: cardLoading } = useCard(activeCardId);
   const { data: profile } = useProfile();
   const { data: stylePack } = useStylePack(profile?.style_pack);
-  const upsertCard = useUpsertCard();
+  const upsertCard = useUpsertCard(activeCardId);
+
   const { generate, isGenerating, content: aiContent } = useGenerateCardContent();
   const qc = useQueryClient();
 
@@ -82,16 +89,22 @@ export function useCardBuilderState() {
   const [globalSaveState, setGlobalSaveState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const globalSaveTimer = useRef<ReturnType<typeof setTimeout>>();
   const hydrated = useRef(false);
+  const hydratedCardId = useRef<string | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout>>();
   const coverUrlRef = useRef<string | null>(null);
 
-  const professionName = (profile as any)?.professions?.name ?? "Professional";
+  const { data: professionOptions = [] } = useProfessionOptions();
+  const cardProfession = professionOptions.find((p: any) => p.id === (card as any)?.profession_id);
+  const professionName = cardProfession?.name ?? (profile as any)?.professions?.name ?? "Professional";
   const displayJobTitle = jobTitle || professionName;
+
 
   // ── Hydrate from DB ──
   useEffect(() => {
-    if (card && !hydrated.current) {
+    if (card && (!hydrated.current || hydratedCardId.current !== (card as any).id)) {
       hydrated.current = true;
+      hydratedCardId.current = (card as any).id;
+
       const dbSections = card.sections_json as unknown as CardSection[] | null;
       if (dbSections && Array.isArray(dbSections) && dbSections.length > 0) setSections(dbSections);
       setPublished(card.status === "published");
@@ -460,7 +473,9 @@ export function useCardBuilderState() {
 
   return {
     // Data
-    card, profile, stylePack, cardLoading,
+    card, stylePack, cardLoading, activeCardId,
+    profile: (card as any)?.company ? ({ ...(profile as any), company: (card as any).company }) : profile,
+
     // Sections
     sections, setSections, toggleSection, handleSectionContentSave, handleCopyToSection,
     editingSection, setEditingSection,
