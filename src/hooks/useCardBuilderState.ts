@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
+
 import {
   useCard,
   useUpsertCard,
@@ -19,10 +21,13 @@ import type { SectionContent } from "@/modules/card/components/SectionEditor";
 const FALLBACK_PALETTE = { primary: "#4361ee", secondary: "#6b7280", accent: "#7c3aed", background: "#ffffff" };
 
 export function useCardBuilderState() {
-  const { data: card, isLoading: cardLoading } = useCard();
+  const [searchParams] = useSearchParams();
+  const activeCardId = searchParams.get("card");
+  const { data: card, isLoading: cardLoading } = useCard(activeCardId);
   const { data: profile } = useProfile();
   const { data: stylePack } = useStylePack(profile?.style_pack);
-  const upsertCard = useUpsertCard();
+  const upsertCard = useUpsertCard(activeCardId);
+
   const { generate, isGenerating, content: aiContent } = useGenerateCardContent();
   const qc = useQueryClient();
 
