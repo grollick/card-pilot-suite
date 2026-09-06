@@ -151,10 +151,10 @@ export function useStylePack(key: string | null | undefined) {
   });
 }
 
-// ── Public: Fetch card + profile by handle (parallelized for <500ms) ──
-export function usePublicCard(handle: string | undefined) {
+// ── Public: Fetch card + profile by handle (optionally a specific card slug) ──
+export function usePublicCard(handle: string | undefined, cardSlug?: string | null) {
   return useQuery({
-    queryKey: ["public-card", handle],
+    queryKey: ["public-card", handle, cardSlug ?? "primary"],
     enabled: !!handle,
     staleTime: 0,
     gcTime: 10 * 60 * 1000,
@@ -169,15 +169,26 @@ export function usePublicCard(handle: string | undefined) {
         .single();
       if (pErr) throw pErr;
 
+      const cardQuery = cardSlug
+        ? supabase
+            .from("cards")
+            .select("sections_json, theme_json, status, slug, label, company, profession_id")
+            .eq("user_id", profile.id)
+            .eq("slug", cardSlug)
+            .limit(1)
+            .maybeSingle()
+        : supabase
+            .from("cards")
+            .select("sections_json, theme_json, status, slug, label, company, profession_id")
+            .eq("user_id", profile.id)
+            .order("is_primary", { ascending: false })
+            .order("updated_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
       // Step 2: Fire all dependent queries in parallel
       const [cardResult, servicesResult, stylePackResult, dutyResult, recentViewsResult] = await Promise.all([
-        supabase
-          .from("cards")
-          .select("sections_json, theme_json, status")
-          .eq("user_id", profile.id)
-          .order("updated_at", { ascending: false })
-          .limit(1)
-          .maybeSingle(),
+        cardQuery,
         supabase
           .from("booking_services")
           .select("id, name, price, duration_min")
@@ -204,16 +215,32 @@ export function usePublicCard(handle: string | undefined) {
           .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
       ]);
 
+      const cardRow: any = cardResult.data;
+
+      // Per-card overrides: business name + profession
+      let professionOverride: { name: string; category: string | null } | null = null;
+      if (cardRow?.profession_id && cardRow.profession_id !== profile.profession_id) {
+        const { data: prof } = await supabase
+          .from("professions")
+          .select("name, category")
+          .eq("id", cardRow.profession_id)
+          .maybeSingle();
+        if (prof) professionOverride = prof as any;
+      }
+
       return {
         profile: {
           ...profile,
+          company: cardRow?.company || profile.company,
+          professions: professionOverride ?? profile.professions,
           is_on_duty: dutyResult.data?.is_on_duty ?? false,
         },
-        card: cardResult.data,
+        card: cardRow,
         stylePack: stylePackResult.data,
         services: servicesResult.data ?? [],
         recentViewCount: recentViewsResult.count ?? 0,
       };
+
     },
   });
 }
