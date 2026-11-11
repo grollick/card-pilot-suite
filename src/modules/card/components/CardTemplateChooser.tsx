@@ -154,7 +154,7 @@ const TEMPLATE_OPTIONS: TemplateOption[] = [
       { label: "Contact", height: 24 },
     ],
     ctaLabels: ["Get Started", "Call"],
-    sampleTagline: "Trusted by hundreds of local customers",
+    sampleTagline: "Quality work, fair prices",
     sampleReview: "Most professional service I've experienced.",
   },
 ];
@@ -562,7 +562,7 @@ export default function CardTemplateChooser({ onSelect, onSkip, professionName }
                   { icon: Zap, text: "Set up your card in under 30 seconds" },
                   { icon: Sparkles, text: "Professionally designed, conversion-optimized layouts" },
                   { icon: Star, text: "Premium style presets and design options" },
-                  { icon: Shield, text: "Trusted by thousands of local businesses" },
+                  { icon: Shield, text: "Built for local businesses" },
                 ].map(({ icon: BenefitIcon, text }) => (
                   <div key={text} className="flex items-start gap-3">
                     <div className="h-6 w-6 rounded-lg bg-primary/8 flex items-center justify-center shrink-0 mt-0.5">

@@ -36,7 +36,7 @@ export default function IndustryLandingPage() {
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={metaDesc} />
-        <link rel="canonical" href={`https://guzzl-pro.app/for/${page.slug}`} />
+        <link rel="canonical" href={`https://guzzl.pro/for/${page.slug}`} />
         <meta property="og:title" content={pageTitle} />
         <meta property="og:description" content={metaDesc} />
         <meta property="og:type" content="website" />
@@ -268,34 +268,6 @@ export default function IndustryLandingPage() {
           </section>
         )}
 
-        {/* ── Testimonials (from demo card) ── */}
-        {!page.socialProof && demo && demo.testimonials.length > 0 && (
-          <section className="max-w-5xl mx-auto px-4 py-16 md:py-20">
-            <motion.h2
-              initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}
-              className="text-2xl md:text-3xl font-bold text-center mb-3"
-            >
-              {page.testimonialIntro}
-            </motion.h2>
-            <p className="text-center text-muted-foreground mb-10">Real reviews from real clients.</p>
-            <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-              {demo.testimonials.map((t, i) => (
-                <motion.div
-                  key={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={i}
-                  className="bg-card rounded-xl border border-border/60 p-6"
-                >
-                  <div className="flex gap-0.5 mb-3">
-                    {Array.from({ length: t.rating }).map((_, j) => (
-                      <Star key={j} className="h-4 w-4 fill-primary text-primary" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-3">"{t.text}"</p>
-                  <p className="text-sm font-medium text-foreground">— {t.name}</p>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        )}
 
         {/* ── Demo Section ── */}
         {demo && page.demoSection && (
@@ -311,6 +283,7 @@ export default function IndustryLandingPage() {
                 </p>
 
                 {/* Mini card preview */}
+                <div className="flex justify-center mb-2"><Badge variant="outline" className="text-2xs uppercase tracking-wider">Example card</Badge></div>
                 <div className="max-w-sm mx-auto bg-card rounded-2xl border border-border/60 shadow-lg overflow-hidden mb-6">
                   <div className="p-5" style={{ borderTop: `4px solid ${demo.accentColor}` }}>
                     <div className="flex items-center gap-3 mb-2">
@@ -356,6 +329,7 @@ export default function IndustryLandingPage() {
             <p className="text-center text-muted-foreground mb-10 max-w-xl mx-auto">
               Here's a sample {page.profession.toLowerCase()} card built with guzzl.pro.
             </p>
+            <div className="flex justify-center mb-2"><Badge variant="outline" className="text-2xs uppercase tracking-wider">Example card</Badge></div>
             <motion.div
               initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={1}
               className="max-w-md mx-auto bg-card rounded-2xl border border-border/60 shadow-lg overflow-hidden"
@@ -437,7 +411,7 @@ export default function IndustryLandingPage() {
                 {page.finalCtaHeadline || `Ready to Grow Your ${page.profession} Business?`}
               </h2>
               <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
-                {page.finalCtaSubheadline || `Join thousands of ${page.profession.toLowerCase()}s who use guzzl.pro to capture more leads, book more jobs, and build a stronger reputation.`}
+                {page.finalCtaSubheadline || "Use guzzl.pro to capture more leads, book more jobs, and build a stronger reputation."}
               </p>
               <Button asChild size="lg" className="text-base px-10">
                 <Link to={authLink(page.slug)}>

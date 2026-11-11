@@ -323,7 +323,7 @@ export default function FirstFiveMinutes() {
                       <div className="flex items-center gap-2 justify-center">
                         <TrendingUp className="h-4 w-4 text-primary" />
                         <p className="text-sm font-medium text-foreground">
-                          Pros who respond in &lt;5 min win 3x more jobs
+                          Fast replies win more jobs
                         </p>
                       </div>
                     </div>

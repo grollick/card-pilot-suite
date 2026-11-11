@@ -1070,6 +1070,7 @@ export default function PublicCard() {
           {enabledSections.has("testimonials") && (() => {
             const testimonials = sectionContent("testimonials")?.testimonials as { name: string; text: string; role?: string }[] | undefined;
             const hasContent = testimonials && testimonials.length > 0;
+            if (!hasContent) return null;
 
             return (
               <div>

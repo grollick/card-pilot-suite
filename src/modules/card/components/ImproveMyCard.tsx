@@ -52,7 +52,7 @@ function analyzeCard(sections: CardSection[], profile: any, avatarUrl: string | 
     issues.push({
       id: "no-avatar",
       title: "Add a profile photo",
-      description: "Cards with photos get 3x more engagement. Upload a professional headshot.",
+      description: "Cards with photos get noticed more. Upload a professional headshot.",
       priority: "high",
       icon: Image,
     });

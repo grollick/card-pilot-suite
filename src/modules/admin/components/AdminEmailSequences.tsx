@@ -58,7 +58,7 @@ const PRESET_SEQUENCES = [
     description: "Push users to complete key actions",
     trigger: "incomplete_profile",
     steps: [
-      { subject: "Complete your profile, {{name}}", body: "Hey {{name}},\n\nYou're almost there! Complete your profile to unlock the full power of guzzl.pro.\n\nWhat to do:\n1. Add your business name\n2. Set your services and pricing\n3. Publish your card\n\nPros who complete their profile get 3x more leads. Let's go! 💪", delay: 48 },
+      { subject: "Complete your profile, {{name}}", body: "Hey {{name}},\n\nYou're almost there! Complete your profile to unlock the full power of guzzl.pro.\n\nWhat to do:\n1. Add your business name\n2. Set your services and pricing\n3. Publish your card\n\nA complete profile wins more leads. Let's go! 💪", delay: 48 },
       { subject: "Your card is waiting to be published", body: "Hey {{name}},\n\nYou signed up for guzzl.pro but haven't published your card yet.\n\nA published card means:\n✅ Clients can find and book you\n✅ Leads are captured automatically\n✅ You look professional online\n\nIt takes 30 seconds. Let's do this!", delay: 96 },
     ],
   },
@@ -77,7 +77,7 @@ const PRESET_SEQUENCES = [
     trigger: "lead_activity",
     steps: [
       { subject: "You're outgrowing the free plan, {{name}}", body: "Hey {{name}},\n\nGreat news — you're getting traction on guzzl.pro! 🎉\n\nBut with the free plan, you're limited on:\n• Number of contacts\n• Services you can offer\n• Advanced features\n\nUpgrade to Pro and unlock:\n✅ Unlimited contacts\n✅ Unlimited services\n✅ Estimates & invoicing\n✅ AI tools\n\nOne new job pays for your entire month. Worth it? We think so.", delay: 0 },
-      { subject: "Special: Upgrade to Pro today", body: "Hey {{name}},\n\nJust a friendly nudge — upgrading to Pro means you never hit a limit again.\n\nPro users close 3x more deals. The math speaks for itself.\n\n→ Upgrade now from your settings page.\n\nQuestions? Just reply to this email.", delay: 72 },
+      { subject: "Special: Upgrade to Pro today", body: "Hey {{name}},\n\nJust a friendly nudge — upgrading to Pro means you never hit a limit again.\n\n→ Upgrade now from your settings page.\n\nQuestions? Just reply to this email.", delay: 72 },
     ],
   },
   {

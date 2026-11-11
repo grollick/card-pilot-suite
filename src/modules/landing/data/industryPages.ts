@@ -93,11 +93,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       { title: "Scan Business Cards", icon: "📸", description: "Scan physical cards at job sites to add contacts instantly." },
       { title: "Stay Organized", icon: "📊", description: "Manage all your leads and jobs in one dashboard." },
     ],
-    socialProof: {
-      quote: "I shared my card and got 3 renovation leads in the first week.",
-      attribution: "Local Contractor",
-    },
-    testimonialIntro: "Contractors across the country trust guzzl.pro",
+    testimonialIntro: "Built for contractors",
     demoSection: {
       headline: "See a real contractor card",
       buttonText: "View Example Card",
@@ -169,11 +165,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       { title: "Stay Organized", icon: "📊", description: "Track appointments and clients easily." },
       { title: "Bring Clients Back", icon: "🔔", description: "Encourage repeat bookings and loyalty." },
     ],
-    socialProof: {
-      quote: "I added my link to Instagram and filled my week in 3 days.",
-      attribution: "Local Barber",
-    },
-    testimonialIntro: "Barbers are growing their clientele with guzzl.pro",
+    testimonialIntro: "Built for barbers",
     demoSection: {
       headline: "See a real barber card",
       buttonText: "View Example Barber Card",
@@ -245,11 +237,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       { title: "Scan Business Cards", icon: "📸", description: "Scan cards at open houses to instantly add contacts to your CRM." },
       { title: "Stay Organized", icon: "📊", description: "Track all leads and conversations." },
     ],
-    socialProof: {
-      quote: "I started getting more serious buyer inquiries within days.",
-      attribution: "Local Realtor",
-    },
-    testimonialIntro: "Top-producing agents choose guzzl.pro",
+    testimonialIntro: "Built for real estate agents",
     demoSection: {
       headline: "See a real realtor card",
       buttonText: "View Example Realtor Card",
@@ -301,7 +289,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       { title: "Client Testimonials", icon: "⭐", description: "Display glowing reviews from past clients to build trust." },
       { title: "Social Links", icon: "📱", description: "Connect your Instagram, TikTok, and portfolio site in one place." },
     ],
-    testimonialIntro: "Photographers are booking more sessions with guzzl.pro",
+    testimonialIntro: "Built for photographers",
     focusAreas: ["Portfolio", "Bookings", "Client Inquiries"],
   },
   landscapers: {
@@ -338,7 +326,7 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
       { title: "Maintenance Plans", icon: "📆", description: "Display recurring plan options to lock in steady monthly revenue." },
       { title: "Review Collection", icon: "⭐", description: "Automatically request reviews after completing a landscaping project." },
     ],
-    testimonialIntro: "Landscapers are growing faster with guzzl.pro",
+    testimonialIntro: "Built for landscapers",
     focusAreas: ["Before/After Projects", "Quote Requests", "Seasonal Promotions"],
   },
 };

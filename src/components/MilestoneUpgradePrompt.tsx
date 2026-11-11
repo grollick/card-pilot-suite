@@ -21,7 +21,6 @@ const milestoneContent = {
     title: "You got your first lead! 🎉",
     description: "Your guzzl.pro card is working. Imagine what happens when you add automated follow-ups — never let a lead go cold again.",
     ctaText: "Unlock Automated Follow-ups",
-    stat: "Pro users convert 3x more leads with automation",
   },
   first_booking: {
     icon: TrendingUp,
@@ -50,10 +49,12 @@ export default function MilestoneUpgradePrompt({ milestone, open, onOpenChange }
         </DialogHeader>
 
         {/* ROI indicator */}
-        <div className="flex items-center gap-2 rounded-lg bg-success/5 border border-success/20 px-4 py-2.5 mx-auto mt-2">
-          <Sparkles className="h-4 w-4 text-success shrink-0" />
-          <span className="text-xs font-medium text-success">{content.stat}</span>
-        </div>
+        {"stat" in content && content.stat && (
+          <div className="flex items-center gap-2 rounded-lg bg-success/5 border border-success/20 px-4 py-2.5 mx-auto mt-2">
+            <Sparkles className="h-4 w-4 text-success shrink-0" />
+            <span className="text-xs font-medium text-success">{content.stat}</span>
+          </div>
+        )}
 
         <div className="flex flex-col gap-2 mt-4">
           <Link to="/pricing">

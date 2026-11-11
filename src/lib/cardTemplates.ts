@@ -129,7 +129,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       showTestimonials: true,
     },
     preview: {
-      tagline: "Trusted by hundreds of local customers",
+      tagline: "Quality work, fair prices",
       sampleServices: ["Free Consultation", "Custom Solutions", "Priority Support"],
       sampleReview: "Hands down the most professional service I've experienced. Will absolutely hire again.",
     },

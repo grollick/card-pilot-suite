@@ -258,7 +258,7 @@ export default function Onboarding() {
             return { ...sec, content: { items: aiServices && aiServices.length > 0 ? aiServices : profDefaults.services } };
           }
           case "testimonials":
-            return { ...sec, content: { testimonials: profDefaults.testimonials } };
+            return { ...sec, content: { testimonials: [] } };
           case "contact":
             return { ...sec, content: { heading: "Get in Touch", description: `Ready to work with ${company || "us"}? Send a message and we'll get back to you quickly.` } };
           case "booking":

@@ -15,7 +15,7 @@ const PLAYBOOKS: Playbook[] = [
     profession: "Contractor",
     icon: Wrench,
     steps: [
-      { title: "Set up your digital card", description: "Add your services, coverage area, photos of past work, and contact info. A complete card gets 3x more leads." },
+      { title: "Set up your digital card", description: "Add your services, coverage area, photos of past work, and contact info. A complete card wins more leads." },
       { title: "Add your services & pricing", description: "List at least 3 services with clear pricing. Customers prefer transparent pricing — it builds trust instantly." },
       { title: "Enable online booking", description: "Turn on availability and let customers book estimates directly. This eliminates back-and-forth scheduling." },
       { title: "Share your card link", description: "Add your card link to Google Business, social media bios, and email signatures. Every touchpoint is a lead opportunity." },

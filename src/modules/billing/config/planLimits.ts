@@ -161,7 +161,7 @@ export const UPGRADE_SCENARIOS: Record<UpgradeTrigger, UpgradeScenario> = {
     bullets: [
       "Appear first in marketplace search results",
       "Premium badge builds instant trust",
-      "Featured providers get 3x more leads on average",
+      "Featured providers show up first in search",
     ],
     suggestedPlan: "growth",
   },

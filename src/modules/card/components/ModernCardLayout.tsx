@@ -456,11 +456,11 @@ export default function ModernCardLayout({
         )}
 
         {/* Testimonials */}
-        {enabledSections.has("testimonials") && (
+        {enabledSections.has("testimonials") && testimonials && testimonials.length > 0 && (
           <motion.section initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={stagger} className="mx-4 mt-6">
             <h2 className="text-lg font-bold text-foreground mb-3">Testimonials</h2>
             <div className="space-y-3">
-              {(testimonials && testimonials.length > 0 ? testimonials : [{ name: "Happy Client", text: "Absolutely amazing experience. Highly recommend!", role: "" }]).map((t, i) => (
+              {testimonials.map((t, i) => (
                 <motion.div key={i} variants={fade} className="rounded-xl border border-border bg-card p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex gap-0.5">
