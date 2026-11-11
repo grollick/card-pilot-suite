@@ -279,6 +279,7 @@ export default function PublicCard() {
   const sections: CardSection[] =
     card && Array.isArray(card.sections_json) ? (card.sections_json as unknown as CardSection[]) : [];
   const enabledSections = new Set(sections.filter((s) => s.enabled).map((s) => s.id));
+  if (!data?.hasAvailability) enabledSections.delete("booking");
   const sectionContent = (id: string) => sections.find((s) => s.id === id)?.content as Record<string, any> | undefined;
   const professionName = (profile as any)?.professions?.name ?? "Professional";
   const cardUrl = `${window.location.origin}/${handle}`;
@@ -306,7 +307,7 @@ export default function PublicCard() {
           .filter(c => c !== (profile.primary_cta ?? "call"))
           .map(c => ({ id: c, label: CTA_TYPES.find(ct => ct.value === c)?.label ?? c, enabled: true, isPrimary: false })),
       ];
-  const enabledCtas = ctaConfig.filter(c => c.enabled);
+  const enabledCtas = ctaConfig.filter(c => c.enabled && (c.id !== "book" || data?.hasAvailability));
   const primaryCtaItem = enabledCtas.find(c => c.isPrimary) || enabledCtas[0];
   const secondaryCtaItems = enabledCtas.filter(c => c !== primaryCtaItem);
   const primaryCta = primaryCtaItem?.id ?? "call";
@@ -362,7 +363,7 @@ export default function PublicCard() {
     try {
       const visitorMeta = getVisitorMeta();
 
-      const result = await captureLead({
+      await captureLead({
         ownerId: profile.id,
         name: formData.name,
         email: formData.email || null,
@@ -374,90 +375,6 @@ export default function PublicCard() {
         handle: handle ?? null,
         metaJson: visitorMeta,
       });
-
-      const leadId = result?.lead_id;
-      const existingLead = result?.is_existing;
-
-      // Notify card owner via email (fire-and-forget)
-      if (profile.email) {
-        supabase.functions.invoke("send-email", {
-          body: {
-            to: profile.email,
-            subject: existingLead
-              ? `Returning lead: ${formData.name}`
-              : `New lead captured: ${formData.name}`,
-            html: `
-              <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;">
-                <h2 style="color:#4361ee;margin:0 0 16px;">${existingLead ? "Returning Contact" : "New Lead"} from Your Card</h2>
-                <p style="color:#374151;margin:0 0 12px;">${existingLead ? "A returning contact" : "Someone new"} just submitted the contact form on your digital card.</p>
-                <table style="width:100%;border-collapse:collapse;margin:16px 0;">
-                  <tr><td style="padding:8px 0;color:#6b7280;width:90px;">Name</td><td style="padding:8px 0;color:#111827;font-weight:600;">${formData.name}</td></tr>
-                  ${formData.email ? `<tr><td style="padding:8px 0;color:#6b7280;">Email</td><td style="padding:8px 0;color:#111827;">${formData.email}</td></tr>` : ""}
-                  ${formData.phone ? `<tr><td style="padding:8px 0;color:#6b7280;">Phone</td><td style="padding:8px 0;color:#111827;">${formData.phone}</td></tr>` : ""}
-                  ${formData.message ? `<tr><td style="padding:8px 0;color:#6b7280;">Message</td><td style="padding:8px 0;color:#111827;">${formData.message}</td></tr>` : ""}
-                </table>
-                <a href="${window.location.origin}/app/contacts" style="display:inline-block;padding:10px 20px;background:#4361ee;color:#fff;border-radius:6px;text-decoration:none;font-weight:600;margin-top:8px;">View in CRM</a>
-                <p style="color:#9ca3af;font-size:12px;margin:24px 0 0;">guzzl.pro — Your digital business card platform</p>
-              </div>
-            `,
-            email_type: "custom",
-            lead_id: leadId,
-          },
-        }).catch(() => {}); // fire-and-forget
-      }
-
-      // Schedule automated follow-up sequence (fire-and-forget)
-      if (leadId && formData.email) {
-        supabase
-          .from("profiles")
-          .select("followup_enabled")
-          .eq("id", profile.id)
-          .single()
-          .then(({ data: ownerProfile }) => {
-            if (!ownerProfile?.followup_enabled) return;
-            // Fetch all enabled sequence steps
-            supabase
-              .from("followup_steps")
-              .select("id, step_number, delay_minutes")
-              .eq("user_id", profile.id)
-              .eq("enabled", true)
-              .order("step_number", { ascending: true })
-              .then(({ data: steps }) => {
-                if (!steps || steps.length === 0) {
-                  // Fallback: use legacy single-step from profile
-                  supabase.from("profiles")
-                    .select("followup_delay_minutes")
-                    .eq("id", profile.id)
-                    .single()
-                    .then(({ data: p }) => {
-                      const delayMs = ((p as any)?.followup_delay_minutes || 120) * 60 * 1000;
-                      supabase.from("scheduled_followups").insert({
-                        user_id: profile.id,
-                        lead_id: leadId,
-                        trigger_type: "form_submit",
-                        recipient_name: formData.name,
-                        recipient_email: formData.email,
-                        send_at: new Date(Date.now() + delayMs).toISOString(),
-                        step_number: 1,
-                      } as any).then();
-                    });
-                  return;
-                }
-                // Schedule each step
-                const inserts = steps.map((step: any) => ({
-                  user_id: profile.id,
-                  lead_id: leadId,
-                  trigger_type: "form_submit",
-                  recipient_name: formData.name,
-                  recipient_email: formData.email,
-                  send_at: new Date(Date.now() + step.delay_minutes * 60 * 1000).toISOString(),
-                  step_id: step.id,
-                  step_number: step.step_number,
-                }));
-                supabase.from("scheduled_followups").insert(inserts as any).then();
-              });
-          });
-      }
 
       setFormSent(true);
     } catch {

@@ -5,8 +5,6 @@ import { useNavigate } from "react-router-dom";
 import {
   assessSignupRisk,
   recordSignupAttempt,
-  generateFingerprint,
-  getEmailDomain,
 } from "@/utils/antiAbuse";
 
 interface AuthContextType {
@@ -45,23 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = useCallback(async (email: string, password: string, name?: string, referralCode?: string) => {
     // Anti-abuse checks
     const risk = assessSignupRisk(email);
-    const fingerprint = generateFingerprint();
-    const domain = getEmailDomain(email);
 
     // Record attempt for rate limiting
     recordSignupAttempt();
 
-    // Log abuse attempt (fire-and-forget, non-blocking)
-    const ipHash = fingerprint; // Use fingerprint as proxy for IP in client-side
-    supabase.from("signup_abuse_log").insert({
-      ip_hash: ipHash,
-      email_domain: domain,
-      fingerprint_hash: fingerprint,
-      email,
-      risk_level: risk.level,
-      flags: risk.flags,
-      blocked: risk.blocked,
-    }).then(() => {});
+    // Abuse records are server-only. Keep local rate limiting without making
+    // an anonymous write that is guaranteed to fail its security policy.
 
     // Block high-risk signups
     if (risk.blocked) {

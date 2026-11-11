@@ -308,7 +308,7 @@ export default function ModernCardLayout({
               else handleCtaClick("quote");
             }},
             { icon: Download, label: "Save", color: "hsl(262, 83%, 58%)", onClick: onDownloadVCard },
-          ].map((cta) => (
+          ].filter(cta => cta.label !== "Book" || enabledSections.has("booking")).map((cta) => (
             <motion.button
               key={cta.label}
               variants={fade}

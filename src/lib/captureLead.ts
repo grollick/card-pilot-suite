@@ -25,17 +25,8 @@ interface CaptureLeadResult {
  * activity logging, analytics events, and daily_metrics updates.
  */
 export async function captureLead(params: CaptureLeadParams): Promise<CaptureLeadResult | null> {
-  const { data, error } = await supabase.rpc("capture_lead", {
-    p_owner_id: params.ownerId,
-    p_name: params.name,
-    p_email: params.email || null,
-    p_phone: params.phone || null,
-    p_source: params.source ?? "card_form",
-    p_activity_type: params.activityType ?? "form_submitted",
-    p_activity_title: params.activityTitle ?? "Contact form submitted",
-    p_activity_description: params.activityDescription ?? null,
-    p_meta_json: (params.metaJson ?? {}) as unknown as Record<string, string>,
-    p_handle: params.handle ?? null,
+  const { data, error } = await supabase.functions.invoke("create-booking", {
+    body: { action: "capture_lead", ...params, email: params.email || null, phone: params.phone || null },
   });
 
   if (error) {

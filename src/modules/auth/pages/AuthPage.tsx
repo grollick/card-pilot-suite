@@ -27,6 +27,7 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -38,28 +39,27 @@ export default function Auth() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    let result;
-    if (mode === "signup") {
-      result = await signUp(email, password, undefined, refCode || undefined);
-      if (!result.error) {
+    setFormError(null);
+    try {
+      const result = mode === "signup"
+        ? await signUp(email, password, undefined, refCode || undefined)
+        : await signIn(email, password);
+      if (result.error) {
+        setFormError(mode === "signup"
+          ? "We couldn't create your account. Please try again."
+          : "We couldn't sign you in. Check your email and password and try again.");
+      } else if (mode === "signup") {
         setSignupSuccess(true);
-        setLoading(false);
-        return;
-      }
-    } else {
-      result = await signIn(email, password);
-      if (!result.error) {
+      } else {
         navigate("/app");
-        setLoading(false);
-        return;
       }
+    } catch {
+      setFormError(mode === "signup"
+        ? "We couldn't create your account. Please try again."
+        : "We couldn't sign you in. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    if (result?.error) {
-      toast({ title: "Error", description: result.error.message, variant: "destructive" });
-    }
-    setLoading(false);
   };
 
   const handleGoogleSignIn = async () => {
@@ -213,6 +213,7 @@ export default function Auth() {
 
               {/* Form — email + password only */}
               <form onSubmit={handleSubmit} className="space-y-4">
+                {formError && <p role="alert" className="text-sm text-destructive">{formError}</p>}
                 <div className="relative">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
+import { captureLead } from "@/lib/captureLead";
 import type { OnDutyProfessional } from "@/hooks/useOnDutyMap";
 import { Loader2, CheckCircle2, AlertCircle, Users, Clock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -40,24 +41,22 @@ export default function QuickQuoteForm({ professional, onSuccess }: Props) {
     setSubmitting(true);
     try {
       // 1. Create CRM lead for this specific professional
-      const { error: rpcError } = await supabase.rpc("capture_lead", {
-        p_owner_id: professional.id,
-        p_name: name.trim(),
-        p_email: email.trim() || null,
-        p_phone: phone.trim() || null,
-        p_source: "marketplace",
-        p_activity_type: "quote_requested",
-        p_activity_title: `Quote request from map — ${name.trim()}`,
-        p_activity_description: details.trim(),
-        p_meta_json: {
+      await captureLead({
+        ownerId: professional.id,
+        name: name.trim(),
+        email: email.trim() || null,
+        phone: phone.trim() || null,
+        source: "marketplace",
+        activityType: "quote_requested",
+        activityTitle: `Quote request from map — ${name.trim()}`,
+        activityDescription: details.trim(),
+        metaJson: {
           from_map: true,
           profession: professional.profession_name,
           requester_details: details.trim(),
         },
-        p_handle: professional.handle,
+        handle: professional.handle,
       });
-
-      if (rpcError) throw rpcError;
 
       // 2. Also create an estimate_request and trigger auto-matching
       // to find additional nearby professionals

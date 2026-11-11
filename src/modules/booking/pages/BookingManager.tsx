@@ -66,6 +66,7 @@ export default function BookingManager() {
 
   // Availability editing
   const [editingAvail, setEditingAvail] = useState(false);
+  const [activeTab, setActiveTab] = useState("bookings");
   const [availDays, setAvailDays] = useState<Record<number, { enabled: boolean; start: string; end: string }>>({});
 
   // Init availability state from DB
@@ -218,7 +219,15 @@ export default function BookingManager() {
         </Dialog>
       </div>
 
-      <Tabs defaultValue="bookings">
+      {services.length > 0 && availability.length === 0 && (
+        <div className="flex items-center justify-between gap-3 flex-wrap border-l-2 border-primary pl-4">
+          <p className="text-sm font-medium">Set your hours so customers can book you</p>
+          <Button variant="outline" onClick={() => { setActiveTab("availability"); setEditingAvail(true); }}>
+            <Clock className="h-4 w-4 mr-2" /> Set your hours
+          </Button>
+        </div>
+      )}
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="bookings">Bookings ({bookings.length})</TabsTrigger>
           <TabsTrigger value="services">Services ({services.length})</TabsTrigger>

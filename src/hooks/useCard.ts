@@ -187,7 +187,7 @@ export function usePublicCard(handle: string | undefined, cardSlug?: string | nu
             .maybeSingle();
 
       // Step 2: Fire all dependent queries in parallel
-      const [cardResult, servicesResult, stylePackResult, dutyResult, recentViewsResult] = await Promise.all([
+      const [cardResult, servicesResult, stylePackResult, dutyResult, recentViewsResult, availabilityResult] = await Promise.all([
         cardQuery,
         supabase
           .from("booking_services")
@@ -213,6 +213,7 @@ export function usePublicCard(handle: string | undefined, cardSlug?: string | nu
           .eq("handle", handle!)
           .eq("event_type", "card_view")
           .gte("created_at", new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
+        supabase.rpc("get_availability_by_user", { p_user_id: profile.id }),
       ]);
 
       const cardRow: any = cardResult.data;
@@ -238,6 +239,7 @@ export function usePublicCard(handle: string | undefined, cardSlug?: string | nu
         card: cardRow,
         stylePack: stylePackResult.data,
         services: servicesResult.data ?? [],
+        hasAvailability: !availabilityResult.error && (availabilityResult.data?.length ?? 0) > 0,
         recentViewCount: recentViewsResult.count ?? 0,
       };
 

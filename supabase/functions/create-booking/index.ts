@@ -1,5 +1,21 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { z } from "npm:zod@3";
+import { notifyLeadOwner } from "./lead-notification.ts";
+
+const LeadSchema = z.object({
+  action: z.literal("capture_lead"),
+  ownerId: z.string().uuid(),
+  handle: z.string().max(100).nullish(),
+  name: z.string().trim().min(1).max(200),
+  email: z.string().email().max(255).nullish(),
+  phone: z.string().max(50).nullish(),
+  source: z.enum(["card_form", "business_card", "marketplace", "manual", "booking"]).default("card_form"),
+  activityType: z.enum(["form_submitted", "quote_requested", "card_scanned"]).default("form_submitted"),
+  activityTitle: z.string().max(300).default("Contact form submitted"),
+  activityDescription: z.string().max(10000).nullish(),
+  metaJson: z.record(z.unknown()).default({}),
+});
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,6 +29,29 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
+    if (body.action === "capture_lead") {
+      const parsed = LeadSchema.safeParse(body);
+      if (!parsed.success) return new Response(JSON.stringify({ error: "Please check your contact details." }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+      const input = parsed.data;
+      const client = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+      // Resolve the destination independently; callers cannot choose the email recipient.
+      const { data: owner } = await client.from("profiles").select("id,handle").eq("id", input.ownerId).single();
+      if (!owner || (input.handle && input.handle !== owner.handle)) return new Response(JSON.stringify({ error: "Card not found" }), {
+        status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+      const { data: result, error } = await client.rpc("capture_lead", {
+        p_owner_id: owner.id, p_name: input.name, p_email: input.email || null, p_phone: input.phone || null,
+        p_source: input.source, p_activity_type: input.activityType, p_activity_title: input.activityTitle,
+        p_activity_description: input.activityDescription || null, p_meta_json: input.metaJson, p_handle: owner.handle,
+      });
+      if (error || !result?.lead_id) return new Response(JSON.stringify({ error: "We couldn't save your message. Please try again." }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+      await notifyLeadOwner(client, result.lead_id, crypto.randomUUID(), input.activityTitle, input.activityDescription);
+      return new Response(JSON.stringify(result), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
     const {
       handle,
       service_id,
@@ -143,6 +182,9 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const { data: linkedBooking } = await supabase.from("bookings").select("lead_id").eq("id", bookingId).single();
+    if (linkedBooking?.lead_id) await notifyLeadOwner(supabase, linkedBooking.lead_id, bookingId, "New booking request", notes || null);
 
     // ── Send booking confirmation email (fire-and-forget) ──
     if (customer_email) {
