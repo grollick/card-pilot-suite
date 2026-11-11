@@ -614,7 +614,7 @@ export const DEMO_CARDS: AnimatedBusinessCardProps[] = [
     name: "Rachel Torres",
     business: "Torres Electric Co.",
     location: "Houston, TX",
-    tagline: "Licensed, insured & always on time",
+    tagline: "Reliable work, always on time",
     rating: 5.0,
     reviewCount: 61,
     photoUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&h=200&fit=crop&crop=face&q=80",

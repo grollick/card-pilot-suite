@@ -296,7 +296,7 @@ export const CARD_TEMPLATES: CardTemplate[] = [
       showTestimonials: true,
     },
     preview: {
-      tagline: "Licensed, insured, and ready to build",
+      tagline: "Built right, on time, on budget",
       sampleServices: ["Kitchen Renovation", "Basement Finishing", "Custom Deck Build"],
       sampleReview: "Incredible attention to detail. Project came in on time and under budget. Already planning our next one.",
     },

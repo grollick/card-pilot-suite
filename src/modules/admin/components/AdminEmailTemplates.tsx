@@ -160,7 +160,7 @@ const COLD_TEMPLATES: ColdTemplate[] = [
     { name: "Portfolio Pitch", subject: "Need stunning photos? Let's talk", body: "Hi {{name}},\n\nGreat photos tell your story better than words ever could.\n\nI'm {{user_name}}, a professional photographer specializing in {{specialty}}. I'm offering a limited number of sessions this month at a special rate.\n\nWant to see my portfolio?\n\n{{user_name}}" },
   ]},
   { profession: "Videographer", category: "Creative & Media", templates: [
-    { name: "Video Content Pitch", subject: "Video is the #1 way to grow your brand", body: "Hi {{name}},\n\nBusinesses using video grow revenue 49% faster. If you're not using video yet, you're leaving money on the table.\n\nI create professional brand videos, social content, and event coverage. Let's chat about what video could do for {{company}}.\n\n{{user_name}}" },
+    { name: "Video Content Pitch", subject: "Video is the #1 way to grow your brand", body: "Hi {{name}},\n\nVideo helps people get to know your business. If you're not using video yet, you're leaving money on the table.\n\nI create professional brand videos, social content, and event coverage. Let's chat about what video could do for {{company}}.\n\n{{user_name}}" },
   ]},
   { profession: "Graphic Designer", category: "Creative & Media", templates: [
     { name: "Brand Refresh", subject: "Is your brand saying what you want it to?", body: "Hi {{name}},\n\nYour brand is your first impression — and it happens in seconds.\n\nI help businesses create memorable, professional visual identities. From logos to full brand systems, I'd love to show you what's possible.\n\nFree 30-minute consultation.\n\n{{user_name}}" },
@@ -189,7 +189,7 @@ const COLD_TEMPLATES: ColdTemplate[] = [
 
   // AUTOMOTIVE
   { profession: "Auto Mechanic", category: "Automotive", templates: [
-    { name: "New Customer Intro", subject: "Tired of overpaying at the dealership?", body: "Hi {{name}},\n\nDealership prices are 30-50% higher than independent shops — for the exact same work.\n\nI'm a certified mechanic offering honest, transparent pricing. First-time customers get a free diagnostic.\n\n{{user_name}}" },
+    { name: "New Customer Intro", subject: "Tired of overpaying at the dealership?", body: "Hi {{name}},\n\nDealerships often charge more than independent shops for the same work.\n\nI'm a certified mechanic offering honest, transparent pricing. First-time customers get a free diagnostic.\n\n{{user_name}}" },
   ]},
   { profession: "Auto Detailer", category: "Automotive", templates: [
     { name: "Detail Special", subject: "Your car deserves a spa day", body: "Hi {{name}},\n\nA professional detail doesn't just make your car look amazing — it protects your investment.\n\nI'm offering 20% off full details this month. Mobile service available — I come to you!\n\n{{user_name}}" },

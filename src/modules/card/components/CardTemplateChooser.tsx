@@ -45,7 +45,7 @@ const TEMPLATE_OPTIONS: TemplateOption[] = [
       { label: "Get a Quote", height: 20 },
     ],
     ctaLabels: ["Call Now", "Get Quote"],
-    sampleTagline: "Licensed, insured, and ready to build",
+    sampleTagline: "Built right, on time, on budget",
     sampleReview: "Incredible attention to detail. On time and under budget.",
     premium: true,
   },

@@ -68,7 +68,7 @@ const STEP = {
   }),
   image: (o = 3): ChecklistStepTemplate => ({
     key: "image", label: "Upload a photo or logo", group: "setup", order: o,
-    tip: "Cards with images get 3× more engagement. Add a profile photo or work sample.",
+    tip: "Cards with photos get noticed more. Add a profile photo or work sample.",
     route: "/app/card", icon: Image, signal: "has_image",
   }),
   estimate: (o = 4): ChecklistStepTemplate => ({
@@ -124,7 +124,7 @@ const contractorChecklist: ProfessionChecklist = {
   id: "contractor",
   label: "Contractor",
   headline: "Get Your First Job",
-  subheadline: "Complete these steps to land your first job within 48 hours.",
+  subheadline: "Complete these steps to start landing jobs.",
   steps: [
     STEP.card(1),
     STEP.services(2),
@@ -185,7 +185,7 @@ const defaultChecklist: ProfessionChecklist = {
   id: "default",
   label: "Professional",
   headline: "Get Your First Lead",
-  subheadline: "Complete these steps to start getting leads within 48 hours.",
+  subheadline: "Complete these steps to start getting leads.",
   steps: [
     STEP.card(1),
     STEP.services(2),

@@ -60,7 +60,7 @@ function UpgradeDriver({ plan, roi }: { plan: string; roi: AIRoiData }) {
         {hasConversions
           ? `AI helped convert ${roi.ai_assisted_bookings_month} booking${roi.ai_assisted_bookings_month !== 1 ? "s" : ""} this month — upgrade to keep growing.`
           : plan === "free"
-            ? "Pro providers respond 3× faster and convert more leads with AI."
+            ? "Pro providers reply faster with AI and win more jobs."
             : "Growth plan unlocks advanced insights and unlimited AI assists."}
       </p>
       <Button size="sm" onClick={() => navigate("/pricing")} className="gap-1">

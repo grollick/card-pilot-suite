@@ -41,7 +41,7 @@ export default function ShareCtaWidget({ views = 0, onShare }: ShareCtaWidgetPro
       <div className="mt-4 flex items-start gap-2 p-3 rounded-lg bg-background/60 border border-border">
         <Lightbulb className="h-4 w-4 text-warning mt-0.5 flex-shrink-0" />
         <p className="text-xs text-muted-foreground">
-          <span className="font-medium text-foreground">Pro tip:</span> Providers who share their card within 24 hours get their first lead 3× faster.
+          <span className="font-medium text-foreground">Pro tip:</span> Share your card today. The sooner you share, the sooner leads come in.
         </p>
       </div>
     </motion.div>

@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
                     <li><strong>Add it</strong> to your social media bio</li>
                   </ol>
                   <p style="color: #555; line-height: 1.6;">
-                    Most guzzl.pro users get their first lead within 48 hours of sharing. You're almost there!
+                    The more you share your card, the sooner leads come in. You're almost there!
                   </p>
                   <a href="https://guzzl.pro/app" 
                      style="display: inline-block; background: #6366f1; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin-top: 12px;">

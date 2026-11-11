@@ -207,7 +207,7 @@ serve(async (req) => {
     const qualityLabel = qualityTier === "high" ? "⭐ High-quality lead" : qualityTier === "medium" ? "✅ Good lead" : "📋 New lead";
     const urgencyNote = qualityTier === "high"
       ? "This is a high-value lead — respond within 30 minutes for best results!"
-      : "Respond quickly — leads who hear back within 1 hour are 7x more likely to convert.";
+      : "Respond quickly — fast replies win more jobs.";
 
     for (const business of finalMatches) {
       const { data: leadResult } = await supabase.rpc("capture_lead", {

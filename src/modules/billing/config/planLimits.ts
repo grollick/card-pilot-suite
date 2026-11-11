@@ -185,7 +185,7 @@ export const UPGRADE_SCENARIOS: Record<UpgradeTrigger, UpgradeScenario> = {
     bullets: [
       "Send automated review requests after jobs",
       "Display verified reviews on your profile",
-      "Businesses with 5+ reviews get 2x more bookings",
+      "Reviews help customers choose you",
     ],
     suggestedPlan: "pro",
   },

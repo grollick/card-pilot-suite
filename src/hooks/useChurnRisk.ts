@@ -114,7 +114,7 @@ export function useChurnRisk(): ChurnRiskData & { isLoading: boolean } {
       recoveryMessage = "You're one step away from your first lead. Finish your setup to start getting customers.";
       recoveryAction = { label: "Continue Setup", route: "/app/card" };
     } else if (!hasLeads) {
-      recoveryMessage = "Your card is ready — share it to get your first lead. Most users see results within 48 hours.";
+      recoveryMessage = "Your card is ready — share it to get your first lead. The more you share it, the sooner leads come in.";
       recoveryAction = { label: "Share Your Card", route: "/app/card/qr" };
     } else if (!hasBookings) {
       recoveryMessage = "You have leads waiting! Follow up to book your first customer.";

@@ -149,7 +149,7 @@ export default function StepSocialLinks({ onNext, onBack }: Props) {
       {/* Benefit message */}
       <div className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/10 px-3 py-2">
         <Sparkles className="h-4 w-4 text-primary shrink-0" />
-        <p className="text-xs text-primary/80">Profiles with social links get 2× more views</p>
+        <p className="text-xs text-primary/80">Social links help customers trust you</p>
       </div>
 
       {/* Actions */}

@@ -27,7 +27,7 @@ export default function ConversionTips({ sections }: ConversionTipsProps) {
       id: "testimonials",
       icon: Star,
       title: "Add testimonials",
-      description: "Cards with reviews get 3× more leads",
+      description: "Reviews help customers choose you",
       action: "Add section",
       present: hasSection("testimonials"),
     },

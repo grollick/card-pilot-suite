@@ -56,7 +56,7 @@ serve(async (req) => {
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
                   <h2 style="color: #1a1a1a;">Don't miss this lead!</h2>
                   <p>${quoteReq?.customer_name || "A potential customer"} requested a quote${quoteReq?.service_needed ? ` for <strong>${quoteReq.service_needed}</strong>` : ""} 1 hour ago and hasn't heard back yet.</p>
-                  <p style="color: #666;">Businesses that respond within 1 hour are <strong>7x more likely</strong> to win the job.</p>
+                  <p style="color: #666;"><strong>Fast replies win more jobs.</strong> Reach out while they are still deciding.</p>
                   <p><a href="https://guzzl.pro/app/contacts" style="background: #f59e0b; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">Respond Now</a></p>
                 </div>
               `,

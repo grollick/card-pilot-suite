@@ -179,7 +179,7 @@ export default function ProviderDashboard() {
         {plan.plan_name !== "growth" && (
           <div className="mt-3 p-3 rounded-lg bg-muted/50">
             <p className="text-xs text-muted-foreground">
-              Growth plan providers see <span className="font-medium text-foreground">40% more clicks</span> with the Premium badge.
+              The <span className="font-medium text-foreground">Premium badge</span> helps your listing stand out on the Growth plan.
             </p>
           </div>
         )}
@@ -196,7 +196,7 @@ export default function ProviderDashboard() {
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">Appear higher in search</p>
-            <p className="text-xs text-muted-foreground">Featured placement drives 3× more leads</p>
+            <p className="text-xs text-muted-foreground">Featured placement puts you first in search</p>
           </div>
           <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
         </button>

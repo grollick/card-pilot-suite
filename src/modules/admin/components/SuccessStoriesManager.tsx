@@ -83,7 +83,7 @@ export default function SuccessStoriesManager() {
                 <Input placeholder="User name" value={form.user_name} onChange={(e) => setForm((f) => ({ ...f, user_name: e.target.value }))} />
                 <Input placeholder="Business type" value={form.business_type} onChange={(e) => setForm((f) => ({ ...f, business_type: e.target.value }))} />
               </div>
-              <Input placeholder="Result (e.g., 40% more leads)" value={form.result_text} onChange={(e) => setForm((f) => ({ ...f, result_text: e.target.value }))} />
+              <Input placeholder="Result (e.g. Booked 3 new jobs in the first month)" value={form.result_text} onChange={(e) => setForm((f) => ({ ...f, result_text: e.target.value }))} />
               <Input placeholder="Timeframe (e.g., first month)" value={form.timeframe} onChange={(e) => setForm((f) => ({ ...f, timeframe: e.target.value }))} />
               <Textarea placeholder="Quote from user" value={form.quote} onChange={(e) => setForm((f) => ({ ...f, quote: e.target.value }))} rows={2} />
               <div className="grid grid-cols-2 gap-3">

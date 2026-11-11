@@ -97,7 +97,7 @@ export default function StepBookingSetup({ bookingEnabled, onToggleBooking, onNe
       {/* Social proof */}
       <div className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/10 px-3 py-2">
         <Sparkles className="h-4 w-4 text-primary shrink-0" />
-        <p className="text-xs text-primary/80">Pros with booking enabled get 3× more conversions</p>
+        <p className="text-xs text-primary/80">Online booking makes it easy to hire you</p>
       </div>
 
       <div className="flex gap-2">

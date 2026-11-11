@@ -35,7 +35,7 @@ export function useAhaMoments() {
         id: "share-card",
         title: "Share your card to get your first lead",
         description:
-          "Your card is live! Send it to 5 people via text or email — most users get a lead within 24 hours.",
+          "Your card is live! Send it to 5 people via text or email — the more you share, the sooner leads come in.",
         actionLabel: "Share Now",
         route: "/app/card/qr",
         icon: Share2,

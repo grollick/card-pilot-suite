@@ -72,7 +72,7 @@ export default function SecondSessionBanner() {
   // Daily tip (simple rotation)
   const dailyTip = useMemo(() => {
     const tips = [
-      "Respond to leads within 5 minutes to win 3× more jobs.",
+      "Reply to leads fast. Fast replies win more jobs.",
       "Share your card link on social media to attract new customers.",
       "Stay on duty during peak hours for the best opportunities.",
       "Complete your profile to rank higher in the marketplace.",

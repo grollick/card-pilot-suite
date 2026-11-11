@@ -36,7 +36,7 @@ export default function BuilderAISuggestions({ sections, cardStatus, sectionCoun
       id: "testimonials",
       icon: Star,
       title: "Add testimonials",
-      description: "Cards with reviews convert 3× more visitors into leads.",
+      description: "Reviews help visitors trust you and reach out.",
       priority: "high",
       applicable: !hasSection("testimonials"),
     },
