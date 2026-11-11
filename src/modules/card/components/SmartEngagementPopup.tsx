@@ -8,6 +8,7 @@ interface SmartEngagementPopupProps {
   palette: { primary: string; secondary: string; background: string };
   fonts: { primary: string; secondary: string };
   delaySeconds?: number;
+  canBook?: boolean;
   onAction: (action: "quote" | "book" | "ask") => void;
 }
 
@@ -17,6 +18,7 @@ export default function SmartEngagementPopup({
   palette,
   fonts,
   delaySeconds = 8,
+  canBook = false,
   onAction,
 }: SmartEngagementPopupProps) {
   const [visible, setVisible] = useState(false);
@@ -44,7 +46,7 @@ export default function SmartEngagementPopup({
     { key: "quote" as const, label: "Request Quote", icon: FileText },
     { key: "book" as const, label: "Book Appointment", icon: Calendar },
     { key: "ask" as const, label: "Ask a Question", icon: MessageSquare },
-  ];
+  ].filter(action => action.key !== "book" || canBook);
 
   return (
     <AnimatePresence>

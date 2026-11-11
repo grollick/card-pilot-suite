@@ -20,7 +20,7 @@ interface CaptureLeadResult {
 }
 
 /**
- * Calls the centralized `capture_lead` DB function.
+ * Captures through the public server endpoint, which schedules follow-ups and notifies the owner.
  * Handles: contact matching (email/phone), pipeline assignment,
  * activity logging, analytics events, and daily_metrics updates.
  */
@@ -30,7 +30,7 @@ export async function captureLead(params: CaptureLeadParams): Promise<CaptureLea
   });
 
   if (error) {
-    console.error("capture_lead error:", error.message, error.details, error.hint, error.code);
+    console.error("capture_lead error:", error.message);
     throw new Error(`capture_lead failed: ${error.message}`);
   }
 

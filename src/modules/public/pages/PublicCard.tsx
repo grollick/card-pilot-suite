@@ -1654,6 +1654,7 @@ export default function PublicCard() {
           palette={palette}
           fonts={fonts}
           delaySeconds={8}
+          canBook={Boolean(data?.hasAvailability)}
           onAction={(action) => {
             if (action === "quote") {
               const el = document.getElementById("quote-request-section");

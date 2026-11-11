@@ -29,12 +29,8 @@ function isServiceRole(req: Request): boolean {
   const authHeader = req.headers.get('Authorization') ?? ''
   if (!authHeader.startsWith('Bearer ')) return false
   const token = authHeader.slice(7)
-  try {
-    const payload = JSON.parse(atob(token.split('.')[1]))
-    return payload.role === 'service_role'
-  } catch {
-    return false
-  }
+  const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+  return Boolean(serviceKey && (token === serviceKey || req.headers.get('x-internal-service-key') === serviceKey))
 }
 
 Deno.serve(async (req) => {

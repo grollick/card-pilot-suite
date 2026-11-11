@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { z } from "npm:zod@3";
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { notifyLeadOwner } from "./lead-notification.ts";
 
 const LeadSchema = z.object({
@@ -17,11 +18,6 @@ const LeadSchema = z.object({
   metaJson: z.record(z.unknown()).default({}),
 });
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -35,7 +31,10 @@ serve(async (req) => {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
       const input = parsed.data;
-      const client = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+      const url = Deno.env.get("SUPABASE_URL");
+      const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (!url || !serviceKey) throw new Error("Missing server configuration");
+      const client = createClient(url, serviceKey);
       // Resolve the destination independently; callers cannot choose the email recipient.
       const { data: owner } = await client.from("profiles").select("id,handle").eq("id", input.ownerId).single();
       if (!owner || (input.handle && input.handle !== owner.handle)) return new Response(JSON.stringify({ error: "Card not found" }), {
@@ -117,10 +116,10 @@ serve(async (req) => {
       });
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
+    const url = Deno.env.get("SUPABASE_URL");
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!url || !serviceKey) throw new Error("Missing server configuration");
+    const supabase = createClient(url, serviceKey);
 
     // ── Resolve handle → user_id server-side (never trust client) ──
     const { data: profile, error: profileError } = await supabase
@@ -250,7 +249,7 @@ serve(async (req) => {
   } catch (err) {
     console.error("create-booking error:", err);
     return new Response(JSON.stringify({ error: "Internal server error" }), {
-      status: 500,
+      status: err instanceof SyntaxError ? 400 : 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
