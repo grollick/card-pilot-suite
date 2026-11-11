@@ -28,17 +28,32 @@ import {
   Collapsible, CollapsibleContent, CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
+import { useShowAllTools } from "@/hooks/useShowAllTools";
 
 /* ── Navigation structure ── */
 
-const crmItems = [
+type NavItem = { title: string; url: string; icon: any; end?: boolean; glowKey?: string };
+
+const coreItems: NavItem[] = [
+  { title: "Dashboard", url: "/app", icon: LayoutDashboard, end: true },
+  { title: "Card Editor", url: "/app/card", icon: CreditCard },
   { title: "Contacts", url: "/app/contacts", icon: Inbox },
-  { title: "Scan Card", url: "/app/scan-card", icon: ScanLine },
-  { title: "Pipeline", url: "/app/pipeline", icon: Kanban },
   { title: "Job Requests", url: "/app/job-requests", icon: Bell, glowKey: "job-requests" },
+  { title: "Pipeline", url: "/app/pipeline", icon: Kanban },
   { title: "Bookings", url: "/app/bookings", icon: Calendar },
-  { title: "Tasks", url: "/app/tasks", icon: CheckSquare },
+  { title: "Estimates", url: "/app/estimates", icon: FileText },
+  { title: "Invoices", url: "/app/invoices", icon: DollarSign },
   { title: "Reviews", url: "/app/reviews", icon: Star },
+];
+
+/* Everything below lives under "More tools", hidden unless enabled in Settings */
+const quickItems: NavItem[] = [
+  { title: "AI Assistant", url: "/app/assistant", icon: Sparkles },
+];
+
+const crmItems = [
+  { title: "Scan Card", url: "/app/scan-card", icon: ScanLine },
+  { title: "Tasks", url: "/app/tasks", icon: CheckSquare },
   { title: "Loyalty", url: "/app/loyalty", icon: Gift },
 ];
 
@@ -47,11 +62,9 @@ const jobsItems = [
   { title: "Job Pipeline", url: "/app/job-pipeline", icon: ClipboardList },
   { title: "Projects", url: "/app/projects", icon: Briefcase },
   { title: "Recurring", url: "/app/recurring", icon: RefreshCw },
-  { title: "Estimates", url: "/app/estimates", icon: FileText },
 ];
 
 const moneyItems = [
-  { title: "Invoices", url: "/app/invoices", icon: DollarSign },
   { title: "Revenue", url: "/app/revenue", icon: DollarSign },
   { title: "Expenses", url: "/app/expenses", icon: DollarSign },
 ];
@@ -68,7 +81,6 @@ const marketingItems = [
 ];
 
 const brandItems = [
-  { title: "Card Editor", url: "/app/card", icon: CreditCard },
   { title: "Templates", url: "/app/templates", icon: Palette },
   { title: "Page Builder", url: "/app/page-builder", icon: Globe },
   { title: "QR Campaigns", url: "/app/qr-campaigns", icon: QrCode },
@@ -94,7 +106,6 @@ const adminOnlyItems = [
   { title: "Admin Marketing", url: "/app/admin-marketing", icon: Megaphone },
 ];
 
-type NavItem = { title: string; url: string; icon: any; end?: boolean; glowKey?: string };
 
 export function AppSidebar() {
   const { state, toggleSidebar, isMobile, setOpenMobile } = useSidebar();
@@ -105,6 +116,7 @@ export function AppSidebar() {
   const { data: isAdmin } = useIsAdmin();
   const { data: profile } = useProfileCache();
   const { data: jobStats } = useJobRequestStats();
+  const [showAllTools] = useShowAllTools();
   const hasPendingOpportunities = (jobStats?.newRequests ?? 0) > 0 || (jobStats?.hasGuaranteeMatch ?? false);
 
   const isActive = (path: string, end?: boolean) => {
@@ -231,96 +243,82 @@ export function AppSidebar() {
           </div>
         </SidebarHeader>
 
-        {!collapsed && (
-          <div className="px-4 pb-2">
-            <ClientSwitcher />
-          </div>
-        )}
-
         <SidebarContent className="px-2.5 pt-0.5">
-          {/* ── Quick Access ── */}
+          {/* ── Core navigation ── */}
           <SidebarGroup className="py-1">
             <SidebarGroupContent>
-              <SidebarMenu className="space-y-0.5">
-                <SidebarMenuItem>
-                  <Tip label="Dashboard" side="right" delayDuration={collapsed ? 100 : 600}>
-                    <SidebarMenuButton asChild>
-                      <NavLink
-                        to="/app"
-                        end
-                        onClick={closeMobile}
-                        className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] transition-all duration-150 ${
-                          location.pathname === "/app"
-                            ? "bg-primary/10 text-primary font-semibold shadow-sm"
-                            : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-muted/50"
-                        }`}
-                        activeClassName="bg-primary/10 text-primary font-semibold"
-                      >
-                        <LayoutDashboard className={`h-4 w-4 shrink-0 ${location.pathname === "/app" ? "text-primary" : "text-muted-foreground"}`} />
-                        {!collapsed && <span>Dashboard</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </Tip>
-                </SidebarMenuItem>
-
-                {/* AI Assistant — highlighted */}
-                <SidebarMenuItem>
-                  <Tip label="AI Assistant" side="right" delayDuration={collapsed ? 100 : 600}>
-                    <SidebarMenuButton asChild>
-                      <NavLink
-                        to="/app/assistant"
-                        onClick={closeMobile}
-                        className={`flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] transition-all duration-150 ${
-                          isActive("/app/assistant")
-                            ? "bg-gradient-to-r from-primary/15 to-primary/5 text-primary font-semibold shadow-sm"
-                            : "text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-muted/50"
-                        }`}
-                        activeClassName="bg-gradient-to-r from-primary/15 to-primary/5 text-primary font-semibold"
-                      >
-                        <Sparkles className={`h-4 w-4 shrink-0 ${isActive("/app/assistant") ? "text-primary" : "text-primary/60"}`} />
-                        {!collapsed && <span>AI Assistant</span>}
-                      </NavLink>
-                    </SidebarMenuButton>
-                  </Tip>
-                </SidebarMenuItem>
-              </SidebarMenu>
+              <SidebarMenu className="space-y-0.5">{coreItems.map(renderItem)}</SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
 
-          {!collapsed && <Separator className="mx-2 my-1 w-auto opacity-30" />}
-
-          {/* ── Workflow Groups ── */}
-          {renderGroup("CRM", UserCheck, crmItems)}
-          {renderGroup("Jobs", Briefcase, jobsItems)}
-          {renderGroup("Money", DollarSign, moneyItems)}
-          {renderGroup("Marketing", Megaphone, marketingItems)}
-          {renderGroup("Brand", CreditCard, brandItems)}
-          {renderGroup("Team", Users, teamItems)}
-          {renderGroup("Discover", MapPin, discoverItems)}
-
-          {/* View website link */}
-          {profile?.handle && !collapsed && (
-            <div className="px-2 pt-1">
-              <a
-                href={`/site/${profile.handle}`}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[12px] font-medium text-primary/70 hover:text-primary hover:bg-primary/5 transition-colors"
-              >
-                <ExternalLink className="h-3.5 w-3.5" />
-                <span>View Live Website</span>
-              </a>
-            </div>
+          {/* ── More tools (hidden unless enabled in Settings) ── */}
+          {showAllTools && (
+            <>
+              {!collapsed && <Separator className="mx-2 my-1 w-auto opacity-30" />}
+              {collapsed ? (
+                <>
+                  {renderGroup("Quick", Sparkles, quickItems)}
+                  {renderGroup("CRM", UserCheck, crmItems)}
+                  {renderGroup("Jobs", Briefcase, jobsItems)}
+                  {renderGroup("Money", DollarSign, moneyItems)}
+                  {renderGroup("Marketing", Megaphone, marketingItems)}
+                  {renderGroup("Brand", CreditCard, brandItems)}
+                  {renderGroup("Team", Users, teamItems)}
+                  {renderGroup("Discover", MapPin, discoverItems)}
+                </>
+              ) : (
+                <Collapsible defaultOpen={false} className="group/more">
+                  <CollapsibleTrigger asChild>
+                    <button type="button" className="w-full h-8 text-[11px] uppercase tracking-wider px-3 hover:bg-muted/30 rounded-md flex items-center gap-2 font-semibold text-muted-foreground/70 select-none">
+                      <span className="flex-1 text-left">More tools</span>
+                      <ChevronRight className="h-3 w-3 text-muted-foreground/40 transition-transform duration-200 group-data-[state=open]/more:rotate-90" />
+                    </button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-0.5">
+                    <div className="px-2 py-2">
+                      <ClientSwitcher />
+                    </div>
+                    <SidebarGroup className="py-1">
+                      <SidebarGroupContent>
+                        <SidebarMenu className="space-y-0.5">{quickItems.map(renderItem)}</SidebarMenu>
+                      </SidebarGroupContent>
+                    </SidebarGroup>
+                    {renderGroup("CRM", UserCheck, crmItems)}
+                    {renderGroup("Jobs", Briefcase, jobsItems)}
+                    {renderGroup("Money", DollarSign, moneyItems)}
+                    {renderGroup("Marketing", Megaphone, marketingItems)}
+                    {renderGroup("Brand", CreditCard, brandItems)}
+                    {renderGroup("Team", Users, teamItems)}
+                    {renderGroup("Discover", MapPin, discoverItems)}
+                    {profile?.handle && (
+                      <div className="px-2 pt-1">
+                        <a
+                          href={`/site/${profile.handle}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex items-center gap-2 rounded-md px-2.5 py-1.5 text-[12px] font-medium text-primary/70 hover:text-primary hover:bg-primary/5 transition-colors"
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          <span>View Live Website</span>
+                        </a>
+                      </div>
+                    )}
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
+            </>
           )}
 
-          {/* Bug Review */}
-          <SidebarGroup className="py-1">
-            <SidebarGroupContent>
-              <SidebarMenu className="space-y-0.5">
-                {renderItem({ title: "Bug Review", url: "/app/bugs", icon: Bug })}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+          {/* Bug Review — admins only */}
+          {isAdmin && (
+            <SidebarGroup className="py-1">
+              <SidebarGroupContent>
+                <SidebarMenu className="space-y-0.5">
+                  {renderItem({ title: "Bug Review", url: "/app/bugs", icon: Bug })}
+                </SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          )}
         </SidebarContent>
 
         {/* ── Footer ── */}

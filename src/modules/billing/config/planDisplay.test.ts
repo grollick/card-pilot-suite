@@ -12,7 +12,10 @@ describe("public beta plans", () => {
   it("displays the enforced three-service free limit", () => {
     expect(PLAN_COMPARISON.find(row => row.key === "services")?.values).toEqual(["3", "Unlimited", "Unlimited"]);
   });
-  it("displays the enforced 100-contact free limit", () => {
-    expect(PLAN_COMPARISON.find(row => row.key === "contacts")?.values).toEqual(["100", "Unlimited", "Unlimited"]);
+  it("displays the enforced 20-contact free limit", () => {
+    expect(PLAN_COMPARISON.find(row => row.key === "contacts")?.values).toEqual(["20", "Unlimited", "Unlimited"]);
+  });
+  it("displays the enforced 10-bookings-a-month free limit", () => {
+    expect(PLAN_COMPARISON.find(row => row.key === "booking")?.values).toEqual(["10", "Unlimited", "Unlimited"]);
   });
 });

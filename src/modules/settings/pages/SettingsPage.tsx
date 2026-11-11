@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
+import { useShowAllTools } from "@/hooks/useShowAllTools";
 
 export default function SettingsPage() {
   const navigate = useNavigate();
@@ -113,6 +114,7 @@ export default function SettingsPage() {
         </TabsList>
 
         <TabsContent value="profile" className="mt-4 space-y-4">
+          <ShowAllToolsToggle />
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             className="rounded-xl border border-border bg-card p-6 space-y-5">
 
@@ -714,5 +716,17 @@ function DailyReportToggle({ profile, queryClient }: { profile: any; queryClient
         Receive a daily email summary with your card views, new leads, bookings, and estimated revenue.
       </p>
     </motion.div>
+  );
+}
+function ShowAllToolsToggle() {
+  const [showAll, setShowAll] = useShowAllTools();
+  return (
+    <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between gap-4">
+      <div>
+        <Label htmlFor="show-all-tools" className="text-sm font-semibold">Show all tools in the sidebar</Label>
+        <p className="text-xs text-muted-foreground mt-0.5">Adds a "More tools" section with marketing, team, jobs and other extras.</p>
+      </div>
+      <Switch id="show-all-tools" checked={showAll} onCheckedChange={setShowAll} />
+    </div>
   );
 }

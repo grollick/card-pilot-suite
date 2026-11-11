@@ -1,3 +1,4 @@
+import { PLAN_CONFIGS } from "@/modules/billing/config/planLimits";
 // ── guzzl.pro Pricing Tiers ──
 // 4-tier model: Starter (free) → Growth → Pro → Agency
 
@@ -21,14 +22,14 @@ export const PLAN_TIERS = [
       "2 review requests per month",
     ],
     limits: {
-      contacts: 100,
+      contacts: PLAN_CONFIGS.free.limits.contacts,
       cards: 1,
       estimates: 3,
       invoices: 3,
       social_posts: 5,
       social_posts_monthly: 3,
       booking_services: 3,
-      bookings_monthly: 200,
+      bookings_monthly: PLAN_CONFIGS.free.limits.bookingsPerMonth,
       team_members: 1,
       automations: 0,
       email_templates: 0,

@@ -26,7 +26,7 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
   free: {
     key: "free",
     label: "Free",
-    limits: { services: 3, bookingsPerMonth: 200, contacts: 100 },
+    limits: { services: 3, bookingsPerMonth: 10, contacts: 20 },
     features: {
       removeBranding: false,
       analytics: false,
@@ -42,7 +42,7 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
   starter: {
     key: "starter",
     label: "Free",
-    limits: { services: 3, bookingsPerMonth: 200, contacts: 100 },
+    limits: { services: 3, bookingsPerMonth: 10, contacts: 20 },
     features: {
       removeBranding: false,
       analytics: false,
