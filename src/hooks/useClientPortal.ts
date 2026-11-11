@@ -1,17 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { createClient } from "@supabase/supabase-js";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-
-// Create a portal-scoped supabase client that sends the x-portal-token header
-function createPortalClient(portalToken: string) {
-  return createClient(
-    import.meta.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-    { global: { headers: { "x-portal-token": portalToken } } }
-  );
-}
 
 // ── Portal token management (business side) ──
 
@@ -79,13 +69,8 @@ export function usePortalSession(token?: string) {
     queryKey: ["portal-session", token],
     enabled: !!token,
     queryFn: async () => {
-      // Use a portal-scoped client that sends the token as a header for RLS
-      const portalClient = createPortalClient(token!);
-      const { data: tokenData, error: tokenError } = await portalClient
-        .from("client_portal_tokens")
-        .select("lead_id, user_id, expires_at")
-        .eq("token", token!)
-        .single();
+      const { data: rows, error: tokenError } = await supabase.rpc("get_portal_session", { p_token: token! });
+      const tokenData = (rows as any[] | null)?.[0];
       if (tokenError || !tokenData) throw new Error("Invalid or expired portal link");
       if (new Date((tokenData as any).expires_at) < new Date()) throw new Error("Portal link expired");
 
@@ -202,10 +187,11 @@ export function useSendPortalMessage() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ userId, leadId, message, portalToken }: { userId: string; leadId: string; message: string; portalToken?: string }) => {
-      const client = portalToken ? createPortalClient(portalToken) : supabase;
-      const { error } = await client
-        .from("client_portal_messages")
-        .insert({ user_id: userId, lead_id: leadId, message, sender: "client" });
+      const { error } = portalToken
+        ? await supabase.rpc("send_portal_message", { p_token: portalToken, p_message: message })
+        : await supabase
+            .from("client_portal_messages")
+            .insert({ user_id: userId, lead_id: leadId, message, sender: "client" });
       if (error) throw error;
     },
     onSuccess: (_, vars) => {

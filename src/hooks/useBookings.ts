@@ -187,11 +187,7 @@ export function usePublicBookingData(handle: string | undefined) {
       const [servicesResult, availabilityResult, bookingsResult] = await Promise.all([
         supabase
           .rpc("get_services_by_handle", { p_handle: handle! }),
-        supabase
-          .from("availability_rules")
-          .select("day_of_week, start_time, end_time, buffer_min")
-          .eq("user_id", profile.id)
-          .order("day_of_week"),
+        supabase.rpc("get_availability_by_user", { p_user_id: profile.id }),
         supabase
           .from("bookings")
           .select("start_datetime, end_datetime")

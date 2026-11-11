@@ -48,11 +48,7 @@ export default function PublicInvoicePage() {
     queryKey: ["public-invoice-items", invoice?.id],
     enabled: !!invoice?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("invoice_line_items")
-        .select("*")
-        .eq("invoice_id", invoice.id)
-        .order("sort_order");
+      const { data, error } = await supabase.rpc("get_public_invoice_line_items", { p_token: token! });
       if (error) throw error;
       return (data ?? []) as any[];
     },
@@ -63,11 +59,7 @@ export default function PublicInvoicePage() {
     queryKey: ["public-invoice-payments", invoice?.id],
     enabled: !!invoice?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("invoice_payments")
-        .select("*")
-        .eq("invoice_id", invoice.id)
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.rpc("get_public_invoice_payments", { p_token: token! });
       if (error) throw error;
       return (data ?? []) as any[];
     },

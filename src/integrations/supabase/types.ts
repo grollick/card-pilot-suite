@@ -8415,7 +8415,54 @@ export type Database = {
           target_city: string
         }[]
       }
+      get_availability_by_user: {
+        Args: { p_user_id: string }
+        Returns: {
+          buffer_min: number
+          day_of_week: number
+          end_time: string
+          start_time: string
+        }[]
+      }
       get_effective_plan: { Args: { p_user_id: string }; Returns: Json }
+      get_portal_session: {
+        Args: { p_token: string }
+        Returns: {
+          expires_at: string
+          lead_id: string
+          user_id: string
+        }[]
+      }
+      get_public_invoice_line_items: {
+        Args: { p_token: string }
+        Returns: {
+          created_at: string
+          description: string | null
+          id: string
+          invoice_id: string
+          line_total: number
+          quantity: number
+          sort_order: number
+          title: string
+          unit_price: number
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "invoice_line_items"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_public_invoice_payments: {
+        Args: { p_token: string }
+        Returns: {
+          amount: number
+          id: string
+          paid_at: string
+          payment_method: string
+          payment_reference: string
+        }[]
+      }
       get_public_profiles: {
         Args: { p_handle?: string }
         Returns: {
@@ -8605,6 +8652,10 @@ export type Database = {
               total_count: number
             }[]
           }
+      send_portal_message: {
+        Args: { p_message: string; p_token: string }
+        Returns: undefined
+      }
       update_sms_delivery_status: {
         Args: {
           p_delivery_status: string
