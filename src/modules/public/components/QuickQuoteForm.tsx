@@ -17,7 +17,7 @@ export default function QuickQuoteForm({ professional, onSuccess }: Props) {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [details, setDetails] = useState(
-    `Hi, I saw you're available on CardPilot. I'm looking for help with...`
+    `Hi, I saw you're available on guzzl.pro. I'm looking for help with...`
   );
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);

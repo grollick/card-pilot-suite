@@ -25,8 +25,8 @@ export default function SimpleLandingPage() {
   return (
     <>
       <Helmet>
-        <title>Get More Local Jobs — CardPilot</title>
-        <meta name="description" content="Join local businesses already getting leads. Create your card, get discovered, and start receiving jobs in minutes." />
+        <title>Get More Local Jobs — guzzl.pro</title>
+        <meta name="description" content="Create your card, share it, and start getting leads." />
       </Helmet>
 
       <div className="min-h-screen bg-background text-foreground">
@@ -43,7 +43,7 @@ export default function SimpleLandingPage() {
             </motion.h1>
 
             <motion.p initial="hidden" animate="visible" variants={fade} custom={1} className="text-lg md:text-xl text-muted-foreground max-w-xl mx-auto mb-8">
-              Join local businesses already getting leads.
+              Create your card, share it, and start getting leads.
             </motion.p>
 
             <motion.div initial="hidden" animate="visible" variants={fade} custom={2}>
@@ -57,37 +57,6 @@ export default function SimpleLandingPage() {
           </div>
         </section>
 
-        {/* Proof */}
-        <section className="max-w-3xl mx-auto px-4 pb-16 md:pb-24">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="rounded-2xl border border-border bg-card p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-3">
-                <Star className="h-5 w-5 text-warning fill-warning" />
-                <span className="text-sm font-semibold text-warning">Real Result</span>
-              </div>
-              <p className="text-xl md:text-2xl font-bold mb-2">
-                "Mike Landscaping got 2 leads in 3 days"
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Local landscaper in Ohio — signed up, shared his card, and booked his first job within a week.
-              </p>
-            </div>
-
-            {/* Mini card preview */}
-            <div className="w-48 shrink-0 rounded-xl border border-border bg-background p-4 shadow-card text-center">
-              <div className="h-12 w-12 mx-auto rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                <Briefcase className="h-6 w-6 text-primary" />
-              </div>
-              <p className="font-bold text-sm">Mike Landscaping</p>
-              <p className="text-2xs text-muted-foreground">Columbus, OH</p>
-              <div className="mt-2 flex items-center justify-center gap-0.5">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <Star key={s} className="h-3 w-3 text-warning fill-warning" />
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        </section>
 
         {/* How It Works */}
         <section className="max-w-3xl mx-auto px-4 pb-16 md:pb-24">

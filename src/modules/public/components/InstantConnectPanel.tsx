@@ -33,7 +33,7 @@ export default function InstantConnectPanel({ professional, onClose }: Props) {
   const initials = pro.name.split(" ").map(n => n[0]).join("").slice(0, 2);
 
   const prefilledMessage = encodeURIComponent(
-    `Hi ${pro.name.split(" ")[0]}, I saw you're available on CardPilot. I need help with a project — are you free to chat?`
+    `Hi ${pro.name.split(" ")[0]}, I saw you're available on guzzl.pro. I need help with a project — are you free to chat?`
   );
 
   return (

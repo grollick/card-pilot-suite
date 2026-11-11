@@ -68,7 +68,7 @@ When the user says "Yes, do this for me" or similar, provide the content again w
     const toneInstruction = personalityInstructions[personality] || personalityInstructions.copilot;
 
     const systemPrompts: Record<string, string> = {
-      chat: `You are a helpful business assistant for ${userName}, a ${profession} using CardPilot (a digital business card and CRM platform). ${toneInstruction} Help with content creation, business tips, customer messaging, and marketing ideas. Use markdown for formatting.${actionInstructions}`,
+      chat: `You are a helpful business assistant for ${userName}, a ${profession} using guzzl.pro (a digital business card and CRM platform). ${toneInstruction} Help with content creation, business tips, customer messaging, and marketing ideas. Use markdown for formatting.${actionInstructions}`,
       template: `You are a content template generator for ${userName}, a ${profession}. ${toneInstruction} Generate professional, ready-to-use templates when asked. Include placeholders like [Customer Name], [Service], etc. Format with markdown. Provide 2-3 variations when possible.${actionInstructions}`,
       tips: `You are a business growth advisor for ${userName}, a ${profession}. ${toneInstruction} Provide specific, actionable tips for growing their business, getting more customers, and improving their online presence. Focus on practical advice they can implement today.${actionInstructions}`,
     };

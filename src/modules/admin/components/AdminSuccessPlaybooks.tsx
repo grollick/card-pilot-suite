@@ -31,7 +31,7 @@ const PLAYBOOKS: Playbook[] = [
       { title: "Build your style portfolio", description: "Upload photos of your best work. Visual proof is everything in the grooming industry." },
       { title: "Set your services & durations", description: "Add each service with accurate time slots. This prevents overbooking and keeps your day running smooth." },
       { title: "Set up your weekly availability", description: "Block out lunch breaks, days off, and personal time. Your calendar should reflect reality." },
-      { title: "Share your booking link on social", description: "Post your CardPilot booking link on Instagram, TikTok, and in your bio. Make booking frictionless." },
+      { title: "Share your booking link on social", description: "Post your guzzl.pro booking link on Instagram, TikTok, and in your bio. Make booking frictionless." },
       { title: "Enable reminders", description: "Reduce no-shows with automated booking reminders sent to clients before their appointment." },
       { title: "Collect reviews after each cut", description: "Happy clients are your best marketing. Ask for a review right after they leave the chair." },
     ],

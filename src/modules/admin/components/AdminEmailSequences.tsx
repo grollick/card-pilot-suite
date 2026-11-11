@@ -48,9 +48,9 @@ const PRESET_SEQUENCES = [
     description: "Guide new users through setup",
     trigger: "signup",
     steps: [
-      { subject: "Welcome to CardPilot, {{name}}! 🎉", body: "Hey {{name}},\n\nWelcome to CardPilot! We're thrilled to have you.\n\nYour first step: Create your digital business card. It takes less than 30 seconds.\n\n→ Log in and hit \"Create Card\" to get started.\n\nLet's make this your best business tool yet!", delay: 0 },
+      { subject: "Welcome to guzzl.pro, {{name}}! 🎉", body: "Hey {{name}},\n\nWelcome to guzzl.pro! We're thrilled to have you.\n\nYour first step: Create your digital business card. It takes less than 30 seconds.\n\n→ Log in and hit \"Create Card\" to get started.\n\nLet's make this your best business tool yet!", delay: 0 },
       { subject: "Did you create your card yet?", body: "Hey {{name}},\n\nJust checking in — have you created your digital business card yet?\n\nIt's the fastest way to start capturing leads and booking clients.\n\nHere's what you can do:\n• Share your card link anywhere\n• Capture leads automatically\n• Let clients book directly\n\n→ Create your card now — it's free!", delay: 24 },
-      { subject: "Pro tip: Share your card to get leads", body: "Hey {{name}},\n\nHere's a quick win: Share your CardPilot link on your social media, email signature, or Google Business profile.\n\nEvery visitor becomes a potential lead — automatically tracked in your CRM.\n\nNeed help? Reply to this email and we'll guide you.", delay: 72 },
+      { subject: "Pro tip: Share your card to get leads", body: "Hey {{name}},\n\nHere's a quick win: Share your guzzl.pro link on your social media, email signature, or Google Business profile.\n\nEvery visitor becomes a potential lead — automatically tracked in your CRM.\n\nNeed help? Reply to this email and we'll guide you.", delay: 72 },
     ],
   },
   {
@@ -58,8 +58,8 @@ const PRESET_SEQUENCES = [
     description: "Push users to complete key actions",
     trigger: "incomplete_profile",
     steps: [
-      { subject: "Complete your profile, {{name}}", body: "Hey {{name}},\n\nYou're almost there! Complete your profile to unlock the full power of CardPilot.\n\nWhat to do:\n1. Add your business name\n2. Set your services and pricing\n3. Publish your card\n\nPros who complete their profile get 3x more leads. Let's go! 💪", delay: 48 },
-      { subject: "Your card is waiting to be published", body: "Hey {{name}},\n\nYou signed up for CardPilot but haven't published your card yet.\n\nA published card means:\n✅ Clients can find and book you\n✅ Leads are captured automatically\n✅ You look professional online\n\nIt takes 30 seconds. Let's do this!", delay: 96 },
+      { subject: "Complete your profile, {{name}}", body: "Hey {{name}},\n\nYou're almost there! Complete your profile to unlock the full power of guzzl.pro.\n\nWhat to do:\n1. Add your business name\n2. Set your services and pricing\n3. Publish your card\n\nPros who complete their profile get 3x more leads. Let's go! 💪", delay: 48 },
+      { subject: "Your card is waiting to be published", body: "Hey {{name}},\n\nYou signed up for guzzl.pro but haven't published your card yet.\n\nA published card means:\n✅ Clients can find and book you\n✅ Leads are captured automatically\n✅ You look professional online\n\nIt takes 30 seconds. Let's do this!", delay: 96 },
     ],
   },
   {
@@ -67,8 +67,8 @@ const PRESET_SEQUENCES = [
     description: "Re-engage inactive users",
     trigger: "inactivity",
     steps: [
-      { subject: "We miss you, {{name}}!", body: "Hey {{name}},\n\nIt's been a while since you logged into CardPilot.\n\nWhile you were away, your competitors have been:\n• Capturing leads\n• Booking clients\n• Growing their business\n\nDon't fall behind. Log in today and check your dashboard.", delay: 0 },
-      { subject: "Your leads are waiting", body: "Hey {{name}},\n\nQuick reminder: CardPilot is working for you even when you're not logged in.\n\nBut to make the most of it, you should:\n1. Check your new leads\n2. Follow up with prospects\n3. Send your first estimate\n\nOne new job can pay for months of growth. Let's make it happen!", delay: 72 },
+      { subject: "We miss you, {{name}}!", body: "Hey {{name}},\n\nIt's been a while since you logged into guzzl.pro.\n\nWhile you were away, your competitors have been:\n• Capturing leads\n• Booking clients\n• Growing their business\n\nDon't fall behind. Log in today and check your dashboard.", delay: 0 },
+      { subject: "Your leads are waiting", body: "Hey {{name}},\n\nQuick reminder: guzzl.pro is working for you even when you're not logged in.\n\nBut to make the most of it, you should:\n1. Check your new leads\n2. Follow up with prospects\n3. Send your first estimate\n\nOne new job can pay for months of growth. Let's make it happen!", delay: 72 },
     ],
   },
   {
@@ -76,7 +76,7 @@ const PRESET_SEQUENCES = [
     description: "Convert free users to Pro",
     trigger: "lead_activity",
     steps: [
-      { subject: "You're outgrowing the free plan, {{name}}", body: "Hey {{name}},\n\nGreat news — you're getting traction on CardPilot! 🎉\n\nBut with the free plan, you're limited on:\n• Number of contacts\n• Services you can offer\n• Advanced features\n\nUpgrade to Pro and unlock:\n✅ Unlimited contacts\n✅ Unlimited services\n✅ Estimates & invoicing\n✅ AI tools\n\nOne new job pays for your entire month. Worth it? We think so.", delay: 0 },
+      { subject: "You're outgrowing the free plan, {{name}}", body: "Hey {{name}},\n\nGreat news — you're getting traction on guzzl.pro! 🎉\n\nBut with the free plan, you're limited on:\n• Number of contacts\n• Services you can offer\n• Advanced features\n\nUpgrade to Pro and unlock:\n✅ Unlimited contacts\n✅ Unlimited services\n✅ Estimates & invoicing\n✅ AI tools\n\nOne new job pays for your entire month. Worth it? We think so.", delay: 0 },
       { subject: "Special: Upgrade to Pro today", body: "Hey {{name}},\n\nJust a friendly nudge — upgrading to Pro means you never hit a limit again.\n\nPro users close 3x more deals. The math speaks for itself.\n\n→ Upgrade now from your settings page.\n\nQuestions? Just reply to this email.", delay: 72 },
     ],
   },
@@ -85,7 +85,7 @@ const PRESET_SEQUENCES = [
     description: "Notify beta users before access expires",
     trigger: "beta_expiry",
     steps: [
-      { subject: "Your beta access expires soon, {{name}}", body: "Hey {{name}},\n\nHeads up — your beta access to CardPilot Pro features expires soon.\n\nTo keep everything you've built:\n• Your card and leads are safe\n• But Pro features will be locked\n• Upgrade to keep full access\n\nDon't lose momentum. Upgrade to Pro before your trial ends!", delay: 0 },
+      { subject: "Your beta access expires soon, {{name}}", body: "Hey {{name}},\n\nHeads up — your beta access to guzzl.pro Pro features expires soon.\n\nTo keep everything you've built:\n• Your card and leads are safe\n• But Pro features will be locked\n• Upgrade to keep full access\n\nDon't lose momentum. Upgrade to Pro before your trial ends!", delay: 0 },
       { subject: "Last chance: Keep your Pro features", body: "Hey {{name}},\n\nThis is your final reminder — your beta access is about to expire.\n\nAfter expiry, you'll lose access to:\n❌ Unlimited contacts\n❌ Estimates & invoices\n❌ AI tools\n❌ Advanced analytics\n\nUpgrade now to keep everything. Your data is safe either way.", delay: 48 },
     ],
   },

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
+import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import LeadGuaranteeBanner from "@/components/LeadGuaranteeBanner";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
@@ -123,7 +124,7 @@ const faqs = [
   },
   {
     q: "How quickly will I see results?",
-    a: "Most users get their first lead within 48 hours of sharing their card. The more you share, the more leads you capture.",
+    a: "That depends on how much you share your card. The more people see it, the more leads you capture.",
   },
   {
     q: "What happens if I downgrade?",
@@ -135,7 +136,7 @@ const faqs = [
   },
   {
     q: "Is guzzl.pro worth $29/month?",
-    a: "One new job from an automated follow-up can easily cover months of guzzl.pro. Most Pro users report earning back their investment within the first week.",
+    a: "One new job from an automated follow-up can easily cover months of guzzl.pro.",
   },
 ];
 
@@ -172,9 +173,7 @@ export default function PricingPage() {
         {/* Nav */}
         <nav className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
           <div className="mx-auto max-w-6xl flex items-center justify-between px-6 h-14">
-            <button onClick={() => navigate("/")} className="font-bold text-lg tracking-tight text-foreground">
-              Card<span className="text-primary">Pilot</span>
-            </button>
+            <GuzzlLogo to="/" />
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="sm" onClick={() => handleAuthNav()}>{user ? "Dashboard" : "Sign in"}</Button>
               {!user && <Button size="sm" onClick={() => handleAuthNav("signup")}>Get Started Free</Button>}
@@ -328,34 +327,6 @@ export default function PricingPage() {
           </div>
         </section>
 
-        {/* ── ROI SECTION ── */}
-        <section className="px-6 pb-20">
-          <div className="mx-auto max-w-4xl rounded-2xl bg-gradient-to-br from-success/5 via-background to-primary/5 border border-border p-8 md:p-12">
-            <div className="text-center">
-              <DollarSign className="h-10 w-10 text-success mx-auto mb-4" />
-              <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
-                The math is simple
-              </h2>
-              <p className="text-muted-foreground max-w-lg mx-auto mb-8">
-                guzzl.pro costs less than a single business card order — and generates leads every single day.
-              </p>
-            </div>
-            <div className="grid sm:grid-cols-3 gap-6 text-center">
-              <div className="rounded-xl bg-card border border-border/60 p-5">
-                <p className="text-3xl font-bold text-foreground">$29</p>
-                <p className="text-sm text-muted-foreground mt-1">Pro plan per month</p>
-              </div>
-              <div className="rounded-xl bg-card border border-border/60 p-5">
-                <p className="text-3xl font-bold text-success">$500+</p>
-                <p className="text-sm text-muted-foreground mt-1">Average value of 1 new job</p>
-              </div>
-              <div className="rounded-xl bg-card border border-border/60 p-5">
-                <p className="text-3xl font-bold text-primary">17x</p>
-                <p className="text-sm text-muted-foreground mt-1">Return on investment</p>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* ── FEATURE COMPARISON ── */}
         <section className="px-6 pb-20">
@@ -455,9 +426,6 @@ export default function PricingPage() {
               Create Your Free Card
               <ArrowRight className="h-4 w-4" />
             </Button>
-            <p className="text-xs text-muted-foreground mt-3">
-              Join thousands of local professionals already growing with guzzl.pro.
-            </p>
           </div>
         </section>
 

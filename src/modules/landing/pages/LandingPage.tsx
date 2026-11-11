@@ -43,7 +43,6 @@ import HeroPhoneAnimation from "@/modules/landing/components/HeroPhoneAnimation"
 import MarketplaceSection from "@/modules/landing/components/MarketplaceSection";
 import { DEMO_CARDS } from "@/lib/demoCards";
 import InteractiveCardShowcase from "@/components/InteractiveCardShowcase";
-import SuccessStoryBanner from "@/components/SuccessStoryBanner";
 import DemoCardsSection from "@/modules/landing/components/DemoCardsSection";
 
 /* ── animations ── */
@@ -94,63 +93,8 @@ const steps = [
   { num: "3", icon: TrendingUp, title: "Turn Visitors Into Customers", desc: "Capture leads, book jobs, send estimates, and grow your revenue — automatically." },
 ];
 
-const results = [
-  { value: "3×", label: "More Leads", desc: "Professionals using guzzl.pro capture 3x more leads than traditional business cards.", icon: Target },
-  { value: "40%", label: "More Bookings", desc: "Online booking eliminates friction and converts more inquiries into confirmed jobs.", icon: Calendar },
-  { value: "2×", label: "Faster Payments", desc: "Digital estimates and invoices with online payment get you paid twice as fast.", icon: DollarSign },
-];
 
 
-const testimonials = [
-  {
-    name: "Jake Morales",
-    role: "Landscaper",
-    location: "Phoenix, AZ",
-    result: "+$1,400 first week",
-    text: "I used to lose 4–5 leads a week to voicemail. First week with guzzl.pro I booked 3 extra jobs — that's $1,400 I would've left on the table.",
-    rating: 5,
-  },
-  {
-    name: "Sarah Lindqvist",
-    role: "Interior Painter",
-    location: "Austin, TX",
-    result: "2 jobs/week → 5 jobs/week",
-    text: "My phone used to blow up with 'are you available?' texts. Now clients book themselves. I went from 2 jobs a week to 5 — same amount of effort.",
-    rating: 5,
-  },
-  {
-    name: "Marco Rivera",
-    role: "Electrician",
-    location: "Chicago, IL",
-    result: "Closed 2 jobs on the spot",
-    text: "I was losing jobs because my estimates took 3 days to arrive. Now I send them standing in the customer's driveway. Closed 2 jobs on the spot last Tuesday.",
-    rating: 5,
-  },
-  {
-    name: "Dave Kowalski",
-    role: "Plumber",
-    location: "Cleveland, OH",
-    result: "+8 leads/week",
-    text: "I'm a plumber — I don't do social media. My son set this up for me in 20 minutes. Now I get 8–10 new customer messages a week without doing anything different.",
-    rating: 5,
-  },
-  {
-    name: "Tanya Brooks",
-    role: "House Cleaner",
-    location: "Atlanta, GA",
-    result: "Booked on-site same day",
-    text: "I was handing out paper business cards at every job. Half ended up in a drawer. Now I text people my link and they book before I even leave the driveway.",
-    rating: 5,
-  },
-  {
-    name: "Ray Okonkwo",
-    role: "HVAC Tech",
-    location: "Houston, TX",
-    result: "First booking same day",
-    text: "Honestly thought this was going to be complicated. It wasn't. Took me 15 minutes to set up. Got my first online booking the same day.",
-    rating: 5,
-  },
-];
 
 const plans = [
   {
@@ -381,7 +325,7 @@ export default function LandingPage() {
         <div className="relative py-8 border-t border-border/30">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <p className="text-center text-xs font-semibold text-muted-foreground uppercase tracking-widest mb-5">
-              Trusted by 1,000+ local professionals — plumbers, electricians, landscapers, painters, cleaners, and more
+              Built for local pros: plumbers, electricians, landscapers, painters, cleaners and more
             </p>
             <div className="overflow-hidden relative">
               <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-background to-transparent z-10" />
@@ -525,54 +469,7 @@ export default function LandingPage() {
       {/* ─── 5.5 MARKETPLACE / LOCAL DISCOVERY ─── */}
       <MarketplaceSection />
 
-      {/* ─── 6. RESULTS ─── */}
-      <section className="py-20 md:py-28 relative">
-        <div className="absolute inset-0 -z-10 gradient-mesh" />
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
-            <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Results</p>
-            <h2 className="text-display text-3xl md:text-4xl lg:text-5xl mb-4">Real outcomes for real businesses</h2>
-            <p className="text-muted-foreground max-w-lg mx-auto text-lg">guzzl.pro helps service professionals get more leads, more bookings, and faster payments.</p>
-          </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {results.map((r) => (
-              <motion.div key={r.label} variants={scaleIn} className="landing-card rounded-2xl p-8 text-center">
-                <div className="h-14 w-14 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-5">
-                  <r.icon className="h-6 w-6 text-primary" />
-                </div>
-                <p className="text-6xl font-extrabold gradient-text mb-2 tracking-tighter">{r.value}</p>
-                <p className="text-lg font-bold text-foreground mb-2">{r.label}</p>
-                <p className="text-sm text-muted-foreground leading-relaxed">{r.desc}</p>
-              </motion.div>
-            ))}
-          </motion.div>
 
-          {/* Testimonials inline */}
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-12">
-            {testimonials.map((t) => (
-              <motion.div key={t.name} variants={scaleIn} className="landing-card rounded-2xl p-6">
-                <div className="flex gap-0.5 mb-3">
-                  {Array.from({ length: t.rating }).map((_, j) => (
-                    <Star key={j} className="h-4 w-4 fill-warning text-warning" />
-                  ))}
-                </div>
-                <p className="text-sm leading-relaxed mb-4 text-foreground">"{t.text}"</p>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.role}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── SUCCESS STORIES ─── */}
-      <section className="py-10 md:py-14">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <SuccessStoryBanner location="landing" />
-        </div>
-      </section>
 
       <div className="glow-line" />
 
