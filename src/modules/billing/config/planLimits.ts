@@ -73,7 +73,7 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
   },
   growth: {
     key: "growth",
-    label: "Growth",
+    label: "Pro Plus",
     limits: { services: -1, bookingsPerMonth: -1, contacts: -1 },
     features: {
       removeBranding: true,
@@ -89,7 +89,7 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
   },
   pro_plus: {
     key: "pro_plus",
-    label: "Growth",
+    label: "Pro Plus",
     limits: { services: -1, bookingsPerMonth: -1, contacts: -1 },
     features: {
       removeBranding: true,
@@ -125,7 +125,6 @@ export const UPGRADE_SCENARIOS: Record<UpgradeTrigger, UpgradeScenario> = {
     bullets: [
       "List unlimited services on your profile",
       "Reach more customers searching for what you offer",
-      "One extra service listing can bring in $500+/month",
     ],
     suggestedPlan: "pro",
   },
@@ -137,7 +136,7 @@ export const UPGRADE_SCENARIOS: Record<UpgradeTrigger, UpgradeScenario> = {
     bullets: [
       "Accept unlimited bookings every month",
       "Never turn away a paying customer",
-      "Automated reminders reduce no-shows by 40%",
+      "Automated reminders cut down on no-shows",
     ],
     suggestedPlan: "pro",
   },
@@ -149,7 +148,7 @@ export const UPGRADE_SCENARIOS: Record<UpgradeTrigger, UpgradeScenario> = {
     bullets: [
       "Remove \"Powered by guzzl\" from your card",
       "Build trust with a clean, professional look",
-      "Customers take you more seriously — and pay more",
+      "Customers take you more seriously",
     ],
     suggestedPlan: "pro",
   },

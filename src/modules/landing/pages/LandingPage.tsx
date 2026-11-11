@@ -1,5 +1,6 @@
-import { useState, useRef, useMemo, useEffect, useCallback } from "react";
-import { useABTest } from "@/hooks/useABTest";
+import { useState, useRef, useMemo } from "react";
+import { PLAN_DISPLAY } from "@/modules/billing/config/planDisplay";
+import { Badge } from "@/components/ui/badge";
 import { Link, useSearchParams } from "react-router-dom";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
@@ -96,36 +97,6 @@ const steps = [
 
 
 
-const plans = [
-  {
-    name: "Free",
-    price: "$0",
-    period: "forever",
-    desc: "Everything you need to get started",
-    features: ["1 Smart Digital Card", "QR & link sharing", "Basic CRM (20 contacts)", "5 Leads per month", "Lead capture form", "Business card scanner"],
-    highlighted: false,
-    cta: "Start Free",
-  },
-  {
-    name: "Pro",
-    price: "$29",
-    period: "/month",
-    desc: "Everything you need to grow",
-    features: ["Unlimited cards & contacts", "Online booking system", "Estimates & invoices", "Full CRM & pipeline", "Autopilot follow-ups", "Remove branding", "Priority support"],
-    highlighted: true,
-    cta: "Start Free Trial",
-  },
-  {
-    name: "Pro Plus",
-    price: "$79",
-    period: "/month",
-    desc: "For power users & teams",
-    features: ["Everything in Pro", "Team members", "Advanced analytics", "AI marketing autopilot", "Custom domain", "API access", "Dedicated support"],
-    highlighted: false,
-    cta: "Start Free Trial",
-  },
-];
-
 const TRUST_ITEMS = [
   "Contractors", "Plumbers", "Electricians", "Landscapers", "Painters", "Roofers",
   "HVAC Pros", "Photographers", "Barbers", "Realtors", "Personal Trainers", "Cleaners",
@@ -144,28 +115,6 @@ export default function LandingPage() {
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
-
-  const { variant: abVariant, trackClick: abTrackClick, hasTest: hasABTest } = useABTest("hero");
-
-  // ── Rotating headline system ──
-  const ROTATING_HEADLINES = useMemo(() => [
-    { main: "Turn Every Connection", accent: "Into a Customer" },
-    { main: "Your Business.", accent: "On Demand." },
-    { main: "Get Found. Get Booked.", accent: "Get Paid." },
-    { main: "Get More Local Customers —", accent: "All From One Simple Card" },
-    { main: "More Leads. More Bookings.", accent: "More Revenue." },
-  ], []);
-
-  const [headlineIdx, setHeadlineIdx] = useState(0);
-
-  useEffect(() => {
-    // Don't rotate if A/B test or profession param is active
-    if (abVariant?.headline || professionParam) return;
-    const interval = setInterval(() => {
-      setHeadlineIdx((i) => (i + 1) % ROTATING_HEADLINES.length);
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [abVariant, ROTATING_HEADLINES]);
 
   // ── Profession-based dynamic headlines ──
   const [searchParams] = useSearchParams();
@@ -191,20 +140,9 @@ export default function LandingPage() {
     "personal trainer": { main: "Fill Your Client Roster —", accent: "Without Chasing Leads" },
   }), []);
 
-  // Priority: A/B test > profession param > rotating
-  const heroHeadlineAccent = useMemo(() => {
-    if (abVariant?.headline) {
-      const parts = abVariant.headline.split(" — ");
-      return parts.length > 1 ? { main: parts[0] + " —", accent: parts[1] } : { main: abVariant.headline, accent: "" };
-    }
-    if (professionParam && professionHeadlines[professionParam]) {
-      return professionHeadlines[professionParam];
-    }
-    return ROTATING_HEADLINES[headlineIdx];
-  }, [abVariant, professionParam, professionHeadlines, ROTATING_HEADLINES, headlineIdx]);
-
-  const heroSubheadline = abVariant?.subheadline || "A smart digital business card + CRM + marketplace for local professionals.";
-  const heroCta = abVariant?.cta_text || "Get Your Card";
+  const heroHeadlineAccent = professionHeadlines[professionParam] ?? { main: "Guzzl leads", accent: "like a pro." };
+  const heroSubheadline = "A digital business card that captures leads, books jobs and sends estimates. Built for local service pros.";
+  const heroCta = "Get Your Free Card";
 
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
@@ -283,7 +221,7 @@ export default function LandingPage() {
                   {heroSubheadline}
                 </motion.p>
                 <motion.div initial="hidden" animate="visible" variants={fade} custom={3} className="flex flex-col sm:flex-row items-center lg:items-start gap-3">
-                  <Link to="/onboarding" onClick={() => abTrackClick()}>
+                  <Link to="/onboarding">
                     <Button size="lg" className="text-base h-13 px-10 rounded-xl shadow-glow-lg group">
                       {heroCta}
                       <ArrowRight className="h-4 w-4 ml-1.5 group-hover:translate-x-0.5 transition-transform" />
@@ -479,10 +417,10 @@ export default function LandingPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Pricing</p>
             <h2 className="text-display text-3xl md:text-4xl lg:text-5xl mb-4">Simple, transparent pricing</h2>
-            <p className="text-muted-foreground max-w-md mx-auto text-lg">Start free. Upgrade when you're ready to grow. One new job pays for your entire month.</p>
+            <p className="text-muted-foreground max-w-md mx-auto text-lg">Free during beta. Paid plans are coming later; nothing is charged today.</p>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {plans.map((p) => (
+            {PLAN_DISPLAY.map((p) => (
               <motion.div
                 key={p.name}
                 variants={scaleIn}
@@ -494,40 +432,38 @@ export default function LandingPage() {
               >
                 {p.highlighted && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-5 py-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold shadow-glow">
-                    Most Popular
+                    Coming soon
                   </div>
                 )}
                 <div className="mb-6">
                   <h3 className="text-lg font-bold text-foreground mb-1">{p.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-4">{p.desc}</p>
+                  {p.status === "coming_soon" && !p.highlighted && <Badge variant="secondary" className="mb-2">Coming soon</Badge>}
+                  <p className="text-sm text-muted-foreground mb-4">{p.tagline}</p>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-extrabold text-foreground tracking-tight">{p.price}</span>
-                    <span className="text-sm text-muted-foreground">{p.period}</span>
+                    <span className="text-5xl font-extrabold text-foreground tracking-tight">${p.price}</span>
+                    <span className="text-sm text-muted-foreground">{p.price === 0 ? "Free during beta" : "/month"}</span>
                   </div>
                 </div>
                 <ul className="space-y-3 mb-8 flex-1">
                   {p.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2.5 text-sm text-foreground">
+                    <li key={f.key} className="flex items-start gap-2.5 text-sm text-foreground">
                       <Check className="h-4 w-4 text-success mt-0.5 shrink-0" />
-                      <span>{f}</span>
+                      <span>{f.bullet}</span>
                     </li>
                   ))}
                 </ul>
-                <Link to="/onboarding" className="block">
-                  <Button
-                    className={`w-full rounded-xl group ${p.highlighted ? "shadow-glow" : ""}`}
-                    variant={p.highlighted ? "default" : "outline"}
-                    size="lg"
-                  >
-                    {p.cta}
-                    <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                {p.status === "available" ? (
+                  <Button asChild className={`w-full rounded-xl group ${p.highlighted ? "shadow-glow" : ""}`} variant={p.highlighted ? "default" : "outline"} size="lg">
+                    <Link to="/onboarding">Start Free <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" /></Link>
                   </Button>
-                </Link>
+                ) : (
+                  <Button className={`w-full rounded-xl ${p.highlighted ? "shadow-glow" : ""}`} variant={p.highlighted ? "default" : "outline"} size="lg" disabled>Coming soon</Button>
+                )}
               </motion.div>
             ))}
           </motion.div>
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={3} className="text-center text-xs text-muted-foreground mt-8">
-            No credit card required • Cancel anytime • 14-day free trial on paid plans
+            Free during beta • No credit card required • Nothing charged today
           </motion.p>
         </div>
       </section>
@@ -548,7 +484,7 @@ export default function LandingPage() {
             Start getting more customers today
           </motion.h2>
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={2} className="text-lg text-muted-foreground mb-10 max-w-md mx-auto">
-            Create your smart business card in 2 minutes. Start capturing leads today — free forever.
+            Create your smart business card in 2 minutes. Start capturing leads today — Free during beta.
           </motion.p>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={3} className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link to="/onboarding">
@@ -563,7 +499,7 @@ export default function LandingPage() {
             </a>
           </motion.div>
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={4} className="text-xs text-muted-foreground mt-6">
-            Free forever • No credit card • Setup in 2 minutes
+            Free during beta • No credit card • Setup in 2 minutes
           </motion.p>
           <motion.p initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={5} className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground/70 mt-4">
             <Shield className="h-3 w-3" /> Trusted and secure platform for local businesses

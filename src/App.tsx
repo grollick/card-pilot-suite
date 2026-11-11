@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { OrgProvider } from "@/contexts/OrgContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
@@ -32,8 +32,6 @@ const PublicSite = lazy(() => import("@/modules/public/pages/PublicSite"));
 const DemoCardPreview = lazy(() => import("@/modules/public/pages/DemoCardPreview"));
 const SecurityPage = lazy(() => import("@/modules/public/pages/SecurityPage"));
 const ReferralRedirect = lazy(() => import("@/modules/public/pages/ReferralRedirect"));
-const SimpleLandingPage = lazy(() => import("@/modules/landing/pages/SimpleLandingPage"));
-const NewHeroPage = lazy(() => import("@/modules/landing/pages/NewHeroPage"));
 
 // Client Portal — loaded eagerly (public, token-based)
 const ClientPortal = lazy(() => import("@/modules/portal/pages/ClientPortal"));
@@ -195,6 +193,11 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
 }
 
 
+function LandingRedirect() {
+  const { search, hash } = useLocation();
+  return <Navigate to={{ pathname: "/", search, hash }} replace />;
+}
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -238,8 +241,8 @@ const App = () => (
 
             {/* Industry landing pages */}
             <Route path="/for/:industry" element={<IndustryLandingPage />} />
-            <Route path="/get-started" element={<LazyRoute><SimpleLandingPage /></LazyRoute>} />
-            <Route path="/new-hero" element={<LazyRoute><NewHeroPage /></LazyRoute>} />
+            <Route path="/get-started" element={<LandingRedirect />} />
+            <Route path="/new-hero" element={<LandingRedirect />} />
 
             {/* Demo cards — no auth */}
             <Route path="/demo/:slug" element={<LazyRoute><DemoCardPreview /></LazyRoute>} />

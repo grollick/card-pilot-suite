@@ -106,31 +106,6 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
     ],
   },
   {
-    key: "new-hero",
-    title: "Hero Variant A — Modern Split",
-    description: "A/B test hero at /new-hero",
-    url: "/new-hero",
-    sections: [
-      { id: "hero_modern", type: "hero_modern", label: "Modern Split Hero", enabled: true, content: {
-        headline: "Turn Every Conversation Into a Customer",
-        subheadline: "The smart digital business card that captures leads, books jobs, sends estimates, and grows your local service business — all from one simple link.",
-        description: "No more lost contacts, endless texting, or slow estimates. Share via QR, NFC, text, or social — and watch your leads and bookings grow automatically.",
-        cta_primary: "Create My Free Card →",
-        cta_primary_url: "/auth",
-        cta_secondary: "See Live Demo Card",
-        cta_secondary_url: "/demo/mike-reynolds",
-        trust_line: "Free to start • No credit card required • Secure",
-        mockup_name: "Mike Reynolds",
-        mockup_company: "Reynolds Construction LLC",
-        mockup_location: "Toronto, ON",
-        mockup_rating: "5.0",
-        mockup_reviews: "42",
-        ab_test_active: "false",
-        ab_variant: "A",
-      }},
-    ],
-  },
-  {
     key: "for/landscapers", title: "Landscapers Landing Page", description: "Industry page at /for/landscapers", url: "/for/landscapers",
     sections: [
       { id: "hero", type: "hero", label: "Hero", enabled: true, content: {} },
@@ -400,9 +375,6 @@ function ModernHeroEditor({
           <label className="text-2xs text-muted-foreground">Variant Label</label>
           <Input value={content.ab_variant || "A"} onChange={(e) => onUpdate("ab_variant", e.target.value)} className="text-xs h-7 mt-0.5" />
         </div>
-        <a href="/new-hero" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-2xs text-primary hover:underline mt-1">
-          <ExternalLink className="h-2.5 w-2.5" /> Preview live page
-        </a>
       </div>
 
       <div className="border-t border-border pt-3 space-y-3">
@@ -732,7 +704,6 @@ export default function LandingPageManager({ adminOnly = true }: LandingPageMana
   const PAGE_GROUPS: { label: string; description: string; keys: string[] }[] = [
     { label: "Core Pages", description: "Your main website pages", keys: ["main"] },
     { label: "Industry Pages", description: "Targeted landing pages for specific professions", keys: ["for/contractors", "for/barbers", "for/realtors", "for/photographers", "for/landscapers"] },
-    { label: "A/B Tests", description: "Experimental page variants for conversion testing", keys: ["new-hero"] },
     { label: "Legal", description: "Privacy policy, terms of service, and compliance pages", keys: ["privacy", "terms"] },
   ];
 
@@ -767,8 +738,7 @@ export default function LandingPageManager({ adminOnly = true }: LandingPageMana
                         <Scale className="h-5 w-5 text-primary" />
                       ) : page.key === "main" ? (
                         <Globe className="h-5 w-5 text-primary" />
-                      ) : page.key === "new-hero" ? (
-                        <FlaskConical className="h-5 w-5 text-primary" />
+
                       ) : (
                         <FileText className="h-5 w-5 text-primary" />
                       )}
@@ -781,9 +751,6 @@ export default function LandingPageManager({ adminOnly = true }: LandingPageMana
                         </Badge>
                         {(page.key === "privacy" || page.key === "terms") && (
                           <Badge variant="outline" className="text-2xs"><Sparkles className="h-2.5 w-2.5 mr-1" />AI Assisted</Badge>
-                        )}
-                        {page.key === "new-hero" && (
-                          <Badge variant="outline" className="text-2xs border-primary/30 text-primary"><FlaskConical className="h-2.5 w-2.5 mr-1" />A/B Test</Badge>
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground mt-0.5">{page.description}</p>
