@@ -18,6 +18,7 @@ import {
   Shield, MessageCircle, Briefcase, Instagram,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 // Icon lookup
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -186,14 +187,7 @@ export default function BlockMarketplaceDialog({
                         <Plus className="h-3 w-3" /> Add
                       </Button>
                     ) : (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-7 text-[11px] gap-1 text-amber-600"
-                        onClick={() => window.location.href = "/pricing"}
-                      >
-                        <Crown className="h-3 w-3" /> Upgrade
-                      </Button>
+                      <AskForMoreRoom size="sm" variant="ghost" className="h-7 text-[11px] gap-1" limit={`Card block: ${block.name ?? block.id ?? "premium block"}`} />
                     )}
                   </div>
                 </div>

@@ -200,7 +200,7 @@ export default function LandingPage() {
                 <motion.div initial="hidden" animate="visible" variants={fade} custom={0} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/8 border border-primary/15 text-primary text-xs font-semibold mb-6">
                   <Zap className="h-3 w-3" /> The all-in-one platform for service professionals
                 </motion.div>
-                <div className="text-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] mb-6 min-h-[1.2em] sm:min-h-[2.4em]">
+                <div className="text-display text-4xl sm:text-5xl lg:text-6xl xl:text-[4rem] mb-6">
                   <AnimatePresence mode="wait">
                     <motion.h1
                       key={`${heroHeadlineAccent.main}-${heroHeadlineAccent.accent}`}

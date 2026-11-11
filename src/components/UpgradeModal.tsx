@@ -1,9 +1,9 @@
-import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight, CheckCircle2 } from "lucide-react";
+import { X, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { UPGRADE_SCENARIOS, type UpgradeTrigger } from "@/modules/billing/config/planLimits";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 interface UpgradeModalProps {
   open: boolean;
@@ -13,14 +13,8 @@ interface UpgradeModalProps {
 }
 
 export default function UpgradeModal({ open, onClose, trigger, currentPlan = "Free" }: UpgradeModalProps) {
-  const navigate = useNavigate();
   const scenario = UPGRADE_SCENARIOS[trigger];
   const Icon = scenario.icon;
-
-  const handleUpgrade = () => {
-    onClose();
-    navigate("/pricing");
-  };
 
   return (
     <AnimatePresence>
@@ -73,7 +67,7 @@ export default function UpgradeModal({ open, onClose, trigger, currentPlan = "Fr
 
                 {/* Message */}
                 <p className="text-sm text-muted-foreground mb-5">
-                  {scenario.message}
+                  {BETA_UPGRADE_MESSAGE}
                 </p>
 
                 {/* Benefits */}
@@ -88,9 +82,7 @@ export default function UpgradeModal({ open, onClose, trigger, currentPlan = "Fr
 
                 {/* CTAs */}
                 <div className="flex flex-col gap-2">
-                  <Button size="lg" className="w-full font-semibold" onClick={handleUpgrade}>
-                    Upgrade Now <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  <AskForMoreRoom size="lg" className="w-full font-semibold" limit={scenario.headline} />
                   <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={onClose}>
                     Maybe Later
                   </Button>

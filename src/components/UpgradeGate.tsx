@@ -1,6 +1,6 @@
 import { Lock } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import type { UpgradeTrigger } from "@/modules/billing/config/planLimits";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 interface UpgradeGateProps {
   locked: boolean;
@@ -28,12 +28,10 @@ export default function UpgradeGate({ locked, trigger, onUpgrade, children, mode
           <div className="flex items-center gap-2 text-sm">
             <Lock className="h-3.5 w-3.5 text-primary" />
             <span className="text-foreground font-medium">
-              {bannerText ?? "Upgrade to unlock this feature"}
+              {bannerText ?? BETA_UPGRADE_MESSAGE}
             </span>
           </div>
-          <Button size="sm" variant="default" onClick={() => onUpgrade(trigger)}>
-            Upgrade
-          </Button>
+          <AskForMoreRoom size="sm" variant="default" limit={bannerText ?? trigger} />
         </div>
         <div className="opacity-50 pointer-events-none select-none">
           {children}
@@ -54,11 +52,9 @@ export default function UpgradeGate({ locked, trigger, onUpgrade, children, mode
             <Lock className="h-5 w-5 text-primary" />
           </div>
           <p className="text-sm font-medium text-foreground mb-3">
-            {bannerText ?? "Upgrade to unlock"}
+            {bannerText ?? BETA_UPGRADE_MESSAGE}
           </p>
-          <Button size="sm" onClick={() => onUpgrade(trigger)}>
-            Upgrade Now
-          </Button>
+          <AskForMoreRoom size="sm" limit={bannerText ?? trigger} />
         </div>
       </div>
     </div>

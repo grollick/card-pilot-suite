@@ -20,6 +20,7 @@ import {
   useMyCards, useCreateCard, useDeleteCard, useSetPrimaryCard,
   useProfessionOptions, useCardAllowance, slugifyCard,
 } from "@/hooks/useCards";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 interface Props {
   handle?: string | null;
@@ -112,10 +113,10 @@ export default function CardSwitcher({ handle, activeCardId }: Props) {
               <Plus className="h-3.5 w-3.5" /> New card
             </DropdownMenuItem>
           ) : (
-            <DropdownMenuItem className="text-xs gap-2" onSelect={() => navigate("/pricing")}>
-              <Crown className="h-3.5 w-3.5 text-primary" />
-              {isMultiCardPlan ? "Upgrade for more cards" : "Upgrade to add more cards"}
-            </DropdownMenuItem>
+            <div className="px-2 py-1.5 space-y-1.5">
+              <p className="text-[11px] text-muted-foreground">{BETA_UPGRADE_MESSAGE}</p>
+              <AskForMoreRoom size="sm" variant="outline" className="w-full h-7 text-xs" limit="More cards" />
+            </div>
           )}
           {active && !active.is_primary && (
             <>

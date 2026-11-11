@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { useAIRoi, useAIUsage, type AIRoiData } from "../hooks/useProviderInsights";
 import { useNavigate } from "react-router-dom";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 function TrendIndicator({ current, previous }: { current: number; previous: number }) {
   if (previous === 0 && current === 0) return <Minus className="h-3 w-3 text-muted-foreground" />;
@@ -46,7 +47,6 @@ function UpgradeDriver({ plan, roi }: { plan: string; roi: AIRoiData }) {
 
   if (plan === "growth") return null;
 
-  const hasConversions = roi.ai_assisted_bookings_month > 0;
 
   return (
     <div className="p-4 rounded-xl border border-primary/20 bg-primary/5">
@@ -57,16 +57,9 @@ function UpgradeDriver({ plan, roi }: { plan: string; roi: AIRoiData }) {
         </p>
       </div>
       <p className="text-xs text-muted-foreground mb-3">
-        {hasConversions
-          ? `AI helped convert ${roi.ai_assisted_bookings_month} booking${roi.ai_assisted_bookings_month !== 1 ? "s" : ""} this month — upgrade to keep growing.`
-          : plan === "free"
-            ? "Pro providers reply faster with AI and win more jobs."
-            : "Growth plan unlocks advanced insights and unlimited AI assists."}
+        {BETA_UPGRADE_MESSAGE}
       </p>
-      <Button size="sm" onClick={() => navigate("/pricing")} className="gap-1">
-        <Zap className="h-3 w-3" />
-        Upgrade to {plan === "free" ? "Pro" : "Growth"}
-      </Button>
+      <AskForMoreRoom size="sm" className="gap-1" limit="More AI assists" />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { CARD_TEMPLATES, STYLE_PRESETS, type StylePreset } from "@/lib/cardTemplates";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 interface TemplateOption {
   id: string;
@@ -575,16 +576,11 @@ export default function CardTemplateChooser({ onSelect, onSkip, professionName }
 
               {/* CTA */}
               <div className="px-6 pb-6 pt-1 space-y-2">
-                <Button
-                  size="lg"
-                  className="w-full h-11 gap-2 font-semibold shadow-md"
-                  onClick={() => window.location.href = "/app/pricing"}
-                >
-                  <Crown className="h-4 w-4" /> Upgrade to Pro
+                <p className="text-[11px] text-muted-foreground text-center">{BETA_UPGRADE_MESSAGE}</p>
+                <AskForMoreRoom size="lg" className="w-full h-11 gap-2 font-semibold shadow-md" limit={`Premium template: ${lockedTemplateName}`} />
+                <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={() => setShowUpgradeModal(false)}>
+                  Maybe Later
                 </Button>
-                <p className="text-[11px] text-muted-foreground text-center">
-                  One new job pays for your month. Cancel anytime.
-                </p>
               </div>
             </motion.div>
           </motion.div>

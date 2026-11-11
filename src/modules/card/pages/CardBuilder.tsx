@@ -40,6 +40,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { motion, AnimatePresence } from "framer-motion";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
 import CtaEditor from "@/modules/card/components/CtaEditor";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 const TEMPLATE_STYLE_PALETTES: Record<string, { primary: string; secondary: string; accent: string; background: string }> = {
   Modern: { primary: "#2563eb", secondary: "#0f172a", accent: "#14b8a6", background: "#f8fafc" },
@@ -500,11 +501,9 @@ export default function CardBuilder() {
             <span className="text-[11px] font-semibold text-foreground">Unlock Pro</span>
           </div>
           <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
-            Premium templates, animations, AI tools, and more.
+            {BETA_UPGRADE_MESSAGE}
           </p>
-          <Button size="sm" className="w-full h-8 text-[10px] rounded-xl shadow-sm" onClick={() => window.location.href = "/app/pricing"}>
-            Upgrade
-          </Button>
+          <AskForMoreRoom size="sm" className="w-full h-8 text-[10px] rounded-xl shadow-sm" limit="Pro card tools" />
         </div>
       )}
     </div>
@@ -618,7 +617,7 @@ export default function CardBuilder() {
                 style_preset_id: preset.id,
               });
             }}
-            onUpgrade={() => { window.location.href = "/app/pricing"; }}
+            onUpgrade={() => { toast(BETA_UPGRADE_MESSAGE); }}
           />
         </PanelSection>
 

@@ -20,6 +20,7 @@ import {
 } from "@/lib/cardTemplates";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
 import { toast } from "sonner";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 const STYLE_COLORS: Record<string, string> = {
   Modern: "hsl(var(--primary))",
@@ -72,7 +73,7 @@ export default function TemplateGalleryPage() {
 
   const handleApply = (template: CardTemplate) => {
     if (template.premium && !hasPremium) {
-      navigate("/app/pricing");
+      toast(BETA_UPGRADE_MESSAGE);
       return;
     }
     // Navigate to card builder with template param
@@ -474,9 +475,7 @@ function TemplatePreviewDialog({
           {/* Actions */}
           <div className="flex gap-2 pt-2">
             {isLocked ? (
-              <Button className="flex-1 gap-1.5" onClick={onApply}>
-                <Crown className="h-3.5 w-3.5" /> Upgrade to Unlock
-              </Button>
+              <AskForMoreRoom className="flex-1 gap-1.5" limit={`Premium template: ${template.name}`} />
             ) : (
               <Button className="flex-1 gap-1.5" onClick={onApply}>
                 <ArrowRight className="h-3.5 w-3.5" /> Apply Template

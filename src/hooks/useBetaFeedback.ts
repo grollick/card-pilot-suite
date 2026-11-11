@@ -68,6 +68,8 @@ export function useSubmitFeedback() {
       page_url?: string;
       feature_tag?: string;
       meta_json?: Record<string, unknown>;
+      /** Skip the default success toast */
+      silent?: boolean;
     }) => {
       if (!user) throw new Error("Not authenticated");
 
@@ -86,8 +88,8 @@ export function useSubmitFeedback() {
       });
       if (error) throw error;
     },
-    onSuccess: () => {
-      toast.success("Thanks for your feedback!");
+    onSuccess: (_data, vars) => {
+      if (!vars.silent) toast.success("Thanks for your feedback!");
       qc.invalidateQueries({ queryKey: ["my-feedback"] });
     },
     onError: (e: Error) => toast.error(e.message),

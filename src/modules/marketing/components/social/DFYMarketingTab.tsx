@@ -7,6 +7,7 @@ import DFYMarketingDashboard from "./DFYMarketingDashboard";
 import { useAutoCampaigns, useCreateCampaign, useDeleteCampaign } from "@/hooks/useAutoCampaigns";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
 import { toast } from "sonner";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 interface Props {
   onSwitchToCalendar: () => void;
@@ -101,9 +102,8 @@ export default function DFYMarketingTab({ onSwitchToCalendar }: Props) {
             <li className="flex items-center gap-2"><Sparkles className="h-3 w-3 text-primary" /> Pro Plus: Full automation + AI optimization + weekly reports</li>
           </ul>
         </div>
-        <Button onClick={() => window.location.href = "/pricing"} className="gap-2">
-          <Crown className="h-4 w-4" /> Upgrade to Pro
-        </Button>
+        <p className="text-sm text-muted-foreground">{BETA_UPGRADE_MESSAGE}</p>
+        <AskForMoreRoom className="gap-2" limit="Done-for-you marketing" />
       </div>
     );
   }

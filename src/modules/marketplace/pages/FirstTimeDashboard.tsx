@@ -13,6 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import ShareCardModal from "../components/ShareCardModal";
 import ShareCtaWidget from "../components/ShareCtaWidget";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 /* ─── Mock state (replace with real queries) ─── */
 const MOCK_BUSINESS = {
@@ -334,13 +335,11 @@ export default function FirstTimeDashboard() {
             <div>
               <p className="text-sm font-semibold text-foreground">Want more visibility?</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Upgrade to appear higher in marketplace results and get more customers.
+                {BETA_UPGRADE_MESSAGE}
               </p>
             </div>
           </div>
-          <Button size="sm" variant="outline" className="flex-shrink-0" onClick={() => navigate("/pricing")}>
-            Explore Plans
-          </Button>
+          <AskForMoreRoom size="sm" variant="outline" className="flex-shrink-0" limit="Marketplace visibility" />
         </div>
       </motion.div>
 

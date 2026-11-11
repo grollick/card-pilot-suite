@@ -3,6 +3,7 @@ import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import type { AIUsageData } from "../hooks/useProviderInsights";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 interface Props {
   usage: AIUsageData | null | undefined;
@@ -58,23 +59,9 @@ export default function AIUsageMeter({ usage, isLoading }: Props) {
 
         {/* Upgrade CTA — only when near/at limit */}
         {isAtLimit ? (
-          <Button
-            size="sm"
-            className="h-8 text-xs gap-1 shrink-0"
-            onClick={() => navigate("/pricing")}
-          >
-            <Zap className="h-3 w-3" />
-            Upgrade
-          </Button>
+          <AskForMoreRoom size="sm" className="h-8 text-xs gap-1 shrink-0" limit="AI requests" />
         ) : isNearLimit ? (
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-7 text-xs gap-1 shrink-0"
-            onClick={() => navigate("/pricing")}
-          >
-            Get More
-          </Button>
+          <AskForMoreRoom size="sm" variant="outline" className="h-7 text-xs gap-1 shrink-0" limit="AI requests" />
         ) : null}
       </div>
 
@@ -82,7 +69,7 @@ export default function AIUsageMeter({ usage, isLoading }: Props) {
       {isAtLimit && (
         <div className="px-4 py-2 bg-primary/5 border-t border-primary/10">
           <p className="text-xs text-muted-foreground">
-            Upgrade to keep replying faster and winning more jobs
+            {BETA_UPGRADE_MESSAGE}
           </p>
         </div>
       )}

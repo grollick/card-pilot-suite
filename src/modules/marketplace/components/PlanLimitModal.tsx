@@ -4,6 +4,7 @@ import { X, ArrowRight, CheckCircle2, Zap, Users, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import type { LimitKind } from "../hooks/useBusinessPlanStatus";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 const LIMIT_CONTENT: Record<LimitKind, {
   icon: React.ElementType;
@@ -114,7 +115,7 @@ export default function PlanLimitModal({
                 </div>
 
                 <p className="text-sm text-muted-foreground mb-5">
-                  {content.message}
+                  {BETA_UPGRADE_MESSAGE}
                 </p>
 
                 <div className="space-y-2.5 mb-6">
@@ -127,15 +128,9 @@ export default function PlanLimitModal({
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <Button
-                    size="lg"
-                    className="w-full font-semibold"
-                    onClick={() => { onClose(); navigate("/pricing"); }}
-                  >
-                    Upgrade Now <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
+                  <AskForMoreRoom size="lg" className="w-full font-semibold" limit={content.headline} />
                   <Button variant="ghost" size="sm" className="w-full text-muted-foreground" onClick={onClose}>
-                    Cancel
+                    Maybe Later
                   </Button>
                 </div>
               </div>

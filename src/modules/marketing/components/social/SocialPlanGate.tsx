@@ -4,6 +4,7 @@ import { usePlanLimits } from "@/hooks/usePlanLimits";
 import { useSocialPosts } from "@/hooks/useSocialPosts";
 import { useNavigate } from "react-router-dom";
 import type { PlanLimits } from "@/lib/plans";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 interface GateProps {
   feature: keyof PlanLimits;
@@ -29,11 +30,9 @@ export function SocialFeatureGate({ feature, children, label, description }: Gat
       </div>
       <h3 className="text-lg font-bold mb-1">{label || "Feature Locked"}</h3>
       <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-        {description || "Upgrade your plan to unlock this feature and grow your social presence."}
+        {BETA_UPGRADE_MESSAGE}
       </p>
-      <Button onClick={() => navigate("/pricing")} className="gap-2">
-        <Crown className="h-4 w-4" /> Upgrade Plan
-      </Button>
+      <AskForMoreRoom className="gap-2" limit={label || String(feature)} />
     </div>
   );
 }

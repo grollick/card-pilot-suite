@@ -1,6 +1,7 @@
 import { Lock, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 const FEATURE_LABELS: Record<string, { label: string; plan: string }> = {
   follow_up: { label: "Follow-up suggestions", plan: "Pro" },
@@ -31,11 +32,9 @@ export default function AIFeatureGate({ feature, children, enabled }: Props) {
           {info.label} available on {info.plan}
         </p>
         <p className="text-xs text-muted-foreground text-center mb-3">
-          Upgrade to unlock this feature and grow faster.
+          {BETA_UPGRADE_MESSAGE}
         </p>
-        <Button size="sm" className="gap-1" onClick={() => navigate("/pricing")}>
-          <Zap className="h-3.5 w-3.5" /> Upgrade
-        </Button>
+        <AskForMoreRoom size="sm" className="gap-1" limit={info.label} />
       </div>
       <div className="opacity-30 pointer-events-none">
         {children}

@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import BoostCampaignPanel from "../components/BoostCampaignPanel";
 import PlanLimitModal from "../components/PlanLimitModal";
 import { useBusinessPlanStatus, type LimitKind } from "../hooks/useBusinessPlanStatus";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 const PLAN_COLORS: Record<string, string> = {
   free: "bg-muted text-muted-foreground",
@@ -171,15 +172,13 @@ export default function ProviderDashboard() {
               <ShieldCheck className="h-3 w-3" /> Active
             </Badge>
           ) : (
-            <Button size="sm" onClick={() => navigate("/pricing")}>
-              <Zap className="h-3.5 w-3.5 mr-1" /> Upgrade to Growth
-            </Button>
+            <AskForMoreRoom size="sm" limit="Premium badge" />
           )}
         </div>
         {plan.plan_name !== "growth" && (
           <div className="mt-3 p-3 rounded-lg bg-muted/50">
             <p className="text-xs text-muted-foreground">
-              The <span className="font-medium text-foreground">Premium badge</span> helps your listing stand out on the Growth plan.
+              {BETA_UPGRADE_MESSAGE}
             </p>
           </div>
         )}
@@ -187,9 +186,8 @@ export default function ProviderDashboard() {
 
       {/* Upgrade Hooks */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <button
-          onClick={() => navigate("/pricing")}
-          className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card hover:border-primary/30 transition-all text-left group"
+        <div
+          className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card text-left"
         >
           <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-success/10">
             <TrendingUp className="h-4 w-4 text-success" />
@@ -198,11 +196,10 @@ export default function ProviderDashboard() {
             <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">Appear higher in search</p>
             <p className="text-xs text-muted-foreground">Featured placement puts you first in search</p>
           </div>
-          <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-        </button>
-        <button
-          onClick={() => navigate("/pricing")}
-          className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card hover:border-primary/30 transition-all text-left group"
+          <AskForMoreRoom size="sm" variant="outline" limit="Featured placement" />
+        </div>
+        <div
+          className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card text-left"
         >
           <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10">
             <Users className="h-4 w-4 text-primary" />
@@ -211,8 +208,8 @@ export default function ProviderDashboard() {
             <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">Get more customers</p>
             <p className="text-xs text-muted-foreground">Unlock unlimited bookings and better lead tools</p>
           </div>
-          <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-        </button>
+          <AskForMoreRoom size="sm" variant="outline" limit="Unlimited bookings" />
+        </div>
       </div>
 
       {/* Reviews Dashboard */}

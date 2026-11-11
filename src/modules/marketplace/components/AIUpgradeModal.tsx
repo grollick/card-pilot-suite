@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Zap, CheckCircle2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 const PLAN_BENEFITS: Record<string, { headline: string; message: string; features: string[] }> = {
   free: {
@@ -69,9 +70,7 @@ export default function AIUpgradeModal({ open, onClose, currentPlan = "free", re
             </h2>
 
             <p className="text-sm text-muted-foreground text-center mb-1">
-              {reason === "feature_locked" && featureName
-                ? `${featureName} is available on ${nextPlan}.`
-                : benefits.message}
+              {BETA_UPGRADE_MESSAGE}
             </p>
 
             <p className="text-xs text-muted-foreground text-center mb-4">
@@ -87,13 +86,7 @@ export default function AIUpgradeModal({ open, onClose, currentPlan = "free", re
               ))}
             </div>
 
-            <Button
-              className="w-full gap-2"
-              onClick={() => { onClose(); navigate("/pricing"); }}
-            >
-              <Zap className="h-4 w-4" />
-              Upgrade to {nextPlan}
-            </Button>
+            <AskForMoreRoom className="w-full gap-2" limit={featureName ? `AI: ${featureName}` : "AI requests"} />
 
             <button
               onClick={onClose}

@@ -1,6 +1,5 @@
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, TrendingUp, PartyPopper } from "lucide-react";
+import { Sparkles, TrendingUp, PartyPopper } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -8,6 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 interface MilestoneUpgradePromptProps {
   milestone: "first_lead" | "first_booking";
@@ -44,7 +44,7 @@ export default function MilestoneUpgradePrompt({ milestone, open, onOpenChange }
           </div>
           <DialogTitle className="text-xl">{content.title}</DialogTitle>
           <DialogDescription className="mt-2">
-            {content.description}
+            {BETA_UPGRADE_MESSAGE}
           </DialogDescription>
         </DialogHeader>
 
@@ -57,12 +57,7 @@ export default function MilestoneUpgradePrompt({ milestone, open, onOpenChange }
         )}
 
         <div className="flex flex-col gap-2 mt-4">
-          <Link to="/pricing">
-            <Button className="w-full shadow-glow gap-2">
-              {content.ctaText} <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-          <p className="text-[11px] text-muted-foreground">No credit card required · Cancel anytime</p>
+          <AskForMoreRoom className="w-full shadow-glow gap-2" limit={content.ctaText} />
           <Button variant="ghost" size="sm" onClick={() => onOpenChange(false)}>
             Maybe later
           </Button>

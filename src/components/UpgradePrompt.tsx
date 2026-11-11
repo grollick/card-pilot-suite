@@ -1,6 +1,5 @@
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowUp, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -9,6 +8,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { getNextTier, getPlanByKey } from "@/lib/plans";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 interface UpgradePromptProps {
   open: boolean;
@@ -35,15 +35,11 @@ export default function UpgradePrompt({ open, onOpenChange, feature, currentPlan
           <DialogTitle className="text-xl">Upgrade to {nextName}</DialogTitle>
           <DialogDescription>
             You've reached the {feature} limit on your <span className="font-semibold">{currentDisplay}</span> plan.
-            Upgrade to {nextName} to unlock more.
+            {BETA_UPGRADE_MESSAGE}
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-2 mt-4">
-          <Link to="/app/settings">
-            <Button className="w-full shadow-glow">
-              <ArrowUp className="h-4 w-4 mr-1.5" /> View Plans & Upgrade
-            </Button>
-          </Link>
+          <AskForMoreRoom className="w-full shadow-glow" limit={feature} />
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Maybe later
           </Button>

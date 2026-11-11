@@ -106,7 +106,7 @@ export default function PricingPage() {
               <Check className="h-3 w-3" /> Free during beta
             </Badge>
             <Badge variant="secondary" className="gap-1.5 py-1.5 px-3 text-xs">
-              <Zap className="h-3 w-3" /> Set up in 30 seconds
+              <Zap className="h-3 w-3" /> Set up in 2 minutes
             </Badge>
           </motion.div>
 
@@ -273,7 +273,7 @@ export default function PricingPage() {
               Your next customer is one link away.
             </h2>
             <p className="text-muted-foreground max-w-md mx-auto mb-6">
-              Create your free card in 30 seconds. No credit card, no commitment.
+              Create your free card in 2 minutes. No credit card, no commitment.
             </p>
             <Button size="lg" className="shadow-glow gap-2" onClick={() => handleAuthNav("signup")}>
               <Sparkles className="h-4 w-4" />

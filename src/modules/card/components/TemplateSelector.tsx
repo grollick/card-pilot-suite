@@ -12,6 +12,7 @@ import {
   type TemplateCategory,
 } from "@/lib/cardTemplates";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
+import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 interface TemplateSelectorProps {
   selectedTemplateId: string | null;
@@ -139,13 +140,7 @@ export default function TemplateSelector({
                 ))}
               </div>
               <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  className="flex-1 h-8 text-[11px] gap-1.5"
-                  onClick={() => window.location.href = "/app/pricing"}
-                >
-                  <Crown className="h-3 w-3" /> Upgrade to Pro
-                </Button>
+                <AskForMoreRoom size="sm" className="flex-1 h-8 text-[11px] gap-1.5" limit="Premium templates" />
                 <Button
                   variant="ghost"
                   size="sm"
