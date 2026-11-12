@@ -77,6 +77,13 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
     setStep("ocr_running");
     setOcrError(null);
     try {
+      const { data: sess } = await supabase.auth.getSession();
+      if (!sess.session) {
+        // Visitors can't use the AI reader; let them type the details instead.
+        setContact({ name: "" });
+        setStep("review");
+        return;
+      }
       const base64 = await prepareBase64(file);
       const { data, error } = await supabase.functions.invoke("scan-business-card-public", {
         body: { image: base64, card_handle: handle },
