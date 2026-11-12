@@ -4,6 +4,7 @@ import DataExportSection from "@/modules/settings/components/DataExportSection";
 import DataImportSection from "@/modules/settings/components/DataImportSection";
 import BrandKitSettings from "@/modules/settings/components/BrandKitSettings";
 import AIPersonalitySettings from "@/components/settings/AIPersonalitySettings";
+import GetPaidOnlineCard from "@/modules/settings/components/GetPaidOnlineCard";
 import GoogleBusinessSync from "@/modules/settings/components/GoogleBusinessSync";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -209,6 +210,8 @@ export default function SettingsPage() {
               Re-run Setup Wizard
             </Button>
           </motion.div>
+
+          <GetPaidOnlineCard />
 
           <AIPersonalitySettings profile={profile} />
         </TabsContent>

@@ -14,8 +14,11 @@ export const PAYMENT_METHOD_OPTIONS = [
   { value: "cash", label: "Cash", phrase: "cash" },
   { value: "check", label: "Cheque", phrase: "cheque" },
   { value: "bank_transfer", label: "Bank transfer", phrase: "bank transfer" },
+  { value: "paypal", label: "PayPal", phrase: "PayPal" },
+  { value: "card", label: "Card", phrase: "card" },
   { value: "other", label: "Other", phrase: "another way" },
 ] as const;
+export const methodName = (m?: string | null) => PAYMENT_METHOD_OPTIONS.find((o) => o.value === m)?.label ?? "Other";
 export const methodPhrase = (m?: string | null) => PAYMENT_METHOD_OPTIONS.find((o) => o.value === m)?.phrase ?? "another way";
 
 export interface InvoiceReport {
@@ -32,10 +35,15 @@ interface Props {
   businessName: string;
   report: InvoiceReport;
   onReported: (r: InvoiceReport) => void;
+  payOnline?: { paypal_url: string | null; stripe_url: string | null } | null;
+  amountDue?: number;
 }
 
+const money = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
 /** Payment part of the customer invoice page. Online payment buttons will be added here later. */
-export default function InvoicePaymentSection({ token, status, paidAt, businessName, report, onReported }: Props) {
+export default function InvoicePaymentSection({ token, status, paidAt, businessName, report, onReported, payOnline, amountDue = 0 }: Props) {
+  const [tapped, setTapped] = useState<null | "paypal" | "card">(null);
   const [open, setOpen] = useState(false);
   const [method, setMethod] = useState(report.customer_reported_method || "e_transfer");
   const [reference, setReference] = useState(report.customer_reported_reference || "");
@@ -60,10 +68,12 @@ export default function InvoicePaymentSection({ token, status, paidAt, businessN
     );
   }
 
-  const submit = async () => {
+  const submit = async (override?: "paypal" | "card") => {
     setSaving(true);
     const { data, error } = await supabase.functions.invoke("invoice-share", {
-      body: { action: "report_payment", token, method, reference: reference.trim() || null, note: note.trim() || null },
+      body: override
+        ? { action: "report_payment", token, method: override, reference: null, note: null }
+        : { action: "report_payment", token, method, reference: reference.trim() || null, note: note.trim() || null },
     });
     setSaving(false);
     let msg: string | null = data?.error ?? null;
@@ -80,6 +90,7 @@ export default function InvoicePaymentSection({ token, status, paidAt, businessN
       customer_reported_note: data.customer_reported_note,
     });
     setOpen(false);
+    setTapped(null);
   };
 
   if (!open && report.customer_reported_at) {
@@ -96,9 +107,41 @@ export default function InvoicePaymentSection({ token, status, paidAt, businessN
     );
   }
 
+  const hasOnline = !!(payOnline?.paypal_url || payOnline?.stripe_url);
   return (
+    <>
+    {hasOnline && (
+      <section className="bg-background rounded-xl border border-border p-5 space-y-4">
+        <div>
+          <h2 className="text-base font-semibold">Pay online</h2>
+          <p className="text-sm text-muted-foreground">Amount due: {money(amountDue)}</p>
+        </div>
+        {payOnline?.paypal_url && (
+          <div className="space-y-1.5">
+            <Button asChild className="w-full min-h-12">
+              <a href={payOnline.paypal_url} target="_blank" rel="noopener noreferrer" onClick={() => setTapped("paypal")}>Pay with PayPal</a>
+            </Button>
+            <p className="text-xs text-muted-foreground">You'll finish paying on PayPal's page.</p>
+          </div>
+        )}
+        {payOnline?.stripe_url && (
+          <div className="space-y-1.5">
+            <Button asChild variant="outline" className="w-full min-h-12">
+              <a href={payOnline.stripe_url} target="_blank" rel="noopener noreferrer" onClick={() => setTapped("card")}>Pay by card</a>
+            </Button>
+            <p className="text-xs text-muted-foreground">You'll finish paying on Stripe's page. Enter {money(amountDue)} when asked.</p>
+          </div>
+        )}
+        {tapped && (
+          <Button variant="secondary" className="w-full min-h-12" disabled={saving} onClick={() => submit(tapped)}>
+            {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
+            Finished paying? Tell {businessName}
+          </Button>
+        )}
+      </section>
+    )}
     <section className="bg-background rounded-xl border border-border p-5 space-y-4">
-      <h2 className="text-base font-semibold">Paid already?</h2>
+      <h2 className="text-base font-semibold">{hasOnline ? "Paid another way?" : "Paid already?"}</h2>
       {!open ? (
         <Button className="w-full min-h-12" onClick={() => setOpen(true)}>I've sent payment</Button>
       ) : (
@@ -122,7 +165,7 @@ export default function InvoicePaymentSection({ token, status, paidAt, businessN
             <Label htmlFor="inv-note">Note (optional)</Label>
             <Textarea id="inv-note" rows={3} maxLength={1000} value={note} onChange={(e) => setNote(e.target.value)} />
           </div>
-          <Button className="w-full min-h-12" onClick={submit} disabled={saving}>
+          <Button className="w-full min-h-12" onClick={() => submit()} disabled={saving}>
             {saving && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
             Tell {businessName} I've paid
           </Button>
@@ -130,5 +173,6 @@ export default function InvoicePaymentSection({ token, status, paidAt, businessN
         </div>
       )}
     </section>
+    </>
   );
 }

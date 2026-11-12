@@ -1,11 +1,11 @@
 // Pure rules for the customer invoice link. No runtime-specific imports so tests can load it.
 
 export type InvoiceStatus = "draft" | "sent" | "viewed" | "paid" | "overdue" | "cancelled";
-export const REPORT_METHODS = ["e_transfer", "cash", "check", "bank_transfer", "other"] as const;
+export const REPORT_METHODS = ["e_transfer", "cash", "check", "bank_transfer", "paypal", "card", "other"] as const;
 export type ReportMethod = typeof REPORT_METHODS[number];
 
 export const METHOD_LABELS: Record<ReportMethod, string> = {
-  e_transfer: "e-transfer", cash: "cash", check: "cheque", bank_transfer: "bank transfer", other: "another way",
+  e_transfer: "e-transfer", cash: "cash", check: "cheque", bank_transfer: "bank transfer", paypal: "PayPal", card: "card", other: "another way",
 };
 export const methodLabel = (m?: string | null) => METHOD_LABELS[m as ReportMethod] ?? "another way";
 
@@ -76,6 +76,7 @@ export function buildInvoicePayload(
     customer_reported_method: inv.customer_reported_method ?? null,
     customer_reported_reference: inv.customer_reported_reference ?? null,
     customer_reported_note: inv.customer_reported_note ?? null,
+    pay_online: inv.pay_online ?? { paypal_url: null, stripe_url: null },
     customer: { name: customer?.name ?? null, company: customer?.company ?? null },
     business: {
       name: (business.company || "").trim() || (business.name || "").trim() || "Your pro",

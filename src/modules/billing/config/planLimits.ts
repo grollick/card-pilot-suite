@@ -19,6 +19,7 @@ export interface PlanConfig {
     multipleServiceAreas: boolean;
     leadManagement: boolean;
     advancedLeadManagement: boolean;
+    online_invoice_payments: boolean;
   };
 }
 
@@ -37,6 +38,7 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
       multipleServiceAreas: false,
       leadManagement: false,
       advancedLeadManagement: false,
+      online_invoice_payments: false,
     },
   },
   starter: {
@@ -53,6 +55,7 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
       multipleServiceAreas: false,
       leadManagement: false,
       advancedLeadManagement: false,
+      online_invoice_payments: false,
     },
   },
   pro: {
@@ -69,6 +72,7 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
       multipleServiceAreas: false,
       leadManagement: true,
       advancedLeadManagement: false,
+      online_invoice_payments: true,
     },
   },
   growth: {
@@ -85,6 +89,7 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
       multipleServiceAreas: true,
       leadManagement: true,
       advancedLeadManagement: true,
+      online_invoice_payments: true,
     },
   },
   pro_plus: {
@@ -101,6 +106,7 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
       multipleServiceAreas: true,
       leadManagement: true,
       advancedLeadManagement: true,
+      online_invoice_payments: true,
     },
   },
 };

@@ -21,7 +21,7 @@ describe("invoice-share view payload", () => {
   );
   const text = JSON.stringify(payload);
   it("contains none of the forbidden fields", () => {
-    for (const bad of ["user_id", "lead_id", "org_id", "payment_token", "stripe", "internal_notes", "sam@x.com", "123\"", "pro@x.com", "\"id\""]) {
+    for (const bad of ["user_id", "lead_id", "org_id", "payment_token", "stripe_payment_intent", "pi_123", "internal_notes", "sam@x.com", "123\"", "pro@x.com", "\"id\""]) {
       expect(text).not.toContain(bad);
     }
   });

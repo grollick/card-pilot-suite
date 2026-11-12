@@ -17,7 +17,7 @@ import {
   useInvoice, useInvoiceLineItems, useUpdateInvoice, useUpdateInvoiceStatus,
   useSaveInvoiceLineItems, useCreateInvoice, type InvoiceStatus,
 } from "@/hooks/useInvoices";
-import { methodPhrase } from "@/modules/public/components/InvoicePaymentSection";
+import { methodName, methodPhrase } from "@/modules/public/components/InvoicePaymentSection";
 import { useInvoicePayments, useRecordPayment, useInvoicePaymentLink } from "@/hooks/useInvoicePayments";
 import { useContacts } from "@/hooks/useContacts";
 import { useJobs } from "@/hooks/useJobs";
@@ -718,6 +718,8 @@ function InvoicePaymentPanel({ invoice, invoiceId, grandTotal }: { invoice: any;
                 <SelectItem value="cash">Cash</SelectItem>
                 <SelectItem value="check">Check</SelectItem>
                 <SelectItem value="e_transfer">E-Transfer</SelectItem>
+                <SelectItem value="paypal">PayPal</SelectItem>
+                <SelectItem value="card">Card</SelectItem>
                 <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
@@ -764,7 +766,7 @@ function InvoicePaymentPanel({ invoice, invoiceId, grandTotal }: { invoice: any;
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">History</p>
           {payments.map((p: any) => (
             <div key={p.id} className="flex justify-between text-xs">
-              <span className="text-muted-foreground capitalize">{(p.payment_method || "").replace(/_/g, " ")}</span>
+              <span className="text-muted-foreground">{methodName(p.payment_method)}</span>
               <span className="tabular-nums font-medium">${Number(p.amount).toFixed(2)}</span>
             </div>
           ))}

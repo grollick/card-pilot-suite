@@ -1,6 +1,6 @@
 import { useState } from "react";
 import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Plus, Loader2, FileText, Send, Eye, CheckCircle, AlertTriangle,
   MoreHorizontal, Trash2, Download, Search, DollarSign, FileInput,
@@ -121,6 +121,14 @@ export default function InvoicesPage() {
           </Button>
         </div>
       </motion.div>
+
+      {hasFeature("online_invoice_payments") && profile && !(profile as any).paypal_me_url && !(profile as any).stripe_payment_link && (
+        <p className="text-sm">
+          <Link to="/app/settings#get-paid-online" className="text-primary hover:underline">
+            Let customers pay online. Connect Stripe or PayPal.
+          </Link>
+        </p>
+      )}
 
       {/* KPI Cards */}
       <motion.div

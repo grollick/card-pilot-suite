@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { useProfile } from "@/hooks/useCard";
 import { useEffectivePlan } from "@/hooks/useBetaAccess";
 import { getPlanLimits, isLimitReached, showsBranding, getNextTier, type PlanLimits, type PlanKey } from "@/lib/plans";
-import type { UpgradeTrigger } from "@/modules/billing/config/planLimits";
+import { getPlanConfig, type UpgradeTrigger } from "@/modules/billing/config/planLimits";
 
 /**
  * Returns the current user's plan limits and helpers to check them.
@@ -24,7 +24,8 @@ export function usePlanLimits() {
     return isLimitReached(val, currentCount);
   };
 
-  const hasFeature = (feature: keyof PlanLimits): boolean => {
+  const hasFeature = (feature: keyof PlanLimits | "online_invoice_payments"): boolean => {
+    if (feature === "online_invoice_payments") return getPlanConfig(planKey).features.online_invoice_payments;
     const val = limits[feature];
     return typeof val === "boolean" ? val : true;
   };

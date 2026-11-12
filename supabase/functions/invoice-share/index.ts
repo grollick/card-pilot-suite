@@ -3,6 +3,7 @@ import { z } from "npm:zod@3";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { buildInvoicePayload, REPORT_METHODS, statusAfterView, type InvoiceStatus } from "./logic.ts";
 import { INV_FIELDS, reportPayment } from "../_shared/invoice-share/report.ts";
+import { buildPayOnline } from "../_shared/paymentLinks.ts";
 
 const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -36,12 +37,15 @@ Deno.serve(async (req) => {
         await client.from("invoices").update({ status: next, viewed_at: new Date().toISOString() }).eq("id", inv.id).eq("status", "sent");
         inv.status = next;
       }
-      const [{ data: items }, { data: payments }, { data: business }, { data: lead }] = await Promise.all([
+      const [{ data: items }, { data: payments }, { data: business }, { data: lead }, { data: payPro }, { data: plan }] = await Promise.all([
         client.from("invoice_line_items").select("title,description,quantity,unit_price,line_total,sort_order").eq("invoice_id", inv.id).order("sort_order"),
         client.from("invoice_payments").select("amount,payment_method,paid_at").eq("invoice_id", inv.id).order("paid_at"),
         client.from("profiles").select("company,name,handle,phone,avatar_url").eq("id", inv.user_id).single(),
         inv.lead_id ? client.from("leads").select("name,company").eq("id", inv.lead_id).maybeSingle() : Promise.resolve({ data: null }),
+        client.from("profiles").select("paypal_me_url,stripe_payment_link").eq("id", inv.user_id).single(),
+        client.rpc("get_effective_plan", { p_user_id: inv.user_id }),
       ]);
+      (inv as any).pay_online = buildPayOnline(inv, payPro ?? {}, (plan as any)?.plan);
       return json({ invoice: buildInvoicePayload(inv, items ?? [], payments ?? [], business ?? {}, lead as any) });
     }
 

@@ -6,7 +6,7 @@ import { AlertTriangle, Loader2, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Separator } from "@/components/ui/separator";
 import DocumentStatusBadge from "@/components/DocumentStatusBadge";
-import InvoicePaymentSection, { methodPhrase, type InvoiceReport } from "@/modules/public/components/InvoicePaymentSection";
+import InvoicePaymentSection, { methodName, type InvoiceReport } from "@/modules/public/components/InvoicePaymentSection";
 
 const BAD_LINK = "This invoice link isn't working. Please ask the business that sent it for a new link.";
 const money = (n: unknown) =>
@@ -170,6 +170,8 @@ export default function PublicInvoicePage() {
           businessName={biz}
           report={report}
           onReported={(r) => setInv({ ...inv, ...r })}
+          payOnline={inv.pay_online}
+          amountDue={balance}
         />
 
         {inv.payments.length > 0 && (
@@ -177,7 +179,7 @@ export default function PublicInvoicePage() {
             <h2 className="text-sm font-semibold">Payments received</h2>
             {inv.payments.map((p: any, i: number) => (
               <div key={i} className="flex justify-between py-1.5 text-sm">
-                <span>{p.paid_at ? format(new Date(p.paid_at), "MMM d, yyyy") : ""} · {methodPhrase(p.payment_method)}</span>
+                <span>{p.paid_at ? format(new Date(p.paid_at), "MMM d, yyyy") : ""} · {methodName(p.payment_method)}</span>
                 <span className="font-semibold tabular-nums text-primary">{money(p.amount)}</span>
               </div>
             ))}

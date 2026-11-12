@@ -5993,6 +5993,7 @@ export type Database = {
           marketplace_enabled: boolean
           name: string | null
           onboarding_completed: boolean
+          paypal_me_url: string | null
           phone: string | null
           plan: string
           primary_cta: string | null
@@ -6003,6 +6004,7 @@ export type Database = {
           signup_source: string | null
           signup_utm_campaign: string | null
           signup_utm_medium: string | null
+          stripe_payment_link: string | null
           style_pack: string | null
           suspended_reason: string | null
           tour_completed: boolean
@@ -6038,6 +6040,7 @@ export type Database = {
           marketplace_enabled?: boolean
           name?: string | null
           onboarding_completed?: boolean
+          paypal_me_url?: string | null
           phone?: string | null
           plan?: string
           primary_cta?: string | null
@@ -6048,6 +6051,7 @@ export type Database = {
           signup_source?: string | null
           signup_utm_campaign?: string | null
           signup_utm_medium?: string | null
+          stripe_payment_link?: string | null
           style_pack?: string | null
           suspended_reason?: string | null
           tour_completed?: boolean
@@ -6083,6 +6087,7 @@ export type Database = {
           marketplace_enabled?: boolean
           name?: string | null
           onboarding_completed?: boolean
+          paypal_me_url?: string | null
           phone?: string | null
           plan?: string
           primary_cta?: string | null
@@ -6093,6 +6098,7 @@ export type Database = {
           signup_source?: string | null
           signup_utm_campaign?: string | null
           signup_utm_medium?: string | null
+          stripe_payment_link?: string | null
           style_pack?: string | null
           suspended_reason?: string | null
           tour_completed?: boolean
