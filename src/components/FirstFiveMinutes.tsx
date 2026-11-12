@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfileCache } from "@/hooks/useProfileCache";
 import { supabase } from "@/integrations/supabase/client";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   CheckCircle2, Radio, ArrowRight, Eye, Zap,
   MessageSquare, TrendingUp, X, Clock,
@@ -21,7 +21,40 @@ export default function FirstFiveMinutes() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const queryClient = useQueryClient();
-  const [currentStep, setCurrentStep] = useState<FlowStep>("card-live");
+  const stepKey = user ? `guzzl_f5m_step_${user.id}` : null;
+  const [currentStep, setCurrentStepState] = useState<FlowStep>("card-live");
+  const [milestoneOpen, setMilestoneOpen] = useState<boolean>(() => !!(window as any).__guzzlMilestoneOpen);
+
+  // Remember the step the pro reached so the panel resumes there.
+  useEffect(() => {
+    if (!stepKey) return;
+    const saved = localStorage.getItem(stepKey) as FlowStep | null;
+    if (saved && STEPS.includes(saved)) setCurrentStepState(saved);
+  }, [stepKey]);
+  const setCurrentStep = useCallback((step: FlowStep) => {
+    setCurrentStepState(step);
+    if (stepKey) localStorage.setItem(stepKey, step);
+  }, [stepKey]);
+
+  useEffect(() => {
+    const onMilestone = (e: Event) => setMilestoneOpen(Boolean((e as CustomEvent).detail));
+    window.addEventListener("guzzl:milestone-open", onMilestone);
+    return () => window.removeEventListener("guzzl:milestone-open", onMilestone);
+  }, []);
+
+  // Once a first lead or booking exists, the panel is no longer needed.
+  const { data: activity } = useQuery({
+    queryKey: ["milestone-counts", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const [leadsRes, bookingsRes] = await Promise.all([
+        supabase.from("leads").select("id", { count: "exact", head: true }),
+        supabase.from("bookings").select("id", { count: "exact", head: true }),
+      ]);
+      return { leads: leadsRes.count ?? 0, bookings: bookingsRes.count ?? 0 };
+    },
+  });
+  const hasActivity = !!activity && (activity.leads > 0 || activity.bookings > 0);
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [dutyToggled, setDutyToggled] = useState(false);
@@ -37,11 +70,11 @@ export default function FirstFiveMinutes() {
       setVisible(false);
       return;
     }
-    if (onboardingCompleted && !tourCompleted && !dismissed) {
+    if (onboardingCompleted && !tourCompleted && !dismissed && activity && !hasActivity) {
       const t = setTimeout(() => setVisible(true), 800);
       return () => clearTimeout(t);
     }
-  }, [onboardingCompleted, tourCompleted, dismissed, pathname]);
+  }, [onboardingCompleted, tourCompleted, dismissed, pathname, activity, hasActivity]);
 
   const completeFlow = useCallback(async () => {
     setVisible(false);
@@ -91,7 +124,7 @@ export default function FirstFiveMinutes() {
   const stepIndex = STEPS.indexOf(currentStep);
   const progress = ((stepIndex + 1) / STEPS.length) * 100;
 
-  if (!visible || pathname !== "/app") return null;
+  if (!visible || pathname !== "/app" || milestoneOpen || hasActivity) return null;
 
   return (
     <AnimatePresence>

@@ -48,6 +48,12 @@ export default function UpgradeTriggers() {
     }
   }, [counts, profile]);
 
+  // Let the First 5 Minutes panel know a milestone pop-up is open so the two never overlap.
+  useEffect(() => {
+    (window as any).__guzzlMilestoneOpen = !!milestone;
+    window.dispatchEvent(new CustomEvent("guzzl:milestone-open", { detail: !!milestone }));
+  }, [milestone]);
+
   const handleDismiss = () => {
     if (milestone) {
       const existing = localStorage.getItem("cp_milestone_dismissed") ?? "";

@@ -6,6 +6,19 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+async function queueReminder(
+  supabase: any, recipientEmail: string, idempotencyKey: string,
+  leadName: string | null | undefined, service: string | null | undefined, leadId: string | null,
+) {
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  if (!serviceKey) return;
+  const { error } = await supabase.functions.invoke("send-transactional-email", {
+    headers: { Authorization: `Bearer ${serviceKey}`, "x-internal-service-key": serviceKey },
+    body: { templateName: "lead-reminder", recipientEmail, idempotencyKey, templateData: { leadName, service } },
+  });
+  if (error) console.error("Lead reminder email failed", { leadId, error: error.message });
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -54,22 +67,7 @@ serve(async (req) => {
           .eq("id", log.quote_request_id)
           .single();
 
-        try {
-          await supabase.functions.invoke("send-email", {
-            body: {
-              to: recipientEmail,
-              subject: `⏰ Reminder: ${quoteReq?.customer_name || "A customer"} is waiting for your response`,
-              html: `
-                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                  <h2 style="color: #1a1a1a;">Don't miss this lead!</h2>
-                  <p>${quoteReq?.customer_name || "A potential customer"} requested a quote${quoteReq?.service_needed ? ` for <strong>${quoteReq.service_needed}</strong>` : ""} 1 hour ago and hasn't heard back yet.</p>
-                  <p style="color: #666;"><strong>Fast replies win more jobs.</strong> Reach out while they are still deciding.</p>
-                  <p><a href="https://guzzl.pro/app/contacts" style="background: #f59e0b; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">Respond Now</a></p>
-                </div>
-              `,
-            },
-          });
-        } catch (_) { /* best effort */ }
+        await queueReminder(supabase, recipientEmail, `lead-reminder-1h-${log.id}`, quoteReq?.customer_name, quoteReq?.service_needed, log.lead_id);
       }
 
       // Log reminder activity
@@ -123,22 +121,7 @@ serve(async (req) => {
           .eq("id", log.quote_request_id)
           .single();
 
-        try {
-          await supabase.functions.invoke("send-email", {
-            body: {
-              to: recipientEmail,
-              subject: `🚨 Final reminder: ${quoteReq?.customer_name || "A customer"} may go elsewhere`,
-              html: `
-                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                  <h2 style="color: #dc2626;">You're about to lose this lead</h2>
-                  <p>${quoteReq?.customer_name || "A potential customer"} has been waiting <strong>24 hours</strong> for a response${quoteReq?.service_needed ? ` about <strong>${quoteReq.service_needed}</strong>` : ""}.</p>
-                  <p style="color: #666;">This is your last reminder. After this, the lead may choose another provider.</p>
-                  <p><a href="https://guzzl.pro/app/contacts" style="background: #dc2626; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">Respond Now Before It's Too Late</a></p>
-                </div>
-              `,
-            },
-          });
-        } catch (_) { /* best effort */ }
+        await queueReminder(supabase, recipientEmail, `lead-reminder-24h-${log.id}`, quoteReq?.customer_name, quoteReq?.service_needed, log.lead_id);
       }
 
       if (log.lead_id) {

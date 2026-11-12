@@ -253,6 +253,7 @@ export default function LandingPage() {
               >
                 {/* Phone glow ring */}
                 <div className="absolute -inset-8 rounded-[3rem] bg-primary/5 blur-2xl -z-10" />
+                <div className="flex justify-center mb-2"><Badge variant="outline" className="text-2xs uppercase tracking-wider">Example card</Badge></div>
                 <HeroPhoneAnimation />
               </motion.div>
             </div>

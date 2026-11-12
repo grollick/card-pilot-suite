@@ -72,8 +72,11 @@ describe("owner reminder email fallbacks", () => {
     expect((await run()).status).toBe(200);
     expect(client.auth.admin.getUserById).toHaveBeenCalledTimes(2);
     expect(client.functions.invoke).toHaveBeenCalledTimes(2);
-    for (const [, options] of client.functions.invoke.mock.calls) {
-      expect(options.body.to).toBe("account@example.org");
+    for (const [name, options] of client.functions.invoke.mock.calls) {
+      expect(name).toBe("send-transactional-email");
+      expect(options.body.templateName).toBe("lead-reminder");
+      expect(options.body.recipientEmail).toBe("account@example.org");
+      expect(options.headers["x-internal-service-key"]).toBe("test-service-key");
     }
   });
 

@@ -75,6 +75,33 @@ export interface EstimateTotals {
   optional_total: number;
 }
 
+/** Columns that exist on the estimates table and may be written by the editor. */
+export const ESTIMATE_WRITABLE_COLUMNS = [
+  "lead_id", "booking_id", "estimate_number", "status", "issue_date", "expiry_date",
+  "job_address", "job_type", "scope_of_work", "notes", "template_key",
+  "discount_amount", "discount_percent", "deposit_amount", "deposit_percent",
+  "terms_conditions", "internal_notes",
+  "subtotal", "labor_total", "material_total", "markup_total", "tax_total", "grand_total",
+] as const;
+
+/** Builds the row to save. Computed-only values (deposit_due, balance_due, …) stay on screen and PDF. */
+export function buildEstimatePayload(form: Omit<EstimateFormData, "sections"> & { sections?: unknown }, totals: EstimateTotals) {
+  const merged: Record<string, unknown> = {
+    ...form, ...totals,
+    discount_amount: form.discount_amount ?? 0,
+    discount_percent: form.discount_percent ?? 0,
+    deposit_amount: form.deposit_amount ?? 0,
+    deposit_percent: form.deposit_percent ?? 0,
+    terms_conditions: form.terms_conditions ?? null,
+    internal_notes: form.internal_notes ?? null,
+  };
+  const row: Record<string, unknown> = {};
+  for (const key of ESTIMATE_WRITABLE_COLUMNS) if (merged[key] !== undefined) row[key] = merged[key];
+  return row;
+}
+
+export const ESTIMATE_SAVE_ERROR = "We couldn't save this estimate. Please try again.";
+
 // ── Calculation helpers ──
 
 export function calculateLineTotals(item: Omit<EstimateLineItem, "line_total"> & { line_total?: number }): EstimateLineItem {
@@ -219,15 +246,7 @@ export function useCreateEstimate() {
       const { sections, ...rest } = form;
       const { data: estimate, error } = await supabase
         .from("estimates")
-        .insert({
-          ...rest, ...totals, user_id: user!.id,
-          discount_amount: form.discount_amount ?? 0,
-          discount_percent: form.discount_percent ?? 0,
-          deposit_amount: form.deposit_amount ?? 0,
-          deposit_percent: form.deposit_percent ?? 0,
-          terms_conditions: form.terms_conditions ?? null,
-          internal_notes: form.internal_notes ?? null,
-        } as any)
+        .insert({ ...buildEstimatePayload(rest, totals), user_id: user!.id } as any)
         .select()
         .single();
       if (error) throw error;
@@ -269,7 +288,7 @@ export function useCreateEstimate() {
       qc.invalidateQueries({ queryKey: ["contact-activities"] });
       toast.success("Estimate created");
     },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: any) => { console.error("Estimate create failed", e); toast.error(ESTIMATE_SAVE_ERROR); },
   });
 }
 
@@ -282,15 +301,7 @@ export function useUpdateEstimate() {
         deposit_amount: form.deposit_amount, deposit_percent: form.deposit_percent,
       });
       const { sections, ...rest } = form;
-      const { error } = await supabase.from("estimates").update({
-        ...rest, ...totals,
-        discount_amount: form.discount_amount ?? 0,
-        discount_percent: form.discount_percent ?? 0,
-        deposit_amount: form.deposit_amount ?? 0,
-        deposit_percent: form.deposit_percent ?? 0,
-        terms_conditions: form.terms_conditions ?? null,
-        internal_notes: form.internal_notes ?? null,
-      } as any).eq("id", id);
+      const { error } = await supabase.from("estimates").update(buildEstimatePayload(rest, totals) as any).eq("id", id);
       if (error) throw error;
 
       // Replace sections and line items atomically
@@ -324,7 +335,7 @@ export function useUpdateEstimate() {
       qc.invalidateQueries({ queryKey: ["estimate", vars.id] });
       toast.success("Estimate updated");
     },
-    onError: (e: any) => toast.error(e.message),
+    onError: (e: any) => { console.error("Estimate update failed", e); toast.error(ESTIMATE_SAVE_ERROR); },
   });
 }
 

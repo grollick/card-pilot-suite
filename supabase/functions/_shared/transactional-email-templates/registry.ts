@@ -17,6 +17,7 @@ import { template as estimateSent } from './estimate-sent.tsx'
 import { template as reviewRequest } from './review-request.tsx'
 import { template as platformInvite } from './platform-invite.tsx'
 import { template as newLead } from './new-lead.tsx'
+import { template as leadReminder } from './lead-reminder.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-confirmation': bookingConfirmation,
@@ -27,4 +28,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'review-request': reviewRequest,
   'platform-invite': platformInvite,
   'new-lead': newLead,
+  'lead-reminder': leadReminder,
 }

@@ -221,9 +221,13 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
       terms_conditions: termsConditions || undefined, internal_notes: internalNotes || undefined,
       sections,
     };
-    if (isEdit && editId) await updateEstimate.mutateAsync({ ...form, id: editId });
-    else await createEstimate.mutateAsync(form);
-    onOpenChange(false);
+    try {
+      if (isEdit && editId) await updateEstimate.mutateAsync({ ...form, id: editId });
+      else await createEstimate.mutateAsync(form);
+      onOpenChange(false);
+    } catch {
+      // The error toast is shown by the save hook; keep the dialog open so nothing is lost.
+    }
   };
 
   const handleExportPDF = () => {

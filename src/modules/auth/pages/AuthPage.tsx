@@ -149,10 +149,12 @@ export default function Auth() {
           </div>
 
           <div className="mt-12 pt-8 border-t border-primary-foreground/15">
-            <p className="text-primary-foreground/60 text-xs">
-              "guzzl.pro helped me double my bookings in the first month."
-            </p>
-            <p className="text-primary-foreground/40 text-xs mt-2">— Mike R., HVAC Contractor</p>
+            <p className="text-primary-foreground text-base font-semibold">Guzzl leads like a pro.</p>
+            <ul className="mt-3 space-y-1.5 text-primary-foreground/70 text-xs">
+              <li>Your card live in minutes</li>
+              <li>Leads and bookings in one place</li>
+              <li>Free during beta</li>
+            </ul>
           </div>
         </motion.div>
       </div>

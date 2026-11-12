@@ -256,38 +256,39 @@ serve(async (req) => {
         lead_quality_score: leadQualityScore,
       });
 
-      // Send email with quality context
-      if (business.email) {
-        const qualityBadgeColor = qualityTier === "high" ? "#16a34a" : qualityTier === "medium" ? "#ca8a04" : "#6b7280";
-        try {
-          await supabase.functions.invoke("send-email", {
-            body: {
-              to: business.email,
-              subject: `${qualityLabel} ${escapeHtml(quoteReq.customer_name)} needs ${escapeHtml(quoteReq.service_needed || "your services")}`,
-              html: `
-                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-                  <h2 style="color: #1a1a1a;">New Lead from guzzl.pro Marketplace</h2>
-                  <div style="display: inline-block; background: ${qualityBadgeColor}; color: white; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600; margin-bottom: 12px;">
-                    Quality Score: ${leadQualityScore}/100 — ${qualityTier.toUpperCase()}
-                  </div>
-                  <div style="background: #f5f5f5; border-radius: 8px; padding: 20px; margin: 16px 0;">
-                    <p><strong>Name:</strong> ${escapeHtml(quoteReq.customer_name)}</p>
-                    ${quoteReq.customer_email ? `<p><strong>Email:</strong> ${escapeHtml(quoteReq.customer_email)}</p>` : ""}
-                    ${quoteReq.customer_phone ? `<p><strong>Phone:</strong> ${escapeHtml(quoteReq.customer_phone)}</p>` : ""}
-                    ${quoteReq.service_needed ? `<p><strong>Service:</strong> ${escapeHtml(quoteReq.service_needed)}</p>` : ""}
-                    ${quoteReq.budget ? `<p><strong>Budget:</strong> ${escapeHtml(quoteReq.budget)}</p>` : ""}
-                    ${quoteReq.timeline ? `<p><strong>Timeline:</strong> ${escapeHtml(quoteReq.timeline)}</p>` : ""}
-                    ${quoteReq.notes ? `<p><strong>Details:</strong> ${escapeHtml(quoteReq.notes)}</p>` : ""}
-                  </div>
-                  <p style="color: #666;">${urgencyNote}</p>
-                  <p><a href="https://guzzl.pro/app/contacts" style="background: #6366f1; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; display: inline-block;">View in Dashboard</a></p>
-                </div>
-              `,
+      // Email the pro through the queued transactional mail path (profile email, then account email).
+      let recipientEmail = (business.email as string | null | undefined)?.trim();
+      if (!recipientEmail) {
+        const { data } = await supabase.auth.admin.getUserById(business.id);
+        recipientEmail = data.user?.email?.trim();
+      }
+      const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (recipientEmail && serviceKey) {
+        const details = [
+          quoteReq.service_needed ? `Service: ${quoteReq.service_needed}` : "",
+          quoteReq.budget ? `Budget: ${quoteReq.budget}` : "",
+          quoteReq.timeline ? `Timeline: ${quoteReq.timeline}` : "",
+          quoteReq.notes ? `Details: ${quoteReq.notes}` : "",
+          urgencyNote || "",
+        ].filter(Boolean).join("\n");
+        const { error: emailErr } = await supabase.functions.invoke("send-transactional-email", {
+          headers: { Authorization: `Bearer ${serviceKey}`, "x-internal-service-key": serviceKey },
+          body: {
+            templateName: "new-lead",
+            recipientEmail,
+            idempotencyKey: `marketplace-lead-${quoteRequestId}-${business.id}`,
+            templateData: {
+              name: quoteReq.customer_name,
+              email: quoteReq.customer_email,
+              phone: quoteReq.customer_phone,
+              title: `New job request: ${quoteReq.service_needed || "your services"}`,
+              message: details,
             },
-          });
-        } catch (emailErr) {
-          console.error("Email notification failed for", business.id, emailErr);
-        }
+          },
+        });
+        if (emailErr) console.error("Job request email failed for", business.id, emailErr.message);
+      } else if (!recipientEmail) {
+        console.warn("Job request email skipped: no profile or account email", { businessId: business.id });
       }
 
       // Dashboard notification with quality context

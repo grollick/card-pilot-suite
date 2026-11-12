@@ -39,7 +39,12 @@ export default function MilestoneUpgradePrompt({ milestone, open, onOpenChange }
 
   return (
     <Dialog modal={false} open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md text-center">
+      <DialogContent
+        className="sm:max-w-md text-center"
+        onInteractOutside={(e) => e.preventDefault()}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onEscapeKeyDown={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <div className="mx-auto h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center mb-2">
             <Icon className="h-7 w-7 text-primary" />

@@ -164,6 +164,16 @@ export default function PublicCard() {
   const { user } = useAuth();
   const { data, isLoading, isError } = usePublicCard(handle, cardSlug);
 
+  // Card pages carry their own description; take the site-wide default out while one is shown.
+  useEffect(() => {
+    const fallback = document.head.querySelector('meta[name="description"]:not([data-rh])');
+    if (!fallback) return;
+    const parent = fallback.parentNode;
+    const next = fallback.nextSibling;
+    fallback.remove();
+    return () => { if (parent && !fallback.isConnected) parent.insertBefore(fallback, next); };
+  }, []);
+
   const [formSent, setFormSent] = useState(false);
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", message: "" });
   const [honeypot, setHoneypot] = useState("");
@@ -447,7 +457,7 @@ export default function PublicCard() {
   };
 
   const isModernLayout = (themeJson as any).cardLayout === "modern";
-  const cardMetadata = <Helmet><title>{`${profile.name || "Professional"} | ${professionName || profile.company || "Local service pro"} | guzzl.pro`}</title><meta name="description" content={String(sectionContent("hero")?.tagline || themeJson.tagline || "")} /></Helmet>;
+  const cardMetadata = <Helmet><title>{`${profile.name || "Professional"} | ${displayJobTitle || profile.company || "Local service pro"} | guzzl.pro`}</title><meta name="description" content={String(sectionContent("hero")?.tagline || themeJson.tagline || "")} /></Helmet>;
 
   if (isModernLayout) {
     return (
