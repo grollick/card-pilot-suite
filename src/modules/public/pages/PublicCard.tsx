@@ -285,7 +285,10 @@ export default function PublicCard() {
   if (isUnpublished && !isOwner) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <p className="text-muted-foreground">This card is not published yet</p>
+        <div className="text-center space-y-2">
+          <p className="text-muted-foreground">This card isn't available right now.</p>
+          <Link to="/" className="text-xs text-primary hover:underline">Create your own card</Link>
+        </div>
       </div>
     );
   }

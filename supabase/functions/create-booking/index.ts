@@ -14,6 +14,16 @@ const StatusSchema = z.object({
 const json = (data: unknown, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
+// Run email work after the response is sent; a failed email never fails the booking or lead.
+function runInBackground(tasks: Array<() => Promise<unknown>>) {
+  const work = Promise.allSettled(tasks.map((t) => t())).then((results) => {
+    for (const r of results) if (r.status === "rejected") console.error("Background email task failed:", r.reason);
+  });
+  const rt = (globalThis as any).EdgeRuntime;
+  if (rt?.waitUntil) rt.waitUntil(work);
+  return work;
+}
+
 const LeadSchema = z.object({
   action: z.literal("capture_lead"),
   ownerId: z.string().uuid(),
@@ -100,7 +110,8 @@ serve(async (req) => {
       if (error || !result?.lead_id) return new Response(JSON.stringify({ error: "We couldn't save your message. Please try again." }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
-      await notifyLeadOwner(client, result.lead_id, crypto.randomUUID(), input.activityTitle, input.activityDescription);
+      const bg = runInBackground([() => notifyLeadOwner(client, result.lead_id, crypto.randomUUID(), input.activityTitle, input.activityDescription)]);
+      if (!(globalThis as any).EdgeRuntime?.waitUntil) await bg;
       return new Response(JSON.stringify(result), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     const {
@@ -237,11 +248,12 @@ serve(async (req) => {
       });
     }
 
-    const { data: linkedBooking } = await supabase.from("bookings").select("lead_id").eq("id", bookingId).single();
-    if (linkedBooking?.lead_id) await notifyLeadOwner(supabase, linkedBooking.lead_id, bookingId, "New booking request", notes || null);
-
-    // ── Send booking confirmation email (fire-and-forget) ──
-    if (customer_email) {
+    const notifyOwner = async () => {
+      const { data: linkedBooking } = await supabase.from("bookings").select("lead_id").eq("id", bookingId).single();
+      if (linkedBooking?.lead_id) await notifyLeadOwner(supabase, linkedBooking.lead_id, bookingId, "New booking request", notes || null);
+    };
+    const sendCustomerEmail = async () => {
+      if (!customer_email) return;
       try {
         // Fetch provider name and service name for the email
         const { data: providerProfile } = await supabase
@@ -275,7 +287,9 @@ serve(async (req) => {
         // Non-fatal — booking was already created
         console.error("Failed to send booking confirmation email:", emailErr);
       }
-    }
+    };
+    const bg = runInBackground([notifyOwner, sendCustomerEmail]);
+    if (!(globalThis as any).EdgeRuntime?.waitUntil) await bg;
 
     return new Response(JSON.stringify({ success: true, data: booking }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

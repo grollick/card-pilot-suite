@@ -13,6 +13,7 @@ import { usePublicBookingData } from "@/hooks/useBookings";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatServicePrice, formatServiceDuration } from "@/lib/serviceDisplay";
+import { isLongJob, isLongJobDayAvailable, dayWindow } from "@/lib/longJobBooking";
 
 function generateICS(
   name: string,
@@ -44,9 +45,11 @@ export default function PublicBooking() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", notes: "" });
   const [submitting, setSubmitting] = useState(false);
-  const [bookingResult, setBookingResult] = useState<{ start: Date; end: Date } | null>(null);
+  const [bookingResult, setBookingResult] = useState<{ start: Date; end: Date; longJob?: boolean } | null>(null);
 
   const selectedService = data?.services.find((s) => s.id === selectedServiceId);
+  const longJob = !!data && isLongJob(selectedService?.duration_min, data.availability);
+  const longJobWindow = longJob && selectedDate && data ? dayWindow(selectedDate, data.availability) : null;
 
   // Compute available time slots for selected date
   const timeSlots = useMemo(() => {
@@ -96,12 +99,12 @@ export default function PublicBooking() {
       const d = addDays(today, i);
       const jsDay = d.getDay();
       const dbDay = jsDay === 0 ? 6 : jsDay - 1;
-      if (data.availability.some((r) => r.day_of_week === dbDay)) {
+      if (longJob ? isLongJobDayAvailable(d, data.availability, data.existingBookings) : data.availability.some((r) => r.day_of_week === dbDay)) {
         days.add(format(d, "yyyy-MM-dd"));
       }
     }
     return days;
-  }, [data]);
+  }, [data, longJob]);
 
   const handleConfirm = async () => {
     if (!selectedService || !selectedDate || !selectedTime || !formData.name || !data) return;
@@ -113,8 +116,13 @@ export default function PublicBooking() {
       let [h, m] = time.split(":").map(Number);
       if (ampm === "PM" && h < 12) h += 12;
       if (ampm === "AM" && h === 12) h = 0;
-      const startDt = setMinutes(setHours(selectedDate, h), m);
-      const endDt = new Date(startDt.getTime() + (selectedService.duration_min ?? 30) * 60000);
+      let startDt = setMinutes(setHours(selectedDate, h), m);
+      let endDt = new Date(startDt.getTime() + (selectedService.duration_min ?? 30) * 60000);
+      if (longJob && longJobWindow) {
+        // Long job: block the start day from opening to closing; the pro confirms the rest.
+        startDt = longJobWindow.open;
+        endDt = longJobWindow.close;
+      }
 
       // Create booking via secure edge function (handle resolved server-side)
       const { data: bookingData, error: bookingError } = await supabase.functions.invoke("create-booking", {
@@ -148,7 +156,7 @@ export default function PublicBooking() {
         meta_json: { service: selectedService.name, ...visitorMeta },
       });
 
-      setBookingResult({ start: startDt, end: endDt });
+      setBookingResult({ start: startDt, end: endDt, longJob });
       setStep(4);
     } catch {
       toast.error("Something went wrong. Please try again.");
@@ -285,7 +293,27 @@ export default function PublicBooking() {
                   )}
 
 
-                  {selectedDate && (
+                  {selectedDate && longJob && (
+                    <div className="space-y-3">
+                      {longJobWindow ? (
+                        <>
+                          <p className="text-sm text-foreground">
+                            This job takes about {formatServiceDuration(selectedService?.duration_min)}. Pick the day you'd like it to start. {data.businessName} will confirm.
+                          </p>
+                          <Button
+                            className="w-full"
+                            onClick={() => { setSelectedTime(format(longJobWindow.open, "h:mm a")); setStep(3); }}
+                          >
+                            Start at {format(longJobWindow.open, "h:mm a")}
+                          </Button>
+                        </>
+                      ) : (
+                        <p className="text-xs text-muted-foreground">No available times. Try another day.</p>
+                      )}
+                    </div>
+                  )}
+
+                  {selectedDate && !longJob && (
                     <div>
                       <p className="text-sm text-muted-foreground mb-2">
                         {format(selectedDate, "EEEE, MMMM d")} — {timeSlots.length} slots
@@ -350,8 +378,9 @@ export default function PublicBooking() {
                     disabled={submitting || !formData.name}
                     className="w-full shadow-glow"
                   >
-                    {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
-                    Confirm Booking
+                    {submitting ? (
+                      <><Loader2 className="h-4 w-4 animate-spin mr-2" />Sending your request…</>
+                    ) : "Confirm Booking"}
                   </Button>
                 </motion.div>
               )}
@@ -368,8 +397,14 @@ export default function PublicBooking() {
                   </div>
                   <div className="p-4 rounded-xl border border-border bg-muted/20 text-sm text-left space-y-1">
                     <p><span className="text-muted-foreground">Service:</span> {selectedService?.name}</p>
-                    <p><span className="text-muted-foreground">Date:</span> {format(bookingResult.start, "EEEE, MMMM d, yyyy")}</p>
-                    <p><span className="text-muted-foreground">Time:</span> {format(bookingResult.start, "h:mm a")} – {format(bookingResult.end, "h:mm a")}</p>
+                    {bookingResult.longJob ? (
+                      <p>Starts {format(bookingResult.start, "EEEE, MMMM d")} at {format(bookingResult.start, "h:mm a")}. About {formatServiceDuration(selectedService?.duration_min)}.</p>
+                    ) : (
+                      <>
+                        <p><span className="text-muted-foreground">Date:</span> {format(bookingResult.start, "EEEE, MMMM d, yyyy")}</p>
+                        <p><span className="text-muted-foreground">Time:</span> {format(bookingResult.start, "h:mm a")} – {format(bookingResult.end, "h:mm a")}</p>
+                      </>
+                    )}
                   </div>
                   <Button variant="outline" className="w-full" onClick={handleDownloadICS}>
                     <Download className="h-4 w-4 mr-2" /> Add to Calendar (.ics)

@@ -88,7 +88,7 @@ export function bookingStatusMessage(label: string, r: BookingStatusResult | nul
   if (!r || !r.emailAttempted) return `${label}.`;
   if (!r.hasEmail) return `${label}. No email on file for this customer.`;
   if (!r.emailQueued) return `${label}, but the email could not be sent.`;
-  return `${label}. Email sent to ${r.customerEmail}.`;
+  return `${label}. Email on its way to ${r.customerEmail}.`;
 }
 
 export function useUpdateBooking() {

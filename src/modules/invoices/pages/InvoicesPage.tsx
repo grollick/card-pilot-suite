@@ -25,7 +25,6 @@ import UpgradePrompt from "@/components/UpgradePrompt";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Sparkles } from "lucide-react";
 import CreateInvoiceFromEstimateDialog from "../components/CreateInvoiceFromEstimateDialog";
-import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const STATUS_TABS: Array<{ value: string; label: string; icon: any }> = [
   { value: "all", label: "All", icon: FileText },
@@ -96,7 +95,7 @@ export default function InvoicesPage() {
         className="flex items-center justify-between flex-wrap gap-3"
       >
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Invoices" /></h1>
+          <h1 className="text-3xl font-bold tracking-tight">Invoices</h1>
           <p className="text-muted-foreground text-sm mt-1">
             Manage billing and track payments
           </p>

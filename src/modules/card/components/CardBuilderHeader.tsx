@@ -4,11 +4,15 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { useState } from "react";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import QRShareDialog from "./QRShareDialog";
 import NFCShareDialog from "./NFCShareDialog";
 import WalletPassDialog from "./WalletPassDialog";
@@ -38,6 +42,7 @@ export default function CardBuilderHeader({
 
   const navigate = useNavigate();
   const [networkingOpen, setNetworkingOpen] = useState(false);
+  const [confirmOffline, setConfirmOffline] = useState(false);
 
   const saveLabel = globalSaveState === "saving" ? "Saving…" : globalSaveState === "saved" ? "Saved" : globalSaveState === "error" ? "Error" : "Synced";
 
@@ -140,10 +145,29 @@ export default function CardBuilderHeader({
 
           {/* Publish */}
           <div className="flex items-center gap-2 rounded-xl border border-border/40 bg-muted/15 px-3 py-1.5">
-            <Badge variant={published ? "default" : "secondary"} className={`text-[10px] px-2 py-0.5 font-semibold uppercase tracking-wide rounded-md ${published ? "bg-emerald-500/12 text-emerald-600 border-emerald-500/25 hover:bg-emerald-500/18" : ""}`}>
+            <Badge variant={published ? "default" : "secondary"} className={`text-[10px] px-2 py-0.5 font-semibold uppercase tracking-wide rounded-md ${published ? "bg-primary/10 text-primary border-primary/25 hover:bg-primary/15" : ""}`}>
               {published ? "Live" : "Draft"}
             </Badge>
-            <Switch checked={published} onCheckedChange={onPublishToggle} className="scale-[0.8]" />
+            <Switch
+              checked={published}
+              onCheckedChange={(v) => { if (!v && published) setConfirmOffline(true); else onPublishToggle(v); }}
+              className="scale-[0.8]"
+              aria-label={published ? "Card is live" : "Card is offline"}
+            />
+            <AlertDialog open={confirmOffline} onOpenChange={setConfirmOffline}>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Take your card offline?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Anyone who opens your link or scans your QR code will see that it isn't available.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Keep it live</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => onPublishToggle(false)}>Take offline</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
 
           {handle && (

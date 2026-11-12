@@ -12,6 +12,15 @@ interface SmartEngagementPopupProps {
   onAction: (action: "quote" | "book" | "ask") => void;
 }
 
+function isVisitorBusy(): boolean {
+  const active = document.activeElement;
+  if (active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA" || (active as HTMLElement).isContentEditable)) return true;
+  const fields = document.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>("input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=range]), textarea");
+  for (const f of Array.from(fields)) if (f.value && f.value.trim()) return true;
+  if (document.querySelector("[data-engagement-busy='true'], [role='dialog']")) return true;
+  return false;
+}
+
 export default function SmartEngagementPopup({
   handle,
   profileName,
@@ -30,7 +39,13 @@ export default function SmartEngagementPopup({
       setDismissed(true);
       return;
     }
-    const timer = setTimeout(() => setVisible(true), delaySeconds * 1000);
+    // Wait until the visitor isn't busy: no focused or filled-in field, no open quote/booking step or dialog.
+    let timer: ReturnType<typeof setTimeout>;
+    const tryOpen = () => {
+      if (isVisitorBusy()) { timer = setTimeout(tryOpen, 2000); return; }
+      setVisible(true);
+    };
+    timer = setTimeout(tryOpen, delaySeconds * 1000);
     return () => clearTimeout(timer);
   }, [handle, delaySeconds]);
 

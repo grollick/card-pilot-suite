@@ -1,9 +1,10 @@
 import {
   Star, Image, Briefcase, MessageSquare, CalendarCheck, FileText,
   Megaphone, Share2, Phone, MapPin, Type, Layout,
-  GripVertical, Pencil, Copy, Trash2, Eye, EyeOff,
+  GripVertical, Pencil, Copy, Trash2, Eye, EyeOff, MoreHorizontal,
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Tip from "@/components/Tip";
 import {
@@ -33,7 +34,6 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
   onDelete?: (id: string) => void;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: section.id });
-  const Icon = SECTION_ICONS[section.id] || FileText;
   const hasContent = section.content && Object.keys(section.content).length > 0;
 
   const style = {
@@ -51,7 +51,7 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
         className={`group flex items-center gap-2 py-2 px-2.5 rounded-xl transition-all duration-200 ${
           section.enabled
             ? "hover:bg-accent/30 hover:shadow-sm"
-            : "opacity-30 hover:opacity-50"
+            : "bg-muted/30"
         }`}
       >
         <Tip label="Drag to reorder" side="left">
@@ -65,63 +65,56 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
           </button>
         </Tip>
 
-        <Tip label={`Edit ${section.label}`} side="top">
-          <button
-            className="flex items-center gap-2.5 flex-1 min-w-0 text-left"
-            onClick={() => onEdit(section.id)}
-          >
-            <div className={`h-7 w-7 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-200 ${
-              section.enabled ? "bg-primary/8 text-primary" : "bg-muted/60 text-muted-foreground/60"
-            }`}>
-              <Icon className="h-3.5 w-3.5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <span className={`text-[12px] font-medium block truncate ${section.enabled ? "text-foreground" : "text-muted-foreground"}`}>
-                {section.label}
-              </span>
-            </div>
-          </button>
-        </Tip>
+        <button
+          className="flex-1 min-w-[6rem] text-left"
+          onClick={() => onEdit(section.id)}
+          title={`Edit ${section.label}`}
+        >
+          <span className={`text-[13px] font-medium block truncate whitespace-nowrap ${section.enabled ? "text-foreground" : "text-muted-foreground"}`}>
+            {section.label}
+          </span>
+        </button>
 
-        {/* Hover controls */}
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-          <Tip label="Edit section" side="top">
-            <button
-              onClick={() => onEdit(section.id)}
-              className="h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-accent transition-colors"
-            >
-              <Pencil className="h-3 w-3" />
-            </button>
-          </Tip>
-          {onDuplicate && (
-            <Tip label="Duplicate section" side="top">
-              <button
-                onClick={() => onDuplicate(section.id)}
-                className="h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-accent transition-colors"
-              >
-                <Copy className="h-3 w-3" />
-              </button>
-            </Tip>
-          )}
-          {onDelete && !["hero", "contact", "social"].includes(section.id) && (
-            <Tip label="Remove section" side="top">
-              <button
-                onClick={() => onDelete(section.id)}
-                className="h-6 w-6 rounded-md flex items-center justify-center text-muted-foreground/50 hover:text-destructive hover:bg-destructive/8 transition-colors"
-              >
-                <Trash2 className="h-3 w-3" />
-              </button>
-            </Tip>
-          )}
-        </div>
+        <button
+          onClick={() => onEdit(section.id)}
+          className="h-7 w-7 shrink-0 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+          aria-label={`Edit ${section.label}`}
+          title="Edit"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+        </button>
 
-        <Tip label={section.enabled ? "Hide section" : "Show section"}>
-          <Switch
-            checked={section.enabled}
-            onCheckedChange={() => onToggle(section.id)}
-            className="scale-[0.7] shrink-0"
-          />
-        </Tip>
+        {(onDuplicate || (onDelete && !["hero", "contact", "social"].includes(section.id))) && (
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="h-7 w-6 shrink-0 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                aria-label={`More options for ${section.label}`}
+              >
+                <MoreHorizontal className="h-3.5 w-3.5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {onDuplicate && (
+                <DropdownMenuItem onClick={() => onDuplicate(section.id)}>
+                  <Copy className="h-3.5 w-3.5 mr-2" /> Duplicate
+                </DropdownMenuItem>
+              )}
+              {onDelete && !["hero", "contact", "social"].includes(section.id) && (
+                <DropdownMenuItem className="text-destructive" onClick={() => onDelete(section.id)}>
+                  <Trash2 className="h-3.5 w-3.5 mr-2" /> Remove
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
+        <Switch
+          checked={section.enabled}
+          onCheckedChange={() => onToggle(section.id)}
+          className="scale-[0.8] shrink-0"
+          aria-label={section.enabled ? `Hide ${section.label}` : `Show ${section.label}`}
+        />
       </div>
     </TooltipProvider>
   );

@@ -39,9 +39,9 @@ export default function Auth() {
     return () => clearTimeout(t);
   }, [resendWait]);
 
-  // Start the 30-second wait as soon as the first email goes out.
+  // Start the 60-second wait as soon as the first email goes out.
   useEffect(() => {
-    if (signupSuccess) setResendWait(30);
+    if (signupSuccess) setResendWait(60);
   }, [signupSuccess]);
 
   const handleResend = async () => {
@@ -59,7 +59,7 @@ export default function Auth() {
       return;
     }
     setResendSent(true);
-    setResendWait(30);
+    setResendWait(60);
   };
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();

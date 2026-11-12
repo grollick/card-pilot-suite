@@ -90,6 +90,8 @@ function QuoteCalculatorInner({
   const [formData, setFormData] = useState({ name: "", phone: "", email: "" });
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [contactError, setContactError] = useState<string | null>(null);
 
   const updateValue = useCallback((fieldId: string, val: string | number) => {
     setValues((prev) => ({ ...prev, [fieldId]: val }));
@@ -119,7 +121,11 @@ function QuoteCalculatorInner({
   const hasSelections = preset.fields.some((f) => values[f.id] !== undefined);
 
   const handleSubmitLead = async () => {
-    if (!formData.name) return;
+    const missingName = !formData.name.trim();
+    const missingContact = !formData.phone.trim() && !formData.email.trim();
+    setNameError(missingName ? "Please add your name." : null);
+    setContactError(missingContact ? "Add a phone number or an email so we can reach you." : null);
+    if (missingName || missingContact) return;
     setSubmitting(true);
 
     setSubmitError(null);
@@ -139,7 +145,7 @@ function QuoteCalculatorInner({
         source: "card_form",
         handle,
         activityType: "quote_requested",
-        activityTitle: `Instant quote: ${chosen || "job"}, $${estimate.min} to $${estimate.max}`,
+        activityTitle: quoteActivityTitle(chosen, estimate.min, estimate.max),
         metaJson: {
           ...getVisitorMeta(),
           quote_calculator: { selections: values, job: chosen, estimateMin: estimate.min, estimateMax: estimate.max },
@@ -171,7 +177,7 @@ function QuoteCalculatorInner({
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div data-engagement-busy={step === "result" || step === "form" ? "true" : undefined} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <AnimatePresence mode="wait">
         {step === "calc" && (
           <motion.div
@@ -419,22 +425,24 @@ function QuoteCalculatorInner({
                 <input
                   placeholder="Your name *"
                   value={formData.name}
-                  onChange={(e) => setFormData((f) => ({ ...f, name: e.target.value }))}
+                  onChange={(e) => { setFormData((f) => ({ ...f, name: e.target.value })); setNameError(null); }}
                   style={inputStyle}
                 />
+                {nameError && <p role="alert" style={{ fontSize: 12, color: palette.primary, margin: "-4px 0 0" }}>{nameError}</p>}
                 <input
                   placeholder="Phone number"
                   value={formData.phone}
-                  onChange={(e) => setFormData((f) => ({ ...f, phone: e.target.value }))}
+                  onChange={(e) => { setFormData((f) => ({ ...f, phone: e.target.value })); setContactError(null); }}
                   style={inputStyle}
                 />
                 <input
                   type="email"
                   placeholder="Email"
                   value={formData.email}
-                  onChange={(e) => setFormData((f) => ({ ...f, email: e.target.value }))}
+                  onChange={(e) => { setFormData((f) => ({ ...f, email: e.target.value })); setContactError(null); }}
                   style={inputStyle}
                 />
+                {contactError && <p role="alert" style={{ fontSize: 12, color: palette.primary, margin: "-4px 0 0" }}>{contactError}</p>}
 
                 {submitError && (
                   <p role="alert" style={{ fontSize: 13, color: palette.primary, margin: 0 }}>{submitError}</p>
@@ -507,4 +515,11 @@ function QuoteCalculatorInner({
       </AnimatePresence>
     </div>
   );
+}
+
+const money = (n: number) => `$${n.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+
+export function quoteActivityTitle(job: string, min: number, max: number): string {
+  const price = max > min ? `${money(min)} to ${money(max)}` : money(min);
+  return `Instant quote: ${job || "job"}, ${price}`;
 }
