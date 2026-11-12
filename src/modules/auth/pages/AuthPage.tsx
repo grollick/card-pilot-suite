@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useNavigate, Link, useSearchParams, Navigate } from "react-router-dom";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,38 @@ export default function Auth() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [resendWait, setResendWait] = useState(0);
+  const [resendSent, setResendSent] = useState(false);
+  const [resending, setResending] = useState(false);
+
+  useEffect(() => {
+    if (resendWait <= 0) return;
+    const t = setTimeout(() => setResendWait((w) => w - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendWait]);
+
+  // Start the 30-second wait as soon as the first email goes out.
+  useEffect(() => {
+    if (signupSuccess) setResendWait(30);
+  }, [signupSuccess]);
+
+  const handleResend = async () => {
+    if (resendWait > 0 || resending) return;
+    setResending(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: window.location.origin },
+    });
+    setResending(false);
+    if (error) {
+      setResendSent(false);
+      toast({ title: "Couldn't resend", description: "Please wait a moment and try again.", variant: "destructive" });
+      return;
+    }
+    setResendSent(true);
+    setResendWait(30);
+  };
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -151,6 +184,20 @@ export default function Auth() {
                   <li>We auto-generate your card</li>
                   <li>Start receiving leads</li>
                 </ol>
+              </div>
+              <div className="mt-6 space-y-3">
+                <Button variant="outline" className="w-full" onClick={handleResend} disabled={resendWait > 0 || resending}>
+                  {resending ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Mail className="h-4 w-4 mr-2" />}
+                  {resendWait > 0 ? `Resend email (${resendWait}s)` : "Resend email"}
+                </Button>
+                {resendSent && <p className="text-xs text-success" role="status">Sent</p>}
+                <button
+                  type="button"
+                  className="text-sm text-primary hover:underline"
+                  onClick={() => { setSignupSuccess(false); setResendSent(false); setMode("signup"); }}
+                >
+                  Use a different email
+                </button>
               </div>
             </motion.div>
           ) : (

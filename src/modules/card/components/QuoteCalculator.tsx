@@ -230,15 +230,37 @@ interface QuoteCalculatorProps {
   customPreset?: CalcPreset;
 }
 
-export default function QuoteCalculator({
+/**
+ * Returns the pro's own saved calculator (options + prices) from section content,
+ * or null when nothing priced has been saved. Built-in presets never count.
+ */
+export function getSavedCalcPreset(content: any): CalcPreset | null {
+  const preset = content?.calcCustomPreset as CalcPreset | undefined;
+  if (!preset || !Array.isArray(preset.fields) || preset.fields.length === 0) return null;
+  const hasPrice =
+    Number(preset.basePrice) > 0 || Number(preset.basePriceMax) > 0 ||
+    preset.fields.some((f) =>
+      (f.options || []).some((o) => Number(o.priceMin) > 0 || Number(o.priceMax) > 0) ||
+      Number(f.pricePerUnit) > 0,
+    );
+  return hasPrice ? preset : null;
+}
+
+export default function QuoteCalculator(props: QuoteCalculatorProps) {
+  // Never fall back to built-in price numbers: no saved prices, no calculator.
+  if (!props.customPreset) return null;
+  return <QuoteCalculatorInner {...props} customPreset={props.customPreset} />;
+}
+
+function QuoteCalculatorInner({
   theme,
   profileId,
   handle,
   profession,
   metallicEffect,
   customPreset,
-}: QuoteCalculatorProps) {
-  const preset = customPreset ?? getCalcPresetForProfession(profession);
+}: QuoteCalculatorProps & { customPreset: CalcPreset }) {
+  const preset = customPreset;
   const { palette, fonts, radii } = theme;
 
   const [values, setValues] = useState<Record<string, string | number>>({});

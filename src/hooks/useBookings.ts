@@ -184,7 +184,7 @@ export function usePublicBookingData(handle: string | undefined) {
       const thirtyDays = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
       // Fire all queries in parallel
-      const [servicesResult, availabilityResult, bookingsResult] = await Promise.all([
+      const [servicesResult, availabilityResult, bookingsResult, cardResult] = await Promise.all([
         supabase
           .rpc("get_services_by_handle", { p_handle: handle! }),
         supabase.rpc("get_availability_by_user", { p_user_id: profile.id }),
@@ -195,10 +195,26 @@ export function usePublicBookingData(handle: string | undefined) {
           .in("status", ["pending", "confirmed", "requested"])
           .gte("start_datetime", now.toISOString())
           .lte("start_datetime", thirtyDays.toISOString()),
+        supabase
+          .from("cards")
+          .select("sections_json, company")
+          .eq("user_id", profile.id)
+          .order("is_primary", { ascending: false })
+          .order("updated_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
       ]);
+
+      const cardSections = Array.isArray((cardResult.data as any)?.sections_json)
+        ? ((cardResult.data as any).sections_json as { id: string; enabled?: boolean }[])
+        : [];
+      // Online booking is on only when the card's booking section is switched on.
+      const bookingEnabled = cardSections.some((s) => s.id === "booking" && s.enabled);
 
       return {
         profile,
+        businessName: ((cardResult.data as any)?.company as string) || profile.name || handle!,
+        bookingEnabled,
         services: servicesResult.data ?? [],
         availability: availabilityResult.data ?? [],
         existingBookings: bookingsResult.data ?? [],

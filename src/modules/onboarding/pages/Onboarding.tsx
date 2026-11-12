@@ -221,9 +221,15 @@ export default function Onboarding() {
     }
   };
 
+  const activateInFlightRef = useRef(false);
+  const activateDoneRef = useRef(false);
+
   // Full save — called when activating the card (step 7)
   const handleActivateCard = async () => {
     if (!user || !selectedProfession) return;
+    // Never run twice: block while a save is running or once it has succeeded.
+    if (activateInFlightRef.current || activateDoneRef.current) return;
+    activateInFlightRef.current = true;
     setSaving(true);
 
     try {
@@ -281,16 +287,21 @@ export default function Onboarding() {
         }
       });
 
+      // The booking section follows the pro's onboarding choice.
+      const withBooking = enrichedSections.some((s: any) => s.id === "booking")
+        ? enrichedSections.map((s: any) => (s.id === "booking" ? { ...s, enabled: bookingEnabled } : s))
+        : [...enrichedSections, { id: "booking", label: "Booking", enabled: bookingEnabled, content: { bookingHeading: "Book an Appointment" } }];
+
       // Add social links to sections if provided
-      let finalSections = enrichedSections;
+      let finalSections = withBooking;
       if (socialLinks.length > 0) {
-        const existingSocial = enrichedSections.findIndex((s: any) => s.id === "social");
+        const existingSocial = withBooking.findIndex((s: any) => s.id === "social");
         if (existingSocial >= 0) {
-          finalSections = enrichedSections.map((s: any, i: number) =>
+          finalSections = withBooking.map((s: any, i: number) =>
             i === existingSocial ? { ...s, enabled: true, content: { links: socialLinks } } : s
           );
         } else {
-          finalSections = [...enrichedSections, { id: "social", label: "Social", enabled: true, content: { links: socialLinks } }];
+          finalSections = [...withBooking, { id: "social", label: "Social", enabled: true, content: { links: socialLinks } }];
         }
       }
 
@@ -311,9 +322,15 @@ export default function Onboarding() {
       }, { onConflict: "user_id" });
       if (cardErr) throw cardErr;
 
+      // Safe to repeat: skip inserts when this user already has rows in the table.
+      const userHasRows = async (table: "pipeline_stages" | "booking_services" | "email_templates") => {
+        const { count } = await supabase.from(table).select("id", { count: "exact", head: true }).eq("user_id", user.id);
+        return (count ?? 0) > 0;
+      };
+
       // Pipeline stages
       const stages = (selectedProfession.default_pipeline_stages as string[]) || [];
-      if (stages.length > 0) {
+      if (stages.length > 0 && !(await userHasRows("pipeline_stages"))) {
         await supabase.from("pipeline_stages").insert(
           stages.map((stageName: string, i: number) => ({ user_id: user.id, name: stageName, sort_order: i }))
         );
@@ -321,7 +338,7 @@ export default function Onboarding() {
 
       // Services
       const finalServices = aiSetup?.services || [];
-      if (finalServices.length > 0) {
+      if (finalServices.length > 0 && !(await userHasRows("booking_services"))) {
         await supabase.from("booking_services").insert(
           finalServices.map((s: any) => ({
             user_id: user.id,
@@ -335,7 +352,7 @@ export default function Onboarding() {
 
       // Email templates
       const templates = (selectedProfession.default_email_templates as any[]) || [];
-      if (templates.length > 0) {
+      if (templates.length > 0 && !(await userHasRows("email_templates"))) {
         await supabase.from("email_templates").insert(
           templates.map((t: any) => ({ user_id: user.id, name: t.name, subject: t.subject, body: t.body }))
         );
@@ -350,11 +367,14 @@ export default function Onboarding() {
         await supabase.functions.invoke("referral-system", { body: { action: "record_signup" } });
       } catch { /* Non-critical */ }
 
+      activateDoneRef.current = true;
+      activateInFlightRef.current = false;
       setSaving(false);
       setStep(7); // Show "You're Live!"
     } catch (err: any) {
       console.error("Onboarding error:", err);
       toast({ title: "Something went wrong", description: err.message, variant: "destructive" });
+      activateInFlightRef.current = false;
       setSaving(false);
     }
   };
@@ -513,6 +533,7 @@ export default function Onboarding() {
               <StepBookingSetup
                 bookingEnabled={bookingEnabled}
                 onToggleBooking={setBookingEnabled}
+                saving={saving}
                 onNext={() => {
                   // Now activate the card
                   handleActivateCard();

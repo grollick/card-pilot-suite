@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { X, Plus, Trash2, GripVertical, Wand2, Loader2 } from "lucide-react";
-import { CALCULATOR_PRESETS } from "./QuoteCalculator";
+import { CALCULATOR_PRESETS, getSavedCalcPreset } from "./QuoteCalculator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -522,6 +522,11 @@ function ProjectsEditor({ draft, setDraft }: { draft: SectionContent; setDraft: 
 function QuoteCalculatorEditor({ draft, setDraft }: { draft: SectionContent; setDraft: (d: SectionContent) => void }) {
   return (
     <div className="space-y-3">
+      {!getSavedCalcPreset(draft) && (
+        <p className="rounded-md border border-border bg-muted px-3 py-2 text-xs text-muted-foreground">
+          Not shown on your card until you add your own prices.
+        </p>
+      )}
       <div>
         <Label className="text-xs">Section Heading</Label>
         <Input

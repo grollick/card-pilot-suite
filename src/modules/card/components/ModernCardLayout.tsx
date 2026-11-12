@@ -24,7 +24,7 @@ import NFCShareDialog from "@/modules/card/components/NFCShareDialog";
 import WalletPassDialog from "@/modules/card/components/WalletPassDialog";
 import QuoteRequestForm from "@/modules/card/components/QuoteRequestForm";
 import ProjectShowcase from "@/modules/card/components/ProjectShowcase";
-import QuoteCalculator from "@/modules/card/components/QuoteCalculator";
+import QuoteCalculator, { getSavedCalcPreset } from "@/modules/card/components/QuoteCalculator";
 import GalleryLightbox from "@/modules/card/components/GalleryLightbox";
 import ScanToSaveWidget from "@/modules/card/components/ScanToSaveWidget";
 import ReviewForm from "@/modules/public/components/ReviewForm";
@@ -439,10 +439,10 @@ export default function ModernCardLayout({
         )}
 
         {/* Quote Calculator */}
-        {enabledSections.has("quote_calculator") && (
+        {enabledSections.has("quote_calculator") && getSavedCalcPreset(sectionContent("quote_calculator")) && (
           <motion.section initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }} variants={fade} className="mx-4 mt-6" id="quote-calculator-section">
             <h2 className="text-lg font-bold text-foreground mb-3">{sectionContent("quote_calculator")?.heading || "Instant Quote"}</h2>
-            <QuoteCalculator theme={theme} profileId={profile.id} handle={handle} profession={professionName} />
+            <QuoteCalculator theme={theme} profileId={profile.id} handle={handle} profession={professionName} customPreset={getSavedCalcPreset(sectionContent("quote_calculator"))!} />
           </motion.section>
         )}
 

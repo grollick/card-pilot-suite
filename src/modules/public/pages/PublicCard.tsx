@@ -58,7 +58,7 @@ import SmartEngagementPopup from "@/modules/card/components/SmartEngagementPopup
 import StickyActionBar from "@/modules/card/components/StickyActionBar";
 import GalleryLightbox from "@/modules/card/components/GalleryLightbox";
 import ProjectShowcase from "@/modules/card/components/ProjectShowcase";
-import QuoteCalculator from "@/modules/card/components/QuoteCalculator";
+import QuoteCalculator, { getSavedCalcPreset } from "@/modules/card/components/QuoteCalculator";
 import ScanToSaveWidget from "@/modules/card/components/ScanToSaveWidget";
 import { getHeroBackgroundForProfession, getHeroBackgroundById } from "@/lib/heroBackgrounds";
 import { showsBranding } from "@/lib/plans";
@@ -282,7 +282,9 @@ export default function PublicCard() {
   const sections: CardSection[] =
     card && Array.isArray(card.sections_json) ? (card.sections_json as unknown as CardSection[]) : [];
   const enabledSections = new Set(sections.filter((s) => s.enabled).map((s) => s.id));
-  if (!data?.hasAvailability) enabledSections.delete("booking");
+  // Booking shows only when the pro switched the booking section on AND set hours.
+  const canBook = Boolean(data?.hasAvailability) && enabledSections.has("booking");
+  if (!canBook) enabledSections.delete("booking");
   const sectionContent = (id: string) => sections.find((s) => s.id === id)?.content as Record<string, any> | undefined;
   const professionName = (profile as any)?.professions?.name ?? profile.company ?? "Professional";
   const cardUrl = `${window.location.origin}/${handle}`;
@@ -310,7 +312,7 @@ export default function PublicCard() {
           .filter(c => c !== (profile.primary_cta ?? "call"))
           .map(c => ({ id: c, label: CTA_TYPES.find(ct => ct.value === c)?.label ?? c, enabled: true, isPrimary: false })),
       ];
-  const enabledCtas = ctaConfig.filter(c => c.enabled && (c.id !== "book" || data?.hasAvailability));
+  const enabledCtas = ctaConfig.filter(c => c.enabled && (c.id !== "book" || canBook));
   const primaryCtaItem = enabledCtas.find(c => c.isPrimary) || enabledCtas[0];
   const secondaryCtaItems = enabledCtas.filter(c => c !== primaryCtaItem);
   const primaryCta = primaryCtaItem?.id ?? "call";
@@ -966,7 +968,7 @@ export default function PublicCard() {
             </div>
           )}
 
-          {enabledSections.has("quote_calculator") && (
+          {enabledSections.has("quote_calculator") && getSavedCalcPreset(sectionContent("quote_calculator")) && (
             <div id="quote-calculator-section">
               <SectionTitle id="quote_calculator" label={sectionContent("quote_calculator")?.heading || "Instant Quote"} />
               <QuoteCalculator
@@ -975,6 +977,7 @@ export default function PublicCard() {
                 handle={handle!}
                 profession={professionName}
                 metallicEffect={metallicEffect}
+                customPreset={getSavedCalcPreset(sectionContent("quote_calculator"))!}
               />
             </div>
           )}
@@ -1000,8 +1003,7 @@ export default function PublicCard() {
               <div>
                 <SectionTitle id="testimonials" label="Testimonials" />
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {hasContent
-                    ? testimonials!.map((t, i) => (
+                  {testimonials!.map((t, i) => (
                         <CardSectionWrapper key={i} theme={theme} index={i + 2} metallicEffect={metallicEffect}>
                           <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
                             {[...Array(5)].map((_, j) => (
@@ -1015,23 +1017,7 @@ export default function PublicCard() {
                             — {t.name}{t.role ? `, ${t.role}` : ""}
                           </p>
                         </CardSectionWrapper>
-                      ))
-                    : (
-                        <CardSectionWrapper theme={theme} index={2} metallicEffect={metallicEffect}>
-                          <div style={{ display: "flex", gap: 2, marginBottom: 8 }}>
-                            {[...Array(5)].map((_, i) => (
-                              <Star key={i} className="h-3.5 w-3.5" style={{ fill: "#f59e0b", color: "#f59e0b" }} />
-                            ))}
-                          </div>
-                          <p style={{ fontSize: 14, fontStyle: "italic", color: palette.secondary, margin: 0, lineHeight: 1.6 }}>
-                            "Absolutely amazing experience. Highly recommend!"
-                          </p>
-                          <p style={{ fontSize: 12, color: `${palette.secondary}99`, margin: 0, marginTop: 8 }}>
-                            — Happy Client
-                          </p>
-                        </CardSectionWrapper>
-                      )
-                  }
+                      ))}
                 </div>
               </div>
             );
@@ -1661,7 +1647,7 @@ export default function PublicCard() {
           palette={palette}
           fonts={fonts}
           delaySeconds={8}
-          canBook={Boolean(data?.hasAvailability)}
+          canBook={canBook}
           onAction={(action) => {
             if (action === "quote") {
               const el = document.getElementById("quote-request-section");

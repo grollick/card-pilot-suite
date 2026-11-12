@@ -55,9 +55,9 @@ export default function DashboardHeroHeader() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.15 }}
           >
-            {greeting}, {firstName}
+            {greeting}, {firstName}{" "}
             <motion.span
-              className="inline-block ml-2"
+              className="inline-block"
               animate={{ rotate: [0, 14, -8, 14, 0] }}
               transition={{ duration: 1.8, delay: 0.8, ease: "easeInOut" }}
             >

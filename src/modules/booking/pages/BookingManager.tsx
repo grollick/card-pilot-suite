@@ -30,7 +30,10 @@ import {
 } from "@/hooks/useBookings";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
 import UpgradePrompt from "@/components/UpgradePrompt";
-import GuzzlLogo from "@/components/brand/GuzzlLogo";
+import { useCard } from "@/hooks/useCard";
+import { useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { formatServicePrice, formatServiceDuration } from "@/lib/serviceDisplay";
 
 const statusColors: Record<string, string> = {
   requested: "bg-[hsl(var(--warning))]/10 text-[hsl(var(--warning))]",
@@ -56,6 +59,25 @@ export default function BookingManager() {
   const { planKey, checkLimit } = usePlanLimits();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [upgradeFeature, setUpgradeFeature] = useState("");
+  const queryClient = useQueryClient();
+  const { data: primaryCard } = useCard();
+  const [savingOnline, setSavingOnline] = useState(false);
+  const cardSections: any[] = Array.isArray(primaryCard?.sections_json) ? (primaryCard!.sections_json as any[]) : [];
+  const onlineBookingOn = cardSections.some((sec) => sec.id === "booking" && sec.enabled);
+
+  // Turns the card's booking section on or off.
+  const setOnlineBooking = async (on: boolean) => {
+    if (!primaryCard) return;
+    setSavingOnline(true);
+    const next = cardSections.some((sec) => sec.id === "booking")
+      ? cardSections.map((sec) => (sec.id === "booking" ? { ...sec, enabled: on } : sec))
+      : [...cardSections, { id: "booking", label: "Booking", enabled: on, content: { bookingHeading: "Book an Appointment" } }];
+    const { error } = await supabase.from("cards").update({ sections_json: next }).eq("id", primaryCard.id);
+    setSavingOnline(false);
+    if (error) { toast.error("Couldn't save. Please try again."); return; }
+    await queryClient.invalidateQueries({ queryKey: ["cards"] });
+    toast.success(on ? "Online booking is on" : "Online booking is off");
+  };
 
   // New service dialog
   const [newOpen, setNewOpen] = useState(false);
@@ -166,7 +188,7 @@ export default function BookingManager() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Booking" /></h1>
+        <h1 className="text-3xl font-bold tracking-tight">Bookings</h1>
         <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
       </div>
     );
@@ -182,7 +204,7 @@ export default function BookingManager() {
       />
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Booking" /></h1>
+          <h1 className="text-3xl font-bold tracking-tight">Bookings</h1>
           <p className="text-muted-foreground text-sm mt-1">
             {bookings.length} total bookings · {services.filter((s) => s.active).length} active services
           </p>
@@ -218,6 +240,16 @@ export default function BookingManager() {
           </DialogContent>
         </Dialog>
       </div>
+
+      {primaryCard && (
+        <div className="rounded-xl border border-border bg-card p-4">
+          <label className="flex items-center justify-between gap-3">
+            <span className="text-sm font-semibold">Let customers book me online</span>
+            <Switch checked={onlineBookingOn} disabled={savingOnline} onCheckedChange={setOnlineBooking} />
+          </label>
+          <p className="text-xs text-muted-foreground mt-1">Customers can book during the hours on the Availability tab.</p>
+        </div>
+      )}
 
       {services.length > 0 && availability.length === 0 && (
         <div className="flex items-center justify-between gap-3 flex-wrap border-l-2 border-primary pl-4">
@@ -335,11 +367,11 @@ export default function BookingManager() {
                   </div>
                   {s.description && <p className="text-sm text-muted-foreground mt-1">{s.description}</p>}
                   <div className="flex items-center gap-3 mt-3 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{s.duration_min} min</span>
-                    {s.price != null ? (
-                      <span className="font-medium text-foreground">${Number(s.price).toFixed(0)}</span>
-                    ) : (
-                      <span className="text-[hsl(var(--success))]">Free</span>
+                    {formatServiceDuration(s.duration_min) && (
+                      <span className="flex items-center gap-1"><Clock className="h-3.5 w-3.5" />{formatServiceDuration(s.duration_min)}</span>
+                    )}
+                    {formatServicePrice(s.price) && (
+                      <span className="font-medium text-foreground">{formatServicePrice(s.price)}</span>
                     )}
                   </div>
                 </motion.div>

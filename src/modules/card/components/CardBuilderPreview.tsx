@@ -1,4 +1,5 @@
 import { CreditCard, Eye, Pencil, Smartphone, Tablet, Move, Star, Calendar, Send, Globe, Instagram, Facebook, Linkedin, Twitter, Youtube, Play, MapPin, QrCode } from "lucide-react";
+import { getSavedCalcPreset } from "./QuoteCalculator";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useState, useRef, useCallback } from "react";
@@ -167,13 +168,7 @@ function ThemedSectionPreview({ section, theme, metallicEffect, index }: {
               </CardSectionWrapper>
             )) : (
               <CardSectionWrapper theme={theme} index={index} metallicEffect={metallicEffect}>
-                <div style={{ display: "flex", gap: 2, marginBottom: 6 }}>
-                  {[...Array(5)].map((_, j) => (
-                    <Star key={j} style={{ width: 12, height: 12, fill: "#f59e0b", color: "#f59e0b" }} />
-                  ))}
-                </div>
-                <p style={{ fontSize: 12, fontStyle: "italic", color: palette.secondary, margin: 0, lineHeight: 1.6 }}>"Absolutely amazing experience. Highly recommend!"</p>
-                <p style={{ fontSize: 11, color: `${palette.secondary}99`, margin: "6px 0 0" }}>— Happy Client</p>
+                <p style={{ fontSize: 12, color: `${palette.secondary}99`, margin: 0, textAlign: "center" }}>No reviews yet. Reviews you add will show here.</p>
               </CardSectionWrapper>
             )}
           </div>
@@ -277,7 +272,9 @@ function ThemedSectionPreview({ section, theme, metallicEffect, index }: {
           <p style={{ fontSize: 11, fontWeight: 600, color: palette.primary, margin: "0 0 6px", textTransform: "uppercase", letterSpacing: 1 }}>
             {c?.heading || "Instant Quote"}
           </p>
-          <p style={{ fontSize: 12, color: `${palette.secondary}60`, textAlign: "center" }}>Interactive pricing calculator</p>
+          <p style={{ fontSize: 12, color: `${palette.secondary}60`, textAlign: "center" }}>
+            {getSavedCalcPreset(c) ? "Interactive pricing calculator" : "Not shown on your card until you add your own prices."}
+          </p>
         </CardSectionWrapper>
       );
 

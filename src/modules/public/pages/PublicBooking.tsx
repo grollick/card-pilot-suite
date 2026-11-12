@@ -189,6 +189,23 @@ export default function PublicBooking() {
     );
   }
 
+  if (!data.bookingEnabled) {
+    return (
+      <div className="min-h-screen bg-background">
+        <PublicTopBar backTo={handle ? `/${handle}` : "/"} backLabel="Back to Profile" title="Book Appointment" />
+        <div className="flex items-start justify-center p-4 py-16">
+          <div className="w-full max-w-md rounded-3xl border border-border bg-card p-8 text-center shadow-lg space-y-4">
+            <Calendar className="h-8 w-8 text-primary mx-auto" />
+            <p className="font-semibold text-foreground">{data.businessName} isn't taking online bookings right now.</p>
+            <Button asChild className="w-full">
+              <Link to={handle ? `/${handle}` : "/"}>Back to their card</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <PublicTopBar backTo={handle ? `/${handle}` : "/"} backLabel="Back to Profile" title="Book Appointment" />

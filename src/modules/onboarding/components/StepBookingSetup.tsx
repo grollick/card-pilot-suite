@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight, Calendar, Clock, CheckCircle2, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Calendar, Clock, CheckCircle2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import OnboardingStepWrapper from "./OnboardingStepWrapper";
 
@@ -8,9 +8,10 @@ interface Props {
   onToggleBooking: (v: boolean) => void;
   onNext: () => void;
   onBack: () => void;
+  saving?: boolean;
 }
 
-export default function StepBookingSetup({ bookingEnabled, onToggleBooking, onNext, onBack }: Props) {
+export default function StepBookingSetup({ bookingEnabled, onToggleBooking, onNext, onBack, saving = false }: Props) {
   return (
     <OnboardingStepWrapper stepKey="booking-setup">
       <div className="text-center space-y-1">
@@ -101,11 +102,15 @@ export default function StepBookingSetup({ bookingEnabled, onToggleBooking, onNe
       </div>
 
       <div className="flex gap-2">
-        <Button variant="outline" onClick={onBack} className="flex-1">
+        <Button variant="outline" onClick={onBack} className="flex-1" disabled={saving}>
           <ArrowLeft className="h-4 w-4 mr-1" /> Back
         </Button>
-        <Button onClick={onNext} className="flex-1">
-          {bookingEnabled ? "Continue" : "Skip for now"} <ArrowRight className="h-4 w-4 ml-1" />
+        <Button onClick={onNext} className="flex-1" disabled={saving}>
+          {saving ? (
+            <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Building your card…</>
+          ) : (
+            <>{bookingEnabled ? "Continue" : "Skip for now"} <ArrowRight className="h-4 w-4 ml-1" /></>
+          )}
         </Button>
       </div>
     </OnboardingStepWrapper>
