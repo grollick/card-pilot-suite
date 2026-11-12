@@ -50,6 +50,13 @@
       "when": 1794497887576,
       "tag": "0006_security_hardening_batch",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1794499001853,
+      "tag": "0007_estimate_share_columns",
+      "breakpoints": true
     }
   ]
 }

@@ -1,8 +1,9 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
-import { Plus, Trash2, Loader2, Download, ChevronDown, ChevronRight, Calculator, Bookmark, Sparkles, Save, X } from "lucide-react";
+import { Plus, Trash2, Loader2, Download, ChevronDown, ChevronRight, Calculator, Bookmark, Sparkles, Save, X, Send } from "lucide-react";
 import { useCustomEstimateTemplates, useCreateEstimateTemplate, useDeleteEstimateTemplate } from "@/hooks/useEstimateTemplates";
 import EstimateAssistantSheet from "./EstimateAssistantSheet";
+import SendEstimateDialog from "@/modules/estimates/components/SendEstimateDialog";
 import EstimatePhotoUpload from "./EstimatePhotoUpload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -74,6 +75,7 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
   const [newTemplateName, setNewTemplateName] = useState("");
 
   const [leadId, setLeadId] = useState("");
+  const [sendOpen, setSendOpen] = useState(false);
   const [bookingId] = useState(defaultBookingId ?? "");
   const [estimateNumber, setEstimateNumber] = useState(generateEstimateNumber());
   const [status, setStatus] = useState("draft");
@@ -318,6 +320,12 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
 
               <div><Label className="text-xs text-muted-foreground">Scope of Work</Label><Textarea value={scope} onChange={e => setScope(e.target.value)} rows={2} placeholder="Describe the work…" /></div>
 
+              {isEdit && (existing as any)?.response_name && (
+                <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm">
+                  <p className="font-medium">{(existing as any).status === "approved" ? "Approved" : "Declined"} by {(existing as any).response_name}</p>
+                  {(existing as any).response_note && <p className="text-muted-foreground mt-1 whitespace-pre-wrap">{(existing as any).response_note}</p>}
+                </div>
+              )}
               {isEdit && editId && (
                 <EstimatePhotoUpload estimateId={editId} />
               )}
@@ -376,6 +384,9 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
                   <div><span className="text-xs font-medium">Grand Total</span><br/><span className="tabular-nums text-lg font-bold">${totals.grand_total.toFixed(2)}</span></div>
                 </div>
                 <div className="flex gap-2 shrink-0">
+                  {isEdit && existing && !["approved", "declined"].includes((existing as any).status) && (
+                    <Button variant="outline" onClick={() => setSendOpen(true)} className="gap-1.5"><Send className="h-3.5 w-3.5" /> Send to customer</Button>
+                  )}
                   <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
                   <Button onClick={handleSave} disabled={saving || !estimateNumber}>
                     {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
@@ -408,6 +419,7 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
         onApplyScope={setScope}
         onApplyTerms={setTermsConditions}
       />
+    <SendEstimateDialog estimate={sendOpen && existing ? (existing as any) : null} onOpenChange={setSendOpen} />
     </Dialog>
   );
 }

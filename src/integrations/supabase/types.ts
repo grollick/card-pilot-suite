@@ -3825,7 +3825,11 @@ export type Database = {
           material_total: number
           notes: string | null
           org_id: string | null
+          response_name: string | null
+          response_note: string | null
           scope_of_work: string | null
+          sent_at: string | null
+          share_token: string | null
           status: Database["public"]["Enums"]["estimate_status"]
           subtotal: number
           tax_total: number
@@ -3833,6 +3837,7 @@ export type Database = {
           terms_conditions: string | null
           updated_at: string
           user_id: string
+          viewed_at: string | null
         }
         Insert: {
           approved_at?: string | null
@@ -3858,7 +3863,11 @@ export type Database = {
           material_total?: number
           notes?: string | null
           org_id?: string | null
+          response_name?: string | null
+          response_note?: string | null
           scope_of_work?: string | null
+          sent_at?: string | null
+          share_token?: string | null
           status?: Database["public"]["Enums"]["estimate_status"]
           subtotal?: number
           tax_total?: number
@@ -3866,6 +3875,7 @@ export type Database = {
           terms_conditions?: string | null
           updated_at?: string
           user_id: string
+          viewed_at?: string | null
         }
         Update: {
           approved_at?: string | null
@@ -3891,7 +3901,11 @@ export type Database = {
           material_total?: number
           notes?: string | null
           org_id?: string | null
+          response_name?: string | null
+          response_note?: string | null
           scope_of_work?: string | null
+          sent_at?: string | null
+          share_token?: string | null
           status?: Database["public"]["Enums"]["estimate_status"]
           subtotal?: number
           tax_total?: number
@@ -3899,6 +3913,7 @@ export type Database = {
           terms_conditions?: string | null
           updated_at?: string
           user_id?: string
+          viewed_at?: string | null
         }
         Relationships: [
           {

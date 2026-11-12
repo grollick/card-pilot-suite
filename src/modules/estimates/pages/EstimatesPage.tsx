@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import SendEstimateDialog from "@/modules/estimates/components/SendEstimateDialog";
+import { displayEstimateStatus } from "@/lib/estimateStatus";
 import {
   Plus, Loader2, FileText, Copy, Send, Trash2, MoreHorizontal,
   Search, Filter, CheckCircle2, XCircle, Eye, Download, CalendarCheck,
@@ -60,6 +62,12 @@ export default function EstimatesPage() {
   const { planKey, profile } = usePlanLimits();
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [sendEstimate, setSendEstimate] = useState<any>(null);
+  useEffect(() => {
+    const onSend = (e: Event) => setSendEstimate((e as CustomEvent).detail);
+    window.addEventListener("estimate:send", onSend);
+    return () => window.removeEventListener("estimate:send", onSend);
+  }, []);
   const [editId, setEditId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const [search, setSearch] = useState("");
@@ -370,13 +378,20 @@ export default function EstimatesPage() {
                     <TableCell className="font-mono text-sm">
                       {est.estimate_number}
                     </TableCell>
-                    <TableCell>{est.leads?.name ?? "—"}</TableCell>
+                    <TableCell>
+                      <div>{est.leads?.name ?? "—"}</div>
+                      {est.response_name && (
+                        <div className="text-xs text-muted-foreground max-w-[220px] truncate" title={est.response_note || undefined}>
+                          {est.status === "approved" ? "Approved" : "Declined"} by {est.response_name}{est.response_note ? `: "${est.response_note}"` : ""}
+                        </div>
+                      )}
+                    </TableCell>
                     <TableCell className="text-muted-foreground">
                       {est.job_type ?? "—"}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1.5">
-                        <DocumentStatusBadge status={est.status} size="sm" />
+                        <DocumentStatusBadge status={displayEstimateStatus(est.status, est.expiry_date)} size="sm" />
                         {isConverted && (
                           <Badge
                             variant="outline"
@@ -421,11 +436,9 @@ export default function EstimatesPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          {nextStatuses.includes("sent") && (
-                            <DropdownMenuItem
-                              onClick={() => handleStatusChange(est, "sent")}
-                            >
-                              <Send className="h-3.5 w-3.5 mr-2" /> Mark Sent
+                          {!["approved", "declined"].includes(est.status) && (
+                            <DropdownMenuItem onClick={() => setSendEstimate(est)}>
+                              <Send className="h-3.5 w-3.5 mr-2" /> Send to customer
                             </DropdownMenuItem>
                           )}
                           {nextStatuses.includes("viewed") && (
@@ -523,6 +536,7 @@ export default function EstimatesPage() {
         onOpenChange={setDialogOpen}
         editId={editId}
       />
+      <SendEstimateDialog estimate={sendEstimate} onOpenChange={(o) => { if (!o) setSendEstimate(null); }} />
 
       {/* Confirm approve/decline */}
       <AlertDialog

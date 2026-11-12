@@ -13,6 +13,7 @@ const insertKeys: Record<keyof Insert, true> = {
   markup_total: true, material_total: true, notes: true, org_id: true, scope_of_work: true,
   status: true, subtotal: true, tax_total: true, template_key: true, terms_conditions: true,
   updated_at: true, user_id: true,
+  share_token: true, sent_at: true, viewed_at: true, response_name: true, response_note: true,
 };
 const updateKeys: Record<keyof Update, true> = insertKeys;
 

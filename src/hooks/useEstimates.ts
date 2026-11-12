@@ -283,10 +283,15 @@ export function useCreateEstimate() {
       }
       return estimate;
     },
-    onSuccess: () => {
+    onSuccess: (created: any) => {
       qc.invalidateQueries({ queryKey: ["estimates"] });
       qc.invalidateQueries({ queryKey: ["contact-activities"] });
-      toast.success("Estimate created");
+      toast.success("Estimate created", created?.id ? {
+        action: {
+          label: "Send to customer",
+          onClick: () => window.dispatchEvent(new CustomEvent("estimate:send", { detail: created })),
+        },
+      } : undefined);
     },
     onError: (e: any) => { console.error("Estimate create failed", e); toast.error(ESTIMATE_SAVE_ERROR); },
   });

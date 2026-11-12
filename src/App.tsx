@@ -23,6 +23,7 @@ import PublicCard from "@/modules/public/pages/PublicCard";
 
 // ── Public routes — lazy loaded (heavier) ──
 const PublicBooking = lazy(() => import("@/modules/public/pages/PublicBooking"));
+const PublicEstimatePage = lazy(() => import("@/modules/public/pages/PublicEstimatePage"));
 const QRLanding = lazy(() => import("@/modules/public/pages/QRLanding"));
 const ProductsPage = lazy(() => import("@/modules/public/pages/ProductsPage"));
 const DiscoverPage = lazy(() => import("@/modules/public/pages/DiscoverPage"));
@@ -250,6 +251,7 @@ const App = () => (
             {/* Public routes — no auth required */}
             <Route path="/q/:campaign" element={<LazyRoute><QRLanding /></LazyRoute>} />
             <Route path="/book/:handle" element={<LazyRoute><PublicBooking /></LazyRoute>} />
+            <Route path="/estimate/:token" element={<LazyRoute><PublicEstimatePage /></LazyRoute>} />
             <Route path="/products" element={<LazyRoute><ProductsPage /></LazyRoute>} />
             <Route path="/privacy" element={<LegalPage pageKey="privacy" />} />
             <Route path="/terms" element={<LegalPage pageKey="terms" />} />
