@@ -109,6 +109,23 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
       online_invoice_payments: true,
     },
   },
+  agency: {
+    key: "agency",
+    label: "Agency",
+    limits: { services: -1, bookingsPerMonth: -1, contacts: -1 },
+    features: {
+      removeBranding: true,
+      analytics: true,
+      advancedAnalytics: true,
+      reviewTools: true,
+      featuredPlacement: true,
+      premiumBadge: true,
+      multipleServiceAreas: true,
+      leadManagement: true,
+      advancedLeadManagement: true,
+      online_invoice_payments: true,
+    },
+  },
 };
 
 export type UpgradeTrigger = "service_limit" | "booking_limit" | "branding" | "visibility" | "analytics" | "reviews" | "lead_management" | "generic";

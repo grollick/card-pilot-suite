@@ -84,7 +84,7 @@ export default function PublicInvoicePage() {
           </div>
           <div className="flex items-center justify-between gap-3">
             <h1 className="text-xl font-bold">Invoice {inv.invoice_number}</h1>
-            <DocumentStatusBadge status={inv.status} />
+            {["paid", "overdue", "cancelled"].includes(inv.status) && <DocumentStatusBadge status={inv.status} />}
           </div>
           {inv.customer.name && (
             <p className="text-sm">For {inv.customer.name}{inv.customer.company ? `, ${inv.customer.company}` : ""}</p>

@@ -575,7 +575,19 @@ export default function InvoiceDetailPage() {
             <div className="dash-card p-5 space-y-2">
               <h2 className="text-sm font-semibold text-foreground">Actions</h2>
               {!isNew && invoice && (
-                <CopyPayLinkButton invoiceId={id!} />
+                <CopyPayLinkButton
+                  invoiceId={id!}
+                  isDraft={invoice.status === "draft"}
+                  onMarkSent={() =>
+                    updateStatus.mutateAsync({
+                      id: id!,
+                      status: "sent",
+                      lead_id: invoice?.lead_id,
+                      invoice_number: invoice?.invoice_number,
+                      quiet: true,
+                    })
+                  }
+                />
               )}
               {!isNew && invoice?.status === "draft" && (
                 <Button
@@ -777,7 +789,7 @@ function InvoicePaymentPanel({ invoice, invoiceId, grandTotal }: { invoice: any;
 }
 
 /* ── Copy invoice link button ── */
-function CopyPayLinkButton({ invoiceId }: { invoiceId: string }) {
+function CopyPayLinkButton({ invoiceId, isDraft, onMarkSent }: { invoiceId: string; isDraft: boolean; onMarkSent: () => Promise<unknown> }) {
   const { data: payLink } = useInvoicePaymentLink(invoiceId);
   const [manualLink, setManualLink] = useState<string | null>(null);
 
@@ -790,12 +802,23 @@ function CopyPayLinkButton({ invoiceId }: { invoiceId: string }) {
         size="sm"
         className="w-full justify-start gap-2"
         onClick={async () => {
+          let copied = false;
           try {
             await navigator.clipboard.writeText(payLink);
-            toast.success("Invoice link copied");
+            copied = true;
           } catch {
             // The browser blocked the clipboard; show the link so it can be copied by hand.
             setManualLink(payLink);
+          }
+          if (isDraft) {
+            try {
+              await onMarkSent();
+              if (copied) toast.success("Invoice link copied. Marked as sent.");
+            } catch {
+              if (copied) toast.success("Invoice link copied");
+            }
+          } else if (copied) {
+            toast.success("Invoice link copied");
           }
         }}
       >

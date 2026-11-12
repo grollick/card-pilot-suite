@@ -169,7 +169,7 @@ export function useUpdateInvoiceStatus() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, status, lead_id, invoice_number }: {
-      id: string; status: InvoiceStatus; lead_id?: string | null; invoice_number?: string;
+      id: string; status: InvoiceStatus; lead_id?: string | null; invoice_number?: string; quiet?: boolean;
     }) => {
       const updates: any = { status };
       if (status === "sent") updates.sent_at = new Date().toISOString();
@@ -197,7 +197,7 @@ export function useUpdateInvoiceStatus() {
       qc.invalidateQueries({ queryKey: ["invoices"] });
       qc.invalidateQueries({ queryKey: ["invoice", vars.id] });
       qc.invalidateQueries({ queryKey: ["contact-activities"] });
-      toast.success(`Invoice marked as ${INVOICE_STATUS_LABELS[vars.status]}`);
+      if (!vars.quiet) toast.success(`Invoice marked as ${INVOICE_STATUS_LABELS[vars.status]}`);
     },
     onError: (e: any) => toast.error(e.message),
   });

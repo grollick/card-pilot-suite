@@ -268,7 +268,7 @@ export default function EstimatesPage() {
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
               Approved Value
             </p>
-            <p className="text-2xl font-bold tabular-nums text-success mt-1">
+            <p className="text-2xl font-bold tabular-nums text-primary mt-1">
               ${totalApproved.toLocaleString("en-US", {
                 minimumFractionDigits: 0,
               })}
@@ -465,7 +465,7 @@ export default function EstimatesPage() {
                                 handleStatusChange(est, "approved")
                               }
                             >
-                              <CheckCircle2 className="h-3.5 w-3.5 mr-2 text-success" />{" "}
+                              <CheckCircle2 className="h-3.5 w-3.5 mr-2 text-primary" />{" "}
                               Approve
                             </DropdownMenuItem>
                           )}

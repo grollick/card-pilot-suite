@@ -28,6 +28,9 @@ export default function CreateInvoiceFromEstimateDialog({ open, onOpenChange, on
     invoices as any[],
   );
 
+  const allApprovedInvoiced =
+    eligible.length === 0 && (estimates as any[]).some((e) => e.status === "approved");
+
   const handleCreate = async () => {
     if (!selectedId) return;
     await createFromEstimate.mutateAsync(selectedId);
@@ -53,8 +56,14 @@ export default function CreateInvoiceFromEstimateDialog({ open, onOpenChange, on
         ) : eligible.length === 0 ? (
           <div className="text-center py-8">
             <FileText className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">No estimates available to convert.</p>
-            <p className="text-xs text-muted-foreground mt-1">Create an estimate first, then come back here.</p>
+            {allApprovedInvoiced ? (
+              <p className="text-sm text-muted-foreground">Every approved estimate already has an invoice.</p>
+            ) : (
+              <>
+                <p className="text-sm text-muted-foreground">No estimates available to convert.</p>
+                <p className="text-xs text-muted-foreground mt-1">Create an estimate first, then come back here.</p>
+              </>
+            )}
           </div>
         ) : (
           <div className="space-y-3 max-h-[400px] overflow-y-auto">
