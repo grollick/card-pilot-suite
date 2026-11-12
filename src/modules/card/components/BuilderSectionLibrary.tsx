@@ -43,12 +43,15 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
     zIndex: isDragging ? 10 : undefined,
   };
 
+  // Match what the customer sees on the card.
+  const rowLabel = section.id === "quote_calculator" ? "Instant Quote" : section.label;
+
   return (
     <TooltipProvider delayDuration={200}>
       <div
         ref={setNodeRef}
         style={style}
-        className={`group flex items-center gap-2 py-2 px-2.5 rounded-xl transition-all duration-200 ${
+        className={`group flex items-center gap-1.5 py-2 px-2 min-w-0 w-full rounded-xl transition-all duration-200 ${
           section.enabled
             ? "hover:bg-accent/30 hover:shadow-sm"
             : "bg-muted/30"
@@ -66,19 +69,19 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
         </Tip>
 
         <button
-          className="flex-1 min-w-[6rem] text-left"
+          className="flex-1 min-w-0 text-left"
           onClick={() => onEdit(section.id)}
-          title={`Edit ${section.label}`}
+          title={`Edit ${rowLabel}`}
         >
           <span className={`text-[13px] font-medium block truncate whitespace-nowrap ${section.enabled ? "text-foreground" : "text-muted-foreground"}`}>
-            {section.label}
+            {rowLabel}
           </span>
         </button>
 
         <button
           onClick={() => onEdit(section.id)}
           className="h-7 w-7 shrink-0 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-          aria-label={`Edit ${section.label}`}
+          aria-label={`Edit ${rowLabel}`}
           title="Edit"
         >
           <Pencil className="h-3.5 w-3.5" />
@@ -89,7 +92,7 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
             <DropdownMenuTrigger asChild>
               <button
                 className="h-7 w-6 shrink-0 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-                aria-label={`More options for ${section.label}`}
+                aria-label={`More options for ${rowLabel}`}
               >
                 <MoreHorizontal className="h-3.5 w-3.5" />
               </button>
@@ -113,7 +116,7 @@ function SortableSection({ section, onEdit, onToggle, onDuplicate, onDelete }: {
           checked={section.enabled}
           onCheckedChange={() => onToggle(section.id)}
           className="scale-[0.8] shrink-0"
-          aria-label={section.enabled ? `Hide ${section.label}` : `Show ${section.label}`}
+          aria-label={section.enabled ? `Hide ${rowLabel}` : `Show ${rowLabel}`}
         />
       </div>
     </TooltipProvider>

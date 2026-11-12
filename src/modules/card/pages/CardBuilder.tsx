@@ -728,6 +728,13 @@ export default function CardBuilder() {
   );
 
   // ── Mobile tab config ──
+  // Keep the section list at least ~260px wide so names, pencil, "..." and switch all fit on small laptops.
+  const leftPanelPct = (() => {
+    if (typeof window === "undefined") return 22;
+    const editorWidth = Math.max(600, window.innerWidth - 256);
+    return Math.min(34, Math.max(22, Math.ceil((260 / editorWidth) * 100)));
+  })();
+
   const mobileTabs = [
     { id: "preview" as const, label: "Preview", icon: Smartphone },
     { id: "sections" as const, label: "Sections", icon: Layers },
@@ -759,7 +766,7 @@ export default function CardBuilder() {
       <div className="hidden lg:flex flex-1 min-h-0">
         <ResizablePanelGroup direction="horizontal" className="h-full">
           {/* Left Panel — Section Library */}
-          <ResizablePanel defaultSize={22} minSize={20} maxSize={30}>
+          <ResizablePanel defaultSize={leftPanelPct} minSize={Math.min(leftPanelPct, 30)} maxSize={Math.max(30, leftPanelPct)}>
             <div className="h-full flex flex-col bg-background/80 backdrop-blur-sm">
               <div className="flex items-center gap-2.5 px-4 py-3.5 border-b border-border/15 shrink-0">
                 <div className="h-7 w-7 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center shadow-sm ring-1 ring-primary/10">
@@ -771,7 +778,7 @@ export default function CardBuilder() {
                 </div>
               </div>
               <div className="flex-1 overflow-y-auto scrollbar-thin">
-                <div className="p-3 space-y-1">
+                <div className="p-2 space-y-1 min-w-0">
                   {leftPanel}
                 </div>
               </div>
@@ -781,7 +788,7 @@ export default function CardBuilder() {
           <ResizableHandle className="w-[3px] bg-transparent hover:bg-primary/15 transition-colors duration-200 data-[resize-handle-active]:bg-primary/30 relative after:absolute after:inset-y-0 after:-left-px after:w-px after:bg-border/10" />
 
           {/* Center Panel — Preview Canvas */}
-          <ResizablePanel defaultSize={45} minSize={30}>
+          <ResizablePanel defaultSize={67 - leftPanelPct} minSize={30}>
             <div className="h-full flex flex-col bg-gradient-to-b from-muted/10 via-muted/5 to-muted/10" style={{
               backgroundImage: `
                 radial-gradient(circle at 50% 0%, hsl(var(--primary) / 0.02) 0%, transparent 50%),
