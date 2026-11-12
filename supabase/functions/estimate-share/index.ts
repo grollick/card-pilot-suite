@@ -133,7 +133,7 @@ Deno.serve(async (req) => {
       }
       const [{ data: sections }, { data: items }, { data: business }, { data: lead }] = await Promise.all([
         client.from("estimate_sections").select("id,name,sort_order").eq("estimate_id", est.id),
-        client.from("estimate_line_items").select("section_id,title,description,quantity,unit,line_total,is_optional,sort_order").eq("estimate_id", est.id),
+        client.from("estimate_line_items").select("section_id,title,description,quantity,unit,line_total,tax_percent,is_optional,sort_order").eq("estimate_id", est.id),
         client.from("profiles").select("company,name,handle,phone,avatar_url").eq("id", est.user_id).single(),
         est.lead_id ? client.from("leads").select("name").eq("id", est.lead_id).maybeSingle() : Promise.resolve({ data: null }),
       ]);

@@ -20,6 +20,7 @@ interface Props {
 
 export default function SendEstimateDialog({ estimate, onOpenChange }: Props) {
   const qc = useQueryClient();
+  const [manualLink, setManualLink] = useState<string | null>(null);
   const [busy, setBusy] = useState<null | "email" | "link" | "sms" | "manual">(null);
   const open = !!estimate;
 
@@ -71,11 +72,20 @@ export default function SendEstimateDialog({ estimate, onOpenChange }: Props) {
   const handleCopy = async () => {
     setBusy("link");
     try {
-      const r = await send("link");
-      await navigator.clipboard.writeText(r.url);
-      toast.success("Link copied.");
-    } catch {
-      toast.error("Couldn't make the link. Please try again.");
+      let url: string;
+      try {
+        url = (await send("link")).url;
+      } catch {
+        toast.error("Couldn't make the link. Please try again.");
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success("Link copied.");
+      } catch {
+        // The browser blocked the clipboard; show the link so it can be copied by hand.
+        setManualLink(url);
+      }
     } finally { setBusy(null); }
   };
 
@@ -129,6 +139,20 @@ export default function SendEstimateDialog({ estimate, onOpenChange }: Props) {
                 {busy === "sms" ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageSquare className="h-4 w-4" />}
                 Text the link
               </Button>
+            )}
+            {manualLink && (
+              <div className="space-y-1.5 pt-1">
+                <p className="text-sm text-foreground">Copy this link and send it to your customer.</p>
+                <input
+                  readOnly
+                  value={manualLink}
+                  autoFocus
+                  ref={(el) => el?.select()}
+                  onFocus={(e) => e.currentTarget.select()}
+                  className="w-full min-h-11 rounded-md border border-input bg-background px-3 text-sm text-foreground"
+                  aria-label="Estimate link"
+                />
+              </div>
             )}
             <button className="w-full pt-2 text-xs text-muted-foreground underline-offset-2 hover:underline" onClick={handleManual} disabled={!!busy}>
               I sent it another way

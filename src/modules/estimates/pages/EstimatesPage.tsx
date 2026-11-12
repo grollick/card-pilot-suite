@@ -380,9 +380,14 @@ export default function EstimatesPage() {
                     </TableCell>
                     <TableCell>
                       <div>{est.leads?.name ?? "—"}</div>
-                      {est.response_name && (
-                        <div className="text-xs text-muted-foreground max-w-[220px] truncate" title={est.response_note || undefined}>
-                          {est.status === "approved" ? "Approved" : "Declined"} by {est.response_name}{est.response_note ? `: "${est.response_note}"` : ""}
+                      {(est.status === "approved" || est.status === "declined") && (est.response_name || est.response_note) && (
+                        <div className="text-xs text-muted-foreground max-w-[220px]">
+                          <div className="truncate">
+                            {est.status === "approved" ? "Approved" : "Declined"} by {est.response_name || est.leads?.name || "the customer"}
+                          </div>
+                          {est.response_note && (
+                            <div className="line-clamp-2" title={est.response_note}>"{est.response_note}"</div>
+                          )}
                         </div>
                       )}
                     </TableCell>

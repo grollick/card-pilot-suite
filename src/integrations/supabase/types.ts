@@ -8445,6 +8445,13 @@ export type Database = {
           start_time: string
         }[]
       }
+      get_busy_times_by_user: {
+        Args: { p_user_id: string }
+        Returns: {
+          end_datetime: string
+          start_datetime: string
+        }[]
+      }
       get_effective_plan: { Args: { p_user_id: string }; Returns: Json }
       get_portal_session: {
         Args: { p_token: string }

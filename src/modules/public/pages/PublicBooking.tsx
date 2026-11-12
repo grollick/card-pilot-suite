@@ -13,7 +13,7 @@ import { usePublicBookingData } from "@/hooks/useBookings";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatServicePrice, formatServiceDuration } from "@/lib/serviceDisplay";
-import { isLongJob, isLongJobDayAvailable, dayWindow } from "@/lib/longJobBooking";
+import { isLongJob, isLongJobDayAvailable, dayWindow, isStartOfferable, overlapsBooking } from "@/lib/longJobBooking";
 
 function generateICS(
   name: string,
@@ -37,7 +37,7 @@ function generateICS(
 
 export default function PublicBooking() {
   const { handle } = useParams();
-  const { data, isLoading, isError } = usePublicBookingData(handle);
+  const { data, isLoading, isError, refetch } = usePublicBookingData(handle);
 
   const [step, setStep] = useState(1);
   const [selectedServiceId, setSelectedServiceId] = useState<string | null>(null);
@@ -74,14 +74,8 @@ export default function PublicBooking() {
       if (isAfter(slotEnd, dayEnd)) break;
 
       // Skip past times
-      if (!isBefore(cursor, now) || !isBefore(selectedDate, now)) {
-        // Check conflicts
-        const hasConflict = data.existingBookings.some((b) => {
-          const bStart = new Date(b.start_datetime);
-          const bEnd = new Date(b.end_datetime);
-          return cursor < bEnd && slotEnd > bStart;
-        });
-        if (!hasConflict) {
+      if (isStartOfferable(cursor, now)) {
+        if (!overlapsBooking(cursor, slotEnd, data.existingBookings)) {
           slots.push(format(cursor, "h:mm a"));
         }
       }
@@ -139,7 +133,18 @@ export default function PublicBooking() {
         },
       });
 
-      if (bookingError) throw bookingError;
+      if (bookingError) {
+        let msg: string | undefined;
+        try { msg = (await (bookingError as any).context?.json?.())?.error; } catch { /* ignore */ }
+        if ((bookingError as any).context?.status === 409) {
+          toast.error(msg || "That time was just taken. Please pick another time.");
+          setSelectedTime(null);
+          setStep(2);
+          refetch();
+          return;
+        }
+        throw bookingError;
+      }
       if (!bookingData?.success) throw new Error(bookingData?.error || "Booking failed");
 
       // Track analytics event (non-sensitive, fire-and-forget)

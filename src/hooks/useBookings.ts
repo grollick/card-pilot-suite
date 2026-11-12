@@ -171,21 +171,12 @@ export function usePublicBookingData(handle: string | undefined) {
         .single() as { data: any; error: any };
       if (pErr) throw pErr;
 
-      const now = new Date();
-      const thirtyDays = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-
       // Fire all queries in parallel
       const [servicesResult, availabilityResult, bookingsResult, cardResult] = await Promise.all([
         supabase
           .rpc("get_services_by_handle", { p_handle: handle! }),
         supabase.rpc("get_availability_by_user", { p_user_id: profile.id }),
-        supabase
-          .from("bookings")
-          .select("start_datetime, end_datetime")
-          .eq("user_id", profile.id)
-          .in("status", ["pending", "confirmed", "requested"])
-          .gte("start_datetime", now.toISOString())
-          .lte("start_datetime", thirtyDays.toISOString()),
+        supabase.rpc("get_busy_times_by_user" as any, { p_user_id: profile.id }),
         supabase
           .from("cards")
           .select("sections_json, company")
@@ -208,7 +199,7 @@ export function usePublicBookingData(handle: string | undefined) {
         bookingEnabled,
         services: servicesResult.data ?? [],
         availability: availabilityResult.data ?? [],
-        existingBookings: bookingsResult.data ?? [],
+        existingBookings: ((bookingsResult.data as any[]) ?? []) as { start_datetime: string; end_datetime: string }[],
       };
     },
   });

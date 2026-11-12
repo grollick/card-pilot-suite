@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-interface Item { title: string; description: string | null; quantity: number; unit: string | null; line_total: number; is_optional: boolean }
+interface Item { title: string; description: string | null; quantity: number; unit: string | null; amount: number; is_optional: boolean }
 interface CustomerEstimate {
   estimate_number: string; status: string; issue_date: string | null; expiry_date: string | null; responded_at: string | null;
   job_address: string | null; job_type: string | null; scope_of_work: string | null; notes: string | null; terms_conditions: string | null;
@@ -131,7 +131,7 @@ export default function PublicEstimatePage() {
                       {it.description && <p className="text-sm text-muted-foreground whitespace-pre-wrap">{it.description}</p>}
                       <p className="text-sm text-muted-foreground">{it.quantity}{it.unit ? ` ${it.unit}` : ""}</p>
                     </div>
-                    <p className="tabular-nums text-foreground font-medium">{money(it.line_total)}</p>
+                    <p className="tabular-nums text-foreground font-medium">{money(it.amount)}</p>
                   </li>
                 ))}
               </ul>
@@ -142,7 +142,7 @@ export default function PublicEstimatePage() {
         <section className="p-5 sm:p-6 border-b border-border space-y-1.5 text-[15px]">
           <Row label="Subtotal" value={money(est.subtotal)} />
           {est.discount > 0 && <Row label="Discount" value={`-${money(est.discount)}`} />}
-          <Row label="Tax" value={money(est.tax_total)} />
+          {est.tax_total > 0 && <Row label="Tax" value={money(est.tax_total)} />}
           <div className="flex justify-between pt-2 text-lg font-bold text-foreground"><span>Total</span><span className="tabular-nums">{money(est.grand_total)}</span></div>
           {est.deposit && <Row label="Deposit due" value={money(est.deposit)} />}
         </section>

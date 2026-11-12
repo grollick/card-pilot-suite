@@ -220,6 +220,20 @@ serve(async (req) => {
       }
     }
 
+    // ── Refuse overlapping times ──
+    const { data: clash, error: clashErr } = await supabase
+      .from("bookings")
+      .select("id")
+      .eq("user_id", userId)
+      .in("status", ["requested", "pending", "confirmed"])
+      .lt("start_datetime", endDt.toISOString())
+      .gt("end_datetime", startDt.toISOString())
+      .limit(1);
+    if (clashErr) throw clashErr;
+    if (clash && clash.length > 0) {
+      return json({ error: "That time was just taken. Please pick another time." }, 409);
+    }
+
     // ── Create booking ──
     const bookingId = crypto.randomUUID();
     const { data: booking, error: bookingError } = await supabase

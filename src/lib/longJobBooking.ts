@@ -27,9 +27,23 @@ export function dayWindow(date: Date, rules: AvailabilityRule[]): { open: Date; 
 }
 
 /** Long-job day is available when the pro is open and no active booking covers that day's opening time. */
-export function isLongJobDayAvailable(date: Date, rules: AvailabilityRule[], bookings: BookingRange[]): boolean {
+export function isLongJobDayAvailable(date: Date, rules: AvailabilityRule[], bookings: BookingRange[], now: Date = new Date()): boolean {
   const w = dayWindow(date, rules);
   if (!w) return false;
   const t = w.open.getTime();
+  if (!isStartOfferable(w.open, now)) return false;
   return !bookings.some((b) => new Date(b.start_datetime).getTime() <= t && t < new Date(b.end_datetime).getTime());
+}
+
+/** Minimum notice before a slot can be booked. */
+export const MIN_NOTICE_MS = 60 * 60 * 1000;
+
+/** A time can be offered only when it starts at least one hour from now. */
+export function isStartOfferable(start: Date, now: Date = new Date()): boolean {
+  return start.getTime() >= now.getTime() + MIN_NOTICE_MS;
+}
+
+/** True when [start, end) overlaps any active booking. */
+export function overlapsBooking(start: Date, end: Date, bookings: BookingRange[]): boolean {
+  return bookings.some((b) => start.getTime() < new Date(b.end_datetime).getTime() && end.getTime() > new Date(b.start_datetime).getTime());
 }

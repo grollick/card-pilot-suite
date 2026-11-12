@@ -46,3 +46,11 @@ describe("status rules", () => {
     expect(respondError({ status: "viewed" }, "approved", " ")).not.toBeNull();
   });
 });
+
+import { lineAmountBeforeTax } from "../../supabase/functions/estimate-share/logic";
+describe("line amounts", () => {
+  it("$1,130 line at 13% tax shows $1,000 before tax", () => {
+    expect(lineAmountBeforeTax(1130, 13)).toBe(1000);
+    expect(lineAmountBeforeTax(500, 0)).toBe(500);
+  });
+});

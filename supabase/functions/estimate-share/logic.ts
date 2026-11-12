@@ -64,7 +64,7 @@ export function buildCustomerPayload(
     description: li.description ?? null,
     quantity: num(li.quantity),
     unit: li.unit ?? null,
-    line_total: num(li.line_total),
+    amount: lineAmountBeforeTax(li.line_total, li.tax_percent),
     is_optional: !!li.is_optional,
   });
   const sorted = [...items].sort((a, b) => num(a.sort_order) - num(b.sort_order));
@@ -98,4 +98,11 @@ export function buildCustomerPayload(
       avatar_url: business.avatar_url ?? null,
     },
   };
+}
+
+/** Pre-tax amount for a line: line_total includes the line's tax percent. */
+export function lineAmountBeforeTax(lineTotal: unknown, taxPercent: unknown): number {
+  const t = num(lineTotal);
+  const pct = num(taxPercent);
+  return Math.round((pct > 0 ? t / (1 + pct / 100) : t) * 100) / 100;
 }
