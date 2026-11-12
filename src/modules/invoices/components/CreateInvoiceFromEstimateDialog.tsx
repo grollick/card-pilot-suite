@@ -5,7 +5,8 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from "@/components/ui/dialog";
 import { useEstimates } from "@/hooks/useEstimates";
-import { useCreateInvoiceFromEstimate } from "@/hooks/useInvoices";
+import { useCreateInvoiceFromEstimate, useInvoices } from "@/hooks/useInvoices";
+import { notYetInvoiced } from "@/lib/invoicedEstimates";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 
@@ -17,12 +18,14 @@ interface Props {
 
 export default function CreateInvoiceFromEstimateDialog({ open, onOpenChange, onCreated }: Props) {
   const { data: estimates = [], isLoading } = useEstimates();
+  const { data: invoices = [], isLoading: invoicesLoading } = useInvoices();
   const createFromEstimate = useCreateInvoiceFromEstimate();
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  // Show estimates that can be invoiced (approved, sent, or viewed)
-  const eligible = (estimates as any[]).filter(
-    (e) => ["approved", "sent", "viewed", "draft"].includes(e.status)
+  // Show estimates that can be invoiced and do not have an invoice yet
+  const eligible = notYetInvoiced(
+    (estimates as any[]).filter((e) => ["approved", "sent", "viewed", "draft"].includes(e.status)),
+    invoices as any[],
   );
 
   const handleCreate = async () => {
@@ -43,7 +46,7 @@ export default function CreateInvoiceFromEstimateDialog({ open, onOpenChange, on
           </DialogDescription>
         </DialogHeader>
 
-        {isLoading ? (
+        {isLoading || invoicesLoading ? (
           <div className="flex justify-center py-8">
             <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
           </div>

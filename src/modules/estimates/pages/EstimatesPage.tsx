@@ -1,4 +1,7 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useInvoices } from "@/hooks/useInvoices";
+import { invoiceByEstimate } from "@/lib/invoicedEstimates";
 import SendEstimateDialog from "@/modules/estimates/components/SendEstimateDialog";
 import { displayEstimateStatus } from "@/lib/estimateStatus";
 import {
@@ -58,6 +61,9 @@ export default function EstimatesPage() {
   const duplicateEstimate = useDuplicateEstimate();
   const convertToJob = useConvertEstimateToJob();
   const convertToInvoice = useConvertEstimateToInvoice();
+  const navigate = useNavigate();
+  const { data: allInvoices = [] } = useInvoices();
+  const invoiceFor = invoiceByEstimate(allInvoices as any[]);
   const { data: stages = [] } = usePipelineStages();
   const { planKey, profile } = usePlanLimits();
 
@@ -495,17 +501,24 @@ export default function EstimatesPage() {
                                 <CalendarCheck className="h-3.5 w-3.5 mr-2" />{" "}
                                 Convert to Job
                               </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  convertToInvoice.mutate({
-                                    estimateId: est.id,
-                                  })
-                                }
-                              >
-                                <FileBarChart className="h-3.5 w-3.5 mr-2" />{" "}
-                                Convert to Invoice
-                              </DropdownMenuItem>
+                              {!invoiceFor.has(est.id) && (
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    convertToInvoice.mutate({
+                                      estimateId: est.id,
+                                    })
+                                  }
+                                >
+                                  <FileBarChart className="h-3.5 w-3.5 mr-2" />{" "}
+                                  Convert to Invoice
+                                </DropdownMenuItem>
+                              )}
                             </>
+                          )}
+                          {invoiceFor.has(est.id) && (
+                            <DropdownMenuItem onClick={() => navigate(`/app/invoices/${invoiceFor.get(est.id)}`)}>
+                              <FileBarChart className="h-3.5 w-3.5 mr-2" /> View invoice
+                            </DropdownMenuItem>
                           )}
                           <DropdownMenuSeparator />
                           <DropdownMenuItem

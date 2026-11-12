@@ -4449,8 +4449,13 @@ export type Database = {
         Row: {
           amount_paid: number
           created_at: string
+          customer_reported_at: string | null
+          customer_reported_method: string | null
+          customer_reported_note: string | null
+          customer_reported_reference: string | null
           discount_amount: number
           due_date: string | null
+          estimate_id: string | null
           grand_total: number
           id: string
           invoice_number: string
@@ -4479,8 +4484,13 @@ export type Database = {
         Insert: {
           amount_paid?: number
           created_at?: string
+          customer_reported_at?: string | null
+          customer_reported_method?: string | null
+          customer_reported_note?: string | null
+          customer_reported_reference?: string | null
           discount_amount?: number
           due_date?: string | null
+          estimate_id?: string | null
           grand_total?: number
           id?: string
           invoice_number: string
@@ -4509,8 +4519,13 @@ export type Database = {
         Update: {
           amount_paid?: number
           created_at?: string
+          customer_reported_at?: string | null
+          customer_reported_method?: string | null
+          customer_reported_note?: string | null
+          customer_reported_reference?: string | null
           discount_amount?: number
           due_date?: string | null
+          estimate_id?: string | null
           grand_total?: number
           id?: string
           invoice_number?: string
@@ -4537,6 +4552,13 @@ export type Database = {
           viewed_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "invoices_estimate_id_fkey"
+            columns: ["estimate_id"]
+            isOneToOne: false
+            referencedRelation: "estimates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "invoices_job_id_fkey"
             columns: ["job_id"]

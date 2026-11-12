@@ -230,6 +230,11 @@ export default function InvoicesPage() {
                       {inv.invoice_number}
                     </span>
                     <DocumentStatusBadge status={inv.status} size="sm" />
+                    {inv.customer_reported_at && inv.status !== "paid" && inv.status !== "cancelled" && (
+                      <span className="text-[10px] font-medium rounded-full px-1.5 h-5 inline-flex items-center bg-primary/10 text-primary border border-primary/20">
+                        Customer says paid
+                      </span>
+                    )}
                   </div>
                   <p className="text-sm text-muted-foreground truncate mt-0.5">
                     {inv.leads?.name || "No customer"}

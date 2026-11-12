@@ -12,10 +12,10 @@ const CONFIG: Record<DocStatus, { label: string; icon: any; classes: string }> =
   draft:     { label: "Draft",     icon: FileText,      classes: "bg-muted text-muted-foreground border-border" },
   sent:      { label: "Sent",      icon: Send,          classes: "bg-primary/10 text-primary border-primary/20" },
   viewed:    { label: "Viewed",    icon: Eye,           classes: "bg-warning/10 text-warning border-warning/20" },
-  approved:  { label: "Approved",  icon: CheckCircle2,  classes: "bg-success/10 text-success border-success/20" },
+  approved:  { label: "Approved",  icon: CheckCircle2,  classes: "bg-primary text-primary-foreground border-primary" },
   declined:  { label: "Declined",  icon: XCircle,       classes: "bg-destructive/10 text-destructive border-destructive/20" },
   expired:   { label: "Expired",   icon: Clock,         classes: "bg-muted text-muted-foreground/60 border-border" },
-  paid:      { label: "Paid",      icon: CheckCircle2,  classes: "bg-success/10 text-success border-success/20" },
+  paid:      { label: "Paid",      icon: CheckCircle2,  classes: "bg-primary text-primary-foreground border-primary" },
   overdue:   { label: "Overdue",   icon: AlertTriangle,  classes: "bg-destructive/10 text-destructive border-destructive/20" },
   cancelled: { label: "Cancelled", icon: Ban,           classes: "bg-muted text-muted-foreground/60 border-border" },
 };

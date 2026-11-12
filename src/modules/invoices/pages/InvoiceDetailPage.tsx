@@ -17,6 +17,7 @@ import {
   useInvoice, useInvoiceLineItems, useUpdateInvoice, useUpdateInvoiceStatus,
   useSaveInvoiceLineItems, useCreateInvoice, type InvoiceStatus,
 } from "@/hooks/useInvoices";
+import { methodPhrase } from "@/modules/public/components/InvoicePaymentSection";
 import { useInvoicePayments, useRecordPayment, useInvoicePaymentLink } from "@/hooks/useInvoicePayments";
 import { useContacts } from "@/hooks/useContacts";
 import { useJobs } from "@/hooks/useJobs";
@@ -669,6 +670,30 @@ function InvoicePaymentPanel({ invoice, invoiceId, grandTotal }: { invoice: any;
         </p>
       )}
 
+      {!isPaid && invoice.customer_reported_at && (
+        <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-2">
+          <p className="text-xs text-foreground">
+            Customer says they paid by {methodPhrase(invoice.customer_reported_method)} on{" "}
+            {format(new Date(invoice.customer_reported_at), "MMM d")}.
+            {invoice.customer_reported_reference ? ` Ref: ${invoice.customer_reported_reference}.` : ""}
+            {invoice.customer_reported_note ? ` Note: ${invoice.customer_reported_note}` : ""}
+          </p>
+          {!showRecordForm && (
+            <Button
+              size="sm"
+              className="w-full"
+              onClick={() => {
+                setPayMethod(invoice.customer_reported_method || "bank_transfer");
+                setPayRef(invoice.customer_reported_reference || "");
+                setShowRecordForm(true);
+              }}
+            >
+              Mark as paid
+            </Button>
+          )}
+        </div>
+      )}
+
       {/* Record payment form */}
       {!isPaid && !showRecordForm && (
         <Button
@@ -749,23 +774,45 @@ function InvoicePaymentPanel({ invoice, invoiceId, grandTotal }: { invoice: any;
   );
 }
 
-/* ── Copy Pay Link button ── */
+/* ── Copy invoice link button ── */
 function CopyPayLinkButton({ invoiceId }: { invoiceId: string }) {
   const { data: payLink } = useInvoicePaymentLink(invoiceId);
+  const [manualLink, setManualLink] = useState<string | null>(null);
 
   if (!payLink) return null;
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      className="w-full justify-start gap-2"
-      onClick={() => {
-        navigator.clipboard.writeText(payLink);
-        toast.success("Payment link copied!");
-      }}
-    >
-      <Link2 className="h-3.5 w-3.5" /> Copy Pay Link
-    </Button>
+    <div className="space-y-1.5">
+      <Button
+        variant="outline"
+        size="sm"
+        className="w-full justify-start gap-2"
+        onClick={async () => {
+          try {
+            await navigator.clipboard.writeText(payLink);
+            toast.success("Invoice link copied");
+          } catch {
+            // The browser blocked the clipboard; show the link so it can be copied by hand.
+            setManualLink(payLink);
+          }
+        }}
+      >
+        <Link2 className="h-3.5 w-3.5" /> Copy invoice link
+      </Button>
+      {manualLink && (
+        <div className="space-y-1.5">
+          <p className="text-xs text-foreground">Copy this link and send it to your customer.</p>
+          <input
+            readOnly
+            value={manualLink}
+            autoFocus
+            ref={(el) => el?.select()}
+            onFocus={(e) => e.currentTarget.select()}
+            className="w-full min-h-11 rounded-md border border-input bg-background px-3 text-sm text-foreground"
+            aria-label="Invoice link"
+          />
+        </div>
+      )}
+    </div>
   );
 }

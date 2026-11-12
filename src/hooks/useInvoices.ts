@@ -15,7 +15,7 @@ export const INVOICE_STATUS_COLORS: Record<InvoiceStatus, string> = {
   draft: "bg-muted text-muted-foreground",
   sent: "bg-primary/10 text-primary",
   viewed: "bg-warning/10 text-warning",
-  paid: "bg-success/10 text-success",
+  paid: "bg-primary text-primary-foreground",
   overdue: "bg-destructive/10 text-destructive",
   cancelled: "bg-muted text-muted-foreground",
 };
@@ -322,6 +322,7 @@ export async function createInvoiceFromEstimate(userId: string, estimateId: stri
         .insert({
           user_id: userId,
           lead_id: est.lead_id ?? null,
+          estimate_id: est.id,
           invoice_number: invoiceNumber,
           status: "draft" as any,
           due_date: dueDate.toISOString().split("T")[0],

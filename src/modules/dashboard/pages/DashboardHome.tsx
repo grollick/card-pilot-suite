@@ -61,6 +61,35 @@ function BookingRequestsStrip() {
     </div>
   );
 }
+function PaymentReportsStrip() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { data: count = 0 } = useQuery({
+    queryKey: ["invoices", "customer-says-paid-count", user?.id],
+    enabled: !!user,
+    staleTime: 30_000,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("invoices")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .not("customer_reported_at", "is", null)
+        .not("status", "in", "(paid,cancelled)");
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+  if (count < 1) return null;
+  return (
+    <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl border border-primary/30 bg-primary/5 p-3">
+      <p className="text-sm font-medium">
+        {count === 1 ? "1 customer says they've paid." : `${count} customers say they've paid.`}{" "}
+        Check and mark {count === 1 ? "it" : "them"} paid.
+      </p>
+      <Button size="sm" onClick={() => navigate("/app/invoices")}>Invoices</Button>
+    </div>
+  );
+}
 import {
   Pencil, UserPlus, CalendarPlus, ExternalLink,
   Zap, Sparkles, Bell, Store, Globe,
@@ -125,6 +154,7 @@ export default function DashboardHome() {
       variants={stagger}
     >
       <BookingRequestsStrip />
+      <PaymentReportsStrip />
       {/* System widgets (always render, not layout-controlled) */}
       <ReferralActivationChecker />
       {showAllTools && <SecondSessionBanner />}
