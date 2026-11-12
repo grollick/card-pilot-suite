@@ -1,12 +1,13 @@
+import { tierName } from "@/lib/planTiers";
 import { Lock, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import AskForMoreRoom, { BETA_UPGRADE_MESSAGE } from "@/components/beta/AskForMoreRoom";
 
 const FEATURE_LABELS: Record<string, { label: string; plan: string }> = {
-  follow_up: { label: "Follow-up suggestions", plan: "Pro" },
-  profile_rewrite: { label: "Profile rewrite assistant", plan: "Pro" },
-  advanced_growth: { label: "Advanced growth insights", plan: "Growth" },
+  follow_up: { label: "Follow-up suggestions", plan: tierName("growth") },
+  profile_rewrite: { label: "Profile rewrite assistant", plan: tierName("growth") },
+  advanced_growth: { label: "Advanced growth insights", plan: tierName("pro") },
 };
 
 interface Props {
@@ -20,7 +21,7 @@ export default function AIFeatureGate({ feature, children, enabled }: Props) {
 
   if (enabled) return <>{children}</>;
 
-  const info = FEATURE_LABELS[feature] || { label: feature, plan: "Pro" };
+  const info = FEATURE_LABELS[feature] || { label: feature, plan: tierName("growth") };
 
   return (
     <div className="relative rounded-xl border border-border bg-card overflow-hidden">

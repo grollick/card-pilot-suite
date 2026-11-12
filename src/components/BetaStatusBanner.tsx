@@ -1,3 +1,4 @@
+import { tierName, tierOf } from "@/lib/planTiers";
 import { differenceInDays, format } from "date-fns";
 import { FlaskConical, X } from "lucide-react";
 import { useState } from "react";
@@ -18,7 +19,7 @@ export default function BetaStatusBanner() {
   // Active beta
   if (beta && beta.is_active && new Date(beta.expiry_date) > new Date()) {
     const daysLeft = differenceInDays(new Date(beta.expiry_date), new Date());
-    const planLabel = PLAN_TIERS.find((p) => p.key === beta.granted_plan)?.name ?? beta.granted_plan;
+    const planLabel = tierName(beta.granted_plan);
     const isUrgent = daysLeft <= 7;
 
     return (

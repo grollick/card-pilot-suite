@@ -1,10 +1,11 @@
+import { tierAtLeast, type PlanTier } from "@/lib/planTiers";
 import { Lock } from "lucide-react";
 
 /**
  * Portal feature tiers based on the BUSINESS OWNER's plan.
  * Free: basic portal access (view bookings)
  * Pro (growth): rescheduling + review submission
- * Pro Plus (scale): payments, invoices, messaging, file sharing
+ * Ultra (pro): payments, invoices, messaging, file sharing
  */
 
 export type PortalFeature =
@@ -18,21 +19,14 @@ export type PortalFeature =
   | "loyalty"
   | "whatsapp_chat";
 
-const FEATURE_TIERS: Record<PortalFeature, string[]> = {
-  cancel: ["starter", "growth", "pro", "agency"],         // All plans
-  reschedule: ["growth", "pro", "agency"],                // Pro+
-  review: ["growth", "pro", "agency"],                    // Pro+
-  loyalty: ["growth", "pro", "agency"],                   // Pro+
-  whatsapp_chat: ["growth", "pro", "agency"],             // Pro+
-  invoices: ["pro", "agency"],                            // Pro Plus+
-  messaging: ["pro", "agency"],                           // Pro Plus+
-  payments: ["pro", "agency"],                            // Pro Plus+
-  file_sharing: ["pro", "agency"],                        // Pro Plus+
+const FEATURE_TIERS: Record<PortalFeature, PlanTier> = {
+  cancel: "free", reschedule: "pro", review: "pro", loyalty: "pro", whatsapp_chat: "pro",
+  invoices: "ultra", messaging: "ultra", payments: "ultra", file_sharing: "ultra",
 };
 
 export function isPortalFeatureEnabled(businessPlan: string, feature: PortalFeature): boolean {
-  const allowed = FEATURE_TIERS[feature] || [];
-  return allowed.includes(businessPlan || "starter");
+  const minimum = FEATURE_TIERS[feature];
+  return minimum !== undefined && tierAtLeast(businessPlan, minimum);
 }
 
 export function PortalUpgradeNotice({ feature }: { feature: string }) {

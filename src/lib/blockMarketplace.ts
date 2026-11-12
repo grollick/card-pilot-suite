@@ -1,3 +1,4 @@
+import { tierAtLeast, tierOf } from "./planTiers";
 // ── Block Marketplace Catalog ──
 // Static catalog of installable card builder blocks
 
@@ -311,8 +312,5 @@ export function getBlockById(id: string): MarketplaceBlock | undefined {
 
 /** Check if user's plan can access a block */
 export function canAccessBlock(block: MarketplaceBlock, userPlan: string): boolean {
-  const planOrder = ["starter", "growth", "pro", "agency"];
-  const userIdx = planOrder.indexOf(userPlan || "starter");
-  const reqIdx = planOrder.indexOf(block.requiredPlan);
-  return userIdx >= reqIdx;
+  return tierAtLeast(userPlan, tierOf(block.requiredPlan));
 }

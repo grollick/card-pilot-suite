@@ -250,7 +250,7 @@ export default function NetworkingModeDialog({ open, onOpenChange }: NetworkingM
               <div className="w-full rounded-xl border border-dashed border-border bg-muted/20 p-3 text-center">
                 <p className="text-xs text-muted-foreground">
                   <Nfc className="h-3.5 w-3.5 inline mr-1" />
-                  NFC tap-to-share available on <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Pro Plus</Badge>
+                  NFC tap-to-share available on <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Ultra</Badge>
                 </p>
               </div>
             )}

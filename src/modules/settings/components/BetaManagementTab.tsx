@@ -1,3 +1,4 @@
+import { tierName, tierOf } from "@/lib/planTiers";
 import { useState, useMemo } from "react";
 import { format, differenceInDays, addDays, isPast, isBefore, addWeeks } from "date-fns";
 import {
@@ -102,7 +103,7 @@ export default function BetaManagementTab() {
       return s === "expired" || s === "revoked";
     });
 
-    if (planFilter !== "all") list = list.filter((b) => b.granted_plan === planFilter);
+    if (planFilter !== "all") list = list.filter((b) => tierOf(b.granted_plan) === tierOf(planFilter));
 
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -116,6 +117,7 @@ export default function BetaManagementTab() {
   }, [betaList, statusFilter, planFilter, search]);
 
   const handleCreate = async () => {
+    if (!user) return;
     if (!email.trim()) return toast.error("Please enter a user email");
     const { data: profile, error } = await supabase
       .from("profiles")
@@ -130,7 +132,7 @@ export default function BetaManagementTab() {
       granted_plan: plan,
       expiry_date: addDays(start, Number(days)).toISOString(),
       notes: notes || undefined,
-      admin_id: user!.id,
+      admin_id: user.id,
     });
     setDialogOpen(false);
     setEmail("");
@@ -155,7 +157,7 @@ export default function BetaManagementTab() {
     updateBeta.mutate({ id, notes: `Plan changed to ${newPlan}` });
     // We need to update granted_plan - extend the mutation
     supabase.from("beta_access").update({ granted_plan: newPlan }).eq("id", id).then(() => {
-      toast.success(`Plan changed to ${PLAN_TIERS.find((p) => p.key === newPlan)?.name ?? newPlan}`);
+      toast.success(`Plan changed to ${tierName(newPlan)}`);
     });
   };
 
@@ -285,7 +287,7 @@ export default function BetaManagementTab() {
               {filtered.map((b) => {
                 const status = getStatus(b);
                 const daysLeft = differenceInDays(new Date(b.expiry_date), new Date());
-                const planLabel = PLAN_TIERS.find((p) => p.key === b.granted_plan)?.name ?? b.granted_plan;
+                const planLabel = tierName(b.granted_plan);
 
                 return (
                   <TableRow key={b.id}>

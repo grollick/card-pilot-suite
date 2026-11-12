@@ -1,3 +1,4 @@
+import { tierName, tierOf, tierAtLeast } from "@/lib/planTiers";
 import { useState } from "react";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { Helmet } from "react-helmet-async";
@@ -87,7 +88,7 @@ export default function ProviderDashboard() {
     toast.info("Create booking");
   };
 
-  const planColor = PLAN_COLORS[plan.plan_name] ?? PLAN_COLORS.free;
+  const planColor = tierOf(plan.plan_name) === "free" ? PLAN_COLORS.free : "bg-primary/10 text-primary";
 
   return (
     <div className="space-y-6">
@@ -99,7 +100,7 @@ export default function ProviderDashboard() {
           <h1 className="text-3xl font-bold tracking-tight"><GuzzlLogo to={null} size="lg" suffix="Marketplace" /></h1>
           <Badge className={`text-xs capitalize gap-1 ${planColor}`}>
             <Crown className="h-3 w-3" />
-            {plan.plan_name} plan
+            {tierName(plan.plan_name)} plan
           </Badge>
         </div>
         <div className="flex items-center gap-2">
@@ -167,7 +168,7 @@ export default function ProviderDashboard() {
               <p className="text-xs text-muted-foreground">Increases trust and clicks on your profile</p>
             </div>
           </div>
-          {plan.plan_name === "growth" ? (
+          {tierAtLeast(plan.plan_name, "ultra") ? (
             <Badge className="bg-warning/10 text-warning border-warning/20 gap-1">
               <ShieldCheck className="h-3 w-3" /> Active
             </Badge>
@@ -175,7 +176,7 @@ export default function ProviderDashboard() {
             <AskForMoreRoom size="sm" limit="Premium badge" />
           )}
         </div>
-        {plan.plan_name !== "growth" && (
+        {!tierAtLeast(plan.plan_name, "ultra") && (
           <div className="mt-3 p-3 rounded-lg bg-muted/50">
             <p className="text-xs text-muted-foreground">
               {BETA_UPGRADE_MESSAGE}
@@ -189,8 +190,8 @@ export default function ProviderDashboard() {
         <div
           className="flex items-center gap-3 p-4 rounded-xl border border-border bg-card text-left"
         >
-          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-success/10">
-            <TrendingUp className="h-4 w-4 text-success" />
+          <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10">
+            <TrendingUp className="h-4 w-4 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">Appear higher in search</p>
@@ -234,7 +235,7 @@ export default function ProviderDashboard() {
           {tips.map((tip, i) => (
             <div key={i} className="flex items-center gap-2 text-sm">
               {tip.done ? (
-                <CheckCircle2 className="h-4 w-4 text-success" />
+                <CheckCircle2 className="h-4 w-4 text-primary" />
               ) : (
                 <AlertCircle className="h-4 w-4 text-warning" />
               )}

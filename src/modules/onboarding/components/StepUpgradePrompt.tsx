@@ -1,3 +1,4 @@
+import { tierPrice, tierName } from "@/lib/planTiers";
 import { motion } from "framer-motion";
 import { ArrowRight, TrendingUp, BarChart3, Zap, Eye, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,8 +10,8 @@ interface Props {
 }
 
 const PRO_BENEFITS = [
-  { icon: Eye, text: "Priority marketplace visibility", detail: "Show up first in local search" },
-  { icon: BarChart3, text: "Advanced analytics", detail: "Track views, leads & conversions" },
+  { icon: Eye, text: "Unlimited services", detail: "List every service you offer" },
+  { icon: BarChart3, text: "Card analytics", detail: "Track views, leads & conversions" },
   { icon: Zap, text: "AI-powered automation", detail: "Auto follow-ups & smart replies" },
   { icon: TrendingUp, text: "Growth tools", detail: "Social posting & email campaigns" },
 ];
@@ -62,8 +63,8 @@ export default function StepUpgradePrompt({ onUpgrade, onSkip }: Props) {
       {/* Pricing hint */}
       <div className="rounded-xl border-2 border-primary/20 bg-primary/5 p-4 text-center space-y-1">
         <p className="text-xs text-muted-foreground">Starting at</p>
-        <p className="text-2xl font-bold text-foreground">$29<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
-        <p className="text-xs text-primary font-medium">Cancel anytime · No contracts</p>
+        <p className="text-2xl font-bold text-foreground">${tierPrice("pro")}<span className="text-sm font-normal text-muted-foreground">/mo</span></p>
+        <p className="text-xs text-primary font-medium">Paid plans coming soon</p>
       </div>
 
       <div className="space-y-2">

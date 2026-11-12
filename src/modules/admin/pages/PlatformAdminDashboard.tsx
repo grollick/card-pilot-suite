@@ -1,3 +1,4 @@
+import { KEY_FOR_TIER, tierName, tierOf, tierPrice } from "@/lib/planTiers";
 import { motion } from "framer-motion";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -20,21 +21,9 @@ import GuzzlLogo from "@/components/brand/GuzzlLogo";
 
 const anim = { initial: { opacity: 0, y: 14 }, animate: { opacity: 1, y: 0 } };
 
-const PLAN_LABELS: Record<string, { label: string; color: string }> = {
-  starter: { label: "Free", color: "bg-muted text-muted-foreground" },
-  free: { label: "Free", color: "bg-muted text-muted-foreground" },
-  pro: { label: "Pro", color: "bg-primary/15 text-primary" },
-  pro_plus: { label: "Pro Plus", color: "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" },
-  business: { label: "Pro Plus", color: "bg-[hsl(var(--success))]/15 text-[hsl(var(--success))]" },
-  agency: { label: "Agency", color: "bg-[hsl(var(--warning))]/15 text-[hsl(var(--warning))]" },
-};
-
-const PLAN_PRICES: Record<string, number> = {
-  pro: 29,
-  pro_plus: 79,
-  business: 79,
-  agency: 249,
-};
+const PLAN_LABELS = Object.fromEntries(Object.values(KEY_FOR_TIER).map(key => [key, {
+  label: tierName(key), color: tierOf(key) === "free" ? "bg-muted text-muted-foreground" : "bg-primary/15 text-primary",
+}]));
 
 export default function PlatformAdminDashboard() {
   const { data: isAdmin, isLoading: adminLoading } = useIsAdmin();
@@ -45,14 +34,14 @@ export default function PlatformAdminDashboard() {
   const mrr = useMemo(() => {
     if (!stats) return 0;
     return Object.entries(stats.planCounts).reduce((sum, [plan, count]) => {
-      return sum + (PLAN_PRICES[plan] || 0) * count;
+      return sum + tierPrice(tierOf(plan)) * count;
     }, 0);
   }, [stats]);
 
   const paidUsers = useMemo(() => {
     if (!stats) return 0;
     return Object.entries(stats.planCounts)
-      .filter(([plan]) => plan !== "starter" && plan !== "free")
+      .filter(([plan]) => tierOf(plan) !== "free")
       .reduce((sum, [, count]) => sum + count, 0);
   }, [stats]);
 
@@ -105,7 +94,7 @@ export default function PlatformAdminDashboard() {
       value: stats?.signups30d ?? 0,
       sub: growthPct !== null ? `${growthPct >= 0 ? "+" : ""}${growthPct}% vs prev 30d` : "—",
       icon: UserPlus,
-      color: "text-[hsl(var(--success))] bg-[hsl(var(--success))]/10",
+      color: "text-primary bg-primary/10",
       onClick: () => navigate("/app/admin-marketing"),
     },
     {
@@ -239,7 +228,7 @@ export default function PlatformAdminDashboard() {
           ) : (
             <div className="space-y-1">
               {stats.recentSignups.map((user) => {
-                const planInfo = PLAN_LABELS[user.plan || "starter"] || PLAN_LABELS.starter;
+                const planInfo = PLAN_LABELS[KEY_FOR_TIER[tierOf(user.plan)]];
                 const initials = user.name
                   ? user.name.split(" ").map((n) => n[0]).join("").slice(0, 2).toUpperCase()
                   : "?";
@@ -339,13 +328,8 @@ export default function PlatformAdminDashboard() {
             ) : (
               <div className="space-y-3">
                 {Object.entries(PLAN_LABELS)
-                  .filter(([key], idx, arr) => {
-                    // Deduplicate: skip "starter" since it's same as "free", skip "business" same as "pro_plus"
-                    if (key === "starter" || key === "business") return false;
-                    return true;
-                  })
                   .map(([key, info]) => {
-                    const count = stats?.planCounts[key] || 0;
+                    const count = Object.entries(stats?.planCounts ?? {}).reduce((sum, [savedKey, value]) => sum + (tierOf(savedKey) === tierOf(key) ? value : 0), 0);
                     const total = stats?.totalUsers || 1;
                     const pct = Math.round((count / total) * 100);
                     return (

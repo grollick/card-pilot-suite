@@ -1,3 +1,4 @@
+import { tierName, tierOf } from "@/lib/planTiers";
 import { useMemo } from "react";
 import { useProfile } from "@/hooks/useCard";
 import { useEffectivePlan } from "@/hooks/useBetaAccess";
@@ -12,7 +13,9 @@ export function usePlanLimits() {
   const { data: profile } = useProfile();
   const { data: effectivePlan } = useEffectivePlan();
 
-  const planKey = (effectivePlan?.plan ?? profile?.plan ?? "starter") as PlanKey;
+  const savedPlanKey = effectivePlan?.plan ?? profile?.plan ?? "free";
+  // Normalize aliases for existing consumers comparing enforcement keys directly.
+  const planKey: PlanKey = ({ free: "starter", pro: "growth", ultra: "pro", agency: "agency" } as const)[tierOf(savedPlanKey)];
   const isBeta = effectivePlan?.is_beta ?? false;
   const betaExpiryDate = effectivePlan?.expiry_date ?? null;
 
@@ -44,10 +47,7 @@ export function usePlanLimits() {
   const hasBranding = showsBranding(planKey);
 
   /** Label for the current plan */
-  const planLabel = useMemo(() => {
-    const labels: Record<string, string> = { starter: "Free", free: "Free", growth: "Pro", pro: "Pro Plus", agency: "Agency" };
-    return labels[planKey] ?? "Free";
-  }, [planKey]);
+  const planLabel = useMemo(() => tierName(savedPlanKey), [savedPlanKey]);
 
   /** Next tier info */
   const nextTier = useMemo(() => getNextTier(planKey), [planKey]);

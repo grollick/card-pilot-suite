@@ -1,3 +1,4 @@
+import { tierOf } from "@/lib/planTiers";
 import { motion } from "framer-motion";
 import {
   TrendingUp, Zap, Users, CalendarCheck, DollarSign,
@@ -45,7 +46,7 @@ function MetricCard({ icon: Icon, label, value, subValue, trend }: {
 function UpgradeDriver({ plan, roi }: { plan: string; roi: AIRoiData }) {
   const navigate = useNavigate();
 
-  if (plan === "growth") return null;
+  if (tierOf(plan) === "agency") return null;
 
 
   return (
@@ -53,7 +54,7 @@ function UpgradeDriver({ plan, roi }: { plan: string; roi: AIRoiData }) {
       <div className="flex items-center gap-2 mb-2">
         <Rocket className="h-4 w-4 text-primary" />
         <p className="text-sm font-semibold text-foreground">
-          {plan === "free" ? "Unlock more AI power" : "Level up your growth"}
+          {tierOf(plan) === "free" ? "Unlock more AI power" : "Level up your growth"}
         </p>
       </div>
       <p className="text-xs text-muted-foreground mb-3">

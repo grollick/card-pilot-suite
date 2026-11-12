@@ -1,3 +1,5 @@
+import { tierName, tierOf } from "@/lib/planTiers";
+import { getNextTier } from "@/lib/plans";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sparkles, Zap, CheckCircle2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,7 +11,7 @@ const PLAN_BENEFITS: Record<string, { headline: string; message: string; feature
     headline: "Unlock more with guzzl Copilot",
     message: "Keep replying faster and win more jobs with more AI assists.",
     features: [
-      "100 AI assists per month",
+      "50 AI assists per month",
       "Follow-up suggestions",
       "Profile rewrite assistant",
       "Priority support",
@@ -17,7 +19,7 @@ const PLAN_BENEFITS: Record<string, { headline: string; message: string; feature
   },
   pro: {
     headline: "Supercharge your growth",
-    message: "Get unlimited AI help and advanced growth insights.",
+    message: "Get more AI help and advanced insights.",
     features: [
       "500 AI assists per month",
       "Advanced growth analytics",
@@ -37,8 +39,12 @@ interface Props {
 
 export default function AIUpgradeModal({ open, onClose, currentPlan = "free", reason = "limit_reached", featureName }: Props) {
   const navigate = useNavigate();
-  const benefits = PLAN_BENEFITS[currentPlan] || PLAN_BENEFITS.free;
-  const nextPlan = currentPlan === "pro" ? "Growth" : "Pro";
+  const next = getNextTier(currentPlan);
+  const benefits = next ? {
+    headline: `More room with ${next.name}`,
+    features: [`${next.limits.ai_requests_monthly === -1 ? "Unlimited" : next.limits.ai_requests_monthly} AI assists per month`,
+      ...(tierOf(next.key) === "pro" ? ["Follow-up suggestions", "Profile rewrite assistant"] : ["Advanced analytics", "Team tools"])],
+  } : { headline: "You're on Agency", features: ["Unlimited AI assists per month"] };
 
   return (
     <AnimatePresence>
@@ -74,13 +80,13 @@ export default function AIUpgradeModal({ open, onClose, currentPlan = "free", re
             </p>
 
             <p className="text-xs text-muted-foreground text-center mb-4">
-              Current plan: <span className="font-medium capitalize text-foreground">{currentPlan}</span>
+              Current plan: <span className="font-medium capitalize text-foreground">{tierName(currentPlan)}</span>
             </p>
 
             <div className="space-y-2 mb-5">
               {benefits.features.map((f, i) => (
                 <div key={i} className="flex items-center gap-2 text-sm">
-                  <CheckCircle2 className="h-4 w-4 text-success shrink-0" />
+                  <CheckCircle2 className="h-4 w-4 text-primary shrink-0" />
                   <span className="text-foreground">{f}</span>
                 </div>
               ))}

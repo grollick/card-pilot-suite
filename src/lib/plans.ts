@@ -1,12 +1,13 @@
+import { tierOf, tierName, tierPrice } from "./planTiers";
 import { PLAN_CONFIGS } from "@/modules/billing/config/planLimits";
 // ── guzzl.pro Pricing Tiers ──
-// 4-tier model: Starter (free) → Growth → Pro → Agency
+// Stored keys remain starter → growth → pro → agency; resolve aliases through tierOf.
 
 export const PLAN_TIERS = [
   {
     key: "starter",
-    name: "Free",
-    price: 0,
+    name: tierName("starter"),
+    price: tierPrice(tierOf("starter")),
     interval: "month" as const,
     tagline: "Start getting leads — no strings attached",
     popular: false,
@@ -63,8 +64,8 @@ export const PLAN_TIERS = [
   },
   {
     key: "growth",
-    name: "Pro",
-    price: 29,
+    name: tierName("growth"),
+    price: tierPrice(tierOf("growth")),
     interval: "month" as const,
     tagline: "Generate more leads and book more jobs — on autopilot",
     popular: true,
@@ -126,8 +127,8 @@ export const PLAN_TIERS = [
   },
   {
     key: "pro",
-    name: "Pro Plus",
-    price: 79,
+    name: tierName("pro"),
+    price: tierPrice(tierOf("pro")),
     interval: "month" as const,
     tagline: "Scale with AI, payments, and team tools",
     popular: false,
@@ -186,13 +187,13 @@ export const PLAN_TIERS = [
   },
   {
     key: "agency",
-    name: "Agency",
-    price: 249,
+    name: tierName("agency"),
+    price: tierPrice(tierOf("agency")),
     interval: "month" as const,
     tagline: "Manage multiple clients at scale",
     popular: false,
     features: [
-      "Everything in Pro Plus, plus:",
+      "Everything in Ultra, plus:",
       "Unlimited client workspaces",
       "Unlimited team cards",
       "White-label branding",
@@ -288,7 +289,7 @@ export interface PlanLimits {
 }
 
 export function getPlanByKey(key: string): (typeof PLAN_TIERS)[number] | undefined {
-  return PLAN_TIERS.find((p) => p.key === key);
+  return PLAN_TIERS.find((p) => tierOf(p.key) === tierOf(key));
 }
 
 export function getPlanLimits(key: string): PlanLimits {
@@ -306,22 +307,19 @@ export function isLimitReached(limit: number, current: number): boolean {
 }
 
 /** AI request limits by plan key (used server-side in edge functions) */
-export const AI_LIMITS: Record<string, number> = {
-  starter: 5,
-  free: 5,
-  growth: 50,
-  pro: 500,
-  agency: -1,
-};
+export const AI_LIMITS: Record<string, number> = new Proxy(
+  Object.fromEntries(["free", "starter", "growth", "pro", "pro_plus", "business", "agency"].map(key => [key, getPlanLimits(key).ai_requests_monthly])),
+  { get: (limits, key) => typeof key === "string" ? limits[key] ?? getPlanLimits(key).ai_requests_monthly : undefined },
+);
 
 /** Whether this plan shows "Powered by guzzl.pro" branding */
 export function showsBranding(planKey: string): boolean {
-  return planKey === "starter" || planKey === "free" || !planKey;
+  return tierOf(planKey) === "free";
 }
 
 /** Returns the next tier up from the current plan, or null if already at top */
 export function getNextTier(currentKey: string): (typeof PLAN_TIERS)[number] | null {
-  const idx = PLAN_TIERS.findIndex((p) => p.key === currentKey);
+  const idx = PLAN_TIERS.findIndex((p) => tierOf(p.key) === tierOf(currentKey));
   if (idx === -1 || idx >= PLAN_TIERS.length - 1) return null;
   return PLAN_TIERS[idx + 1];
 }

@@ -191,7 +191,7 @@ export default function SocialAnalyticsTab() {
     <div className="space-y-6">
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard icon={Send} label="Published" value={published.length} color="bg-emerald-500/10 text-emerald-600" />
+        <StatCard icon={Send} label="Published" value={published.length} color="bg-primary/10 text-primary" />
         <StatCard icon={MousePointerClick} label="Total Clicks" value={totalClicks} color="bg-blue-500/10 text-blue-600" />
         <StatCard icon={Users} label="Leads Generated" value={totalLeads} color="bg-primary/10 text-primary" />
         <StatCard icon={CalendarCheck} label="Bookings" value={totalBookings} color="bg-amber-500/10 text-amber-600" />
@@ -222,7 +222,7 @@ export default function SocialAnalyticsTab() {
               {insights.map((insight, i) => (
                 <div key={i} className={`p-3 rounded-lg border ${
                   insight.type === "warning" ? "border-amber-500/30 bg-amber-500/5" :
-                  insight.type === "tip" ? "border-emerald-500/30 bg-emerald-500/5" :
+                  insight.type === "tip" ? "border-primary/30 bg-primary/5" :
                   "border-border bg-accent/30"
                 }`}>
                   <p className="text-xs font-medium mb-0.5">{insight.title}</p>
@@ -333,17 +333,17 @@ export default function SocialAnalyticsTab() {
           </CardContent>
         </Card>
 
-        {/* Weekly Report (Pro Plus) */}
+        {/* Weekly Report (Ultra) */}
         <Card className="dash-card">
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
             <CardTitle className="text-sm font-medium">Weekly Report</CardTitle>
-            {!isProPlus && <Badge variant="secondary" className="text-[9px] gap-0.5"><Crown className="h-3 w-3" />Pro Plus</Badge>}
+            {!isProPlus && <Badge variant="secondary" className="text-[9px] gap-0.5"><Crown className="h-3 w-3" />Ultra</Badge>}
           </CardHeader>
           <CardContent>
             {!isProPlus ? (
               <div className="text-center py-4 space-y-1">
                 <p className="text-xs text-muted-foreground">Weekly AI performance reports with auto-optimization</p>
-                <p className="text-[10px] text-muted-foreground">Available on Pro Plus</p>
+                <p className="text-[10px] text-muted-foreground">Available on Ultra</p>
               </div>
             ) : (
               <div className="space-y-2">

@@ -59,7 +59,7 @@ export default function PricingPage() {
     <>
       <Helmet>
         <title>Pricing — guzzl.pro | Grow Your Business Starting Free</title>
-        <meta name="description" content="guzzl.pro is free during beta. Compare Free, Pro and Pro Plus. Paid plans are coming later; nothing is charged today." />
+        <meta name="description" content="guzzl.pro is free during beta. Compare Free, Pro, Ultra and Agency. Paid plans are coming later; nothing is charged today." />
       </Helmet>
 
       <div className="min-h-screen bg-background">
@@ -114,7 +114,7 @@ export default function PricingPage() {
 
         {/* ── PRICING CARDS ── */}
         <section className="px-6 pb-20">
-          <div className="mx-auto max-w-5xl grid md:grid-cols-3 gap-6 items-start">
+          <div className="mx-auto max-w-6xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
             {PLAN_DISPLAY.map((plan, i) => {
               const price = plan.price;
               const isPro = plan.highlighted;
@@ -126,7 +126,7 @@ export default function PricingPage() {
                   transition={{ delay: 0.15 + i * 0.08 }}
                   className={`relative rounded-2xl border p-6 flex flex-col ${
                     isPro
-                      ? "border-primary shadow-lg ring-1 ring-primary/20 md:scale-105 md:-my-2 md:py-8"
+                      ? "border-primary shadow-lg ring-1 ring-primary/20 lg:-my-2 lg:py-8"
                       : "border-border"
                   }`}
                 >
@@ -160,9 +160,9 @@ export default function PricingPage() {
                     {plan.status === "available" && <ArrowRight className="h-4 w-4" />}
                   </Button>
                   <ul className="mt-6 space-y-3 flex-1">
-                    {plan.features.map((f) => (
+                    {plan.features.filter(f => f.value !== false).map((f) => (
                       <li key={f.key} className="flex items-start gap-2 text-sm">
-                        <Check className="h-4 w-4 text-success shrink-0 mt-0.5" />
+                        <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                         <span className="text-foreground">{f.bullet}</span>
                       </li>
                     ))}
@@ -183,10 +183,10 @@ export default function PricingPage() {
 
         {/* ── FEATURE COMPARISON ── */}
         <section className="px-6 pb-20">
-          <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-6xl">
             <h2 className="text-2xl font-bold text-foreground text-center mb-8">Compare plans</h2>
             <div className="overflow-x-auto rounded-xl border border-border">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[600px] text-sm">
                 <thead>
                   <tr className="border-b border-border bg-muted/40">
                     <th className="text-left py-3 px-4 font-medium text-muted-foreground">Feature</th>
@@ -205,7 +205,7 @@ export default function PricingPage() {
                       {row.values.map((val, ci) => (
                         <td key={ci} className="text-center py-2.5 px-4">
                           {val === true ? (
-                            <Check className="h-4 w-4 text-success mx-auto" />
+                            <Check className="h-4 w-4 text-primary mx-auto" />
                           ) : val === false ? (
                             <X className="h-4 w-4 text-muted-foreground/30 mx-auto" />
                           ) : (

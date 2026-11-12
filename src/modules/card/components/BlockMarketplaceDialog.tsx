@@ -1,3 +1,4 @@
+import { tierName } from "@/lib/planTiers";
 import { useState, useMemo } from "react";
 import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import {
@@ -141,7 +142,7 @@ export default function BlockMarketplaceDialog({
                       className="absolute top-2.5 right-2.5 text-[9px] px-1.5 py-0 bg-amber-500/10 text-amber-600 border-amber-500/20"
                     >
                       <Crown className="h-2.5 w-2.5 mr-0.5" />
-                      {block.requiredPlan}
+                      {tierName(block.requiredPlan)}
                     </Badge>
                   )}
 

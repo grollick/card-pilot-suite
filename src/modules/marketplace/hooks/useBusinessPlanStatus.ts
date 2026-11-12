@@ -1,6 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+/** Historical subscription_plans keys are reversed; adapt identity only, not entitlements. */
+export function canonicalSubscriptionKey(legacyKey?: string | null): string {
+  return legacyKey === "pro" ? "growth" : legacyKey === "growth" ? "pro" : legacyKey ?? "free";
+}
+
 export interface BusinessPlanStatus {
   business_id: string;
   plan_name: string;
@@ -37,7 +42,7 @@ export function useBusinessPlanStatus(businessId: string | undefined) {
       if (!data) return { ...DEFAULT_FREE, business_id: businessId };
       return {
         business_id: data.business_id ?? businessId,
-        plan_name: data.plan_name ?? "free",
+        plan_name: canonicalSubscriptionKey(data.plan_name),
         max_services: data.max_services,
         max_bookings_per_month: data.max_bookings_per_month,
         max_service_areas: data.max_service_areas,

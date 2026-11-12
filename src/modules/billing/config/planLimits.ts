@@ -1,3 +1,4 @@
+import { KEY_FOR_TIER, tierName, tierOf } from "@/lib/planTiers";
 import { Rocket, Eye, Sparkles, Zap, Star, TrendingUp, Users, Shield } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -26,7 +27,7 @@ export interface PlanConfig {
 export const PLAN_CONFIGS: Record<string, PlanConfig> = {
   free: {
     key: "free",
-    label: "Free",
+    label: tierName("free"),
     limits: { services: 3, bookingsPerMonth: 10, contacts: 20 },
     features: {
       removeBranding: false,
@@ -43,7 +44,7 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
   },
   starter: {
     key: "starter",
-    label: "Free",
+    label: tierName("free"),
     limits: { services: 3, bookingsPerMonth: 10, contacts: 20 },
     features: {
       removeBranding: false,
@@ -58,9 +59,9 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
       online_invoice_payments: false,
     },
   },
-  pro: {
-    key: "pro",
-    label: "Pro",
+  growth: {
+    key: "growth",
+    label: tierName("growth"),
     limits: { services: -1, bookingsPerMonth: -1, contacts: -1 },
     features: {
       removeBranding: true,
@@ -75,9 +76,9 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
       online_invoice_payments: true,
     },
   },
-  growth: {
-    key: "growth",
-    label: "Pro Plus",
+  pro: {
+    key: "pro",
+    label: tierName("pro"),
     limits: { services: -1, bookingsPerMonth: -1, contacts: -1 },
     features: {
       removeBranding: true,
@@ -94,7 +95,7 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
   },
   pro_plus: {
     key: "pro_plus",
-    label: "Pro Plus",
+    label: tierName("pro_plus"),
     limits: { services: -1, bookingsPerMonth: -1, contacts: -1 },
     features: {
       removeBranding: true,
@@ -111,7 +112,7 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
   },
   agency: {
     key: "agency",
-    label: "Agency",
+    label: tierName("agency"),
     limits: { services: -1, bookingsPerMonth: -1, contacts: -1 },
     features: {
       removeBranding: true,
@@ -127,6 +128,8 @@ export const PLAN_CONFIGS: Record<string, PlanConfig> = {
     },
   },
 };
+
+PLAN_CONFIGS.business = { ...PLAN_CONFIGS.pro, key: "business" };
 
 export type UpgradeTrigger = "service_limit" | "booking_limit" | "branding" | "visibility" | "analytics" | "reviews" | "lead_management" | "generic";
 
@@ -149,7 +152,7 @@ export const UPGRADE_SCENARIOS: Record<UpgradeTrigger, UpgradeScenario> = {
       "List unlimited services on your profile",
       "Reach more customers searching for what you offer",
     ],
-    suggestedPlan: "pro",
+    suggestedPlan: "growth",
   },
   booking_limit: {
     trigger: "booking_limit",
@@ -161,7 +164,7 @@ export const UPGRADE_SCENARIOS: Record<UpgradeTrigger, UpgradeScenario> = {
       "Never turn away a paying customer",
       "Automated reminders cut down on no-shows",
     ],
-    suggestedPlan: "pro",
+    suggestedPlan: "growth",
   },
   branding: {
     trigger: "branding",
@@ -173,7 +176,7 @@ export const UPGRADE_SCENARIOS: Record<UpgradeTrigger, UpgradeScenario> = {
       "Build trust with a clean, professional look",
       "Customers take you more seriously",
     ],
-    suggestedPlan: "pro",
+    suggestedPlan: "growth",
   },
   visibility: {
     trigger: "visibility",
@@ -185,7 +188,7 @@ export const UPGRADE_SCENARIOS: Record<UpgradeTrigger, UpgradeScenario> = {
       "Premium badge builds instant trust",
       "Featured providers show up first in search",
     ],
-    suggestedPlan: "growth",
+    suggestedPlan: "pro",
   },
   analytics: {
     trigger: "analytics",
@@ -197,7 +200,7 @@ export const UPGRADE_SCENARIOS: Record<UpgradeTrigger, UpgradeScenario> = {
       "See your conversion rate over time",
       "Make data-driven decisions to grow faster",
     ],
-    suggestedPlan: "pro",
+    suggestedPlan: "growth",
   },
   reviews: {
     trigger: "reviews",
@@ -209,7 +212,7 @@ export const UPGRADE_SCENARIOS: Record<UpgradeTrigger, UpgradeScenario> = {
       "Display verified reviews on your profile",
       "Reviews help customers choose you",
     ],
-    suggestedPlan: "pro",
+    suggestedPlan: "growth",
   },
   lead_management: {
     trigger: "lead_management",
@@ -221,7 +224,7 @@ export const UPGRADE_SCENARIOS: Record<UpgradeTrigger, UpgradeScenario> = {
       "Lead scoring to prioritize hot prospects",
       "Pipeline view to track every opportunity",
     ],
-    suggestedPlan: "pro",
+    suggestedPlan: "growth",
   },
   generic: {
     trigger: "generic",
@@ -233,16 +236,19 @@ export const UPGRADE_SCENARIOS: Record<UpgradeTrigger, UpgradeScenario> = {
       "Professional branding and analytics",
       "Automated lead follow-ups that close deals",
     ],
-    suggestedPlan: "pro",
+    suggestedPlan: "growth",
   },
 };
 
 export function getPlanConfig(planKey: string): PlanConfig {
-  return PLAN_CONFIGS[planKey] ?? PLAN_CONFIGS.free;
+  return PLAN_CONFIGS[KEY_FOR_TIER[tierOf(planKey)]];
 }
 
 export function getNextPlan(currentPlan: string): string {
-  if (currentPlan === "free" || currentPlan === "starter") return "pro";
-  if (currentPlan === "pro") return "growth";
-  return currentPlan;
+  switch (tierOf(currentPlan)) {
+    case "free": return KEY_FOR_TIER.pro;
+    case "pro": return KEY_FOR_TIER.ultra;
+    case "ultra": return KEY_FOR_TIER.agency;
+    case "agency": return KEY_FOR_TIER.agency;
+  }
 }

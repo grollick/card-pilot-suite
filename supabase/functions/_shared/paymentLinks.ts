@@ -1,9 +1,10 @@
+import { tierAtLeast } from "./planTiers.ts";
 // The pro's own PayPal.Me and Stripe Payment Link. Shared by the app and invoice-share.
 // guzzl.pro never handles the money: the customer pays on PayPal's or Stripe's page.
 
 /** Plans with online_invoice_payments. Must match PLAN_CONFIGS in planLimits.ts (a test checks this). */
-export const ONLINE_PAYMENT_PLANS = ["pro", "growth", "pro_plus", "agency"];
-export const planHasOnlinePayments = (plan?: string | null) => ONLINE_PAYMENT_PLANS.includes((plan || "").toLowerCase());
+export const ONLINE_PAYMENT_PLANS = ["pro", "growth", "pro_plus", "business", "agency"];
+export const planHasOnlinePayments = (plan?: string | null) => tierAtLeast(plan, "pro");
 
 /** Returns https://paypal.me/<name>, or null when it isn't a PayPal.Me link. */
 export function normalizePaypalMe(input: string): string | null {

@@ -1,3 +1,4 @@
+import { tierAtLeast } from "../_shared/planTiers.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -188,7 +189,7 @@ serve(async (req) => {
 
       // Premium plan boost for high-quality leads
       if (qualityTier === "high") {
-        if (c.plan === "growth" || c.plan === "pro") score += 25;
+        if (tierAtLeast(c.plan, "pro")) score += 25;
         if (c.avg_response_minutes && c.avg_response_minutes < 30) score += 10;
       }
 

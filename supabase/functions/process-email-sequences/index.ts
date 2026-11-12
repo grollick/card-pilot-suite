@@ -1,3 +1,4 @@
+import { tierAtLeast } from "../_shared/planTiers.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -344,7 +345,7 @@ async function checkStopConditions(supabase: any) {
           .select("plan")
           .eq("id", enrollment.user_id)
           .maybeSingle();
-        if (profile?.plan && profile.plan !== "starter") {
+        if (tierAtLeast(profile?.plan, "pro")) {
           shouldStop = true;
           reason = "Plan upgraded";
         }

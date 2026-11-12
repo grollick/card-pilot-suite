@@ -1,3 +1,4 @@
+import { tierName } from "@/lib/planTiers";
 import { getDemoCardBySlug, type DemoCard } from "@/lib/demoCards";
 
 export interface IndustryPageData {
@@ -101,9 +102,9 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
     pricingPreview: {
       headline: "Start free. Upgrade when you're ready.",
       plans: [
-        { name: "Free", description: "Basic card, lead capture, booking" },
-        { name: "Pro", description: "Automation, unlimited services, advanced features" },
-        { name: "Pro Plus", description: "Full business tools and customization" },
+        { name: tierName("free"), description: "Basic card, lead capture, booking" },
+        { name: tierName("growth"), description: "Automation, unlimited services, advanced features" },
+        { name: tierName("pro"), description: "Full business tools and customization" },
       ],
     },
     finalCtaHeadline: "Start getting more leads today.",
@@ -173,9 +174,9 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
     pricingPreview: {
       headline: "Start free. Upgrade when you're ready.",
       plans: [
-        { name: "Free", description: "Basic card and booking" },
-        { name: "Pro", description: "Unlimited services, automation, analytics" },
-        { name: "Pro Plus", description: "Advanced tools and full customization" },
+        { name: tierName("free"), description: "Basic card and booking" },
+        { name: tierName("growth"), description: "Unlimited services, automation, analytics" },
+        { name: tierName("pro"), description: "Advanced tools and full customization" },
       ],
     },
     finalCtaHeadline: "Start filling your schedule today.",
@@ -245,9 +246,9 @@ export const INDUSTRY_PAGES: Record<string, IndustryPageData> = {
     pricingPreview: {
       headline: "Start free. Upgrade when you're ready.",
       plans: [
-        { name: "Free", description: "Basic card and lead capture" },
-        { name: "Pro", description: "Automation, analytics, unlimited features" },
-        { name: "Pro Plus", description: "Full business tools and customization" },
+        { name: tierName("free"), description: "Basic card and lead capture" },
+        { name: tierName("growth"), description: "Automation, analytics, unlimited features" },
+        { name: tierName("pro"), description: "Full business tools and customization" },
       ],
     },
     finalCtaHeadline: "Start capturing more clients today.",

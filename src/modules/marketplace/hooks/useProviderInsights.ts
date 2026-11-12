@@ -1,3 +1,4 @@
+import { canonicalSubscriptionKey } from "./useBusinessPlanStatus";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -113,7 +114,7 @@ export function useAIUsage() {
     staleTime: 1000 * 60 * 2,
     queryFn: async () => {
       const result = await callInsights("get_usage");
-      return result as AIUsageData;
+      return { ...result, plan: canonicalSubscriptionKey(result?.plan) } as AIUsageData;
     },
   });
 }

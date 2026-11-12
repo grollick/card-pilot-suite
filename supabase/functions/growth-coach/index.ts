@@ -1,3 +1,4 @@
+import { tierOf } from "../_shared/planTiers.ts";
 import { sanitizeChatMessages } from "../_shared/auth.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -50,8 +51,8 @@ serve(async (req) => {
       .single();
 
     const planKey = profileData?.plan || "starter";
-    const aiLimits: Record<string, number> = { starter: 5, free: 5, growth: 50, pro: 500, agency: -1 };
-    const limit = aiLimits[planKey] ?? 5;
+    const aiLimits = { free: 5, pro: 50, ultra: 500, agency: -1 };
+    const limit = aiLimits[tierOf(planKey)];
 
     const { data: usageCheck, error: usageError } = await adminClient.rpc(
       "check_and_increment_ai_usage",

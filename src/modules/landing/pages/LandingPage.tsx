@@ -240,7 +240,7 @@ export default function LandingPage() {
                     { icon: Shield, label: "Secure platform" },
                   ].map(({ icon: Icon, label }) => (
                     <span key={label} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <Icon className="h-3.5 w-3.5 text-success" /> {label}
+                      <Icon className="h-3.5 w-3.5 text-primary" /> {label}
                     </span>
                   ))}
                 </motion.div>
@@ -370,7 +370,7 @@ export default function LandingPage() {
       {/* ─── 4. HOW IT WORKS ─── */}
       <section id="how-it-works" className="py-20 md:py-28 relative">
         <div className="absolute inset-0 -z-10 gradient-mesh" />
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">How it works</p>
             <h2 className="text-display text-3xl md:text-4xl lg:text-5xl">Three steps to more customers</h2>
@@ -414,20 +414,20 @@ export default function LandingPage() {
 
       {/* ─── 7. PRICING ─── */}
       <section id="pricing" className="py-20 md:py-28">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fade} custom={0} className="text-center mb-16">
             <p className="text-sm font-semibold text-primary mb-3 uppercase tracking-wider">Pricing</p>
             <h2 className="text-display text-3xl md:text-4xl lg:text-5xl mb-4">Simple, transparent pricing</h2>
             <p className="text-muted-foreground max-w-md mx-auto text-lg">Free during beta. Paid plans are coming later; nothing is charged today.</p>
           </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
             {PLAN_DISPLAY.map((p) => (
               <motion.div
                 key={p.name}
                 variants={scaleIn}
-                className={`rounded-2xl border p-7 flex flex-col transition-all duration-300 ${
+                className={`rounded-2xl border p-5 flex flex-col transition-all duration-300 ${
                   p.highlighted
-                    ? "border-primary/40 bg-card shadow-glow-lg relative scale-[1.03]"
+                    ? "border-primary/40 bg-card shadow-glow-lg relative"
                     : "border-border bg-card landing-card"
                 }`}
               >
@@ -441,14 +441,14 @@ export default function LandingPage() {
                   {p.status === "coming_soon" && !p.highlighted && <Badge variant="secondary" className="mb-2">Coming soon</Badge>}
                   <p className="text-sm text-muted-foreground mb-4">{p.tagline}</p>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-5xl font-extrabold text-foreground tracking-tight">${p.price}</span>
-                    <span className="text-sm text-muted-foreground">{p.price === 0 ? "Free during beta" : "/month"}</span>
+                    <span className="text-4xl font-extrabold text-foreground tracking-tight">${p.price}</span>
+                    <span className="text-sm text-muted-foreground">{p.price === 0 ? "" : "/month"}</span>
                   </div>
                 </div>
                 <ul className="space-y-3 mb-8 flex-1">
-                  {p.features.map((f) => (
+                  {p.features.filter(f => f.value !== false).map((f) => (
                     <li key={f.key} className="flex items-start gap-2.5 text-sm text-foreground">
-                      <Check className="h-4 w-4 text-success mt-0.5 shrink-0" />
+                      <Check className="h-4 w-4 text-primary mt-0.5 shrink-0" />
                       <span>{f.bullet}</span>
                     </li>
                   ))}

@@ -1,3 +1,4 @@
+import { KEY_FOR_TIER, tierName, tierOf } from "@/lib/planTiers";
 import { useState } from "react";
 import { Send, Eye, Loader2 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,13 +11,11 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import type { AdminStats } from "@/hooks/useAdminStats";
 
-type Audience = "all" | "starter" | "pro" | "pro_plus" | "beta";
+type Audience = "all" | "free" | "growth" | "pro" | "agency" | "beta";
 
 const AUDIENCES: { value: Audience; label: string }[] = [
   { value: "all", label: "All Users" },
-  { value: "starter", label: "Free / Starter" },
-  { value: "pro", label: "Pro" },
-  { value: "pro_plus", label: "Pro Plus" },
+  ...Object.values(KEY_FOR_TIER).map(value => ({ value, label: tierName(value) })),
   { value: "beta", label: "Beta Users" },
 ];
 
@@ -40,7 +39,8 @@ export default function AdminCampaignBuilder({ stats }: Props) {
   const audienceCount = (() => {
     if (!stats) return 0;
     if (audience === "all") return stats.totalUsers;
-    return stats.planCounts[audience] ?? 0;
+    if (audience === "beta") return stats.planCounts.beta ?? 0;
+    return Object.entries(stats.planCounts).reduce((sum, [key, count]) => sum + (tierOf(key) === tierOf(audience) ? count : 0), 0);
   })();
 
   const previewHtml = message

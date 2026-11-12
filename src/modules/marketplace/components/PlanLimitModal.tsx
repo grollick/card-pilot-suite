@@ -1,3 +1,4 @@
+import { tierName } from "@/lib/planTiers";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, CheckCircle2, Zap, Users, MapPin } from "lucide-react";
@@ -96,7 +97,7 @@ export default function PlanLimitModal({
               <div className="p-6 pt-5">
                 <div className="flex items-center gap-2 mb-4">
                   <Badge variant="secondary" className="text-xs capitalize">
-                    {currentPlan} plan
+                    {tierName(currentPlan)} plan
                   </Badge>
                   {maxLimit !== null && (
                     <Badge variant="outline" className="text-xs">
@@ -121,7 +122,7 @@ export default function PlanLimitModal({
                 <div className="space-y-2.5 mb-6">
                   {content.bullets.map((bullet, i) => (
                     <div key={i} className="flex items-start gap-2.5">
-                      <CheckCircle2 className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                       <span className="text-sm text-foreground">{bullet}</span>
                     </div>
                   ))}

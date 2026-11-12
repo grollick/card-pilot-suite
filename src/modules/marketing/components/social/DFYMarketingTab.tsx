@@ -99,7 +99,7 @@ export default function DFYMarketingTab({ onSwitchToCalendar }: Props) {
           </div>
           <ul className="space-y-2 text-xs text-muted-foreground">
             <li className="flex items-center gap-2"><Sparkles className="h-3 w-3 text-primary" /> Pro: Limited automation (3 posts/week)</li>
-            <li className="flex items-center gap-2"><Sparkles className="h-3 w-3 text-primary" /> Pro Plus: Full automation + AI optimization + weekly reports</li>
+            <li className="flex items-center gap-2"><Sparkles className="h-3 w-3 text-primary" /> Ultra: Full automation + AI optimization + weekly reports</li>
           </ul>
         </div>
         <p className="text-sm text-muted-foreground">{BETA_UPGRADE_MESSAGE}</p>
@@ -130,7 +130,7 @@ export default function DFYMarketingTab({ onSwitchToCalendar }: Props) {
           </p>
           {!isProPlus && (
             <p className="text-[11px] text-amber-600 mt-2">
-              Pro plan: limited to 3 posts/week. Upgrade to Pro Plus for full automation.
+              Pro plan: limited to 3 posts/week. Upgrade to Ultra for full automation.
             </p>
           )}
         </div>

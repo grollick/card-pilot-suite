@@ -1,3 +1,4 @@
+import { tierAtLeast } from "../_shared/planTiers.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -268,8 +269,8 @@ serve(async (req) => {
       }
 
       // Plan tier
-      if (p.plan === "pro_plus" || p.plan === "agency") score += 15;
-      else if (p.plan === "pro" || p.plan === "growth") score += 5;
+      if (tierAtLeast(p.plan, "ultra")) score += 15;
+      else if (tierAtLeast(p.plan, "pro")) score += 5;
 
       return { ...p, score, duty, perf: perf ?? null };
     });

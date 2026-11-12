@@ -93,7 +93,7 @@ export default function SocialSidebar({ activeView, onChangeView, lockedFeatures
                     {!collapsed && (
                       <>
                         <span className="flex-1 text-left truncate">{item.label}</span>
-                        {isLocked && <ProBadge tier={item.id === "dfy" ? "Pro Plus" : "Pro"} />}
+                        {isLocked && <ProBadge tier={item.id === "dfy" ? "Ultra" : "Pro"} />}
                       </>
                     )}
                   </button>
