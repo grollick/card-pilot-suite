@@ -11,18 +11,19 @@ export interface AiCreditPack {
 }
 
 export function useAiCredits() {
-  const { user } = useAuth();
+  const { user, session, loading: authLoading } = useAuth();
   const { limits, planKey } = usePlanLimits();
 
   const usageQuery = useQuery({
     queryKey: ["ai-usage", user?.id],
     enabled: !!user,
     queryFn: async () => {
+      if (!user) return 0;
       const monthKey = new Date().toISOString().slice(0, 7);
       const { data } = await supabase
         .from("ai_usage")
         .select("request_count")
-        .eq("user_id", user!.id)
+        .eq("user_id", user.id)
         .eq("month_key", monthKey)
         .maybeSingle();
       return data?.request_count ?? 0;
@@ -33,27 +34,30 @@ export function useAiCredits() {
     queryKey: ["ai-bonus-credits", user?.id],
     enabled: !!user,
     queryFn: async () => {
+      if (!user) return 0;
       const { data } = await supabase
         .from("ai_credit_purchases")
         .select("credits_remaining")
-        .eq("user_id", user!.id)
+        .eq("user_id", user.id)
         .gt("credits_remaining", 0);
       return (data || []).reduce((sum, r) => sum + r.credits_remaining, 0);
     },
   });
 
   const packsQuery = useQuery({
-    queryKey: ["ai-credit-packs"],
+    queryKey: ["ai-credit-packs", user?.id],
+    enabled: !authLoading && !!user && !!session?.access_token,
     staleTime: 1000 * 60 * 60,
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return [] as AiCreditPack[];
       const resp = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/purchase-ai-credits`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${session?.access_token}`,
+            Authorization: `Bearer ${session.access_token}`,
             apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
           },
           body: JSON.stringify({ action: "get_packs" }),
@@ -73,13 +77,16 @@ export function useAiCredits() {
 
   const purchasePack = async (packId: string) => {
     const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      return { error: "Please sign in again to continue.", code: "AUTH_REQUIRED" };
+    }
     const resp = await fetch(
       `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/purchase-ai-credits`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
           apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
         },
         body: JSON.stringify({ action: "purchase", pack_id: packId }),
