@@ -5,9 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 
 interface LeaderboardEntry {
-  referrer_id: string;
-  referrer_name: string | null;
-  avatar_url: string | null;
+  rank: number;
+  first_name: string | null;
   total_referrals: number;
   completed_referrals: number;
   total_reward_days: number;
@@ -18,12 +17,9 @@ function useLeaderboard() {
     queryKey: ["referral-leaderboard"],
     staleTime: 60_000,
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from("referral_leaderboard")
-        .select("*")
-        .limit(10);
+      const { data, error } = await supabase.rpc("get_referral_leaderboard", { p_limit: 10 });
       if (error) throw error;
-      return (data || []) as LeaderboardEntry[];
+      return (data || []) as unknown as LeaderboardEntry[];
     },
   });
 }
@@ -63,11 +59,11 @@ export default function ReferralLeaderboard() {
         {leaders.map((entry, i) => {
           const RankIcon = RANK_ICONS[i] || Award;
           const rankColor = RANK_COLORS[i] || "text-muted-foreground";
-          const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent((entry.referrer_name || "?").slice(0, 2))}&background=3B82F6&color=fff&size=80`;
+          const fallback = `https://ui-avatars.com/api/?name=${encodeURIComponent((entry.first_name || "?").slice(0, 2))}&background=3B82F6&color=fff&size=80`;
 
           return (
             <motion.div
-              key={entry.referrer_id}
+              key={entry.rank}
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
@@ -77,13 +73,13 @@ export default function ReferralLeaderboard() {
                 <RankIcon className={`h-4 w-4 ${rankColor}`} />
               </div>
               <img
-                src={entry.avatar_url || fallback}
-                alt={entry.referrer_name || "User"}
+                src={fallback}
+                alt={entry.first_name || "User"}
                 className="w-8 h-8 rounded-full object-cover"
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">
-                  {entry.referrer_name || "Anonymous"}
+                  {entry.first_name || "Anonymous"}
                 </p>
                 <p className="text-[11px] text-muted-foreground">
                   {entry.completed_referrals} activated · {entry.total_reward_days} days earned

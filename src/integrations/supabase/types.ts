@@ -8458,6 +8458,10 @@ export type Database = {
         Returns: number
       }
       expire_beta_access: { Args: never; Returns: number }
+      find_user_for_org_invite: {
+        Args: { p_email: string; p_org_id: string }
+        Returns: string
+      }
       get_active_boosts: {
         Args: never
         Returns: {
@@ -8483,13 +8487,78 @@ export type Database = {
           start_datetime: string
         }[]
       }
+      get_client_business_profiles: {
+        Args: { p_ids: string[] }
+        Returns: {
+          avatar_url: string
+          city: string
+          company: string
+          handle: string
+          id: string
+          name: string
+          phone: string
+        }[]
+      }
       get_effective_plan: { Args: { p_user_id: string }; Returns: Json }
+      get_on_duty_providers: {
+        Args: { p_city?: string; p_limit?: number }
+        Returns: {
+          avatar_url: string
+          city: string
+          company: string
+          handle: string
+          id: string
+          name: string
+        }[]
+      }
+      get_org_member_profiles: {
+        Args: { p_org_id: string }
+        Returns: {
+          avatar_url: string
+          email: string
+          id: string
+          name: string
+        }[]
+      }
+      get_portal_business_profile: {
+        Args: { p_token: string }
+        Returns: {
+          avatar_url: string
+          bio: string
+          city: string
+          company: string
+          handle: string
+          name: string
+        }[]
+      }
       get_portal_session: {
         Args: { p_token: string }
         Returns: {
           expires_at: string
           lead_id: string
           user_id: string
+        }[]
+      }
+      get_public_card_profile: {
+        Args: { p_handle: string }
+        Returns: {
+          available_for_work: boolean
+          avatar_url: string
+          avg_response_minutes: number
+          city: string
+          company: string
+          email: string
+          handle: string
+          id: string
+          is_on_duty: boolean
+          name: string
+          phone: string
+          primary_cta: string
+          profession_category: string
+          profession_id: string
+          profession_name: string
+          style_pack: string
+          verification_level: string
         }[]
       }
       get_public_invoice_line_items: {
@@ -8560,6 +8629,16 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_referral_leaderboard: {
+        Args: { p_limit?: number }
+        Returns: {
+          completed_referrals: number
+          first_name: string
+          rank: number
+          total_referrals: number
+          total_reward_days: number
+        }[]
+      }
       get_services_by_handle: {
         Args: { p_handle: string }
         Returns: {
@@ -8590,6 +8669,7 @@ export type Database = {
         Returns: undefined
       }
       increment_boost_views: { Args: { p_user_id: string }; Returns: undefined }
+      is_handle_available: { Args: { p_handle: string }; Returns: boolean }
       is_org_admin: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean

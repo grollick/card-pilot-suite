@@ -70,10 +70,7 @@ export function useClientBusinesses() {
 
       // Get business profiles for each unique user_id
       const businessUserIds = [...new Set(leads.map(l => l.user_id))];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, name, avatar_url, handle")
-        .in("id", businessUserIds);
+      const { data: profiles } = await supabase.rpc("get_client_business_profiles", { p_ids: businessUserIds });
 
       return leads.map(lead => {
         const biz = profiles?.find(p => p.id === lead.user_id);
@@ -132,10 +129,7 @@ export function useClientBookings() {
 
       // Get business names
       const bizIds = [...new Set(bookings.map(b => b.user_id))];
-      const { data: bizProfiles } = await supabase
-        .from("profiles")
-        .select("id, name")
-        .in("id", bizIds);
+      const { data: bizProfiles } = await supabase.rpc("get_client_business_profiles", { p_ids: bizIds });
 
       return bookings.map(b => ({
         ...b,

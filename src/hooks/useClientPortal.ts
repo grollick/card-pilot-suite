@@ -84,12 +84,9 @@ export function usePortalSession(token?: string) {
         .eq("id", leadId)
         .single();
 
-      // Fetch business profile via restricted view (excludes PII like phone/email)
-      const { data: profile } = await supabase
-        .from("client_safe_profiles" as any)
-        .select("name, company, handle, avatar_url, city, bio")
-        .eq("id", userId)
-        .single();
+      // Business profile via token-checked server function (no phone/email)
+      const { data: bizRows } = await supabase.rpc("get_portal_business_profile", { p_token: token! });
+      const profile = (bizRows as any[] | null)?.[0] ?? null;
 
       return { lead: lead as any, profile: profile as any, userId, leadId };
     },

@@ -162,12 +162,18 @@ export function usePublicCard(handle: string | undefined, cardSlug?: string | nu
     refetchOnWindowFocus: true,
     queryFn: async () => {
       // Step 1: Get profile (required for user_id)
-      const { data: profile, error: pErr } = await supabase
-        .from("profiles")
-        .select("id, name, handle, email, phone, company, city, avatar_url, primary_cta, style_pack, profession_id, verification_level, available_for_work, avg_response_minutes, professions(name, category)")
-        .eq("handle", handle!)
-        .single();
+      // Narrow server function: only the fields a card shows. Email and phone
+      // are empty when the account has no published card; suspended or unknown
+      // handles return nothing.
+      const { data: rows, error: pErr } = await supabase.rpc("get_public_card_profile", { p_handle: handle! });
       if (pErr) throw pErr;
+      const row = (rows as any[] | null)?.[0];
+      if (!row) throw new Error("Card not found");
+      const { profession_name, profession_category, is_on_duty, ...rest } = row;
+      const profile = {
+        ...rest,
+        professions: profession_name ? { name: profession_name as string, category: (profession_category ?? null) as string | null } : null,
+      };
 
       const cardQuery = cardSlug
         ? supabase
@@ -187,7 +193,7 @@ export function usePublicCard(handle: string | undefined, cardSlug?: string | nu
             .maybeSingle();
 
       // Step 2: Fire all dependent queries in parallel
-      const [cardResult, servicesResult, stylePackResult, dutyResult, recentViewsResult, availabilityResult] = await Promise.all([
+      const [cardResult, servicesResult, stylePackResult, recentViewsResult, availabilityResult] = await Promise.all([
         cardQuery,
         supabase
           .from("booking_services")
@@ -202,11 +208,6 @@ export function usePublicCard(handle: string | undefined, cardSlug?: string | nu
               .eq("key", profile.style_pack)
               .maybeSingle()
           : Promise.resolve({ data: null }),
-        supabase
-          .from("estimate_duty_status")
-          .select("is_on_duty")
-          .eq("user_id", profile.id)
-          .maybeSingle(),
         supabase
           .from("analytics_events")
           .select("id", { count: "exact", head: true })
@@ -234,7 +235,7 @@ export function usePublicCard(handle: string | undefined, cardSlug?: string | nu
           ...profile,
           company: cardRow?.company || profile.company,
           professions: professionOverride ?? profile.professions,
-          is_on_duty: dutyResult.data?.is_on_duty ?? false,
+          is_on_duty: !!is_on_duty,
         },
         card: cardRow,
         stylePack: stylePackResult.data,

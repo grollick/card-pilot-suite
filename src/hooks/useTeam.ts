@@ -60,10 +60,7 @@ export function useTeamMembers() {
 
       // Fetch profiles for each member
       const userIds = members.map((m: any) => m.user_id);
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, name, email, avatar_url")
-        .in("id", userIds);
+      const { data: profiles } = await supabase.rpc("get_org_member_profiles", { p_org_id: currentOrg!.id });
 
       const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]));
 
@@ -194,10 +191,7 @@ export function useTeamPerformance() {
       const userIds = members.map((m: any) => m.user_id);
 
       // Get profiles
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("id, name, avatar_url")
-        .in("id", userIds);
+      const { data: profiles } = await supabase.rpc("get_org_member_profiles", { p_org_id: currentOrg!.id });
 
       // Get jobs for these users
       const { data: jobs } = await (supabase

@@ -20,18 +20,7 @@ function useOnDutyProviders(city?: string | null) {
     queryKey: ["on-duty-near", city],
     staleTime: 30_000,
     queryFn: async () => {
-      let q = (supabase as any)
-        .from("profiles")
-        .select("id, name, avatar_url, city, handle, company")
-        .eq("is_on_duty", true)
-        .not("handle", "is", null)
-        .limit(8);
-
-      if (city) {
-        q = q.ilike("city", `%${city}%`);
-      }
-
-      const { data, error } = await q.order("updated_at", { ascending: false });
+      const { data, error } = await supabase.rpc("get_on_duty_providers", { p_city: city || null, p_limit: 8 });
       if (error) throw error;
       return (data || []) as OnDutyProvider[];
     },

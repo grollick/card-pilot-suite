@@ -128,11 +128,8 @@ export function OrgProvider({ children }: { children: ReactNode }) {
   const inviteMember = useCallback(async (email: string, role: "admin" | "member") => {
     if (!currentOrg) return { error: "No organization selected" };
     // Look up user by email in profiles
-    const { data: targetProfile, error: lookupErr } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("email", email)
-      .single();
+    const { data: targetId, error: lookupErr } = await supabase.rpc("find_user_for_org_invite", { p_org_id: currentOrg.id, p_email: email });
+    const targetProfile = targetId ? { id: targetId as string } : null;
     if (lookupErr || !targetProfile) return { error: "User not found. They need a guzzl.pro account first." };
 
     const { error } = await supabase.from("organization_members").insert({
