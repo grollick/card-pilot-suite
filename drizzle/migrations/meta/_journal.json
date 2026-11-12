@@ -106,6 +106,13 @@
       "when": 1794519474338,
       "tag": "0014_on_duty_providers_published_only",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1794520270712,
+      "tag": "0015_lock_public_profiles_read",
+      "breakpoints": true
     }
   ]
 }
