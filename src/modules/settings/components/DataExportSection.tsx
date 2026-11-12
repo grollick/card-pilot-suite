@@ -72,7 +72,9 @@ function toCsv(rows: Record<string, any>[]): string {
   const headers = Object.keys(rows[0]);
   const escape = (v: any) => {
     if (v == null) return "";
-    const s = typeof v === "object" ? JSON.stringify(v) : String(v);
+    let s = typeof v === "object" ? JSON.stringify(v) : String(v);
+    // Neutralize spreadsheet formulas (=, +, -, @, tab, CR) from customer-supplied text.
+    if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
     return s.includes(",") || s.includes('"') || s.includes("\n")
       ? `"${s.replace(/"/g, '""')}"`
       : s;

@@ -1,3 +1,4 @@
+import { getUserId, isServiceCall, unauthorized } from "../_shared/auth.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -10,16 +11,22 @@ Deno.serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
+  const serviceCall = isServiceCall(req);
+  const callerId = serviceCall ? null : await getUserId(req);
+  if (!serviceCall && !callerId) return unauthorized(corsHeaders);
+
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceKey);
 
     // Find users in "monitoring" status approaching or past deadline
-    const { data: guarantees, error: gErr } = await supabase
+    let gQuery = supabase
       .from("first_lead_guarantee")
       .select("id, user_id, deadline_at, status, activated_at")
-      .eq("status", "monitoring")
+      .eq("status", "monitoring");
+    if (callerId) gQuery = gQuery.eq("user_id", callerId);
+    const { data: guarantees, error: gErr } = await gQuery
       .lte("deadline_at", new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString()); // within 4 hours of deadline
 
     if (gErr) throw gErr;

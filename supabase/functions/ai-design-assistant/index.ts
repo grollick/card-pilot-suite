@@ -1,3 +1,4 @@
+import { cleanPromptText } from "../_shared/auth.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -28,7 +29,24 @@ serve(async (req) => {
       });
     }
 
-    const { business_type, services, city, style, primary_cta, name, company, template } = await req.json();
+    const { business_type, services, city, style, primary_cta, name, company, template: rawTemplate } = await req.json();
+    // Treat template fields as plain data: strip control characters and cap length.
+    const c = (v: unknown, n = 80) => cleanPromptText(v, n);
+    const cList = (v: unknown, n = 12) => (Array.isArray(v) ? v.slice(0, n).map((x) => c(x)) : []);
+    const template = rawTemplate && typeof rawTemplate === "object" ? {
+      id: c(rawTemplate.id, 60), name: c(rawTemplate.name), category: c(rawTemplate.category), style: c(rawTemplate.style),
+      ctaPriority: cList(rawTemplate.ctaPriority),
+      emphasis: {
+        heroStyle: c(rawTemplate.emphasis?.heroStyle, 30),
+        showGallery: Boolean(rawTemplate.emphasis?.showGallery), showBooking: Boolean(rawTemplate.emphasis?.showBooking),
+        showQuote: Boolean(rawTemplate.emphasis?.showQuote), showTestimonials: Boolean(rawTemplate.emphasis?.showTestimonials),
+      },
+      sections: Array.isArray(rawTemplate.sections) ? rawTemplate.sections.slice(0, 30).map((s: any) => ({ id: c(s?.id, 40), enabled: Boolean(s?.enabled) })) : [],
+      preview: {
+        tagline: c(rawTemplate.preview?.tagline, 160), sampleServices: cList(rawTemplate.preview?.sampleServices),
+        sampleReview: c(rawTemplate.preview?.sampleReview, 200),
+      },
+    } : null;
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");

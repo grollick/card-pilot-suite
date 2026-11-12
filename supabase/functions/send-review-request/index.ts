@@ -1,3 +1,4 @@
+import { escapeHtml } from "../_shared/auth.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -120,21 +121,21 @@ serve(async (req) => {
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#ffffff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
 <div style="max-width:520px;margin:0 auto;padding:40px 24px">
-  <h1 style="font-size:22px;font-weight:700;color:#1a1a2e;margin:0 0 8px">Thanks for choosing ${ownerName}!</h1>
+  <h1 style="font-size:22px;font-weight:700;color:#1a1a2e;margin:0 0 8px">Thanks for choosing ${escapeHtml(ownerName)}!</h1>
   <p style="font-size:15px;color:#555;line-height:1.6;margin:0 0 24px">
-    Hi ${booking.customer_name},<br><br>
-    We hope you enjoyed your ${serviceName}. Your feedback means the world to us and helps other customers find great service.
+    Hi ${escapeHtml(booking.customer_name)},<br><br>
+    We hope you enjoyed your ${escapeHtml(serviceName)}. Your feedback means the world to us and helps other customers find great service.
   </p>
   <p style="font-size:15px;color:#555;line-height:1.6;margin:0 0 24px">
     Would you mind taking a moment to leave a quick review?
   </p>
   <div style="text-align:center;margin:32px 0">
-    <a href="${reviewUrl}" style="display:inline-block;background:#4361ee;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;font-weight:600">
+    <a href="${escapeHtml(reviewUrl)}" style="display:inline-block;background:#4361ee;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:8px;font-size:15px;font-weight:600">
       Leave a Review ⭐
     </a>
   </div>
   <p style="font-size:13px;color:#999;margin:24px 0 0">
-    Thank you for your support!<br>— ${ownerName}
+    Thank you for your support!<br>— ${escapeHtml(ownerName)}
   </p>
 </div>
 </body>

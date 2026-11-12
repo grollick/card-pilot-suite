@@ -145,6 +145,14 @@ serve(async (req) => {
             headers: { ...corsHeaders, "Content-Type": "application/json" },
           });
         }
+        const { data: ownedLead } = await supabase
+          .from("leads").select("id").eq("id", lead_id).eq("user_id", user_id).maybeSingle();
+        if (!ownedLead) {
+          return new Response(JSON.stringify({ error: "Lead not found" }), {
+            status: 404,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
         const { data: activity, error } = await supabase
           .from("contact_activities")
           .insert({

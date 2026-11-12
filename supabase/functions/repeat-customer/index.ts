@@ -1,3 +1,4 @@
+import { escapeHtml, isServiceCall, unauthorized } from "../_shared/auth.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -10,6 +11,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+  if (!isServiceCall(req)) return unauthorized(corsHeaders);
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -69,16 +71,16 @@ serve(async (req) => {
             html: `
               <div style="font-family:'DM Sans',sans-serif;max-width:520px;margin:0 auto;padding:32px 24px;background:#ffffff;">
                 <h2 style="color:#1a1a2e;margin:0 0 8px;">Time to Rebook!</h2>
-                <p style="color:#374151;margin:0 0 16px;">Hi ${booking.customer_name},</p>
+                <p style="color:#374151;margin:0 0 16px;">Hi ${escapeHtml(booking.customer_name)},</p>
                 <p style="color:#374151;margin:0 0 16px;">
-                  It's been about 30 days since your last ${serviceName} with ${profile.company || profile.name}. We'd love to see you again!
+                  It's been about 30 days since your last ${escapeHtml(serviceName)} with ${escapeHtml(profile.company || profile.name)}. We'd love to see you again!
                 </p>
-                <a href="${bookingLink}" 
+                <a href="${escapeHtml(bookingLink)}" 
                    style="display:inline-block;padding:12px 24px;background:#4361ee;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">
                   Book Again
                 </a>
                 <p style="color:#9ca3af;font-size:12px;margin:24px 0 0;">
-                  Sent via guzzl.pro on behalf of ${profile.company || profile.name}
+                  Sent via guzzl.pro on behalf of ${escapeHtml(profile.company || profile.name)}
                 </p>
               </div>
             `,

@@ -1,3 +1,5 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getUserId } from "../_shared/auth.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -12,7 +14,23 @@ serve(async (req) => {
   }
 
   try {
-    const { image } = await req.json();
+    const { image, card_handle } = await req.json();
+
+    // Signed-in users may scan; visitors may only scan from a real published card.
+    if (!(await getUserId(req))) {
+      const handle = typeof card_handle === "string" ? card_handle.trim().toLowerCase().slice(0, 64) : "";
+      let ok = false;
+      if (/^[a-z0-9_-]+$/.test(handle)) {
+        const svc = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+        const { data } = await svc.from("profiles").select("id").eq("handle", handle).maybeSingle();
+        ok = Boolean(data);
+      }
+      if (!ok) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
     if (!image) throw new Error("image (base64 data URL) is required");
 
     // Validate image payload size (max ~2MB base64)

@@ -1,3 +1,4 @@
+import { sanitizeChatMessages } from "../_shared/auth.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -97,7 +98,7 @@ serve(async (req) => {
         model: "google/gemini-3-flash-preview",
         messages: [
           { role: "system", content: BASE_SYSTEM_PROMPT + `\n\nCOMMUNICATION STYLE:\n${toneInstruction}` + contextBlock },
-          ...messages,
+          ...sanitizeChatMessages(messages),
         ],
         stream: true,
       }),

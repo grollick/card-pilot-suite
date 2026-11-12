@@ -1,3 +1,4 @@
+import { getUserId, unauthorized } from "../_shared/auth.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -72,6 +73,7 @@ async function generateImage(LOVABLE_API_KEY: string, prompt: string, avatarUrl?
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (!(await getUserId(req))) return unauthorized(corsHeaders);
 
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

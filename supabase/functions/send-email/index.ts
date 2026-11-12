@@ -157,7 +157,9 @@ serve(async (req) => {
     if (lead_id && userId) {
       const svcClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-      await svcClient.from("contact_activities").insert({
+      const { data: ownedLead } = await svcClient
+        .from("leads").select("id").eq("id", lead_id).eq("user_id", userId).maybeSingle();
+      if (ownedLead) await svcClient.from("contact_activities").insert({
         user_id: userId,
         lead_id,
         activity_type: "email",

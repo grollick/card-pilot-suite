@@ -1,3 +1,4 @@
+import { cleanPromptText } from "../_shared/auth.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -177,7 +178,7 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `You are a content specialist for a ${profession || "professional"}'s digital business card. Generate compelling titles and descriptions for portfolio/gallery images. Also detect if any pairs of images could represent a before/after transformation.`,
+              content: `You are a content specialist for a ${cleanPromptText(profession, 60) || "professional"}'s digital business card. Generate compelling titles and descriptions for portfolio/gallery images. Also detect if any pairs of images could represent a before/after transformation.`,
             },
             {
               role: "user",

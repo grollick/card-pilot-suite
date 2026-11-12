@@ -43,6 +43,13 @@
       "when": 1794492132732,
       "tag": "0005_bookings_timezone",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794497887576,
+      "tag": "0006_security_hardening_batch",
+      "breakpoints": true
     }
   ]
 }

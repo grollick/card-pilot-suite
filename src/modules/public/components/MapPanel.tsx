@@ -228,8 +228,8 @@ export default function MapPanel({
         .setLngLat([p.lng, p.lat])
         .setPopup(
           new maplibregl.Popup({ offset: 22 }).setHTML(
-            `<div style="font-size:12px;"><b>${p.name ?? "Professional"}</b>${
-              p.profession_name ? `<br/><span style="color:#666">${p.profession_name}</span>` : ""
+            `<div style="font-size:12px;"><b>${escapeHtml(p.name ?? "Professional")}</b>${
+              p.profession_name ? `<br/><span style="color:#666">${escapeHtml(p.profession_name)}</span>` : ""
             }</div>`
           )
         )
@@ -454,4 +454,13 @@ export default function MapPanel({
       )}
     </section>
   );
+}
+
+function escapeHtml(v: unknown): string {
+  return String(v ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }

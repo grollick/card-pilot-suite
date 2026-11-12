@@ -79,7 +79,7 @@ export default function ScanToSaveWidget({ ownerId, handle, palette, fonts, radi
     try {
       const base64 = await prepareBase64(file);
       const { data, error } = await supabase.functions.invoke("scan-business-card-public", {
-        body: { image: base64 },
+        body: { image: base64, card_handle: handle },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
