@@ -1,3 +1,4 @@
+import { isMultiDayBooking } from "@/lib/longJobBooking";
 import PageHelpBanner from "@/components/PageHelpBanner";
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
@@ -306,7 +307,9 @@ export default function BookingManager() {
                   </div>
                   <div className="flex items-center gap-1.5 text-sm">
                     <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                    {format(new Date(b.start_datetime), "EEE, MMM d · h:mm a")}
+                    {isMultiDayBooking(b.start_datetime, b.end_datetime)
+                      ? `${format(new Date(b.start_datetime), "EEE, MMM d · h:mm a")} – ${format(new Date(b.end_datetime), "EEE, MMM d · h:mm a")}`
+                      : format(new Date(b.start_datetime), "EEE, MMM d · h:mm a")}
                   </div>
                   {(b.customer_phone || b.customer_email) && (
                     <div className="flex flex-col gap-1 text-sm">
@@ -359,7 +362,9 @@ export default function BookingManager() {
                       <td className="p-3">
                         <div className="flex items-center gap-1.5 text-sm">
                           <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                          {format(new Date(b.start_datetime), "MMM d, yyyy · h:mm a")}
+                          {isMultiDayBooking(b.start_datetime, b.end_datetime)
+                            ? `${format(new Date(b.start_datetime), "MMM d · h:mm a")} – ${format(new Date(b.end_datetime), "MMM d, yyyy · h:mm a")}`
+                            : format(new Date(b.start_datetime), "MMM d, yyyy · h:mm a")}
                         </div>
                       </td>
                       <td className="p-3">

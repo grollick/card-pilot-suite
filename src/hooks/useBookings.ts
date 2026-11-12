@@ -166,7 +166,7 @@ export function usePublicBookingData(handle: string | undefined) {
     queryFn: async () => {
       const { data: profile, error: pErr } = await supabase
         .from("public_profiles" as any)
-        .select("id, name, handle, avatar_url")
+        .select("id, name, company, handle, avatar_url")
         .eq("handle", handle!)
         .single() as { data: any; error: any };
       if (pErr) throw pErr;
@@ -195,7 +195,8 @@ export function usePublicBookingData(handle: string | undefined) {
 
       return {
         profile,
-        businessName: ((cardResult.data as any)?.company as string) || profile.name || handle!,
+        // Business first: card company, then profile company, then the person, then the handle.
+        businessName: ((cardResult.data as any)?.company as string)?.trim() || (profile.company as string)?.trim() || profile.name || handle!,
         bookingEnabled,
         services: servicesResult.data ?? [],
         availability: availabilityResult.data ?? [],

@@ -1,3 +1,4 @@
+import { applyDiscountBeforeTax } from "@/lib/estimateDiscount";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -144,11 +145,16 @@ export function calculateEstimateTotals(
     }
   }
 
-  const preDiscount = subtotal + labor_total + material_total + markup_total + tax_total;
-  const discAmt = opts?.discount_amount || 0;
-  const discPct = opts?.discount_percent || 0;
-  const discount_total = discAmt + preDiscount * (discPct / 100);
-  const grand_total = Math.max(0, preDiscount - discount_total);
+  // Discount comes off the amount before tax; tax is charged on what is left.
+  const discounted = applyDiscountBeforeTax({
+    beforeTax: subtotal + labor_total + material_total + markup_total,
+    taxTotal: tax_total,
+    discountAmount: opts?.discount_amount,
+    discountPercent: opts?.discount_percent,
+  });
+  const discount_total = discounted.discount;
+  tax_total = discounted.tax;
+  const grand_total = discounted.total;
   const depAmt = opts?.deposit_amount || 0;
   const depPct = opts?.deposit_percent || 0;
   const deposit_due = depAmt > 0 ? depAmt : grand_total * (depPct / 100);

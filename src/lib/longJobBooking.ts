@@ -26,13 +26,57 @@ export function dayWindow(date: Date, rules: AvailabilityRule[]): { open: Date; 
   return { open: at(openMin), close: at(closeMin) };
 }
 
-/** Long-job day is available when the pro is open and no active booking covers that day's opening time. */
-export function isLongJobDayAvailable(date: Date, rules: AvailabilityRule[], bookings: BookingRange[], now: Date = new Date()): boolean {
-  const w = dayWindow(date, rules);
-  if (!w) return false;
-  const t = w.open.getTime();
-  if (!isStartOfferable(w.open, now)) return false;
-  return !bookings.some((b) => new Date(b.start_datetime).getTime() <= t && t < new Date(b.end_datetime).getTime());
+/** Working days a job needs: duration / 1,440 minutes, rounded up, at least 1. */
+export function workingDaysNeeded(durationMin: number | null | undefined): number {
+  return Math.max(1, Math.ceil((durationMin || 0) / 1440));
+}
+
+/** The start day plus the next open days until the job has the days it needs. Null when the start day is closed. */
+export function longJobDays(start: Date, rules: AvailabilityRule[], needed: number): Date[] | null {
+  if (!dayWindow(start, rules)) return null;
+  const days: Date[] = [];
+  const d = new Date(start); d.setHours(0, 0, 0, 0);
+  for (let i = 0; i < 366 && days.length < needed; i++) {
+    if (dayWindow(d, rules)) days.push(new Date(d));
+    d.setDate(d.getDate() + 1);
+  }
+  return days.length === needed ? days : null;
+}
+
+/** Opening time on the first day to closing time on the last day of a long job. */
+export function longJobSpan(start: Date, rules: AvailabilityRule[], durationMin: number | null | undefined): { open: Date; close: Date; days: Date[] } | null {
+  const days = longJobDays(start, rules, workingDaysNeeded(durationMin));
+  if (!days) return null;
+  return { open: dayWindow(days[0], rules)!.open, close: dayWindow(days[days.length - 1], rules)!.close, days };
+}
+
+/** A long job can start on a day only when every working day it needs is completely free and the start is an hour away. */
+export function isLongJobDayAvailable(date: Date, rules: AvailabilityRule[], bookings: BookingRange[], now: Date = new Date(), durationMin: number | null | undefined = 1440): boolean {
+  const span = longJobSpan(date, rules, durationMin);
+  if (!span) return false;
+  if (!isStartOfferable(span.open, now)) return false;
+  return span.days.every((d) => { const w = dayWindow(d, rules)!; return !overlapsBooking(w.open, w.close, bookings); });
+}
+
+/** Customers can pick a start date from today up to this many days ahead. */
+export const BOOKING_WINDOW_DAYS = 60;
+
+/** True when the date is no later than day 60 from today. */
+export function isWithinBookingWindow(date: Date, now: Date = new Date()): boolean {
+  const last = new Date(now); last.setHours(0, 0, 0, 0); last.setDate(last.getDate() + BOOKING_WINDOW_DAYS);
+  const d = new Date(date); d.setHours(0, 0, 0, 0);
+  return d.getTime() <= last.getTime();
+}
+
+/** Last bookable date (day 60). */
+export function lastBookableDate(now: Date = new Date()): Date {
+  const last = new Date(now); last.setHours(0, 0, 0, 0); last.setDate(last.getDate() + BOOKING_WINDOW_DAYS);
+  return last;
+}
+
+/** True when a booking ends on a different calendar day than it starts. */
+export function isMultiDayBooking(start: Date | string, end: Date | string): boolean {
+  return new Date(start).toDateString() !== new Date(end).toDateString();
 }
 
 /** Minimum notice before a slot can be booked. */
@@ -71,6 +115,7 @@ export function daySlots(date: Date, rules: AvailabilityRule[], bookings: Bookin
 
 /** A day can be tapped only when it has at least one time that can be offered for the chosen service. */
 export function dayHasFreeTime(date: Date, rules: AvailabilityRule[], bookings: BookingRange[], durationMin: number | null | undefined, now: Date = new Date()): boolean {
-  if (isLongJob(durationMin, rules)) return isLongJobDayAvailable(date, rules, bookings, now);
+  if (!isWithinBookingWindow(date, now)) return false;
+  if (isLongJob(durationMin, rules)) return isLongJobDayAvailable(date, rules, bookings, now, durationMin);
   return daySlots(date, rules, bookings, durationMin, now).length > 0;
 }

@@ -1,5 +1,7 @@
 // Pure rules for customer estimate sharing. No runtime-specific imports so tests can load it.
 
+import { discountFromStoredTotals } from "../_shared/estimateDiscount.ts";
+
 export type EstimateStatus = "draft" | "sent" | "viewed" | "approved" | "declined" | "expired";
 
 export const SITE_URL = "https://guzzl.pro";
@@ -56,7 +58,7 @@ export function buildCustomerPayload(
   const subtotal = num(est.subtotal);
   const tax = num(est.tax_total);
   const grand = num(est.grand_total);
-  const discount = Math.max(0, Math.round((subtotal + tax - grand) * 100) / 100);
+  const discount = discountFromStoredTotals(subtotal, tax, grand);
   const deposit = num(est.deposit_amount) > 0 ? num(est.deposit_amount)
     : num(est.deposit_percent) > 0 ? Math.round(grand * num(est.deposit_percent)) / 100 : 0;
   const mapItem = (li: Record<string, any>) => ({

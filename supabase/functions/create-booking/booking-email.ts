@@ -20,6 +20,18 @@ export function formatBookingTimes(start: string | Date, end: string | Date, tz?
   const date = s.toLocaleDateString("en-US", { timeZone, weekday: "long", year: "numeric", month: "long", day: "numeric" });
   const shortDate = s.toLocaleDateString("en-US", { timeZone, weekday: "short", month: "short", day: "numeric" });
   const t = (d: Date) => d.toLocaleTimeString("en-US", { timeZone, hour: "numeric", minute: "2-digit" });
+  const dayKey = (d: Date) => d.toLocaleDateString("en-US", { timeZone });
+  if (dayKey(s) !== dayKey(e)) {
+    // Multi-day job: show both days instead of a same-day time range.
+    const long = (d: Date) => d.toLocaleDateString("en-US", { timeZone, weekday: "long", month: "long", day: "numeric" });
+    const endShort = e.toLocaleDateString("en-US", { timeZone, weekday: "short", month: "short", day: "numeric" });
+    const year = e.toLocaleDateString("en-US", { timeZone, year: "numeric" });
+    return {
+      date: `${long(s)} – ${long(e)}, ${year}`,
+      shortDate: `${shortDate} – ${endShort}`,
+      time: `Starts ${long(s)} at ${t(s)}, through ${long(e)} at ${t(e)}`,
+    };
+  }
   return { date, shortDate, time: `${t(s)} – ${t(e)}` };
 }
 

@@ -162,6 +162,10 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    // Booking window: 60 days, plus one day of slack for time zones.
+    if (startDt.getTime() > Date.now() + 61 * 24 * 60 * 60 * 1000) {
+      return json({ error: "You can book up to 60 days ahead. Please pick an earlier date." }, 400);
+    }
     if (customer_email && (typeof customer_email !== "string" || customer_email.length > 255)) {
       return new Response(JSON.stringify({ error: "Invalid email" }), {
         status: 400,

@@ -13,13 +13,14 @@ import { usePublicBookingData } from "@/hooks/useBookings";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatServicePrice, formatServiceDuration } from "@/lib/serviceDisplay";
-import { isLongJob, dayWindow, daySlots, dayHasFreeTime } from "@/lib/longJobBooking";
+import { isLongJob, longJobSpan, daySlots, dayHasFreeTime, workingDaysNeeded, lastBookableDate, isMultiDayBooking } from "@/lib/longJobBooking";
 
 function generateICS(
   name: string,
   service: string,
   start: Date,
-  end: Date
+  end: Date,
+  description?: string
 ): string {
   const pad = (d: Date) =>
     d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
@@ -30,6 +31,7 @@ function generateICS(
     `DTSTART:${pad(start)}`,
     `DTEND:${pad(end)}`,
     `SUMMARY:${service} with ${name}`,
+    ...(description ? [`DESCRIPTION:${description.replace(/[\\,;]/g, (c) => `\\${c}`)}`] : []),
     "END:VEVENT",
     "END:VCALENDAR",
   ].join("\r\n");
@@ -45,11 +47,12 @@ export default function PublicBooking() {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: "", email: "", phone: "", notes: "" });
   const [submitting, setSubmitting] = useState(false);
-  const [bookingResult, setBookingResult] = useState<{ start: Date; end: Date; longJob?: boolean } | null>(null);
+  const [bookingResult, setBookingResult] = useState<{ start: Date; end: Date; longJob?: boolean; days?: number } | null>(null);
 
   const selectedService = data?.services.find((s) => s.id === selectedServiceId);
   const longJob = !!data && isLongJob(selectedService?.duration_min, data.availability);
-  const longJobWindow = longJob && selectedDate && data ? dayWindow(selectedDate, data.availability) : null;
+  const longJobWindow = longJob && selectedDate && data ? longJobSpan(selectedDate, data.availability, selectedService?.duration_min) : null;
+  const daysNeeded = longJob ? workingDaysNeeded(selectedService?.duration_min) : 1;
 
   // Times that can be offered on the selected date (shared rule with the calendar)
   const timeSlots = useMemo(() => {
@@ -87,7 +90,7 @@ export default function PublicBooking() {
       let startDt = setMinutes(setHours(selectedDate, h), m);
       let endDt = new Date(startDt.getTime() + (selectedService.duration_min ?? 30) * 60000);
       if (longJob && longJobWindow) {
-        // Long job: block the start day from opening to closing; the pro confirms the rest.
+        // Long job: opening time on the first working day to closing time on the last one.
         startDt = longJobWindow.open;
         endDt = longJobWindow.close;
       }
@@ -110,6 +113,13 @@ export default function PublicBooking() {
       if (bookingError) {
         let msg: string | undefined;
         try { msg = (await (bookingError as any).context?.json?.())?.error; } catch { /* ignore */ }
+        if ((bookingError as any).context?.status === 400 && msg && /60 days ahead/.test(msg)) {
+          toast.error(msg);
+          setSelectedDate(undefined);
+          setSelectedTime(null);
+          setStep(2);
+          return;
+        }
         if ((bookingError as any).context?.status === 409) {
           toast.error(msg || "That time was just taken. Please pick another time.");
           setSelectedTime(null);
@@ -135,7 +145,7 @@ export default function PublicBooking() {
         meta_json: { service: selectedService.name, ...visitorMeta },
       });
 
-      setBookingResult({ start: startDt, end: endDt, longJob });
+      setBookingResult({ start: startDt, end: endDt, longJob, days: daysNeeded });
       setStep(4);
     } catch {
       toast.error("Something went wrong. Please try again.");
@@ -150,7 +160,10 @@ export default function PublicBooking() {
       data.businessName,
       selectedService.name,
       bookingResult.start,
-      bookingResult.end
+      bookingResult.end,
+      isMultiDayBooking(bookingResult.start, bookingResult.end)
+        ? `About ${bookingResult.days ?? 2} working days, through ${format(bookingResult.end, "EEEE, MMMM d")}.`
+        : undefined
     );
     const blob = new Blob([ics], { type: "text/calendar" });
     const url = URL.createObjectURL(blob);
@@ -266,13 +279,17 @@ export default function PublicBooking() {
                       onMonthChange={setShownMonth}
                       selected={selectedDate}
                       onSelect={(d) => { setSelectedDate(d); setSelectedTime(null); }}
+                      toDate={lastBookableDate()}
                       disabled={(date) => {
                         const key = format(date, "yyyy-MM-dd");
                         return !availableDays.has(key) || isBefore(date, addDays(new Date(), -1));
                       }}
                       className={cn("p-3 pointer-events-auto rounded-xl border border-border")}
                     />
-                    <p className="text-xs text-muted-foreground">Greyed out days are full or closed.</p>
+                    <p className="text-xs text-muted-foreground">Greyed out days are full or closed. You can book up to 60 days ahead.</p>
+                    {longJob && daysNeeded > 1 && (
+                      <p className="text-sm text-foreground">This job needs about {daysNeeded} working days.</p>
+                    )}
                     {availableDays.size === 0 && (
                       <p className="text-sm font-medium text-foreground">No free days this month. Try next month.</p>
                     )}
@@ -384,7 +401,12 @@ export default function PublicBooking() {
                   </div>
                   <div className="p-4 rounded-xl border border-border bg-muted/20 text-sm text-left space-y-1">
                     <p><span className="text-muted-foreground">Service:</span> {selectedService?.name}</p>
-                    {bookingResult.longJob ? (
+                    {isMultiDayBooking(bookingResult.start, bookingResult.end) ? (
+                      <>
+                        <p>Starts {format(bookingResult.start, "EEEE, MMMM d")} at {format(bookingResult.start, "h:mm a")}</p>
+                        <p>About {bookingResult.days} working days, through {format(bookingResult.end, "EEEE, MMMM d")}</p>
+                      </>
+                    ) : bookingResult.longJob ? (
                       <p>Starts {format(bookingResult.start, "EEEE, MMMM d")} at {format(bookingResult.start, "h:mm a")}. About {formatServiceDuration(selectedService?.duration_min)}.</p>
                     ) : (
                       <>

@@ -16,8 +16,8 @@ describe("simple estimate lines", () => {
     const items = [simpleLineItem("A", 1, 1000, 13, 0), simpleLineItem("B", 2, 50, 13, 1)];
     const t = calculateEstimateTotals(sec(items), { discount_percent: 10 });
     expect(t.subtotal).toBe(1100);
-    expect(t.tax_total).toBe(143);
-    expect(t.grand_total).toBe(1118.7);
+    expect(t.tax_total).toBe(128.7);
+    expect(t.grand_total).toBe(1118.7); // 1100 - 110 + 128.70
   });
 });
 

@@ -259,7 +259,7 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-5xl max-h-[92vh] flex flex-col p-0">
-        <DesktopGuidanceNotice toolKey="estimate-builder" />
+        {!simpleView && <DesktopGuidanceNotice toolKey="estimate-builder" />}
         <DialogHeader className="px-6 pt-6 pb-3 border-b border-border">
           <div className="flex items-center justify-between">
             <DialogTitle>{isEdit ? `Edit ${estimateNumber}` : "New Estimate"}</DialogTitle>
@@ -320,7 +320,7 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
 
               <div className="rounded-lg border border-border bg-muted/20 p-3 text-sm space-y-1">
                 <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span className="tabular-nums">${totals.subtotal.toFixed(2)}</span></div>
-                <div className="flex justify-between"><span className="text-muted-foreground">Discount</span><span className="tabular-nums">-${totals.discount_total.toFixed(2)}</span></div>
+                {totals.discount_total > 0 && <div className="flex justify-between"><span className="text-muted-foreground">Discount</span><span className="tabular-nums">-${totals.discount_total.toFixed(2)}</span></div>}
                 <div className="flex justify-between"><span className="text-muted-foreground">Tax</span><span className="tabular-nums">${totals.tax_total.toFixed(2)}</span></div>
                 <div className="flex justify-between font-bold text-base pt-1 border-t border-border"><span>Total</span><span className="tabular-nums">${totals.grand_total.toFixed(2)}</span></div>
               </div>
@@ -455,8 +455,8 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
                   {isEdit && existing && !["approved", "declined"].includes((existing as any).status) && (
                     <Button variant="outline" onClick={() => setSendOpen(true)} className="gap-1.5"><Send className="h-3.5 w-3.5" /> Send to customer</Button>
                   )}
-                  <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-                  <Button onClick={handleSave} disabled={saving || !estimateNumber}>
+                  <Button variant="outline" className="min-h-[44px] sm:min-h-10" onClick={() => onOpenChange(false)}>Cancel</Button>
+                  <Button className="min-h-[44px] sm:min-h-10" onClick={handleSave} disabled={saving || !estimateNumber}>
                     {saving && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                     {isEdit ? "Update" : "Create Estimate"}
                   </Button>
