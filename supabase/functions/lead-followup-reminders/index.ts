@@ -39,7 +39,14 @@ serve(async (req) => {
         .eq("id", log.user_id)
         .single();
 
-      if (profile?.email) {
+      let recipientEmail = profile?.email?.trim();
+      if (!recipientEmail) {
+        const { data } = await supabase.auth.admin.getUserById(log.user_id);
+        recipientEmail = data.user?.email?.trim();
+      }
+      if (!recipientEmail) console.warn("Lead follow-up reminder skipped: no profile or account email", { leadId: log.lead_id });
+
+      if (recipientEmail) {
         // Fetch quote request details
         const { data: quoteReq } = await supabase
           .from("marketplace_quote_requests")
@@ -50,7 +57,7 @@ serve(async (req) => {
         try {
           await supabase.functions.invoke("send-email", {
             body: {
-              to: profile.email,
+              to: recipientEmail,
               subject: `⏰ Reminder: ${quoteReq?.customer_name || "A customer"} is waiting for your response`,
               html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
@@ -102,7 +109,14 @@ serve(async (req) => {
         .eq("id", log.user_id)
         .single();
 
-      if (profile?.email) {
+      let recipientEmail = profile?.email?.trim();
+      if (!recipientEmail) {
+        const { data } = await supabase.auth.admin.getUserById(log.user_id);
+        recipientEmail = data.user?.email?.trim();
+      }
+      if (!recipientEmail) console.warn("Lead follow-up reminder skipped: no profile or account email", { leadId: log.lead_id });
+
+      if (recipientEmail) {
         const { data: quoteReq } = await supabase
           .from("marketplace_quote_requests")
           .select("customer_name, service_needed")
@@ -112,7 +126,7 @@ serve(async (req) => {
         try {
           await supabase.functions.invoke("send-email", {
             body: {
-              to: profile.email,
+              to: recipientEmail,
               subject: `🚨 Final reminder: ${quoteReq?.customer_name || "A customer"} may go elsewhere`,
               html: `
                 <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { motion, AnimatePresence } from "framer-motion";
@@ -96,6 +96,12 @@ export default function Onboarding() {
   const [externalUrl, setExternalUrl] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
+  const emailPrefilled = useRef(false);
+  useEffect(() => {
+    if (emailPrefilled.current || !user?.email) return;
+    emailPrefilled.current = true;
+    setEmail(current => current === "" ? user.email || "" : current);
+  }, [user?.email]);
   const [city, setCity] = useState("");
   const [services, setServices] = useState<string[]>([]);
   const [bookingEnabled, setBookingEnabled] = useState(false);
@@ -236,7 +242,7 @@ export default function Onboarding() {
         onboarding_completed: true,
         marketplace_enabled: true,
         phone: phone || null,
-        email: email || null,
+        email: email.trim() || null,
         city: city || null,
         marketplace_categories: aiSetup?.suggested_categories || [],
       } as any).eq("id", user.id);

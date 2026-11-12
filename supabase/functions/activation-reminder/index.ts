@@ -67,7 +67,14 @@ Deno.serve(async (req) => {
       const cardUrl = `${Deno.env.get("SUPABASE_URL")?.replace(".supabase.co", "")?.includes("http") ? "" : "https://"}${profile.handle ? `guzzl.pro/${profile.handle}` : ""}`;
 
       const resendKey = Deno.env.get("RESEND_API_KEY");
-      if (resendKey && profile.email) {
+      let recipientEmail = profile.email?.trim();
+      if (!recipientEmail) {
+        const { data } = await supabase.auth.admin.getUserById(profile.id);
+        recipientEmail = data.user?.email?.trim();
+      }
+      if (!recipientEmail) console.warn("Activation reminder skipped: no profile or account email", { userId: profile.id });
+
+      if (resendKey && recipientEmail) {
         try {
           await fetch("https://api.resend.com/emails", {
             method: "POST",
@@ -77,7 +84,7 @@ Deno.serve(async (req) => {
             },
             body: JSON.stringify({
               from: "guzzl.pro <noreply@guzzl-pro.app>",
-              to: [profile.email],
+              to: [recipientEmail],
               subject: `${firstName}, your card is ready — now let's get your first lead! 🚀`,
               html: `
                 <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 24px;">
@@ -116,7 +123,7 @@ Deno.serve(async (req) => {
         user_id: profile.id,
         action_type: "activation_reminder",
         title: "24-hour activation reminder sent",
-        description: `Reminder email sent to ${profile.email}`,
+        description: `Reminder email sent to ${recipientEmail || "no available email address"}`,
         status: "completed",
       });
     }
