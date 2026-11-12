@@ -4,7 +4,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
 
 // Configuration baked in at scaffold time
-const SITE_NAME = "card-pilot-suite"
+const SITE_NAME = "guzzl.pro"
 const SENDER_DOMAIN = "notify.guzzl.pro"
 const FROM_DOMAIN = "notify.guzzl.pro"
 

@@ -36,7 +36,7 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "card-pilot-suite"
+const SITE_NAME = "guzzl.pro"
 const SENDER_DOMAIN = "notify.guzzl.pro"
 const ROOT_DOMAIN = "guzzl.pro"
 const FROM_DOMAIN = "notify.guzzl.pro" // Domain shown in From address (may be root or sender subdomain)

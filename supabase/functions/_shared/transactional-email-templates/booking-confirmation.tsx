@@ -39,7 +39,7 @@ const BookingConfirmationEmail = ({
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>
-      Your booking{serviceName ? ` for ${serviceName}` : ''} is confirmed!
+      We got your booking request{serviceName ? ` for ${serviceName}` : ''}
     </Preview>
     <Body style={main}>
       <Container style={container}>
@@ -48,13 +48,10 @@ const BookingConfirmationEmail = ({
           <span style={brandDot}>.pro</span>
         </Text>
         <Heading style={h1}>
-          {customerName ? `Hey ${customerName}, ` : ''}your booking is confirmed! 🎉
+          {customerName ? `${customerName}, we` : 'We'} got your booking request
         </Heading>
         <Text style={text}>
-          {providerName
-            ? `${providerName} has received your booking request.`
-            : 'Your booking request has been received.'}{' '}
-          Here are the details:
+          {providerName || 'The provider'} will confirm your time. You'll get another email when they do.
         </Text>
         <Section style={detailsBox}>
           {serviceName && (
@@ -82,11 +79,6 @@ const BookingConfirmationEmail = ({
             </Text>
           )}
         </Section>
-        <Text style={text}>
-          You'll receive another notification once your appointment is confirmed
-          by {providerName || 'the provider'}. If you need to make any changes,
-          please reach out directly.
-        </Text>
         {handle && (
           <Button
             style={button}
@@ -114,8 +106,8 @@ export const template = {
   component: BookingConfirmationEmail,
   subject: (data: Record<string, any>) =>
     data?.serviceName
-      ? `Booking confirmed: ${data.serviceName}`
-      : 'Your booking is confirmed!',
+      ? `Booking request received: ${data.serviceName}`
+      : 'Booking request received',
   displayName: 'Booking confirmation',
   previewData: {
     customerName: 'Jane',

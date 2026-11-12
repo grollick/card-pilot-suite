@@ -127,6 +127,7 @@ export default function PublicBooking() {
           notes: formData.notes?.trim() || null,
           start_datetime: startDt.toISOString(),
           end_datetime: endDt.toISOString(),
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || null,
         },
       });
 

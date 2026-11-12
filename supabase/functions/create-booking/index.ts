@@ -3,6 +3,16 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { z } from "npm:zod@3";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { notifyLeadOwner } from "./lead-notification.ts";
+import { formatBookingTimes, queueCustomerEmail, validTimezone } from "./booking-email.ts";
+
+const StatusSchema = z.object({
+  action: z.literal("update_status"),
+  bookingId: z.string().uuid(),
+  status: z.enum(["pending", "confirmed", "completed", "cancelled", "no_show", "requested"]),
+});
+
+const json = (data: unknown, status = 200) =>
+  new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, "Content-Type": "application/json" } });
 
 const LeadSchema = z.object({
   action: z.literal("capture_lead"),
@@ -25,6 +35,48 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
+    if (body?.action === "update_status") {
+      const parsed = StatusSchema.safeParse(body);
+      if (!parsed.success) return json({ error: "Invalid request" }, 400);
+      const url = Deno.env.get("SUPABASE_URL");
+      const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+      if (!url || !serviceKey) throw new Error("Missing server configuration");
+      const client = createClient(url, serviceKey);
+      const token = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+      const { data: authData } = token ? await client.auth.getUser(token) : { data: { user: null } };
+      const user = authData?.user;
+      if (!user) return json({ error: "Please sign in again." }, 401);
+
+      const { bookingId, status } = parsed.data;
+      const { data: booking } = await client.from("bookings")
+        .select("id,user_id,customer_name,customer_email,start_datetime,end_datetime,timezone,service_id,booking_services(name)")
+        .eq("id", bookingId).maybeSingle();
+      if (!booking || booking.user_id !== user.id) return json({ error: "Booking not found" }, 404);
+
+      const { error: updErr } = await client.from("bookings").update({ status }).eq("id", bookingId);
+      if (updErr) {
+        console.error("Booking status update failed", { bookingId, error: updErr.message });
+        return json({ error: "Couldn't update the booking." }, 400);
+      }
+
+      const templateName = status === "confirmed" ? "booking-confirmed"
+        : status === "cancelled" ? "booking-cancelled"
+        : status === "completed" ? "review-request" : null;
+      const email = booking.customer_email?.trim() || null;
+      let emailQueued = false;
+      if (templateName && email) {
+        const { data: provider } = await client.from("profiles").select("name,company,handle").eq("id", user.id).single();
+        const { date, shortDate, time } = formatBookingTimes(booking.start_datetime, booking.end_datetime, booking.timezone);
+        emailQueued = await queueCustomerEmail(client, bookingId, templateName, email, `${templateName}-${bookingId}`, {
+          customerName: booking.customer_name?.trim().split(" ")[0],
+          serviceName: (booking.booking_services as any)?.name || "",
+          date, shortDate, time,
+          providerName: provider?.company || provider?.name || "",
+          handle: provider?.handle || "",
+        });
+      }
+      return json({ success: true, status, emailAttempted: Boolean(templateName), hasEmail: Boolean(email), emailQueued, customerEmail: email });
+    }
     if (body.action === "capture_lead") {
       const parsed = LeadSchema.safeParse(body);
       if (!parsed.success) return new Response(JSON.stringify({ error: "Please check your contact details." }), {
@@ -60,7 +112,9 @@ serve(async (req) => {
       notes,
       start_datetime,
       end_datetime,
+      timezone,
     } = body;
+    const bookingTimezone = validTimezone(timezone);
 
     // ── Input validation ──
     if (!handle || typeof handle !== "string" || handle.length > 100) {
@@ -170,6 +224,7 @@ serve(async (req) => {
         start_datetime: startDt.toISOString(),
         end_datetime: endDt.toISOString(),
         status: "requested",
+        timezone: bookingTimezone,
       })
       .select("id, start_datetime, end_datetime")
       .single();
@@ -207,35 +262,14 @@ serve(async (req) => {
 
         const providerName = providerProfile?.company || providerProfile?.name || "";
 
-        // Format dates for the email
-        const dateStr = startDt.toLocaleDateString("en-US", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        });
-        const timeStr = `${startDt.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-        })} – ${endDt.toLocaleTimeString("en-US", {
-          hour: "numeric",
-          minute: "2-digit",
-        })}`;
-
-        await supabase.functions.invoke("send-transactional-email", {
-          body: {
-            templateName: "booking-confirmation",
-            recipientEmail: customer_email.trim(),
-            idempotencyKey: `booking-confirm-${bookingId}`,
-            templateData: {
-              customerName: customer_name.trim().split(" ")[0],
-              serviceName,
-              date: dateStr,
-              time: timeStr,
-              providerName,
-              handle: providerProfile?.handle || handle,
-            },
-          },
+        const { date, time } = formatBookingTimes(startDt, endDt, bookingTimezone);
+        await queueCustomerEmail(supabase, bookingId, "booking-confirmation", customer_email.trim(), `booking-confirm-${bookingId}`, {
+          customerName: customer_name.trim().split(" ")[0],
+          serviceName,
+          date,
+          time,
+          providerName,
+          handle: providerProfile?.handle || handle,
         });
       } catch (emailErr) {
         // Non-fatal — booking was already created

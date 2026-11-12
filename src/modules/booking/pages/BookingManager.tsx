@@ -3,9 +3,8 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Calendar, Clock, Plus, Settings, Loader2, CheckCircle2,
-  XCircle, AlertCircle, MoreHorizontal, User
+  XCircle, AlertCircle, MoreHorizontal, User, Phone, Mail
 } from "lucide-react";
-import { useSendEmail } from "@/hooks/useEmail";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +24,7 @@ import { format, startOfMonth } from "date-fns";
 import { toast } from "sonner";
 import {
   useBookingServices, useCreateService, useUpdateService,
-  useBookings, useUpdateBooking,
+  useBookings, useUpdateBooking, bookingStatusMessage,
   useAvailability, useUpsertAvailability,
 } from "@/hooks/useBookings";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
@@ -55,7 +54,7 @@ export default function BookingManager() {
   const updateService = useUpdateService();
   const updateBooking = useUpdateBooking();
   const upsertAvailability = useUpsertAvailability();
-  const sendEmail = useSendEmail();
+  const [busyId, setBusyId] = useState<string | null>(null);
   const { planKey, checkLimit } = usePlanLimits();
   const [upgradeOpen, setUpgradeOpen] = useState(false);
   const [upgradeFeature, setUpgradeFeature] = useState("");
@@ -143,45 +142,64 @@ export default function BookingManager() {
     setEditingAvail(false);
   };
 
-  const handleStatusChange = async (bookingId: string, status: "pending" | "confirmed" | "completed" | "cancelled" | "no_show" | "requested") => {
-    await updateBooking.mutateAsync({ id: bookingId, status });
-
-    // Auto-send confirmation email
-    if (status === "confirmed") {
-      const booking = bookings.find((b: any) => b.id === bookingId);
-      if (booking?.customer_email) {
-        const startDate = format(new Date(booking.start_datetime), "EEEE, MMMM d, yyyy");
-        const startTime = format(new Date(booking.start_datetime), "h:mm a");
-        const serviceName = booking.booking_services?.name ?? "your appointment";
-
-        sendEmail.mutate({
-          to: booking.customer_email,
-          subject: `Booking Confirmed – ${serviceName} on ${startDate}`,
-          html: `
-            <div style="font-family: sans-serif; max-width: 520px; margin: 0 auto; padding: 24px;">
-              <h2 style="color: #111; margin-bottom: 8px;">You're confirmed! ✅</h2>
-              <p style="color: #555; font-size: 15px;">
-                Hi ${booking.customer_name.split(" ")[0]}, your booking has been confirmed.
-              </p>
-              <div style="background: #f8f9fa; border-radius: 12px; padding: 20px; margin: 20px 0;">
-                <p style="margin: 0 0 8px; font-weight: 600; color: #111;">${serviceName}</p>
-                <p style="margin: 0 0 4px; color: #555;">📅 ${startDate}</p>
-                <p style="margin: 0; color: #555;">🕐 ${startTime}</p>
-              </div>
-              <p style="color: #888; font-size: 13px;">
-                Need to reschedule? Reply to this email and we'll help you find a new time.
-              </p>
-            </div>
-          `,
-          email_type: "booking_confirmation",
-          lead_id: booking.lead_id ?? undefined,
-        });
-        toast.success("Confirmation email sent");
-      }
-    }
-
-    toast.success(`Booking ${status}`);
+  const STATUS_LABELS: Record<string, string> = {
+    confirmed: "Booking confirmed", cancelled: "Booking cancelled", completed: "Booking completed",
+    no_show: "Marked as no-show", pending: "Booking pending", requested: "Booking requested",
   };
+  const handleStatusChange = async (bookingId: string, status: "pending" | "confirmed" | "completed" | "cancelled" | "no_show" | "requested") => {
+    setBusyId(bookingId);
+    try {
+      const result = await updateBooking.mutateAsync({ id: bookingId, status });
+      const msg = bookingStatusMessage(STATUS_LABELS[status], result);
+      if (result?.emailAttempted && result.hasEmail && !result.emailQueued) toast.warning(msg);
+      else toast.success(msg);
+    } catch {
+      toast.error("Couldn't update the booking. Please try again.");
+    } finally {
+      setBusyId(null);
+    }
+  };
+  const handleDecline = (bookingId: string) => {
+    if (window.confirm("Decline this booking?")) handleStatusChange(bookingId, "cancelled");
+  };
+  const isWaiting = (status: string) => status === "requested" || status === "pending";
+
+  const renderMenu = (b: any) => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-9 w-9" aria-label="More actions">
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-40">
+        {b.status !== "confirmed" && (
+          <DropdownMenuItem onClick={() => handleStatusChange(b.id, "confirmed")}>
+            <CheckCircle2 className="h-4 w-4 mr-2 text-[hsl(var(--success))]" /> Confirm
+          </DropdownMenuItem>
+        )}
+        {b.status !== "completed" && (
+          <DropdownMenuItem onClick={() => handleStatusChange(b.id, "completed")}>
+            <CheckCircle2 className="h-4 w-4 mr-2" /> Complete
+          </DropdownMenuItem>
+        )}
+        {b.status !== "cancelled" && (
+          <DropdownMenuItem onClick={() => handleStatusChange(b.id, "cancelled")}>
+            <XCircle className="h-4 w-4 mr-2 text-destructive" /> Cancel
+          </DropdownMenuItem>
+        )}
+        {b.status !== "no_show" && (
+          <DropdownMenuItem onClick={() => handleStatusChange(b.id, "no_show")}>
+            <AlertCircle className="h-4 w-4 mr-2" /> No Show
+          </DropdownMenuItem>
+        )}
+        {b.lead_id && (
+          <DropdownMenuItem onClick={() => navigate(`/app/contacts/${b.lead_id}`)}>
+            <User className="h-4 w-4 mr-2" /> View Contact
+          </DropdownMenuItem>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   const isLoading = sLoading || bLoading || aLoading;
 
@@ -272,15 +290,60 @@ export default function BookingManager() {
               No bookings yet. Share your card to start receiving bookings.
             </div>
           ) : (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-xl border border-border bg-card overflow-hidden">
+            <>
+            <div className="space-y-3 sm:hidden">
+              {bookings.map((b: any) => (
+                <div key={b.id} className="rounded-xl border border-border bg-card p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{b.customer_name}</p>
+                      <p className="text-sm text-muted-foreground">{b.booking_services?.name ?? "—"}</p>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${statusColors[b.status] ?? "bg-muted text-muted-foreground"}`}>{b.status}</span>
+                      {renderMenu(b)}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sm">
+                    <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
+                    {format(new Date(b.start_datetime), "EEE, MMM d · h:mm a")}
+                  </div>
+                  {(b.customer_phone || b.customer_email) && (
+                    <div className="flex flex-col gap-1 text-sm">
+                      {b.customer_phone && (
+                        <a href={`tel:${b.customer_phone}`} className="inline-flex items-center gap-1.5 text-primary min-h-[32px]">
+                          <Phone className="h-3.5 w-3.5" /> {b.customer_phone}
+                        </a>
+                      )}
+                      {b.customer_email && (
+                        <a href={`mailto:${b.customer_email}`} className="inline-flex items-center gap-1.5 text-primary min-h-[32px] break-all">
+                          <Mail className="h-3.5 w-3.5" /> {b.customer_email}
+                        </a>
+                      )}
+                    </div>
+                  )}
+                  {isWaiting(b.status) && (
+                    <div className="flex flex-col gap-2">
+                      <Button className="w-full min-h-[44px]" disabled={busyId === b.id} onClick={() => handleStatusChange(b.id, "confirmed")}>
+                        {busyId === b.id ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}Confirm
+                      </Button>
+                      <Button variant="outline" className="w-full min-h-[44px]" disabled={busyId === b.id} onClick={() => handleDecline(b.id)}>
+                        Decline
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="hidden sm:block rounded-xl border border-border bg-card overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border bg-muted/30">
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Customer</th>
-                    <th className="text-left p-3 font-medium text-muted-foreground text-xs hidden sm:table-cell">Service</th>
+                    <th className="text-left p-3 font-medium text-muted-foreground text-xs ">Service</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Date & Time</th>
                     <th className="text-left p-3 font-medium text-muted-foreground text-xs">Status</th>
-                    <th className="w-10" />
+                    <th className="w-32" />
                   </tr>
                 </thead>
                 <tbody>
@@ -290,7 +353,7 @@ export default function BookingManager() {
                         <p className="font-medium">{b.customer_name}</p>
                         {b.customer_email && <p className="text-xs text-muted-foreground">{b.customer_email}</p>}
                       </td>
-                      <td className="p-3 text-muted-foreground hidden sm:table-cell">
+                      <td className="p-3 text-muted-foreground ">
                         {b.booking_services?.name ?? "—"}
                       </td>
                       <td className="p-3">
@@ -305,46 +368,21 @@ export default function BookingManager() {
                         </span>
                       </td>
                       <td className="p-3">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-7 w-7">
-                              <MoreHorizontal className="h-4 w-4" />
+                        <div className="flex items-center justify-end gap-1">
+                          {isWaiting(b.status) && (
+                            <Button size="sm" disabled={busyId === b.id} onClick={() => handleStatusChange(b.id, "confirmed")}>
+                              {busyId === b.id ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : null}Confirm
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-40">
-                            {b.status !== "confirmed" && (
-                              <DropdownMenuItem onClick={() => handleStatusChange(b.id, "confirmed")}>
-                                <CheckCircle2 className="h-4 w-4 mr-2 text-[hsl(var(--success))]" /> Confirm
-                              </DropdownMenuItem>
-                            )}
-                            {b.status !== "completed" && (
-                              <DropdownMenuItem onClick={() => handleStatusChange(b.id, "completed")}>
-                                <CheckCircle2 className="h-4 w-4 mr-2" /> Complete
-                              </DropdownMenuItem>
-                            )}
-                            {b.status !== "cancelled" && (
-                              <DropdownMenuItem onClick={() => handleStatusChange(b.id, "cancelled")}>
-                                <XCircle className="h-4 w-4 mr-2 text-destructive" /> Cancel
-                              </DropdownMenuItem>
-                            )}
-                            {b.status !== "no_show" && (
-                              <DropdownMenuItem onClick={() => handleStatusChange(b.id, "no_show")}>
-                                <AlertCircle className="h-4 w-4 mr-2" /> No Show
-                              </DropdownMenuItem>
-                            )}
-                            {b.lead_id && (
-                              <DropdownMenuItem onClick={() => navigate(`/app/contacts/${b.lead_id}`)}>
-                                <User className="h-4 w-4 mr-2" /> View Contact
-                              </DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                          )}
+                          {renderMenu(b)}
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </motion.div>
+            </>
           )}
         </TabsContent>
 

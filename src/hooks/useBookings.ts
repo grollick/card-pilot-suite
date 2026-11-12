@@ -74,6 +74,23 @@ export function useBookings() {
   });
 }
 
+export interface BookingStatusResult {
+  success: boolean;
+  status: string;
+  emailAttempted: boolean;
+  hasEmail: boolean;
+  emailQueued: boolean;
+  customerEmail: string | null;
+}
+
+/** Toast text that reports exactly what happened with the customer email. */
+export function bookingStatusMessage(label: string, r: BookingStatusResult | null): string {
+  if (!r || !r.emailAttempted) return `${label}.`;
+  if (!r.hasEmail) return `${label}. No email on file for this customer.`;
+  if (!r.emailQueued) return `${label}, but the email could not be sent.`;
+  return `${label}. Email sent to ${r.customerEmail}.`;
+}
+
 export function useUpdateBooking() {
   const qc = useQueryClient();
   return useMutation({
@@ -81,44 +98,18 @@ export function useUpdateBooking() {
       id: string;
       status?: "pending" | "confirmed" | "completed" | "cancelled" | "no_show" | "requested";
       internal_notes?: string;
-    }) => {
-      const { error } = await supabase.from("bookings").update(updates).eq("id", id);
-      if (error) throw error;
-
-      // Send review request email when booking is completed
-      if (updates.status === "completed") {
-        try {
-          const { data: booking } = await supabase
-            .from("bookings")
-            .select("customer_email, customer_name, user_id, service_id, booking_services(name)")
-            .eq("id", id)
-            .single();
-
-          if (booking?.customer_email) {
-            const { data: profile } = await supabase
-              .from("profiles")
-              .select("name, handle")
-              .eq("id", booking.user_id)
-              .single();
-
-            supabase.functions.invoke("send-transactional-email", {
-              body: {
-                templateName: "review-request",
-                recipientEmail: booking.customer_email,
-                idempotencyKey: `review-request-${id}`,
-                templateData: {
-                  customerName: booking.customer_name?.split(" ")[0],
-                  providerName: profile?.name || "",
-                  serviceName: (booking.booking_services as any)?.name || "",
-                  handle: profile?.handle || "",
-                },
-              },
-            }).catch(() => {});
-          }
-        } catch {
-          // Non-blocking — don't fail the status update
-        }
+    }): Promise<BookingStatusResult | null> => {
+      if (updates.internal_notes !== undefined) {
+        const { error } = await supabase.from("bookings").update({ internal_notes: updates.internal_notes }).eq("id", id);
+        if (error) throw error;
       }
+      if (!updates.status) return null;
+      // Status changes go through the server so it can check ownership and email the customer.
+      const { data, error } = await supabase.functions.invoke("create-booking", {
+        body: { action: "update_status", bookingId: id, status: updates.status },
+      });
+      if (error || !data?.success) throw error || new Error(data?.error || "Couldn't update the booking");
+      return data as BookingStatusResult;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["bookings"] });

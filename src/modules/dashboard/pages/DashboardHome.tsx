@@ -28,6 +28,39 @@ import DashboardOpportunityAlert from "@/modules/dashboard/components/DashboardO
 import ShareCardWidget from "@/modules/dashboard/components/ShareCardWidget";
 import TodaysSchedule from "@/modules/dashboard/components/TodaysSchedule";
 import { useShowAllTools } from "@/hooks/useShowAllTools";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+
+/** Strip shown while booking requests are waiting for the pro to confirm. */
+function BookingRequestsStrip() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { data: count = 0 } = useQuery({
+    queryKey: ["bookings", "waiting-count", user?.id],
+    enabled: !!user,
+    staleTime: 30_000,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("bookings")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user!.id)
+        .in("status", ["requested", "pending"]);
+      if (error) throw error;
+      return count ?? 0;
+    },
+  });
+  if (count < 1) return null;
+  return (
+    <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl border border-primary/30 bg-primary/5 p-3">
+      <p className="text-sm font-medium">
+        {count === 1 ? "1 booking request is waiting." : `${count} booking requests are waiting.`}{" "}
+        Confirm {count === 1 ? "it" : "them"} so your {count === 1 ? "customer knows" : "customers know"} you're coming.
+      </p>
+      <Button size="sm" onClick={() => navigate("/app/bookings")}>Review</Button>
+    </div>
+  );
+}
 import {
   Pencil, UserPlus, CalendarPlus, ExternalLink,
   Zap, Sparkles, Bell, Store, Globe,
@@ -91,6 +124,7 @@ export default function DashboardHome() {
       animate="animate"
       variants={stagger}
     >
+      <BookingRequestsStrip />
       {/* System widgets (always render, not layout-controlled) */}
       <ReferralActivationChecker />
       {showAllTools && <SecondSessionBanner />}

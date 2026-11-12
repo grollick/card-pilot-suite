@@ -1396,6 +1396,7 @@ export type Database = {
           service_id: string | null
           start_datetime: string
           status: Database["public"]["Enums"]["booking_status"]
+          timezone: string | null
           updated_at: string
           user_id: string
         }
@@ -1413,6 +1414,7 @@ export type Database = {
           service_id?: string | null
           start_datetime: string
           status?: Database["public"]["Enums"]["booking_status"]
+          timezone?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1430,6 +1432,7 @@ export type Database = {
           service_id?: string | null
           start_datetime?: string
           status?: Database["public"]["Enums"]["booking_status"]
+          timezone?: string | null
           updated_at?: string
           user_id?: string
         }
