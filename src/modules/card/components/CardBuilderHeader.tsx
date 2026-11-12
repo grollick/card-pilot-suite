@@ -2,7 +2,6 @@ import {
   Globe, Loader2, Cloud, CloudOff, Link2, Eye, ChevronLeft, Wifi,
   Smartphone, Tablet, Save,
 } from "lucide-react";
-import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
@@ -44,7 +43,7 @@ export default function CardBuilderHeader({
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className="h-13 flex items-center justify-between px-4 border-b border-border/15 bg-background/90 backdrop-blur-xl shrink-0 shadow-sm">
+      <div data-card-editor-header className="flex flex-wrap items-center justify-between gap-3 px-4 py-2 border-b border-border/15 bg-background/90 backdrop-blur-xl shrink-0 shadow-sm">
         {/* ── Left: Back + Card name + Save status ── */}
         <div className="flex items-center gap-3 min-w-0">
           <Tooltip>
@@ -58,8 +57,8 @@ export default function CardBuilderHeader({
 
           <Separator orientation="vertical" className="h-5 hidden sm:block" />
 
-          <div className="flex items-center gap-2.5 min-w-0">
-            <GuzzlLogo to={null} size="lg" suffix="Card Editor" />
+          <div className="flex flex-wrap items-center gap-2.5 min-w-0">
+            <h1 className="text-base font-semibold whitespace-nowrap shrink-0">Card Editor</h1>
             {cardSwitcher}
 
             <div className={`flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full shrink-0 transition-colors ${
@@ -78,7 +77,7 @@ export default function CardBuilderHeader({
         </div>
 
         {/* ── Center: Device preview toggle ── */}
-        <div className="hidden md:flex items-center gap-0.5 rounded-lg border border-border/40 bg-muted/20 p-0.5">
+        <div className="hidden md:flex shrink-0 items-center gap-0.5 rounded-lg border border-border/40 bg-muted/20 p-0.5">
           {([
             { id: "phone" as const, icon: Smartphone, label: "Phone" },
             { id: "tablet" as const, icon: Tablet, label: "Tablet" },
@@ -103,7 +102,7 @@ export default function CardBuilderHeader({
         </div>
 
         {/* ── Right: Preview + Share + Publish ── */}
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           {handle && (
             <>
               <Tooltip>
@@ -129,9 +128,11 @@ export default function CardBuilderHeader({
                 <TooltipContent side="bottom">Copy link</TooltipContent>
               </Tooltip>
 
-              <QRShareDialog url={`${window.location.origin}/${handle}`} name={name || "Card"} />
-              <NFCShareDialog url={`${window.location.origin}/${handle}`} name={name || "Card"} />
-              <WalletPassDialog handle={handle} name={name || "Card"} />
+              <div className="flex shrink-0 items-center gap-1.5 [&>button]:h-8 [&>button]:w-8 [&>button]:p-0 [&>button]:rounded-lg [&>button>span]:sr-only [&>button>svg]:h-4 [&>button>svg]:w-4">
+                <QRShareDialog url={`${window.location.origin}/${handle}`} name={name || "Card"} />
+                <NFCShareDialog url={`${window.location.origin}/${handle}`} name={name || "Card"} />
+                <WalletPassDialog handle={handle} name={name || "Card"} />
+              </div>
             </>
           )}
 

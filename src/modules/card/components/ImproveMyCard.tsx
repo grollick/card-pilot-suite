@@ -1,14 +1,12 @@
 import { useState, useMemo } from "react";
 import {
-  Sparkles, Loader2, Check, ChevronDown, ChevronUp,
+  Sparkles, Check, ChevronDown, ChevronUp,
   AlertTriangle, Zap, Image, FileText, Phone, Calendar,
-  MessageSquare, TrendingUp, RefreshCw,
+  MessageSquare, TrendingUp,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { useAICardOptimizer } from "@/hooks/useAICopilot";
-import { useQueryClient } from "@tanstack/react-query";
 import type { CardSection } from "@/hooks/useCard";
 
 /* ── Types ── */
@@ -44,11 +42,11 @@ const priorityConfig = {
 };
 
 /* ── Client-side analysis ── */
-function analyzeCard(sections: CardSection[], profile: any, avatarUrl: string | null, coverUrl: string | null): LocalIssue[] {
+export function analyzeCard(sections: CardSection[], profile: any, avatarUrl: string | null, coverUrl: string | null): LocalIssue[] {
   const issues: LocalIssue[] = [];
 
   // Missing avatar
-  if (!avatarUrl && !profile?.avatar_url) {
+  if (!avatarUrl) {
     issues.push({
       id: "no-avatar",
       title: "Add a profile photo",
@@ -104,11 +102,11 @@ function analyzeCard(sections: CardSection[], profile: any, avatarUrl: string | 
     });
   } else {
     const items = services.content?.items as any[] | undefined;
-    if (!items || items.length < 2) {
+    if (!items || items.filter(item => item.name?.trim()).length < 2) {
       issues.push({
         id: "services-few",
         title: "Add more services",
-        description: "Cards with 3+ services convert better. Add your key offerings.",
+        description: "List the services customers can hire you for.",
         priority: "medium",
         icon: Zap,
         action: { label: "Edit", sectionId: "services" },
@@ -135,7 +133,7 @@ function analyzeCard(sections: CardSection[], profile: any, avatarUrl: string | 
     issues.push({
       id: "booking-disabled",
       title: "Enable online booking",
-      description: "Let customers book directly from your card. Reduces back-and-forth by 80%.",
+      description: "Let customers book directly from your card.",
       priority: "medium",
       icon: Calendar,
       action: { label: "Enable", sectionId: "booking", enableSection: true },
@@ -144,14 +142,23 @@ function analyzeCard(sections: CardSection[], profile: any, avatarUrl: string | 
 
   // Testimonials
   const testimonials = sections.find(s => s.id === "testimonials");
-  if (!testimonials?.enabled) {
+  if (!testimonials?.enabled || !testimonials.content?.testimonials?.some((item: any) => item.name?.trim() && item.text?.trim())) {
     issues.push({
       id: "testimonials-disabled",
       title: "Add testimonials",
-      description: "Social proof increases conversions. Even 1–2 reviews make a difference.",
+      description: "Add a real customer's name and review.",
       priority: "low",
       icon: MessageSquare,
-      action: { label: "Enable", sectionId: "testimonials", enableSection: true },
+      action: { label: testimonials?.enabled ? "Edit" : "Enable", sectionId: "testimonials", enableSection: !testimonials?.enabled },
+    });
+  }
+
+  const gallery = sections.find(s => s.id === "gallery");
+  if (!gallery?.enabled || !gallery.content?.images?.some((image: any) => image.url?.trim())) {
+    issues.push({
+      id: "gallery-empty", title: "Add gallery photos", description: "Show photos of your work.",
+      priority: "low", icon: Image,
+      action: { label: gallery?.enabled ? "Edit" : "Enable", sectionId: "gallery", enableSection: !gallery?.enabled },
     });
   }
 
@@ -176,10 +183,7 @@ export default function ImproveMyCard({
   sections, profile, avatarUrl, coverUrl,
   onToggleSection, onSectionContentSave, onScrollToSection,
 }: Props) {
-  const { data: aiData, isLoading: aiLoading, isFetching } = useAICardOptimizer();
-  const queryClient = useQueryClient();
   const [expanded, setExpanded] = useState(true);
-  const [appliedIds, setAppliedIds] = useState<Set<string>>(new Set());
 
   const localIssues = useMemo(
     () => analyzeCard(sections, profile, avatarUrl, coverUrl),
@@ -190,36 +194,18 @@ export default function ImproveMyCard({
   const allSuggestions = useMemo(() => {
     const items: (LocalIssue & { source: "local" | "ai" })[] = localIssues.map(i => ({ ...i, source: "local" as const }));
 
-    if (aiData?.suggestions) {
-      for (const s of aiData.suggestions) {
-        // Skip if local already covers it
-        const sectionId = s.section?.toLowerCase();
-        if (localIssues.some(l => l.action?.sectionId === sectionId)) continue;
-        items.push({
-          id: `ai-${s.title.slice(0, 20)}`,
-          title: s.title,
-          description: s.description,
-          priority: s.priority as "high" | "medium" | "low",
-          icon: TrendingUp,
-          source: "ai",
-          action: sectionId ? { label: "View", sectionId } : undefined,
-        });
-      }
-    }
-
     // Sort: high > medium > low, unapplied first
     const order = { high: 0, medium: 1, low: 2 };
     return items
-      .filter(i => !appliedIds.has(i.id))
       .sort((a, b) => order[a.priority] - order[b.priority]);
-  }, [localIssues, aiData, appliedIds]);
+  }, [localIssues]);
 
   // Score: 100 - (issues * weight)
   const score = useMemo(() => {
     const weights = { high: 15, medium: 8, low: 4 };
     const penalty = allSuggestions.reduce((sum, s) => sum + weights[s.priority], 0);
-    return Math.max(0, Math.min(100, aiData?.overall_score ?? Math.max(20, 100 - penalty)));
-  }, [allSuggestions, aiData]);
+    return Math.max(0, Math.min(100, 100 - penalty));
+  }, [allSuggestions]);
 
   const handleApply = (item: LocalIssue & { source: string }) => {
     if (item.action?.enableSection && item.action.sectionId) {
@@ -231,7 +217,6 @@ export default function ImproveMyCard({
     if (item.action?.sectionId) {
       onScrollToSection?.(item.action.sectionId);
     }
-    setAppliedIds(prev => new Set([...prev, item.id]));
   };
 
   const highCount = allSuggestions.filter(s => s.priority === "high").length;
@@ -263,18 +248,6 @@ export default function ImproveMyCard({
             {allSuggestions.length === 0 ? "Your card looks great!" : `${allSuggestions.length} improvement${allSuggestions.length !== 1 ? "s" : ""} found`}
           </p>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-6 w-6 p-0 shrink-0"
-          disabled={isFetching}
-          onClick={(e) => {
-            e.stopPropagation();
-            queryClient.invalidateQueries({ queryKey: ["ai-card-optimizer"] });
-          }}
-        >
-          <RefreshCw className={`h-3 w-3 ${isFetching ? "animate-spin" : ""}`} />
-        </Button>
         {expanded ? <ChevronUp className="h-3 w-3 text-muted-foreground" /> : <ChevronDown className="h-3 w-3 text-muted-foreground" />}
       </button>
 
@@ -303,12 +276,6 @@ export default function ImproveMyCard({
               </div>
 
               {/* Loading state */}
-              {aiLoading && (
-                <div className="flex items-center gap-2 py-2">
-                  <Loader2 className="h-3 w-3 animate-spin text-primary" />
-                  <span className="text-[10px] text-muted-foreground">Analyzing your card…</span>
-                </div>
-              )}
 
               {/* Suggestion list */}
               <div className="space-y-1.5 max-h-[320px] overflow-y-auto scrollbar-thin">
@@ -358,7 +325,7 @@ export default function ImproveMyCard({
                 })}
               </div>
 
-              {allSuggestions.length === 0 && !aiLoading && (
+              {allSuggestions.length === 0 && (
                 <div className="text-center py-3">
                   <Check className="h-5 w-5 text-green-500 mx-auto mb-1" />
                   <p className="text-[11px] font-medium text-green-600">Your card is optimized!</p>

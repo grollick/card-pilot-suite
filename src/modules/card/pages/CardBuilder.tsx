@@ -9,7 +9,6 @@ import DesktopGuidanceNotice from "@/components/DesktopGuidanceNotice";
 import BlockMarketplaceDialog from "@/modules/card/components/BlockMarketplaceDialog";
 import { canAccessBlock, type MarketplaceBlock } from "@/lib/blockMarketplace";
 import AIDesignAssistantDialog, { type AICardResult } from "@/modules/card/components/AIDesignAssistantDialog";
-import ConversionTips from "@/modules/card/components/ConversionTips";
 import ImproveMyCard from "@/modules/card/components/ImproveMyCard";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -481,7 +480,6 @@ export default function CardBuilder() {
         </div>
       </PanelSection>
 
-      <ConversionTips sections={s.sections} />
       <ImproveMyCard
         sections={s.sections}
         profile={s.profile}

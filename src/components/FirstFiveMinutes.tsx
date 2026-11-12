@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useProfileCache } from "@/hooks/useProfileCache";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +19,7 @@ export default function FirstFiveMinutes() {
   const { user } = useAuth();
   const { data: profile } = useProfileCache();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState<FlowStep>("card-live");
   const [visible, setVisible] = useState(false);
@@ -32,11 +33,15 @@ export default function FirstFiveMinutes() {
 
   // Show only for freshly onboarded users who haven't done the tour
   useEffect(() => {
+    if (pathname !== "/app") {
+      setVisible(false);
+      return;
+    }
     if (onboardingCompleted && !tourCompleted && !dismissed) {
       const t = setTimeout(() => setVisible(true), 800);
       return () => clearTimeout(t);
     }
-  }, [onboardingCompleted, tourCompleted, dismissed]);
+  }, [onboardingCompleted, tourCompleted, dismissed, pathname]);
 
   const completeFlow = useCallback(async () => {
     setVisible(false);
@@ -86,7 +91,7 @@ export default function FirstFiveMinutes() {
   const stepIndex = STEPS.indexOf(currentStep);
   const progress = ((stepIndex + 1) / STEPS.length) * 100;
 
-  if (!visible) return null;
+  if (!visible || pathname !== "/app") return null;
 
   return (
     <AnimatePresence>
