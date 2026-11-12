@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 interface Props {
   company: string;
   onNext: () => void;
+  onDashboard: () => void;
+  cardUrl: string;
 }
 
-export default function StepYoureLive({ company, onNext }: Props) {
+export default function StepYoureLive({ company, onNext, onDashboard, cardUrl }: Props) {
   return (
     <motion.div
       key="youre-live"
@@ -124,13 +126,11 @@ export default function StepYoureLive({ company, onNext }: Props) {
           </ul>
         </div>
 
-        <Button onClick={onNext} size="lg" className="w-full h-12 text-base font-semibold gap-2">
-          Turn On Duty <ArrowRight className="h-5 w-5" />
+        <Button onClick={onDashboard} size="lg" className="w-full h-12 text-base font-semibold gap-2">
+          Go to my dashboard <ArrowRight className="h-5 w-5" />
         </Button>
-
-        <p className="text-[11px] text-muted-foreground">
-          Go on duty to start receiving leads immediately
-        </p>
+        <Button variant="outline" className="w-full" asChild><a href={cardUrl} target="_blank" rel="noreferrer">View my card</a></Button>
+        <Button variant="ghost" size="sm" onClick={onNext}>Turn On Duty</Button>
       </motion.div>
     </motion.div>
   );

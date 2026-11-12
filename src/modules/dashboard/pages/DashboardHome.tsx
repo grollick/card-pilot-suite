@@ -25,6 +25,9 @@ import SecondSessionBanner from "@/modules/dashboard/components/SecondSessionBan
 import Week1RetentionWidget from "@/modules/dashboard/components/Week1RetentionWidget";
 import DashboardHeroHeader from "@/modules/dashboard/components/DashboardHeroHeader";
 import DashboardOpportunityAlert from "@/modules/dashboard/components/DashboardOpportunityAlert";
+import ShareCardWidget from "@/modules/dashboard/components/ShareCardWidget";
+import TodaysSchedule from "@/modules/dashboard/components/TodaysSchedule";
+import { useShowAllTools } from "@/hooks/useShowAllTools";
 import {
   Pencil, UserPlus, CalendarPlus, ExternalLink,
   Zap, Sparkles, Bell, Store, Globe,
@@ -51,6 +54,7 @@ const WIDGET_COMPONENTS: Record<string, React.ComponentType<any>> = {
 
 export default function DashboardHome() {
   const isMobile = useIsMobile();
+  const [showAllTools] = useShowAllTools();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: profile } = useProfileCache();
@@ -89,11 +93,11 @@ export default function DashboardHome() {
     >
       {/* System widgets (always render, not layout-controlled) */}
       <ReferralActivationChecker />
-      <SecondSessionBanner />
-      <Week1RetentionWidget />
+      {showAllTools && <SecondSessionBanner />}
+      {showAllTools && <Week1RetentionWidget />}
 
       {/* Layout toolbar */}
-      <DashboardLayoutToolbar
+      {showAllTools && <DashboardLayoutToolbar
         widgets={widgets}
         isEditing={isEditing}
         onToggleEdit={() => setIsEditing(!isEditing)}
@@ -101,12 +105,12 @@ export default function DashboardHome() {
         onCycleSize={cycleSize}
         onMove={moveWidget}
         onReset={resetLayout}
-      />
+      />}
 
       {/* Dynamic widget grid */}
       <div className="grid grid-cols-12 gap-4">
         {widgets
-          .filter(w => w.visible)
+          .filter(w => w.visible && (showAllTools || ["hero-header", "kpi-cards", "first-lead-assistant", "activity-feed"].includes(w.id)))
           .map(widget => {
             const content = renderWidget(widget.id);
             if (!content) return null;
@@ -117,13 +121,14 @@ export default function DashboardHome() {
             );
           })}
       </div>
+      {!showAllTools && <><ShareCardWidget /><TodaysSchedule /></>}
 
       {/* Mobile floating buttons */}
-      {isMobile && <MobileJobDashboard />}
-      {isMobile && <MobileQuickCreate />}
+      {showAllTools && isMobile && <MobileJobDashboard />}
+      {showAllTools && isMobile && <MobileQuickCreate />}
 
       {/* AI Business Assistant (floating) */}
-      <AIBusinessAssistant />
+      {showAllTools && <AIBusinessAssistant />}
     </motion.div>
   );
 }

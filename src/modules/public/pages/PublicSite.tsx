@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
+import { formatServicePrice, formatServiceDuration } from "@/lib/serviceDisplay";
 
 const NAV_ITEMS = [
   { id: "home", label: "Home", hash: "" },
@@ -252,13 +253,13 @@ export default function PublicSite() {
                         )}
                         <div className="flex items-center justify-between mt-auto pt-4 border-t border-border/40">
                           <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                            {svc.price != null && (
+                            {formatServicePrice(svc.price) && (
                               <span className="flex items-center gap-1 font-semibold text-foreground">
-                                <DollarSign className="h-3.5 w-3.5" />{svc.price}
+                                {formatServicePrice(svc.price)}
                               </span>
                             )}
                             <span className="flex items-center gap-1">
-                              <Clock className="h-3.5 w-3.5" />{svc.duration_min} min
+                              <Clock className="h-3.5 w-3.5" />{formatServiceDuration(svc.duration_min)}
                             </span>
                           </div>
                           <Button size="sm" variant="outline" asChild>

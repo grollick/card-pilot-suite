@@ -1,11 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -16,9 +11,10 @@ serve(async (req) => {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("Missing authorization");
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+    if (!supabaseUrl || !serviceKey || !anonKey) throw new Error("Missing server configuration");
 
     // Validate user
     const userClient = createClient(supabaseUrl, anonKey, {
@@ -45,6 +41,14 @@ serve(async (req) => {
     }
 
     if (action === "record_signup") {
+      // Only the authenticated account can receive its own welcome message.
+      if (user.email && user.email_confirmed_at) {
+        const { error: welcomeError } = await sb.functions.invoke("send-transactional-email", {
+          headers: { Authorization: `Bearer ${serviceKey}`, "x-internal-service-key": serviceKey },
+          body: { templateName: "welcome", recipientEmail: user.email, idempotencyKey: `welcome-${user.id}`, templateData: { name: user.user_metadata?.name || "" } },
+        });
+        if (welcomeError) console.error("Welcome email could not be queued");
+      }
       // Called after signup to create a referral record
       const referredBy = user.user_metadata?.referred_by;
       if (!referredBy) {

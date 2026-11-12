@@ -4,6 +4,7 @@ import { Search, BookOpen, Users, Calendar, Rocket, TrendingUp, ChevronRight, Pl
 import { Input } from "@/components/ui/input";
 import { motion } from "framer-motion";
 import HelpVideoCard from "@/components/HelpVideoCard";
+import { Button } from "@/components/ui/button";
 
 interface HelpSection {
   id: string;
@@ -135,6 +136,7 @@ export default function HelpCenter() {
       </div>
 
       {/* Search */}
+      <Button variant="outline" onClick={() => window.dispatchEvent(new Event("guzzl:start-product-tour"))}><PlayCircle className="h-4 w-4 mr-2" />Start product tour</Button>
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input

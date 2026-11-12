@@ -154,7 +154,7 @@ export default function StepCardPreview({ name, company, phone, city, tagline, s
             <div>
               <p className="font-bold text-base text-foreground">{name || "Your Name"}</p>
               {tagline && <p className="text-xs text-primary font-medium mt-0.5">{tagline}</p>}
-              {company && <p className="text-sm text-muted-foreground">{company}</p>}
+              {company && company.trim().toLowerCase() !== name.trim().toLowerCase() && <p className="text-sm text-muted-foreground">{company}</p>}
             </div>
             <div className="flex flex-wrap gap-1">
               {city && <span className="text-[11px] text-muted-foreground flex items-center gap-0.5">📍 {city}</span>}

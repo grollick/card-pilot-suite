@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import { useRecentActivity } from "@/hooks/useDashboardStats";
 import { formatDistanceToNow } from "date-fns";
+import { useShowAllTools } from "@/hooks/useShowAllTools";
 
 const feedIcons: Record<string, typeof UserPlus> = {
   lead: UserPlus,
@@ -21,6 +22,7 @@ const feedStyles: Record<string, { bg: string; text: string }> = {
 
 export default function DashboardActivityFeed() {
   const navigate = useNavigate();
+  const [showAllTools] = useShowAllTools();
   const { data: feed = [], isLoading } = useRecentActivity();
 
   return (
@@ -32,7 +34,7 @@ export default function DashboardActivityFeed() {
     >
       <div className="px-5 pt-5 pb-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h2 className="font-semibold text-sm text-foreground">Activity Feed</h2>
+          <h2 className="font-semibold text-sm text-foreground">{showAllTools ? "Activity Feed" : "Recent Contacts"}</h2>
           <div className="h-2 w-2 rounded-full bg-success animate-pulse" />
         </div>
         <Badge variant="secondary" className="text-[10px] font-medium px-2 py-0.5 rounded-full">
@@ -64,7 +66,7 @@ export default function DashboardActivityFeed() {
           </div>
         ) : (
           <div className="space-y-0.5">
-            {feed.map((item, idx) => {
+            {feed.filter(item => showAllTools || item.type === "lead").map((item, idx) => {
               const Icon = feedIcons[item.type] ?? FileText;
               const style = feedStyles[item.type] ?? { bg: "bg-muted", text: "text-muted-foreground" };
               return (

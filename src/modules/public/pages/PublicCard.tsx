@@ -63,6 +63,9 @@ import ScanToSaveWidget from "@/modules/card/components/ScanToSaveWidget";
 import { getHeroBackgroundForProfession, getHeroBackgroundById } from "@/lib/heroBackgrounds";
 import { showsBranding } from "@/lib/plans";
 import ModernCardLayout from "@/modules/card/components/ModernCardLayout";
+import { Helmet } from "react-helmet-async";
+import { getVerificationLevel } from "@/components/trust/VerificationBadge";
+import { formatServicePrice, formatServiceDuration } from "@/lib/serviceDisplay";
 
 // ── Visitor meta for analytics ──
 function getVisitorMeta() {
@@ -281,7 +284,7 @@ export default function PublicCard() {
   const enabledSections = new Set(sections.filter((s) => s.enabled).map((s) => s.id));
   if (!data?.hasAvailability) enabledSections.delete("booking");
   const sectionContent = (id: string) => sections.find((s) => s.id === id)?.content as Record<string, any> | undefined;
-  const professionName = (profile as any)?.professions?.name ?? "Professional";
+  const professionName = (profile as any)?.professions?.name ?? profile.company ?? "Professional";
   const cardUrl = `${window.location.origin}/${handle}`;
   const themeJson = (card?.theme_json ?? {}) as Record<string, any>;
   const displayJobTitle = (themeJson.job_title as string) || professionName;
@@ -442,10 +445,12 @@ export default function PublicCard() {
   };
 
   const isModernLayout = (themeJson as any).cardLayout === "modern";
+  const cardMetadata = <Helmet><title>{`${profile.name || "Professional"} | ${professionName || profile.company || "Local service pro"} | guzzl.pro`}</title><meta name="description" content={String(sectionContent("hero")?.tagline || themeJson.tagline || "")} /></Helmet>;
 
   if (isModernLayout) {
     return (
       <>
+        {cardMetadata}
         <ModernCardLayout
           profile={profile}
           card={card}
@@ -525,6 +530,7 @@ export default function PublicCard() {
       className="min-h-screen flex items-start justify-center p-4 py-8"
       style={{ background: `linear-gradient(135deg, ${palette.primary}08, ${palette.accent}06, ${palette.background})` }}
     >
+      {cardMetadata}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -708,7 +714,7 @@ export default function PublicCard() {
                     heroBackground={resolvedHeroBackground}
                     ctaChildren={heroCtaButtons}
                     glassHero={theme.section.cardStyle === "glass"}
-                    verificationLevel={profile.verification_level as any}
+                    verificationLevel={getVerificationLevel(profile)}
                     isAvailable={profile.is_on_duty === true}
                   />
                 </div>
@@ -859,7 +865,7 @@ export default function PublicCard() {
                 <SectionTitle id="services" label="Services" />
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                   {hasCardServices
-                    ? cardServices!.filter((s) => s.name).map((s, i) => (
+                    ? (cardServices ?? []).filter((s) => s.name).map((s, i) => (
                         <motion.div
                           key={i}
                           style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 10px", borderRadius: radii.button, cursor: "default" }}
@@ -872,8 +878,8 @@ export default function PublicCard() {
                               <p style={{ fontSize: 12, color: palette.secondary, margin: "4px 0 0", opacity: 0.8 }}>{s.description}</p>
                             )}
                           </div>
-                          {s.price && (
-                            <span style={{ fontSize: 13, color: palette.secondary, fontWeight: 500 }}>{s.price}</span>
+                          {formatServicePrice(s.price) && (
+                            <span style={{ fontSize: 13, color: palette.secondary, fontWeight: 500 }}>{formatServicePrice(s.price)}</span>
                           )}
                         </motion.div>
                       ))
@@ -885,8 +891,9 @@ export default function PublicCard() {
                           transition={{ duration: 0.15 }}
                         >
                           <span style={{ fontSize: 14, fontWeight: 500, color: palette.primary }}>{s.name}</span>
-                          {s.price != null && (
-                            <span style={{ fontSize: 13, color: palette.secondary }}>${Number(s.price).toFixed(0)}</span>
+                          <span className="text-xs text-muted-foreground">{formatServiceDuration(s.duration_min)}</span>
+                          {formatServicePrice(s.price) && (
+                            <span style={{ fontSize: 13, color: palette.secondary }}>{formatServicePrice(s.price)}</span>
                           )}
                         </motion.div>
                       ))

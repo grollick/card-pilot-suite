@@ -72,7 +72,7 @@ export default function ProductTour() {
       await supabase
         .from("profiles")
         .update({ tour_completed: true } as any)
-        .eq("id", user!.id);
+        .eq("id", user?.id ?? "");
     },
     onSuccess: () => {
       queryClient.setQueryData(["tour-completed", user?.id], true);
@@ -80,15 +80,10 @@ export default function ProductTour() {
   });
 
   useEffect(() => {
-    if (isAdminPage || !isDashboardHome) {
-      setIsVisible(false);
-      return;
-    }
-    if (tourCompleted === false) {
-      const timer = setTimeout(() => setIsVisible(true), 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [tourCompleted, isAdminPage, isDashboardHome]);
+    const start = () => { setCurrentStep(0); setIsVisible(true); };
+    window.addEventListener("guzzl:start-product-tour", start);
+    return () => window.removeEventListener("guzzl:start-product-tour", start);
+  }, []);
 
   const handleNext = useCallback(() => {
     if (currentStep < TOUR_STEPS.length - 1) {

@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { usePublicBookingData } from "@/hooks/useBookings";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { formatServicePrice, formatServiceDuration } from "@/lib/serviceDisplay";
 
 function generateICS(
   name: string,
@@ -231,12 +232,8 @@ export default function PublicBooking() {
                         <p className="font-medium text-sm">{s.name}</p>
                         {s.description && <p className="text-xs text-muted-foreground mt-0.5">{s.description}</p>}
                         <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{s.duration_min} min</span>
-                          {s.price != null ? (
-                            <span className="font-medium text-foreground">${Number(s.price).toFixed(0)}</span>
-                          ) : (
-                            <span className="text-[hsl(var(--success))]">Free</span>
-                          )}
+                          <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatServiceDuration(s.duration_min)}</span>
+                          {formatServicePrice(s.price) && <span className="font-medium text-foreground">{formatServicePrice(s.price)}</span>}
                         </div>
                       </button>
                     ))

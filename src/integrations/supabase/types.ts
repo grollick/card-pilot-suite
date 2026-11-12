@@ -5891,6 +5891,7 @@ export type Database = {
         Row: {
           category: string
           created_at: string
+          created_by: string | null
           default_booking_services: Json
           default_card_sections: Json
           default_email_templates: Json
@@ -5901,6 +5902,7 @@ export type Database = {
         Insert: {
           category: string
           created_at?: string
+          created_by?: string | null
           default_booking_services?: Json
           default_card_sections?: Json
           default_email_templates?: Json
@@ -5911,6 +5913,7 @@ export type Database = {
         Update: {
           category?: string
           created_at?: string
+          created_by?: string | null
           default_booking_services?: Json
           default_card_sections?: Json
           default_email_templates?: Json

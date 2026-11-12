@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { UserPlus, CalendarCheck, DollarSign, Percent, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { Eye, UserPlus, CalendarCheck, DollarSign, Percent, TrendingUp, TrendingDown, Minus } from "lucide-react";
+import { useShowAllTools } from "@/hooks/useShowAllTools";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useBusinessPerformance } from "@/hooks/useBusinessPerformance";
 
@@ -47,9 +48,11 @@ function TrendBadge({ value }: { value: number }) {
 
 export default function RevenueKPICards() {
   const navigate = useNavigate();
+  const [showAllTools] = useShowAllTools();
   const { data, isLoading } = useBusinessPerformance();
 
   const kpis = [
+    ...(!showAllTools ? [{ label: "Views", value: data?.views ?? 0, icon: Eye, trend: data?.trends?.views ?? 0, iconBg: "bg-primary/10", iconColor: "text-primary", borderAccent: "hover:border-primary/30", route: "/app/analytics" }] : []),
     {
       label: "Leads",
       value: data?.leads ?? 0,
@@ -95,8 +98,8 @@ export default function RevenueKPICards() {
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      {kpis.map((kpi, idx) => (
+    <div className={`grid grid-cols-2 ${showAllTools ? "lg:grid-cols-4" : "lg:grid-cols-3"} gap-4`}>
+      {kpis.filter(kpi => showAllTools || ["Views", "Leads", "Bookings"].includes(kpi.label)).map((kpi, idx) => (
         <motion.div
           key={kpi.label}
           initial={{ opacity: 0, y: 20 }}

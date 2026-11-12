@@ -77,7 +77,7 @@ function TimeRemaining({ deadline }: { deadline: string }) {
   return (
     <div className="space-y-1.5">
       <div className="flex justify-between text-xs">
-        <span className="text-muted-foreground">Time remaining</span>
+        <span className="text-muted-foreground">Sample lead in</span>
         <span className="font-medium tabular-nums">
           {hoursLeft}h {minutesLeft}m left
         </span>
@@ -88,7 +88,7 @@ function TimeRemaining({ deadline }: { deadline: string }) {
 }
 
 const MILESTONES = [
-  { key: "activated", label: "Guarantee activated", icon: Sparkles },
+  { key: "activated", label: "Card ready", icon: Sparkles },
   { key: "lead", label: "First lead delivered", icon: Zap },
   { key: "responded", label: "First response sent", icon: MessageSquare },
 ];
@@ -102,7 +102,7 @@ export default function FirstLeadGuaranteeWidget() {
 
   // Don't show if responded or expired > 48 hours ago
   if (guarantee.status === "responded") {
-    const respondedAge = Date.now() - new Date(guarantee.first_response_at!).getTime();
+    const respondedAge = Date.now() - new Date(guarantee.first_response_at ?? guarantee.deadline_at).getTime();
     if (respondedAge > 48 * 60 * 60 * 1000) return null;
   }
   if (guarantee.status === "expired") {
@@ -118,30 +118,10 @@ export default function FirstLeadGuaranteeWidget() {
   if (guarantee.first_lead_at) completedMilestones.add("lead");
   if (guarantee.first_response_at) completedMilestones.add("responded");
 
-  const statusMessages: Record<string, { title: string; subtitle: string }> = {
-    monitoring: {
-      title: "We're helping you get your first opportunity",
-      subtitle: "Our system is actively looking for leads and requests in your area. Make sure your card is published!",
-    },
-    matched: {
-      title: "You've been matched with a real opportunity!",
-      subtitle: "Check your contacts to see the new lead and respond quickly to make a great first impression.",
-    },
-    test_delivered: {
-      title: "Your first practice lead is ready!",
-      subtitle: "We've delivered a demo lead so you can try out the response workflow. Give it a try!",
-    },
-    responded: {
-      title: "Amazing! You responded to your first lead 🎉",
-      subtitle: "You've completed the First Lead Guarantee. Keep up the momentum!",
-    },
-    expired: {
-      title: "Your 24-hour window has ended",
-      subtitle: "Don't worry — leads will keep coming. Make sure your card is published and shared.",
-    },
+  const msg = {
+    title: "Your first lead",
+    subtitle: "Share your card to get your first real lead. If nothing comes in within 24 hours, we'll add a sample lead to your Contacts so you can practise replying.",
   };
-
-  const msg = statusMessages[guarantee.status];
 
   return (
     <motion.div
@@ -169,16 +149,6 @@ export default function FirstLeadGuaranteeWidget() {
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <h3 className="text-sm font-semibold">{msg.title}</h3>
-              {guarantee.status === "monitoring" && (
-                <motion.div
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="flex items-center gap-1 text-[10px] text-primary font-medium"
-                >
-                  <Loader2 className="h-2.5 w-2.5 animate-spin" />
-                  Active
-                </motion.div>
-              )}
             </div>
             <p className="text-xs text-muted-foreground mt-0.5">{msg.subtitle}</p>
           </div>
@@ -253,7 +223,7 @@ export default function FirstLeadGuaranteeWidget() {
                 onClick={() => navigate("/app/card")}
               >
                 <Sparkles className="h-3.5 w-3.5" />
-                Make sure your card is ready
+                Share your card
                 <ArrowRight className="h-3 w-3" />
               </Button>
             </motion.div>

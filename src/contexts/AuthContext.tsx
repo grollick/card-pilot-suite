@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const utmCampaign = urlParams.get("utm_campaign") || "";
     const utmMedium = urlParams.get("utm_medium") || "";
 
-    const { data: signUpData, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -74,18 +74,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         data: { name: name || "", referred_by: referralCode || "", signup_source: signupSource, signup_utm_campaign: utmCampaign, signup_utm_medium: utmMedium },
       },
     });
-
-    // Fire welcome email (non-blocking)
-    if (!error && signUpData?.user) {
-      supabase.functions.invoke("send-transactional-email", {
-        body: {
-          templateName: "welcome",
-          recipientEmail: email,
-          idempotencyKey: `welcome-${signUpData.user.id}`,
-          templateData: { name: name || "" },
-        },
-      }).catch(() => {});
-    }
 
     return { error: error as Error | null };
   }, []);

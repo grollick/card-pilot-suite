@@ -17,7 +17,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { AvailableNowBadge, ResponseSpeedBadge, RecentViewsBadge } from "@/components/activity/LiveActivityIndicators";
-import VerificationBadge from "@/components/trust/VerificationBadge";
+import VerificationBadge, { getVerificationLevel } from "@/components/trust/VerificationBadge";
+import { formatServicePrice, formatServiceDuration } from "@/lib/serviceDisplay";
 import QRShareDialog from "@/modules/card/components/QRShareDialog";
 import NFCShareDialog from "@/modules/card/components/NFCShareDialog";
 import WalletPassDialog from "@/modules/card/components/WalletPassDialog";
@@ -176,7 +177,7 @@ export default function ModernCardLayout({
   const cardServices = sectionContent("services")?.items as { name: string; description?: string; price?: string }[] | undefined;
   const displayServices = (cardServices && cardServices.length > 0)
     ? cardServices.filter(s => s.name)
-    : services.map(s => ({ name: s.name, price: s.price != null ? `$${Number(s.price).toFixed(0)}` : undefined, description: s.description }));
+    : services.map(s => ({ name: s.name, price: s.price, duration_min: s.duration_min, description: s.description }));
 
   // Social links
   const socialLinks = sectionContent("social")?.links as { platform: string; url: string }[] | undefined;
@@ -230,7 +231,7 @@ export default function ModernCardLayout({
 
             {/* Trust badges in cover — certificate-style overlay */}
             <div className="absolute bottom-2 right-2 flex items-center gap-2 z-10">
-              {profile.is_verified && (
+              {getVerificationLevel(profile) !== "basic" && (
                 <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/85 px-2.5 py-1 shadow-lg backdrop-blur-md">
                   <span className="relative flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary ring-1 ring-primary/15">
                     <ShieldCheck className="h-3 w-3" />
@@ -276,7 +277,7 @@ export default function ModernCardLayout({
 
             <div className="pt-10">
               <h1 className="text-xl font-extrabold text-foreground">{profile.name || "Your Name"}</h1>
-              <p className="text-sm text-muted-foreground font-medium">{profile.company}</p>
+              {profile.company?.trim().toLowerCase() !== profile.name?.trim().toLowerCase() && <p className="text-sm text-muted-foreground font-medium">{profile.company}</p>}
               <p className="text-sm mt-1 font-medium" style={{ color: palette.primary }}>
                 {displayJobTitle}
               </p>
@@ -388,9 +389,10 @@ export default function ModernCardLayout({
                       <p className="text-xs text-muted-foreground mt-0.5">{s.description}</p>
                     )}
                   </div>
-                  {s.price && (
+                  {s.duration_min && <span className="text-xs text-muted-foreground ml-2">{formatServiceDuration(s.duration_min)}</span>}
+                  {formatServicePrice(s.price) && (
                     <Badge variant="secondary" className="text-xs font-bold shrink-0 ml-3">
-                      {s.price}
+                      {formatServicePrice(s.price)}
                     </Badge>
                   )}
                 </motion.div>

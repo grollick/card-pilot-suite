@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import { useProfileCache } from "@/hooks/useProfileCache";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -100,6 +101,11 @@ export default function Onboarding() {
   const [bookingEnabled, setBookingEnabled] = useState(false);
   const [saving, setSaving] = useState(false);
   const [launched, setLaunched] = useState(false);
+  const [publishedHandle, setPublishedHandle] = useState("");
+  const { data: existingProfile } = useProfileCache();
+  useEffect(() => {
+    if (existingProfile?.onboarding_completed && !launched) navigate("/app", { replace: true });
+  }, [existingProfile?.onboarding_completed, launched, navigate]);
   const [socialLinks, setSocialLinks] = useState<{ platform: string; url: string }[]>([]);
 
   // AI state
@@ -107,11 +113,11 @@ export default function Onboarding() {
   const [aiLoading, setAiLoading] = useState(false);
 
   const { data: professions = [] } = useQuery({
-    queryKey: ["professions"],
+    queryKey: ["professions", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase.from("professions").select("*").order("category").order("name");
       if (error) throw error;
-      return data as Profession[];
+      return (data ?? []).filter(p => (Array.isArray(p.default_card_sections) && p.default_card_sections.length > 0) || (Boolean(user?.id) && p.created_by === user?.id)) as Profession[];
     },
   });
 
@@ -216,6 +222,7 @@ export default function Onboarding() {
 
     try {
       const handle = generateHandle(company || user.email || "user");
+      setPublishedHandle(handle);
       const packKey = pickStylePackKey("Modern", categoryKey);
 
       const { error: profileErr } = await supabase.from("profiles").update({
@@ -330,6 +337,7 @@ export default function Onboarding() {
 
       await queryClient.invalidateQueries({ queryKey: ["profile-onboarding"] });
       setLaunched(true);
+      await queryClient.invalidateQueries({ queryKey: ["profile-cache", user.id] });
 
       // Record referral signup
       try {
@@ -345,7 +353,7 @@ export default function Onboarding() {
     }
   };
 
-  const handle = (company || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+  const handle = publishedHandle || (company || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
   const cardUrl = `${window.location.origin}/${handle}`;
   const shareMessage = `Hey! I just set up my digital business card — check it out and let me know if you ever need ${selectedProfession?.name?.toLowerCase() || "my"} services: ${cardUrl}`;
 
@@ -419,6 +427,7 @@ export default function Onboarding() {
                       .from("professions")
                       .insert({
                         name: customName,
+                        created_by: user?.id,
                         category: "Other",
                         default_card_sections: [],
                         default_pipeline_stages: [],
@@ -510,7 +519,9 @@ export default function Onboarding() {
             {step === 7 && (
               <StepYoureLive
                 company={company}
-                onNext={() => setStep(8)}
+                cardUrl={cardUrl}
+                onDashboard={() => navigate("/app")}
+                onNext={() => navigate("/app/duty")}
               />
             )}
 

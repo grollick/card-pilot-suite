@@ -86,28 +86,6 @@ export function getVerificationLevel(profile: {
   trust_score?: number | null;
   verification_level?: string | null;
 }, stats?: { leadCount?: number; bookingCount?: number; hasCard?: boolean }): VerificationLevel {
-  if (profile.verification_level && profile.verification_level !== "basic") {
-    return profile.verification_level as VerificationLevel;
-  }
-
-  const hasProfile = !!profile.name && !!profile.profession_id;
-  const hasActivity = (stats?.leadCount ?? 0) >= 1 || (stats?.bookingCount ?? 0) >= 1;
-  const trustScore = profile.trust_score ?? 0;
-
-  if (
-    trustScore >= 60 &&
-    hasProfile &&
-    !!profile.phone &&
-    !!profile.avatar_url &&
-    stats?.hasCard &&
-    ((stats?.leadCount ?? 0) >= 5 || (stats?.bookingCount ?? 0) >= 3)
-  ) {
-    return "pro_verified";
-  }
-
-  if (hasProfile && hasActivity) {
-    return "verified";
-  }
-
-  return "basic";
+  return profile.verification_level === "verified" || profile.verification_level === "pro_verified"
+    ? profile.verification_level : "basic";
 }
