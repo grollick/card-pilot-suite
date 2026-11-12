@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { calculateInvoiceTotals } from "@/lib/invoiceTotals";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft, Save, Send, CheckCircle, Loader2, Plus, Trash2,
@@ -69,7 +70,7 @@ export default function InvoiceDetailPage() {
       setDueDate(invoice.due_date || "");
       setNotes(invoice.notes || "");
       setTerms(invoice.terms || "");
-      setTaxPercent(Number(invoice.tax_total) || 0);
+      setTaxPercent(Number((invoice as any).tax_percent) || 0);
       setDiscountAmount(Number(invoice.discount_amount) || 0);
     }
   }, [invoice]);
@@ -88,18 +89,12 @@ export default function InvoiceDetailPage() {
     }
   }, [existingItems]);
 
-  const subtotal = useMemo(
-    () => items.reduce((sum, li) => sum + li.line_total, 0),
-    [items]
+  const totals = useMemo(
+    () => calculateInvoiceTotals({ lineTotals: items.map((li) => li.line_total), taxPercent, discountAmount }),
+    [items, taxPercent, discountAmount]
   );
-  const taxTotal = useMemo(
-    () => subtotal * (taxPercent / 100),
-    [subtotal, taxPercent]
-  );
-  const grandTotal = useMemo(
-    () => Math.max(0, subtotal + taxTotal - discountAmount),
-    [subtotal, taxTotal, discountAmount]
-  );
+  const { subtotal, tax: taxTotal, total: grandTotal } = totals;
+  const discountShown = totals.discount;
 
   const addItem = () =>
     setItems([...items, { title: "", quantity: 1, unit_price: 0, line_total: 0 }]);
@@ -132,7 +127,8 @@ export default function InvoiceDetailPage() {
         due_date: dueDate || undefined,
         subtotal,
         tax_total: taxTotal,
-        discount_amount: discountAmount,
+        tax_percent: taxPercent,
+        discount_amount: discountShown,
         grand_total: grandTotal,
         notes,
         terms,
@@ -147,7 +143,8 @@ export default function InvoiceDetailPage() {
         due_date: dueDate || null,
         subtotal,
         tax_total: taxTotal,
-        discount_amount: discountAmount,
+        tax_percent: taxPercent,
+        discount_amount: discountShown,
         grand_total: grandTotal,
         notes,
         terms,
@@ -510,26 +507,6 @@ export default function InvoiceDetailPage() {
 
                 <div className="flex items-center justify-between gap-2">
                   <Label className="text-xs text-muted-foreground shrink-0">
-                    Tax %
-                  </Label>
-                  <Input
-                    type="number"
-                    min={0}
-                    max={100}
-                    value={taxPercent}
-                    onChange={(e) => setTaxPercent(Number(e.target.value))}
-                    className="h-8 w-20 text-sm tabular-nums text-right"
-                  />
-                </div>
-                {taxTotal > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Tax</span>
-                    <span className="tabular-nums">+${taxTotal.toFixed(2)}</span>
-                  </div>
-                )}
-
-                <div className="flex items-center justify-between gap-2">
-                  <Label className="text-xs text-muted-foreground shrink-0">
                     Discount $
                   </Label>
                   <Input
@@ -543,12 +520,33 @@ export default function InvoiceDetailPage() {
                     className="h-8 w-20 text-sm tabular-nums text-right"
                   />
                 </div>
-                {discountAmount > 0 && (
+                {discountShown > 0 && (
                   <div className="flex justify-between text-sm text-destructive">
                     <span>Discount</span>
                     <span className="tabular-nums">
-                      -${discountAmount.toFixed(2)}
+                      -${discountShown.toFixed(2)}
                     </span>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between gap-2">
+                  <Label className="text-xs text-muted-foreground shrink-0">
+                    Tax %
+                  </Label>
+                  <Input
+                    type="number"
+                    min={0}
+                    max={100}
+                    step="0.01"
+                    value={Math.round(taxPercent * 100) / 100}
+                    onChange={(e) => setTaxPercent(Number(e.target.value))}
+                    className="h-8 w-20 text-sm tabular-nums text-right"
+                  />
+                </div>
+                {taxTotal > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Tax</span>
+                    <span className="tabular-nums">+${taxTotal.toFixed(2)}</span>
                   </div>
                 )}
 
@@ -655,7 +653,7 @@ function InvoicePaymentPanel({ invoice, invoiceId, grandTotal }: { invoice: any;
         </div>
         <div className="flex justify-between">
           <span className="text-muted-foreground">Paid</span>
-          <span className="font-medium tabular-nums text-success">${amountPaid.toFixed(2)}</span>
+          <span className="font-medium tabular-nums text-primary">${amountPaid.toFixed(2)}</span>
         </div>
         {!isPaid && remaining > 0 && (
           <div className="flex justify-between">
@@ -666,7 +664,7 @@ function InvoicePaymentPanel({ invoice, invoiceId, grandTotal }: { invoice: any;
       </div>
 
       {invoice.paid_at && (
-        <p className="text-xs text-success">
+        <p className="text-xs text-primary">
           Paid {format(new Date(invoice.paid_at), "MMM d, yyyy")}
         </p>
       )}

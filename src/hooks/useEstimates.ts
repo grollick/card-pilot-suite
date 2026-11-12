@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { createInvoiceFromEstimate } from "@/hooks/useInvoices";
 import type { CalcMode } from "@/lib/estimateCalculators";
 
 // ── Types ──
@@ -529,81 +530,7 @@ export function useConvertEstimateToInvoice() {
   const { user } = useAuth();
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async ({ estimateId }: { estimateId: string }) => {
-      // Fetch estimate with lead
-      const { data: est, error: estErr } = await supabase
-        .from("estimates")
-        .select("*, leads(name, email, phone, company)")
-        .eq("id", estimateId)
-        .single();
-      if (estErr) throw estErr;
-
-      // Fetch line items
-      const { data: items } = await supabase
-        .from("estimate_line_items")
-        .select("*")
-        .eq("estimate_id", estimateId)
-        .order("sort_order");
-
-      // Generate invoice number
-      const now = new Date();
-      const y = now.getFullYear().toString().slice(-2);
-      const m = String(now.getMonth() + 1).padStart(2, "0");
-      const rand = Math.floor(Math.random() * 9000 + 1000);
-      const invoiceNumber = `INV-${y}${m}-${rand}`;
-
-      const dueDate = new Date();
-      dueDate.setDate(dueDate.getDate() + 14);
-
-      // Create invoice
-      const { data: invoice, error: invErr } = await supabase
-        .from("invoices")
-        .insert({
-          user_id: user!.id,
-          lead_id: est.lead_id ?? null,
-          invoice_number: invoiceNumber,
-          status: "draft" as any,
-          due_date: dueDate.toISOString().split("T")[0],
-          subtotal: Number(est.subtotal ?? 0),
-          tax_total: Number(est.tax_total ?? 0),
-          discount_amount: Number(est.discount_amount ?? 0),
-          grand_total: Number(est.grand_total ?? 0),
-          notes: est.notes ?? null,
-          terms: est.terms_conditions ?? "Payment due within 14 days of invoice date.",
-        })
-        .select()
-        .single();
-      if (invErr) throw invErr;
-
-      // Copy line items
-      const lineItems = (items ?? []).map((li: any, i: number) => ({
-        invoice_id: (invoice as any).id,
-        title: li.title,
-        description: li.description || null,
-        quantity: Number(li.quantity),
-        unit_price: Number(li.unit_price),
-        line_total: Number(li.line_total),
-        sort_order: i,
-      }));
-
-      if (lineItems.length > 0) {
-        const { error: liErr } = await supabase.from("invoice_line_items").insert(lineItems);
-        if (liErr) throw liErr;
-      }
-
-      // Log CRM activity
-      if (est.lead_id) {
-        await supabase.from("contact_activities").insert({
-          lead_id: est.lead_id,
-          user_id: user!.id,
-          activity_type: "invoice_created",
-          title: `Invoice ${invoiceNumber} created from estimate ${est.estimate_number}`,
-          related_id: (invoice as any).id,
-        });
-      }
-
-      return invoice;
-    },
+    mutationFn: ({ estimateId }: { estimateId: string }) => createInvoiceFromEstimate(user!.id, estimateId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["estimates"] });
       qc.invalidateQueries({ queryKey: ["invoices"] });

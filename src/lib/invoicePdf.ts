@@ -150,8 +150,8 @@ export function exportInvoicePDF({
 
   <div class="totals">
     <div class="row muted"><span>Subtotal</span><span>${fmt(invoice.subtotal)}</span></div>
-    ${Number(invoice.tax_total) > 0 ? `<div class="row muted"><span>Tax</span><span>${fmt(invoice.tax_total)}</span></div>` : ""}
     ${Number(invoice.discount_amount) > 0 ? `<div class="row discount"><span>Discount</span><span>-${fmt(invoice.discount_amount)}</span></div>` : ""}
+    ${Number(invoice.tax_total) > 0 ? `<div class="row muted"><span>Tax</span><span>${fmt(invoice.tax_total)}</span></div>` : ""}
     <div class="row grand"><span>Total</span><span>${fmt(invoice.grand_total)}</span></div>
     ${Number(invoice.amount_paid) > 0 ? `<div class="paid"><div class="row"><span>Paid</span><span>${fmt(invoice.amount_paid)}</span></div></div>` : ""}
     ${balanceDue > 0 && balanceDue < Number(invoice.grand_total) ? `<div class="balance"><div class="row"><span>Balance Due</span><span>${fmt(balanceDue)}</span></div></div>` : ""}

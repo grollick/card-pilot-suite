@@ -141,7 +141,7 @@ export default function InvoicesPage() {
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
             Paid
           </p>
-          <p className="text-2xl font-bold tabular-nums text-success mt-1">
+          <p className="text-2xl font-bold tabular-nums text-primary mt-1">
             ${totalRevenue.toLocaleString()}
           </p>
         </div>

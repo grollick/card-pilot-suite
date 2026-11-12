@@ -144,8 +144,8 @@ export default function PublicInvoicePage() {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-success/10 border border-success/20 rounded-xl p-6 text-center"
           >
-            <CheckCircle2 className="h-12 w-12 text-success mx-auto mb-3" />
-            <h2 className="text-xl font-bold text-success">Payment Complete</h2>
+            <CheckCircle2 className="h-12 w-12 text-primary mx-auto mb-3" />
+            <h2 className="text-xl font-bold text-primary">Payment Complete</h2>
             <p className="text-sm text-muted-foreground mt-1">
               Thank you for your payment of ${grandTotal.toLocaleString()}
             </p>
@@ -230,16 +230,16 @@ export default function PublicInvoicePage() {
               <span className="text-muted-foreground">Subtotal</span>
               <span className="tabular-nums">${Number(invoice.subtotal ?? 0).toFixed(2)}</span>
             </div>
-            {Number(invoice.tax_total) > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Tax</span>
-                <span className="tabular-nums">+${Number(invoice.tax_total).toFixed(2)}</span>
-              </div>
-            )}
             {Number(invoice.discount_amount) > 0 && (
               <div className="flex justify-between text-sm text-destructive">
                 <span>Discount</span>
                 <span className="tabular-nums">-${Number(invoice.discount_amount).toFixed(2)}</span>
+              </div>
+            )}
+            {Number(invoice.tax_total) > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Tax</span>
+                <span className="tabular-nums">+${Number(invoice.tax_total).toFixed(2)}</span>
               </div>
             )}
             <Separator />
@@ -249,7 +249,7 @@ export default function PublicInvoicePage() {
             </div>
             {amountPaid > 0 && !isPaid && (
               <>
-                <div className="flex justify-between text-sm text-success">
+                <div className="flex justify-between text-sm text-primary">
                   <span>Paid</span>
                   <span className="tabular-nums">-${amountPaid.toFixed(2)}</span>
                 </div>
@@ -395,7 +395,7 @@ export default function PublicInvoicePage() {
                     {format(new Date(p.paid_at), "MMM d, yyyy 'at' h:mm a")}
                   </p>
                 </div>
-                <span className="font-semibold tabular-nums text-success">${Number(p.amount).toLocaleString()}</span>
+                <span className="font-semibold tabular-nums text-primary">${Number(p.amount).toLocaleString()}</span>
               </div>
             ))}
           </motion.div>

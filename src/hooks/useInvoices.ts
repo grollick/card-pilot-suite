@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { buildInvoiceFromEstimate } from "@/lib/invoiceTotals";
 
 export type InvoiceStatus = "draft" | "sent" | "viewed" | "paid" | "overdue" | "cancelled";
 
@@ -88,7 +89,7 @@ export function useCreateInvoice() {
     mutationFn: async (invoice: {
       job_id?: string | null; lead_id?: string | null;
       invoice_number?: string; due_date?: string;
-      subtotal?: number; tax_total?: number; discount_amount?: number;
+      subtotal?: number; tax_total?: number; tax_percent?: number; discount_amount?: number;
       grand_total?: number; notes?: string; terms?: string;
       line_items?: Array<{ title: string; description?: string; quantity: number; unit_price: number; line_total: number }>;
     }) => {
@@ -297,11 +298,8 @@ export function useSaveInvoiceLineItems() {
   });
 }
 
-export function useCreateInvoiceFromEstimate() {
-  const { user } = useAuth();
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: async (estimateId: string) => {
+/** The one way an invoice is made from an estimate. Used by the Invoices page and the Estimates row menu. */
+export async function createInvoiceFromEstimate(userId: string, estimateId: string) {
       // Fetch estimate with line items
       const { data: estimate, error: estErr } = await supabase
         .from("estimates")
@@ -313,9 +311,7 @@ export function useCreateInvoiceFromEstimate() {
       const est = estimate as any;
       const lineItems = (est.estimate_line_items ?? []).sort((a: any, b: any) => a.sort_order - b.sort_order);
 
-      const subtotal = lineItems.reduce((s: number, li: any) => s + Number(li.line_total || 0), 0);
-      const discountAmt = Number(est.discount_amount || 0) + subtotal * (Number(est.discount_percent || 0) / 100);
-      const grandTotal = Math.max(0, subtotal - discountAmt);
+      const built = buildInvoiceFromEstimate(est, lineItems);
 
       const invoiceNumber = generateInvoiceNumber();
       const dueDate = new Date();
@@ -324,33 +320,28 @@ export function useCreateInvoiceFromEstimate() {
       const { data: inv, error: invErr } = await supabase
         .from("invoices")
         .insert({
-          user_id: user!.id,
+          user_id: userId,
           lead_id: est.lead_id ?? null,
           invoice_number: invoiceNumber,
           status: "draft" as any,
           due_date: dueDate.toISOString().split("T")[0],
-          subtotal,
-          discount_amount: discountAmt,
-          grand_total: grandTotal,
+          subtotal: built.subtotal,
+          discount_amount: built.discount_amount,
+          tax_total: built.tax_total,
+          tax_percent: built.tax_percent,
+          grand_total: built.grand_total,
           notes: est.notes || null,
-          terms: est.terms_conditions || null,
+          terms: est.terms_conditions || "Payment due within 14 days of invoice date.",
         })
         .select()
         .single();
       if (invErr) throw invErr;
 
-      // Convert estimate line items to invoice line items (skip optional items)
-      const invoiceItems = lineItems
-        .filter((li: any) => !li.is_optional)
-        .map((li: any, i: number) => ({
-          invoice_id: (inv as any).id,
-          title: li.title,
-          description: li.description || null,
-          quantity: Number(li.quantity),
-          unit_price: Number(li.unit_price) + Number(li.labor_hours || 0) * Number(li.labor_rate || 0) + Number(li.material_cost || 0),
-          line_total: Number(li.line_total),
-          sort_order: i,
-        }));
+      const invoiceItems = built.lines.map((li, i) => ({
+        invoice_id: (inv as any).id,
+        ...li,
+        sort_order: i,
+      }));
 
       if (invoiceItems.length) {
         const { error: liErr } = await supabase
@@ -363,7 +354,7 @@ export function useCreateInvoiceFromEstimate() {
       if (est.lead_id) {
         await supabase.from("contact_activities").insert({
           lead_id: est.lead_id,
-          user_id: user!.id,
+          user_id: userId,
           activity_type: "invoice_created",
           title: `Invoice ${invoiceNumber} created from estimate ${est.estimate_number}`,
           related_id: (inv as any).id,
@@ -371,7 +362,13 @@ export function useCreateInvoiceFromEstimate() {
       }
 
       return inv;
-    },
+}
+
+export function useCreateInvoiceFromEstimate() {
+  const { user } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (estimateId: string) => createInvoiceFromEstimate(user!.id, estimateId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["invoices"] });
       qc.invalidateQueries({ queryKey: ["contact-activities"] });

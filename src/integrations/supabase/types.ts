@@ -4469,6 +4469,7 @@ export type Database = {
           status: Database["public"]["Enums"]["invoice_status"]
           stripe_payment_intent_id: string | null
           subtotal: number
+          tax_percent: number
           tax_total: number
           terms: string | null
           updated_at: string
@@ -4498,6 +4499,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["invoice_status"]
           stripe_payment_intent_id?: string | null
           subtotal?: number
+          tax_percent?: number
           tax_total?: number
           terms?: string | null
           updated_at?: string
@@ -4527,6 +4529,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["invoice_status"]
           stripe_payment_intent_id?: string | null
           subtotal?: number
+          tax_percent?: number
           tax_total?: number
           terms?: string | null
           updated_at?: string

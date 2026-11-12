@@ -71,6 +71,13 @@
       "when": 1794502894363,
       "tag": "0009_busy_times_90_days",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794515477040,
+      "tag": "0010_invoice_tax_percent",
+      "breakpoints": true
     }
   ]
 }
