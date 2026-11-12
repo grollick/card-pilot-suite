@@ -129,16 +129,11 @@ serve(async (req) => {
       .from("social_posts")
       .insert({
         user_id: user.id,
-        body: fullCaption,
-        platforms: [postContent.suggested_platform],
+        content: fullCaption,
+        platforms_json: [postContent.suggested_platform].filter(Boolean),
         status: "draft",
-        meta_json: {
-          auto_campaign_id: campaign_id,
-          content_type: contentType,
-          ai_generated: true,
-          hashtags: postContent.hashtags,
-          cta: postContent.cta,
-        },
+        content_type: contentType,
+        content_label: "AI generated",
       });
 
     if (insertError) throw insertError;
