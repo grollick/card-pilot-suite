@@ -1,3 +1,4 @@
+import { NEW_ACCOUNT_SERVICE_CAP, capServices } from "@/modules/onboarding/lib/serviceCap";
 import { ArrowLeft, ArrowRight, Phone, Mail, MapPin, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +22,10 @@ export default function StepContactDetails({
   onPhoneChange, onEmailChange, onCityChange, onServicesChange,
   onNext, onBack,
 }: Props) {
+  const cap = NEW_ACCOUNT_SERVICE_CAP;
+  const atCap = cap >= 0 && services.length >= cap;
   const addService = (name: string) => {
+    if (atCap) return;
     if (name.trim() && !services.includes(name.trim())) {
       onServicesChange([...services, name.trim()]);
     }
@@ -86,7 +90,7 @@ export default function StepContactDetails({
           </label>
           {services.length > 0 && (
             <div className="flex flex-wrap gap-1.5 mb-2">
-              {services.map((s, i) => (
+              {capServices(services).map((s, i) => (
                 <span
                   key={i}
                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium"
@@ -105,6 +109,7 @@ export default function StepContactDetails({
           <Input
             placeholder="Type a service and press Enter"
             className="h-10"
+            disabled={atCap}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -114,7 +119,7 @@ export default function StepContactDetails({
             }}
           />
           <p className="text-[11px] text-muted-foreground mt-1">
-            {services.length === 0 ? "Pre-filled from your profession — add more or skip" : `${services.length} service${services.length !== 1 ? "s" : ""} added`}
+            {atCap ? `Free lists up to ${cap} services. You can ask for more room later.` : services.length === 0 ? "Pre-filled from your profession — add more or skip" : `${services.length} service${services.length !== 1 ? "s" : ""} added`}
           </p>
         </div>
       </div>

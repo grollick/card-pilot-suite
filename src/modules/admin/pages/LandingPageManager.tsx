@@ -46,7 +46,7 @@ const MAIN_PAGE_DEFAULTS: { key: string; title: string; description: string; url
       { id: "examples", type: "demo_cards", label: "Demo Cards", enabled: true, content: { headline: "Cards for every profession", subheadline: "See how professionals use guzzl.pro to grow their business." } },
       { id: "results", type: "results", label: "Results & Testimonials", enabled: true, content: { headline: "Real outcomes for real businesses", subheadline: "guzzl.pro helps service professionals get more leads, more bookings, and faster payments." } },
       { id: "pricing", type: "pricing", label: "Pricing", enabled: true, content: { headline: "Simple, transparent pricing", subheadline: "Start free. Upgrade when you're ready to grow." } },
-      { id: "final_cta", type: "final_cta", label: "Final CTA", enabled: true, content: { headline: "Start getting more customers today", subheadline: "Create your smart business card in 2 minutes. Start capturing leads today — free forever." } },
+      { id: "final_cta", type: "final_cta", label: "Final CTA", enabled: true, content: { headline: "Start getting more customers today", subheadline: "Create your smart business card in 2 minutes. Start capturing leads today. Free to start." } },
     ],
   },
   {

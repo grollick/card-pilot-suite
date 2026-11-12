@@ -48,7 +48,7 @@ export default function FinalCTASection() {
           custom={2}
           className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto"
         >
-          Start capturing leads, booking customers, and growing your revenue — all from one platform. Free forever.
+          Start capturing leads, booking customers, and growing your revenue — all from one platform. Free to start.
         </motion.p>
 
         <motion.div
@@ -79,7 +79,7 @@ export default function FinalCTASection() {
           custom={4}
           className="text-xs text-muted-foreground mt-5"
         >
-          No credit card required • Setup in 2 minutes • Free forever plan
+          No credit card required • Setup in 2 minutes • Free to start
         </motion.p>
 
         {/* Lead Guarantee */}

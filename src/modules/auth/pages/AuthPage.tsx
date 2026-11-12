@@ -14,7 +14,7 @@ const SOCIAL_PROOF_POINTS = [
   "Get discovered by local customers",
   "Receive leads & booking requests",
   "Professional card in under 2 minutes",
-  "Free forever — upgrade anytime",
+  "Free to start. No credit card.",
 ];
 
 export default function Auth() {

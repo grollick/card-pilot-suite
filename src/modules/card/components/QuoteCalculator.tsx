@@ -1,13 +1,12 @@
 import { useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Calculator, Send, ChevronRight, Check } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import { captureLead, getVisitorMeta } from "@/lib/captureLead";
 import type { ResolvedCardTheme } from "@/lib/cardTokens";
 import CardSectionWrapper from "./CardSectionWrapper";
 import CardButton from "./CardButton";
 
-// ── Profession calculator presets ──
+// ── Calculator shape (the pro's own price list is saved in this shape) ──
 
 export interface CalcOption {
   label: string;
@@ -39,183 +38,6 @@ export interface CalcPreset {
   basePrice: number;
   basePriceMax: number;
   disclaimer?: string;
-}
-
-export const CALCULATOR_PRESETS: CalcPreset[] = [
-  {
-    id: "landscaper",
-    name: "Landscaping",
-    professions: ["landscaper", "lawn care", "gardener"],
-    basePrice: 0,
-    basePriceMax: 0,
-    fields: [
-      {
-        id: "service",
-        label: "Service Type",
-        type: "select",
-        options: [
-          { label: "Lawn Mowing", value: "mowing", priceMin: 40, priceMax: 80 },
-          { label: "Garden Design", value: "garden", priceMin: 200, priceMax: 500 },
-          { label: "Hardscaping", value: "hardscape", priceMin: 500, priceMax: 2000 },
-          { label: "Tree Trimming", value: "tree", priceMin: 100, priceMax: 400 },
-          { label: "Full Landscaping", value: "full", priceMin: 800, priceMax: 3000 },
-        ],
-      },
-      {
-        id: "size",
-        label: "Property Size (sq ft)",
-        type: "slider",
-        min: 500,
-        max: 10000,
-        step: 500,
-        unit: "sq ft",
-        pricePerUnit: 0.02,
-        pricePerUnitMax: 0.05,
-      },
-    ],
-    disclaimer: "Final pricing depends on property assessment.",
-  },
-  {
-    id: "cleaner",
-    name: "Cleaning",
-    professions: ["cleaner", "cleaning", "maid", "janitor"],
-    basePrice: 0,
-    basePriceMax: 0,
-    fields: [
-      {
-        id: "service",
-        label: "Cleaning Type",
-        type: "select",
-        options: [
-          { label: "Standard Clean", value: "standard", priceMin: 80, priceMax: 150 },
-          { label: "Deep Clean", value: "deep", priceMin: 150, priceMax: 300 },
-          { label: "Move-In/Out Clean", value: "move", priceMin: 200, priceMax: 450 },
-          { label: "Post-Construction", value: "construction", priceMin: 300, priceMax: 600 },
-        ],
-      },
-      {
-        id: "rooms",
-        label: "Number of Rooms",
-        type: "slider",
-        min: 1,
-        max: 10,
-        step: 1,
-        unit: "rooms",
-        pricePerUnit: 15,
-        pricePerUnitMax: 30,
-      },
-    ],
-    disclaimer: "Prices may vary based on condition and special requests.",
-  },
-  {
-    id: "painter",
-    name: "Painting",
-    professions: ["painter", "painting"],
-    basePrice: 0,
-    basePriceMax: 0,
-    fields: [
-      {
-        id: "service",
-        label: "Project Type",
-        type: "select",
-        options: [
-          { label: "Interior Room", value: "interior", priceMin: 200, priceMax: 500 },
-          { label: "Exterior Paint", value: "exterior", priceMin: 800, priceMax: 3000 },
-          { label: "Cabinet Refinishing", value: "cabinets", priceMin: 400, priceMax: 1200 },
-          { label: "Deck Staining", value: "deck", priceMin: 200, priceMax: 800 },
-        ],
-      },
-      {
-        id: "size",
-        label: "Area Size (sq ft)",
-        type: "slider",
-        min: 100,
-        max: 3000,
-        step: 100,
-        unit: "sq ft",
-        pricePerUnit: 0.5,
-        pricePerUnitMax: 1.5,
-      },
-    ],
-    disclaimer: "Includes standard paint. Premium paints may cost extra.",
-  },
-  {
-    id: "detailer",
-    name: "Auto Detailing",
-    professions: ["auto detailer", "detailer", "car wash", "detailing"],
-    basePrice: 0,
-    basePriceMax: 0,
-    fields: [
-      {
-        id: "vehicle",
-        label: "Vehicle Type",
-        type: "select",
-        options: [
-          { label: "Sedan / Coupe", value: "sedan", priceMin: 80, priceMax: 150 },
-          { label: "SUV / Crossover", value: "suv", priceMin: 120, priceMax: 200 },
-          { label: "Truck / Van", value: "truck", priceMin: 150, priceMax: 250 },
-          { label: "Luxury / Exotic", value: "luxury", priceMin: 200, priceMax: 400 },
-        ],
-      },
-      {
-        id: "service",
-        label: "Service Level",
-        type: "select",
-        options: [
-          { label: "Exterior Wash", value: "exterior", priceMin: 0, priceMax: 0 },
-          { label: "Interior Detail", value: "interior", priceMin: 30, priceMax: 60 },
-          { label: "Full Detail", value: "full", priceMin: 60, priceMax: 120 },
-          { label: "Paint Correction", value: "correction", priceMin: 150, priceMax: 400 },
-        ],
-      },
-    ],
-    disclaimer: "Prices may vary based on vehicle condition.",
-  },
-  {
-    id: "general",
-    name: "General Service",
-    professions: [],
-    basePrice: 50,
-    basePriceMax: 100,
-    fields: [
-      {
-        id: "service",
-        label: "Service Type",
-        type: "select",
-        options: [
-          { label: "Basic Service", value: "basic", priceMin: 50, priceMax: 100 },
-          { label: "Standard Service", value: "standard", priceMin: 100, priceMax: 250 },
-          { label: "Premium Service", value: "premium", priceMin: 250, priceMax: 500 },
-          { label: "Custom Project", value: "custom", priceMin: 500, priceMax: 1500 },
-        ],
-      },
-      {
-        id: "scope",
-        label: "Project Scope",
-        type: "select",
-        options: [
-          { label: "Small", value: "small", priceMin: 0, priceMax: 0 },
-          { label: "Medium", value: "medium", priceMin: 50, priceMax: 100 },
-          { label: "Large", value: "large", priceMin: 150, priceMax: 300 },
-        ],
-      },
-    ],
-    disclaimer: "This is a rough estimate. Contact us for exact pricing.",
-  },
-];
-
-/**
- * Find the best calculator preset for a profession name.
- */
-export function getCalcPresetForProfession(profession?: string): CalcPreset {
-  if (!profession) return CALCULATOR_PRESETS[CALCULATOR_PRESETS.length - 1];
-  const lower = profession.toLowerCase();
-  for (const preset of CALCULATOR_PRESETS) {
-    if (preset.professions.some((p) => lower.includes(p) || p.includes(lower))) {
-      return preset;
-    }
-  }
-  return CALCULATOR_PRESETS[CALCULATOR_PRESETS.length - 1];
 }
 
 // ── Component ──
@@ -267,6 +89,7 @@ function QuoteCalculatorInner({
   const [step, setStep] = useState<"calc" | "result" | "form" | "done">("calc");
   const [formData, setFormData] = useState({ name: "", phone: "", email: "" });
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const updateValue = useCallback((fieldId: string, val: string | number) => {
     setValues((prev) => ({ ...prev, [fieldId]: val }));
@@ -299,98 +122,32 @@ function QuoteCalculatorInner({
     if (!formData.name) return;
     setSubmitting(true);
 
+    setSubmitError(null);
     try {
-      // Check for existing lead
-      let existingLead: { id: string } | null = null;
-      if (formData.email) {
-        const { data } = await supabase
-          .from("leads")
-          .select("id")
-          .eq("user_id", profileId)
-          .eq("email", formData.email)
-          .limit(1)
-          .maybeSingle();
-        if (data) existingLead = data;
-      }
-      if (!existingLead && formData.phone) {
-        const { data } = await supabase
-          .from("leads")
-          .select("id")
-          .eq("user_id", profileId)
-          .eq("phone", formData.phone)
-          .limit(1)
-          .maybeSingle();
-        if (data) existingLead = data;
-      }
-
-      const { data: stages } = await supabase
-        .from("pipeline_stages")
-        .select("id")
-        .eq("user_id", profileId)
-        .order("sort_order", { ascending: true })
-        .limit(1);
-
-      const estimateDetails = {
-        preset: preset.id,
-        selections: values,
-        estimateMin: estimate.min,
-        estimateMax: estimate.max,
-      };
-
-      let leadId: string | undefined;
-
-      if (existingLead) {
-        await supabase
-          .from("leads")
-          .update({
-            name: formData.name,
-            ...(formData.phone ? { phone: formData.phone } : {}),
-            ...(formData.email ? { email: formData.email } : {}),
-            notes: `Instant quote: $${estimate.min}–$${estimate.max}`,
-            custom_fields_json: { quote_calculator: estimateDetails },
-          })
-          .eq("id", existingLead.id);
-        leadId = existingLead.id;
-      } else {
-        const { data: lead } = await supabase
-          .from("leads")
-          .insert({
-            user_id: profileId,
-            name: formData.name,
-            phone: formData.phone || null,
-            email: formData.email || null,
-            notes: `Instant quote: $${estimate.min}–$${estimate.max}`,
-            source: "card_form" as const,
-            stage_id: stages?.[0]?.id ?? null,
-            custom_fields_json: { quote_calculator: estimateDetails },
-          })
-          .select("id")
-          .maybeSingle();
-        leadId = lead?.id;
-      }
-
-      if (leadId) {
-        await supabase.from("contact_activities").insert({
-          user_id: profileId,
-          lead_id: leadId,
-          activity_type: "quote_calculator",
-          title: `Quote calculator: $${estimate.min}–$${estimate.max}`,
-          description: JSON.stringify(estimateDetails),
-          occurred_at: new Date().toISOString(),
-        });
-      }
-
-      // Analytics
-      await supabase.from("analytics_events").insert({
-        user_id: profileId,
+      const chosen = preset.fields
+        .map((f) => {
+          const opt = f.options?.find((o) => o.value === values[f.id]);
+          return opt ? opt.label : null;
+        })
+        .filter(Boolean)
+        .join(", ");
+      await captureLead({
+        ownerId: profileId,
+        name: formData.name,
+        email: formData.email || null,
+        phone: formData.phone || null,
+        source: "card_form",
         handle,
-        event_type: "form_submit" as const,
-        meta_json: { type: "quote_calculator", lead_id: leadId, ...estimateDetails },
+        activityType: "quote_requested",
+        activityTitle: `Instant quote: ${chosen || "job"}, $${estimate.min} to $${estimate.max}`,
+        metaJson: {
+          ...getVisitorMeta(),
+          quote_calculator: { selections: values, job: chosen, estimateMin: estimate.min, estimateMax: estimate.max },
+        },
       });
-
       setStep("done");
     } catch {
-      toast.error("Something went wrong");
+      setSubmitError("We couldn't send your request. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -398,12 +155,6 @@ function QuoteCalculatorInner({
 
   // Track calculator usage
   const handleShowEstimate = () => {
-    supabase.from("analytics_events").insert({
-      user_id: profileId,
-      handle,
-      event_type: "button_click" as const,
-      meta_json: { type: "quote_calculator_estimate", ...values, estimateMin: estimate.min, estimateMax: estimate.max },
-    }).then();
     setStep("result");
   };
 
@@ -545,7 +296,7 @@ function QuoteCalculatorInner({
                       ${estimate.min.toLocaleString()}
                       {estimate.max > estimate.min && (
                         <span style={{ fontSize: 20, fontWeight: 500 }}>
-                          {" "}– ${estimate.max.toLocaleString()}
+                          {" "}to ${estimate.max.toLocaleString()}
                         </span>
                       )}
                     </p>
@@ -597,7 +348,7 @@ function QuoteCalculatorInner({
                     ${estimate.min.toLocaleString()}
                     {estimate.max > estimate.min && (
                       <span style={{ fontSize: 24, fontWeight: 500 }}>
-                        {" "}– ${estimate.max.toLocaleString()}
+                        {" "}to ${estimate.max.toLocaleString()}
                       </span>
                     )}
                   </p>
@@ -661,7 +412,7 @@ function QuoteCalculatorInner({
                   <p style={{ fontSize: 11, color: palette.secondary, margin: 0 }}>Your estimate</p>
                   <p style={{ fontSize: 20, fontWeight: 700, color: palette.primary, margin: 0 }}>
                     ${estimate.min.toLocaleString()}
-                    {estimate.max > estimate.min && ` – $${estimate.max.toLocaleString()}`}
+                    {estimate.max > estimate.min && ` to $${estimate.max.toLocaleString()}`}
                   </p>
                 </div>
 
@@ -685,6 +436,9 @@ function QuoteCalculatorInner({
                   style={inputStyle}
                 />
 
+                {submitError && (
+                  <p role="alert" style={{ fontSize: 13, color: palette.primary, margin: 0 }}>{submitError}</p>
+                )}
                 <CardButton
                   theme={theme}
                   fullWidth

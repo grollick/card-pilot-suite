@@ -87,7 +87,7 @@ export default function HeroSection() {
             custom={4}
             className="mt-5 flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground"
           >
-            <span>Free forever plan</span>
+            <span>Free to start</span>
             <span>•</span>
             <span>Setup in 2 minutes</span>
             <span>•</span>

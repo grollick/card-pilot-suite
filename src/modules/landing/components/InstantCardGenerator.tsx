@@ -394,7 +394,7 @@ export default function InstantCardGenerator() {
 
                 {/* Trust badges */}
                 <div className="flex items-center justify-center lg:justify-start gap-4 mt-6 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1"><Check className="h-3 w-3 text-success" /> Free forever plan</span>
+                  <span className="flex items-center gap-1"><Check className="h-3 w-3 text-success" /> Free to start</span>
                   <span className="flex items-center gap-1"><Check className="h-3 w-3 text-success" /> No credit card</span>
                 </div>
               </motion.div>

@@ -1,3 +1,4 @@
+import { capServices } from "@/modules/onboarding/lib/serviceCap";
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import GuzzlLogo from "@/components/brand/GuzzlLogo";
@@ -186,7 +187,7 @@ export default function Onboarding() {
           },
         });
         if (!error && !data?.error) {
-          setup = data.setup as AISetup;
+          setup = { ...(data.setup as AISetup), services: capServices((data.setup as AISetup).services) };
           setAiSetup(setup);
           setServices(setup.services.map(s => s.name));
         }
@@ -196,7 +197,7 @@ export default function Onboarding() {
 
       if (!setup) {
         const defaultServices = (selectedProfession.default_booking_services as any[]) || [];
-        setServices(defaultServices.slice(0, 5).map((s: any) => s.name));
+        setServices(capServices(defaultServices).map((s: any) => s.name));
       }
 
       // Also try instant-card if URL provided
@@ -273,8 +274,8 @@ export default function Onboarding() {
           case "about":
             return { ...sec, content: { text: aiSetup?.about || profDefaults.about } };
           case "services": {
-            const aiServices = aiSetup?.services?.map((s: any) => ({ name: s.name, description: s.description || "", price: "" }));
-            return { ...sec, content: { items: aiServices && aiServices.length > 0 ? aiServices : profDefaults.services } };
+            const aiServices = capServices(aiSetup?.services).map((s: any) => ({ name: s.name, description: s.description || "", price: "" }));
+            return { ...sec, content: { items: aiServices.length > 0 ? aiServices : capServices(profDefaults.services) } };
           }
           case "testimonials":
             return { ...sec, content: { testimonials: [] } };
@@ -337,7 +338,7 @@ export default function Onboarding() {
       }
 
       // Services
-      const finalServices = aiSetup?.services || [];
+      const finalServices = capServices(aiSetup?.services);
       if (finalServices.length > 0 && !(await userHasRows("booking_services"))) {
         await supabase.from("booking_services").insert(
           finalServices.map((s: any) => ({

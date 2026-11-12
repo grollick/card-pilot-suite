@@ -1006,6 +1006,7 @@ export default function CardBuilder() {
           profession={(s.profile as any)?.professions?.name ?? ""}
           userName={s.profile?.name ?? ""}
           company={s.profile?.company ?? ""}
+          sectionEnabled={!!(editingSec as any).enabled}
         />
       )}
 

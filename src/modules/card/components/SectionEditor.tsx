@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { X, Plus, Trash2, GripVertical, Wand2, Loader2 } from "lucide-react";
-import { CALCULATOR_PRESETS, getSavedCalcPreset } from "./QuoteCalculator";
+import { getSavedCalcPreset, type CalcPreset } from "./QuoteCalculator";
+import { buildPresetFromRows, rowsFromPreset, validatePriceRow, isPricedRow, MAX_PRICE_ROWS, DEFAULT_PRICE_NOTE, type PriceRow } from "@/modules/card/lib/priceList";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -41,6 +43,8 @@ export interface SectionContent {
   calcHeading?: string;
   calcPresetId?: string;
   calcDisclaimer?: string;
+  calcPriceRows?: PriceRow[];
+  calcCustomPreset?: CalcPreset | null;
   // Video Introduction
   videoUrl?: string;
   videoHeading?: string;
@@ -58,6 +62,7 @@ interface SectionEditorProps {
   profession?: string;
   userName?: string;
   company?: string;
+  sectionEnabled?: boolean;
 }
 
 const SOCIAL_PLATFORMS = [
@@ -147,6 +152,7 @@ export default function SectionEditor({
   profession = "",
   userName = "",
   company = "",
+  sectionEnabled = false,
 }: SectionEditorProps) {
   const [draft, setDraft] = useState<SectionContent>(content);
 
@@ -156,6 +162,16 @@ export default function SectionEditor({
   };
 
   const handleSave = () => {
+    if (sectionId === "quote_calculator") {
+      const rows = draft.calcPriceRows ?? rowsFromPreset(draft.calcCustomPreset);
+      const bad = rows.map(validatePriceRow).find(Boolean);
+      if (bad) { toast.error(bad); return; }
+      const note = draft.calcDisclaimer ?? DEFAULT_PRICE_NOTE;
+      const { calcPresetId: _unused, ...rest } = draft;
+      onSave({ ...rest, calcPriceRows: rows, calcDisclaimer: note, calcCustomPreset: buildPresetFromRows(rows, note) });
+      onOpenChange(false);
+      return;
+    }
     onSave(draft);
     onOpenChange(false);
   };
@@ -191,7 +207,7 @@ export default function SectionEditor({
           {sectionId === "booking" && <BookingEditor draft={draft} setDraft={setDraft} />}
           {sectionId === "projects" && <ProjectsEditor draft={draft} setDraft={setDraft} />}
           {sectionId === "video_intro" && <VideoIntroEditor draft={draft} setDraft={setDraft} />}
-          {sectionId === "quote_calculator" && <QuoteCalculatorEditor draft={draft} setDraft={setDraft} />}
+          {sectionId === "quote_calculator" && <QuoteCalculatorEditor draft={draft} setDraft={setDraft} sectionEnabled={sectionEnabled} />}
           <div className="flex gap-2 pt-4 border-t border-border">
             <Button onClick={handleSave} className="flex-1">Save Changes</Button>
             <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
@@ -519,48 +535,88 @@ function ProjectsEditor({ draft, setDraft }: { draft: SectionContent; setDraft: 
   );
 }
 
-function QuoteCalculatorEditor({ draft, setDraft }: { draft: SectionContent; setDraft: (d: SectionContent) => void }) {
+function QuoteCalculatorEditor({ draft, setDraft, sectionEnabled }: { draft: SectionContent; setDraft: (d: SectionContent) => void; sectionEnabled: boolean }) {
+  const { user } = useAuth();
+  const [filling, setFilling] = useState(false);
+  const rows: PriceRow[] = draft.calcPriceRows ?? rowsFromPreset(draft.calcCustomPreset);
+  const note = draft.calcDisclaimer ?? DEFAULT_PRICE_NOTE;
+  const setRows = (next: PriceRow[]) => setDraft({ ...draft, calcPriceRows: next });
+  const updateRow = (i: number, patch: Partial<PriceRow>) => setRows(rows.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
+  const showing = sectionEnabled && rows.some(isPricedRow);
+
+  const addMyServices = async () => {
+    if (!user) return;
+    setFilling(true);
+    const { data, error } = await supabase.from("booking_services").select("name").eq("user_id", user.id).order("created_at", { ascending: true });
+    setFilling(false);
+    if (error) { toast.error("Couldn't load your services. Please try again."); return; }
+    const have = new Set(rows.map((r) => r.name.trim().toLowerCase()));
+    const extra = (data || []).map((d) => d.name).filter((n) => n && !have.has(n.trim().toLowerCase()));
+    if (extra.length === 0) { toast("No new services to add."); return; }
+    setRows([...rows, ...extra.map((name) => ({ name, from: "", to: "" }))].slice(0, MAX_PRICE_ROWS));
+  };
+
   return (
-    <div className="space-y-3">
-      {!getSavedCalcPreset(draft) && (
-        <p className="rounded-md border border-border bg-muted px-3 py-2 text-xs text-muted-foreground">
-          Not shown on your card until you add your own prices.
-        </p>
-      )}
+    <div className="space-y-4">
+      <p className={`rounded-md border px-3 py-2 text-sm ${showing ? "border-primary/30 bg-primary/5 text-primary" : "border-border bg-muted text-muted-foreground"}`}>
+        {showing ? "Showing on your card" : "Not shown on your card until you add your own prices."}
+      </p>
       <div>
         <Label className="text-xs">Section Heading</Label>
         <Input
+          className="h-11"
           placeholder="e.g. Get an Instant Quote"
           value={draft.calcHeading || ""}
           onChange={(e) => setDraft({ ...draft, calcHeading: e.target.value })}
         />
       </div>
-      <div>
-        <Label className="text-xs">Calculator Preset</Label>
-        <select
-          className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-          value={draft.calcPresetId || ""}
-          onChange={(e) => setDraft({ ...draft, calcPresetId: e.target.value })}
-        >
-          <option value="">Auto (match profession)</option>
-          {CALCULATOR_PRESETS.map((p) => (
-            <option key={p.id} value={p.id}>{p.name}</option>
-          ))}
-        </select>
-        <p className="text-[10px] text-muted-foreground mt-1">Choose a preset or let it auto-detect from your profession.</p>
+      <div className="space-y-1">
+        <h3 className="text-sm font-semibold text-foreground">Your price list</h3>
+        <p className="text-xs text-muted-foreground">Customers pick a job and see your price range. Nothing shows on your card until you add at least one price.</p>
       </div>
-      <div>
-        <Label className="text-xs">Disclaimer Text</Label>
-        <Textarea
-          placeholder="e.g. Final pricing depends on site assessment."
-          value={draft.calcDisclaimer || ""}
-          onChange={(e) => setDraft({ ...draft, calcDisclaimer: e.target.value })}
-          rows={2}
-        />
+      <div className="space-y-3">
+        {rows.map((row, i) => {
+          const err = validatePriceRow(row);
+          return (
+            <div key={i} className="space-y-2 rounded-md border border-border p-3">
+              <div className="flex gap-2">
+                <Input className="h-11 flex-1" placeholder="Job name" aria-label="Job name" value={row.name} onChange={(e) => updateRow(i, { name: e.target.value })} />
+                <Button type="button" variant="ghost" size="icon" className="h-11 w-11 shrink-0" aria-label="Remove job" onClick={() => setRows(rows.filter((_, idx) => idx !== i))}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Label className="text-xs">From $</Label>
+                  <Input className="h-11" type="number" inputMode="decimal" min={0} value={row.from} onChange={(e) => updateRow(i, { from: e.target.value })} />
+                </div>
+                <div className="flex-1">
+                  <Label className="text-xs">To $ (optional)</Label>
+                  <Input className="h-11" type="number" inputMode="decimal" min={0} value={row.to} onChange={(e) => updateRow(i, { to: e.target.value })} />
+                </div>
+              </div>
+              {err ? (
+                <p className="text-xs text-destructive">{err}</p>
+              ) : !isPricedRow(row) ? (
+                <p className="text-xs text-muted-foreground">No price yet, so customers won't see this job.</p>
+              ) : null}
+            </div>
+          );
+        })}
       </div>
-      <p className="text-xs text-muted-foreground">
-        The calculator lets visitors estimate costs and submit their info as a lead automatically.
-      </p>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Button type="button" variant="outline" className="h-11 flex-1" disabled={rows.length >= MAX_PRICE_ROWS} onClick={() => setRows([...rows, { name: "", from: "", to: "" }])}>
+          <Plus className="h-4 w-4 mr-1" /> Add a job
+        </Button>
+        <Button type="button" variant="outline" className="h-11 flex-1" disabled={filling || rows.length >= MAX_PRICE_ROWS} onClick={addMyServices}>
+          {filling && <Loader2 className="h-4 w-4 mr-1 animate-spin" />} Add my services
+        </Button>
+      </div>
+      {rows.length >= MAX_PRICE_ROWS && <p className="text-xs text-muted-foreground">Up to {MAX_PRICE_ROWS} jobs.</p>}
+      <div>
+        <Label className="text-xs">Note under the price (optional)</Label>
+        <Input className="h-11" value={note} onChange={(e) => setDraft({ ...draft, calcDisclaimer: e.target.value })} />
+      </div>
     </div>
   );
 }

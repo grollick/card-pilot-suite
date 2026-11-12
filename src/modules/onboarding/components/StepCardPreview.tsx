@@ -1,3 +1,4 @@
+import { capServices } from "@/modules/onboarding/lib/serviceCap";
 import { useState, useEffect } from "react";
 import { ArrowLeft, ArrowRight, Eye, Sparkles, Check, User, Palette, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -160,16 +161,13 @@ export default function StepCardPreview({ name, company, phone, city, tagline, s
               {city && <span className="text-[11px] text-muted-foreground flex items-center gap-0.5">📍 {city}</span>}
               {phone && <span className="text-[11px] text-muted-foreground flex items-center gap-0.5">📞 {phone}</span>}
             </div>
-            {services.length > 0 && (
+            {capServices(services).length > 0 && (
               <div className="pt-2 space-y-1">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Services</p>
                 <div className="flex flex-wrap gap-1">
-                  {services.slice(0, 4).map(s => (
+                  {capServices(services).map(s => (
                     <span key={s} className="px-2 py-0.5 rounded-full bg-muted text-[11px] font-medium text-muted-foreground">{s}</span>
                   ))}
-                  {services.length > 4 && (
-                    <span className="px-2 py-0.5 rounded-full bg-muted text-[11px] text-muted-foreground">+{services.length - 4}</span>
-                  )}
                 </div>
               </div>
             )}
