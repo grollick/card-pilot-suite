@@ -47,3 +47,30 @@ export function isStartOfferable(start: Date, now: Date = new Date()): boolean {
 export function overlapsBooking(start: Date, end: Date, bookings: BookingRange[]): boolean {
   return bookings.some((b) => start.getTime() < new Date(b.end_datetime).getTime() && end.getTime() > new Date(b.start_datetime).getTime());
 }
+
+const fmtTime = (d: Date) => {
+  const h = d.getHours(); const m = d.getMinutes();
+  return `${h % 12 === 0 ? 12 : h % 12}:${String(m).padStart(2, "0")} ${h < 12 ? "AM" : "PM"}`;
+};
+
+/** Start times (e.g. "9:00 AM") a normal job can be booked at on a date: 30-minute steps inside opening hours, one hour notice, no overlap. */
+export function daySlots(date: Date, rules: AvailabilityRule[], bookings: BookingRange[], durationMin: number | null | undefined, now: Date = new Date()): string[] {
+  const rule = rules.find((r) => r.day_of_week === dbDayOf(date));
+  if (!rule) return [];
+  const duration = durationMin ?? 30;
+  const at = (t: string) => { const d = new Date(date); const m = toMin(t); d.setHours(Math.floor(m / 60), m % 60, 0, 0); return d; };
+  const dayEnd = at(rule.end_time);
+  const slots: string[] = [];
+  for (let cursor = at(rule.start_time); cursor < dayEnd; cursor = new Date(cursor.getTime() + 30 * 60000)) {
+    const end = new Date(cursor.getTime() + duration * 60000);
+    if (end > dayEnd) break;
+    if (isStartOfferable(cursor, now) && !overlapsBooking(cursor, end, bookings)) slots.push(fmtTime(cursor));
+  }
+  return slots;
+}
+
+/** A day can be tapped only when it has at least one time that can be offered for the chosen service. */
+export function dayHasFreeTime(date: Date, rules: AvailabilityRule[], bookings: BookingRange[], durationMin: number | null | undefined, now: Date = new Date()): boolean {
+  if (isLongJob(durationMin, rules)) return isLongJobDayAvailable(date, rules, bookings, now);
+  return daySlots(date, rules, bookings, durationMin, now).length > 0;
+}

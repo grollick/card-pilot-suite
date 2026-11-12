@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import OnboardingStepWrapper from "./OnboardingStepWrapper";
 
 interface Props {
+  ownerName: string;
+  onOwnerNameChange: (v: string) => void;
   businessName: string;
   externalUrl: string;
   onBusinessNameChange: (v: string) => void;
@@ -13,6 +15,8 @@ interface Props {
 }
 
 export default function StepAutoBuild({
+  ownerName,
+  onOwnerNameChange,
   businessName,
   externalUrl,
   onBusinessNameChange,
@@ -20,7 +24,7 @@ export default function StepAutoBuild({
   onGenerate,
   onBack,
 }: Props) {
-  const canGenerate = businessName.trim().length > 1;
+  const canGenerate = businessName.trim().length > 1 && ownerName.trim().length > 1;
 
   return (
     <OnboardingStepWrapper stepKey="auto-build">
@@ -32,11 +36,27 @@ export default function StepAutoBuild({
           Build Your Card Instantly
         </h2>
         <p className="text-sm text-muted-foreground">
-          Just your business name — AI creates everything else
+          Your name and business name — AI creates everything else
         </p>
       </div>
 
       <div className="space-y-4">
+        <div>
+          <label htmlFor="onboarding-owner-name" className="text-sm font-medium text-foreground mb-1.5 block">
+            Your name *
+          </label>
+          <Input
+            id="onboarding-owner-name"
+            placeholder="e.g. Dave Kowalski"
+            value={ownerName}
+            onChange={(e) => onOwnerNameChange(e.target.value)}
+            className="h-12 text-base"
+            maxLength={80}
+            autoComplete="name"
+            autoFocus
+          />
+        </div>
+
         <div>
           <label className="text-sm font-medium text-foreground mb-1.5 block">
             Business Name *
@@ -47,7 +67,6 @@ export default function StepAutoBuild({
             onChange={(e) => onBusinessNameChange(e.target.value)}
             className="h-12 text-base"
             maxLength={80}
-            autoFocus
           />
         </div>
 

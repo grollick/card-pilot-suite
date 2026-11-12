@@ -94,6 +94,15 @@ export default function Onboarding() {
   const [step, setStep] = useState(0);
   const [selectedProfessionId, setSelectedProfessionId] = useState("");
   const [company, setCompany] = useState("");
+  const [ownerName, setOwnerName] = useState("");
+  const ownerPrefilled = useRef(false);
+  useEffect(() => {
+    if (ownerPrefilled.current || !user) return;
+    const meta = (user.user_metadata || {}) as Record<string, unknown>;
+    const fromGoogle = String(meta.full_name || meta.name || "").trim();
+    ownerPrefilled.current = true;
+    if (fromGoogle) setOwnerName(current => current === "" ? fromGoogle : current);
+  }, [user]);
   const [externalUrl, setExternalUrl] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -239,7 +248,7 @@ export default function Onboarding() {
       const packKey = pickStylePackKey("Modern", categoryKey);
 
       const { error: profileErr } = await supabase.from("profiles").update({
-        name: company,
+        name: ownerName.trim() || company,
         company: company || null,
         handle,
         profession_id: selectedProfession.id,
@@ -478,6 +487,8 @@ export default function Onboarding() {
             {/* Step 2: Business Name (Auto-Build) */}
             {step === 2 && (
               <StepAutoBuild
+                ownerName={ownerName}
+                onOwnerNameChange={setOwnerName}
                 businessName={company}
                 externalUrl={externalUrl}
                 onBusinessNameChange={setCompany}
@@ -490,7 +501,7 @@ export default function Onboarding() {
             {/* Step 3: Card Preview (generating / preview) */}
             {step === 3 && (
               <StepCardPreview
-                name={company}
+                name={ownerName.trim() || company}
                 company={company}
                 phone={phone}
                 city={city}

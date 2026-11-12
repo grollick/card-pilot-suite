@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { motion, AnimatePresence } from "framer-motion";
-import { format, addDays, setHours, setMinutes, isBefore, isAfter } from "date-fns";
+import { format, addDays, setHours, setMinutes, isBefore } from "date-fns";
 import { Calendar as CalendarPicker } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { usePublicBookingData } from "@/hooks/useBookings";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { formatServicePrice, formatServiceDuration } from "@/lib/serviceDisplay";
-import { isLongJob, isLongJobDayAvailable, dayWindow, isStartOfferable, overlapsBooking } from "@/lib/longJobBooking";
+import { isLongJob, dayWindow, daySlots, dayHasFreeTime } from "@/lib/longJobBooking";
 
 function generateICS(
   name: string,
@@ -51,54 +51,28 @@ export default function PublicBooking() {
   const longJob = !!data && isLongJob(selectedService?.duration_min, data.availability);
   const longJobWindow = longJob && selectedDate && data ? dayWindow(selectedDate, data.availability) : null;
 
-  // Compute available time slots for selected date
+  // Times that can be offered on the selected date (shared rule with the calendar)
   const timeSlots = useMemo(() => {
     if (!selectedDate || !data) return [];
-    // day_of_week: 0=Mon .. 6=Sun in our DB
-    const jsDay = selectedDate.getDay(); // 0=Sun
-    const dbDay = jsDay === 0 ? 6 : jsDay - 1;
-    const rule = data.availability.find((r) => r.day_of_week === dbDay);
-    if (!rule) return [];
-
-    const duration = selectedService?.duration_min ?? 30;
-    const [startH, startM] = rule.start_time.split(":").map(Number);
-    const [endH, endM] = rule.end_time.split(":").map(Number);
-
-    const slots: string[] = [];
-    let cursor = setMinutes(setHours(selectedDate, startH), startM);
-    const dayEnd = setMinutes(setHours(selectedDate, endH), endM);
-    const now = new Date();
-
-    while (isBefore(cursor, dayEnd)) {
-      const slotEnd = new Date(cursor.getTime() + duration * 60000);
-      if (isAfter(slotEnd, dayEnd)) break;
-
-      // Skip past times
-      if (isStartOfferable(cursor, now)) {
-        if (!overlapsBooking(cursor, slotEnd, data.existingBookings)) {
-          slots.push(format(cursor, "h:mm a"));
-        }
-      }
-      cursor = new Date(cursor.getTime() + 30 * 60000); // 30-min increments
-    }
-    return slots;
+    return daySlots(selectedDate, data.availability, data.existingBookings, selectedService?.duration_min);
   }, [selectedDate, data, selectedService]);
 
-  // Available days (next 30 days with availability rules)
+  const [shownMonth, setShownMonth] = useState<Date>(() => new Date());
+
+  // Days in the shown month that have at least one free time for this service
   const availableDays = useMemo(() => {
-    if (!data) return new Set<string>();
     const days = new Set<string>();
-    const today = new Date();
-    for (let i = 0; i < 30; i++) {
-      const d = addDays(today, i);
-      const jsDay = d.getDay();
-      const dbDay = jsDay === 0 ? 6 : jsDay - 1;
-      if (longJob ? isLongJobDayAvailable(d, data.availability, data.existingBookings) : data.availability.some((r) => r.day_of_week === dbDay)) {
+    if (!data) return days;
+    const now = new Date();
+    const first = new Date(shownMonth.getFullYear(), shownMonth.getMonth(), 1);
+    for (let d = first; d.getMonth() === first.getMonth(); d = addDays(d, 1)) {
+      if (isBefore(d, addDays(now, -1))) continue;
+      if (dayHasFreeTime(d, data.availability, data.existingBookings, selectedService?.duration_min, now)) {
         days.add(format(d, "yyyy-MM-dd"));
       }
     }
     return days;
-  }, [data, longJob]);
+  }, [data, selectedService, shownMonth]);
 
   const handleConfirm = async () => {
     if (!selectedService || !selectedDate || !selectedTime || !formData.name || !data) return;
@@ -173,7 +147,7 @@ export default function PublicBooking() {
   const handleDownloadICS = () => {
     if (!bookingResult || !selectedService || !data) return;
     const ics = generateICS(
-      data.profile.name ?? handle ?? "",
+      data.businessName,
       selectedService.name,
       bookingResult.start,
       bookingResult.end
@@ -234,7 +208,7 @@ export default function PublicBooking() {
             )}
             <div className="flex-1">
               <h1 className="font-bold">Book an Appointment</h1>
-              <p className="text-xs text-muted-foreground">with {data.profile.name ?? `@${handle}`}</p>
+              <p className="text-xs text-muted-foreground">with {data.businessName}</p>
             </div>
             <div className="flex gap-1">
               {[1, 2, 3, 4].map((s) => (
@@ -276,7 +250,7 @@ export default function PublicBooking() {
               {step === 2 && (
                 <motion.div key="s2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-4">
                   <h2 className="font-semibold">Pick a Date & Time</h2>
-                  {availableDays.size === 0 ? (
+                  {data.availability.length === 0 ? (
                     <div className="rounded-xl border border-border bg-muted/30 p-6 text-center space-y-3">
                       <Clock className="h-8 w-8 text-muted-foreground mx-auto" />
                       <p className="text-sm font-medium text-foreground">No availability set</p>
@@ -285,8 +259,11 @@ export default function PublicBooking() {
                       </p>
                     </div>
                   ) : (
+                    <div className="space-y-2">
                     <CalendarPicker
                       mode="single"
+                      month={shownMonth}
+                      onMonthChange={setShownMonth}
                       selected={selectedDate}
                       onSelect={(d) => { setSelectedDate(d); setSelectedTime(null); }}
                       disabled={(date) => {
@@ -295,6 +272,11 @@ export default function PublicBooking() {
                       }}
                       className={cn("p-3 pointer-events-auto rounded-xl border border-border")}
                     />
+                    <p className="text-xs text-muted-foreground">Greyed out days are full or closed.</p>
+                    {availableDays.size === 0 && (
+                      <p className="text-sm font-medium text-foreground">No free days this month. Try next month.</p>
+                    )}
+                    </div>
                   )}
 
 
@@ -398,7 +380,7 @@ export default function PublicBooking() {
                   </div>
                   <div>
                     <h2 className="text-lg font-bold">Booking Requested!</h2>
-                    <p className="text-sm text-muted-foreground mt-1">You'll receive a confirmation once approved.</p>
+                    <p className="text-sm text-muted-foreground mt-1">{data.businessName} will confirm your booking.</p>
                   </div>
                   <div className="p-4 rounded-xl border border-border bg-muted/20 text-sm text-left space-y-1">
                     <p><span className="text-muted-foreground">Service:</span> {selectedService?.name}</p>

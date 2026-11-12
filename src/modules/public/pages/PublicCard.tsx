@@ -515,7 +515,7 @@ export default function PublicCard() {
         {!isOwner && (
           <SmartEngagementPopup
             handle={handle!}
-            profileName={profile.name ?? ""}
+            profileName={(card as any)?.company || (profile as any).company || profile.name || ""}
             palette={palette}
             fonts={fonts}
             delaySeconds={8}
@@ -1656,7 +1656,7 @@ export default function PublicCard() {
       {!isOwner && (
         <SmartEngagementPopup
           handle={handle!}
-          profileName={profile.name ?? ""}
+          profileName={(card as any)?.company || (profile as any).company || profile.name || ""}
           palette={palette}
           fonts={fonts}
           delaySeconds={8}

@@ -34,16 +34,8 @@ import { TRADES_TEMPLATES } from "@/lib/estimateTemplates";
 import { exportEstimatePDF } from "@/lib/estimatePdf";
 import { usePlanLimits } from "@/hooks/usePlanLimits";
 import { useEstimatePresets, DEFAULT_PRESETS, type PresetType } from "@/hooks/useEstimatePresets";
+import { EMPTY_LINE_ITEM, simpleLineItem, sharedTaxPercent, needsFullEditor } from "@/modules/estimates/lib/simpleEstimate";
 import { CALC_MODES, calcQuantityFromMode, dimensionFieldsForMode, unitForMode, type CalcMode } from "@/lib/estimateCalculators";
-
-const EMPTY_LINE_ITEM: EstimateLineItem = {
-  title: "", description: "", quantity: 1, unit: "each",
-  unit_price: 0, labor_hours: 0, labor_rate: 0,
-  material_cost: 0, markup_percent: 0, tax_percent: 0,
-  line_total: 0, sort_order: 0,
-  calc_mode: "unit_count", calc_length: 0, calc_width: 0, calc_depth: 0,
-  is_optional: false,
-};
 
 function makeSection(name = "General", items: EstimateLineItem[] = [{ ...EMPTY_LINE_ITEM }]): EstimateSection {
   return { _tempId: crypto.randomUUID(), name, notes: "", sort_order: 0, items };
@@ -95,6 +87,7 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
   const [internalNotes, setInternalNotes] = useState("");
   const [showFinancials, setShowFinancials] = useState(false);
   const [assistantOpen, setAssistantOpen] = useState(false);
+  const [simpleView, setSimpleView] = useState(true);
   useEffect(() => {
     if (isEdit && existing) {
       setLeadId(existing.lead_id ?? "");
@@ -130,6 +123,17 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
         setSections([makeSection("General", lineItems.length > 0 ? lineItems.map((li: any) => ({ ...li, calc_mode: (li.calc_mode || "unit_count") as CalcMode })) : [{ ...EMPTY_LINE_ITEM }])]);
       }
 
+      const extraGeneral = dbSections.length > 0 && lineItems.some((li: any) => !li.section_id) ? 1 : 0;
+      const sectionCount = Math.max(dbSections.length, 1) + extraGeneral;
+      const shape = sectionCount > 1
+        ? Array.from({ length: sectionCount }, (_, i) => ({ name: "", sort_order: i, items: [] }))
+        : [{ name: "", sort_order: 0, items: lineItems as any }];
+      setSimpleView(!needsFullEditor(shape, {
+        discount_amount: Number((existing as any).discount_amount) || 0,
+        deposit_amount: Number((existing as any).deposit_amount) || 0,
+        deposit_percent: Number((existing as any).deposit_percent) || 0,
+      }));
+
       if (Number((existing as any).discount_amount) > 0 || Number((existing as any).discount_percent) > 0 || Number((existing as any).deposit_amount) > 0 || Number((existing as any).deposit_percent) > 0) setShowFinancials(true);
     } else if (!isEdit && open) {
       resetForm();
@@ -145,6 +149,7 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
     setTemplateKey(""); setSections([makeSection()]);
     setDiscountAmount(0); setDiscountPercent(0); setDepositAmount(0); setDepositPercent(0);
     setTermsConditions(""); setInternalNotes(""); setShowFinancials(false);
+    setSimpleView(true);
   }
 
   const handleTemplateChange = (key: string) => {
@@ -210,6 +215,15 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
   const removeSection = (idx: number) => setSections(prev => prev.length === 1 ? prev : prev.filter((_, i) => i !== idx));
   const updateSectionField = (idx: number, field: string, value: string) => setSections(prev => prev.map((s, i) => i === idx ? { ...s, [field]: value } : s));
 
+  // ── Simple view: one section, Item / Qty / Price each, one tax % for the whole estimate ──
+  const simpleTax = sharedTaxPercent(sections);
+  const canUseSimpleView = !needsFullEditor(sections, { discount_amount: discountAmount, deposit_amount: depositAmount, deposit_percent: depositPercent });
+  const simpleItems = sections[0]?.items ?? [];
+  const setSimpleItems = (fn: (items: EstimateLineItem[]) => EstimateLineItem[]) =>
+    setSections(prev => [{ ...(prev[0] ?? makeSection()), items: fn(prev[0]?.items ?? []).map((it, i) => simpleLineItem(it.title, it.quantity, it.unit_price, it.tax_percent, i, it)) }]);
+  const updateSimpleLine = (ii: number, patch: Partial<EstimateLineItem>) => setSimpleItems(items => items.map((it, i) => i === ii ? { ...it, ...patch } : it));
+  const setSimpleTax = (v: number) => setSimpleItems(items => items.map(it => ({ ...it, tax_percent: v })));
+
   const totals = useMemo(() => calculateEstimateTotals(sections, { discount_amount: discountAmount, discount_percent: discountPercent, deposit_amount: depositAmount, deposit_percent: depositPercent }), [sections, discountAmount, discountPercent, depositAmount, depositPercent]);
 
   const handleSave = async () => {
@@ -264,6 +278,56 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
           <div className="flex justify-center py-12"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
         ) : (
           <>
+            {simpleView ? (
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div><Label className="text-sm">Contact</Label><Select value={leadId} onValueChange={setLeadId}><SelectTrigger className="h-11"><SelectValue placeholder="Select contact…" /></SelectTrigger><SelectContent>{contacts.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}</SelectContent></Select></div>
+                <div><Label className="text-sm">Job type</Label><Input className="h-11" value={jobType} onChange={e => setJobType(e.target.value)} placeholder="e.g. Bathroom repaint" /></div>
+                <div><Label className="text-sm">Valid until <span className="text-muted-foreground font-normal">(optional)</span></Label><Input className="h-11" type="date" value={expiryDate} onChange={e => setExpiryDate(e.target.value)} /></div>
+              </div>
+
+              {isEdit && (existing as any)?.response_name && (
+                <div className="rounded-lg border border-border bg-muted/30 p-3 text-sm">
+                  <p className="font-medium">{(existing as any).status === "approved" ? "Approved" : "Declined"} by {(existing as any).response_name}</p>
+                  {(existing as any).response_note && <p className="text-muted-foreground mt-1 whitespace-pre-wrap">{(existing as any).response_note}</p>}
+                </div>
+              )}
+
+              <div className="space-y-3">
+                <Label className="text-sm font-semibold">Lines</Label>
+                {simpleItems.map((item, ii) => (
+                  <div key={item.id ?? ii} className="grid grid-cols-1 sm:grid-cols-[1fr_90px_130px_44px] gap-2 rounded-lg border border-border p-3 sm:p-2 sm:border-0 sm:items-end">
+                    <div><Label className="text-xs text-muted-foreground">Item</Label><Input className="h-11" value={item.title} onChange={e => updateSimpleLine(ii, { title: e.target.value })} placeholder="e.g. Paint living room" /></div>
+                    <div className="grid grid-cols-2 sm:contents gap-2">
+                      <div><Label className="text-xs text-muted-foreground">Qty</Label><Input className="h-11" type="number" inputMode="decimal" min={0} value={item.quantity} onChange={e => updateSimpleLine(ii, { quantity: +e.target.value })} /></div>
+                      <div><Label className="text-xs text-muted-foreground">Price each ($)</Label><Input className="h-11" type="number" inputMode="decimal" min={0} step={0.01} value={item.unit_price} onChange={e => updateSimpleLine(ii, { unit_price: +e.target.value })} /></div>
+                    </div>
+                    <Button variant="ghost" size="icon" className="h-11 w-11 justify-self-end" aria-label="Remove line" disabled={simpleItems.length <= 1} onClick={() => setSimpleItems(items => items.filter((_, j) => j !== ii))}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+                <Button variant="outline" className="h-11 w-full sm:w-auto gap-1.5" onClick={() => setSimpleItems(items => [...items, { ...EMPTY_LINE_ITEM, tax_percent: simpleTax }])}>
+                  <Plus className="h-4 w-4" /> Add a line
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div><Label className="text-sm">Tax %</Label><Input className="h-11" type="number" inputMode="decimal" min={0} value={simpleTax} onChange={e => setSimpleTax(+e.target.value)} /></div>
+                <div><Label className="text-sm">Discount % <span className="text-muted-foreground font-normal">(optional)</span></Label><Input className="h-11" type="number" inputMode="decimal" min={0} max={100} value={discountPercent} onChange={e => setDiscountPercent(+e.target.value)} /></div>
+              </div>
+              <div><Label className="text-sm">Notes for the customer</Label><Textarea className="min-h-[88px]" value={notes} onChange={e => setNotes(e.target.value)} rows={3} placeholder="e.g. Price includes paint and cleanup." /></div>
+
+              <div className="rounded-lg border border-border bg-muted/20 p-3 text-sm space-y-1">
+                <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span className="tabular-nums">${totals.subtotal.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Discount</span><span className="tabular-nums">-${totals.discount_total.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Tax</span><span className="tabular-nums">${totals.tax_total.toFixed(2)}</span></div>
+                <div className="flex justify-between font-bold text-base pt-1 border-t border-border"><span>Total</span><span className="tabular-nums">${totals.grand_total.toFixed(2)}</span></div>
+              </div>
+
+              <button type="button" className="text-sm text-primary underline underline-offset-2 min-h-[44px]" onClick={() => setSimpleView(false)}>More options</button>
+            </div>
+            ) : (
             <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
               {!isEdit && (
                 <div className="space-y-2">
@@ -371,11 +435,15 @@ export default function EstimateBuilderDialog({ open, onOpenChange, editId, defa
                 <div><Label className="text-xs text-muted-foreground">Terms & Conditions</Label><Textarea value={termsConditions} onChange={e => setTermsConditions(e.target.value)} rows={2} placeholder="Standard terms…" /></div>
               </div>
               <div><Label className="text-xs text-muted-foreground">Internal Notes (not visible to customer)</Label><Textarea value={internalNotes} onChange={e => setInternalNotes(e.target.value)} rows={2} placeholder="Margin notes…" className="border-dashed" /></div>
+              {canUseSimpleView && (
+                <button type="button" className="text-sm text-primary underline underline-offset-2 min-h-[44px]" onClick={() => setSimpleView(true)}>Simple view</button>
+              )}
             </div>
+            )}
 
             <div className="border-t border-border bg-muted/30 px-6 py-4">
               <div className="flex items-end justify-between gap-6">
-                <div className="flex-1 grid grid-cols-3 sm:grid-cols-6 gap-x-4 gap-y-1 text-sm">
+                <div className={`flex-1 grid grid-cols-3 sm:grid-cols-6 gap-x-4 gap-y-1 text-sm ${simpleView ? "invisible" : ""}`}>
                   <div><span className="text-muted-foreground text-xs">Subtotal</span><br/><span className="tabular-nums">${totals.subtotal.toFixed(2)}</span></div>
                   {totals.labor_total > 0 && <div><span className="text-muted-foreground text-xs">Labor</span><br/><span className="tabular-nums">${totals.labor_total.toFixed(2)}</span></div>}
                   {totals.material_total > 0 && <div><span className="text-muted-foreground text-xs">Materials</span><br/><span className="tabular-nums">${totals.material_total.toFixed(2)}</span></div>}
