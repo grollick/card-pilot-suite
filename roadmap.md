@@ -15,3 +15,4 @@
 - [ ] Add product configuration, PayPal button, Plans page, pending strip and admin Subscriptions section.
 - [ ] Open paid pricing and upgrade links only after subscription safeguards are ready.
 - [ ] Test rules, deploy functions and verify without making a live purchase; report remaining limitations.
+- [ ] After Batch Q exists, use the confirmed shared client ID for all four products, remove the Agency provisional note, update affected tests and redeploy importing functions; blocked by unfinished Batch Q and absent configs.
