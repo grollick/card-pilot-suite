@@ -87,6 +87,7 @@ const TOTAL_STEPS = 12;
 export default function Onboarding() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const rerun = searchParams.get("rerun") === "true";
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -120,8 +121,8 @@ export default function Onboarding() {
   const [publishedHandle, setPublishedHandle] = useState("");
   const { data: existingProfile } = useProfileCache();
   useEffect(() => {
-    if (existingProfile?.onboarding_completed && !launched) navigate("/app", { replace: true });
-  }, [existingProfile?.onboarding_completed, launched, navigate]);
+    if (existingProfile?.onboarding_completed && !launched && !rerun) navigate("/app", { replace: true });
+  }, [existingProfile?.onboarding_completed, launched, rerun, navigate]);
   const [socialLinks, setSocialLinks] = useState<{ platform: string; url: string }[]>([]);
 
   // AI state

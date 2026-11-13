@@ -258,7 +258,7 @@ export default function SettingsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => navigate("/onboarding")}>
+            <AlertDialogAction onClick={() => navigate("/onboarding?rerun=true")}>
               Continue
             </AlertDialogAction>
           </AlertDialogFooter>

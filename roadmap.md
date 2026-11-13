@@ -16,3 +16,8 @@
 - [ ] Open paid pricing and upgrade links only after subscription safeguards are ready.
 - [ ] Test rules, deploy functions and verify without making a live purchase; report remaining limitations.
 - [ ] After Batch Q exists, use the confirmed shared client ID for all four products, remove the Agency provisional note, update affected tests and redeploy importing functions; blocked by unfinished Batch Q and absent configs.
+
+# Monitoring fixes
+- [x] Verify and fix card design and pending-save isolation when switching cards; two regression tests reproduce the old failure and pass after the fix.
+- [x] Verify and fix explicit setup-wizard reruns for completed accounts; three regression tests and signed-in Settings → Continue → profession selection pass.
+- [x] Check signed-in editor and full test suite; resolve confirmed findings. Live second-card switching is blocked by the existing cards_user_id_unique constraint; no schema change was made.

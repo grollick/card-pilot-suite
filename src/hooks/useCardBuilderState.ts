@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -99,8 +99,74 @@ export function useCardBuilderState() {
   const displayJobTitle = jobTitle || professionName;
 
 
+  const pendingThemeFieldsRef = useRef<Record<string, any>>({});
+
+  // Scope all local drafts and delayed saves to the selected card.
+  useLayoutEffect(() => {
+    hydrated.current = false;
+    hydratedCardId.current = null;
+    coverUrlRef.current = null;
+    pendingThemeFieldsRef.current = {};
+    setSections(DEFAULT_SECTIONS);
+    setPublished(false);
+    setCoverUrl(null);
+    setAvatarBgColor("transparent");
+    setAvatarRotation(0);
+    setCoverOffsetY(0);
+    setCoverFlipX(false);
+    setCoverHeight(144);
+    setLogoUrl(null);
+    setLogoFrostedBg(true);
+    setLogoGlow(false);
+    setLogoPosition("top-right");
+    setLogoSize("medium");
+    setLogoOpacity(100);
+    setLogoPadding(4);
+    setLogoNameGap(8);
+    setLogoVerticalAlign("center");
+    setLogoCustomPosition(null);
+    setCtaConfig(DEFAULT_CTA_CONFIG);
+    setCtaIconsOnly(false);
+    setSocialIconsOnly(true);
+    setSocialBtnColor("");
+    setSocialBtnStyle("auto");
+    setShowSectionIcons(false);
+    setEditingSection(null);
+    setThemeEditorOpen(false);
+    setThemePreviewOverrides(null);
+    setPendingThemeFields({});
+    setEditName(null);
+    setEditCompany(null);
+    setEditJobTitle(null);
+    setJobTitle(null);
+    setBoldLastName(false);
+    setUppercaseName(false);
+    setNameLetterSpacing(0);
+    setNameFontWeight(700);
+    setFirstNameFontWeight(null);
+    setNameItalic(false);
+    setNameFontSize(null);
+    setSubtitleFontSize(null);
+    setSubtitleItalic(false);
+    setSubtitleSpacing(null);
+    setShowCompany(true);
+    setIdentityPosition(null);
+    setNameLineHeight(null);
+    setNameTextStroke(false);
+    setNameTextStrokeWidth(1);
+    setCompanyColor(null);
+    setIdentitySaveState({});
+    setGlobalSaveState("idle");
+    return () => {
+      clearTimeout(saveTimer.current);
+      clearTimeout(globalSaveTimer.current);
+      Object.values(identitySaveTimers.current).forEach(clearTimeout);
+      identitySaveTimers.current = {};
+    };
+  }, [activeCardId]);
+
   // ── Hydrate from DB ──
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (card && (!hydrated.current || hydratedCardId.current !== (card as any).id)) {
       hydrated.current = true;
       hydratedCardId.current = (card as any).id;
@@ -157,16 +223,13 @@ export function useCardBuilderState() {
       if (t?.social_btn_style) setSocialBtnStyle(t.social_btn_style);
       if (t?.cta_config && Array.isArray(t.cta_config)) setCtaConfig(t.cta_config as CtaItem[]);
     }
-  }, [card]);
+  }, [card, activeCardId]);
 
   useEffect(() => {
     if (profile?.avatar_url) setAvatarUrl(profile.avatar_url);
   }, [profile]);
 
   // ── Save helpers ──
-  const pendingThemeFieldsRef = useRef<Record<string, any>>({});
-  // Keep ref in sync
-  useEffect(() => { pendingThemeFieldsRef.current = pendingThemeFields; }, [pendingThemeFields]);
 
   const saveThemeField = useCallback(async (fields: Record<string, any>) => {
     // Apply locally FIRST for instant preview update
@@ -374,7 +437,7 @@ export function useCardBuilderState() {
       const allSynced = Object.keys(pendingThemeFields).every(
         key => JSON.stringify(dbJson[key]) === JSON.stringify(pendingThemeFields[key])
       );
-      if (allSynced) setPendingThemeFields({});
+      if (allSynced) { pendingThemeFieldsRef.current = {}; setPendingThemeFields({}); }
     }
   }, [card?.theme_json, pendingThemeFields]);
 
